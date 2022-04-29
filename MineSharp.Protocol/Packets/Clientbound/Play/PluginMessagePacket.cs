@@ -4,11 +4,11 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class PluginMessagePacket : Packet {
 
         public Identifier? Channel { get; private set; }
-        public byte[]? /* TODO: ARRAY */ Data { get; private set; }
+        public byte[]? Data { get; private set; }
 
         public PluginMessagePacket() { }
 
-        public PluginMessagePacket(Identifier? channel, byte[]? /* TODO: ARRAY */ data) {
+        public PluginMessagePacket(Identifier? channel, byte[]? data) {
             this.Channel = channel;
             this.Data = data;
         }

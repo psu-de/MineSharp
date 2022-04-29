@@ -34,5 +34,7 @@ namespace MineSharp.Core.Types {
         public override string ToString() {
             return $"({X} / {Y} / {Z})";
         }
+
+        public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
     }
 }

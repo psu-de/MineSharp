@@ -11,7 +11,7 @@ namespace MineSharp.Bot.Enums {
         BlockNotLoaded,
         TooFar,
         NotDiggable,
-        Failed
-
+        Failed,
+        Cancelled
     }
 }

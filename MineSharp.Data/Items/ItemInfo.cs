@@ -40,13 +40,6 @@ namespace MineSharp.Data.Items {
             return 1;
         }
 
-        public bool CanHarvest(Blocks.BlockInfo info) {
-
-            if (info.HarvestTools == null) return true;
-
-            return info.HarvestTools.Contains(this.Id);
-        }
-
         public int GetToolMultiplier(Blocks.BlockInfo info) {
 
             if (info.Material.Contains("/")) {

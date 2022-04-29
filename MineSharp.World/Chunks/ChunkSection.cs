@@ -72,7 +72,7 @@ namespace MineSharp.World.Chunks {
             return BlockData.StateToBlockMap[state];
         }
 
-        public Task<Block?> FindBlockAsync(BlockType type) {
+        public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {
 
             return Task.Factory.StartNew(() => {
                 var blockInfo = BlockData.Blocks[(int)type];
@@ -81,6 +81,7 @@ namespace MineSharp.World.Chunks {
                 for (int y = 0; y < Chunk.ChunkSectionLength; y++) {
                     for (int z = 0; z < Chunk.ChunkSectionLength; z++) {
                         for (int x = 0; x < Chunk.ChunkSectionLength; x++) {
+                            if (cancellation?.IsCancellationRequested ?? false) return null;
                             int value = BlockStorage.GetAt(GetIndex(x, y, z));
                             if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId)
                                 return GetBlockAt(new Position(x, y, z));
@@ -92,7 +93,7 @@ namespace MineSharp.World.Chunks {
             });
         }
 
-        public Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1) {
+        public Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) {
 
             return Task.Factory.StartNew(() => {
 
@@ -104,6 +105,7 @@ namespace MineSharp.World.Chunks {
                 for (int y = 0; y < Chunk.ChunkSectionLength; y++) {
                     for (int z = 0; z < Chunk.ChunkSectionLength; z++) {
                         for (int x = 0; x < Chunk.ChunkSectionLength; x++) {
+                            if (cancellation?.IsCancellationRequested ?? false) return null;
                             int value = BlockStorage.GetAt(GetIndex(x, y, z));
                             if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId) {
                                 blocks.Add(GetBlockAt(new Position(x, y, z)));

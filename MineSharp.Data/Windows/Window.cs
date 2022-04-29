@@ -2,15 +2,9 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Items;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Data.Windows {
     public abstract class Window {
-
         private static Logger Logger = Logger.GetLogger();
 
         public delegate void EmptyEvent(Window sender);
@@ -63,6 +57,17 @@ namespace MineSharp.Data.Windows {
 
         protected abstract ItemInfo[]? GetAllowedItemsForSlot(int slotIndex);
 
+        public WindowSlot[] GetHotbarSlots() {
+
+            WindowSlot[] slots = new WindowSlot[9];
+
+            for (int i = 0; i < 9; i++) {
+                slots[i] = Slots[i + HotbarStart];
+            }
+
+            return slots;
+        }
+
         public void SetSlot(int index, Slot? slot) {
             if (index < 0 || index >= this.SlotCount) throw new IndexOutOfRangeException();
 
@@ -86,10 +91,10 @@ namespace MineSharp.Data.Windows {
 
         public void Click(short slotIndex, WindowOperationMode mode, byte button) {
             switch (mode) {
-                case WindowOperationMode.MouseLeftRight:        handleMouseClick(slotIndex, button); break;
-                case WindowOperationMode.ShiftMouseLeftRight:   handleShiftMouseClick(slotIndex, button); break;
-                case WindowOperationMode.Hotkey:                handleHotkeyClick(slotIndex, button); break;
-                case WindowOperationMode.DropKey:               handleDropKeyClick(slotIndex, button); break;
+                case WindowOperationMode.MouseLeftRight: handleMouseClick(slotIndex, button); break;
+                case WindowOperationMode.ShiftMouseLeftRight: handleShiftMouseClick(slotIndex, button); break;
+                case WindowOperationMode.Hotkey: handleHotkeyClick(slotIndex, button); break;
+                case WindowOperationMode.DropKey: handleDropKeyClick(slotIndex, button); break;
                 default: throw new NotImplementedException();
             }
 
@@ -239,7 +244,7 @@ namespace MineSharp.Data.Windows {
 
                     } else {
                         start = 0;
-                        end = this.InventoryStart;                        
+                        end = this.InventoryStart;
                     }
 
                     int idx = -1;
@@ -282,7 +287,7 @@ namespace MineSharp.Data.Windows {
         private int FindNextSlotToFillUp(Item item, int start, int end, bool allowsShift) {
             int[] indicies = this.Slots.Where(x => x.Value.Item != null && x.Value.Item.Info.Id == item.Info.Id && (item.Info.StackSize - x.Value.Item.Count) > 0).Select(x => x.Key).ToArray();
             if (indicies.Length > 0) return indicies[0];
-            
+
             return FindEmptySlot(start, end, allowsShift);
         }
 

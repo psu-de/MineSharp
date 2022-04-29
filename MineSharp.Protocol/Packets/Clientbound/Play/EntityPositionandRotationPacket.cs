@@ -1,6 +1,6 @@
 using MineSharp.Core.Types;
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
-    public class EntityPositionandRotationPacket : Packet {
+    public class EntityPositionAndRotationPacket : Packet {
 
         public int EntityID { get; private set; }
         public short DeltaX { get; private set; }
@@ -10,9 +10,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public Angle? Pitch { get; private set; }
         public bool OnGround { get; private set; }
 
-        public EntityPositionandRotationPacket() { }
+        public EntityPositionAndRotationPacket() { }
 
-        public EntityPositionandRotationPacket(int entityid, short deltax, short deltay, short deltaz, Angle? yaw, Angle? pitch, bool onground) {
+        public EntityPositionAndRotationPacket(int entityid, short deltax, short deltay, short deltaz, Angle? yaw, Angle? pitch, bool onground) {
             this.EntityID = entityid;
             this.DeltaX = deltax;
             this.DeltaY = deltay;

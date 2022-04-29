@@ -44,6 +44,14 @@ namespace MineSharp.Data.Blocks {
             HarvestTools = harvestTools;
         }
 
+        public bool CanBeHarvested(Items.ItemInfo? info) {
+            if (this.HarvestTools == null) return true;
+
+            if (info == null) return false;
+
+            return this.HarvestTools.Contains(info.Id);
+        }
+
         public int CalculateBreakingTime(Items.ItemInfo? info) {
 
             Logger.GetLogger().Info(info?.DisplayName ?? " No item");
@@ -60,7 +68,7 @@ namespace MineSharp.Data.Blocks {
 
             float damage = toolMultiplier / (float)this.Hardness;
 
-            bool canHarvest = info.CanHarvest(this);
+            bool canHarvest = this.CanBeHarvested(info);
             if (canHarvest) {
                 damage /= 30f;
             } else {

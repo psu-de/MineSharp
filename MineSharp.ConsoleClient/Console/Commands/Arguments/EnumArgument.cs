@@ -1,0 +1,42 @@
+﻿using PrettyPrompt.Completion;
+using PrettyPrompt.Highlighting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
+    internal class EnumArgument<T> : Argument where T : Enum {
+
+        public EnumArgument(string name, bool isOptional = false) : base(name, isOptional) { }
+
+        public override string Color { get => "cornflowerblue"; set => throw new NotImplementedException(); }
+
+        public override List<CompletionItem> GetCompletionItems(string str) {
+            return Enum.GetNames(typeof(T)).Select(x => {
+                return new CompletionItem(
+                    replacementText: x,
+                    displayText: CColor.FromMarkup($"[{Color}]{x}[/]")
+                    );
+            }).ToList();
+        }
+
+        public override bool IsValid(string str) {
+            return Enum.TryParse(typeof(T), str, out var _);
+        }
+
+        public override bool Match(ref string str) {
+            bool complete = str.Contains(' ');
+
+            str = string.Join(' ', str.Split(' ').Skip(1).ToArray());
+            return complete;
+        }
+
+        public T? GetValue(string str) {
+            if (!Enum.TryParse(typeof(T), str, out var bt))
+                return default(T);
+            return (T)bt;
+        }
+    }
+}

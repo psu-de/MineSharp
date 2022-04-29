@@ -40,7 +40,11 @@ namespace MineSharp.Bot {
         /// </summary>
         public event BotEntityEvent EntityDespawned;
 
-        public Player Player { get; private set; }
+        /// <summary>
+        /// Fires when an entity moved
+        /// </summary>
+        public event BotEntityEvent EntityMoved;
+        public Player BotEntity { get; private set; }
         private bool isPlayerLoaded = false;
 
         /// <summary>
@@ -58,12 +62,17 @@ namespace MineSharp.Bot {
         }
 
         private void InitPlayer(Protocol.Packets.Clientbound.Play.JoinGamePacket packet1, Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket packet2) {
-            this.Player = new Player(this.Options.UsernameOrEmail, this.Session.UUID, 0, packet1.Gamemode, packet1.EntityID, new Vector3( packet2.X, packet2.Y, packet2.Z), packet2.Pitch, packet2.Yaw);
+            this.BotEntity = new Player(this.Options.UsernameOrEmail, this.Session.UUID, 0, packet1.Gamemode, packet1.EntityID, new Vector3( packet2.X, packet2.Y, packet2.Z), packet2.Pitch, packet2.Yaw);
             Logger.Info($"Initialized Player entity: Location=({packet2.X} / {packet2.Y} / {packet2.Z})");
+
+            if (false == this.PlayerMapping.TryAdd(this.Session.UUID, this.BotEntity)) {
+                this.PlayerMapping[this.Session.UUID] = this.BotEntity;
+            }
+
             isPlayerLoaded = true;
 
             this.Client.SendPacket(new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
-                packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, true)); //TODO: Change onGround=true
+                packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround)); 
         }
 
 
@@ -78,10 +87,20 @@ namespace MineSharp.Bot {
             switch (packet.Action) {
                 case PlayerInfoAction.AddPlayer: //TODO: Nich ganz korrekt, wird auch gesendet wenn davor schon spieler aufm server waren
                     foreach ((UUID uuid, object? data) in packet.Players) {
+
                         PlayerInfo dat = (PlayerInfo)data;
                         string name = dat.Name;
+                        if (name == Session.Username) continue;
+
                         GameMode gm = dat.GameMode;
                         int ping = dat.Ping;
+                        if (this.PlayerMapping.ContainsKey(uuid)) {
+                            this.PlayerMapping[uuid].Username = name;
+                            this.PlayerMapping[uuid].Ping = ping;
+                            this.PlayerMapping[uuid].GameMode = gm;
+                            continue;
+                        }
+
                         Player newPlayer = new Player(name, uuid, ping, gm, -1, new Vector3( double.NaN, double.NaN, double.NaN), float.NaN, float.NaN);
                         if (!PlayerMapping.TryAdd(uuid, newPlayer)) { Logger.Debug("Could not add player"); return; }
                         PlayerJoined?.Invoke(newPlayer);
@@ -114,7 +133,14 @@ namespace MineSharp.Bot {
         }
 
         private void handleSpawnLivingEntity(Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket packet) {
-            Entity newEntity = new Entity(Entities.EntitiesByType[packet.Type], packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z), packet.Pitch, packet.Yaw, new Vector3(packet.VelocityX, packet.VelocityY, packet.VelocityZ));
+            Entity newEntity = new Entity(
+                Entities.EntitiesByType[packet.Type], 
+                packet.EntityId, 
+                new Vector3(packet.X, packet.Y, packet.Z), 
+                packet.Pitch, 
+                packet.Yaw, 
+                new Vector3(packet.VelocityX / Version.VelocityToBlock, packet.VelocityY / Version.VelocityToBlock, packet.VelocityZ / Version.VelocityToBlock),
+                true);
             AddEntity(newEntity);
         }
 
@@ -125,6 +151,67 @@ namespace MineSharp.Bot {
                 this.EntityDespawned?.Invoke(entity);
 
             }
+        }
+
+        private void handleUpdateEntityVelocity(Protocol.Packets.Clientbound.Play.EntityVelocityPacket packet) {
+            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+
+            EntitiesMapping[packet.EntityID].Velocity = new Vector3(packet.VelocityX / Version.VelocityToBlock, packet.VelocityY / Version.VelocityToBlock, packet.VelocityZ / Version.VelocityToBlock);
+        }
+
+        private void handleEntityPosition(Protocol.Packets.Clientbound.Play.EntityPositionPacket packet) {
+            
+            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+
+            EntitiesMapping[packet.EntityID].Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
+            EntitiesMapping[packet.EntityID].IsOnGround = packet.OnGround;
+
+            EntityMoved?.Invoke(EntitiesMapping[packet.EntityID]);
+        }
+
+        private void handleEntityPositionAndRotation(Protocol.Packets.Clientbound.Play.EntityPositionAndRotationPacket packet) {
+            
+            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+
+            EntitiesMapping[packet.EntityID].Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
+            EntitiesMapping[packet.EntityID].Yaw = packet.Yaw;
+            EntitiesMapping[packet.EntityID].Pitch = packet.Pitch;
+            EntitiesMapping[packet.EntityID].IsOnGround = packet.OnGround;
+
+            EntityMoved?.Invoke(EntitiesMapping[packet.EntityID]);
+        }
+
+        private void handleEntityRotation(Protocol.Packets.Clientbound.Play.EntityRotationPacket packet) {
+            
+            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+
+            EntitiesMapping[packet.EntityID].Yaw = packet.Yaw;
+            EntitiesMapping[packet.EntityID].Pitch = packet.Pitch;
+            EntitiesMapping[packet.EntityID].IsOnGround = packet.OnGround;
+
+            EntityMoved?.Invoke(EntitiesMapping[packet.EntityID]);
+        }
+
+        private void handlePlayerPositionAndLook(Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket packet) {
+
+            if ((packet.Flags & 0x01) == 0x01) this.BotEntity.Position.X += packet.X;
+            else this.BotEntity.Position.X = packet.X;
+
+            if ((packet.Flags & 0x02) == 0x02) this.BotEntity.Position.Y += packet.Y;
+            else this.BotEntity.Position.Y = packet.Y;
+
+            if ((packet.Flags & 0x04) == 0x04) this.BotEntity.Position.Z += packet.Z;
+            else this.BotEntity.Position.Z = packet.Z;
+
+            if ((packet.Flags & 0x08) == 0x08) this.BotEntity.Pitch += packet.Pitch;
+            else this.BotEntity.Pitch = packet.Pitch;
+
+            if ((packet.Flags & 0x10) == 0x10) this.BotEntity.Yaw += packet.Yaw;
+            else this.BotEntity.Yaw = packet.Yaw;
+
+            // TODO: Dismount Vehicle
+
+            this.Client.SendPacket(new Protocol.Packets.Serverbound.Play.TeleportConfirmPacket(packet.TeleportID));
         }
     }
 }

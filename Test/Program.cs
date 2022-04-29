@@ -15,11 +15,17 @@ using MineSharp.Data.Biomes;
 using MineSharp.Data;
 using MineSharp.Data.Windows;
 
-Logger Logger = Logger.GetLogger("Main");
+using ConInp;
+using System.Reflection;
 
+
+
+Console.ReadKey();
+
+
+Logger Logger = Logger.GetLogger("Main");
 MinecraftData.Load();
 
-Bot bot = null;
 //MineSharp.World.World world = new MineSharp.World.World();
 
 //var chunk = new MineSharp.World.Chunks.Chunk(0, 0, File.ReadAllBytes("chunk_-11_-4.dump"));
@@ -40,8 +46,10 @@ Bot bot = null;
 //Console.ReadKey();
 //Environment.Exit(0);
 
+MineSharp.Bot.Bot bot;
+
 Task.Run(async () => {
-    bot = new Bot(new Bot.BotOptions() {
+     bot = new Bot(new Bot.BotOptions() {
         Host = "127.0.0.1",
         Offline = true,
         UsernameOrEmail = "afk_paul4",
@@ -68,21 +76,18 @@ Task.Run(async () => {
     bot.EntitySpawned += Event_EntitySpawned;
     //bot.EntityDespawned += Event_EntityDespawned;
 
-    //await Task.Delay(3000);
 
-    //client.SendPacket(new PlayerDiggingPacket(0, new MineSharp.Core.Types.Position(312, 62, 787), 1));
-
-    //await Task.Delay(7500);
-
-    //client.SendPacket(new PlayerDiggingPacket(2, new MineSharp.Core.Types.Position(312, 62, 787), 1));
-
-    //Logger.Info("Sent " + nameof(PlayerDiggingPacket));
 
 
     await bot.Connect();
     await bot.WaitUntilLoaded();
 
     await Task.Delay(1000);
+    await Task.Delay(3000);
+
+    await bot.MineBlock(bot.World.GetBlockAt(new MineSharp.Core.Types.Position(331, 72, 793)));
+
+    Logger.Info("Sent " + nameof(PlayerDiggingPacket));
     //Logger.Info("Picking up item");
     //bot.Inventory.Click((short)InventoryWindow.InvSlots.HotBarStart, WindowOperationMode.MouseLeftRight, 0);
     //await Task.Delay(1000);
@@ -100,9 +105,9 @@ Task.Run(async () => {
 
 void Event_EntitySpawned(Entity entity) {
 
-    if (bot.Player == null) return; // TODO: PlayerLoaded awaiten
+    if (bot.BotEntity == null) return; // TODO: PlayerLoaded awaiten
 
-    if (entity.Position.DistanceSquared(bot.Player.Position) < 36) {
+    if (entity.Position.DistanceSquared(bot.BotEntity.Position) < 36) {
 
         Logger.Info("Attack entity " + entity.EntityInfo.Name + " at " + entity.Position);
         bot.Attack(entity);
@@ -111,6 +116,8 @@ void Event_EntitySpawned(Entity entity) {
 
 new Thread(() => {
     while (true) {
+        Thread.Sleep(1000);
+        break;
         string? str = Console.ReadLine();
         if (str != null) {
 
@@ -121,29 +128,29 @@ new Thread(() => {
 
                 switch (parts.Length) {
                     case 1:
-                        BlockType type = (BlockType)Enum.Parse(typeof(BlockType), str);
-                        if (type != null) {
-                            var block = bot.World.FindBlocksAsync(type).GetAwaiter().GetResult();
-                            if (block == null) {
-                                Logger.Info("No block was found");
-                                continue;
-                            }
-                            Logger.Info($"Found {block.Length} Blocks: " + String.Join(",", block.Select(b => b.ToString()).Take(block.Length > 10 ? 10 : block.Length)));
-                        }
+                        //BlockType type = (BlockType)Enum.Parse(typeof(BlockType), str);
+                        //if (type != null) {
+                        //    var block = bot.World.FindBlocksAsync(type).GetAwaiter().GetResult();
+                        //    if (block == null) {
+                        //        Logger.Info("No block was found");
+                        //        continue;
+                        //    }
+                        //    Logger.Info($"Found {block.Length} Blocks: " + String.Join(",", block.Select(b => b.ToString()).Take(block.Length > 10 ? 10 : block.Length)));
+                        //}
                         //int slot = int.Parse(str);
                         //Logger.Info("Switching to slot " + slot);
                         //bot.SelectHotbarSlot((byte)slot).GetAwaiter().GetResult();
                         break;
                     case 3:
-                        //int x = int.Parse(parts[0]);
-                        //int y = int.Parse(parts[1]);
-                        //int z = int.Parse(parts[2]);
-                        //var pos = new Position(x, y, z);
-                        //Logger.Info(pos.ToString());
-                        //var block = bot.World.GetBlockAt(pos);
-                        //Logger.Info("Breaking: " + block.ToString() + " Hardness=" + block.Info.Hardness);
-                        //var result = bot.MineBlock(block).GetAwaiter().GetResult();
-                        //Logger.Info("Finished: " + Enum.GetName(typeof(MineSharp.Bot.Enums.MineBlockStatus), result));
+                        int x = int.Parse(parts[0]);
+                        int y = int.Parse(parts[1]);
+                        int z = int.Parse(parts[2]);
+                        var pos = new Position(x, y, z);
+                        Logger.Info(pos.ToString());
+                        var block = bot.World.GetBlockAt(pos);
+                        Logger.Info("Breaking: " + block.ToString() + " Hardness=" + block.Info.Hardness);
+                        var result = bot.MineBlock(block).GetAwaiter().GetResult();
+                        Logger.Info("Finished: " + Enum.GetName(typeof(MineSharp.Bot.Enums.MineBlockStatus), result));
                         break;
                 }
 
@@ -166,5 +173,6 @@ void Event_HeldItemChanged(MineSharp.Data.Items.Item item) {
     Logger.Info("Held item: " + item);
 }
 
-Console.ReadKey();
-Console.ReadKey();
+while (true) {
+    Console.ReadKey();
+}

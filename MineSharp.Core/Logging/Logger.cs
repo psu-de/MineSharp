@@ -4,7 +4,9 @@ using System.Reflection;
 namespace MineSharp.Core.Logging {
     public class Logger {
 
-        public static LogLevel Threshold = LogLevel.DEBUG2;
+        public static LogLevel Threshold = LogLevel.DEBUG3;
+
+        public static TextWriter LogWriter = Console.Out;
 
         public static Logger GetLogger(string? module = null) {
             return new Logger(module ?? NamespaceOfCallingClass());
@@ -58,7 +60,8 @@ namespace MineSharp.Core.Logging {
 
             string logMessage = $"[{logl}][{time}][{name}] > {message}";
 
-            Console.WriteLine(logMessage);
+            LogWriter.WriteLine(logMessage);
+            System.Diagnostics.Debug.WriteLine(logMessage); 
         }
 
         private string GetLogLevelString(LogLevel level) {

@@ -165,7 +165,7 @@ namespace MineSharp.Protocol.Packets {
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x27, typeof(MapDataPacket));
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x28, typeof(TradeListPacket));
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x29, typeof(EntityPositionPacket));
-            InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x2A, typeof(EntityPositionandRotationPacket));
+            InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x2A, typeof(EntityPositionAndRotationPacket));
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x2B, typeof(EntityRotationPacket));
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x2C, typeof(Clientbound.Play.VehicleMovePacket));
             InitPacket(GameState.PLAY, PacketFlow.CLIENTBOUND, 0x2D, typeof(OpenBookPacket));

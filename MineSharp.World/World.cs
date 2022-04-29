@@ -93,10 +93,13 @@ namespace MineSharp.World {
             }
         }
 
-        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1) {
+        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) {
             List<Block> blocks = new List<Block>();
             foreach (var chunk in this.Chunks.Values) {
-                var chunkBlocks = await chunk.FindBlocksAsync(type, count - blocks.Count);
+                var chunkBlocks = await chunk.FindBlocksAsync(type, count - blocks.Count, cancellation);
+
+                if (cancellation?.IsCancellationRequested ?? false) return null;
+
                 if (chunkBlocks != null) {
                     blocks.AddRange(chunkBlocks);
                     if (count > 0 && blocks.Count >= count) {
@@ -109,9 +112,10 @@ namespace MineSharp.World {
             return blocks.ToArray();
         }
 
-        public async Task<Block?> FindBlockAsync(BlockType type) {
+        public async Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {
             foreach (var chunk in this.Chunks.Values) {
-                var block = await chunk.FindBlockAsync(type);
+                var block = await chunk.FindBlockAsync(type, cancellation);
+                if (cancellation?.IsCancellationRequested ?? false) return null; 
                 if (block != null) return block;
             }
 

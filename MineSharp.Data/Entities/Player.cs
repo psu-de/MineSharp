@@ -14,7 +14,7 @@ namespace MineSharp.Data.Entities {
         public int Ping { get; set; }
         public GameMode GameMode { get; set; }
 
-        public Player(string username, UUID uuid, int ping, GameMode gamemode, int id, Vector3 pos, float pitch, float yaw) : base(Entities.PLAYER, id, pos, pitch, yaw, Vector3.Zero) {
+        public Player(string username, UUID uuid, int ping, GameMode gamemode, int id, Vector3 pos, float pitch, float yaw) : base(Entities.PLAYER, id, pos, pitch, yaw, Vector3.Zero, true) {
             this.Username = username;
             this.UUID = uuid;
             this.Ping = ping;

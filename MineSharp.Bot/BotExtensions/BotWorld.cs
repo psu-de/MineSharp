@@ -1,4 +1,5 @@
 ﻿using MineSharp.Bot.Enums;
+using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
@@ -46,7 +47,10 @@ namespace MineSharp.Bot {
             var chunk = World.GetChunkAt(sectionX, sectionZ);
             if (chunk == null) return;
             chunk.ChunkSections[sectionY].Update(packet.Blocks);
-
         }
+
+        public Block GetBlockAt(Position pos) => World.GetBlockAt(pos);
+        public Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) => World.FindBlocksAsync(type, count, cancellation);
+        public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) => World.FindBlockAsync(type, cancellation);
     }
 }

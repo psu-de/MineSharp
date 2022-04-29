@@ -2,6 +2,7 @@
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Core.Versions;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Entities;
 using MineSharp.Data.Windows;
@@ -24,6 +25,7 @@ namespace MineSharp.Bot {
             public ushort? Port;
         }
 
+        public MinecraftVersion Version { get; private set; }
         public MinecraftClient Client { get; private set; }
         public BotOptions Options { get; private set; }
         public Session Session { get; private set; }
@@ -41,7 +43,9 @@ namespace MineSharp.Bot {
 
 
         public Bot(BotOptions options) {
-            this.Options = options; 
+            this.Options = options;
+            this.Version = new MinecraftVersion(this.Options.Version);
+
             if (this.Options.Offline == true) {
                 this.Session = Session.OfflineSession(this.Options.UsernameOrEmail);
             } else {
@@ -56,16 +60,17 @@ namespace MineSharp.Bot {
             this.LoadWindows();
             this.LoadEntities();
             this.LoadWorld();
+            this.LoadMovements();
         }
 
         private partial void LoadWindows();
         private partial void LoadEntities();
         private partial void LoadWorld();
+        private partial void LoadMovements();
 
-        public async Task<bool> Connect () {
+        public async Task<bool> Connect() {
             this.Health = 20;
-            await this.Client.Connect(GameState.LOGIN);
-            return true;
+            return await this.Client.Connect(GameState.LOGIN);
         }
 
         public async Task WaitUntilLoaded() {
@@ -74,17 +79,18 @@ namespace MineSharp.Bot {
             }
         }
 
-        public Task<T> WaitForPacket<T>() where T: Packet {
+        public Task<Packet> WaitForPacket<T>() where T : Packet {
             Type packetType = typeof(T);
             if (!packetWaiters.TryGetValue(packetType, out var task)) {
                 TaskCompletionSource<Packet> tsc = new TaskCompletionSource<Packet>();
                 this.packetWaiters.Add(packetType, tsc);
-                return tsc.Task as Task<T> ?? throw new ArgumentNullException();
-            } else return task.Task as Task<T> ?? throw new ArgumentNullException();
+
+                return tsc.Task ?? throw new ArgumentNullException();
+            } else return task.Task ?? throw new ArgumentNullException();
         }
 
         private void Events_PacketReceived(MinecraftClient client, Packet packet) {
-            
+
             Type packetType = packet.GetType();
             if (packetWaiters.TryGetValue(packetType, out var tsc)) {
                 tsc.TrySetResult(packet);
@@ -94,36 +100,41 @@ namespace MineSharp.Bot {
             switch (packet) {
 
                 // Base
-                case Protocol.Packets.Clientbound.Play.JoinGamePacket                   p_0x26: handleJoinGame(p_0x26); break;
-                case Protocol.Packets.Clientbound.Play.DeathCombatEventPacket           p_0x35: handleDeathCombat(p_0x35); break;
-                case Protocol.Packets.Clientbound.Play.DestroyEntitiesPacket            p_0x3A: handleDespawnEntity(p_0x3A); break;
-                case Protocol.Packets.Clientbound.Play.RespawnPacket                    p_0x3D: handleRespawn(p_0x3D); break;
-                case Protocol.Packets.Clientbound.Play.UpdateHealthPacket               p_0x52: handleUpdateHealth(p_0x52); break;
-                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket             p_0x48: handleHeldItemChange(p_0x48); break;
+                case Protocol.Packets.Clientbound.Play.JoinGamePacket p_0x26: handleJoinGame(p_0x26); break;
+                case Protocol.Packets.Clientbound.Play.DeathCombatEventPacket p_0x35: handleDeathCombat(p_0x35); break;
+                case Protocol.Packets.Clientbound.Play.DestroyEntitiesPacket p_0x3A: handleDespawnEntity(p_0x3A); break;
+                case Protocol.Packets.Clientbound.Play.RespawnPacket p_0x3D: handleRespawn(p_0x3D); break;
+                case Protocol.Packets.Clientbound.Play.UpdateHealthPacket p_0x52: handleUpdateHealth(p_0x52); break;
+                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket p_0x48: handleHeldItemChange(p_0x48); break;
 
                 // Entities 
-                case Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket          p_0x02: handleSpawnLivingEntity(p_0x02); break;
-                case Protocol.Packets.Clientbound.Play.SpawnPlayerPacket                p_0x04: handleSpawnPlayer(p_0x04); break;
-                case Protocol.Packets.Clientbound.Play.PlayerInfoPacket                 p_0x36: handlePlayerInfo(p_0x36); break;
+                case Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket p_0x02: handleSpawnLivingEntity(p_0x02); break;
+                case Protocol.Packets.Clientbound.Play.SpawnPlayerPacket p_0x04: handleSpawnPlayer(p_0x04); break;
+                case Protocol.Packets.Clientbound.Play.EntityPositionPacket p_0x29: handleEntityPosition(p_0x29); break;
+                case Protocol.Packets.Clientbound.Play.EntityPositionAndRotationPacket p_0x2A: handleEntityPositionAndRotation(p_0x2A); break;
+                case Protocol.Packets.Clientbound.Play.EntityRotationPacket p_0x2B: handleEntityRotation(p_0x2B); break;
+                case Protocol.Packets.Clientbound.Play.PlayerInfoPacket p_0x36: handlePlayerInfo(p_0x36); break;
+                case Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket p_0x38: handlePlayerPositionAndLook(p_0x38); break;
+                case Protocol.Packets.Clientbound.Play.EntityVelocityPacket p_0x4F: handleUpdateEntityVelocity(p_0x4F); break;
 
                 // World
-                case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket    p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
-                case Protocol.Packets.Clientbound.Play.UnloadChunkPacket                p_0x1D: handleUnloadChunk(p_0x1D); break;
-                case Protocol.Packets.Clientbound.Play.BlockChangePacket                p_0x0C: handleBlockUpdate(p_0x0C); break;
-                case Protocol.Packets.Clientbound.Play.MultiBlockChangePacket           p_0x3F: handleMultiBlockChange(p_0x3F); break;
+                case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
+                case Protocol.Packets.Clientbound.Play.UnloadChunkPacket p_0x1D: handleUnloadChunk(p_0x1D); break;
+                case Protocol.Packets.Clientbound.Play.BlockChangePacket p_0x0C: handleBlockUpdate(p_0x0C); break;
+                case Protocol.Packets.Clientbound.Play.MultiBlockChangePacket p_0x3F: handleMultiBlockChange(p_0x3F); break;
 
                 // Windows
-                case Protocol.Packets.Clientbound.Play.WindowItemsPacket                p_0x14: handleWindowItems(p_0x14); break;
-                case Protocol.Packets.Clientbound.Play.SetSlotPacket                    p_0x16: handleSetSlot(p_0x16); break;
+                case Protocol.Packets.Clientbound.Play.WindowItemsPacket p_0x14: handleWindowItems(p_0x14); break;
+                case Protocol.Packets.Clientbound.Play.SetSlotPacket p_0x16: handleSetSlot(p_0x16); break;
 
-            }            
+            }
         }
 
 
 
         #region Minecraft Interactions
 
-        public Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null) {
+        public Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null) {
             return Task.Run(async () => {
 
                 if (!block.Info.Diggable) return MineBlockStatus.NotDiggable;
@@ -134,6 +145,8 @@ namespace MineSharp.Bot {
                     // TODO: Maybe rausfinden wie des geht   
                 }
 
+                if (cancellation?.IsCancellationRequested ?? false) return MineBlockStatus.Cancelled;
+
                 var packet = new MineSharp.Protocol.Packets.Serverbound.Play.PlayerDiggingPacket(DiggingStatus.StartedDigging, block.Position, face ?? BlockFace.Top);
 
                 await this.Client.SendPacket(packet);
@@ -141,22 +154,34 @@ namespace MineSharp.Bot {
                 int time = block.Info.CalculateBreakingTime(this.HeldItem?.Info);
 
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
+
+                cancellation?.Register(() => cancelToken.Cancel());
+
                 Task<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket?> sendAgain = Task.Run(async () => {
-                    await Task.Delay(time);
+                    await Task.Delay(time, cancelToken.Token);
                     if (cancelToken.Token.IsCancellationRequested) return null;
+
                     packet.Status = DiggingStatus.FinishedDigging;
                     await this.Client.SendPacket(packet);
-                    return await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>();
+                    return await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>() as Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket;
                 });
 
-                var ack = await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>();
-                if (!ack.Successful) {
+                var ack = await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>() as Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket;
+                if (cancellation?.IsCancellationRequested ?? false) {
                     cancelToken.Cancel();
+                    await this.Client.SendPacket(new PlayerDiggingPacket(DiggingStatus.CancelledDigging, block.Position, face ?? BlockFace.Top));
+                    return MineBlockStatus.Cancelled;
+                }
+
+                if (ack.Status != DiggingStatus.StartedDigging) {
                     return MineBlockStatus.Failed;
                 }
 
                 var secondPacket = await sendAgain;
-                if (secondPacket == null || !secondPacket.Successful) return MineBlockStatus.Failed;
+                if (secondPacket == null || !secondPacket.Successful) {
+
+                    return MineBlockStatus.Failed;
+                }
 
                 return MineBlockStatus.Finished;
             });
@@ -194,19 +219,24 @@ namespace MineSharp.Bot {
 
         public Task Attack(Entity entity) {
             // TODO: Cooldown
-            if (entity.Position.DistanceSquared(this.Player.Position) > 36) throw new InvalidOperationException("Too far");
+            if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
 
             var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, false); // TODO: Change sneaking
             return this.Client.SendPacket(packet);
         }
 
-        public async Task<Window?> OpenChest (Block block) {
+        public Task Chat(string message) {
+            var packet = new Protocol.Packets.Serverbound.Play.ChatMessagePacket(message);
+            return this.Client.SendPacket(packet);
+        }
+
+        public async Task<Window?> OpenChest(Block block) {
             if (block.Info.Id != BlockType.Chest || block.Info.Id != BlockType.TrappedChest || block.Info.Id == BlockType.EnderChest) return null;
 
             var packet = new PlayerBlockPlacementPacket(0, block.Position, BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Block Face 
             await this.Client.SendPacket(packet);
 
-            var windowPacket = await WaitForPacket<Protocol.Packets.Clientbound.Play.OpenWindowPacket>();
+            var windowPacket = await WaitForPacket<Protocol.Packets.Clientbound.Play.OpenWindowPacket>() as Protocol.Packets.Clientbound.Play.OpenWindowPacket;
 
             Window? window = GetWindow(windowPacket.WindowID);
             if (window != null) { // Update window
@@ -215,7 +245,7 @@ namespace MineSharp.Bot {
 
             window = Window.CreateWindowById(windowPacket.WindowID);
             this.OpenWindows.Add(windowPacket.WindowID, window);
-            return window;  
+            return window;
         }
 
 

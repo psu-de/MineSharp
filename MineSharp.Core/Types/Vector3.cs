@@ -27,6 +27,12 @@ namespace MineSharp.Core.Types {
             this.Z = z;
         }
 
+        public void Add(Vector3 v) {
+            this.X += v.X;
+            this.Y += v.Y;
+            this.Z += v.Z;
+        }
+
         public Vector3 Plus(Vector3 v) {
             return new Vector3(this.X + v.X, this.Y + v.Y, this.Z + v.Z);
         }
@@ -34,6 +40,16 @@ namespace MineSharp.Core.Types {
         public Vector3 Minus(Vector3 v) {
             return new Vector3(this.X - v.X, this.Y - v.Y, this.Z - v.Z);
         }
+
+
+        public static Vector3 operator *(Vector3 v, int val) {
+            return new Vector3(v.X * val, v.Y * val, v.Z * val);
+        }
+
+        public static Vector3 operator /(Vector3 v, int val) {
+            return new Vector3(v.X / val, v.Y / val, v.Z / val);
+        }
+
 
         public double DistanceSquared(Vector3 v) {
             var diff = this.Minus(v);

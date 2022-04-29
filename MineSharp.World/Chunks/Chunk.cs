@@ -85,9 +85,12 @@ namespace MineSharp.World.Chunks {
             return (y - World.MinY) >> 4;
         }
 
-        public async Task<Block?> FindBlockAsync(BlockType type) {
+        public async Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {
             for (int i = 0; i < this.ChunkSections.Length; i++) {
-                var block = await this.ChunkSections[i].FindBlockAsync(type);
+                var block = await this.ChunkSections[i].FindBlockAsync(type, cancellation);
+
+                if (cancellation?.IsCancellationRequested ?? false) return null;
+
                 if (block != null) {
                     block.Position = Chunk2WorldPos(block.Position, i);
                     return block;
@@ -96,11 +99,13 @@ namespace MineSharp.World.Chunks {
             return null;
         }
 
-        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1) {
+        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) {
             List<Block> blocks = new List<Block>();
 
             for (int i = 0; i < this.ChunkSections.Length; i++) {
-                var sectionBlocks = await this.ChunkSections[i].FindBlocksAsync(type, count - blocks.Count);
+                var sectionBlocks = await this.ChunkSections[i].FindBlocksAsync(type, count - blocks.Count, cancellation);
+                if (cancellation?.IsCancellationRequested ?? false) return null;
+
                 if (sectionBlocks != null) {
                     sectionBlocks = sectionBlocks.Select(block => { block.Position = Chunk2WorldPos(block.Position, i); return block; }).ToArray();
                     blocks.AddRange(sectionBlocks);
