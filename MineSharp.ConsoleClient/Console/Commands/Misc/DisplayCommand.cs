@@ -93,7 +93,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
                 .AddItem("Food", BotClient.Bot.Food, Spectre.Console.Color.Orange4_1)
                 .AddItem("Saturation", BotClient.Bot.Saturation, Spectre.Console.Color.Yellow4));
 
-            AnsiConsole.Write(new Table().AddColumns("Position", "OnGround").AddRow(BotClient.Bot.BotEntity.Position.ToString(), BotClient.Bot.BotEntity.IsOnGround.ToString()));
+            AnsiConsole.Write(new Table().AddColumns("Position", "Velocity", "OnGround").AddRow(BotClient.Bot.BotEntity.Position.ToString(), BotClient.Bot.BotEntity.Velocity.ToString(), BotClient.Bot.BotEntity.IsOnGround.ToString()));
             AnsiConsole.WriteLine();
         }
 

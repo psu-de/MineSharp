@@ -75,7 +75,6 @@ namespace MineSharp.World.Chunks {
         public Block GetBlockAt(Position pos) {
             int sectionIndex = GetSectionIndex(pos.Y);
             var chunkPos = this.World2ChunkPos(pos);
-
             Block block = this.ChunkSections[sectionIndex].GetBlockAt(chunkPos);
             block.Position = pos;
             return block;

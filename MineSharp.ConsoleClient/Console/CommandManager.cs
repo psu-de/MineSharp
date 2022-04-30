@@ -63,12 +63,15 @@ namespace MineSharp.ConsoleClient.Console {
                 RegisterCommand(new AttackCommand());
                 RegisterCommand(new SetRotationCommand());
                 RegisterCommand(new LookAtCommand());
+                RegisterCommand(new MoveCommand());
+                RegisterCommand(new PhysicsTickCommand());
 
                 //Entities
                 RegisterCommand(new GetEntitiesCommand());
 
                 //Misc
                 RegisterCommand(new DisplayCommand());
+                RegisterCommand(new EnablePhysicsCommand());
             }
 
         }

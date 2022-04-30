@@ -36,7 +36,6 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
                     return false;
                 }
                 str = remaining.Substring(idxTo + 1);
-                System.Diagnostics.Debug.WriteLine(str);
                 return true;
             } else {
                 var splits = str.Split(' ');

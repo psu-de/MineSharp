@@ -19,7 +19,8 @@ namespace MineSharp.Core.Types {
         public double Y { get; set; }
         public double Z { get; set; }
 
-
+        public static implicit operator Position(Vector3 x) => new Position((int)x.X, (int)x.Y, (int)x.Z);  
+        public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
 
         public Vector3(double x, double y, double z) {
             this.X = x;
@@ -33,6 +34,22 @@ namespace MineSharp.Core.Types {
             this.Z += v.Z;
         }
 
+        public Vector3 Normalized () {
+            return this * Length();
+        }
+
+        public Vector3 Clone() {
+            return new Vector3(this.X, this.Y, this.Z);
+        }
+
+        public double Length() {
+            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+        }
+
+        public Vector3 Floored() {
+            return new Vector3(Math.Floor(X), Math.Floor(Y), Math.Floor(Z));    
+        }
+
         public Vector3 Plus(Vector3 v) {
             return new Vector3(this.X + v.X, this.Y + v.Y, this.Z + v.Z);
         }
@@ -43,6 +60,10 @@ namespace MineSharp.Core.Types {
 
 
         public static Vector3 operator *(Vector3 v, int val) {
+            return new Vector3(v.X * val, v.Y * val, v.Z * val);
+        }
+
+        public static Vector3 operator *(Vector3 v, double val) {
             return new Vector3(v.X * val, v.Y * val, v.Z * val);
         }
 

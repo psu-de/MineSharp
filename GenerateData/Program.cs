@@ -4,6 +4,7 @@
 using GenerateData;
 using GenerateData.Biomes;
 using GenerateData.Blocks;
+using GenerateData.Effects;
 using GenerateData.Items;
 using Newtonsoft.Json;
 
@@ -62,8 +63,10 @@ void Main () {
 
 
     BlockData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].BlocksPath, "blocks.json"), outDir);
+    BlockShapeData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].BlockCollisionShapesPath, "blockCollisionShapes.json"), outDir);
     BiomeData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].BiomesPath, "biomes.json"), outDir);
     ItemData.Generate (Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].ItemsPath, "items.json"), outDir);
+    EffectData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].EffectsPath, "effects.json"), outDir);
 }
 
 

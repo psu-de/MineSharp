@@ -9,9 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
     <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
-    <ProjectReference Include="..\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
-    <ProjectReference Include="..\MineSharp.Physics\MineSharp.Physics.csproj" />
-    <ProjectReference Include="..\MineSharp.Protocol\MineSharp.Protocol.csproj" />
     <ProjectReference Include="..\MineSharp.World\MineSharp.World.csproj" />
   </ItemGroup>
 

@@ -35,6 +35,7 @@ namespace MineSharp.Core.Types {
             return $"({X} / {Y} / {Z})";
         }
 
-        public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+        //public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+        //public static explicit operator Position(Vector3 x) => new Position((int)x.X, (int)x.Y, (int) x.Z);
     }
 }

@@ -44,7 +44,9 @@ namespace MineSharp.Bot {
         /// Fires when an entity moved
         /// </summary>
         public event BotEntityEvent EntityMoved;
-        public Player BotEntity { get; private set; }
+
+
+        public Player BotEntity { get; internal set; }
         private bool isPlayerLoaded = false;
 
         /// <summary>

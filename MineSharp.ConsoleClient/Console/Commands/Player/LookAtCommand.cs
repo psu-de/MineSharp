@@ -34,7 +34,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 AnsiConsole.MarkupLine($"[{CColor.Error}]Invalid pitch![/]");
             }
 
-            BotClient.Bot.ForceLookAt(new Position(x.Value, y.Value, z.Value), cancellation).GetAwaiter().GetResult();
+            BotClient.Bot.ForceLookAt(new Position(x.Value, y.Value, z.Value));
         }
 
     }

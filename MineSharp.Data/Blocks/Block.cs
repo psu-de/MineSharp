@@ -19,7 +19,11 @@ namespace MineSharp.Data.Blocks {
         }
 
         public bool IsSolid() {
-            return !(Info.Id == BlockType.Air || Info.Id == BlockType.CaveAir || Info.Id == BlockType.VoidAir);
+            return !IsAir();
+        }
+
+        public bool IsAir() {
+            return (Info.Id == BlockType.Air || Info.Id == BlockType.CaveAir || Info.Id == BlockType.VoidAir);
         }
 
         public override string ToString() {
