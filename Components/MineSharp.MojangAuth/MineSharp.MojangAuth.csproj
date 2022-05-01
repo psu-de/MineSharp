@@ -7,9 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
-    <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
-    <ProjectReference Include="..\MineSharp.World\MineSharp.World.csproj" />
+    <PackageReference Include="Hawezo.MojangSharp" Version="0.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>

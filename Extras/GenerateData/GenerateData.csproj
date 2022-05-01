@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>

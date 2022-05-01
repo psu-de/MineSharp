@@ -76,7 +76,7 @@ if (true /*args.Length == 1*/) {
 }
 
 AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
-AnsiConsole.Write(new FigletText("MineSharp").Centered());
+AnsiConsole.Write(new FigletText("MineSharp Alpha").Centered());
 
 AnsiConsole.Status()
     .Spinner(Spinner.Known.Dots2)
