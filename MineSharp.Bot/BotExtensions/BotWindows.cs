@@ -19,6 +19,8 @@ namespace MineSharp.Bot {
 
         }
 
+        #region Packet Handling
+
         private void handleWindowItems(Protocol.Packets.Clientbound.Play.WindowItemsPacket packet) {
 
             OpenWindows[packet.WindowID].UpdateSlots(packet.SlotData);
@@ -39,15 +41,26 @@ namespace MineSharp.Bot {
 
         }
 
+        #endregion
+
         private void Window_Clicked(Window sender, short slotIndex, Core.Types.Enums.WindowOperationMode mode, byte button) {
             var packet = new MineSharp.Protocol.Packets.Serverbound.Play.ClickWindowPacket(0, Inventory.StateId, slotIndex, button, mode, Inventory.GetSlotData(), Inventory.SelectedItem?.ToSlot() ?? Slot.Empty);
             this.Client.SendPacket(packet);
         }
 
+        #region Public Methods
+
+        /// <summary>
+        /// Returns a <see cref="Window"/> with the id <paramref name="windowID"/>
+        /// </summary>
+        /// <param name="windowID"></param>
+        /// <returns></returns>
         public Window? GetWindow(int windowID) {
             Window? window = null;
             OpenWindows.TryGetValue(windowID, out window);
             return window;
         }
+
+        #endregion
     }
 }

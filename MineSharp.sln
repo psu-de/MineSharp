@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data", "MineSharp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Bot", "MineSharp.Bot\MineSharp.Bot.csproj", "{BE1F403C-749A-4AA1-A980-98BACB57ABC8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Component", "Component", "{08FBDED7-F952-4266-BB96-93C475D53102}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{08FBDED7-F952-4266-BB96-93C475D53102}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.MojangAuth", "Components\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj", "{9B8495C7-6AAD-403D-B2DC-E7786ECA08FF}"
 EndProject

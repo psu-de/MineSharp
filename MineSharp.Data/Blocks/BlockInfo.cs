@@ -55,11 +55,12 @@ namespace MineSharp.Data.Blocks {
 
         public int CalculateBreakingTime(Items.ItemInfo? info, Player miner) {
 
-            Logger.GetLogger().Info(info?.DisplayName ?? " No item");
-            if (this.Hardness == null) throw new Exception("Hardness is null");
+            if (this.Hardness == null) throw new InvalidDataException("Hardness is null");
+
+            if (miner.GameMode == Core.Types.Enums.GameMode.Creative) return 0;
 
             float toolMultiplier = info?.GetToolMultiplier(this) ?? 1;
-            float efficiencyLevel = 0; // TODO:
+            float efficiencyLevel = 0; // TODO: Efficiency level
             float hasteLevel = miner.GetEffectLevel(Effects.EffectType.Haste) ?? 0;
             float miningFatiqueLevel = miner.GetEffectLevel(Effects.EffectType.MiningFatigue) ?? 0;
 

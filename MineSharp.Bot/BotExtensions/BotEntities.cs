@@ -69,6 +69,18 @@ namespace MineSharp.Bot {
             this.PlayerMapping = new ConcurrentDictionary<UUID, Player>();
         }
 
+        #region Public Methods
+
+        /// <summary>
+        /// Returns a Task that finishes once <see cref="BotEntity"/> has been initialized.
+        /// </summary>
+        public Task WaitForBot() {
+            if (BotEntity != null) return Task.CompletedTask;
+            return BotJoinedTask.Task;
+        }
+
+        #endregion
+
         private void InitPlayer(Protocol.Packets.Clientbound.Play.JoinGamePacket packet1, Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket packet2) {
             this.BotEntity = new Player(this.Options.UsernameOrEmail, this.Session.UUID, 0, packet1.Gamemode, packet1.EntityID, new Vector3(packet2.X, packet2.Y, packet2.Z), packet2.Pitch, packet2.Yaw);
             if (!this.EntitiesMapping.TryAdd(BotEntity.Id, this.BotEntity)) Logger.Error("Cannot add player entity");
@@ -86,16 +98,13 @@ namespace MineSharp.Bot {
                 packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround)); 
         }
 
-        public Task WaitForBot() {
-            if (BotEntity != null) return Task.CompletedTask;
-            return BotJoinedTask.Task;
-        }
-
 
         private void AddEntity(Entity entity) {
             if (!this.EntitiesMapping.TryAdd(entity.Id, entity)) { Logger.Debug("Could not add entity"); return; }
             this.EntitySpawned?.Invoke(entity);
         }
+
+        #region Packet Handling
 
         private void handlePlayerInfo(Protocol.Packets.Clientbound.Play.PlayerInfoPacket packet) {
 
@@ -259,5 +268,7 @@ namespace MineSharp.Bot {
                 entity.Effects.Remove(packet.EffectID);
             }
         }
+
+        #endregion
     }
 }

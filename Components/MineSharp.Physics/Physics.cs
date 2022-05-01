@@ -232,7 +232,7 @@ namespace MineSharp.Physics {
                             if (block.Info.Id == Data.Blocks.BlockType.Cobweb) {
                                 this.PlayerState.IsInWeb = true;
                             } else if (block.Info.Id == Data.Blocks.BlockType.BubbleColumn) {
-                                var down = true;//TODO: !block.metadata;
+                                var down = true;
                                 var aboveBlock = this.World.GetBlockAt(cursor.Plus(Vector3.Up));
                                 var bubbleDrag = (aboveBlock.IsAir()) ? PhysicsConst.BubbleColumnSurfaceDrag : PhysicsConst.BubbleColumnDrag;
                                 if (down) {
@@ -292,8 +292,6 @@ namespace MineSharp.Physics {
             if (PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id)) return 0;
             //TODO: if (block.getProperties().waterlogged) return 0;
             if (block.Info.Id != BlockType.Water) return -1;
-            //TODO: const meta = block.metadata;
-            //TODO: return meta >= 8 ? 0 : meta;
             return 0;
         }
 
@@ -422,17 +420,6 @@ namespace MineSharp.Physics {
                     flow.Z += dz * f;
                 }
             }
-
-            //TODO:
-            /*if (block.metadata >= 8) {
-                for (const [dx, dz] of[[0, 1], [-1, 0], [0, -1], [1, 0]]) {
-                    const adjBlock = this.World.getBlock(block.position.offset(dx, 0, dz));
-                    const adjUpBlock = this.World.getBlock(block.position.offset(dx, 1, dz));
-                    if ((adjBlock && adjBlock.boundingBox !== 'empty') || (adjUpBlock && adjUpBlock.boundingBox !== 'empty')) {
-                        flow.normalize().translate(0, -6, 0);
-                    }
-                }
-            }*/
 
             return flow.Normalized();
         }

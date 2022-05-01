@@ -50,6 +50,8 @@ namespace MineSharp.Bot {
         public byte SelectedHotbarIndex { get; private set; } = 0;
         public Item? HeldItem => this.Inventory == null ? null : this.Inventory.GetHotbarSlot(this.SelectedHotbarIndex);
 
+        #region Packet Handling
+
         private void handleJoinGame(Protocol.Packets.Clientbound.Play.JoinGamePacket packet) {
             this.GameMode = packet.Gamemode;
             Task.Run(async () => {
@@ -83,5 +85,7 @@ namespace MineSharp.Bot {
                 this.HeldItemChanged?.Invoke(this.HeldItem);
             }
         }
+
+        #endregion
     }
 }

@@ -924,7 +924,6 @@ namespace MineSharp.Data.Blocks {
                 StateToBlockMap.Add(i, Blocks[(int)info.Id]);
             }
         }
-
     }
 }
 

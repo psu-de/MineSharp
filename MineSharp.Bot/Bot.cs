@@ -68,17 +68,21 @@ namespace MineSharp.Bot {
         private partial void LoadWorld();
         private partial void LoadMovements();
 
+        /// <summary>
+        /// Connects the bot to the server
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> Connect() {
             this.Health = 20;
             return await this.Client.Connect(GameState.LOGIN);
         }
 
-        public async Task WaitUntilLoaded() {
-            while (!isPlayerLoaded) {
-                await Task.Delay(10);
-            }
-        }
-
+        /// <summary>
+        /// Waits for a specific packet from the server
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public Task<Packet> WaitForPacket<T>() where T : Packet {
             Type packetType = typeof(T);
             if (!packetWaiters.TryGetValue(packetType, out var task)) {
@@ -134,60 +138,7 @@ namespace MineSharp.Bot {
 
 
 
-        #region Minecraft Interactions
-
-        public Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null) {
-            return Task.Run(async () => {
-
-                if (!block.Info.Diggable) return MineBlockStatus.NotDiggable;
-                if (!World.IsBlockLoaded(block.Position)) return MineBlockStatus.BlockNotLoaded;
-
-
-                if (face == null) {
-                    // TODO: Maybe rausfinden wie des geht   
-                }
-
-                if (cancellation?.IsCancellationRequested ?? false) return MineBlockStatus.Cancelled;
-
-                var packet = new MineSharp.Protocol.Packets.Serverbound.Play.PlayerDiggingPacket(DiggingStatus.StartedDigging, block.Position, face ?? BlockFace.Top);
-
-                await this.Client.SendPacket(packet);
-
-                int time = block.Info.CalculateBreakingTime(this.HeldItem?.Info, BotEntity);
-
-                CancellationTokenSource cancelToken = new CancellationTokenSource();
-
-                cancellation?.Register(() => cancelToken.Cancel());
-
-                Task<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket?> sendAgain = Task.Run(async () => {
-                    await Task.Delay(time, cancelToken.Token);
-                    if (cancelToken.Token.IsCancellationRequested) return null;
-
-                    packet.Status = DiggingStatus.FinishedDigging;
-                    await this.Client.SendPacket(packet);
-                    return await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>() as Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket;
-                });
-
-                var ack = await this.WaitForPacket<Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket>() as Protocol.Packets.Clientbound.Play.AcknowledgePlayerDiggingPacket;
-                if (cancellation?.IsCancellationRequested ?? false) {
-                    cancelToken.Cancel();
-                    await this.Client.SendPacket(new PlayerDiggingPacket(DiggingStatus.CancelledDigging, block.Position, face ?? BlockFace.Top));
-                    return MineBlockStatus.Cancelled;
-                }
-
-                if (ack.Status != DiggingStatus.StartedDigging) {
-                    return MineBlockStatus.Failed;
-                }
-
-                var secondPacket = await sendAgain;
-                if (secondPacket == null || !secondPacket.Successful) {
-
-                    return MineBlockStatus.Failed;
-                }
-
-                return MineBlockStatus.Finished;
-            });
-        }
+        #region Public Methods
 
         /// <summary>
         /// Respawns the bot
@@ -219,6 +170,13 @@ namespace MineSharp.Bot {
             });
         }
 
+
+        /// <summary>
+        /// Attacks a given entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public Task Attack(Entity entity) {
             // TODO: Cooldown
             if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
@@ -227,6 +185,11 @@ namespace MineSharp.Bot {
             return this.Client.SendPacket(packet);
         }
 
+        /// <summary>
+        /// Sends a public chat message to the server
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public Task Chat(string message) {
             var packet = new Protocol.Packets.Serverbound.Play.ChatMessagePacket(message);
             return this.Client.SendPacket(packet);

@@ -65,6 +65,7 @@ namespace MineSharp.MojangAuth {
         }
 
         // This is insecure af
+        // TODO: Encryption?
         public async Task Save(string filepath) {
             using (FileStream fs = new FileStream(filepath, FileMode.OpenOrCreate, FileAccess.Write)) {
                 using (TextWriter writer = new StreamWriter(fs)) {

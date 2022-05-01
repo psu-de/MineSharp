@@ -9,17 +9,6 @@ using Spectre.Console.Rendering;
 using System.Net;
 using System.Reflection;
 
-
-
-//AnsiConsole.MarkupLine($"[{CColor.PlayerCommand}] Player [/]");
-//AnsiConsole.MarkupLine($"[{CColor.EntityCommand}] Entity [/]");
-//AnsiConsole.MarkupLine($"[{CColor.ChatCommand}] Chat [/]");
-//AnsiConsole.MarkupLine($"[{CColor.MiscCommand}] Misc [/]");
-//AnsiConsole.MarkupLine($"[{CColor.WorldCommand}] World [/]");
-//AnsiConsole.MarkupLine($"[{CColor.PromptCommand}] Prompt [/]");
-
-//AnsiConsole.Console.Input.ReadKey(true);
-
 //Credentials
 MineSharp.Bot.Bot.BotOptions loginOptions = new MineSharp.Bot.Bot.BotOptions();
 

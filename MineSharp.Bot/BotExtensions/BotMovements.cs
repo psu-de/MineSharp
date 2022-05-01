@@ -81,12 +81,23 @@ namespace MineSharp.Bot {
             return Client.SendPacket(packet);
         }
 
+        #region Public Methods
+
+        /// <summary>
+        /// Forces the bots rotation to the given yaw and pitch
+        /// </summary>
+        /// <param name="yaw"></param>
+        /// <param name="pitch"></param>
         public void ForceSetRotation(float yaw, float pitch) {
             this.BotEntity.Yaw = yaw;
             this.BotEntity.Pitch = pitch;
             this.BotMoved?.Invoke(BotEntity);
         }
 
+        /// <summary>
+        /// Forces the bot to look at given position
+        /// </summary>
+        /// <param name="position"></param>
         public void ForceLookAt(Position position) {
             var playerPos = this.BotEntity.GetHeadPosition();
             float dx = position.X - (float)playerPos.X;
@@ -100,5 +111,6 @@ namespace MineSharp.Bot {
             ForceSetRotation(yaw, pitch);
         }
 
+        #endregion
     }
 }
