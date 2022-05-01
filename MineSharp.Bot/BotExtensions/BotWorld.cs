@@ -4,6 +4,7 @@ using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.World;
+using MineSharp.World.Chunks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +26,7 @@ namespace MineSharp.Bot {
         }
 
         private void handleUnloadChunk(MineSharp.Protocol.Packets.Clientbound.Play.UnloadChunkPacket packet) {
-            World.UnloadChunk((packet.ChunkX, packet.ChunkZ));
+            World.UnloadChunk(new ChunkCoordinates(packet.ChunkX, packet.ChunkZ));
         }
 
         private void handleBlockUpdate(MineSharp.Protocol.Packets.Clientbound.Play.BlockChangePacket packet) {
@@ -44,9 +45,26 @@ namespace MineSharp.Bot {
 
             sectionY += Math.Abs(MineSharp.World.World.MinY / MineSharp.World.Chunks.Chunk.ChunkSectionLength);
 
-            var chunk = World.GetChunkAt(sectionX, sectionZ);
+            var chunk = World.GetChunkAt(new ChunkCoordinates(sectionX, sectionZ));
             if (chunk == null) return;
-            chunk.ChunkSections[sectionY].Update(packet.Blocks);
+            chunk.ChunkSections[sectionY].Update(packet.Blocks); //TODO: World Block update event
+        }
+
+        /// <summary>
+        /// Returns a Task that finishes once the Chunks in a square with length <paramref name="length"/> have been loaded
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public async Task WaitForChunksToLoad(int length = 5) {
+
+            await WaitForBot();
+
+            var playerChunk = World.GetChunkCoordinates((int)BotEntity.Position.X, (int)BotEntity.Position.Z);
+            for (int x = playerChunk.X - length; x < playerChunk.X + length; x++) {
+                for (int z = playerChunk.Z - length; z < playerChunk.Z + length; z++) {
+                    while (World.GetChunkAt(new ChunkCoordinates(x, z)) == null) await Task.Delay(10);
+                }
+            }
         }
 
         public Block GetBlockAt(Position pos) => World.GetBlockAt(pos);

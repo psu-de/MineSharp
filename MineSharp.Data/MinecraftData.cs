@@ -1,5 +1,6 @@
 ﻿using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
+using MineSharp.Data.Effects;
 using MineSharp.Data.Items;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace MineSharp.Data {
             BlockData.Load();
             BiomeData.Load();
             ItemData.Load();
+            EffectData.Load();
+
+            IsLoaded = true;
         }
 
     }

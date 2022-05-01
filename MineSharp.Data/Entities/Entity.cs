@@ -19,7 +19,7 @@ namespace MineSharp.Data.Entities {
         public EntityInfo EntityInfo { get; set; }
         public Vector3 Velocity { get; set; }
         public bool IsOnGround { get; set; }
-        public List<Effect> Effects { get; set; }
+        public Dictionary<EffectType, Effect> Effects { get; set; }
         public Entity(EntityInfo info, int id, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround) {
             this.Id = id;
             this.EntityInfo = info;
@@ -28,15 +28,15 @@ namespace MineSharp.Data.Entities {
             this.Yaw = yaw;
             this.Velocity = velocity;
             this.IsOnGround = isOnGround;
-            this.Effects = new List<Effect>();
+            this.Effects = new Dictionary<EffectType, Effect>();
         }
 
-        public bool HasEffect(EffectType type) {
-            return Effects.Any(x => x.Info.Id == type);
-        }
 
         public int? GetEffectLevel(EffectType type) {
-            var effect = Effects.Where(x => x.Info.Id == type).FirstOrDefault();
+
+            if (!Effects.TryGetValue(type, out var effect)) {
+                return null;
+            }
             
             return effect?.Amplifier + 1;
         }

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Logging;
+using MineSharp.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,15 +53,15 @@ namespace MineSharp.Data.Blocks {
             return this.HarvestTools.Contains(info.Id);
         }
 
-        public int CalculateBreakingTime(Items.ItemInfo? info) {
+        public int CalculateBreakingTime(Items.ItemInfo? info, Player miner) {
 
             Logger.GetLogger().Info(info?.DisplayName ?? " No item");
             if (this.Hardness == null) throw new Exception("Hardness is null");
 
             float toolMultiplier = info?.GetToolMultiplier(this) ?? 1;
             float efficiencyLevel = 0; // TODO:
-            float hasteLevel = 0;
-            float miningFatiqueLevel = 0;
+            float hasteLevel = miner.GetEffectLevel(Effects.EffectType.Haste) ?? 0;
+            float miningFatiqueLevel = miner.GetEffectLevel(Effects.EffectType.MiningFatigue) ?? 0;
 
             toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
             toolMultiplier /= MathF.Pow(1.2f, hasteLevel);

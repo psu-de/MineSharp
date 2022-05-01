@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
 using System.Collections.Concurrent;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoPacket;
@@ -45,6 +46,10 @@ namespace MineSharp.Bot {
         /// </summary>
         public event BotEntityEvent EntityMoved;
 
+        /// <summary>
+        /// Fires when an entity's effect is added / removed / updated
+        /// </summary>
+        public event BotEntityEvent EntityEffectChanged;
 
         public Player BotEntity { get; internal set; }
         private bool isPlayerLoaded = false;
@@ -57,6 +62,7 @@ namespace MineSharp.Bot {
         public ConcurrentDictionary<UUID, Player> PlayerMapping;
         public List<Player> PlayerList => PlayerMapping.Values.ToList();
 
+        private TaskCompletionSource BotJoinedTask = new TaskCompletionSource();
 
         private partial void LoadEntities() {
             this.EntitiesMapping = new ConcurrentDictionary<int, Entity>();
@@ -64,7 +70,10 @@ namespace MineSharp.Bot {
         }
 
         private void InitPlayer(Protocol.Packets.Clientbound.Play.JoinGamePacket packet1, Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket packet2) {
-            this.BotEntity = new Player(this.Options.UsernameOrEmail, this.Session.UUID, 0, packet1.Gamemode, packet1.EntityID, new Vector3( packet2.X, packet2.Y, packet2.Z), packet2.Pitch, packet2.Yaw);
+            this.BotEntity = new Player(this.Options.UsernameOrEmail, this.Session.UUID, 0, packet1.Gamemode, packet1.EntityID, new Vector3(packet2.X, packet2.Y, packet2.Z), packet2.Pitch, packet2.Yaw);
+            if (!this.EntitiesMapping.TryAdd(BotEntity.Id, this.BotEntity)) Logger.Error("Cannot add player entity");
+            BotJoinedTask.SetResult();
+
             Logger.Info($"Initialized Player entity: Location=({packet2.X} / {packet2.Y} / {packet2.Z})");
 
             if (false == this.PlayerMapping.TryAdd(this.Session.UUID, this.BotEntity)) {
@@ -77,6 +86,10 @@ namespace MineSharp.Bot {
                 packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround)); 
         }
 
+        public Task WaitForBot() {
+            if (BotEntity != null) return Task.CompletedTask;
+            return BotJoinedTask.Task;
+        }
 
 
         private void AddEntity(Entity entity) {
@@ -194,6 +207,12 @@ namespace MineSharp.Bot {
             EntityMoved?.Invoke(EntitiesMapping[packet.EntityID]);
         }
 
+        private void handleEntityTeleport(Protocol.Packets.Clientbound.Play.EntityTeleportPacket packet) {
+            Entity entity;
+            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+
+        }
+
         private void handlePlayerPositionAndLook(Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket packet) {
 
             if ((packet.Flags & 0x01) == 0x01) this.BotEntity.Position.X += packet.X;
@@ -214,6 +233,31 @@ namespace MineSharp.Bot {
             // TODO: Dismount Vehicle
 
             this.Client.SendPacket(new Protocol.Packets.Serverbound.Play.TeleportConfirmPacket(packet.TeleportID));
+        }
+
+        private void handleEntityEffect(Protocol.Packets.Clientbound.Play.EntityEffectPacket packet) {
+            Entity entity;
+            if (!this.EntitiesMapping.TryGetValue(packet.EntityID, out entity)) return;
+
+            var effect = new Effect(EffectData.Effects[packet.EffectID], packet.Amplifier, packet.Duration, packet.Flags);
+
+            //TODO: Effect updating is so noch nich ganz richtig
+            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID].Amplifier) {
+                entity.Effects[packet.EffectID] = effect;
+            } else {
+                entity.Effects.Add(packet.EffectID, effect);
+            }
+
+            EntityEffectChanged?.Invoke(entity);
+        }
+
+        private void handleRemoveEntityEffect(Protocol.Packets.Clientbound.Play.RemoveEntityEffectPacket packet) {
+            Entity entity;
+            if (!this.EntitiesMapping.TryGetValue(packet.EntityID, out entity)) return;
+
+            if (entity.Effects.ContainsKey(packet.EffectID)) {
+                entity.Effects.Remove(packet.EffectID);
+            }
         }
     }
 }

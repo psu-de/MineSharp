@@ -115,7 +115,9 @@ namespace MineSharp.Bot {
                 case Protocol.Packets.Clientbound.Play.EntityRotationPacket p_0x2B: handleEntityRotation(p_0x2B); break;
                 case Protocol.Packets.Clientbound.Play.PlayerInfoPacket p_0x36: handlePlayerInfo(p_0x36); break;
                 case Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket p_0x38: handlePlayerPositionAndLook(p_0x38); break;
+                case Protocol.Packets.Clientbound.Play.RemoveEntityEffectPacket p_0x3B: handleRemoveEntityEffect(p_0x3B); break;
                 case Protocol.Packets.Clientbound.Play.EntityVelocityPacket p_0x4F: handleUpdateEntityVelocity(p_0x4F); break;
+                case Protocol.Packets.Clientbound.Play.EntityEffectPacket p_0x65: handleEntityEffect(p_0x65); break;
 
                 // World
                 case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
@@ -151,7 +153,7 @@ namespace MineSharp.Bot {
 
                 await this.Client.SendPacket(packet);
 
-                int time = block.Info.CalculateBreakingTime(this.HeldItem?.Info);
+                int time = block.Info.CalculateBreakingTime(this.HeldItem?.Info, BotEntity);
 
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
 
@@ -221,7 +223,7 @@ namespace MineSharp.Bot {
             // TODO: Cooldown
             if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
 
-            var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, false); // TODO: Change sneaking
+            var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, MovementControls.Sneak);
             return this.Client.SendPacket(packet);
         }
 

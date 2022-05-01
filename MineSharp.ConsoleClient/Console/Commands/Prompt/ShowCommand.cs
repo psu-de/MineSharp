@@ -40,22 +40,34 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
 
             ShowCommandOption option = OptionArgument.GetValue(argv[0]);
 
-            Table table = new Table();
-
             switch (option) {
                 case ShowCommandOption.Commands:
-                    table.AddColumns("Commands", "Help");
-                    foreach (var c in CommandManager.Commands.Values.ToArray()) {
-                        table.AddRow(new Text(c.Name), new Panel(c.Description));
-                    }
+                    PrintCommands();
                     break;
             }
-            if (table.Rows.Count > 0) {
-                AnsiConsole.Write(table);
-            } else {
-                AnsiConsole.MarkupLine($"[red]Nothing found![/]");
+
+        }
+
+        void PrintCommands() {
+            Dictionary<string, List<Command>> commands = new Dictionary<string, List<Command>>();
+            foreach (var c in CommandManager.Commands.Values) {
+                var commandType = c.GetType().Namespace?.Split('.').Last() ?? "Unknown";
+                commandType += " Commands";
+                if (commands.ContainsKey(commandType)) {
+                    commands[commandType].Add(c);
+                } else {
+                    commands[commandType] = new List<Command>() { c };
+                }
             }
 
+            foreach (var group in commands) {
+                var table = new Table().AddColumns(group.Key, "Help");
+                foreach (var c in group.Value) {
+                    table.AddRow(new Markup($"\n[{c.Color}]{c.Name}[/]"), new Panel(c.Description));
+                }
+                AnsiConsole.Write(table);
+                AnsiConsole.WriteLine();
+            }
         }
 
         enum ShowCommandOption {

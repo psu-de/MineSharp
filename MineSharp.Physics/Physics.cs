@@ -483,7 +483,6 @@ namespace MineSharp.Physics {
             if (Math.Abs(vel.Y) < PhysicsConst.NegligeableVelocity) vel.Y = 0;
             if (Math.Abs(vel.Z) < PhysicsConst.NegligeableVelocity) vel.Z = 0;
 
-            // TODO: Handle inputs
             if (controls.Jump || PlayerState.JumpQueued) {
                 if (PlayerState.JumpTicks > 0) PlayerState.JumpTicks--;
                 if (PlayerState.IsInWater || PlayerState.IsInLava) {
@@ -506,8 +505,8 @@ namespace MineSharp.Physics {
             }
             this.PlayerState.JumpQueued = false;
 
-            var strafe = ((controls.Right ? 1 : 0) - (controls.Left ? 1 : 0)) * 0.98;
-            var forward = ((controls.Forward ? 1 : 0) - (controls.Back ? 1 : 0)) * 0.98;
+            var strafe = ((controls.Right ? 1f : 0f) - (controls.Left ? 1f : 0f)) * 0.98;
+            var forward = ((controls.Forward ? 1f : 0f) - (controls.Back ? 1f : 0f)) * 0.98;
 
             if (controls.Sneak) {
                 strafe *= PhysicsConst.SneakSpeed;

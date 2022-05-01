@@ -85,15 +85,49 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
         }
 
         void WritePlayerInfo() {
-            AnsiConsole.Write(new BarChart()
-                .Width(30)
-                .Label("[green underline]Stats[/]")
-                .CenterLabel()
-                .AddItem("Health", BotClient.Bot.Health, Spectre.Console.Color.Maroon)
-                .AddItem("Food", BotClient.Bot.Food, Spectre.Console.Color.Orange4_1)
-                .AddItem("Saturation", BotClient.Bot.Saturation, Spectre.Console.Color.Yellow4));
 
-            AnsiConsole.Write(new Table().AddColumns("Position", "Velocity", "OnGround").AddRow(BotClient.Bot.BotEntity.Position.ToString(), BotClient.Bot.BotEntity.Velocity.ToString(), BotClient.Bot.BotEntity.IsOnGround.ToString()));
+            if (BotClient.Bot.BotEntity == null) {
+                AnsiConsole.MarkupLine($"[red]Player is not loaded yet[/]");
+                return;
+            }
+
+            //AnsiConsole.Write(new BarChart()
+            //    .Width(30)
+            //    .Label("[green underline]Stats[/]")
+            //    .CenterLabel()
+            //    .AddItem("Health", BotClient.Bot.Health, Spectre.Console.Color.Maroon)
+            //    .AddItem("Food", BotClient.Bot.Food, Spectre.Console.Color.Orange4_1)
+            //    .AddItem("Saturation", BotClient.Bot.Saturation, Spectre.Console.Color.Yellow4));
+            var statsInfo = new Table().AddColumns(new TableColumn("Key"), new TableColumn("Value").Width(26));
+            string getStatRow(int val) {
+                char block = '█';
+                return (string.Join("", Enumerable.Repeat(block, val)) + $" ({val.ToString().PadLeft(2, '0')})").TrimStart();
+            }
+            statsInfo.AddRow(new Text("Health"), new Markup($"[maroon]{getStatRow((int)BotClient.Bot.Health)}[/]"));
+            statsInfo.AddRow(new Text("Food"), new Markup($"[orange4_1]{getStatRow((int)BotClient.Bot.Food)}[/]"));
+            statsInfo.AddRow(new Text("Saturation"), new Markup($"[yellow4]{getStatRow((int)BotClient.Bot.Saturation)}[/]"));
+
+            statsInfo.Title = new TableTitle("[green underline]Stats[/]");
+            AnsiConsole.Write(statsInfo.Centered());
+            AnsiConsole.WriteLine();
+
+            var effectsInfo = new Table().AddColumns("Effect Name", "Level", "Duration");
+            effectsInfo.Title = new TableTitle("[green underline]Bots effects[/]");
+            foreach (var effect in BotClient.Bot.BotEntity.Effects.Values) {
+                var eColor = effect.Info.IsGood ? "springgreen2" : "red1";
+                effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * BotClient.Bot.Version.TickMs) / 1000).ToString() + "s");
+            }
+            AnsiConsole.Write(effectsInfo.Centered());
+            AnsiConsole.WriteLine();
+
+            var positionInfo = new Table().AddColumns("Position", "Velocity", "OnGround", "Yaw", "Pitch")
+                .AddRow(BotClient.Bot.BotEntity.Position.ToString(),
+                        BotClient.Bot.BotEntity.Velocity.ToString(),
+                        BotClient.Bot.BotEntity.IsOnGround.ToString(),
+                        BotClient.Bot.BotEntity.Yaw.ToString(),
+                        BotClient.Bot.BotEntity.Pitch.ToString());
+            positionInfo.Title = new TableTitle("[green underline]Position[/]");
+            AnsiConsole.Write(positionInfo.Centered());
             AnsiConsole.WriteLine();
         }
 

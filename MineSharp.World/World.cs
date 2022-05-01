@@ -15,7 +15,7 @@ namespace MineSharp.World {
         public const int MinY = -64;
         public const int TotalHeight = MaxY - MinY;
 
-        public ConcurrentDictionary<(int, int), Chunk> Chunks = new ConcurrentDictionary<(int, int), Chunk>();
+        public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
 
         public delegate void BlockEvent(Block block);
         public event BlockEvent BlockUpdated;
@@ -29,28 +29,32 @@ namespace MineSharp.World {
         }
 
         public void LoadChunkPacket(ChunkDataAndLightUpdatePacket packet) {
-            var chunk = this.GetChunkAt(packet.ChunkX, packet.ChunkZ);
+            var chunkCoords = new ChunkCoordinates(packet.ChunkX, packet.ChunkZ);
+            var chunk = this.GetChunkAt(chunkCoords);
             if (chunk == null) {
                 chunk = new Chunk(packet);
-                if (!this.Chunks.TryAdd((packet.ChunkX, packet.ChunkZ), chunk)) Logger.Error("Bruh");
+                if (this.Chunks.TryAdd(chunkCoords, chunk)) {
+                    ChunkLoaded?.Invoke(chunk);
+                }
+                else Logger.Error("Could not add chunk!");
             } else {
                 chunk.Load(packet.Data);
                 ChunkLoaded?.Invoke(chunk);
             }
         }
 
-        public void UnloadChunk((int, int) chunk) {
+        public void UnloadChunk(ChunkCoordinates chunk) {
             Chunks.TryRemove(chunk, out var _chunk);
             if (_chunk != null) ChunkUnloaded?.Invoke(_chunk);
         }
 
-        public Chunk? GetChunkAt(int x, int z) {
+        public Chunk? GetChunkAt(ChunkCoordinates coords) {
             Chunk? chunk = null;
-            Chunks.TryGetValue((x, z), out chunk);
+            Chunks.TryGetValue(coords, out chunk);
             return chunk;
         }
 
-        public (int, int) GetChunkCoordinates(int x, int z) {
+        public ChunkCoordinates GetChunkCoordinates(int x, int z) {
             int chunkX;
             int chunkZ;
             if (x >= 0) chunkX = x >> 4;
@@ -59,25 +63,25 @@ namespace MineSharp.World {
 
             if (z >= 0) chunkZ = z >> 4;
             else chunkZ = (int)Math.Floor((float)(z >> 4));
-            return (chunkX, chunkZ);
+            return new ChunkCoordinates(chunkX, chunkZ);
         }
 
         public bool IsBlockLoaded(Position blockPos) {
-            (int cX, int cZ) = GetChunkCoordinates(blockPos.X, blockPos.Z);
-            return GetChunkAt(cX, cZ) != null;
+            ChunkCoordinates coords = GetChunkCoordinates(blockPos.X, blockPos.Z);
+            return GetChunkAt(coords) != null;
         }
 
         public bool IsBlockLoaded(Position blockPos, out Chunk? chunk) {
 
-            (int cX, int cZ) = GetChunkCoordinates(blockPos.X, blockPos.Z);
-            chunk = GetChunkAt(cX, cZ);
+            ChunkCoordinates coords = GetChunkCoordinates(blockPos.X, blockPos.Z);
+            chunk = GetChunkAt(coords);
             return chunk != null;
         }
 
         public void SetBlock(Block block) {
 
-            (int chunkX, int chunkZ) = GetChunkCoordinates(block.Position.X, block.Position.Z);
-            if (!this.IsBlockLoaded(block.Position, out var chunk)) throw new Exception($"Chunk ({chunkX} / {chunkZ}) is not loaded");
+            ChunkCoordinates coords = GetChunkCoordinates(block.Position.X, block.Position.Z);
+            if (!this.IsBlockLoaded(block.Position, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
                 chunk.SetBlock(block);
                 BlockUpdated?.Invoke(block);
@@ -85,9 +89,9 @@ namespace MineSharp.World {
         }
 
         public Block GetBlockAt(Position pos) {
-            (int chunkX, int chunkZ) = GetChunkCoordinates(pos.X, pos.Z);
+            ChunkCoordinates coords = GetChunkCoordinates(pos.X, pos.Z);
 
-            if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk ({chunkX} / {chunkZ}) is not loaded");
+            if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
                 return chunk.GetBlockAt(pos);
             }

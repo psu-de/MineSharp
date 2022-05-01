@@ -33,7 +33,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             }
 
             var block = BotClient.Bot.World.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            var breakingTime = block.Info.CalculateBreakingTime(BotClient.Bot.HeldItem?.Info);
+            var breakingTime = block.Info.CalculateBreakingTime(BotClient.Bot.HeldItem?.Info, BotClient.Bot.BotEntity);
 
             AnsiConsole.Progress()
                 .Start(ctx => {

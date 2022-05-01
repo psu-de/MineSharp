@@ -21,7 +21,6 @@ namespace MineSharp.Data.Effects {
             Register("strength", "Strength", EffectType.Strength, true);
             Register("instant_health", "Instant Health", EffectType.InstantHealth, true);
             Register("instant_damage", "Instant Damage", EffectType.InstantDamage, false);
-            Register("instant_damage", "Instant Damage", EffectType.InstantDamage, false);
             Register("jump_boost", "Jump Boost", EffectType.JumpBoost, true);
             Register("nausea", "Nausea", EffectType.Nausea, false);
             Register("regeneration", "Regeneration", EffectType.Regeneration, true);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MineSharp.Core.Versions {
     public class MinecraftVersion {
 
-        public int WorldTickMs => 50;
+        public int TickMs => 50;
         public double VelocityToBlock => 8000;
 
         public string Version { get; private set; } 

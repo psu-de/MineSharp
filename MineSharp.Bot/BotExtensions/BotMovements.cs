@@ -21,18 +21,19 @@ namespace MineSharp.Bot {
         public PlayerControls MovementControls = new PlayerControls();
 
         private partial void LoadMovements() {
-            void Bot_Joined() {
+            Task.Run(async () => {
+                await WaitForBot();
                 Physics = new Physics.Physics(this.BotEntity, this.World);
                 LastSentPlayerInfo = new PlayerInfoState() { Pos = BotEntity.Position.Clone(), Pitch = BotEntity.Pitch, Yaw = BotEntity.Yaw, IsOnGround = BotEntity.IsOnGround };
                 PhysicsLoop = Task.Run(DoPhysics);
-            }
-            Joined += Bot_Joined;
+            });
 
         }
 
         private async void DoPhysics() {
 
-            while (World.Chunks.Count < 100) await Task.Delay(10); //TODO:
+            //while (World.Chunks.Count < 100) await Task.Delay(10); //TODO:
+            await WaitForChunksToLoad();
             while (true) {
                 try {
                     if (PhysicsEnabled) 
@@ -40,7 +41,7 @@ namespace MineSharp.Bot {
                     
                     UpdatePositionOrLookIfNecessary();
                 } catch (Exception e) { Logger.Error("Error in PhysicsLoop: " + e.ToString()); }
-                await Task.Delay(50);
+                await Task.Delay(Version.TickMs);
             }
         }
 
