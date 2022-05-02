@@ -17,7 +17,23 @@ namespace MineSharp.Protocol {
 
         public Session Session { get; private set; }
 
-        public Events.MinecraftClientEvents Events { get; private set; }
+        public delegate void ClientStringEvent(MinecraftClient client, string message);
+        public delegate void ClientPacketEvent(MinecraftClient client, Packet packet);
+
+        /// <summary>
+        /// Fires when the client Disconnected
+        /// </summary>
+        public event ClientStringEvent? Disconnected;
+
+        /// <summary>
+        /// Fires when a packet has been received
+        /// </summary>
+        public event ClientPacketEvent? PacketReceived;
+
+        /// <summary>
+        /// Fires when a packet has been sent
+        /// </summary>
+        public event ClientPacketEvent? PacketSent;
 
         private Logger Logger;
         private TcpClient _client;
@@ -42,7 +58,6 @@ namespace MineSharp.Protocol {
             this.CancellationTokenSource = new CancellationTokenSource();
             this.CancellationToken = CancellationTokenSource.Token;
             this.PacketQueue = new Queue<(Packet, TaskCompletionSource<bool>, CancellationToken?)>();
-            this.Events = new Events.MinecraftClientEvents();
             this.PacketFactory = new PacketFactory(this);
 
             Packet.Initialize();
@@ -83,7 +98,7 @@ namespace MineSharp.Protocol {
             this.CancellationTokenSource.Cancel();
             this.streamLoopTask?.Wait();
             this._client.Close();
-            this.Events.InvokeClientDisconnected(this, reason);
+            this.Disconnected?.Invoke(this, reason);
         }
 
         private async Task makeHandshake(GameState nextState) {
@@ -143,6 +158,7 @@ namespace MineSharp.Protocol {
 
                     try {
                         await packet.Handle(this);
+                        this.PacketReceived?.Invoke(this, packet);
                     } catch (Exception e) {
                         Logger.Error("There occured an error while handling the packet: \n" + e.ToString());
                     }});
@@ -181,6 +197,7 @@ namespace MineSharp.Protocol {
                         ThreadPool.QueueUserWorkItem(async (object? _) => {
                             try {
                                 await packet.Sent(this);
+                                PacketSent?.Invoke(this, packet);
                             } catch (Exception e) {
                                 Logger.Error("Error while handling sent event of packet: \n" + e.ToString());
                             }

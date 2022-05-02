@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Core;
+using MineSharp.Core.Types;
 using MineSharp.Physics;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,6 @@ namespace MineSharp.Bot {
 
         private async void DoPhysics() {
 
-            //while (World.Chunks.Count < 100) await Task.Delay(10); //TODO:
             await WaitForChunksToLoad();
             while (true) {
                 try {
@@ -41,7 +41,7 @@ namespace MineSharp.Bot {
                     
                     UpdatePositionOrLookIfNecessary();
                 } catch (Exception e) { Logger.Error("Error in PhysicsLoop: " + e.ToString()); }
-                await Task.Delay(Version.TickMs);
+                await Task.Delay(MinecraftConst.TickMs);
             }
         }
 

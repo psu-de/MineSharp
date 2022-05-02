@@ -56,7 +56,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
             byte[] encVerTok = rsa.Encrypt(this.VerifyToken, RSAEncryptionPadding.Pkcs1);
 
             EncryptionResponsePacket response = new EncryptionResponsePacket(encrypted, encVerTok);
-            client.SendPacket(response);
+            client.SendPacket(response); // TODO: Should this be awaited?
 
             await base.Handle(client);
         }

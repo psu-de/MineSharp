@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Logging;
-using MineSharp.Protocol.Events;
 using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Clientbound.Status;
@@ -21,14 +20,9 @@ namespace MineSharp.Protocol.Packets {
 
         public abstract void Read(PacketBuffer buffer);
         public abstract void Write(PacketBuffer buffer);
-        public virtual async Task Handle(MinecraftClient client) {
-            //Logger.Debug("Received packet: " + this.GetType().Name);
-            client.Events.InvokePacketReceived(client, this);
-        }
+        public virtual async Task Handle(MinecraftClient client) { }
 
-        public virtual async Task Sent(MinecraftClient client) {
-            client.Events.InvokePacketSent(client, this);
-        }
+        public virtual async Task Sent(MinecraftClient client) { }
 
 
         protected static Logger Logger = Logger.GetLogger();

@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Core;
+using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
@@ -163,7 +164,7 @@ namespace MineSharp.Bot {
                 new Vector3(packet.X, packet.Y, packet.Z), 
                 packet.Pitch, 
                 packet.Yaw, 
-                new Vector3(packet.VelocityX / Version.VelocityToBlock, packet.VelocityY / Version.VelocityToBlock, packet.VelocityZ / Version.VelocityToBlock),
+                new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
                 true);
             AddEntity(newEntity);
         }
@@ -180,7 +181,7 @@ namespace MineSharp.Bot {
         private void handleUpdateEntityVelocity(Protocol.Packets.Clientbound.Play.EntityVelocityPacket packet) {
             if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
 
-            EntitiesMapping[packet.EntityID].Velocity = new Vector3(packet.VelocityX / Version.VelocityToBlock, packet.VelocityY / Version.VelocityToBlock, packet.VelocityZ / Version.VelocityToBlock);
+            EntitiesMapping[packet.EntityID].Velocity = new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock);
         }
 
         private void handleEntityPosition(Protocol.Packets.Clientbound.Play.EntityPositionPacket packet) {
@@ -218,7 +219,14 @@ namespace MineSharp.Bot {
 
         private void handleEntityTeleport(Protocol.Packets.Clientbound.Play.EntityTeleportPacket packet) {
             Entity entity;
-            if (!EntitiesMapping.ContainsKey(packet.EntityID)) return;
+            if (!EntitiesMapping.TryGetValue(packet.EntityID, out entity)) return;
+
+            entity.Position.X = packet.X;
+            entity.Position.Y = packet.Y;
+            entity.Position.Z = packet.Z;
+
+            entity.Yaw = packet.Yaw;
+            entity.Pitch = packet.Pitch;
 
         }
 

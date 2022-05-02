@@ -55,7 +55,7 @@ namespace MineSharp.Bot {
             }
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
-            this.Client.Events.PacketReceived += Events_PacketReceived;
+            this.Client.PacketReceived += Events_PacketReceived;
 
             this.LoadWindows();
             this.LoadEntities();
@@ -104,34 +104,35 @@ namespace MineSharp.Bot {
             switch (packet) {
 
                 // Base
-                case Protocol.Packets.Clientbound.Play.JoinGamePacket p_0x26: handleJoinGame(p_0x26); break;
-                case Protocol.Packets.Clientbound.Play.DeathCombatEventPacket p_0x35: handleDeathCombat(p_0x35); break;
-                case Protocol.Packets.Clientbound.Play.DestroyEntitiesPacket p_0x3A: handleDespawnEntity(p_0x3A); break;
-                case Protocol.Packets.Clientbound.Play.RespawnPacket p_0x3D: handleRespawn(p_0x3D); break;
-                case Protocol.Packets.Clientbound.Play.UpdateHealthPacket p_0x52: handleUpdateHealth(p_0x52); break;
-                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket p_0x48: handleHeldItemChange(p_0x48); break;
+                case Protocol.Packets.Clientbound.Play.JoinGamePacket                       p_0x26: handleJoinGame(p_0x26); break;
+                case Protocol.Packets.Clientbound.Play.DeathCombatEventPacket               p_0x35: handleDeathCombat(p_0x35); break;
+                case Protocol.Packets.Clientbound.Play.DestroyEntitiesPacket                p_0x3A: handleDespawnEntity(p_0x3A); break;
+                case Protocol.Packets.Clientbound.Play.RespawnPacket                        p_0x3D: handleRespawn(p_0x3D); break;
+                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket                 p_0x48: handleHeldItemChange(p_0x48); break;
+                case Protocol.Packets.Clientbound.Play.UpdateHealthPacket                   p_0x52: handleUpdateHealth(p_0x52); break;
 
                 // Entities 
-                case Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket p_0x02: handleSpawnLivingEntity(p_0x02); break;
-                case Protocol.Packets.Clientbound.Play.SpawnPlayerPacket p_0x04: handleSpawnPlayer(p_0x04); break;
-                case Protocol.Packets.Clientbound.Play.EntityPositionPacket p_0x29: handleEntityPosition(p_0x29); break;
-                case Protocol.Packets.Clientbound.Play.EntityPositionAndRotationPacket p_0x2A: handleEntityPositionAndRotation(p_0x2A); break;
-                case Protocol.Packets.Clientbound.Play.EntityRotationPacket p_0x2B: handleEntityRotation(p_0x2B); break;
-                case Protocol.Packets.Clientbound.Play.PlayerInfoPacket p_0x36: handlePlayerInfo(p_0x36); break;
-                case Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket p_0x38: handlePlayerPositionAndLook(p_0x38); break;
-                case Protocol.Packets.Clientbound.Play.RemoveEntityEffectPacket p_0x3B: handleRemoveEntityEffect(p_0x3B); break;
-                case Protocol.Packets.Clientbound.Play.EntityVelocityPacket p_0x4F: handleUpdateEntityVelocity(p_0x4F); break;
-                case Protocol.Packets.Clientbound.Play.EntityEffectPacket p_0x65: handleEntityEffect(p_0x65); break;
+                case Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket              p_0x02: handleSpawnLivingEntity(p_0x02); break;
+                case Protocol.Packets.Clientbound.Play.SpawnPlayerPacket                    p_0x04: handleSpawnPlayer(p_0x04); break;
+                case Protocol.Packets.Clientbound.Play.EntityPositionPacket                 p_0x29: handleEntityPosition(p_0x29); break;
+                case Protocol.Packets.Clientbound.Play.EntityPositionAndRotationPacket      p_0x2A: handleEntityPositionAndRotation(p_0x2A); break;
+                case Protocol.Packets.Clientbound.Play.EntityRotationPacket                 p_0x2B: handleEntityRotation(p_0x2B); break;
+                case Protocol.Packets.Clientbound.Play.PlayerInfoPacket                     p_0x36: handlePlayerInfo(p_0x36); break;
+                case Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket          p_0x38: handlePlayerPositionAndLook(p_0x38); break;
+                case Protocol.Packets.Clientbound.Play.RemoveEntityEffectPacket             p_0x3B: handleRemoveEntityEffect(p_0x3B); break;
+                case Protocol.Packets.Clientbound.Play.EntityVelocityPacket                 p_0x4F: handleUpdateEntityVelocity(p_0x4F); break;
+                case Protocol.Packets.Clientbound.Play.EntityTeleportPacket                 p_0x62: handleEntityTeleport(p_0x62); break;
+                case Protocol.Packets.Clientbound.Play.EntityEffectPacket                   p_0x65: handleEntityEffect(p_0x65); break;
 
                 // World
-                case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
-                case Protocol.Packets.Clientbound.Play.UnloadChunkPacket p_0x1D: handleUnloadChunk(p_0x1D); break;
-                case Protocol.Packets.Clientbound.Play.BlockChangePacket p_0x0C: handleBlockUpdate(p_0x0C); break;
-                case Protocol.Packets.Clientbound.Play.MultiBlockChangePacket p_0x3F: handleMultiBlockChange(p_0x3F); break;
+                case Protocol.Packets.Clientbound.Play.BlockChangePacket                    p_0x0C: handleBlockUpdate(p_0x0C); break;
+                case Protocol.Packets.Clientbound.Play.UnloadChunkPacket                    p_0x1D: handleUnloadChunk(p_0x1D); break;
+                case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket        p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
+                case Protocol.Packets.Clientbound.Play.MultiBlockChangePacket               p_0x3F: handleMultiBlockChange(p_0x3F); break;
 
                 // Windows
-                case Protocol.Packets.Clientbound.Play.WindowItemsPacket p_0x14: handleWindowItems(p_0x14); break;
-                case Protocol.Packets.Clientbound.Play.SetSlotPacket p_0x16: handleSetSlot(p_0x16); break;
+                case Protocol.Packets.Clientbound.Play.WindowItemsPacket                    p_0x14: handleWindowItems(p_0x14); break;
+                case Protocol.Packets.Clientbound.Play.SetSlotPacket                        p_0x16: handleSetSlot(p_0x16); break;
 
             }
         }

@@ -1,5 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
+using MineSharp.Core;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using System;
@@ -91,13 +92,6 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
                 return;
             }
 
-            //AnsiConsole.Write(new BarChart()
-            //    .Width(30)
-            //    .Label("[green underline]Stats[/]")
-            //    .CenterLabel()
-            //    .AddItem("Health", BotClient.Bot.Health, Spectre.Console.Color.Maroon)
-            //    .AddItem("Food", BotClient.Bot.Food, Spectre.Console.Color.Orange4_1)
-            //    .AddItem("Saturation", BotClient.Bot.Saturation, Spectre.Console.Color.Yellow4));
             var statsInfo = new Table().AddColumns(new TableColumn("Key"), new TableColumn("Value").Width(26));
             string getStatRow(int val) {
                 char block = '█';
@@ -115,7 +109,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             effectsInfo.Title = new TableTitle("[green underline]Bots effects[/]");
             foreach (var effect in BotClient.Bot.BotEntity.Effects.Values) {
                 var eColor = effect.Info.IsGood ? "springgreen2" : "red1";
-                effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * BotClient.Bot.Version.TickMs) / 1000).ToString() + "s");
+                effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * MinecraftConst.TickMs) / 1000).ToString() + "s");
             }
             AnsiConsole.Write(effectsInfo.Centered());
             AnsiConsole.WriteLine();

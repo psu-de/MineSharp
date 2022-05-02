@@ -53,3 +53,8 @@ Contains all Minecraft Packets and Logic to connect and join a Minecraft Server
 
 ### Minesharp.World
 Basic functionality to represend a Minecraft World
+
+## Clients
+### MineSharp.ConsoleClient
+Console Prompt for MineSharp.Bot\
+Used for testing
