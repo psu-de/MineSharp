@@ -29,12 +29,31 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             int? z = Z.GetValue(argv[2]);
 
             if (x == null || y == null || z == null) {
-                AnsiConsole.MarkupLine($"[red]Error: Coordinates invalid");
+                AnsiConsole.MarkupLine($"[red]Error: Coordinates invalid[/]");
                 return;
             }
 
             var block = BotClient.Bot.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            AnsiConsole.MarkupLine($"[green]{block}[/]");
+            var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties");
+
+            string propGetValue(Data.Blocks.BlockStateProperty prop) {
+                switch (prop.Type) {
+                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Bool:
+                        return prop.GetValue<bool>().ToString();
+                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Int:
+                        return prop.GetValue<int>().ToString();
+                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Enum:
+                        return prop.GetValue<string>();
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            string properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
+
+            table.AddRow(block.Info.Name, block.Position.ToString(), block.Metadata.ToString(), properties);
+            AnsiConsole.Write(table);
+            AnsiConsole.WriteLine();
         }
     }
 }

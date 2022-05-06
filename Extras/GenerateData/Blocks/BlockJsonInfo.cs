@@ -29,7 +29,7 @@ namespace GenerateData.Blocks {
         public int MaxStateId { get; set; }
 
         [JsonProperty("states")]
-        public List<object> States { get; set; }
+        public List<BlockStateJsonInfo> States { get; set; }
 
         [JsonProperty("drops")]
         public List<object> Drops { get; set; }
@@ -60,5 +60,17 @@ namespace GenerateData.Blocks {
 
         [JsonProperty("defaultState")]
         public int DefaultState { get; set; }
+    }
+
+    internal class BlockStateJsonInfo {
+        [JsonProperty("name")]
+        public string Name { get; set; }    
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+        [JsonProperty("num_values")]
+        public int NumValues { get; set; }
+        [JsonProperty("values")]
+        public string[]? Values { get; set; }
     }
 }

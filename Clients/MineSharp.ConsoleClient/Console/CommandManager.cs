@@ -65,6 +65,7 @@ namespace MineSharp.ConsoleClient.Console {
                 RegisterCommand(new LookAtCommand());
                 RegisterCommand(new MoveCommand());
                 RegisterCommand(new PhysicsTickCommand());
+                RegisterCommand(new SelectHotbarSlotCommand());
 
                 //Entities
                 RegisterCommand(new GetEntitiesCommand());

@@ -22,7 +22,7 @@ namespace MineSharp.Data.Items {
         }
 
         public override string ToString() {
-            return $"Item(id={(int)Info.Id}, Name={Info.Name}, Count={Count}, Metadata={(Metadata == null)})";
+            return $"Item(id={(int)Info.Id}, Name={Info.Name}, Count={Count}, Metadata={(Metadata == null ? "None" : Metadata.ToString())})";
         }
 
 

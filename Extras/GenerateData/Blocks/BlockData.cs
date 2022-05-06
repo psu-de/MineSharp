@@ -37,34 +37,28 @@ namespace GenerateData.Blocks {
                 return "null";
             }
 
+            string GetProperties(BlockJsonInfo jsonData) {
+                string GetValues(string[]? values) {
+                    return values == null ? "null" : $"new string[] {{ {string.Join(", ", values.Select(x => $"\"{x}\""))} }}";
+                }
+
+                return $"new BlockProperties(new BlockStateProperty[] {{ { string.Join(", ", jsonData.States.Select(x => $"new BlockStateProperty(\"{x.Name}\", BlockStateProperty.BlockStatePropertyType.{x.Type[0].ToString().ToUpper() + x.Type.Substring(1)}, {x.NumValues}, { GetValues(x.Values) })")) } }}, { jsonData.DefaultState - jsonData.MinStateId })";
+            }
+
             int lastId = 0;
             foreach (var blockInfo in Blocks) {
 
                 if (blockInfo.Id != lastId++) throw new Exception("Last id should be currentid-1");
+                var props = GetProperties(blockInfo);
 
                 string staticName = Generator.MakeCSharpSafe(blockInfo.DisplayName.Replace(" ", ""));
                 BlockEnum.EnumAddValue(staticName, blockInfo.Id);
-                //string blockInfoStr = NewBlockInfoTemplate.Replace("%id%", blockInfo.Id.ToString())
-                //                                 .Replace("%displayname%", blockInfo.DisplayName)
-                //                                 .Replace("%name%", blockInfo.Name)
-                //                                 .Replace("%hardness%", (blockInfo.Hardness ?? float.MaxValue).ToString(nfi) + "f")
-                //                                 .Replace("%resistance%", blockInfo.Resistance.ToString(nfi) + "f")
-                //                                 .Replace("%diggable%", blockInfo.Diggable.ToString().ToLower())
-                //                                 .Replace("%transparent%", blockInfo.Transparent.ToString().ToLower())
-                //                                 .Replace("%filterlight%", blockInfo.FilterLight.ToString())
-                //                                 .Replace("%emitlight%", blockInfo.EmitLight.ToString())
-                //                                 .Replace("%boundingbox%", blockInfo.BoundingBox)
-                //                                 .Replace("%stacksize%", blockInfo.StackSize.ToString())
-                //                                 .Replace("%material%", blockInfo.Material)
-                //                                 .Replace("%defaultstate%", blockInfo.DefaultState.ToString())
-                //                                 .Replace("%minSid%", blockInfo.MinStateId.ToString())
-                //                                 .Replace("%maxSid%", blockInfo.MaxStateId.ToString());
-                BlockData.AddLoaderExpression($"Register(BlockType.{staticName}, \"{blockInfo.DisplayName}\", \"{blockInfo.Name}\", {(blockInfo.Hardness ?? float.MaxValue).ToString(nfi)}f, {blockInfo.Resistance.ToString(nfi)}f, {blockInfo.Diggable.ToString().ToLower()}, {blockInfo.Transparent.ToString().ToLower()}, {blockInfo.FilterLight}, {blockInfo.EmitLight}, \"{blockInfo.BoundingBox}\", {blockInfo.StackSize}, \"{blockInfo.Material}\", {blockInfo.StackSize}, {blockInfo.MinStateId}, {blockInfo.MaxStateId}, {GetItemArray(blockInfo.HarvestTools)});");
+                BlockData.AddLoaderExpression($"Register(BlockType.{staticName}, \"{blockInfo.DisplayName}\", \"{blockInfo.Name}\", {(blockInfo.Hardness ?? float.MaxValue).ToString(nfi)}f, {blockInfo.Resistance.ToString(nfi)}f, {blockInfo.Diggable.ToString().ToLower()}, {blockInfo.Transparent.ToString().ToLower()}, {blockInfo.FilterLight}, {blockInfo.EmitLight}, \"{blockInfo.BoundingBox}\", {blockInfo.StackSize}, \"{blockInfo.Material}\", {blockInfo.StackSize}, {blockInfo.MinStateId}, {blockInfo.MaxStateId}, {GetItemArray(blockInfo.HarvestTools)}, {GetProperties(blockInfo)});");
             }
 
 
-            BlockData.WithRegisterFunction(@"private static void Register(BlockType type, string displayName, string name, float hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingbox, int stackSize, string material, int defaultState, int minState, int maxState, Items.ItemType[]? harvestTools){ 
-            BlockInfo info = new BlockInfo(type, displayName, name, hardness, resistance, diggable, transparent, filterLight, emitLight, boundingbox, stackSize, material, defaultState, minState, maxState, harvestTools);
+            BlockData.WithRegisterFunction(@"private static void Register(BlockType type, string displayName, string name, float hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingbox, int stackSize, string material, int defaultState, int minState, int maxState, Items.ItemType[]? harvestTools, BlockProperties properties){ 
+            BlockInfo info = new BlockInfo(type, displayName, name, hardness, resistance, diggable, transparent, filterLight, emitLight, boundingbox, stackSize, material, defaultState, minState, maxState, harvestTools, properties);
             Blocks.Add(info);
             for (int i = info.MinStateId; i <= info.MaxStateId; i++) {
                 StateToBlockMap.Add(i, Blocks[(int)info.Id]);

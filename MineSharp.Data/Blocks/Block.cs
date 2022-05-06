@@ -11,11 +11,15 @@ namespace MineSharp.Data.Blocks {
         public BlockInfo Info { get; set; }
         public Position Position { get; set; }
         public int State { get; set; }
+        public int Metadata => State - Info.MinStateId;
+        public BlockProperties Properties { get; set; }
 
         public Block(BlockInfo info, Position position, int state) {
             Info = info;
             Position = position;
             this.State = state;
+            this.Properties = Info.DefaultProperties.Clone();
+            this.Properties.Set(Metadata);
         }
 
         public bool IsSolid() {
@@ -28,6 +32,12 @@ namespace MineSharp.Data.Blocks {
 
         public override string ToString() {
             return $"Block: (id={Info.Id}, Name={Info.Name}) at {Position}";
+        }
+
+
+        public float[][] GetBlockShape() {
+            var shapeIdx = BlockShapes.BlockToShapeMapping[this.Info.Name][0];
+            return BlockShapes.Shapes[shapeIdx];
         }
     }
 }

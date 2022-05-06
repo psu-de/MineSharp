@@ -25,8 +25,9 @@ namespace MineSharp.Data.Blocks {
         public int MinStateId { get; set; }
         public int MaxStateId { get; set; }
         public Items.ItemType[]? HarvestTools { get; set; }
+        public BlockProperties DefaultProperties { get; set; }
 
-        public BlockInfo(BlockType id, string displayName, string name, float? hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingBox, int stackSize, string material, int defaultState, int minStateId, int maxStateId, Items.ItemType[]? harvestTools) {
+        public BlockInfo(BlockType id, string displayName, string name, float? hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingBox, int stackSize, string material, int defaultState, int minStateId, int maxStateId, Items.ItemType[]? harvestTools, BlockProperties properties) {
             Id = id;
             DisplayName = displayName;
             Name = name;
@@ -43,6 +44,7 @@ namespace MineSharp.Data.Blocks {
             MinStateId = minStateId;
             MaxStateId = maxStateId;
             HarvestTools = harvestTools;
+            DefaultProperties = properties;
         }
 
         public bool CanBeHarvested(Items.ItemInfo? info) {

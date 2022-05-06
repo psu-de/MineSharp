@@ -71,7 +71,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             }
 
             var hotbarSlots = BotClient.Bot.Inventory.GetHotbarSlots();
-            hotbar.AddRow(hotbarSlots.Select(x => new Text(x.Item?.Info.DisplayName ?? "").Centered()).ToArray());
+            hotbar.AddRow(hotbarSlots.Select(x => new Text(x.Item?.ToString() ?? "").Centered()).ToArray());
 
             AnsiConsole.MarkupLine("[olive]Hotbar: [/]");
             AnsiConsole.Write(hotbar);

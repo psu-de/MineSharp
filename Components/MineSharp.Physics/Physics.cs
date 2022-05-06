@@ -30,8 +30,7 @@ namespace MineSharp.Physics {
                         var block = this.World.GetBlockAt(cursor);
                         if (!block.IsAir()) {
                             var blockPos = block.Position;
-                            var shapeIndex = Data.Blocks.BlockShapes.BlockToShapeMapping[block.Info.Name][0];
-                            foreach (var shape in MineSharp.Data.Blocks.BlockShapes.Shapes[shapeIndex]) {
+                            foreach (var shape in block.GetBlockShape()) {
                                 var blockBB = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
                                 blockBB.Offset(blockPos.X, blockPos.Y, blockPos.Z);
                                 surroundingBBs.Add(blockBB);
@@ -232,7 +231,7 @@ namespace MineSharp.Physics {
                             if (block.Info.Id == Data.Blocks.BlockType.Cobweb) {
                                 this.PlayerState.IsInWeb = true;
                             } else if (block.Info.Id == Data.Blocks.BlockType.BubbleColumn) {
-                                var down = true;
+                                var down = block.Metadata == 0;
                                 var aboveBlock = this.World.GetBlockAt(cursor.Plus(Vector3.Up));
                                 var bubbleDrag = (aboveBlock.IsAir()) ? PhysicsConst.BubbleColumnSurfaceDrag : PhysicsConst.BubbleColumnDrag;
                                 if (down) {
@@ -290,9 +289,10 @@ namespace MineSharp.Physics {
         public int GetRenderedDepth(Block block) {
             if (block.IsAir()) return -1;
             if (PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id)) return 0;
-            //TODO: if (block.getProperties().waterlogged) return 0;
+            if (block.Properties.Get("waterlogged")?.GetValue<bool>() == true) return 0;
             if (block.Info.Id != BlockType.Water) return -1;
-            return 0;
+
+            return block.Metadata >= 8 ? 0 : block.Metadata;
         }
 
 
@@ -307,7 +307,7 @@ namespace MineSharp.Physics {
                 for (cursor.Z = Math.Floor(bb.MinZ); cursor.Z <= Math.Floor(bb.MaxZ); cursor.Z++) {
                     for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++) {
                         var block = this.World.GetBlockAt(cursor);
-                        if (!block.IsAir() && (block.Info.Id == BlockType.Water || PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id) /* TODO: || block.getProperties().waterlogged*/)) {
+                        if (!block.IsAir() && (block.Info.Id == BlockType.Water || PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id) || block.Properties.Get("waterlogged")?.GetValue<bool>() == true)) {
                             var waterLevel = cursor.Y + 1 - GetLiquidHeightPercent(block);
                             if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
                         }
@@ -420,6 +420,22 @@ namespace MineSharp.Physics {
                     flow.Z += dz * f;
                 }
             }
+
+            if (block.Metadata >= 8) {
+                foreach ((int dx, int dz) in new [] { (0, 1), (-1, 0), (0, -1), (1, 0) }) {
+
+                    var bPos1 = new Position(block.Position.X + dx, block.Position.Y, block.Position.Z + dz);
+                    var bPos2 = new Position(block.Position.X + dx, block.Position.Y + 1, block.Position.Z + dz);
+
+                    var adjBlock = this.World.GetBlockAt(bPos1);
+                    var adjUpBlock = this.World.GetBlockAt(bPos2);
+
+                 if ((!adjBlock.IsAir() && adjBlock.Info.BoundingBox != "empty") || (!adjUpBlock.IsAir() && adjUpBlock.Info.BoundingBox != "empty")) {
+                        flow.Normalized().Plus(Vector3.Down * 6);
+        }
+                }
+            }
+
 
             return flow.Normalized();
         }

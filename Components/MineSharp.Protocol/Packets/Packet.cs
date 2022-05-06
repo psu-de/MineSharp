@@ -238,12 +238,11 @@ namespace MineSharp.Protocol.Packets {
             try {
                 return IdToPacketType[state][direction][id];
             } catch {
-                Console.WriteLine("Unknown packet id: 0x" + id.ToString("X2"));
-                //Logger.Error($"Unknown packet: State={Enum.GetName(typeof(GameState), state)}, Direction={Enum.GetName(typeof(PacketFlow), direction)}, Id={id.ToString("X2")}");
+                Logger.Error($"Unknown packet: State={Enum.GetName(typeof(GameState), state)}, Direction={Enum.GetName(typeof(PacketFlow), direction)}, Id=0x{id.ToString("X2")}");
                 return null;
             }
         }
-
+         
         public static int GetPacketId(Type packetType) {
             try {
                 return PacketTypeToId[packetType];
