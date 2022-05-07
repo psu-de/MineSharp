@@ -29,5 +29,7 @@ namespace MineSharp.Data.Items {
         public Slot ToSlot() {
             return new Slot((int)Info.Id, (short)Damage, Count, Metadata);
         }
+
+        
     }
 }

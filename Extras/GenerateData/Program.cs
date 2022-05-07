@@ -5,6 +5,7 @@ using GenerateData;
 using GenerateData.Biomes;
 using GenerateData.Blocks;
 using GenerateData.Effects;
+using GenerateData.Enchantments;
 using GenerateData.Items;
 using Newtonsoft.Json;
 
@@ -67,6 +68,7 @@ void Main () {
     BiomeData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].BiomesPath, "biomes.json"), outDir);
     ItemData.Generate (Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].ItemsPath, "items.json"), outDir);
     EffectData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].EffectsPath, "effects.json"), outDir);
+    EnchantmentData.Generate(Path.Join(dataPath, dataPaths.PCVersions[minecraftVersion].EnchantmentsPath, "enchantments.json"), outDir);
 }
 
 

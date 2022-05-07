@@ -48,9 +48,8 @@ namespace MineSharp.Bot {
 
             sectionY += Math.Abs(MineSharp.World.World.MinY / MineSharp.World.Chunks.Chunk.ChunkSectionLength);
 
-            var chunk = World.GetChunkAt(new ChunkCoordinates(sectionX, sectionZ));
-            if (chunk == null) return;
-            chunk.ChunkSections[sectionY].Update(packet.Blocks); //TODO: World Block update event
+            this.World.MultiblockUpdate(packet.Blocks, sectionX, sectionY, sectionZ);
+
         }
 
         #endregion

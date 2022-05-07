@@ -43,6 +43,26 @@ namespace MineSharp.World {
             }
         }
 
+        public void MultiblockUpdate(long[] blocks, int cX, int cY, int cZ) {
+            var chunk = this.GetChunkAt(new ChunkCoordinates(cX, cZ));
+            if (chunk == null) return;
+
+            foreach (var l in blocks) {
+                int blockZ = (int)((l >> 4) & 0x0F);
+                int blockX = (int)((l >> 8) & 0x0F);
+                int blockY = (int)(l & 0x0F);
+                int stateId = (int)(l >> 12);
+
+                var block = new Block(BlockData.StateToBlockMap[stateId], new Position(blockX, blockY, blockZ), stateId);
+
+                chunk.ChunkSections[cY].SetBlock(block);
+
+                block.Position = chunk.Chunk2WorldPos(block.Position, cY);
+
+                BlockUpdated?.Invoke(block);
+            }
+        }
+
         public void UnloadChunk(ChunkCoordinates chunk) {
             Chunks.TryRemove(chunk, out var _chunk);
             if (_chunk != null) ChunkUnloaded?.Invoke(_chunk);

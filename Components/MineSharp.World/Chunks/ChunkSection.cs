@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 namespace MineSharp.World.Chunks {
     public class ChunkSection {
 
+        // Positions used in this Class should be local coordinates, relative to the chunk
+
         public static ChunkSection Read(PacketBuffer buffer) {
             short solidBlockCount = buffer.ReadShort();
             PalettedContainer.PalettedContainer blockContainer = new PalettedContainer.PalettedContainer(false, 16 * 16 * 16);
