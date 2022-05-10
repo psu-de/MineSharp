@@ -268,7 +268,7 @@ namespace MineSharp.Physics {
             strafe *= speed;
             forward *= speed;
 
-            var yaw = Math.PI - this.Player.Yaw;
+            var yaw = Math.PI - this.Player.YawRadians;
             var sin = Math.Sin(yaw);
             var cos = Math.Cos(yaw);
 
@@ -497,7 +497,7 @@ namespace MineSharp.Physics {
                         vel.Y += 0.1 * PlayerState.JumpBoost;
                     }
                     if (controls.Sprint) {
-                        var yaw = Math.PI - Player.Yaw;
+                        var yaw = Math.PI - Player.YawRadians;
                         vel.X -= Math.Sin(yaw) * 0.2;
                         vel.Z += Math.Cos(yaw) * 0.2;
                     }

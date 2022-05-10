@@ -48,6 +48,8 @@ namespace MineSharp.ConsoleClient.Console {
                 //Prompt
                 RegisterCommand(new HelpCommand());
                 RegisterCommand(new ShowCommand());
+                RegisterCommand(new ExitCommand());
+                RegisterCommand(new ReconnectCommand());
 
                 //World
                 RegisterCommand(new FindBlockCommand());
@@ -66,6 +68,7 @@ namespace MineSharp.ConsoleClient.Console {
                 RegisterCommand(new MoveCommand());
                 RegisterCommand(new PhysicsTickCommand());
                 RegisterCommand(new SelectHotbarSlotCommand());
+                RegisterCommand(new RaycastCommand());
 
                 //Entities
                 RegisterCommand(new GetEntitiesCommand());

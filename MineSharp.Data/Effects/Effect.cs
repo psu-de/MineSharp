@@ -19,6 +19,7 @@ namespace MineSharp.Data.Effects {
         /// </summary>
         public int Duration { get { 
                 _duration -= (int)((DateTime.Now - lastUpdated).TotalMilliseconds / MinecraftConst.TickMs);
+                lastUpdated = DateTime.Now;
                 return _duration;
             } set { 
                 _duration = value; 

@@ -92,6 +92,9 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
                 return;
             }
 
+            var masterTable = new Table().AddColumns("Key", "Data");
+            masterTable.Border(TableBorder.Rounded);
+
             var statsInfo = new Table().AddColumns(new TableColumn("Key"), new TableColumn("Value").Width(26));
             string getStatRow(int val) {
                 char block = '█';
@@ -101,18 +104,16 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             statsInfo.AddRow(new Text("Food"), new Markup($"[orange4_1]{getStatRow((int)BotClient.Bot.Food)}[/]"));
             statsInfo.AddRow(new Text("Saturation"), new Markup($"[yellow4]{getStatRow((int)BotClient.Bot.Saturation)}[/]"));
 
-            statsInfo.Title = new TableTitle("[green underline]Stats[/]");
-            AnsiConsole.Write(statsInfo.Centered());
-            AnsiConsole.WriteLine();
+            masterTable.AddRow(new Markup("\n[green underline]Stats[/]"), statsInfo);
 
             var effectsInfo = new Table().AddColumns("Effect Name", "Level", "Duration");
-            effectsInfo.Title = new TableTitle("[green underline]Bots effects[/]");
             foreach (var effect in BotClient.Bot.BotEntity.Effects.Values) {
+                if (effect == null) continue;
                 var eColor = effect.Info.IsGood ? "springgreen2" : "red1";
                 effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * MinecraftConst.TickMs) / 1000).ToString() + "s");
             }
-            AnsiConsole.Write(effectsInfo.Centered());
-            AnsiConsole.WriteLine();
+
+            masterTable.AddRow(new Markup("\n[green underline]Effects[/]"), effectsInfo);
 
             var positionInfo = new Table().AddColumns("Position", "Velocity", "OnGround", "Yaw", "Pitch")
                 .AddRow(BotClient.Bot.BotEntity.Position.ToString(),
@@ -120,9 +121,9 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
                         BotClient.Bot.BotEntity.IsOnGround.ToString(),
                         BotClient.Bot.BotEntity.Yaw.ToString(),
                         BotClient.Bot.BotEntity.Pitch.ToString());
-            positionInfo.Title = new TableTitle("[green underline]Position[/]");
-            AnsiConsole.Write(positionInfo.Centered());
-            AnsiConsole.WriteLine();
+            masterTable.AddRow(new Markup("\n[green underline]Position[/]"), positionInfo);
+
+            AnsiConsole.Write(masterTable);
         }
 
         internal enum DisplayOption {

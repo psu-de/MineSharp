@@ -57,6 +57,28 @@ namespace MineSharp.Bot {
 
         #region Public Methods
 
+        public Task<Block?> Raycast (int length = 100) {
+            return Task.Run(() => {
+
+                var vc = this.BotEntity.GetDirectionVector();
+                var lc = this.BotEntity.GetHeadPosition().Clone();
+                Logger.Info("Vc: " + vc.ToString());
+                for (int i = 0; i < length; i++) {
+                    Logger.Info(lc.ToString());
+                    try {
+                        var b = this.World.GetBlockAt((Position)lc);
+                        if (!b.IsAir()) {
+                            return b;
+                        }
+                    } catch (ArgumentException) {
+                        return null;
+                    }
+                    lc.Add(vc);
+                }
+                return null;
+            });
+        }
+
         /// <summary>
         /// Returns a Task that finishes once the Chunks in a square with length <paramref name="length"/> have been loaded
         /// </summary>
@@ -90,6 +112,7 @@ namespace MineSharp.Bot {
         /// <param name="cancellation">Optional to stop the searching task</param>
         /// <returns></returns>
         public Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) => World.FindBlocksAsync(type, count, cancellation);
+
         /// <summary>
         /// Searches through the loaded chunks for one block of a specific block type 
         /// </summary>
@@ -97,6 +120,7 @@ namespace MineSharp.Bot {
         /// <param name="cancellation"></param>
         /// <returns></returns>
         public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) => World.FindBlockAsync(type, cancellation);
+
         /// <summary>
         /// Tries to mine the block with the currently held item
         /// </summary>

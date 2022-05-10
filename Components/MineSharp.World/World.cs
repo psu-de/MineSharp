@@ -107,8 +107,16 @@ namespace MineSharp.World {
                 BlockUpdated?.Invoke(block);
             }
         }
+        
+        public bool IsOutOfMap(Position pos) {
+            if (pos.Y <= World.MinY || pos.Y >= World.MaxY) return true;
+            if (Math.Abs(pos.X) >= 29999984) return true;
+            if (Math.Abs(pos.Z) >= 29999984) return true;
+            return false;
+        }
 
         public Block GetBlockAt(Position pos) {
+            if (this.IsOutOfMap(pos)) throw new ArgumentException("Position is out of map");
             ChunkCoordinates coords = GetChunkCoordinates(pos.X, pos.Z);
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");

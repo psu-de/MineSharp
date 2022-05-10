@@ -60,13 +60,14 @@ namespace MineSharp.Bot {
 
 
         private void UpdatePositionOrLookIfNecessary() {
+            UpdateServerPositionAndLook();
             if (LastSentPlayerInfo.Pos.X != BotEntity.Position.X || 
                 LastSentPlayerInfo.Pos.Y != BotEntity.Position.Y || 
                 LastSentPlayerInfo.Pos.Z != BotEntity.Position.Z || 
                 LastSentPlayerInfo.Yaw != BotEntity.Yaw || 
                 LastSentPlayerInfo.Pitch != BotEntity.Pitch || 
                 LastSentPlayerInfo.IsOnGround != BotEntity.IsOnGround) {
-                UpdateServerPositionAndLook();
+                //UpdateServerPositionAndLook();
             }
         }
 
@@ -84,14 +85,13 @@ namespace MineSharp.Bot {
         #region Public Methods
 
         /// <summary>
-        /// Forces the bots rotation to the given yaw and pitch
+        /// Forces the bots rotation to the given yaw and pitch (in degrees)
         /// </summary>
         /// <param name="yaw"></param>
         /// <param name="pitch"></param>
         public void ForceSetRotation(float yaw, float pitch) {
             this.BotEntity.Yaw = yaw;
             this.BotEntity.Pitch = pitch;
-            this.BotMoved?.Invoke(BotEntity);
         }
 
         /// <summary>

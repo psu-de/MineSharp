@@ -96,7 +96,9 @@ namespace MineSharp.Bot {
             isPlayerLoaded = true;
 
             this.Client.SendPacket(new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
-                packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround)); 
+                packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround));
+
+            this.ForceSetRotation(packet2.Yaw, packet2.Pitch);
         }
 
 

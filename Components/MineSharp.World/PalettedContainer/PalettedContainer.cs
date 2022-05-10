@@ -55,7 +55,6 @@ namespace MineSharp.World.PalettedContainer {
 
         public void SetAt (int index, int state) {
 
-
             if (this.Biomes) throw new NotSupportedException();
 
             if (this.Palette.HasState(state, state)) {

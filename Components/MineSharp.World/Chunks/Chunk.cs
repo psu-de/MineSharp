@@ -16,6 +16,7 @@ namespace MineSharp.World.Chunks {
 
         public const int ChunkSectionLength = 16;
 
+
         public static int GetSectionCount() {
             return World.TotalHeight >> 4;
         }
@@ -74,6 +75,7 @@ namespace MineSharp.World.Chunks {
 
         public Block GetBlockAt(Position pos) {
             int sectionIndex = GetSectionIndex(pos.Y);
+            if (sectionIndex >= this.ChunkSections.Length) throw new Exception("Out of map");
             var chunkPos = this.World2ChunkPos(pos);
             Block block = this.ChunkSections[sectionIndex].GetBlockAt(chunkPos);
             block.Position = pos;

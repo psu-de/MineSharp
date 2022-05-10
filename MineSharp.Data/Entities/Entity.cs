@@ -15,11 +15,13 @@ namespace MineSharp.Data.Entities {
         public int Id { get; set; }
         public Vector3 Position { get; set; }
         public float Pitch { get;  set; }
+        public float PitchRadians => (MathF.PI / 180) * Pitch;
         public float Yaw { get; set; }
+        public float YawRadians => (MathF.PI / 180) * Yaw;
         public EntityInfo EntityInfo { get; set; }
         public Vector3 Velocity { get; set; }
         public bool IsOnGround { get; set; }
-        public Dictionary<EffectType, Effect> Effects { get; set; }
+        public Dictionary<EffectType, Effect?> Effects { get; set; }
         public Entity(EntityInfo info, int id, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround) {
             this.Id = id;
             this.EntityInfo = info;
@@ -39,6 +41,18 @@ namespace MineSharp.Data.Entities {
             }
             
             return effect?.Amplifier + 1;
+        }
+
+        public Vector3 GetDirectionVector() {
+
+            Logger.Debug($"Yaw={Yaw}");
+            Logger.Debug($"Pitch={Pitch}");
+
+            var len = Math.Cos(this.PitchRadians);
+            return new Vector3(
+                len * Math.Sin(-YawRadians),
+                -Math.Sin(PitchRadians),
+                len * Math.Cos(YawRadians));
         }
     }
 }

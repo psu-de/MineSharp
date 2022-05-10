@@ -59,6 +59,31 @@ namespace MineSharp.Core.Types {
         }
 
 
+        public double DistanceSquared(Vector3 v) {
+            var diff = this.Minus(v);
+            return diff.X * diff.X + diff.Y * diff.Y + diff.Z * diff.Z;
+        }
+
+        public double DotProduct(Vector3 v) {
+            return this.X * v.X + this.Y * v.Y + this.Z * v.Z;
+        }
+
+        public double Distance(Vector3 v) {
+            return Math.Sqrt(this.DistanceSquared(v));
+        }
+
+        public double Angle(Vector3 v) {
+            var dot = this.DotProduct(v);
+            return Math.Acos(dot / this.Length() * v.Length());
+        }
+
+
+        public override string ToString() {
+            return $"({X.ToString("0.##")} / {Y.ToString("0.##")} / {Z.ToString("0.##")})";
+        }
+
+
+
         public static Vector3 operator *(Vector3 v, int val) {
             return new Vector3(v.X * val, v.Y * val, v.Z * val);
         }
@@ -69,20 +94,6 @@ namespace MineSharp.Core.Types {
 
         public static Vector3 operator /(Vector3 v, int val) {
             return new Vector3(v.X / val, v.Y / val, v.Z / val);
-        }
-
-
-        public double DistanceSquared(Vector3 v) {
-            var diff = this.Minus(v);
-            return diff.X * diff.X + diff.Y * diff.Y + diff.Z * diff.Z;
-        }
-
-        public double Distance(Vector3 v) {
-            return Math.Sqrt(this.DistanceSquared(v));
-        }
-
-        public override string ToString() {
-            return $"({X.ToString("0.##")} / {Y.ToString("0.##")} / {Z.ToString("0.##")})";
         }
     }
 }
