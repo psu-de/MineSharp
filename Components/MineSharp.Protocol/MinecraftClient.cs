@@ -45,7 +45,7 @@ namespace MineSharp.Protocol {
         private Task? streamLoopTask;
         private PacketFactory PacketFactory;
 
-        private Queue<(Packet, TaskCompletionSource<bool>, CancellationToken?)> PacketQueue;
+        private Queue<Packet> PacketQueue;
         private int CompressionThreshold = -1;
 
         public MinecraftClient(string version, Session session, string host, int port) {
@@ -57,7 +57,7 @@ namespace MineSharp.Protocol {
             this.Logger = Logger.GetLogger();
             this.CancellationTokenSource = new CancellationTokenSource();
             this.CancellationToken = CancellationTokenSource.Token;
-            this.PacketQueue = new Queue<(Packet, TaskCompletionSource<bool>, CancellationToken?)>();
+            this.PacketQueue = new Queue<Packet>();
             this.PacketFactory = new PacketFactory(this);
 
             Packet.Initialize();
@@ -133,11 +133,12 @@ namespace MineSharp.Protocol {
         /// <param name="packet">Packet instance that will be sent</param>
         /// <returns>A task that will be completed when the packet has been written into the tcp stream</returns>
         public Task SendPacket(Packet packet, CancellationToken? cancellation = null) {
-            var tsc = new TaskCompletionSource<bool>();
-            this.PacketQueue.Enqueue((packet, tsc, cancellation));
+            if (packet == null) throw new ArgumentNullException();
+            Logger.Debug3("Queueing packet: " + packet.GetType().Name);
+            packet.CancellationToken = cancellation;
+            this.PacketQueue.Enqueue(packet);
 
-
-            return tsc.Task;
+            return packet.SendingCompletionSource.Task;
         }
 
 
@@ -176,10 +177,10 @@ namespace MineSharp.Protocol {
                     }
 
                     if (this.PacketQueue.Count > 0) { // Writing
-                        (Packet packet, TaskCompletionSource<bool> sendTask, CancellationToken? cancellation) = this.PacketQueue.Dequeue();
+                        Packet packet = this.PacketQueue.Dequeue();
 
-                        if (cancellation.HasValue && CancellationToken.IsCancellationRequested) {
-                            sendTask.TrySetResult(true);
+                        if (packet.CancellationToken.HasValue && packet.CancellationToken.Value.IsCancellationRequested) {
+                            packet.SendingCompletionSource.SetResult(false);
                             continue;
                         }
 
@@ -193,7 +194,7 @@ namespace MineSharp.Protocol {
 
                         this.Stream.DispatchPacket(packetBuffer);
 
-                        sendTask.TrySetResult(true);
+                        packet.SendingCompletionSource.TrySetResult(true);
                         ThreadPool.QueueUserWorkItem(async (object? _) => {
                             try {
                                 await packet.Sent(this);

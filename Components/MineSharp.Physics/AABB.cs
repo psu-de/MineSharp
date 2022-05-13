@@ -118,5 +118,11 @@
                    this.MinZ < other.MaxZ && this.MaxZ > other.MinZ;
         }
 
+        public bool Contains(double x, double y, double z) {
+            return this.MinX <= x && this.MaxX >= x &&
+                   this.MinY <= y && this.MaxY >= y &&
+                   this.MinZ <= z && this.MaxZ >= z;
+        }
+
     }
 }

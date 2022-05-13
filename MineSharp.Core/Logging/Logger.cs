@@ -61,7 +61,9 @@ namespace MineSharp.Core.Logging {
             string logMessage = $"[{logl}][{time}][{name}] > {message}";
 
             LogWriter.WriteLine(logMessage);
-            System.Diagnostics.Debug.WriteLine(logMessage); 
+            if (level <= LogLevel.DEBUG) {
+                System.Diagnostics.Debug.WriteLine(logMessage);
+            }
         }
 
         private string GetLogLevelString(LogLevel level) {

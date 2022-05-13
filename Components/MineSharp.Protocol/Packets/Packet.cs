@@ -13,7 +13,29 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MineSharp.Protocol.Packets {
-    public abstract class Packet {
+    public abstract class Packet : IDisposable {
+
+        private TaskCompletionSource<bool>? sendingCompletionSource;
+        private CancellationToken? cancellationToken;
+        
+        internal CancellationToken? CancellationToken {
+            get { return cancellationToken; }
+            set { 
+                cancellationToken = value; 
+                if (cancellationToken.HasValue) {
+                    cancellationToken.Value.Register(() => SendingCompletionSource.SetResult(false));
+                }
+            
+            }
+        }
+        internal TaskCompletionSource<bool> SendingCompletionSource {
+            get { 
+                if (sendingCompletionSource == null) 
+                    sendingCompletionSource = new TaskCompletionSource<bool>();
+                return sendingCompletionSource;
+            }
+        }
+
         public Packet() {
 
         }
@@ -250,6 +272,11 @@ namespace MineSharp.Protocol.Packets {
                 Logger.Error($"Unkown packet type: Type={packetType.FullName}");
                 throw new Exception("Unknown packet type", ex);
             }
+        }
+
+        public void Dispose() {
+            sendingCompletionSource = null;
+            cancellationToken = null;
         }
     }
 }

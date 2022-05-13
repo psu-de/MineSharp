@@ -60,14 +60,13 @@ namespace MineSharp.Bot {
 
 
         private void UpdatePositionOrLookIfNecessary() {
-            UpdateServerPositionAndLook();
             if (LastSentPlayerInfo.Pos.X != BotEntity.Position.X || 
                 LastSentPlayerInfo.Pos.Y != BotEntity.Position.Y || 
                 LastSentPlayerInfo.Pos.Z != BotEntity.Position.Z || 
                 LastSentPlayerInfo.Yaw != BotEntity.Yaw || 
                 LastSentPlayerInfo.Pitch != BotEntity.Pitch || 
                 LastSentPlayerInfo.IsOnGround != BotEntity.IsOnGround) {
-                //UpdateServerPositionAndLook();
+                UpdateServerPositionAndLook();
             }
         }
 
@@ -99,16 +98,17 @@ namespace MineSharp.Bot {
         /// </summary>
         /// <param name="position"></param>
         public void ForceLookAt(Position position) {
-            var playerPos = this.BotEntity.GetHeadPosition();
-            float dx = position.X - (float)playerPos.X;
-            float dy = position.Y - (float)playerPos.Y;
-            float dz = position.Z - (float)playerPos.Z;
 
-            float r = MathF.Sqrt(dx * dx + dy * dy + dz * dz);
-            float yaw = -MathF.Atan2(dx, dz) / MathF.PI * 180;
+            var pos = ((Vector3)position).Plus(new Vector3(0.5d, 1, 0.5d));
+            var r = pos.Minus(this.BotEntity.GetHeadPosition());
+            Logger.Info($"BlockPos={pos}");
+            Logger.Info($"HeadPos={this.BotEntity.GetHeadPosition()}");
+            Logger.Info($"R={r}");
+            double yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
             if (yaw < 0) yaw = 360 + yaw;
-            float pitch = -MathF.Asin(dy / r) / MathF.PI * 180;
-            ForceSetRotation(yaw, pitch);
+            double pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
+            Logger.Info($"Yaw={yaw}, Pitch={pitch}");
+            ForceSetRotation((float)yaw, (float)pitch);
         }
 
         #endregion

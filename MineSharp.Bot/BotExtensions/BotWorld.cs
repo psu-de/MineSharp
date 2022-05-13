@@ -2,6 +2,7 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Blocks;
+using MineSharp.Physics;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;
@@ -59,23 +60,28 @@ namespace MineSharp.Bot {
 
         public Task<Block?> Raycast (int length = 100) {
             return Task.Run(() => {
-
-                var vc = this.BotEntity.GetDirectionVector();
+                
+                var vc = this.BotEntity.GetDirectionVector() / 10; // TODO: Vector kann block überspringen
                 var lc = this.BotEntity.GetHeadPosition().Clone();
-                Logger.Info("Vc: " + vc.ToString());
-                for (int i = 0; i < length; i++) {
-                    Logger.Info(lc.ToString());
+
+                for (int i = 0; i < 10 * length; i++) {
                     try {
-                        var b = this.World.GetBlockAt((Position)lc);
+                        var b = this.World.GetBlockAt(lc.Floored());
                         if (!b.IsAir()) {
-                            return b;
+                            List<AABB> boundingBoxes = new List<AABB>();
+                            foreach (float[] shape in b.GetBlockShape()) {
+                                var bb = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
+                                bb.Offset(b.Position.X, b.Position.Y, b.Position.Z);
+                                if (bb.Contains(lc.X, lc.Y, lc.Z))
+                                    return b;
+                            }
                         }
                     } catch (ArgumentException) {
                         return null;
                     }
                     lc.Add(vc);
                 }
-                return null;
+                return (Block?)null;
             });
         }
 

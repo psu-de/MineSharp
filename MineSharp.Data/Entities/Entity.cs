@@ -45,8 +45,7 @@ namespace MineSharp.Data.Entities {
 
         public Vector3 GetDirectionVector() {
 
-            Logger.Debug($"Yaw={Yaw}");
-            Logger.Debug($"Pitch={Pitch}");
+            Logger.Debug($"Yaw={Yaw} Pitch={Pitch}");
 
             var len = Math.Cos(this.PitchRadians);
             return new Vector3(

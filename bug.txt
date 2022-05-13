@@ -1,0 +1,9 @@
+Bug: lookAt -3 -1 -1
+     raycast => gold_ore
+     place carpet 
+     raycast => deepslate was nich da ist
+     ----
+     reconnect
+     getBlockAt -2 0 -1 => air
+     remove carpet
+     getBlockAt -2 0 1 => deepslate was nicht da ist

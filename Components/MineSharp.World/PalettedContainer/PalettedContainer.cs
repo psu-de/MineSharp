@@ -61,6 +61,7 @@ namespace MineSharp.World.PalettedContainer {
                 switch (Palette) {
                     case SingleValuePalette svp: break;
                     case IndirectPalette ip:
+                        Logger.Debug("Adding to indirect palette");
                         int entry = ip.GetStateIndex(state);
                         this.Data.Set(index, entry);
                         break;
@@ -69,12 +70,12 @@ namespace MineSharp.World.PalettedContainer {
                         break;
                 }
             } else {
-
                 byte newBitsPerEntry;
                 BitArray newData; 
                 int dataLength;
                 switch (Palette) {
                     case SingleValuePalette svp:
+                        Logger.Debug("Updating svp palette to indirect palette");
                         newBitsPerEntry = INDIRECT_BLOCK_MIN_BITS;
                         dataLength = (int)Math.Ceiling((float)((float)this.Capacity / (64 / newBitsPerEntry)));
                         newData = new BitArray(new long[dataLength], this.Capacity, newBitsPerEntry);
@@ -84,6 +85,7 @@ namespace MineSharp.World.PalettedContainer {
                         break;
                     case IndirectPalette ip:
 
+                        Logger.Debug("Updating indirect palette");
                         int newMapSize = ip.Map.Length + 1;
                         Array.Resize(ref ip.Map, newMapSize);
                         ip.Map[newMapSize - 1] = state;
@@ -92,6 +94,7 @@ namespace MineSharp.World.PalettedContainer {
                         if (newBitsPerEntry < INDIRECT_BLOCK_MIN_BITS) newBitsPerEntry = INDIRECT_BLOCK_MIN_BITS;
 
                         if (newBitsPerEntry != this.Data.BitsPerEntry) {
+                            Logger.Debug("Updating indirect palette new bits");
                             if (newBitsPerEntry <= INDIRECT_BLOCK_MAX_BITS) {
                                 dataLength = (int)Math.Ceiling((float)((float)this.Capacity / (64 / newBitsPerEntry)));
                                 newData = new BitArray(new long[dataLength], this.Capacity, newBitsPerEntry);

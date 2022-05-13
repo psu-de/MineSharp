@@ -34,6 +34,12 @@ namespace MineSharp.Core.Types {
             this.Z += v.Z;
         }
 
+        public void Subtract(Vector3 v) {
+            this.X -= v.X;
+            this.Y -= v.Y;
+            this.Z -= v.Z;
+        }
+
         public Vector3 Normalized () {
             return this * Length();
         }
@@ -48,6 +54,10 @@ namespace MineSharp.Core.Types {
 
         public Vector3 Floored() {
             return new Vector3(Math.Floor(X), Math.Floor(Y), Math.Floor(Z));    
+        }
+
+        public Vector3 Ceiled() {
+            return new Vector3(Math.Ceiling(X), Math.Ceiling(Y), Math.Ceiling(Z));
         }
 
         public Vector3 Plus(Vector3 v) {
