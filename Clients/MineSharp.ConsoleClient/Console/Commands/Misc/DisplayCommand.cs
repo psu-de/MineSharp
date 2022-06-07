@@ -39,7 +39,6 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             switch (option) {
                 case DisplayOption.Players: WritePlayerTable(); break;
                 case DisplayOption.Inventory: WriteInventory(); break;
-                case DisplayOption.BotLog: WriteBotLog(); break;
                 case DisplayOption.PlayerInfo: WritePlayerInfo(); break;
             }
 
@@ -75,14 +74,6 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
 
             AnsiConsole.MarkupLine("[olive]Hotbar: [/]");
             AnsiConsole.Write(hotbar);
-        }
-
-        void WriteBotLog() {
-            var stream = new MemoryStream(BotClient.BotLog.ToArray());
-            var reader = new StreamReader(stream);
-
-            var fullLog = reader.ReadToEnd();
-            AnsiConsole.WriteLine(fullLog);
         }
 
         void WritePlayerInfo() {
@@ -129,8 +120,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
         internal enum DisplayOption {
             Players,
             PlayerInfo,
-            Inventory,
-            BotLog
+            Inventory
         }
     }
 }

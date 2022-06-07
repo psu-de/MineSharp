@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MineSharp.Bot {
-    public partial class Bot {
+    public partial class MinecraftBot {
 
         public InventoryWindow Inventory;
         public Dictionary<int, Window> OpenWindows;

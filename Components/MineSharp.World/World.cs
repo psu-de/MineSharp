@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -122,6 +123,16 @@ namespace MineSharp.World {
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
                 return chunk.GetBlockAt(pos);
+            }
+        }
+
+        public BiomeInfo GetBiomeAt(Position pos) {
+            if (this.IsOutOfMap(pos)) throw new ArgumentException("Position is out of map");
+            ChunkCoordinates coords = GetChunkCoordinates(pos.X, pos.Z);
+
+            if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
+            else {
+                return chunk.GetBiomeAt(pos);
             }
         }
 

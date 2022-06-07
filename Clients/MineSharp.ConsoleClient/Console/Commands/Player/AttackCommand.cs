@@ -27,12 +27,12 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 return;
             }
 
-            if (!BotClient.Bot.EntitiesMapping.ContainsKey(eId.Value)) {
+            if (!BotClient.Bot.Entities.ContainsKey(eId.Value)) {
                 AnsiConsole.MarkupLine($"[red]Entity with id {eId.Value} does not exist[/]");
                 return;
             }
 
-            var entity = BotClient.Bot.EntitiesMapping[eId.Value];
+            var entity = BotClient.Bot.Entities[eId.Value];
             BotClient.Bot.Attack(entity).GetAwaiter().GetResult();
             AnsiConsole.MarkupLine($"[green]Entity {eId.Value} attacked![/]");
         }

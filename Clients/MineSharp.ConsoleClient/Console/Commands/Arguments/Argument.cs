@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
     internal abstract class Argument {
 
+        protected Action<string> ArgumentMatched;
+
         public Argument(string name, bool isOptional = false) {
             this.Name = name;
             this.IsOptional = isOptional;

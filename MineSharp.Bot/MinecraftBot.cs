@@ -1,4 +1,6 @@
 ﻿using MineSharp.Bot.Enums;
+using MineSharp.Bot.Modules;
+using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
@@ -12,7 +14,7 @@ using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 
 namespace MineSharp.Bot {
-    public partial class Bot {
+    public partial class MinecraftBot {
 
         private static Logger Logger = Logger.GetLogger();
 
@@ -39,10 +41,21 @@ namespace MineSharp.Bot {
 
         #endregion
 
-        private Dictionary<Type, TaskCompletionSource<Packet>> packetWaiters = new Dictionary<Type, TaskCompletionSource<Packet>>();
+        private Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
+        private Dictionary<Type, List<Func<Packet, Task>>> PacketHandlers = new Dictionary<Type, List<Func<Packet, Task>>>();
+        private Task TickLoopTask;
 
+        public List<Module> Modules = new List<Module>();
+        private List<TickedModule> TickedModules = new List<TickedModule>();
 
-        public Bot(BotOptions options) {
+        public BotBaseModule BaseModule;
+
+        public EntityModule EntityModule;
+        public PlayerModule PlayerModule;
+        public WorldModule WorldModule;
+        public PhysicsModule PhysicsModule;
+
+        public MinecraftBot(BotOptions options) {
             this.Options = options;
             this.Version = new MinecraftVersion(this.Options.Version);
 
@@ -57,24 +70,73 @@ namespace MineSharp.Bot {
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
             this.Client.PacketReceived += Events_PacketReceived;
 
-            this.LoadWindows();
-            this.LoadEntities();
-            this.LoadWorld();
-            this.LoadMovements();
+            LoadWindows();
+        }
+
+        public Task LoadModule(Module module) {
+
+            this.Modules.Add(module);
+            if (module is TickedModule)
+                this.TickedModules.Add((TickedModule)module);
+
+            return module.Initialize();
+
+        }
+
+        private async Task TickLoop () {
+            while (true) {
+                var start = DateTime.Now;
+
+                var tasks = new List<Task>();
+
+                foreach (var tickedModule in TickedModules) {
+                    if (tickedModule.IsEnabled) {
+                        tasks.Add(tickedModule.Tick());
+                    }
+                }
+                await Task.WhenAll(tasks);
+
+                var deltaTime = MinecraftConst.TickMs - (int)(DateTime.Now - start).TotalMilliseconds;
+                if (deltaTime < 0) {
+                    Logger.Warning($"Ticked modules taking too long, {-deltaTime}ms behind");
+                }else    
+                    await Task.Delay(deltaTime);
+            }
         }
 
         private partial void LoadWindows();
-        private partial void LoadEntities();
-        private partial void LoadWorld();
-        private partial void LoadMovements();
+
+
+        private async Task LoadModules () {
+            this.BaseModule = new BotBaseModule(this);
+            this.EntityModule = new EntityModule(this);
+            this.PlayerModule = new PlayerModule(this);
+            this.PhysicsModule = new PhysicsModule(this);
+            this.WorldModule = new WorldModule(this);
+
+            await Task.WhenAll(new Task[] {
+                LoadModule(this.BaseModule),
+                LoadModule(this.EntityModule),
+                LoadModule(this.PlayerModule),
+                LoadModule(this.PhysicsModule),
+                LoadModule(this.WorldModule)
+                });
+        }
+
 
         /// <summary>
         /// Connects the bot to the server
         /// </summary>
         /// <returns></returns>
         public async Task<bool> Connect() {
-            this.Health = 20;
-            return await this.Client.Connect(GameState.LOGIN);
+            if (!await this.Client.Connect(GameState.LOGIN)) {
+                return false;
+            }
+
+            await LoadModules();
+
+            TickLoopTask = TickLoop();
+            return true;
         }
 
         /// <summary>
@@ -83,56 +145,55 @@ namespace MineSharp.Bot {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public Task<Packet> WaitForPacket<T>() where T : Packet {
+        public Task<T> WaitForPacket<T>() where T : Packet {
             Type packetType = typeof(T);
             if (!packetWaiters.TryGetValue(packetType, out var task)) {
-                TaskCompletionSource<Packet> tsc = new TaskCompletionSource<Packet>();
+                TaskCompletionSource<T> tsc = new TaskCompletionSource<T>();
                 this.packetWaiters.Add(packetType, tsc);
 
                 return tsc.Task ?? throw new ArgumentNullException();
-            } else return task.Task ?? throw new ArgumentNullException();
+            } else return (((TaskCompletionSource<T>?)task)?.Task) ?? throw new ArgumentNullException();
+        }
+
+
+        public void On<T>(Func<T, Task> handler) where T : Packet {
+            if (PacketHandlers.ContainsKey(typeof(T))) {
+                PacketHandlers[typeof(T)].Add((Packet p) => handler((T)p));
+            } else {
+                PacketHandlers.Add(typeof(T), new List<Func<Packet, Task>>() { (Packet p) => handler((T)p) });
+            }
         }
 
         private void Events_PacketReceived(MinecraftClient client, Packet packet) {
 
             Type packetType = packet.GetType();
             if (packetWaiters.TryGetValue(packetType, out var tsc)) {
-                tsc.TrySetResult(packet);
+                if (null == typeof(TaskCompletionSource<>).MakeGenericType(packetType).GetMethod("TrySetResult")?.Invoke(tsc, new[] { packet })) {
+                    throw new InvalidOperationException();
+                }
+                
                 packetWaiters.Remove(packetType);
             }
+
+            List<Task> tasks = new List<Task>();
+            if (PacketHandlers.TryGetValue(packetType, out var handlers)) {
+                foreach (var handler in handlers) {
+                    tasks.Add(handler(packet));
+                }
+            }
+
+            Task.WaitAll(tasks.ToArray());
 
             switch (packet) {
 
                 // Base
-                case Protocol.Packets.Clientbound.Play.JoinGamePacket                       p_0x26: handleJoinGame(p_0x26); break;
-                case Protocol.Packets.Clientbound.Play.DeathCombatEventPacket               p_0x35: handleDeathCombat(p_0x35); break;
-                case Protocol.Packets.Clientbound.Play.DestroyEntitiesPacket                p_0x3A: handleDespawnEntity(p_0x3A); break;
-                case Protocol.Packets.Clientbound.Play.RespawnPacket                        p_0x3D: handleRespawn(p_0x3D); break;
-                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket                 p_0x48: handleHeldItemChange(p_0x48); break;
-                case Protocol.Packets.Clientbound.Play.UpdateHealthPacket                   p_0x52: handleUpdateHealth(p_0x52); break;
+                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket p_0x48: handleHeldItemChange(p_0x48); break;
 
                 // Entities 
-                case Protocol.Packets.Clientbound.Play.SpawnLivingEntityPacket              p_0x02: handleSpawnLivingEntity(p_0x02); break;
-                case Protocol.Packets.Clientbound.Play.SpawnPlayerPacket                    p_0x04: handleSpawnPlayer(p_0x04); break;
-                case Protocol.Packets.Clientbound.Play.EntityPositionPacket                 p_0x29: handleEntityPosition(p_0x29); break;
-                case Protocol.Packets.Clientbound.Play.EntityPositionAndRotationPacket      p_0x2A: handleEntityPositionAndRotation(p_0x2A); break;
-                case Protocol.Packets.Clientbound.Play.EntityRotationPacket                 p_0x2B: handleEntityRotation(p_0x2B); break;
-                case Protocol.Packets.Clientbound.Play.PlayerInfoPacket                     p_0x36: handlePlayerInfo(p_0x36); break;
-                case Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket          p_0x38: handlePlayerPositionAndLook(p_0x38); break;
-                case Protocol.Packets.Clientbound.Play.RemoveEntityEffectPacket             p_0x3B: handleRemoveEntityEffect(p_0x3B); break;
-                case Protocol.Packets.Clientbound.Play.EntityVelocityPacket                 p_0x4F: handleUpdateEntityVelocity(p_0x4F); break;
-                case Protocol.Packets.Clientbound.Play.EntityTeleportPacket                 p_0x62: handleEntityTeleport(p_0x62); break;
-                case Protocol.Packets.Clientbound.Play.EntityEffectPacket                   p_0x65: handleEntityEffect(p_0x65); break;
-
-                // World
-                case Protocol.Packets.Clientbound.Play.BlockChangePacket                    p_0x0C: handleBlockUpdate(p_0x0C); break;
-                case Protocol.Packets.Clientbound.Play.UnloadChunkPacket                    p_0x1D: handleUnloadChunk(p_0x1D); break;
-                case Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket        p_0x22: handleChunkDataAndLightUpdate(p_0x22); break;
-                case Protocol.Packets.Clientbound.Play.MultiBlockChangePacket               p_0x3F: handleMultiBlockChange(p_0x3F); break;
 
                 // Windows
-                case Protocol.Packets.Clientbound.Play.WindowItemsPacket                    p_0x14: handleWindowItems(p_0x14); break;
-                case Protocol.Packets.Clientbound.Play.SetSlotPacket                        p_0x16: handleSetSlot(p_0x16); break;
+                case Protocol.Packets.Clientbound.Play.WindowItemsPacket p_0x14: handleWindowItems(p_0x14); break;
+                case Protocol.Packets.Clientbound.Play.SetSlotPacket p_0x16: handleSetSlot(p_0x16); break;
 
             }
         }
@@ -141,18 +202,7 @@ namespace MineSharp.Bot {
 
         #region Public Methods
 
-        /// <summary>
-        /// Respawns the bot
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotSupportedException">Thrown when bot is still alive</exception>
-        public Task Respawn() {
-            if (!this.IsAlive) {
-
-                return this.Client.SendPacket(new ClientStatusPacket(ClientStatusPacket.ClientStatusAction.PerformRespawn)).ContinueWith((x) => this.IsAlive = true);
-
-            } else throw new NotSupportedException();
-        }
+        public Task Respawn() => BaseModule.Respawn();
 
 
         /// <summary>

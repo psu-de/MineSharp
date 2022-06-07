@@ -1,6 +1,7 @@
 ﻿using MineSharp.ConsoleClient;
 using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console;
+using MineSharp.Core.Types;
 using MineSharp.Data;
 using PrettyPrompt;
 using PrettyPrompt.Highlighting;
@@ -10,10 +11,10 @@ using System.Net;
 using System.Reflection;
 
 //Credentials
-MineSharp.Bot.Bot.BotOptions loginOptions = new MineSharp.Bot.Bot.BotOptions();
+MineSharp.Bot.MinecraftBot.BotOptions loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions();
 
 if (true /*args.Length == 1*/) {
-    loginOptions = new MineSharp.Bot.Bot.BotOptions() {
+    loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions() {
         Host = "127.0.0.1",
         Port = 25565,
         Offline = true,
@@ -53,7 +54,7 @@ if (true /*args.Length == 1*/) {
 
     string version = AnsiConsole.Ask<string>("Minecraft version: ");
 
-    loginOptions = new MineSharp.Bot.Bot.BotOptions() {
+    loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions() {
         Host = host,
         Offline = isOffline,
         Password = password,
@@ -71,11 +72,6 @@ AnsiConsole.Status()
     .Spinner(Spinner.Known.Dots2)
     .Start($"Connecting to [purple]{loginOptions.Host}:{loginOptions.Port}[/] as [aqua]{loginOptions.UsernameOrEmail}[/]", ctx => {
         BotClient.Initialize(loginOptions);
-
-        void botJoined() {
-            ctx.Status("[green] Connected! [/]");
-        }
-        BotClient.Bot.Joined += botJoined;
 
         MinecraftData.Load();
         var successful = BotClient.Bot.Connect().GetAwaiter().GetResult();

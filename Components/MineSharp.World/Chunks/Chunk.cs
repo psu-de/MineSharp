@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -81,6 +82,15 @@ namespace MineSharp.World.Chunks {
             block.Position = pos;
             return block;
         }
+
+        public BiomeInfo GetBiomeAt(Position pos) {
+            int sectionIndex = GetSectionIndex(pos.Y);
+            if (sectionIndex >= this.ChunkSections.Length) throw new Exception("Out of map");
+            var chunkPos = this.World2ChunkPos(pos);
+            BiomeInfo biome = this.ChunkSections[sectionIndex].GetBiomeAt(chunkPos);
+            return biome;
+        }
+
 
         private int GetSectionIndex(int y) {
             return (y - World.MinY) >> 4;

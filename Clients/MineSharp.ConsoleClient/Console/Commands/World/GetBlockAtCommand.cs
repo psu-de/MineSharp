@@ -34,7 +34,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             }
 
             var block = BotClient.Bot.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties");
+            var biome = BotClient.Bot.GetBiomeAt(new Core.Types.Position((int)x, (int)y, (int)z));
+            var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties", "Biome");
 
             string propGetValue(Data.Blocks.BlockStateProperty prop) {
                 switch (prop.Type) {
@@ -51,7 +52,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
 
             string properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
 
-            table.AddRow(block.Info.Name, block.Position.ToString(), block.Metadata.ToString(), properties);
+            table.AddRow(block.Info.Name, block.Position.ToString(), block.Metadata.ToString(), properties, biome.Name);
             AnsiConsole.Write(table);
             AnsiConsole.WriteLine();
         }

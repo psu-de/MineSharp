@@ -75,7 +75,8 @@ namespace MineSharp.ConsoleClient.Console {
 
                 //Misc
                 RegisterCommand(new DisplayCommand());
-                RegisterCommand(new EnablePhysicsCommand());
+                RegisterCommand(new ToggleModuleCommand());
+                RegisterCommand(new BotLogCommand());
             }
 
         }

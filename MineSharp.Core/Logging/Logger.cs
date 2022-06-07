@@ -7,6 +7,37 @@ namespace MineSharp.Core.Logging {
         public static LogLevel Threshold = LogLevel.DEBUG3;
 
         public static TextWriter LogWriter = Console.Out;
+        public static List<LogMessage> LogMessages = new List<LogMessage>();
+
+        public struct LogMessage {
+            public LogLevel Level;
+            public string Caller;
+            public DateTime Time;
+            public string Message;
+
+            public override string ToString() {
+
+                string Format(string val) {
+                    return val.PadLeft(2, '0');
+                }
+
+                string time = $"{Format(Time.Hour.ToString())}:{Format(Time.Minute.ToString())}:{Format(Time.Second.ToString())}";
+                string logl = Level switch {
+                    LogLevel.INFO => "INFO ",
+                    LogLevel.DEBUG3 => "DEBUG",
+                    LogLevel.DEBUG2 => "DEBUG",
+                    LogLevel.DEBUG => "DEBUG",
+                    LogLevel.WARN => "WARN ",
+                    LogLevel.ERROR => "ERROR",
+                    _ => "-----"
+                };
+                string name = Caller.PadRight(10, ' ').Substring(0, 10);
+
+                return $"[{logl}][{time}][{name}] > {Message}";
+            }
+        }
+
+        
 
         public static Logger GetLogger(string? module = null) {
             return new Logger(module ?? NamespaceOfCallingClass());
@@ -38,55 +69,36 @@ namespace MineSharp.Core.Logging {
         public Logger(string name) {
             this.Name = name;
         }
+
+
         public void Debug3(string message) => this.Log(message, LogLevel.DEBUG3);
-
-
         public void Debug2(string message) => this.Log(message, LogLevel.DEBUG2);
-
         public void Debug(string message) => this.Log(message, LogLevel.DEBUG);
-
-        public void Error(string message) => this.Log(message, LogLevel.Error);
-
+        public void Error(string message) => this.Log(message, LogLevel.ERROR);
         public void Warning(string message) => this.Log(message, LogLevel.WARN);
-
         public void Info(string message) => this.Log(message, LogLevel.INFO);
 
 
         public void Log(string message, LogLevel level) {
             if ((int)level > (int)Threshold) return;
-            string time = this.GetTimeFormatted();
-            string logl = this.GetLogLevelString(level);
-            string name = this.Name.PadRight(10, ' ').Substring(0, 10);
 
-            string logMessage = $"[{logl}][{time}][{name}] > {message}";
+            var log = new LogMessage() {
+                Level = level,
+                Time = DateTime.Now,
+                Caller = this.Name,
+                Message = message
+            };
 
-            LogWriter.WriteLine(logMessage);
+
+            LogWriter.WriteLine(log.ToString());
             if (level <= LogLevel.DEBUG) {
-                System.Diagnostics.Debug.WriteLine(logMessage);
+                System.Diagnostics.Debug.WriteLine(log.ToString());
             }
+
+            if (level == LogLevel.DEBUG3) {
+                LogMessages.RemoveAll(x => x.Level == LogLevel.DEBUG3 && (DateTime.Now - x.Time).TotalMinutes >= 5);
+            }
+            LogMessages.Add(log);
         }
-
-        private string GetLogLevelString(LogLevel level) {
-            switch (level) {
-                case LogLevel.INFO:  return "INFO ";
-                case LogLevel.DEBUG3:
-                case LogLevel.DEBUG2:
-                case LogLevel.DEBUG: return "DEBUG";
-                case LogLevel.WARN:  return "WARN ";
-                case LogLevel.Error: return "ERROR";
-                default: return "-----";
-            }
-        }
-
-         private string GetTimeFormatted() {
-
-            string Format(string val) {
-                return val.PadLeft(2, '0');
-            }
-
-            DateTime dt = DateTime.Now;
-            return $"{Format(dt.Hour.ToString())}:{Format(dt.Minute.ToString())}:{Format(dt.Second.ToString())}";
-
-         }
     }
 }

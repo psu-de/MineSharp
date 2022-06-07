@@ -15,7 +15,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized {
            
             List<CompletionItem> items = new List<CompletionItem>();
 
-            foreach (var e in BotClient.Bot.EntitiesMapping.Values) {
+            foreach (var e in BotClient.Bot.Entities.Values) {
 
                 string displayText = $"[{Color}]{e.Id} ({e.EntityInfo.Name})[/]";
 

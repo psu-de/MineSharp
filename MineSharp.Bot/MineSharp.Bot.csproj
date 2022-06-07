@@ -15,8 +15,4 @@
     <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Plugins\" />
-  </ItemGroup>
-
 </Project>

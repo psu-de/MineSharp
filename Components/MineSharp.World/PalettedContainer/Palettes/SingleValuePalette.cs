@@ -22,5 +22,9 @@ namespace MineSharp.World.PalettedContainer.Palettes {
         public void Read(PacketBuffer buffer) {
             this.Value = buffer.ReadVarInt();
         }
+
+        public IndirectPalette ConvertToIndirectPalette(int newState) {
+            return new IndirectPalette(new int[] { this.Value, newState });
+        }
     }
 }

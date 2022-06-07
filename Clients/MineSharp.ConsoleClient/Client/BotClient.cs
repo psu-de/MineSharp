@@ -12,15 +12,15 @@ namespace MineSharp.ConsoleClient.Client {
         public static MemoryStream BotLog = new MemoryStream();
         private static StreamWriter BotLogWriter;
 
-        public static void Initialize (Bot.Bot.BotOptions options) {
+        public static void Initialize (Bot.MinecraftBot.BotOptions options) {
             BotLogWriter = new StreamWriter(BotLog);
             BotLogWriter.AutoFlush = true;
 
             MineSharp.Core.Logging.Logger.LogWriter = BotLogWriter;
-            Bot = new Bot.Bot(options);
+            Bot = new MineSharp.Bot.MinecraftBot(options);
         }
 
-        public static Bot.Bot Bot;
+        public static Bot.MinecraftBot Bot;
 
     }
 }

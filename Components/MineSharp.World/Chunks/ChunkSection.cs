@@ -1,6 +1,8 @@
 ﻿using MineSharp.Core.Types;
+using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
+using MineSharp.World.PalettedContainer;
 using MineSharp.World.PalettedContainer.Palettes;
 using System;
 using System.Collections.Generic;
@@ -16,21 +18,18 @@ namespace MineSharp.World.Chunks {
 
         public static ChunkSection Read(PacketBuffer buffer) {
             short solidBlockCount = buffer.ReadShort();
-            PalettedContainer.PalettedContainer blockContainer = new PalettedContainer.PalettedContainer(false, 16 * 16 * 16);
-            PalettedContainer.PalettedContainer biomeContainer = new PalettedContainer.PalettedContainer(true, 4 * 4 * 4);
-
-            blockContainer.Read(buffer);
-            biomeContainer.Read(buffer);
+            BlockPalettedContainer blockContainer = BlockPalettedContainer.Read(buffer);
+            BiomePalettedContainer biomeContainer = BiomePalettedContainer.Read(buffer);
 
             return new ChunkSection(solidBlockCount, blockContainer, biomeContainer);
         }
 
 
         public short SolidBlockCount { get; private set; }
-        private PalettedContainer.PalettedContainer BlockStorage;
-        private PalettedContainer.PalettedContainer BiomeStorage;
+        private BlockPalettedContainer BlockStorage;
+        private BiomePalettedContainer BiomeStorage;
 
-        public ChunkSection(short blockCount, PalettedContainer.PalettedContainer blockContainer, PalettedContainer.PalettedContainer biomeContainer) {
+        public ChunkSection(short blockCount, BlockPalettedContainer blockContainer, BiomePalettedContainer biomeContainer) {
             this.SolidBlockCount = blockCount;
             this.BlockStorage = blockContainer;
             this.BiomeStorage = biomeContainer;
@@ -48,13 +47,18 @@ namespace MineSharp.World.Chunks {
             }
         }
 
+        public BiomeInfo GetBiomeAt(Position pos) {
+            BiomeInfo biome = GetBiomeAt(GetBiomeIndex(pos.X, pos.Y, pos.Z));
+            return biome;
+        }
+
         public Block GetBlockAt(Position blockPos) {
-            BlockInfo info = GetBlockAt(GetIndex(blockPos.X, blockPos.Y, blockPos.Z), out int state);
+            BlockInfo info = GetBlockAt(GetBlockIndex(blockPos.X, blockPos.Y, blockPos.Z), out int state);
             return new Block(info, blockPos, state);
         }
 
         public void SetBlock(Block block) {
-            int index = GetIndex(block.Position.X, block.Position.Y, block.Position.Z);
+            int index = GetBlockIndex(block.Position.X, block.Position.Y, block.Position.Z);
 
             var oldBlock = GetBlockAt(block.Position);
 
@@ -65,8 +69,17 @@ namespace MineSharp.World.Chunks {
             this.BlockStorage.SetAt(index, block.State);
         }
 
-        private int GetIndex(int x, int y, int z) {
+        private int GetBiomeIndex(int x, int y, int z) {
+            return (y >> 2) << 2 | (z >> 2) << 2 | (x >> 2);
+        }
+
+        private int GetBlockIndex(int x, int y, int z) {
             return (y << 8) | (z << 4) | x;
+        }
+
+        private BiomeInfo GetBiomeAt(int index) {
+            var state = BiomeStorage.GetAt(index);
+            return BiomeData.Biomes[state];
         }
 
         private BlockInfo GetBlockAt(int index, out int state) {
@@ -84,7 +97,7 @@ namespace MineSharp.World.Chunks {
                     for (int z = 0; z < Chunk.ChunkSectionLength; z++) {
                         for (int x = 0; x < Chunk.ChunkSectionLength; x++) {
                             if (cancellation?.IsCancellationRequested ?? false) return null;
-                            int value = BlockStorage.GetAt(GetIndex(x, y, z));
+                            int value = BlockStorage.GetAt(GetBlockIndex(x, y, z));
                             if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId)
                                 return GetBlockAt(new Position(x, y, z));
                         }
@@ -108,7 +121,7 @@ namespace MineSharp.World.Chunks {
                     for (int z = 0; z < Chunk.ChunkSectionLength; z++) {
                         for (int x = 0; x < Chunk.ChunkSectionLength; x++) {
                             if (cancellation?.IsCancellationRequested ?? false) return null;
-                            int value = BlockStorage.GetAt(GetIndex(x, y, z));
+                            int value = BlockStorage.GetAt(GetBlockIndex(x, y, z));
                             if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId) {
                                 blocks.Add(GetBlockAt(new Position(x, y, z)));
                                 if (count > 0 && blocks.Count >= count) {

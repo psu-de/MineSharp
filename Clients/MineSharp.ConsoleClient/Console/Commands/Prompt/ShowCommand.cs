@@ -60,14 +60,18 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
                 }
             }
 
+            Table masterTable = new Table().AddColumns("Category", "");
+
             foreach (var group in commands) {
-                var table = new Table().AddColumns(group.Key, "Help");
+                var table = new Table().AddColumns("Command", "Help");
                 foreach (var c in group.Value) {
                     table.AddRow(new Markup($"\n[{c.Color}]{c.Name}[/]"), new Panel(c.Description));
                 }
-                AnsiConsole.Write(table);
-                AnsiConsole.WriteLine();
+                masterTable.AddRow(new Text("\n" + group.Key), table.Width(1000));
             }
+
+            AnsiConsole.Write(masterTable);
+            AnsiConsole.WriteLine();
         }
 
         enum ShowCommandOption {

@@ -8,11 +8,19 @@ using System.Threading.Tasks;
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
     internal class StringArgument : Argument {
 
-        public StringArgument(string name, bool isOptional = false) : base(name, isOptional) { }
+
+        private string[]? Options = null;
+        public StringArgument(string name, bool isOptional = false, string[]? options = null) : base(name, isOptional) { 
+        
+            this.Options = options;
+        }
 
         public override string Color { get => "orange1"; set => throw new NotImplementedException(); }
 
         public override List<CompletionItem> GetCompletionItems(string str) {
+            if (Options != null) {
+                return Options.Select(x => new CompletionItem(x)).ToList();
+            }
             return new List<CompletionItem>();
         }
 

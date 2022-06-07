@@ -13,10 +13,8 @@ namespace MineSharp.ConsoleClient.Console {
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Color { get; private set; }
-
         private bool _isInitialized = false;
-
-        public Argument[] Arguments;
+        public List<Argument> Arguments;
 
         public void Initialize(string name, string description, string color, params Argument[] arguments) {
 
@@ -28,14 +26,14 @@ namespace MineSharp.ConsoleClient.Console {
             this.Name = name;
             this.Description = description;
             this.Color = color;
-            this.Arguments = arguments;
+            this.Arguments = arguments.ToList();
         }
 
         public (Argument? arg, string remaining) GetCurrentArgument(string args) {
             if (!_isInitialized) throw new InvalidOperationException("Not initialized");
 
             string remaining = args;
-            for (int i = 0; i < Arguments.Length; i++) {
+            for (int i = 0; i < Arguments.Count; i++) {
                 if (!Arguments[i].Match(ref remaining)) {
                     return (Arguments[i], remaining);
                 }
@@ -49,7 +47,7 @@ namespace MineSharp.ConsoleClient.Console {
             List<FormatSpan> highlights = new List<FormatSpan>();
 
             int strIndex = strOffset;
-            for (int i = 0; i < Arguments.Length; i++) {
+            for (int i = 0; i < Arguments.Count; i++) {
                 string beforeArgs = args;
                 int argLenBefore = args.Length;
                 bool complete = Arguments[i].Match(ref args);
@@ -75,7 +73,7 @@ namespace MineSharp.ConsoleClient.Console {
             List<string> argv = new List<string>();
 
             string remaining = args;
-            for (int i = 0; i < Arguments.Length; i++) {
+            for (int i = 0; i < Arguments.Count; i++) {
                 remaining = remaining.TrimStart();
                 string beforeArgs = remaining;
                 Arguments[i].Match(ref remaining);

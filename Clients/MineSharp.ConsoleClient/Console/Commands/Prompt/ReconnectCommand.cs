@@ -16,7 +16,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
         public override void DoAction(string[] argv, CancellationToken cancellation) {
             var options = BotClient.Bot.Options;
             BotClient.Bot.Client.ForceDisconnect("");
-            BotClient.Bot = new Bot.Bot(options);
+            BotClient.Bot = new Bot.MinecraftBot(options);
             if (!BotClient.Bot.Connect().GetAwaiter().GetResult()) {
                 AnsiConsole.MarkupLine("[red]Error reconnecting![/]");
                 Environment.Exit(0);

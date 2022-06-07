@@ -11,6 +11,6 @@ namespace MineSharp.Core.Logging {
         DEBUG = 4,
         INFO = 3,
         WARN = 2,
-        Error = 1
+        ERROR = 1
     }
 }
