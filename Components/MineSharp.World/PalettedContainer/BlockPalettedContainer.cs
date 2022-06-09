@@ -68,12 +68,13 @@ namespace MineSharp.World.PalettedContainer {
                 switch (this.Palette) {
                     case SingleValuePalette svp:
                         this.Palette = svp.ConvertToIndirectPalette(state);
-                        this.Data = new IntBitArray(Enumerable.Repeat(0L, this.Data.Capacity / (64 / IndirectPalette.BLOCK_MIN_BITS)).ToArray(), IndirectPalette.BLOCK_MIN_BITS);
+                        this.Data = new IntBitArray(new long[(int)Math.Ceiling((float)this.Capacity / (64 / IndirectPalette.BLOCK_MIN_BITS))], IndirectPalette.BLOCK_MIN_BITS);
                         this.Data.Set(index, 1);
                         break;
                     case IndirectPalette dp:
                         var newPalette = dp.AddState(state, false, out var newBitsPerEntry);
-                        var newData = new IntBitArray(Enumerable.Repeat(0L, this.Data.Capacity / (64 / newBitsPerEntry)).ToArray(), newBitsPerEntry);
+
+                        var newData = new IntBitArray(new long[(int)Math.Ceiling((float)this.Capacity / (64 / newBitsPerEntry))], newBitsPerEntry);
                         for (int i = 0; i < this.Data.Capacity; i++) {
                             if (newPalette is DirectPalette)
                                 newData.Set(i, GetAt(i));
@@ -84,6 +85,8 @@ namespace MineSharp.World.PalettedContainer {
                             newData.Set(index, state);
                         else 
                             newData.Set(index, ((IndirectPalette)newPalette).GetStateIndex(state));
+                        this.Data = newData;
+                        this.Palette = newPalette;
                         break;
                 }
 

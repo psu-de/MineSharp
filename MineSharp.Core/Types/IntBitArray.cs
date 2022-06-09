@@ -12,7 +12,7 @@ namespace MineSharp.Core.Types {
 
         public long[] Data { get; private set; }
         public byte BitsPerEntry { get; private set; }
-        public int Capacity => (Data.Length * 64) / BitsPerEntry;
+        public int Capacity => ValuesPerLong * Data.Length;
 
         private int ValuesPerLong => 64 / BitsPerEntry;
         private long ValueMask => (1L << BitsPerEntry) - 1;

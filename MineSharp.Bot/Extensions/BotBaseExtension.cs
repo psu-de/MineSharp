@@ -50,15 +50,6 @@ namespace MineSharp.Bot {
 
         #region Packet Handling
 
-        private void handleHeldItemChange(Protocol.Packets.Clientbound.Play.HeldItemChangePacket packet) {
-            this.SelectedHotbarIndex = packet.Slot;
-
-            if (this.HeldItem != null) {
-                this.HeldItemChanged?.Invoke(this.HeldItem);
-            }
-        }
-
-
         public Task WaitForBot() => this.BaseModule.WaitForBot();
 
         #endregion
