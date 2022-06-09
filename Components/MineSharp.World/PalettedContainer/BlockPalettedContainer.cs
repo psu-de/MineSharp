@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Core.Logging;
+using MineSharp.Core.Types;
 using MineSharp.Protocol.Packets;
 using MineSharp.World.PalettedContainer.Palettes;
 using System;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace MineSharp.World.PalettedContainer {
     public class BlockPalettedContainer : IPalettedContainer {
+
+        static Logger Logger = Logger.GetLogger();
 
         public static BlockPalettedContainer Read(PacketBuffer buffer) {
             byte bitsPerEntry = buffer.ReadByte();
@@ -67,25 +70,26 @@ namespace MineSharp.World.PalettedContainer {
 
                 switch (this.Palette) {
                     case SingleValuePalette svp:
+                        Logger.Info($"Converting {nameof(SingleValuePalette)} to {nameof(IndirectPalette)}");
                         this.Palette = svp.ConvertToIndirectPalette(state);
                         this.Data = new IntBitArray(new long[(int)Math.Ceiling((float)this.Capacity / (64 / IndirectPalette.BLOCK_MIN_BITS))], IndirectPalette.BLOCK_MIN_BITS);
                         this.Data.Set(index, 1);
                         break;
                     case IndirectPalette dp:
                         var newPalette = dp.AddState(state, false, out var newBitsPerEntry);
+                        Logger.Info($"Converting {nameof(IndirectPalette)} (bps={Data.BitsPerEntry}) to {newPalette.GetType().Name} (bps={newBitsPerEntry})");
+                        this.Data.ChangeBitsPerEntry(newBitsPerEntry);
 
-                        var newData = new IntBitArray(new long[(int)Math.Ceiling((float)this.Capacity / (64 / newBitsPerEntry))], newBitsPerEntry);
-                        for (int i = 0; i < this.Data.Capacity; i++) {
-                            if (newPalette is DirectPalette)
-                                newData.Set(i, GetAt(i));
-                            else if (newPalette is IndirectPalette)
-                                newData.Set(i, ((IndirectPalette)newPalette).GetStateIndex(this.Data.Get(i)));
+                        if (newPalette is DirectPalette) {
+                            for (int i = 0; i < Capacity; i++) {
+                                this.Data.Set(i, GetAt(i));
+                            }
                         }
+
                         if (newPalette is DirectPalette)
-                            newData.Set(index, state);
+                            this.Data.Set(index, state);
                         else 
-                            newData.Set(index, ((IndirectPalette)newPalette).GetStateIndex(state));
-                        this.Data = newData;
+                            this.Data.Set(index, ((IndirectPalette)newPalette).GetStateIndex(state));
                         this.Palette = newPalette;
                         break;
                 }

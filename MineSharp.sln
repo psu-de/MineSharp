@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.WebInterface", "C
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "Clients\WebInterface\docker-compose.dcproj", "{AE10353F-2F01-457E-A3E8-E5653F2D913F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Windows", "..\MineSharp.Windows\MineSharp.Windows.csproj", "{D33E64C8-2DC5-4E17-BA2B-8987B33760AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Windows", "..\MineSharp.Windows\MineSharp.Windows.csproj", "{D33E64C8-2DC5-4E17-BA2B-8987B33760AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

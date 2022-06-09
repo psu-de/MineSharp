@@ -20,8 +20,19 @@ namespace MineSharp.Core.Types {
         public IntBitArray(long[] data, byte bitsPerEntry) {
             this.Data = data;
             this.BitsPerEntry = bitsPerEntry;
+        }
 
-            if (bitsPerEntry == 0) return;
+        public void ChangeBitsPerEntry(byte newBitsPerEntry) {
+            if (newBitsPerEntry == BitsPerEntry) return;
+
+            var old = new IntBitArray(this.Data, this.BitsPerEntry);
+            var capacity = this.Capacity;
+            this.BitsPerEntry = newBitsPerEntry;
+
+            this.Data = new long[(int)Math.Ceiling((float)capacity / ValuesPerLong)];
+            for (int i = 0; i < capacity; i++) {
+                this.Set(i, old.Get(i));
+            }
         }
 
         public void Set(int idx, int value) {

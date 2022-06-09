@@ -47,6 +47,7 @@ namespace MineSharp.World.PalettedContainer.Palettes {
 
             var newMapSize = Map.Length + 1;
             newBitsPerEntry = (byte)Math.Ceiling(Math.Log2(newMapSize));
+            newBitsPerEntry = (byte)Math.Max(newBitsPerEntry, biomes ? BIOME_MIN_BITS : BLOCK_MIN_BITS);
 
             if (newBitsPerEntry > (biomes ? BIOME_MAX_BITS : BLOCK_MAX_BITS)) {
                 // direct palette neeeded
