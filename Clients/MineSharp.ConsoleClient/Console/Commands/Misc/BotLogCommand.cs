@@ -26,17 +26,6 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             AnsiConsole.WriteLine($"Use count<0 for the last [{CountArg.Color}]count[/] messages");
         }
 
-        Spectre.Console.Color GetLogLevelColor(LogLevel level) =>
-            level switch {
-                LogLevel.INFO => Spectre.Console.Color.White,
-                LogLevel.WARN => Spectre.Console.Color.Orange1,
-                LogLevel.ERROR => Spectre.Console.Color.Red,
-                LogLevel.DEBUG => Spectre.Console.Color.Cyan1,
-                LogLevel.DEBUG2 => Spectre.Console.Color.Magenta1,
-                LogLevel.DEBUG3 => Spectre.Console.Color.Magenta2,
-                _ => throw new NotSupportedException()
-            };
-
         public override void DoAction(string[] argv, CancellationToken cancellation) {
 
             int count = 0;
@@ -65,7 +54,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             }
 
             foreach (var message in messages) {
-                AnsiConsole.Write(new Text(message.ToString() + "\n", new Style(GetLogLevelColor(message.Level))));
+                AnsiConsole.MarkupLine(message.Markup(Markup.Escape));
             }
         }
     }

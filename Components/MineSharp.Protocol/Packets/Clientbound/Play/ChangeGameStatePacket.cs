@@ -1,24 +1,26 @@
+using MineSharp.Core.Types.Enums;
+
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class ChangeGameStatePacket : Packet {
 
-        public byte Reason { get; private set; }
-public float Value { get; private set; }
+        public GameStateReason Reason { get; private set; }
+        public float Value { get; private set; }
 
         public ChangeGameStatePacket() { }
 
-        public ChangeGameStatePacket(byte reason, float value) {
+        public ChangeGameStatePacket(GameStateReason reason, float value) {
             this.Reason = reason;
-this.Value = value;
+            this.Value = value;
         }
 
         public override void Read(PacketBuffer buffer) {
-            this.Reason = buffer.ReadByte();
-this.Value = buffer.ReadFloat();
+            this.Reason = (GameStateReason)buffer.ReadByte();
+            this.Value = buffer.ReadFloat();
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteByte(this.Reason);
-buffer.WriteFloat(this.Value);
+            buffer.WriteByte((byte)this.Reason);
+            buffer.WriteFloat(this.Value);
         }
     }
 }

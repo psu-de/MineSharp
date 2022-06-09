@@ -9,6 +9,9 @@ namespace MineSharp.Core.Logging {
         public static TextWriter LogWriter = Console.Out;
         public static List<LogMessage> LogMessages = new List<LogMessage>();
 
+        public delegate void LogMessageEvent(LogMessage message);
+        public static event LogMessageEvent OnLogMessageReceieved;
+
         public struct LogMessage {
             public LogLevel Level;
             public string Caller;
@@ -34,6 +37,22 @@ namespace MineSharp.Core.Logging {
                 string name = Caller.PadRight(10, ' ').Substring(0, 10);
 
                 return $"[{logl}][{time}][{name}] > {Message}";
+            }
+
+            public string Markup(Func<string, string>? escape = null) {
+                string color = this.Level switch {
+                    LogLevel.INFO => "white",
+                    LogLevel.WARN => "orange1",
+                    LogLevel.ERROR => "red",
+                    LogLevel.DEBUG => "cyan1",
+                    LogLevel.DEBUG2 => "magenta1",
+                    LogLevel.DEBUG3 => "magenta2",
+                };
+
+                var str = this.ToString();
+                if (escape != null)
+                    str = escape(str);
+                return $"[{color}]{str}[/]"; //TODO: this.ToString() escapen
             }
         }
 
@@ -99,6 +118,7 @@ namespace MineSharp.Core.Logging {
                 LogMessages.RemoveAll(x => x.Level == LogLevel.DEBUG3 && (DateTime.Now - x.Time).TotalMinutes >= 5);
             }
             LogMessages.Add(log);
+            OnLogMessageReceieved?.Invoke(log);
         }
     }
 }

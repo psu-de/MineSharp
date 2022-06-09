@@ -74,7 +74,18 @@ AnsiConsole.Status()
         BotClient.Initialize(loginOptions);
 
         MinecraftData.Load();
+
+        void LogMessage(MineSharp.Core.Logging.Logger.LogMessage log) {
+            if (log.Level < MineSharp.Core.Logging.LogLevel.DEBUG) {
+                AnsiConsole.MarkupLine(log.Markup(Markup.Escape));
+            }
+        }
+
+        MineSharp.Core.Logging.Logger.OnLogMessageReceieved += LogMessage;
+
         var successful = BotClient.Bot.Connect().GetAwaiter().GetResult();
+
+        MineSharp.Core.Logging.Logger.OnLogMessageReceieved -= LogMessage;
 
         if (!successful) {
             AnsiConsole.MarkupLine("[red] Could not connect to server![/]");

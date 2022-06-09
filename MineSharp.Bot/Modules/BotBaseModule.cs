@@ -36,7 +36,7 @@ namespace MineSharp.Bot.Modules {
         public float Food { get; private set; }
         public float Saturation { get; private set; }
         public Identifier CurrentDimension { get; private set; }
-        public GameMode GameMode { get; private set; }
+        public GameMode GameMode => BotEntity.GameMode;
 
         private TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
@@ -64,7 +64,6 @@ namespace MineSharp.Bot.Modules {
             this.Health = 20.0f;
             this.Saturation = 20.0f;
             this.Food = 20.0f;
-            this.GameMode = packet1.Gamemode;
             this.CurrentDimension = packet1.DimensionName;
 
             Logger.Info($"Initialized Player entity: Location=({packet2.X} / {packet2.Y} / {packet2.Z})");

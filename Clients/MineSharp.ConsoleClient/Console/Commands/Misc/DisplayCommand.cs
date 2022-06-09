@@ -55,25 +55,26 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
 
         void WriteInventory() {
 
-            var inventory = new Table()
-                .AddColumns("Slot Id", "Item Name");
+            throw new NotImplementedException();
+            //var inventory = new Table()
+            //    .AddColumns("Slot Id", "Item Name");
 
-            foreach (var slot in BotClient.Bot.Inventory.Slots.Take(BotClient.Bot.Inventory.HotbarStart)) {
-                inventory.AddRow(slot.Key.ToString(), slot.Value.Item?.Info.DisplayName ?? "");
-            }
-            AnsiConsole.Write(inventory);
+            //foreach (var slot in BotClient.Bot.Inventory.Slots.Take(BotClient.Bot.Inventory.HotbarStart)) {
+            //    inventory.AddRow(slot.Key.ToString(), slot.Value.Item?.Info.DisplayName ?? "");
+            //}
+            //AnsiConsole.Write(inventory);
 
-            var hotbar = new Table();
-            hotbar.AddColumns("1", "2", "3", "4", "5", "6", "7", "8", "9");
-            foreach (var col in hotbar.Columns) {
-                col.Width(AnsiConsole.Profile.Width / 9).Centered();
-            }
+            //var hotbar = new Table();
+            //hotbar.AddColumns("1", "2", "3", "4", "5", "6", "7", "8", "9");
+            //foreach (var col in hotbar.Columns) {
+            //    col.Width(AnsiConsole.Profile.Width / 9).Centered();
+            //}
 
-            var hotbarSlots = BotClient.Bot.Inventory.GetHotbarSlots();
-            hotbar.AddRow(hotbarSlots.Select(x => new Text(x.Item?.ToString() ?? "").Centered()).ToArray());
+            //var hotbarSlots = BotClient.Bot.Inventory.GetHotbarSlots();
+            //hotbar.AddRow(hotbarSlots.Select(x => new Text(x.Item?.ToString() ?? "").Centered()).ToArray());
 
-            AnsiConsole.MarkupLine("[olive]Hotbar: [/]");
-            AnsiConsole.Write(hotbar);
+            //AnsiConsole.MarkupLine("[olive]Hotbar: [/]");
+            //AnsiConsole.Write(hotbar);
         }
 
         void WritePlayerInfo() {

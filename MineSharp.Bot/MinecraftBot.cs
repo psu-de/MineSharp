@@ -39,6 +39,9 @@ namespace MineSharp.Bot {
         public delegate void BotChatEvent(Chat chat);
         public delegate void BotItemEvent(Data.Items.Item? item);
 
+        public delegate void BotPlayerEvent(Player entity);
+        public delegate void BotEntityEvent(Entity entity);
+
         #endregion
 
         private Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
@@ -69,18 +72,16 @@ namespace MineSharp.Bot {
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
             this.Client.PacketReceived += Events_PacketReceived;
-
-            LoadWindows();
         }
 
-        public Task LoadModule(Module module) {
+        public async Task LoadModule(Module module) {
 
             this.Modules.Add(module);
             if (module is TickedModule)
                 this.TickedModules.Add((TickedModule)module);
 
-            return module.Initialize();
-
+            await module.Initialize();
+            Logger.Info("Loaded module: " + module.GetType().Name);
         }
 
         private async Task TickLoop () {
@@ -103,8 +104,6 @@ namespace MineSharp.Bot {
                     await Task.Delay(deltaTime);
             }
         }
-
-        private partial void LoadWindows();
 
 
         private async Task LoadModules () {
@@ -183,19 +182,6 @@ namespace MineSharp.Bot {
             }
 
             Task.WaitAll(tasks.ToArray());
-
-            switch (packet) {
-
-                // Base
-                case Protocol.Packets.Clientbound.Play.HeldItemChangePacket p_0x48: handleHeldItemChange(p_0x48); break;
-
-                // Entities 
-
-                // Windows
-                case Protocol.Packets.Clientbound.Play.WindowItemsPacket p_0x14: handleWindowItems(p_0x14); break;
-                case Protocol.Packets.Clientbound.Play.SetSlotPacket p_0x16: handleSetSlot(p_0x16); break;
-
-            }
         }
 
 
@@ -246,23 +232,23 @@ namespace MineSharp.Bot {
             return this.Client.SendPacket(packet);
         }
 
-        public async Task<Window?> OpenChest(Block block) {
-            if (block.Info.Id != BlockType.Chest || block.Info.Id != BlockType.TrappedChest || block.Info.Id == BlockType.EnderChest) return null;
+        //public async Task<Window?> OpenChest(Block block) {
+        //    if (block.Info.Id != BlockType.Chest || block.Info.Id != BlockType.TrappedChest || block.Info.Id == BlockType.EnderChest) return null;
 
-            var packet = new PlayerBlockPlacementPacket(0, block.Position, BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Block Face 
-            await this.Client.SendPacket(packet);
+        //    var packet = new PlayerBlockPlacementPacket(0, block.Position, BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Block Face 
+        //    await this.Client.SendPacket(packet);
 
-            var windowPacket = await WaitForPacket<Protocol.Packets.Clientbound.Play.OpenWindowPacket>() as Protocol.Packets.Clientbound.Play.OpenWindowPacket;
+        //    var windowPacket = await WaitForPacket<Protocol.Packets.Clientbound.Play.OpenWindowPacket>() as Protocol.Packets.Clientbound.Play.OpenWindowPacket;
 
-            Window? window = GetWindow(windowPacket.WindowID);
-            if (window != null) { // Update window
-                throw new NotImplementedException();
-            }
+        //    Window? window = GetWindow(windowPacket.WindowID);
+        //    if (window != null) { // Update window
+        //        throw new NotImplementedException();
+        //    }
 
-            window = Window.CreateWindowById(windowPacket.WindowID);
-            this.OpenWindows.Add(windowPacket.WindowID, window);
-            return window;
-        }
+        //    window = Window.CreateWindowById(windowPacket.WindowID);
+        //    this.OpenWindows.Add(windowPacket.WindowID, window);
+        //    return window;
+        //}
 
 
         #endregion

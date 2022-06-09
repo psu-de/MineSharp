@@ -46,7 +46,7 @@ namespace MineSharp.Bot {
         public GameMode GameMode => BaseModule.GameMode;
 
         public byte SelectedHotbarIndex { get; private set; } = 0;
-        public Item? HeldItem => this.Inventory == null ? null : this.Inventory.GetHotbarSlot(this.SelectedHotbarIndex);
+        public Item? HeldItem => throw new NotImplementedException(); //this.Inventory == null ? null : this.Inventory.GetHotbarSlot(this.SelectedHotbarIndex);
 
         #region Packet Handling
 

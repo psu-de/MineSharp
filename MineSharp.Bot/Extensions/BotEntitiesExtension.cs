@@ -14,10 +14,6 @@ namespace MineSharp.Bot {
     public partial class MinecraftBot {
 
 
-        public delegate void BotPlayerEvent(Player entity);
-        public delegate void BotEntityEvent(Entity entity);
-
-
 
         /// <summary>
         /// All living Entities in range

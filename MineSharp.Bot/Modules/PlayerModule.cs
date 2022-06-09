@@ -18,6 +18,15 @@ namespace MineSharp.Bot.Modules {
 
         public ConcurrentDictionary<UUID, Player> PlayerMapping = new ConcurrentDictionary<UUID, Player>();
 
+        public bool IsRaining { get; private set; }
+        public float RainLevel { get; private set; }
+        public float ThunderLevel { get; private set; }
+
+        /// <summary>
+        /// Fires whenever the weather has changed
+        /// </summary>
+        public event BotEmptyEvent WeatherChanged;
+
         /// <summary>
         /// Fires when a player joins the server (also fires when the bot itself joins the server). Warning: Entity is probably not loaded when this event fires!
         /// </summary>
@@ -38,6 +47,36 @@ namespace MineSharp.Bot.Modules {
             this.Bot.On<PlayerInfoPacket>(handlePlayerInfo);
             this.Bot.On<SpawnPlayerPacket>(handleSpawnPlayer);
             this.Bot.On<PlayerPositionAndLookPacket>(handlePlayerPositionAndLook);
+            this.Bot.On<ChangeGameStatePacket>(handleChangeGameState);
+
+            return Task.CompletedTask;
+        }
+
+        private Task handleChangeGameState(ChangeGameStatePacket packet) {
+
+            //TODO: Implement all GameState Reasons
+            switch (packet.Reason) {
+                case GameStateReason.BeginRaining:
+                    IsRaining = true;
+                    WeatherChanged?.Invoke();
+                    break;
+                case GameStateReason.EndRaining:
+                    IsRaining = false;
+                    WeatherChanged?.Invoke();
+                    break;
+                case GameStateReason.RainLevelChanged:
+                    RainLevel = packet.Value;
+                    WeatherChanged?.Invoke();
+                    break;
+                case GameStateReason.ThunderLevelChanged:
+                    ThunderLevel = packet.Value;
+                    WeatherChanged?.Invoke();
+                    break;
+                case GameStateReason.ChangeGameMode:
+                    var gameMode = (GameMode)packet.Value;
+                    this.Bot.BotEntity.GameMode = gameMode;
+                    break;
+            }
 
             return Task.CompletedTask;
         }

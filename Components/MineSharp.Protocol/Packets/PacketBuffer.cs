@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using fNbt;
+﻿using fNbt;
 using ICSharpCode.SharpZipLib.Zip.Compression;
-using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using System.Text;
 
 namespace MineSharp.Protocol.Packets {
     public class PacketBuffer {
 
-        private static Inflater inflater = new Inflater();
-        private static Deflater deflater = new Deflater();
-
         public static PacketBuffer Decompress(byte[] buffer, int length) {
             if (length == 0) return new PacketBuffer(buffer);
+
+            var inflater = new Inflater();
 
             inflater.SetInput(buffer);
             byte[] abyte1 = new byte[length];
@@ -36,6 +29,8 @@ namespace MineSharp.Protocol.Packets {
 
             byte[] buffer = input.ToArray();
             output.WriteVarInt(buffer.Length);
+
+            var deflater = new Deflater();
             deflater.SetInput(buffer);
             deflater.Finish();
 
@@ -145,7 +140,7 @@ namespace MineSharp.Protocol.Packets {
 
         public void WriteUUID(UUID value) {
             this.WriteLong(value.MostSignificantBits);
-            this.WriteLong(value.LeastSignificantBits);   
+            this.WriteLong(value.LeastSignificantBits);
         }
 
         public void WriteDouble(double value) {
@@ -190,7 +185,7 @@ namespace MineSharp.Protocol.Packets {
             for (int i = 0; i < value.Length; i++) this.WriteString(value[i]);
         }
 
-        public void WriteSlot (Slot? value) {
+        public void WriteSlot(Slot? value) {
             this.WriteBoolean(value != null && value.ItemID != -1);
             if (value == null || value.ItemID == -1)
                 return;
@@ -200,7 +195,7 @@ namespace MineSharp.Protocol.Packets {
             WriteNBTCompound(value.Nbt);
         }
 
-        public void WriteSlotArray (Slot[] value) {
+        public void WriteSlotArray(Slot[] value) {
             if (value == null) {
                 this.WriteVarInt(0);
                 return;
@@ -302,7 +297,7 @@ namespace MineSharp.Protocol.Packets {
             return new Chat(this.ReadString());
         }
 
-        public byte[] ReadByteArray () {
+        public byte[] ReadByteArray() {
             int length = this.ReadVarInt();
             return this.ReadRaw(length);
         }
@@ -373,7 +368,7 @@ namespace MineSharp.Protocol.Packets {
             return result;
         }
 
-        public Slot? ReadSlot () {
+        public Slot? ReadSlot() {
             bool present = this.ReadBoolean();
             if (!present) return null;
 
@@ -402,7 +397,7 @@ namespace MineSharp.Protocol.Packets {
             return new Position(this.ReadULong());
         }
 
-        public long ReadVarLong () {
+        public long ReadVarLong() {
             long value = 0;
             int length = 0;
             byte currentByte;
@@ -438,7 +433,7 @@ namespace MineSharp.Protocol.Packets {
             int slotCount = this.ReadVarInt();
             Slot?[] slots = new Slot?[slotCount];
 
-            for (int i = 0;i < slotCount;i++) slots[i] = this.ReadSlot();
+            for (int i = 0; i < slotCount; i++) slots[i] = this.ReadSlot();
             return slots;
         }
 
@@ -449,10 +444,10 @@ namespace MineSharp.Protocol.Packets {
             return new BitSet(values);
         }
 
-        public string[] ReadStringArray () {
+        public string[] ReadStringArray() {
             int length = this.ReadVarInt();
             string[] array = new string[length];
-            for (var i = 0; i < length; i++) array[i]= this.ReadString();
+            for (var i = 0; i < length; i++) array[i] = this.ReadString();
             return array;
         }
 
