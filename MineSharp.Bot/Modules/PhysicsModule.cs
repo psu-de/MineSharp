@@ -37,8 +37,7 @@ namespace MineSharp.Bot.Modules {
 
             await UpdateServerPos();
 
-            this.Physics = new Physics.Physics(Bot.BotEntity, Bot.World);
-            System.Diagnostics.Debug.WriteLine("Physics initialized");
+            this.Physics = new Physics.Physics(Bot.BotEntity!, Bot.World);
             await this.SetEnabled(true);
         }
 

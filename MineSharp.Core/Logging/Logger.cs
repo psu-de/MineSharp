@@ -52,7 +52,7 @@ namespace MineSharp.Core.Logging {
                 var str = this.ToString();
                 if (escape != null)
                     str = escape(str);
-                return $"[{color}]{str}[/]"; //TODO: this.ToString() escapen
+                return $"[{color}]{str}[/]";
             }
         }
 

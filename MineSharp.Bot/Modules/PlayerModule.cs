@@ -42,14 +42,14 @@ namespace MineSharp.Bot.Modules {
         /// </summary>
         public event BotPlayerEvent PlayerLoaded;
 
-        protected override Task Load() {
+        protected override async Task Load() {
 
             this.Bot.On<PlayerInfoPacket>(handlePlayerInfo);
             this.Bot.On<SpawnPlayerPacket>(handleSpawnPlayer);
             this.Bot.On<PlayerPositionAndLookPacket>(handlePlayerPositionAndLook);
             this.Bot.On<ChangeGameStatePacket>(handleChangeGameState);
 
-            return Task.CompletedTask;
+            await this.SetEnabled(true);
         }
 
         private Task handleChangeGameState(ChangeGameStatePacket packet) {

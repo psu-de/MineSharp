@@ -27,5 +27,7 @@ namespace MineSharp.Core.Types {
             this.Nbt = nbt;
             this.SlotNumber = slotNumber;
         }
+
+        public bool IsEmpty() => ItemID == -1;
     }
 }

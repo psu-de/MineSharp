@@ -51,12 +51,13 @@ namespace MineSharp.Bot {
         public List<Module> Modules = new List<Module>();
         private List<TickedModule> TickedModules = new List<TickedModule>();
 
-        public BotBaseModule BaseModule;
+        public BaseModule BaseModule;
 
         public EntityModule EntityModule;
         public PlayerModule PlayerModule;
         public WorldModule WorldModule;
         public PhysicsModule PhysicsModule;
+        public WindowsModule WindowsModule;
 
         public MinecraftBot(BotOptions options) {
             this.Options = options;
@@ -107,19 +108,21 @@ namespace MineSharp.Bot {
 
 
         private async Task LoadModules () {
-            this.BaseModule = new BotBaseModule(this);
+            this.BaseModule = new BaseModule(this);
             this.EntityModule = new EntityModule(this);
             this.PlayerModule = new PlayerModule(this);
             this.PhysicsModule = new PhysicsModule(this);
             this.WorldModule = new WorldModule(this);
+            this.WindowsModule = new WindowsModule(this);
 
             await Task.WhenAll(new Task[] {
                 LoadModule(this.BaseModule),
                 LoadModule(this.EntityModule),
                 LoadModule(this.PlayerModule),
                 LoadModule(this.PhysicsModule),
-                LoadModule(this.WorldModule)
-                });
+                LoadModule(this.WorldModule),
+                LoadModule(this.WindowsModule),
+            });
         }
 
 

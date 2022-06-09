@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MineSharp.Core.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,16 +8,18 @@ using System.Threading.Tasks;
 namespace MineSharp.Data.Windows {
     public class WindowInfo {
 
-        public string Name { get; set; }
+        public Identifier Name { get; set; }
         public string Title { get; set; }
         public int UniqueSlots { get; private set; }
         public bool ExcludeInventory { get; private set; }
+        public bool HasOffHandSlot { get; private set; }
 
-        public WindowInfo(string name, string title, int uniqueSlots, bool excludeInventory = false) {
+        public WindowInfo(Identifier name, string title, int uniqueSlots, bool excludeInventory = false, bool hasOffHandSlot = false) {
             this.Name = name;
             this.Title = title;
             this.UniqueSlots = uniqueSlots;
             this.ExcludeInventory = excludeInventory;
+            this.HasOffHandSlot = hasOffHandSlot;
         }
 
     }

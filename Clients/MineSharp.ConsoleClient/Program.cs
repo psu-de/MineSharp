@@ -68,24 +68,24 @@ if (true /*args.Length == 1*/) {
 AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
 AnsiConsole.Write(new FigletText("MineSharp Alpha").Centered());
 
+MineSharp.Core.Logging.LogLevel thresholdLogLevel = MineSharp.Core.Logging.LogLevel.INFO;
+
+void LogMessage(MineSharp.Core.Logging.Logger.LogMessage log) {
+    if (log.Level <= thresholdLogLevel) {
+        AnsiConsole.MarkupLine(log.Markup(Markup.Escape));
+    }
+}
+
 AnsiConsole.Status()
     .Spinner(Spinner.Known.Dots2)
     .Start($"Connecting to [purple]{loginOptions.Host}:{loginOptions.Port}[/] as [aqua]{loginOptions.UsernameOrEmail}[/]", ctx => {
         BotClient.Initialize(loginOptions);
+        MineSharp.Core.Logging.Logger.OnLogMessageReceieved += LogMessage;
 
         MinecraftData.Load();
 
-        void LogMessage(MineSharp.Core.Logging.Logger.LogMessage log) {
-            if (log.Level < MineSharp.Core.Logging.LogLevel.DEBUG) {
-                AnsiConsole.MarkupLine(log.Markup(Markup.Escape));
-            }
-        }
-
-        MineSharp.Core.Logging.Logger.OnLogMessageReceieved += LogMessage;
-
         var successful = BotClient.Bot.Connect().GetAwaiter().GetResult();
-
-        MineSharp.Core.Logging.Logger.OnLogMessageReceieved -= LogMessage;
+        thresholdLogLevel = MineSharp.Core.Logging.LogLevel.ERROR;
 
         if (!successful) {
             AnsiConsole.MarkupLine("[red] Could not connect to server![/]");

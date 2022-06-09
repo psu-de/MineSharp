@@ -368,9 +368,9 @@ namespace MineSharp.Protocol.Packets {
             return result;
         }
 
-        public Slot? ReadSlot() {
+        public Slot ReadSlot() {
             bool present = this.ReadBoolean();
-            if (!present) return null;
+            if (!present) return new Slot(-1, 0, 0, null);
 
             int id = ReadVarInt();
             byte count = 0;
@@ -429,11 +429,11 @@ namespace MineSharp.Protocol.Packets {
             return Angle.FromByte(this.ReadByte());
         }
 
-        public Slot?[] ReadSlotArray() {
+        public Slot[] ReadSlotArray() {
             int slotCount = this.ReadVarInt();
-            Slot?[] slots = new Slot?[slotCount];
+            Slot[] slots = new Slot[slotCount];
 
-            for (int i = 0; i < slotCount; i++) slots[i] = this.ReadSlot();
+            for (int i = 0; i < slotCount; i++) { slots[i] = this.ReadSlot(); slots[i].SlotNumber = (short)i; }
             return slots;
         }
 

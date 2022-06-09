@@ -44,6 +44,8 @@ namespace MineSharp.Bot.Modules {
             this.Bot.On<EntityTeleportPacket>(handleEntityTeleport);
             this.Bot.On<EntityEffectPacket>(handleEntityEffect);
             this.Bot.On<RemoveEntityEffectPacket>(handleRemoveEntityEffect);
+
+            await this.SetEnabled(true);
         }
 
         private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {

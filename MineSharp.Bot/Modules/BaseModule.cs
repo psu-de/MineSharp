@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using static MineSharp.Bot.MinecraftBot;
 
 namespace MineSharp.Bot.Modules {
-    public class BotBaseModule : Module {
+    public class BaseModule : Module {
 
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace MineSharp.Bot.Modules {
 
         private TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
-        public BotBaseModule(MinecraftBot bot) : base(bot) { }
+        public BaseModule(MinecraftBot bot) : base(bot) { }
 
         protected override async Task Load() {
             await this.SetEnabled(true);
@@ -78,6 +78,8 @@ namespace MineSharp.Bot.Modules {
 
             await this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
                 packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround));
+
+            await this.SetEnabled(true);
         }
 
 
