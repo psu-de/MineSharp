@@ -66,7 +66,7 @@ namespace MineSharp.Bot.Modules {
             for (int i = 0; i < packet.EntityIds.Length; i++) {
                 if (!this.Entities.TryRemove(packet.EntityIds[i], out var entity)) 
                     continue; 
-                this.EntityDespawned?.Invoke(entity);
+                this.EntityDespawned?.Invoke(this.Bot, entity);
             }
             return Task.CompletedTask;  
         }
@@ -87,7 +87,7 @@ namespace MineSharp.Bot.Modules {
             entity.Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
             entity.IsOnGround = packet.OnGround;
 
-            EntityMoved?.Invoke(entity);
+            EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
@@ -101,7 +101,7 @@ namespace MineSharp.Bot.Modules {
             entity.Pitch = packet.Pitch;
             entity.IsOnGround = packet.OnGround;
 
-            EntityMoved?.Invoke(entity);
+            EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
@@ -114,7 +114,7 @@ namespace MineSharp.Bot.Modules {
             entity.Pitch = packet.Pitch;
             entity.IsOnGround = packet.OnGround;
 
-            EntityMoved?.Invoke(entity);
+            EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
@@ -145,7 +145,7 @@ namespace MineSharp.Bot.Modules {
                 entity.Effects.Add(packet.EffectID, effect);
             }
 
-            EntityEffectChanged?.Invoke(entity);
+            EntityEffectChanged?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 

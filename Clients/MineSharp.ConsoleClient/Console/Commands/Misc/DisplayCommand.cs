@@ -57,15 +57,15 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
         void WriteInventory() {
 
             var inventory = new Table()
-                .AddColumns("Slot Id", "Item Name");
+                .AddColumns("Slot Id", "Item Name", "Count");
 
             if (BotClient.Bot.Inventory == null) {
                 AnsiConsole.MarkupLine("[red] Inventory not loaded yet.[/]");
                 return;
             }
 
-            foreach (var slot in BotClient.Bot.Inventory!.GetSlotData()) {
-                inventory.AddRow(slot.SlotNumber!.ToString(), slot.GetItemInfo()?.DisplayName ?? "");
+            foreach (var slot in BotClient.Bot.Inventory!.GetAllSlots()) {
+                inventory.AddRow(slot.SlotNumber!.ToString(), slot.GetItemInfo()?.DisplayName ?? "", slot.Count.ToString());
             }
             AnsiConsole.Write(inventory);
         }
@@ -107,6 +107,9 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
                         BotClient.Bot.BotEntity.Yaw.ToString(),
                         BotClient.Bot.BotEntity.Pitch.ToString());
             masterTable.AddRow(new Markup("\n[green underline]Position[/]"), positionInfo);
+
+
+            masterTable.AddRow(new Markup("\n[green underline]Held Item[/]"), new Panel(new Text(BotClient.Bot.HeldItem?.ToString() ?? "No Item")));
 
             AnsiConsole.Write(masterTable);
         }

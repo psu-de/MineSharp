@@ -12,6 +12,7 @@ using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;
+using MineSharp.Windows;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {
@@ -35,12 +36,14 @@ namespace MineSharp.Bot {
 
         #region Events 
 
-        public delegate void BotEmptyEvent();
-        public delegate void BotChatEvent(Chat chat);
-        public delegate void BotItemEvent(Data.Items.Item? item);
+        public delegate void BotEmptyEvent(MinecraftBot sender);
+        public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
+        public delegate void BotItemEvent(MinecraftBot sender, Data.Items.Item? item);
 
-        public delegate void BotPlayerEvent(Player entity);
-        public delegate void BotEntityEvent(Entity entity);
+        public delegate void BotPlayerEvent(MinecraftBot sender, Player entity);
+        public delegate void BotEntityEvent(MinecraftBot sender, Entity entity);
+
+        public delegate void BotWindowEvent(MinecraftBot sender, Window window);
 
         #endregion
 
@@ -192,23 +195,6 @@ namespace MineSharp.Bot {
         #region Public Methods
 
         public Task Respawn() => BaseModule.Respawn();
-
-
-        /// <summary>
-        /// Changes the selected hotbar slot 
-        /// </summary>
-        /// <param name="slot">Index in the hotbar (0-8)</param>
-        /// <returns>A task that will be completed when the operation is finshed</returns>
-        public Task SelectHotbarSlot(byte slot) {
-
-            if (slot < 0 || slot > 8) throw new IndexOutOfRangeException();
-
-            return this.Client.SendPacket(new Protocol.Packets.Serverbound.Play.HeldItemChangePacket(slot)).ContinueWith((x) => {
-                this.SelectedHotbarIndex = slot;
-                this.HeldItemChanged?.Invoke(this.HeldItem);
-                return Task.CompletedTask;
-            });
-        }
 
 
         /// <summary>

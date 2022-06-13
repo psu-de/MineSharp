@@ -87,19 +87,19 @@ namespace MineSharp.Bot.Modules {
             this.Health = packet.Health;
             this.Food = packet.Food;
             this.Saturation = packet.FoodSaturation;
-            this.HealthChanged?.Invoke();
+            this.HealthChanged?.Invoke(Bot);
             return Task.CompletedTask;
         }
 
         private Task handleDeathCombat(DeathCombatEventPacket packet) {
             this.Health = 0;
-            this.Died?.Invoke(packet.Message);
+            this.Died?.Invoke(Bot, packet.Message);
             return Task.CompletedTask;
         }
 
         private Task handleRespawnPacket(RespawnPacket packet) {
             this.CurrentDimension = packet.DimensionName;
-            this.Respawned?.Invoke();
+            this.Respawned?.Invoke(Bot);
             return Task.CompletedTask;
         }
 

@@ -20,5 +20,11 @@ namespace MineSharp.Data.Items {
             } else return false;
         }
 
+        public static Item? AsItem(this Slot slot) {
+            var info = slot.GetItemInfo();
+            if (info == null) return null;
+            return new Item(info, slot.Count, slot.ItemDamage, slot.Nbt);
+        }
+
     }
 }

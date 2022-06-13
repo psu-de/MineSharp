@@ -10,6 +10,8 @@ using System.Net.Sockets;
 namespace MineSharp.Protocol {
     public class MinecraftClient {
 
+        private static Logger Logger = Logger.GetLogger();
+
         public string Version { get; private set; }
         public GameState GameState { get; private set; }
         public string Hostname { get; private set; }
@@ -35,7 +37,7 @@ namespace MineSharp.Protocol {
         /// </summary>
         public event ClientPacketEvent? PacketSent;
 
-        private Logger Logger;
+
         private TcpClient _client;
         private MinecraftStream Stream;
 
@@ -54,7 +56,6 @@ namespace MineSharp.Protocol {
             this.GameState = GameState.HANDSHAKING;
             this.Hostname = host;
             this.Port = port;
-            this.Logger = Logger.GetLogger();
             this.CancellationTokenSource = new CancellationTokenSource();
             this.CancellationToken = CancellationTokenSource.Token;
             this.PacketQueue = new Queue<Packet>();
@@ -71,7 +72,7 @@ namespace MineSharp.Protocol {
         /// <param name="nextState">In which <see cref="MineSharp.Protocol.GameState"/> the client and server should switch. Should be either <see cref="Protocol.GameState.LOGIN"/> or <see cref="Protocol.GameState.STATUS"/></param>
         /// <returns>A task that is completed as soon as the Handshake with the server is completed</returns>
         public async Task<bool> Connect (GameState nextState) {
-            this.Logger.Debug("Connecting...");
+            Logger.Debug("Connecting...");
             try {
                 await this._client.ConnectAsync(this.Hostname, this.Port);
 
@@ -79,12 +80,12 @@ namespace MineSharp.Protocol {
                 this.Stream = new MinecraftStream(this._client.GetStream());
                 this.streamLoopTask = Task.Run(async() => await this.streamLoop());
 
-                this.Logger.Info("Connected, starting handshake");
+                Logger.Info("Connected, starting handshake");
                 await this.makeHandshake(nextState);
 
                 return true;
             } catch (Exception ex) {
-                this.Logger.Error("Could not connect: " + ex.ToString());
+                Logger.Error("Could not connect: " + ex.ToString());
                 return false;
             }
         }
@@ -154,9 +155,8 @@ namespace MineSharp.Protocol {
                 }
                 byte[] data = this.Stream.Read(length);
                 Packet? packet = this.PacketFactory.BuildPacket(data, uncompressedLength);
-
                 if (packet != null) ThreadPool.QueueUserWorkItem(async (object? _) => {
-
+                    //Logger.Debug3("Received packet: " + packet.GetType().Name); // Causes cpu usage spikes
                     try {
                         await packet.Handle(this);
                         this.PacketReceived?.Invoke(this, packet);

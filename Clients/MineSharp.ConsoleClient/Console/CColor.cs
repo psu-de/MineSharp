@@ -15,6 +15,7 @@ namespace MineSharp.ConsoleClient.Console {
         public static string ChatCommand = "lightseagreen";
         public static string EntityCommand = "cadetblue";
         public static string PromptCommand = "indianred1";
+        public static string WindowsCommand = "hotpink3_1";
 
         public static string Good = "green";
         public static string Warn = "darkorange";
@@ -74,5 +75,5 @@ namespace MineSharp.ConsoleClient.Console {
             return AnsiColor.Rgb(color.R, color.G, color.B);
         }
 
-        }
     }
+}

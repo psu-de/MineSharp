@@ -26,7 +26,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 return;
             }
 
-            BotClient.Bot.SelectHotbarSlot((byte)slot);
+            BotClient.Bot.SelectHotbarIndex((byte)slot);
         }
     }
 }

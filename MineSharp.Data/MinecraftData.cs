@@ -1,12 +1,9 @@
 ﻿using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
+using MineSharp.Data.Enchantments;
 using MineSharp.Data.Items;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MineSharp.Data.Windows;
 
 namespace MineSharp.Data {
     public static class MinecraftData {
@@ -20,6 +17,8 @@ namespace MineSharp.Data {
             BiomeData.Load();
             ItemData.Load();
             EffectData.Load();
+            EnchantmentData.Load();
+            WindowData.Load();
 
             IsLoaded = true;
         }

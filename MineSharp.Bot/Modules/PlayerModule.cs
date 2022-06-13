@@ -58,19 +58,19 @@ namespace MineSharp.Bot.Modules {
             switch (packet.Reason) {
                 case GameStateReason.BeginRaining:
                     IsRaining = true;
-                    WeatherChanged?.Invoke();
+                    WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.EndRaining:
                     IsRaining = false;
-                    WeatherChanged?.Invoke();
+                    WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.RainLevelChanged:
                     RainLevel = packet.Value;
-                    WeatherChanged?.Invoke();
+                    WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.ThunderLevelChanged:
                     ThunderLevel = packet.Value;
-                    WeatherChanged?.Invoke();
+                    WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.ChangeGameMode:
                     var gameMode = (GameMode)packet.Value;
@@ -101,14 +101,14 @@ namespace MineSharp.Bot.Modules {
 
                         Player newPlayer = new Player(name, uuid, ping, gm, -1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN);
                         if (!PlayerMapping.TryAdd(uuid, newPlayer)) { Logger.Debug("Could not add player"); return Task.CompletedTask; }
-                        PlayerJoined?.Invoke(newPlayer);
+                        PlayerJoined?.Invoke(this.Bot, newPlayer);
                     }
                     break;
                 case PlayerInfoAction.RemovePlayer:
                     foreach ((UUID uuid, object? data) in packet.Players) {
                         Player player;
                         if (!PlayerMapping.TryRemove(uuid, out player)) continue;
-                        PlayerLeft?.Invoke(player);
+                        PlayerLeft?.Invoke(this.Bot, player);
                     }
                     break;
             }
@@ -126,7 +126,7 @@ namespace MineSharp.Bot.Modules {
             player.Id = packet.EntityID;
 
             this.Bot.EntityModule.AddEntity(player);
-            PlayerLoaded?.Invoke(player);
+            PlayerLoaded?.Invoke(this.Bot, player);
             return Task.CompletedTask;
         }
 

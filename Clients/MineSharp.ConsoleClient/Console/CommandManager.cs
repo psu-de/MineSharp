@@ -4,6 +4,7 @@ using MineSharp.ConsoleClient.Console.Commands.Entity;
 using MineSharp.ConsoleClient.Console.Commands.Misc;
 using MineSharp.ConsoleClient.Console.Commands.Player;
 using MineSharp.ConsoleClient.Console.Commands.Prompt;
+using MineSharp.ConsoleClient.Console.Commands.Windows;
 using MineSharp.ConsoleClient.Console.Commands.World;
 using PrettyPrompt.Highlighting;
 using System;
@@ -47,7 +48,6 @@ namespace MineSharp.ConsoleClient.Console {
 
                 //Prompt
                 RegisterCommand(new HelpCommand());
-                RegisterCommand(new ShowCommand());
                 RegisterCommand(new ExitCommand());
                 RegisterCommand(new ReconnectCommand());
 
@@ -77,6 +77,11 @@ namespace MineSharp.ConsoleClient.Console {
                 RegisterCommand(new DisplayCommand());
                 RegisterCommand(new ToggleModuleCommand());
                 RegisterCommand(new BotLogCommand());
+
+                //Windows
+                RegisterCommand(new ClickWindowCommand());
+                RegisterCommand(new OpenContainerCommand());
+                RegisterCommand(new WindowItemsCommand());
             }
 
         }
