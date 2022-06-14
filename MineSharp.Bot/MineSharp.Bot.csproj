@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MineSharp.Windows\MineSharp.Windows.csproj" />
     <ProjectReference Include="..\Components\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
     <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj" />
     <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
+    <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
     <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
     <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
     <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
