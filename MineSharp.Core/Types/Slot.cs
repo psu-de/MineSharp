@@ -8,26 +8,31 @@ using System.Threading.Tasks;
 namespace MineSharp.Core.Types {
     public class Slot {
 
-        public static Slot Empty = new Slot(-1, 0, 0, null, null);
-
-        public int ItemID { get; set; }
-        public short ItemDamage { get; set; }
-        public byte Count { get; set; }
-
-        public NbtCompound? Nbt = null;
-
-        public short? SlotNumber { get; set; } = null;
+        public Item? Item { get; set; } = null;
+        public short SlotNumber { get; set; }
 
         public Slot() { }
 
-        public Slot(int itemId, short itemDamage, byte count, NbtCompound? nbt, short? slotNumber = null) {
-            this.ItemID = itemId;
-            this.ItemDamage = itemDamage;
-            this.Count = count;
-            this.Nbt = nbt;
+        public Slot(Item? item, short slotNumber) {
+            this.Item = item;
             this.SlotNumber = slotNumber;
         }
 
-        public bool IsEmpty() => ItemID == -1;
+        public bool IsEmpty() => Item == null;
+
+        public bool CanStack(Slot otherSlot) {
+            if (this.IsEmpty() || otherSlot.IsEmpty()) return true;
+
+            var slotType = this.Item!.Id;
+            var otherSlotType = otherSlot.Item!.Id;
+
+            if (slotType == otherSlotType) {
+
+                if (this.Item!.StackSize == 1) return false;
+
+                return (this.Item!.StackSize - this.Item.Count) > 0;
+
+            } else return false;
+        }
     }
 }

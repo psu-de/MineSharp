@@ -1,8 +1,8 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Biomes;
-using MineSharp.Data.Blocks;
+using MineSharp.Data.T4.Biomes;
+using MineSharp.Data.T4.Blocks;
 using MineSharp.Physics;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -33,7 +33,7 @@ namespace MineSharp.Bot {
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        public BiomeInfo GetBiomeAt(Position pos) => World.GetBiomeAt(pos);
+        public Biome GetBiomeAt(Position pos) => World.GetBiomeAt(pos);
 
         /// <summary>
         /// Searches through the loaded chunks for a specific block type 

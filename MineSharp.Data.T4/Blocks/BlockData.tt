@@ -1,0 +1,105 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+
+<#@ import namespace="MineSharp.Data.T4" #>
+<#@ import namespace="MineSharp.Data.T4.Blocks" #>
+<#@ import namespace="System.Linq" #>
+
+<# var msg = "  Generated Block Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.T4.Blocks {
+
+	<#
+		var blockData = MinecraftData.LoadJson<BlockJsonInfo>(MinecraftData.Version, "blocks");
+	#>
+
+	public static class BlockPalette {
+
+				public static int GetBlockIdByState(int state) => state switch {
+			<# 
+				foreach (var block in blockData) { #>
+					(>= <#= block.MinStateId #>) and (<= <#= block.MaxStateId #>) => <#= block.Id #>,
+				<#} #>
+				_ => throw new ArgumentException("Block with state " + state + " not found!")
+		};
+
+		public static Type GetBlockTypeById(int id) => id switch {
+			<#
+				foreach (var block in blockData) { #>
+					<#= block.Id #> => typeof(<# WriteName(block.Name); #>),
+				<#} #>
+				_ => throw new ArgumentException("Block with id " + id + " not found!")
+		};
+	}
+
+	<# 
+	foreach (var block in blockData) { 
+	#>
+public class <# WriteName(block.Name); #> : Block {
+		public const int BlockId = <#= block.Id #>;
+		public const string BlockName = "<#= block.Name #>";
+		public const string BlockDisplayName = "<#= block.DisplayName #>";
+
+		public const float BlockHardness = <#= block.Hardness ?? float.MaxValue #>F;
+		public const float BlockResistance = <#= block.Resistance #>F;
+		public const bool BlockDiggable = <#= block.Diggable.ToString().ToLower() #>;
+		public const bool BlockTransparent = <#= block.Transparent.ToString().ToLower() #>;
+		public const int BlockFilterLight = <#= block.FilterLight #>;
+		public const int BlockEmitLight = <#= block.EmitLight #>;
+		public const string BlockBoundingBox = "<#= block.BoundingBox #>";
+		public const int BlockStackSize = <#= block.StackSize #>;
+		public const string BlockMaterial = "<#= block.Material #>";
+		public const int BlockDefaultState = <#= block.DefaultState #>;
+		public const int BlockMinStateId = <#= block.MinStateId #>;
+		public const int BlockMaxStateId = <#= block.MaxStateId #>;
+		<#
+			if (block.HarvestTools == null) { #>
+		public static readonly int[]? BlockHarvestTools = null;
+			<#} else {#>
+		public static readonly int[]? BlockHarvestTools = new int[] { <#= string.Join(", ", block.HarvestTools.Keys) #> };
+			<#}
+		#>
+
+		public static readonly BlockProperties BlockProperties = new BlockProperties(new BlockStateProperty[] { <# foreach (var x in block.States) WritePropertyInfo(x); #> }, <#= block.DefaultState - block.MinStateId #>);	
+
+		public <# WriteName(block.Name); #> () : base(BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {} 
+
+		public <# WriteName(block.Name); #> (int state, Position pos) : base(state, pos, BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {}
+	}
+	<#}#>
+
+
+	public enum BlockType {
+		<#
+		foreach (var block in blockData) { #>
+			<#= MinecraftData.GetCSharpName(block.Name) #> = <#= block.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	private void WritePropertyInfo(BlockStateJsonInfo info) {
+		Write($"new BlockStateProperty(\"{info.Name}\", BlockStateProperty.BlockStatePropertyType.{info.Type[0].ToString().ToUpper() + info.Type.Substring(1)}, { info.NumValues }, ");
+			if (info.Values == null) {  
+				Write("null");
+			 } else {
+				Write($"new string[] {{ { string.Join(", ", info.Values.Select(x => '"' + x + '"')) } }}");
+			 }
+		Write("),");
+	}
+#>
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		Write(name);
+	}
+#>

@@ -1,12 +1,7 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.Blocks;
-using MineSharp.Data.Entities;
-using MineSharp.World;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MineSharp.Data.T4.Entities;
+using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.T4.Effects;
 
 namespace MineSharp.Physics {
     public class Physics {
@@ -14,7 +9,6 @@ namespace MineSharp.Physics {
         public Player Player;
         public PlayerState PlayerState;
         public World.World World;
-
         public Physics(Player player, World.World world) {
             this.World = world;
             this.Player = player;
@@ -28,13 +22,13 @@ namespace MineSharp.Physics {
                 for (cursor.Z = Math.Floor(queryBB.MinZ); cursor.Z <= Math.Floor(queryBB.MaxZ); cursor.Z++) {
                     for (cursor.X = Math.Floor(queryBB.MinX); cursor.X <= Math.Floor(queryBB.MaxX); cursor.X++) {
                         var block = this.World.GetBlockAt(cursor);
-                        if (!block.IsAir()) {
+                        if (block.IsSolid()) {
                             var blockPos = block.Position;
-                            foreach (var shape in block.GetBlockShape()) {
-                                var blockBB = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
-                                blockBB.Offset(blockPos.X, blockPos.Y, blockPos.Z);
-                                surroundingBBs.Add(blockBB);
-                            }
+                            //foreach (var shape in block.GetBlockShape()) { //TODO: Block Shapes!
+                            //    var blockBB = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
+                            //    blockBB.Offset(blockPos.X, blockPos.Y, blockPos.Z);
+                            //    surroundingBBs.Add(blockBB);
+                            //}
                         }
                     }
                 }
@@ -213,7 +207,7 @@ namespace MineSharp.Physics {
             if (dx != oldVelX) vel.X = 0;
             if (dz != oldVelZ) vel.Y = 0;
             if (dy != oldVelY) {
-                if (!blockAtFeet.IsAir() && blockAtFeet.Info.Id == Data.Blocks.BlockType.SlimeBlock  && !controls.Sneak) {
+                if (blockAtFeet.IsSolid() && blockAtFeet.Id == SlimeBlock.BlockId && !controls.Sneak) {
                     vel.Y = -vel.Y;
                 } else {
                     vel.Y = 0;
@@ -226,14 +220,14 @@ namespace MineSharp.Physics {
                 for (cursor.Z = Math.Floor(playerBB.MinZ); cursor.Z <= Math.Floor(playerBB.MaxZ); cursor.Z++) {
                     for (cursor.X = Math.Floor(playerBB.MinX); cursor.X <= Math.Floor(playerBB.MaxX); cursor.X++) {
                         var block = this.World.GetBlockAt(cursor);
-                        if (!block.IsAir()) {
+                        if (block.IsSolid()) {
 
-                            if (block.Info.Id == Data.Blocks.BlockType.Cobweb) {
+                            if (block.Id == Cobweb.BlockId) {
                                 this.PlayerState.IsInWeb = true;
-                            } else if (block.Info.Id == Data.Blocks.BlockType.BubbleColumn) {
+                            } else if (block.Id == BubbleColumn.BlockId) {
                                 var down = block.Metadata == 0;
                                 var aboveBlock = this.World.GetBlockAt(cursor.Plus(Vector3.Up));
-                                var bubbleDrag = (aboveBlock.IsAir()) ? PhysicsConst.BubbleColumnSurfaceDrag : PhysicsConst.BubbleColumnDrag;
+                                var bubbleDrag = (!aboveBlock.IsSolid()) ? PhysicsConst.BubbleColumnSurfaceDrag : PhysicsConst.BubbleColumnDrag;
                                 if (down) {
                                     vel.Y = Math.Max(bubbleDrag.MaxDown, vel.Y - bubbleDrag.Down);
                                 } else {
@@ -246,11 +240,11 @@ namespace MineSharp.Physics {
             }
 
             var blockBelow = this.World.GetBlockAt(this.Player.Position.Floored().Plus(Vector3.Down));
-            if (!blockBelow.IsAir()) {
-                if (blockBelow.Info.Id == Data.Blocks.BlockType.SoulSand) {
+            if (blockBelow.IsSolid()) {
+                if (blockBelow.Id == SoulSand.BlockId) {
                     vel.X *= PhysicsConst.SoulsandSpeed;
                     vel.Z *= PhysicsConst.SoulsandSpeed;
-                } else if (blockBelow.Info.Id == Data.Blocks.BlockType.HoneyBlock) {
+                } else if (blockBelow.Id == HoneyBlock.BlockId) {
                     vel.X *= PhysicsConst.HoneyblockSpeed;
                     vel.Z *= PhysicsConst.HoneyblockSpeed;
                 }
@@ -278,7 +272,7 @@ namespace MineSharp.Physics {
 
         public bool IsOnLadder(Vector3 pos) {
             var block = this.World.GetBlockAt(pos.Floored());
-            return (!block.IsAir() && (block.Info.Id == Data.Blocks.BlockType.Ladder || block.Info.Id == Data.Blocks.BlockType.Vines)); // TODO: Other vines?
+            return (block.IsSolid() && (block.Id == Ladder.BlockId || block.Id == Vine.BlockId)); // TODO: Other vines?
         }
 
         public bool DoesNotCollide(Vector3 pos) {
@@ -287,10 +281,10 @@ namespace MineSharp.Physics {
         }
 
         public int GetRenderedDepth(Block block) {
-            if (block.IsAir()) return -1;
-            if (PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id)) return 0;
+            if (!block.IsSolid()) return -1;
+            if (PhysicsConst.WaterLikeBlocks.Contains(block.Id)) return 0;
             if (block.Properties.Get("waterlogged")?.GetValue<bool>() == true) return 0;
-            if (block.Info.Id != BlockType.Water) return -1;
+            if (block.Id != Water.BlockId) return -1;
 
             return block.Metadata >= 8 ? 0 : block.Metadata;
         }
@@ -307,7 +301,7 @@ namespace MineSharp.Physics {
                 for (cursor.Z = Math.Floor(bb.MinZ); cursor.Z <= Math.Floor(bb.MaxZ); cursor.Z++) {
                     for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++) {
                         var block = this.World.GetBlockAt(cursor);
-                        if (!block.IsAir() && (block.Info.Id == BlockType.Water || PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id) || block.Properties.Get("waterlogged")?.GetValue<bool>() == true)) {
+                        if (block.IsSolid() && (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || block.Properties.Get("waterlogged")?.GetValue<bool>() == true)) {
                             var waterLevel = cursor.Y + 1 - GetLiquidHeightPercent(block);
                             if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
                         }
@@ -329,15 +323,15 @@ namespace MineSharp.Physics {
                 var inertia = PhysicsConst.AirborneInertia;
                 var blockUnder = this.World.GetBlockAt(pos.Floored().Plus(Vector3.Down));
 
-                if (this.Player.IsOnGround && !blockUnder.IsAir()) {
-                    inertia = PhysicsConst.GetBlockSlipperiness(blockUnder.Info) * 0.91;
+                if (this.Player.IsOnGround && blockUnder.IsSolid()) {
+                    inertia = PhysicsConst.GetBlockSlipperiness(blockUnder.Id) * 0.91;
                     acceleration = 0.1 * (0.1627714 / (inertia * inertia * inertia));
                 }
 
                 if (controls.Sprint) acceleration *= PhysicsConst.SprintSpeed;
 
-                var speedLevel = Player.GetEffectLevel(Data.Effects.EffectType.Speed);
-                var slownessLevel = Player.GetEffectLevel(Data.Effects.EffectType.Slowness);
+                var speedLevel = Player.GetEffectLevel(SpeedEffect.EffectId);
+                var slownessLevel = Player.GetEffectLevel(SlownessEffect.EffectId);
                 if (speedLevel != null && speedLevel > 0) acceleration *= PhysicsConst.SpeedEffect * (int)speedLevel;
                 if (slownessLevel != null && slownessLevel > 0) acceleration *= PhysicsConst.SlowEffect * (int)slownessLevel;
 
@@ -406,7 +400,7 @@ namespace MineSharp.Physics {
                 var adjBlock = this.World.GetBlockAt(((Vector3)block.Position).Plus(new Vector3(dx, 0, dz)));
                 var adjLevel = GetRenderedDepth(adjBlock);
                 if (adjLevel < 0) {
-                    if (!adjBlock.IsAir() && adjBlock.Info.BoundingBox != "empty") {
+                    if (adjBlock.IsSolid() && adjBlock.BoundingBox != "empty") {
                         adjLevel = GetRenderedDepth(this.World.GetBlockAt(((Vector3)block.Position).Plus(new Vector3(dx, -1, dz))));
                         if (adjLevel >= 0) {
                             var f = adjLevel - (curlevel - 8);
@@ -430,7 +424,7 @@ namespace MineSharp.Physics {
                     var adjBlock = this.World.GetBlockAt(bPos1);
                     var adjUpBlock = this.World.GetBlockAt(bPos2);
 
-                 if ((!adjBlock.IsAir() && adjBlock.Info.BoundingBox != "empty") || (!adjUpBlock.IsAir() && adjUpBlock.Info.BoundingBox != "empty")) {
+                 if ((adjBlock.IsSolid() && adjBlock.BoundingBox != "empty") || (adjUpBlock.IsSolid() && adjUpBlock.BoundingBox != "empty")) {
                         flow.Normalized().Plus(Vector3.Down * 6);
         }
                 }
@@ -458,13 +452,13 @@ namespace MineSharp.Physics {
             return isInWater;
         }
 
-        public bool IsMaterialInBB(AABB queryBB, BlockType type) {
+        public bool IsMaterialInBB(AABB queryBB, int type) {
             var cursor = new Vector3(0, 0, 0);
             for (cursor.Y = Math.Floor(queryBB.MinY); cursor.Y <= Math.Floor(queryBB.MaxY); cursor.Y++) {
                 for (cursor.Z = Math.Floor(queryBB.MinZ); cursor.Z <= Math.Floor(queryBB.MaxZ); cursor.Z++) {
                     for (cursor.X = Math.Floor(queryBB.MinX); cursor.X <= Math.Floor(queryBB.MaxX); cursor.X++) {
                         var block = this.World.GetBlockAt(cursor);
-                        if (!block.IsAir() && block.Info.Id == type) return true;
+                        if (block.IsSolid() && block.Id == type) return true;
                     }
                 }
             }
@@ -479,7 +473,7 @@ namespace MineSharp.Physics {
             var lavaBB = PhysicsConst.GetPlayerBoundingBox(pos).Contract(0.1, 0.4, 0.1);
 
             this.PlayerState.IsInWater = IsInWaterApplyCurrent(waterBB, vel);
-            this.PlayerState.IsInLava = IsMaterialInBB(lavaBB, BlockType.Lava);
+            this.PlayerState.IsInLava = IsMaterialInBB(lavaBB, Lava.BlockId);
 
             // Reset velocity component if it falls under the threshold
             if (Math.Abs(vel.X) < PhysicsConst.NegligeableVelocity) vel.X = 0;
@@ -492,7 +486,7 @@ namespace MineSharp.Physics {
                     vel.Y += 0.04;
                 } else if (Player.IsOnGround && PlayerState.JumpTicks == 0) {
                     var blockBelow = this.World.GetBlockAt(Player.Position.Floored().Plus(Vector3.Down));
-                    vel.Y = MathF.Round(0.42f) * ((blockBelow.Info.Id == BlockType.HoneyBlock) ? PhysicsConst.HoneyblockJumpSpeed : 1);
+                    vel.Y = MathF.Round(0.42f) * ((blockBelow.Id == HoneyBlock.BlockId) ? PhysicsConst.HoneyblockJumpSpeed : 1);
                           if (PlayerState.JumpBoost > 0) {
                         vel.Y += 0.1 * PlayerState.JumpBoost;
                     }

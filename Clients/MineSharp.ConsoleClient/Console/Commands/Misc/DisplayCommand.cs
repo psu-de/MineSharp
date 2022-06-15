@@ -1,14 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core;
-using MineSharp.Data.Items;
 using Spectre.Console;
-using Spectre.Console.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Misc {
     internal class DisplayCommand : Command {
@@ -49,7 +42,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             var output = new Table()
                         .AddColumns("Player Name", "Position", "ID", "UUID");
             foreach (var player in BotClient.Bot.PlayerList) {
-                output.AddRow(player.Username, player.Position.ToString(), player.Id.ToString(), player.UUID.ToString());
+                output.AddRow(player.Username, player.Entity.Position.ToString(), player.Entity.ServerId.ToString(), player.UUID.ToString());
             }
             AnsiConsole.Write(output);
         }
@@ -65,7 +58,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             }
 
             foreach (var slot in BotClient.Bot.Inventory!.GetAllSlots()) {
-                inventory.AddRow(slot.SlotNumber!.ToString(), slot.GetItemInfo()?.DisplayName ?? "", slot.Count.ToString());
+                inventory.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item!.Count.ToString());
             }
             AnsiConsole.Write(inventory);
         }
@@ -94,8 +87,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             var effectsInfo = new Table().AddColumns("Effect Name", "Level", "Duration");
             foreach (var effect in BotClient.Bot.BotEntity.Effects.Values) {
                 if (effect == null) continue;
-                var eColor = effect.Info.IsGood ? "springgreen2" : "red1";
-                effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * MinecraftConst.TickMs) / 1000).ToString() + "s");
+                var eColor = effect.IsGood ? "springgreen2" : "red1";
+                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), ((effect.Duration * MinecraftConst.TickMs) / 1000).ToString() + "s");
             }
 
             masterTable.AddRow(new Markup("\n[green underline]Effects[/]"), effectsInfo);

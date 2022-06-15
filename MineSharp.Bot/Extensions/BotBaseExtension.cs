@@ -1,8 +1,7 @@
 ﻿
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Entities;
-using MineSharp.Data.Items;
+using MineSharp.Data.T4.Entities;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ namespace MineSharp.Bot {
         //TODO: Events
         
         public Player? BotEntity => this.BaseModule?.BotEntity;
+        public MinecraftPlayer? Player => this.BaseModule?.Player;
 
         public float Health => BaseModule.Health;
         public bool IsAlive => BaseModule.IsAlive;

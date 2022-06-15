@@ -1,19 +1,12 @@
-﻿using MineSharp.Bot;
-using MineSharp.ConsoleClient;
+﻿using MineSharp.ConsoleClient;
 using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console;
-using MineSharp.Core.Types;
-using MineSharp.Data;
 using PrettyPrompt;
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
-using Spectre.Console.Rendering;
 using System.Net;
-using System.Reflection;
 
-Console.WriteLine(string.Join("\n", typeof(MinecraftBot).GetMethods(BindingFlags.Public | BindingFlags.Instance).Select(x => x.ToString())));
 
-Console.ReadKey();
 
 //Credentials
 MineSharp.Bot.MinecraftBot.BotOptions loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions();
@@ -87,8 +80,6 @@ AnsiConsole.Status()
         BotClient.Initialize(loginOptions);
         MineSharp.Core.Logging.Logger.OnLogMessageReceieved += LogMessage;
 
-        MinecraftData.Load();
-
         var successful = BotClient.Bot.Connect().GetAwaiter().GetResult();
         thresholdLogLevel = MineSharp.Core.Logging.LogLevel.ERROR;
 
@@ -151,3 +142,4 @@ while (true) {
         }
     }
 }
+

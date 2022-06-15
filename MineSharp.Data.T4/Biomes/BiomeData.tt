@@ -1,0 +1,92 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+
+<#@ import namespace="MineSharp.Data.T4" #>
+<#@ import namespace="MineSharp.Data.T4.Biomes" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<# var msg = "  Generated Biome Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.T4.Biomes {
+
+	<#
+		var biomeData = MinecraftData.LoadJson<BiomeJsonInfo>(MinecraftData.Version, "biomes");
+	#>
+
+
+	public static class BiomePalette {
+		
+		        public static Type GetBiomeTypeById(int id) => id switch {
+        <#
+			foreach (var biome in biomeData) { #>
+				<#= biome.Id #> => typeof(<# WriteName(biome.Name); #>),
+			<#} #>
+			_ => throw new ArgumentException("Biome with id " + id + " not found!")
+    
+        };
+		
+	}
+
+	<# List<string> writtenCategories = new List<string>(); #>
+	public enum BiomeCategory {
+		
+		<#  
+		foreach (var biome in biomeData) {
+			if (!writtenCategories.Contains(MinecraftData.GetCSharpName(biome.Category))) { #>
+				<#= MinecraftData.GetCSharpName(biome.Category) #> = <#= writtenCategories.Count #>,
+				<#
+				writtenCategories.Add(MinecraftData.GetCSharpName(biome.Category));
+			}
+		}
+		#>
+
+	}
+
+	<# 
+	foreach (var biome in biomeData) { 
+	#>
+public class <# WriteName(biome.Name); #> : Biome {
+
+		public const int BiomeId = <#= biome.Id #>;
+		public const string BiomeName = "<#= biome.Name #>";
+		public const string BiomeDisplayName = "<#= biome.DisplayName #>";
+		public const int BiomeCategory = <#= writtenCategories.IndexOf(MinecraftData.GetCSharpName(biome.Category)) #>;
+		public const float BiomeTemperature = <#= biome.Temperature #>F;
+		public const string BiomePrecipitation = "<#= biome.Precipitation #>"; 
+		public const float BiomeDepth = <#= biome.Depth #>F;
+		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.<#= MinecraftData.Uppercase(biome.Dimension) #>;
+		public const int BiomeColor = <#= biome.Color #>;
+		public const float BiomeRainfall = <#= biome.Rainfall #>F;
+		
+
+		public <# WriteName(biome.Name); #>() : base(<#= biome.Id #>, "<#= biome.Name #>", "<#= biome.DisplayName #>", <#= writtenCategories.IndexOf(MinecraftData.GetCSharpName(biome.Category)) #>, <#= biome.Temperature #>F, "<#= biome.Precipitation #>", <#= biome.Depth #>F, MineSharp.Core.Types.Enums.Dimension.<#= MinecraftData.Uppercase(biome.Dimension) #>, <#= biome.Color #>, <#= biome.Rainfall #>F) {}
+
+	}
+	<#}#>
+
+
+
+	public enum BiomeType {
+		<#
+		foreach (var biome in biomeData) { #>
+			<#= MinecraftData.GetCSharpName(biome.Name) #> = <#= biome.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		Write(name);
+	}
+#>

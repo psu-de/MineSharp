@@ -1,22 +1,17 @@
-﻿using MineSharp.Data.Entities;
-using MineSharp.Core.Types;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MineSharp.Protocol.Packets.Clientbound.Play;
-using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoPacket;
+﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Data.T4.Entities;
+using MineSharp.Protocol.Packets.Clientbound.Play;
+using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
+using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoPacket;
 
 namespace MineSharp.Bot.Modules {
     public class PlayerModule : Module {
 
         public PlayerModule(MinecraftBot bot) : base(bot) { }
 
-        public ConcurrentDictionary<UUID, Player> PlayerMapping = new ConcurrentDictionary<UUID, Player>();
+        public ConcurrentDictionary<UUID, MinecraftPlayer> PlayerMapping = new ConcurrentDictionary<UUID, MinecraftPlayer>();
 
         public bool IsRaining { get; private set; }
         public float RainLevel { get; private set; }
@@ -74,7 +69,7 @@ namespace MineSharp.Bot.Modules {
                     break;
                 case GameStateReason.ChangeGameMode:
                     var gameMode = (GameMode)packet.Value;
-                    this.Bot.BotEntity.GameMode = gameMode;
+                    this.Bot.Player!.GameMode = gameMode;
                     break;
             }
 
@@ -99,15 +94,14 @@ namespace MineSharp.Bot.Modules {
                             continue;
                         }
 
-                        Player newPlayer = new Player(name, uuid, ping, gm, -1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN);
+                        MinecraftPlayer newPlayer = new MinecraftPlayer(name, uuid, ping, gm, new Player(-1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN, Vector3.Zero, true, new Dictionary<int, Effect?>()));
                         if (!PlayerMapping.TryAdd(uuid, newPlayer)) { Logger.Debug("Could not add player"); return Task.CompletedTask; }
                         PlayerJoined?.Invoke(this.Bot, newPlayer);
                     }
                     break;
                 case PlayerInfoAction.RemovePlayer:
                     foreach ((UUID uuid, object? data) in packet.Players) {
-                        Player player;
-                        if (!PlayerMapping.TryRemove(uuid, out player)) continue;
+                        if (!PlayerMapping.TryRemove(uuid, out var player)) continue;
                         PlayerLeft?.Invoke(this.Bot, player);
                     }
                     break;
@@ -120,12 +114,12 @@ namespace MineSharp.Bot.Modules {
                 return Task.CompletedTask;
             }
 
-            player.Position = new Vector3(packet.X, packet.Y, packet.Z);
-            player.Yaw = packet.Yaw;
-            player.Pitch = packet.Pitch;
-            player.Id = packet.EntityID;
+            player.Entity.Position = new Vector3(packet.X, packet.Y, packet.Z);
+            player.Entity.Yaw = packet.Yaw;
+            player.Entity.Pitch = packet.Pitch;
+            player.Entity.ServerId = packet.EntityID;
 
-            this.Bot.EntityModule.AddEntity(player);
+            this.Bot.EntityModule.AddEntity(player.Entity);
             PlayerLoaded?.Invoke(this.Bot, player);
             return Task.CompletedTask;
         }

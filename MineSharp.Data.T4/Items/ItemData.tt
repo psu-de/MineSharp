@@ -1,0 +1,84 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+
+<#@ import namespace="MineSharp.Data.T4" #>
+<#@ import namespace="MineSharp.Data.T4.Items" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<# var msg = "  Generated Item Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.T4.Items {
+
+	<#
+		var itemData = MinecraftData.LoadJson<ItemJsonInfo>(MinecraftData.Version, "items");
+	#>
+
+
+	public static class ItemPalette {
+		public static Type[] AllItems = new Type[] { <# foreach (var item in itemData) {#> typeof(<# WriteName(item.Name); #>), <#}#> };
+
+			public static Type GetItemById(int id) => id switch {
+			<#
+				foreach (var item in itemData) { #>
+					<#= item.Id #> => typeof(<# WriteName(item.Name); #>),
+				<#} #>
+				_ => throw new ArgumentException("Effect with id " + id + " not found!")
+				};
+
+	}
+
+			<# 
+	foreach (var item in itemData) { #>
+public class <# WriteName(item.Name); #> : Item {
+		public const int ItemId = <#= item.Id #>;
+		public const string ItemName = "<#= item.Name #>";
+		public const string ItemDisplayName = "<#= item.DisplayName #>";
+		
+		public const byte ItemStackSize = <#= item.StackSize #>;
+        public static readonly int? ItemMaxDurability = <# Write(item.MaxDurability.ToString() ?? "null"); #>;
+        public static readonly string[]? ItemEnchantCategories = <# WriteStringArray(item.EnchantCategories); #>;
+		public static readonly string[]? ItemRepairWith = <# WriteStringArray(item.RepairWith); #>;
+
+		public <# WriteName(item.Name); #> () : base (ItemId, ItemDisplayName, ItemName, ItemStackSize, ItemMaxDurability, ItemEnchantCategories, ItemRepairWith) {}
+		public <# WriteName(item.Name); #> (byte count, int? damage, fNbt.NbtCompound? metadata) : base(count, damage, metadata, ItemId, ItemDisplayName, ItemName, ItemStackSize, ItemMaxDurability, ItemEnchantCategories, ItemRepairWith) {}
+	}
+	<#}#>
+
+	public enum ItemType {
+		<#
+		foreach (var item in itemData) { #>
+			<#= MinecraftData.GetCSharpName(item.Name) #> = <#= item.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		name += "Item";
+		Write(name);
+	}
+#>
+
+<#+
+	void WriteStringArray(string[]? arr) {
+		if (arr == null) Write("null");
+		else { 
+			Write("new string[] {");
+			Write(string.Join(", ", arr.Select(x => '"' + x + '"')));
+			Write("}");
+
+		}
+	}
+
+#>

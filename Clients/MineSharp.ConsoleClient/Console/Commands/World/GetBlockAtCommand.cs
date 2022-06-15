@@ -1,12 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using PrettyPrompt.Highlighting;
+using MineSharp.Core.Types;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.World {
     internal class GetBlockAtCommand : Command {
@@ -37,13 +32,13 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             var biome = BotClient.Bot.GetBiomeAt(new Core.Types.Position((int)x, (int)y, (int)z));
             var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties", "Biome");
 
-            string propGetValue(Data.Blocks.BlockStateProperty prop) {
+            string propGetValue(BlockStateProperty prop) {
                 switch (prop.Type) {
-                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Bool:
+                    case BlockStateProperty.BlockStatePropertyType.Bool:
                         return prop.GetValue<bool>().ToString();
-                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Int:
+                    case BlockStateProperty.BlockStatePropertyType.Int:
                         return prop.GetValue<int>().ToString();
-                    case Data.Blocks.BlockStateProperty.BlockStatePropertyType.Enum:
+                    case BlockStateProperty.BlockStatePropertyType.Enum:
                         return prop.GetValue<string>();
                     default:
                         throw new NotSupportedException();
@@ -52,7 +47,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
 
             string properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
 
-            table.AddRow(block.Info.Name, block.Position.ToString(), block.Metadata.ToString(), properties, biome.Name);
+            table.AddRow(block.Name, block.Position!.ToString(), block.Metadata.ToString(), properties, biome.Name);
             AnsiConsole.Write(table);
             AnsiConsole.WriteLine();
         }

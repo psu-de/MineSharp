@@ -1,13 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Data.Blocks;
-using PrettyPrompt.Highlighting;
+using MineSharp.Data.T4.Blocks;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.World {
     internal class FindBlockCommand : Command {

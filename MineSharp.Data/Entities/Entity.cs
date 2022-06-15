@@ -1,11 +1,6 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Data.Entities {
     public class Entity {

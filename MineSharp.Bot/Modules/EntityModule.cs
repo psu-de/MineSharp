@@ -1,7 +1,6 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Types;
-using MineSharp.Data.Effects;
-using MineSharp.Data.Entities;
+using MineSharp.Data.T4.Effects;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
@@ -49,14 +48,18 @@ namespace MineSharp.Bot.Modules {
         }
 
         private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {
-            Entity newEntity = new Entity(
-                Data.Entities.Entities.EntitiesByType[packet.Type],
+
+            var entityType = Data.T4.Entities.EntityPalette.GetEntityById(packet.Type);
+
+            var newEntity = (Entity)Activator.CreateInstance(entityType,
                 packet.EntityId,
                 new Vector3(packet.X, packet.Y, packet.Z),
                 packet.Pitch,
                 packet.Yaw,
                 new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
-                true);
+                true,
+                new Dictionary<int, Effect?>()
+                )!;
 
             Entities.TryAdd(packet.EntityId, newEntity);
             return Task.CompletedTask;
@@ -136,7 +139,8 @@ namespace MineSharp.Bot.Modules {
             if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
                 return Task.CompletedTask;
 
-            var effect = new Effect(EffectData.Effects[packet.EffectID], packet.Amplifier, packet.Duration, packet.Flags);
+            var effectType = EffectPalette.GetEffectById(packet.EffectID);
+            var effect = (Effect)Activator.CreateInstance(effectType, packet.Amplifier, DateTime.Now, packet.Duration)!;
 
             //TODO: Effect updating is so noch nich ganz richtig
             if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID].Amplifier) {

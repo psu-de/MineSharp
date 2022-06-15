@@ -1,5 +1,5 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.Blocks;
+using MineSharp.Data.T4.Blocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,11 +40,11 @@ namespace MineSharp.Physics {
         public const double SpeedEffect = 1.2f;
         public const double SlowEffect = 0.85f;
 
-        public static List<BlockType> WaterLikeBlocks = new List<BlockType>() {
-            BlockType.Seagrass,
-            BlockType.TallSeagrass,
-            BlockType.Kelp,
-            BlockType.BubbleColumn,
+        public static List<int> WaterLikeBlocks = new List<int>() {
+            Seagrass.BlockId,
+            TallSeagrass.BlockId,
+            Kelp.BlockId,
+            BubbleColumn.BlockId,
         };
 
         public class BubbleColumnDragC {
@@ -62,17 +62,17 @@ namespace MineSharp.Physics {
             }
         }
 
-        public static double GetBlockSlipperiness(BlockInfo info) {
-            switch (info.Id) {
-                case BlockType.SlimeBlock:
+        public static double GetBlockSlipperiness(int blockId) {
+            switch (blockId) {
+                case SlimeBlock.BlockId:
                     return 0.8f;
-                case BlockType.Ice:
+                case Ice.BlockId:
                     return 0.98f;
-                case BlockType.PackedIce:
+                case PackedIce.BlockId:
                     return 0.98f;
-                case BlockType.FrostedIce:
+                case FrostedIce.BlockId:
                     return 0.98f;
-                case BlockType.BlueIce:
+                case BlueIce.BlockId:
                     return 0.989f;
                 default:
                     return PhysicsConst.DefaultSlipperiness;

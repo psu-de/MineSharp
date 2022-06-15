@@ -6,7 +6,7 @@ using MineSharp.Data.Items;
 using MineSharp.Data.Windows;
 
 namespace MineSharp.Data {
-    public static class MinecraftData {
+    public class MinecraftData {
 
         public static bool IsLoaded = false;
 
@@ -22,6 +22,8 @@ namespace MineSharp.Data {
 
             IsLoaded = true;
         }
+
+
 
     }
 }

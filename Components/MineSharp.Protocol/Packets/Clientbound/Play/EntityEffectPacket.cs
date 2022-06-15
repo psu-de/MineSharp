@@ -1,17 +1,15 @@
-using MineSharp.Data.Effects;
-
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class EntityEffectPacket : Packet {
 
         public int EntityID { get; private set; }
-        public EffectType EffectID { get; private set; }
+        public int EffectID { get; private set; }
         public byte Amplifier { get; private set; }
         public int Duration { get; private set; }
         public byte Flags { get; private set; }
 
         public EntityEffectPacket() { }
 
-        public EntityEffectPacket(int entityid, EffectType effectid, byte amplifier, int duration, byte flags) {
+        public EntityEffectPacket(int entityid, int effectid, byte amplifier, int duration, byte flags) {
             this.EntityID = entityid;
             this.EffectID = effectid;
             this.Amplifier = amplifier;
@@ -21,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Read(PacketBuffer buffer) {
             this.EntityID = buffer.ReadVarInt();
-            this.EffectID = (EffectType)buffer.ReadByte();
+            this.EffectID = buffer.ReadByte();
             this.Amplifier = buffer.ReadByte();
             this.Duration = buffer.ReadVarInt();
             this.Flags = buffer.ReadByte();

@@ -1,10 +1,4 @@
-﻿using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MineSharp.Protocol.Packets;
 
 namespace MineSharp.World.PalettedContainer.Palettes {
     public interface IPalette {

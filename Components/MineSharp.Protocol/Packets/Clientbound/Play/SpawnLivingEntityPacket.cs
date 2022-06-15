@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public int EntityId { get; private set; }
         public UUID EntityUUID { get; private set; }
-        public EntityType Type { get; private set; }
+        public int Type { get; private set; }
         public double X { get; private set; }
         public double Y { get; private set; }
         public double Z { get; private set; }
@@ -25,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public override void Read(PacketBuffer buffer) {
             this.EntityId = buffer.ReadVarInt();
             this.EntityUUID = buffer.ReadUUID();
-            this.Type = (EntityType)buffer.ReadVarInt();
+            this.Type = buffer.ReadVarInt();
             this.X = buffer.ReadDouble();
             this.Y = buffer.ReadDouble();
             this.Z = buffer.ReadDouble();

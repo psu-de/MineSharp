@@ -1,14 +1,8 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized;
-using MineSharp.Data.Items;
 using PrettyPrompt.Completion;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Windows {
     internal class WindowItemsCommand : Command {
@@ -47,7 +41,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
             }
 
             foreach (var slot in window.GetAllSlots()) {
-                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.GetItemInfo()?.DisplayName ?? "", slot.Count.ToString());
+                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item.Count.ToString());
             }
             AnsiConsole.Write(windowTable);
         }
