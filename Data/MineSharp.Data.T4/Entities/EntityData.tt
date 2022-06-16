@@ -3,7 +3,7 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Entities" #>
@@ -26,39 +26,6 @@ namespace MineSharp.Data.Entities {
 
 	public static class EntityPalette {
 		public static Type[] AllEntities = new Type[] { <# foreach (var entity in entityData) {#> typeof(<# WriteName(entity.Name); #>), <#}#> };
-
-			public static Entity CreateEntity(Type type, 
-							int serverId, Vector3 position, 
-							float pitch, float yaw, 
-							Vector3 velocity, bool isOnGround, 
-							Dictionary<int, Effect?> effects) {
-
-				if (!type.IsAssignableTo(typeof(Entity)))
-					throw new ArgumentException();
-				
-				object[] parameters = new object[] { 
-						serverId, 
-						position, 
-						pitch, yaw, 
-						velocity, 
-						isOnGround, 
-						effects
-				};
-
-				return (Entity)Activator.CreateInstance(type, parameters)!;
-			}
-
-			public static Entity CreateEntity(int id,
-							int serverId, Vector3 position,
-							float pitch, float yaw,
-							Vector3 velocity, bool isOnGround,
-							Dictionary<int, Effect?> effects) {
-				var type = GetEntityTypeById(id);
-				return CreateEntity(type, serverId, position, pitch, yaw, velocity, isOnGround, effects);
-			}
-			
-
-
 
 			public static Type GetEntityTypeById(int id) => id switch {
 			<#

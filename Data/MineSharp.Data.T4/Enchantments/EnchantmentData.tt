@@ -3,7 +3,7 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Enchantments" #>
@@ -36,26 +36,6 @@ namespace MineSharp.Data.Enchantments {
 			_ => throw new ArgumentException("Effect with id " + id + " not found!")
 
         };
-
-			public static Enchantment CreateEnchantment(Type type, int level) {
-
-				if (!type.IsAssignableTo(typeof(Enchantment)))
-					throw new ArgumentException();
-				
-				object[] parameters = new object[] { 
-					level
-				};
-
-				return (Enchantment)Activator.CreateInstance(type, parameters)!;
-			}
-
-			public static Enchantment CreateEnchantment(int id, int level) {
-				var type = GetEnchantmentTypeById(id);
-				return CreateEnchantment(type, level);
-			}
-
-
-
 	}
 
 		<# List<string> writtenCategories = new List<string>(); #>

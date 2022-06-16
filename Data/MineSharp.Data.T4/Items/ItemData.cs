@@ -1116,25 +1116,6 @@ namespace MineSharp.Data.Items {
 									1100 => typeof(PointedDripstoneItem),
 								_ => throw new ArgumentException("Effect with id " + id + " not found!")
 				};
-
-
-		public static Item CreateItem(Type type, byte count, int? damage, fNbt.NbtCompound? metadata) {
-
-			if (!type.IsAssignableTo(typeof(Item)))
-				throw new ArgumentException();
-				
-			object[] parameters = new object[] { 
-				count, damage, metadata
-			};
-
-			return (Item)Activator.CreateInstance(type, parameters)!;
-		}
-
-		public static Item CreateItem(int id, byte count, int? damage, fNbt.NbtCompound? metadata) {
-			var type = GetItemTypeById(id);
-			return CreateItem(type, count, damage, metadata);
-		}
-
 	}
 
 			public class StoneItem : Item {

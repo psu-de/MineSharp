@@ -383,8 +383,7 @@ namespace MineSharp.Protocol.Packets {
             //	damage = ReadShort();
             nbt = this.ReadNBTCompound();
 
-            var itemType = ItemPalette.GetItemTypeById(id);
-            var item = ItemPalette.CreateItem(id, count, damage, nbt);
+            var item = ItemFactory.CreateItem(id, count, damage, nbt);
             Slot slot = new Slot(item, -2);
             return slot;
         }

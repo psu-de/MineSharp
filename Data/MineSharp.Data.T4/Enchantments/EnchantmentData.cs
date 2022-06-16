@@ -56,26 +56,6 @@ namespace MineSharp.Data.Enchantments {
 						_ => throw new ArgumentException("Effect with id " + id + " not found!")
 
         };
-
-			public static Enchantment CreateEnchantment(Type type, int level) {
-
-				if (!type.IsAssignableTo(typeof(Enchantment)))
-					throw new ArgumentException();
-				
-				object[] parameters = new object[] { 
-					level
-				};
-
-				return (Enchantment)Activator.CreateInstance(type, parameters)!;
-			}
-
-			public static Enchantment CreateEnchantment(int id, int level) {
-				var type = GetEnchantmentTypeById(id);
-				return CreateEnchantment(type, level);
-			}
-
-
-
 	}
 
 			public enum EnchantmentCategory {

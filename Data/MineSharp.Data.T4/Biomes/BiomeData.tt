@@ -3,7 +3,7 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Biomes" #>
@@ -33,22 +33,7 @@ namespace MineSharp.Data.Biomes {
 			<#} #>
 			_ => throw new ArgumentException("Biome with id " + id + " not found!")
     
-        };
-
-
-		public static Biome CreateBiome(Type type) {
-
-			if (!type.IsAssignableTo(typeof(Biome)))
-				throw new ArgumentException();
-
-			return (Biome)Activator.CreateInstance(type)!;
-		}
-
-		public static Biome CreateBiome(int id) {
-			var type = GetBiomeTypeById(id);
-			return CreateBiome(type);
-		}
-		
+        };		
 	}
 
 	<# List<string> writtenCategories = new List<string>(); #>

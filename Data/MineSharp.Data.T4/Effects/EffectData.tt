@@ -4,7 +4,7 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Effects" #>
@@ -36,25 +36,6 @@ namespace MineSharp.Data.Effects {
 			};
 
 		public static Type[] AllEffects = new Type[] { <# foreach (var effect in effectData) {#> typeof(<# WriteName(effect.Name); #>), <#}#> };
-	
-		public static Effect CreateEffect(Type type, 
-							int amplifier, DateTime startTime, int duration) {
-
-				if (!type.IsAssignableTo(typeof(Effect)))
-					throw new ArgumentException();
-				
-				object[] parameters = new object[] { 
-					amplifier, startTime, duration
-				};
-
-				return (Effect)Activator.CreateInstance(type, parameters)!;
-			}
-
-			public static Effect CreateEffect(int id,
-							int amplifier, DateTime startTime, int duration) {
-				var type = GetEffectTypeById(id);
-				return CreateEffect(type, amplifier, startTime, duration);
-			}
 	
 	}
 

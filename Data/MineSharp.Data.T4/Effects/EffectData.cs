@@ -51,25 +51,6 @@ namespace MineSharp.Data.Effects {
 
 		public static Type[] AllEffects = new Type[] {  typeof(SpeedEffect),  typeof(SlownessEffect),  typeof(HasteEffect),  typeof(MiningfatigueEffect),  typeof(StrengthEffect),  typeof(InstanthealthEffect),  typeof(InstantdamageEffect),  typeof(JumpboostEffect),  typeof(NauseaEffect),  typeof(RegenerationEffect),  typeof(ResistanceEffect),  typeof(FireresistanceEffect),  typeof(WaterbreathingEffect),  typeof(InvisibilityEffect),  typeof(BlindnessEffect),  typeof(NightvisionEffect),  typeof(HungerEffect),  typeof(WeaknessEffect),  typeof(PoisonEffect),  typeof(WitherEffect),  typeof(HealthboostEffect),  typeof(AbsorptionEffect),  typeof(SaturationEffect),  typeof(GlowingEffect),  typeof(LevitationEffect),  typeof(LuckEffect),  typeof(BadluckEffect),  typeof(SlowfallingEffect),  typeof(ConduitpowerEffect),  typeof(DolphinsgraceEffect),  typeof(BadomenEffect),  typeof(HeroofthevillageEffect),  };
 	
-		public static Effect CreateEffect(Type type, 
-							int amplifier, DateTime startTime, int duration) {
-
-				if (!type.IsAssignableTo(typeof(Effect)))
-					throw new ArgumentException();
-				
-				object[] parameters = new object[] { 
-					amplifier, startTime, duration
-				};
-
-				return (Effect)Activator.CreateInstance(type, parameters)!;
-			}
-
-			public static Effect CreateEffect(int id,
-							int amplifier, DateTime startTime, int duration) {
-				var type = GetEffectTypeById(id);
-				return CreateEffect(type, amplifier, startTime, duration);
-			}
-	
 	}
 
 	public class SpeedEffect : Effect {

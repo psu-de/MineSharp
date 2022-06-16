@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Types;
 using MineSharp.Data.Effects;
+using MineSharp.Data.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
@@ -49,7 +50,7 @@ namespace MineSharp.Bot.Modules {
 
         private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {
 
-            var newEntity = Data.Entities.EntityPalette.CreateEntity(
+            var newEntity = EntityFactory.CreateEntity(
                 packet.Type, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
                 packet.Pitch,
                 packet.Yaw,
@@ -135,7 +136,7 @@ namespace MineSharp.Bot.Modules {
             if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
                 return Task.CompletedTask;
             var effectType = EffectPalette.GetEffectTypeById(packet.EffectID);
-            var effect = EffectPalette.CreateEffect(packet.EffectID, packet.Amplifier, DateTime.Now, packet.Duration);
+            var effect = EffectFactory.CreateEffect(packet.EffectID, packet.Amplifier, DateTime.Now, packet.Duration);
 
             //TODO: Effect updating is so noch nich ganz richtig
             if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID]!.Amplifier) {

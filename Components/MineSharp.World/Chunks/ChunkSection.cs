@@ -37,7 +37,7 @@ namespace MineSharp.World.Chunks {
                 int y = (int)((blocks[i] >> 0) & 0xF);
 
                 var blockId = BlockPalette.GetBlockIdByState(stateId);
-                var block = BlockPalette.CreateBlock(blockId, stateId, new Position(x, y, z));
+                var block = BlockFactory.CreateBlock(blockId, stateId, new Position(x, y, z));
                 this.SetBlock(block);
             }
         }
@@ -49,7 +49,7 @@ namespace MineSharp.World.Chunks {
         public Block GetBlockAt(Position blockPos) {
             int state = BlockStorage.GetAt(GetBlockIndex(blockPos.X, blockPos.Y, blockPos.Z));
             var blockId = BlockPalette.GetBlockIdByState(state);
-            var block = BlockPalette.CreateBlock(blockId, state, blockPos);
+            var block = BlockFactory.CreateBlock(blockId, state, blockPos);
             return block;
         }
 
@@ -75,7 +75,7 @@ namespace MineSharp.World.Chunks {
 
         private Biome GetBiomeAt(int index) {
             var state = BiomeStorage.GetAt(index);
-            return BiomePalette.CreateBiome(state);
+            return BiomeFactory.CreateBiome(state);
         }
 
         public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {

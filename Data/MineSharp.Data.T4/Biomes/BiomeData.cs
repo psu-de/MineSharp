@@ -76,22 +76,7 @@ namespace MineSharp.Data.Biomes {
 							60 => typeof(EndBarrens),
 						_ => throw new ArgumentException("Biome with id " + id + " not found!")
     
-        };
-
-
-		public static Biome CreateBiome(Type type) {
-
-			if (!type.IsAssignableTo(typeof(Biome)))
-				throw new ArgumentException();
-
-			return (Biome)Activator.CreateInstance(type)!;
-		}
-
-		public static Biome CreateBiome(int id) {
-			var type = GetBiomeTypeById(id);
-			return CreateBiome(type);
-		}
-		
+        };		
 	}
 
 		public enum BiomeCategory {

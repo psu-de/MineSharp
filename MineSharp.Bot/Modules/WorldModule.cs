@@ -47,7 +47,7 @@ namespace MineSharp.Bot.Modules {
 
             var blockId = BlockPalette.GetBlockIdByState(packet.BlockID);
 
-            Block newBlock = BlockPalette.CreateBlock(blockId, packet.BlockID, packet.Location!);
+            Block newBlock = BlockFactory.CreateBlock(blockId, packet.BlockID, packet.Location!);
             World.SetBlock(newBlock);
             return Task.CompletedTask;
         }

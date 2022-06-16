@@ -2,7 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
-<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Blocks" #>
@@ -23,64 +23,10 @@ namespace MineSharp.Data.Blocks {
 		var blockCollisionData = MinecraftData.LoadJson<BlockCollisionShapeJson>(MinecraftData.Version, "blockCollisionShapes");
 	#>
 
-	public static class BlockExtensions {
-
-		public static bool IsSolid(this Block block) {
-			var id = block.Id;
-			return id == Air.BlockId || id == CaveAir.BlockId || id == VoidAir.BlockId;
-		}
-
-		public static int CalculateBreakingTime(this Block block, Item? heldItem, Entity miner) {
-
-			if (block.Hardness == null) throw new InvalidDataException("Hardness is null");
-
-			//TODO: Gamemode creative
-			//if (miner.GameMode == Core.Types.Enums.GameMode.Creative) return 0;
-
-			float toolMultiplier = heldItem?.GetToolMultiplier(block) ?? 1;
-			float efficiencyLevel = 0; // TODO: Efficiency level
-			float hasteLevel = miner.GetEffectLevel(HasteEffect.EffectId) ?? 0;
-			float miningFatiqueLevel = miner.GetEffectLevel(MiningfatigueEffect.EffectId) ?? 0;
-
-			toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
-			toolMultiplier /= MathF.Pow(1.2f, hasteLevel);
-			toolMultiplier *= MathF.Pow(0.3f, miningFatiqueLevel);
-
-			float damage = toolMultiplier / (float)block.Hardness;
-
-			bool canHarvest = block.CanBeHarvested(heldItem);
-			if (canHarvest) {
-				damage /= 30f;
-			} else {
-				damage /= 100f;
-			}
-
-			if (damage > 1) return 0;
-
-			float ticks = MathF.Ceiling(1 / damage);
-			return (int)((ticks / 20) * 1000);
-		}
-
-		public static bool CanBeHarvested(this Block block, Item? item) {
-			if (block.HarvestTools == null) return true;
-
-			if (item == null) return false;
-
-			return block.HarvestTools.Contains(item!.Id);
-		}
+	public static class BlockShapePalette {
 
 
-		public static BlockShape[] GetBlockShape(this Block block) {
-			
-			var blockType = block.GetType();
-			var shapeIndices = (int[])blockType.GetProperty("", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetValue(null);
-			float[][] shapeData = AllBlockShapes[shapeIndices[0]];
-
-			return shapeData.Select(x => new BlockShape(x)).ToArray();
-		}
-
-
-		internal static readonly Dictionary<int, float[][]> AllBlockShapes = new Dictionary<int, float[][]>() {
+		public static readonly Dictionary<int, float[][]> AllBlockShapes = new Dictionary<int, float[][]>() {
 			<# foreach (var shape in blockCollisionData.Shapes) {
 			 #> 
 			  { <#= shape.Key #>, new float[][] { <#= string.Join(", ", shape.Value.Select(x => $"new float[] {{ { string.Join(", ", x) } }}")) #> } },
@@ -107,23 +53,6 @@ namespace MineSharp.Data.Blocks {
 				<#} #>
 				_ => throw new ArgumentException("Block with id " + id + " not found!")
 		};
-
-		public static Block CreateBlock(Type type, int state, Position pos) {
-
-			if (!type.IsAssignableTo(typeof(Block)))
-				throw new ArgumentException();
-				
-			object[] parameters = new object[] { 
-				state, pos
-			};
-
-			return (Block)Activator.CreateInstance(type, parameters)!;
-		}
-
-		public static Block CreateBlock(int id, int state, Position pos) {
-			var type = GetBlockTypeById(id);
-			return CreateBlock(type, state, pos);
-		}
 	}
 
 	<# 
