@@ -85,8 +85,8 @@ namespace MineSharp.Bot.Modules {
         /// <param name="yaw"></param>
         /// <param name="pitch"></param>
         public void ForceSetRotation(float yaw, float pitch) {
-            this.Bot.BotEntity.Yaw = yaw;
-            this.Bot.BotEntity.Pitch = pitch;
+            this.Bot.BotEntity!.Yaw = yaw;
+            this.Bot.BotEntity!.Pitch = pitch;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace MineSharp.Bot.Modules {
         public void ForceLookAt(Position position) {
 
             var pos = ((Vector3)position).Plus(new Vector3(0.5d, 0.5d, 0.5d));
-            var r = pos.Minus(this.Bot.BotEntity.GetHeadPosition());
+            var r = pos.Minus(this.Bot.Player!.GetHeadPosition());
             double yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
             if (yaw < 0) yaw = 360 + yaw;
             double pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;

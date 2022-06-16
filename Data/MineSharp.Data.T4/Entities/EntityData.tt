@@ -1,0 +1,86 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
+
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Entities" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<# var msg = "  Generated Entity Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.Entities {
+
+	<#
+		var entityData = MinecraftData.LoadJson<EntityJsonInfo[]>(MinecraftData.Version, "entities");
+	#>
+
+
+	public static class EntityPalette {
+		public static Type[] AllEntities = new Type[] { <# foreach (var entity in entityData) {#> typeof(<# WriteName(entity.Name); #>), <#}#> };
+
+			public static Type GetEntityTypeById(int id) => id switch {
+			<#
+				foreach (var entity in entityData) { #>
+					<#= entity.Id #> => typeof(<# WriteName(entity.Name); #>),
+				<#} #>
+				_ => throw new ArgumentException("Effect with id " + id + " not found!")
+				};
+
+	}
+
+	<# List<string> writtenCategories = new List<string>(); #>
+	public enum EntityCategory {
+		<#  
+		foreach (var entity in entityData) {
+			if (!writtenCategories.Contains(MinecraftData.GetCSharpName(entity.Category))) { #>
+				<#= MinecraftData.GetCSharpName(entity.Category) #> = <#= writtenCategories.Count #>,
+				<#
+				writtenCategories.Add(MinecraftData.GetCSharpName(entity.Category));
+			}
+		}
+		#>
+
+	}
+
+		<# 
+	foreach (var entity in entityData) { #>
+public class <# WriteName(entity.Name); #> : Entity {
+		public const int EntityId = <#= entity.Id #>;
+		public const string EntityName = "<#= entity.Name #>";
+		public const string EntityDisplayName = "<#= entity.DisplayName #>";
+		
+		public const float EntityWidth = <#= entity.Width #>F;
+        public const float EntityHeight = <#= entity.Height #>F;
+        public const int EntityCategory = <#= writtenCategories.IndexOf(MinecraftData.GetCSharpName(entity.Category)) #>;
+
+		public <# WriteName(entity.Name); #> () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
+		public <# WriteName(entity.Name); #> (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
+
+	}
+	<#}#>
+
+	
+
+	public enum EntityType {
+		<#
+		foreach (var entity in entityData) { #>
+			<#= MinecraftData.GetCSharpName(entity.Name) #> = <#= entity.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		Write(name);
+	}
+#>

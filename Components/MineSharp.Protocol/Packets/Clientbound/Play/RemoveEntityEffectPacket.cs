@@ -1,21 +1,20 @@
-using MineSharp.Data.Effects;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class RemoveEntityEffectPacket : Packet {
 
         public int EntityID { get; private set; }
-        public EffectType EffectID { get; private set; }
+        public int EffectID { get; private set; }
 
         public RemoveEntityEffectPacket() { }
 
-        public RemoveEntityEffectPacket(int entityid, EffectType effectid) {
+        public RemoveEntityEffectPacket(int entityid, int effectid) {
             this.EntityID = entityid;
             this.EffectID = effectid;
         }
 
         public override void Read(PacketBuffer buffer) {
             this.EntityID = buffer.ReadVarInt();
-            this.EffectID = (EffectType)buffer.ReadByte();
+            this.EffectID = buffer.ReadByte();
         }
 
         public override void Write(PacketBuffer buffer) {

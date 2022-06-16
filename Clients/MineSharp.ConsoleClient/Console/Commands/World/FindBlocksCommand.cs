@@ -1,13 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Data.Blocks;
-using PrettyPrompt.Highlighting;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.World {
     internal class FindBlocksCommand : Command {
@@ -62,7 +56,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
                         table.AddColumns("Block Type", "Position");
 
                         foreach (var b in block) {
-                            table.AddRow(b.Info.Name, b.Position.ToString());
+                            table.AddRow(b.Name, b.Position!.ToString());
                         }
                         block = null;
                     } else {

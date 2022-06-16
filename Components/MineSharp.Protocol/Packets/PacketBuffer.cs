@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using MineSharp.Core.Types;
+using MineSharp.Data.Items;
 using System.Text;
 
 namespace MineSharp.Protocol.Packets {
@@ -162,7 +163,7 @@ namespace MineSharp.Protocol.Packets {
             this.WriteRaw(bytes);
         }
 
-        public void WriteNBTCompound(NbtCompound value) {
+        public void WriteNBTCompound(NbtCompound? value) {
             if (value == null) {
                 this.WriteByte(0);
                 return;
@@ -186,13 +187,13 @@ namespace MineSharp.Protocol.Packets {
         }
 
         public void WriteSlot(Slot? value) {
-            this.WriteBoolean(value != null && value.ItemID != -1);
-            if (value == null || value.ItemID == -1)
+            this.WriteBoolean(value != null && value.Item != null);
+            if (value == null || value.Item == null)
                 return;
 
-            WriteVarInt(value.ItemID);
-            WriteByte(value.Count);
-            WriteNBTCompound(value.Nbt);
+            WriteVarInt(value.Item!.Id);
+            WriteByte(value.Item!.Count);
+            WriteNBTCompound(value.Item!.Metadata);
         }
 
         public void WriteSlotArray(Slot[] value) {
@@ -203,7 +204,7 @@ namespace MineSharp.Protocol.Packets {
 
             this.WriteVarInt(value.Length);
             for (int i = 0; i < value.Length; i++) {
-                this.WriteShort(value[i].SlotNumber ?? throw new NotSupportedException());
+                this.WriteShort(value[i].SlotNumber);
                 this.WriteSlot(value[i]);
             }
         }
@@ -370,7 +371,7 @@ namespace MineSharp.Protocol.Packets {
 
         public Slot ReadSlot() {
             bool present = this.ReadBoolean();
-            if (!present) return new Slot(-1, 0, 0, null);
+            if (!present) return new Slot(null, -2);
 
             int id = ReadVarInt();
             byte count = 0;
@@ -382,8 +383,8 @@ namespace MineSharp.Protocol.Packets {
             //	damage = ReadShort();
             nbt = this.ReadNBTCompound();
 
-
-            Slot slot = new Slot(id, damage, count, nbt);
+            var item = ItemFactory.CreateItem(id, count, damage, nbt);
+            Slot slot = new Slot(item, -2);
             return slot;
         }
 

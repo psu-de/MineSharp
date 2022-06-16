@@ -1,6 +1,5 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-using MineSharp.Data.Items;
 using MineSharp.Data.Windows;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Windows;
@@ -19,7 +18,7 @@ namespace MineSharp.Bot.Modules {
 
 
         public byte SelectedHotbarIndex { get; private set; }
-        public Item? HeldItem => this.Inventory!.GetSlot((int)PlayerWindowSlots.HotbarStart + SelectedHotbarIndex).AsItem();
+        public Item? HeldItem => this.Inventory!.GetSlot((int)PlayerWindowSlots.HotbarStart + SelectedHotbarIndex).Item;
 
         private TaskCompletionSource inventoryLoadedTsc;
 
@@ -43,49 +42,49 @@ namespace MineSharp.Bot.Modules {
         public Task WaitForInventory() => inventoryLoadedTsc.Task;
 
 
-        private List<BlockInfo> AllowedBlocksToOpen = new List<BlockInfo>() {
-            BlockData.Blocks[(int)BlockType.Chest],
-            BlockData.Blocks[(int)BlockType.TrappedChest],
-            BlockData.Blocks[(int)BlockType.EnderChest],
-            BlockData.Blocks[(int)BlockType.CraftingTable],
-            BlockData.Blocks[(int)BlockType.Furnace],
-            BlockData.Blocks[(int)BlockType.BlastFurnace],
-            BlockData.Blocks[(int)BlockType.Smoker],
-            BlockData.Blocks[(int)BlockType.Dispenser],
-            BlockData.Blocks[(int)BlockType.EnchantingTable],
-            BlockData.Blocks[(int)BlockType.BrewingStand],
-            BlockData.Blocks[(int)BlockType.Beacon],
-            BlockData.Blocks[(int)BlockType.Anvil],
-            BlockData.Blocks[(int)BlockType.Hopper],
+        private List<int> AllowedBlocksToOpen = new List<int>() {
+            (int)BlockType.Chest,
+            (int)BlockType.TrappedChest,
+            (int)BlockType.EnderChest,
+            (int)BlockType.CraftingTable,
+            (int)BlockType.Furnace,
+            (int)BlockType.BlastFurnace,
+            (int)BlockType.Smoker,
+            (int)BlockType.Dispenser,
+            (int)BlockType.EnchantingTable,
+            (int)BlockType.BrewingStand,
+            (int)BlockType.Beacon,
+            (int)BlockType.Anvil,
+            (int)BlockType.Hopper,
 
-            BlockData.Blocks[(int)BlockType.ShulkerBox],
-            BlockData.Blocks[(int)BlockType.BlackShulkerBox],
-            BlockData.Blocks[(int)BlockType.BlueShulkerBox],
-            BlockData.Blocks[(int)BlockType.BrownShulkerBox],
-            BlockData.Blocks[(int)BlockType.CyanShulkerBox],
-            BlockData.Blocks[(int)BlockType.GrayShulkerBox],
-            BlockData.Blocks[(int)BlockType.GreenShulkerBox],
-            BlockData.Blocks[(int)BlockType.LightBlueShulkerBox],
-            BlockData.Blocks[(int)BlockType.LightGrayShulkerBox],
-            BlockData.Blocks[(int)BlockType.LimeShulkerBox],
-            BlockData.Blocks[(int)BlockType.MagentaShulkerBox],
-            BlockData.Blocks[(int)BlockType.OrangeShulkerBox],
-            BlockData.Blocks[(int)BlockType.PinkShulkerBox],
-            BlockData.Blocks[(int)BlockType.PurpleShulkerBox],
-            BlockData.Blocks[(int)BlockType.RedShulkerBox],
-            BlockData.Blocks[(int)BlockType.WhiteShulkerBox],
-            BlockData.Blocks[(int)BlockType.YellowShulkerBox],
+            (int)BlockType.ShulkerBox,
+            (int)BlockType.BlackShulkerBox,
+            (int)BlockType.BlueShulkerBox,
+            (int)BlockType.BrownShulkerBox,
+            (int)BlockType.CyanShulkerBox,
+            (int)BlockType.GrayShulkerBox,
+            (int)BlockType.GreenShulkerBox,
+            (int)BlockType.LightBlueShulkerBox,
+            (int)BlockType.LightGrayShulkerBox,
+            (int)BlockType.LimeShulkerBox,
+            (int)BlockType.MagentaShulkerBox,
+            (int)BlockType.OrangeShulkerBox,
+            (int)BlockType.PinkShulkerBox,
+            (int)BlockType.PurpleShulkerBox,
+            (int)BlockType.RedShulkerBox,
+            (int)BlockType.WhiteShulkerBox,
+            (int)BlockType.YellowShulkerBox,
 
-            BlockData.Blocks[(int)BlockType.CartographyTable],
-            BlockData.Blocks[(int)BlockType.Grindstone],
-            BlockData.Blocks[(int)BlockType.Lectern],
-            BlockData.Blocks[(int)BlockType.Loom],
-            BlockData.Blocks[(int)BlockType.Stonecutter],
+            (int)BlockType.CartographyTable,
+            (int)BlockType.Grindstone,
+            (int)BlockType.Lectern,
+            (int)BlockType.Loom,
+            (int)BlockType.Stonecutter,
         };
         public async Task<Window> OpenContainer(Block block) {
             
-            if (!AllowedBlocksToOpen.Contains(block.Info)) {
-                throw new ArgumentException("Cannot open block of type " + block.Info.Name);
+            if (!AllowedBlocksToOpen.Contains(block.Id)) {
+                throw new ArgumentException("Cannot open block of type " + block.Name);
             }
 
             var packet = new Protocol.Packets.Serverbound.Play.PlayerBlockPlacementPacket(
@@ -226,7 +225,7 @@ namespace MineSharp.Bot.Modules {
 
         private void MainInventory_SlotUpdated(Window window, int index) {
             if (index == 3 * 9 + 1 + SelectedHotbarIndex) {
-                this.HeldItemChanged?.Invoke(this.Bot, window.GetSlot(index).AsItem());
+                this.HeldItemChanged?.Invoke(this.Bot, window.GetSlot(index).Item);
             }
         }
     }

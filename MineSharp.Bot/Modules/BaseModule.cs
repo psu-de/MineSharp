@@ -3,11 +3,6 @@ using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static MineSharp.Bot.MinecraftBot;
 
 namespace MineSharp.Bot.Modules {
@@ -31,12 +26,13 @@ namespace MineSharp.Bot.Modules {
 
 
         public Player BotEntity { get; private set; }
+        public MinecraftPlayer Player { get; private set; }
         public float Health { get; private set; }
         public bool IsAlive => Health > 0;
         public float Food { get; private set; }
         public float Saturation { get; private set; }
         public Identifier CurrentDimension { get; private set; }
-        public GameMode GameMode => BotEntity.GameMode;
+        public GameMode GameMode => Player.GameMode;
 
         private TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
@@ -52,14 +48,17 @@ namespace MineSharp.Bot.Modules {
             var packet1 = await task1;
             var packet2 = await task2;
 
-            this.BotEntity = new Player(Bot.Options.UsernameOrEmail, 
-                Bot.Session.UUID, 
-                0, 
-                packet1.Gamemode, 
-                packet1.EntityID, 
-                new Vector3(packet2.X, packet2.Y, packet2.Z), 
-                packet2.Pitch, 
-                packet2.Yaw);
+            this.BotEntity = new Player(
+                packet1.EntityID,
+                new Vector3(packet2.X, packet2.Y, packet2.Z),
+                packet2.Pitch,
+                packet2.Yaw,
+                new Vector3(0, 0, 0),
+                true,
+                new Dictionary<int, Effect?>());
+
+            this.Player = new MinecraftPlayer(Bot.Options.UsernameOrEmail,
+                Bot.Session.UUID, 0, packet1.Gamemode, this.BotEntity);
 
             this.Health = 20.0f;
             this.Saturation = 20.0f;
