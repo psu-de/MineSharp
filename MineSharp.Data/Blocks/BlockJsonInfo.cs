@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineSharp.Data.T4.Blocks {
+namespace MineSharp.Data.Blocks {
     public class BlockJsonInfo {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -72,5 +73,21 @@ namespace MineSharp.Data.T4.Blocks {
         public int NumValues { get; set; }
         [JsonProperty("values")]
         public string[]? Values { get; set; }
+    }
+
+    public class BlockCollisionShapeJson {
+        [JsonProperty("blocks")]
+        public Dictionary<string, object> Blocks;
+        [JsonProperty("shapes")]
+        public Dictionary<string, float[][]> Shapes;
+
+
+        public static int[] GetShapeIndices(object obj) {
+            if (obj is JArray) {
+                return ((JArray)obj).Select(x => (int)x).ToArray();
+            } else {
+                return new int[] { (int)((long)obj) };
+            }
+        }
     }
 }

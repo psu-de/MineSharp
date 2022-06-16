@@ -13,7 +13,7 @@
     <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
     <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
     <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
-    <ProjectReference Include="..\MineSharp.Data.T4\MineSharp.Data.T4.csproj" />
+    <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
   </ItemGroup>
 
 </Project>

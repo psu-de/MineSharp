@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.T4.Blocks;
-using MineSharp.Data.T4.Windows;
+using MineSharp.Data.Blocks;
+using MineSharp.Data.Windows;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Windows;
 using static MineSharp.Bot.MinecraftBot;

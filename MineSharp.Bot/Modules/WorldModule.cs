@@ -1,7 +1,7 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.Blocks;
 using MineSharp.Physics;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -46,9 +46,8 @@ namespace MineSharp.Bot.Modules {
         private Task handleBlockUpdate(MineSharp.Protocol.Packets.Clientbound.Play.BlockChangePacket packet) {
 
             var blockId = BlockPalette.GetBlockIdByState(packet.BlockID);
-            var blockType = BlockPalette.GetBlockTypeById(blockId);
 
-            Block newBlock = (Block)Activator.CreateInstance(blockType, packet.BlockID, packet.Location!)!;
+            Block newBlock = BlockPalette.CreateBlock(blockId, packet.BlockID, packet.Location!);
             World.SetBlock(newBlock);
             return Task.CompletedTask;
         }
@@ -80,14 +79,13 @@ namespace MineSharp.Bot.Modules {
                     try {
                         var b = this.World.GetBlockAt(lc.Floored());
                         if (b.IsSolid()) {
-                            return (Block?)null; //TODO: Block Shapes
-                            //List<AABB> boundingBoxes = new List<AABB>();
-                            //foreach (float[] shape in b.GetBlockShape()) {
-                            //    var bb = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
-                            //    bb.Offset(b.Position.X, b.Position.Y, b.Position.Z);
-                            //    if (bb.Contains(lc.X, lc.Y, lc.Z))
-                            //        return b;
-                            //}
+                            List<AABB> boundingBoxes = new List<AABB>();
+                            foreach (BlockShape shape in b.GetBlockShape()) {
+                                var bb = shape.ToBoundingBox();
+                                bb.Offset(b.Position!.X, b.Position.Y, b.Position.Z);
+                                if (bb.Contains(lc.X, lc.Y, lc.Z))
+                                    return b;
+                            }
                         }
                     } catch (ArgumentException) {
                         return null;

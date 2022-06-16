@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.T4.Entities;
-using MineSharp.Data.T4.Blocks;
-using MineSharp.Data.T4.Effects;
+using MineSharp.Data.Entities;
+using MineSharp.Data.Blocks;
+using MineSharp.Data.Effects;
 
 namespace MineSharp.Physics {
     public class Physics {
@@ -24,11 +24,11 @@ namespace MineSharp.Physics {
                         var block = this.World.GetBlockAt(cursor);
                         if (block.IsSolid()) {
                             var blockPos = block.Position;
-                            //foreach (var shape in block.GetBlockShape()) { //TODO: Block Shapes!
-                            //    var blockBB = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
-                            //    blockBB.Offset(blockPos.X, blockPos.Y, blockPos.Z);
-                            //    surroundingBBs.Add(blockBB);
-                            //}
+                            foreach (var shape in block.GetBlockShape()) { //TODO: Block Shapes!
+                                var blockBB = shape.ToBoundingBox();
+                                blockBB.Offset(blockPos!.X, blockPos.Y, blockPos.Z);
+                                surroundingBBs.Add(blockBB);
+                            }
                         }
                     }
                 }

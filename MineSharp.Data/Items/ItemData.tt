@@ -3,10 +3,10 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
-<#@ import namespace="MineSharp.Data.T4" #>
-<#@ import namespace="MineSharp.Data.T4.Items" #>
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Items" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 
@@ -17,23 +17,41 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Items {
+namespace MineSharp.Data.Items {
 
 	<#
-		var itemData = MinecraftData.LoadJson<ItemJsonInfo>(MinecraftData.Version, "items");
+		var itemData = MinecraftData.LoadJson<ItemJsonInfo[]>(MinecraftData.Version, "items");
 	#>
 
 
 	public static class ItemPalette {
 		public static Type[] AllItems = new Type[] { <# foreach (var item in itemData) {#> typeof(<# WriteName(item.Name); #>), <#}#> };
 
-			public static Type GetItemById(int id) => id switch {
+			public static Type GetItemTypeById(int id) => id switch {
 			<#
 				foreach (var item in itemData) { #>
 					<#= item.Id #> => typeof(<# WriteName(item.Name); #>),
 				<#} #>
 				_ => throw new ArgumentException("Effect with id " + id + " not found!")
 				};
+
+
+		public static Item CreateItem(Type type, byte count, int? damage, fNbt.NbtCompound? metadata) {
+
+			if (!type.IsAssignableTo(typeof(Item)))
+				throw new ArgumentException();
+				
+			object[] parameters = new object[] { 
+				count, damage, metadata
+			};
+
+			return (Item)Activator.CreateInstance(type, parameters)!;
+		}
+
+		public static Item CreateItem(int id, byte count, int? damage, fNbt.NbtCompound? metadata) {
+			var type = GetItemTypeById(id);
+			return CreateItem(type, count, damage, metadata);
+		}
 
 	}
 

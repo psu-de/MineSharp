@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineSharp.Data.T4.Items {
+namespace MineSharp.Data.Items {
     public class ItemJsonInfo {
         [JsonProperty("id")]
         public int Id { get; set; }

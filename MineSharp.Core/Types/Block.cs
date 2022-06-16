@@ -98,7 +98,6 @@ namespace MineSharp.Core.Types {
 		public int[]? HarvestTools { get; }
 		public BlockProperties Properties { get; }
 
-
 		public int? State { get; set; }
 		public Position? Position { get; set; }
 		public int Metadata => (int)this.State! - this.MinStateId;

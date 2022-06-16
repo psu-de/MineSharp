@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.T4.Biomes;
-using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.Biomes;
+using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.World.PalettedContainer;
 
@@ -37,8 +37,7 @@ namespace MineSharp.World.Chunks {
                 int y = (int)((blocks[i] >> 0) & 0xF);
 
                 var blockId = BlockPalette.GetBlockIdByState(stateId);
-                var blockType = BlockPalette.GetBlockTypeById(blockId);
-                var block = (Block)Activator.CreateInstance(blockType, stateId, new Position(x, y, z))!;
+                var block = BlockPalette.CreateBlock(blockId, stateId, new Position(x, y, z));
                 this.SetBlock(block);
             }
         }
@@ -48,8 +47,9 @@ namespace MineSharp.World.Chunks {
         }
 
         public Block GetBlockAt(Position blockPos) {
-            var block = GetBlockAt(GetBlockIndex(blockPos.X, blockPos.Y, blockPos.Z));
-            block.Position = blockPos;
+            int state = BlockStorage.GetAt(GetBlockIndex(blockPos.X, blockPos.Y, blockPos.Z));
+            var blockId = BlockPalette.GetBlockIdByState(state);
+            var block = BlockPalette.CreateBlock(blockId, state, blockPos);
             return block;
         }
 
@@ -75,15 +75,7 @@ namespace MineSharp.World.Chunks {
 
         private Biome GetBiomeAt(int index) {
             var state = BiomeStorage.GetAt(index);
-            var type = BiomePalette.GetBiomeTypeById(state);
-            return (Biome)Activator.CreateInstance(type)!;
-        }
-
-        private Block GetBlockAt(int index) {
-            int state = BlockStorage.GetAt(index);
-            int blockId = BlockPalette.GetBlockIdByState(state);
-            var type = BlockPalette.GetBlockTypeById(blockId);
-            return (Block)Activator.CreateInstance(type, state)!;
+            return BiomePalette.CreateBiome(state);
         }
 
         public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {

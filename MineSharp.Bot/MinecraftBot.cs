@@ -5,7 +5,7 @@ using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Core.Versions;
-using MineSharp.Data.T4.Entities;
+using MineSharp.Data.Entities;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets;

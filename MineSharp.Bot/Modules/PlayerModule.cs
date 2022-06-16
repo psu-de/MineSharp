@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.T4.Entities;
+using MineSharp.Data.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;

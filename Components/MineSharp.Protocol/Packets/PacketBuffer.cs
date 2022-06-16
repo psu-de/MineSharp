@@ -1,7 +1,7 @@
 ﻿using fNbt;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using MineSharp.Core.Types;
-using MineSharp.Data.T4.Items;
+using MineSharp.Data.Items;
 using System.Text;
 
 namespace MineSharp.Protocol.Packets {
@@ -383,8 +383,8 @@ namespace MineSharp.Protocol.Packets {
             //	damage = ReadShort();
             nbt = this.ReadNBTCompound();
 
-            var itemType = ItemPalette.GetItemById(id);
-            var item = (Item)Activator.CreateInstance(itemType, damage, count, nbt)!;
+            var itemType = ItemPalette.GetItemTypeById(id);
+            var item = ItemPalette.CreateItem(id, count, damage, nbt);
             Slot slot = new Slot(item, -2);
             return slot;
         }

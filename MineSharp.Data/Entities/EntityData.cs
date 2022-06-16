@@ -6,14 +6,47 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Entities {
+namespace MineSharp.Data.Entities {
 
 	
 
 	public static class EntityPalette {
 		public static Type[] AllEntities = new Type[] {  typeof(AreaEffectCloud),  typeof(ArmorStand),  typeof(Arrow),  typeof(Axolotl),  typeof(Bat),  typeof(Bee),  typeof(Blaze),  typeof(Boat),  typeof(Cat),  typeof(CaveSpider),  typeof(Chicken),  typeof(Cod),  typeof(Cow),  typeof(Creeper),  typeof(Dolphin),  typeof(Donkey),  typeof(DragonFireball),  typeof(Drowned),  typeof(ElderGuardian),  typeof(EndCrystal),  typeof(EnderDragon),  typeof(Enderman),  typeof(Endermite),  typeof(Evoker),  typeof(EvokerFangs),  typeof(ExperienceOrb),  typeof(EyeOfEnder),  typeof(FallingBlock),  typeof(FireworkRocket),  typeof(Fox),  typeof(Ghast),  typeof(Giant),  typeof(GlowItemFrame),  typeof(GlowSquid),  typeof(Goat),  typeof(Guardian),  typeof(Hoglin),  typeof(Horse),  typeof(Husk),  typeof(Illusioner),  typeof(IronGolem),  typeof(Item),  typeof(ItemFrame),  typeof(Fireball),  typeof(LeashKnot),  typeof(LightningBolt),  typeof(Llama),  typeof(LlamaSpit),  typeof(MagmaCube),  typeof(Marker),  typeof(Minecart),  typeof(ChestMinecart),  typeof(CommandBlockMinecart),  typeof(FurnaceMinecart),  typeof(HopperMinecart),  typeof(SpawnerMinecart),  typeof(TntMinecart),  typeof(Mule),  typeof(Mooshroom),  typeof(Ocelot),  typeof(Painting),  typeof(Panda),  typeof(Parrot),  typeof(Phantom),  typeof(Pig),  typeof(Piglin),  typeof(PiglinBrute),  typeof(Pillager),  typeof(PolarBear),  typeof(Tnt),  typeof(Pufferfish),  typeof(Rabbit),  typeof(Ravager),  typeof(Salmon),  typeof(Sheep),  typeof(Shulker),  typeof(ShulkerBullet),  typeof(Silverfish),  typeof(Skeleton),  typeof(SkeletonHorse),  typeof(Slime),  typeof(SmallFireball),  typeof(SnowGolem),  typeof(Snowball),  typeof(SpectralArrow),  typeof(Spider),  typeof(Squid),  typeof(Stray),  typeof(Strider),  typeof(Egg),  typeof(EnderPearl),  typeof(ExperienceBottle),  typeof(Potion),  typeof(Trident),  typeof(TraderLlama),  typeof(TropicalFish),  typeof(Turtle),  typeof(Vex),  typeof(Villager),  typeof(Vindicator),  typeof(WanderingTrader),  typeof(Witch),  typeof(Wither),  typeof(WitherSkeleton),  typeof(WitherSkull),  typeof(Wolf),  typeof(Zoglin),  typeof(Zombie),  typeof(ZombieHorse),  typeof(ZombieVillager),  typeof(ZombifiedPiglin),  typeof(Player),  typeof(FishingBobber),  };
 
-			public static Type GetEntityById(int id) => id switch {
+			public static Entity CreateEntity(Type type, 
+							int serverId, Vector3 position, 
+							float pitch, float yaw, 
+							Vector3 velocity, bool isOnGround, 
+							Dictionary<int, Effect?> effects) {
+
+				if (!type.IsAssignableTo(typeof(Entity)))
+					throw new ArgumentException();
+				
+				object[] parameters = new object[] { 
+						serverId, 
+						position, 
+						pitch, yaw, 
+						velocity, 
+						isOnGround, 
+						effects
+				};
+
+				return (Entity)Activator.CreateInstance(type, parameters)!;
+			}
+
+			public static Entity CreateEntity(int id,
+							int serverId, Vector3 position,
+							float pitch, float yaw,
+							Vector3 velocity, bool isOnGround,
+							Dictionary<int, Effect?> effects) {
+				var type = GetEntityTypeById(id);
+				return CreateEntity(type, serverId, position, pitch, yaw, velocity, isOnGround, effects);
+			}
+			
+
+
+
+			public static Type GetEntityTypeById(int id) => id switch {
 								0 => typeof(AreaEffectCloud),
 									1 => typeof(ArmorStand),
 									2 => typeof(Arrow),

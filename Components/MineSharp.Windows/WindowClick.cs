@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.T4.Items;
-using MineSharp.Data.T4.Windows;
+using MineSharp.Data.Items;
+using MineSharp.Data.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;

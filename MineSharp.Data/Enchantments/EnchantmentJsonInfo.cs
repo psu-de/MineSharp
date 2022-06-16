@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineSharp.Data.T4.Enchantments {
+namespace MineSharp.Data.Enchantments {
     public class MaxCost {
         [JsonProperty("a")]
         public int A { get; set; }

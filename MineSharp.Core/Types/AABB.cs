@@ -1,4 +1,4 @@
-﻿namespace MineSharp.Physics {
+﻿namespace MineSharp.Core.Types {
     public class AABB {
 
         public double MinX { get; set; }

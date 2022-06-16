@@ -3,10 +3,10 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
-<#@ import namespace="MineSharp.Data.T4" #>
-<#@ import namespace="MineSharp.Data.T4.Entities" #>
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Entities" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 
@@ -17,17 +17,50 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Entities {
+namespace MineSharp.Data.Entities {
 
 	<#
-		var entityData = MinecraftData.LoadJson<EntityJsonInfo>(MinecraftData.Version, "entities");
+		var entityData = MinecraftData.LoadJson<EntityJsonInfo[]>(MinecraftData.Version, "entities");
 	#>
 
 
 	public static class EntityPalette {
 		public static Type[] AllEntities = new Type[] { <# foreach (var entity in entityData) {#> typeof(<# WriteName(entity.Name); #>), <#}#> };
 
-			public static Type GetEntityById(int id) => id switch {
+			public static Entity CreateEntity(Type type, 
+							int serverId, Vector3 position, 
+							float pitch, float yaw, 
+							Vector3 velocity, bool isOnGround, 
+							Dictionary<int, Effect?> effects) {
+
+				if (!type.IsAssignableTo(typeof(Entity)))
+					throw new ArgumentException();
+				
+				object[] parameters = new object[] { 
+						serverId, 
+						position, 
+						pitch, yaw, 
+						velocity, 
+						isOnGround, 
+						effects
+				};
+
+				return (Entity)Activator.CreateInstance(type, parameters)!;
+			}
+
+			public static Entity CreateEntity(int id,
+							int serverId, Vector3 position,
+							float pitch, float yaw,
+							Vector3 velocity, bool isOnGround,
+							Dictionary<int, Effect?> effects) {
+				var type = GetEntityTypeById(id);
+				return CreateEntity(type, serverId, position, pitch, yaw, velocity, isOnGround, effects);
+			}
+			
+
+
+
+			public static Type GetEntityTypeById(int id) => id switch {
 			<#
 				foreach (var entity in entityData) { #>
 					<#= entity.Id #> => typeof(<# WriteName(entity.Name); #>),

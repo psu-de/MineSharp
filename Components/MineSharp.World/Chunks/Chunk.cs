@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using System;

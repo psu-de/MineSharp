@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineSharp.Data.T4.Biomes {
+namespace MineSharp.Data.Biomes {
     public class BiomeJsonInfo {
         [JsonProperty("id")]
         public int Id;

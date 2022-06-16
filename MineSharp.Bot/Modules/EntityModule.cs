@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Types;
-using MineSharp.Data.T4.Effects;
+using MineSharp.Data.Effects;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
@@ -49,17 +49,13 @@ namespace MineSharp.Bot.Modules {
 
         private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {
 
-            var entityType = Data.T4.Entities.EntityPalette.GetEntityById(packet.Type);
-
-            var newEntity = (Entity)Activator.CreateInstance(entityType,
-                packet.EntityId,
-                new Vector3(packet.X, packet.Y, packet.Z),
+            var newEntity = Data.Entities.EntityPalette.CreateEntity(
+                packet.Type, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
                 packet.Pitch,
                 packet.Yaw,
                 new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
                 true,
-                new Dictionary<int, Effect?>()
-                )!;
+                new Dictionary<int, Effect?>());
 
             Entities.TryAdd(packet.EntityId, newEntity);
             return Task.CompletedTask;
@@ -138,12 +134,11 @@ namespace MineSharp.Bot.Modules {
         private Task handleEntityEffect(EntityEffectPacket packet) {
             if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
                 return Task.CompletedTask;
-
-            var effectType = EffectPalette.GetEffectById(packet.EffectID);
-            var effect = (Effect)Activator.CreateInstance(effectType, packet.Amplifier, DateTime.Now, packet.Duration)!;
+            var effectType = EffectPalette.GetEffectTypeById(packet.EffectID);
+            var effect = EffectPalette.CreateEffect(packet.EffectID, packet.Amplifier, DateTime.Now, packet.Duration);
 
             //TODO: Effect updating is so noch nich ganz richtig
-            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID].Amplifier) {
+            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID]!.Amplifier) {
                 entity.Effects[packet.EffectID] = effect;
             } else {
                 entity.Effects.Add(packet.EffectID, effect);

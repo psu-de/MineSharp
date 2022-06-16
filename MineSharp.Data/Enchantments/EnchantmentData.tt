@@ -3,10 +3,10 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
-<#@ import namespace="MineSharp.Data.T4" #>
-<#@ import namespace="MineSharp.Data.T4.Enchantments" #>
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Enchantments" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 
@@ -17,10 +17,10 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Enchantments {
+namespace MineSharp.Data.Enchantments {
 
 	<#
-		var enchantmentData = MinecraftData.LoadJson<EnchantmentJsonInfo>(MinecraftData.Version, "enchantments");
+		var enchantmentData = MinecraftData.LoadJson<EnchantmentJsonInfo[]>(MinecraftData.Version, "enchantments");
 	#>
 
     public static class EnchantmentPalette {
@@ -28,7 +28,7 @@ namespace MineSharp.Data.T4.Enchantments {
 	        public static Type[] AllEnchantments = new Type[] { <# foreach (var enchantment in enchantmentData) {#> typeof(<# WriteName(enchantment.Name); #>), <#}#> };
 
 
-        public static Type GetEnchantmentById(int id) => id switch {
+        public static Type GetEnchantmentTypeById(int id) => id switch {
         <#
 			foreach (var enchantment in enchantmentData) { #>
 				<#= enchantment.Id #> => typeof(<# WriteName(enchantment.Name); #>),
@@ -36,6 +36,25 @@ namespace MineSharp.Data.T4.Enchantments {
 			_ => throw new ArgumentException("Effect with id " + id + " not found!")
 
         };
+
+			public static Enchantment CreateEnchantment(Type type, int level) {
+
+				if (!type.IsAssignableTo(typeof(Enchantment)))
+					throw new ArgumentException();
+				
+				object[] parameters = new object[] { 
+					level
+				};
+
+				return (Enchantment)Activator.CreateInstance(type, parameters)!;
+			}
+
+			public static Enchantment CreateEnchantment(int id, int level) {
+				var type = GetEnchantmentTypeById(id);
+				return CreateEnchantment(type, level);
+			}
+
+
 
 	}
 

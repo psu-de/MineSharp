@@ -8,10 +8,75 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Biomes\BiomeData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BiomeData.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Blocks\BlockData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BlockData.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Effects\EffectData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EffectData.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enchantments\EnchantmentData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EnchantmentData.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Entities\EntityData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EntityData.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Items\ItemData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ItemData.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Biomes\BiomeData.tt">
+      <LastGenOutput>BiomeData.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
+    <None Update="Blocks\BlockData.tt">
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+      <LastGenOutput>BlockData.cs</LastGenOutput>
+    </None>
+    <None Update="Effects\EffectData.tt">
+      <LastGenOutput>EffectData.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
+    <None Update="Enchantments\EnchantmentData.tt">
+      <LastGenOutput>EnchantmentData.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
+    <None Update="Entities\EntityData.tt">
+      <LastGenOutput>EntityData.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
+    <None Update="Items\ItemData.tt">
+      <LastGenOutput>ItemData.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
   </ItemGroup>
 
 </Project>

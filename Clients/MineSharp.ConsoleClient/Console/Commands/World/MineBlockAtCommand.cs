@@ -1,6 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.Blocks;
 using Spectre.Console;
 
 namespace MineSharp.ConsoleClient.Console.Commands.World {

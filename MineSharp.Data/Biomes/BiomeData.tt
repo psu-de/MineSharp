@@ -3,10 +3,10 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
-<#@ import namespace="MineSharp.Data.T4" #>
-<#@ import namespace="MineSharp.Data.T4.Biomes" #>
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Biomes" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 
@@ -17,10 +17,10 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Biomes {
+namespace MineSharp.Data.Biomes {
 
 	<#
-		var biomeData = MinecraftData.LoadJson<BiomeJsonInfo>(MinecraftData.Version, "biomes");
+		var biomeData = MinecraftData.LoadJson<BiomeJsonInfo[]>(MinecraftData.Version, "biomes");
 	#>
 
 
@@ -34,6 +34,20 @@ namespace MineSharp.Data.T4.Biomes {
 			_ => throw new ArgumentException("Biome with id " + id + " not found!")
     
         };
+
+
+		public static Biome CreateBiome(Type type) {
+
+			if (!type.IsAssignableTo(typeof(Biome)))
+				throw new ArgumentException();
+
+			return (Biome)Activator.CreateInstance(type)!;
+		}
+
+		public static Biome CreateBiome(int id) {
+			var type = GetBiomeTypeById(id);
+			return CreateBiome(type);
+		}
 		
 	}
 

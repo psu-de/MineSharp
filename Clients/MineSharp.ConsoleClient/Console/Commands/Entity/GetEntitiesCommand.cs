@@ -1,6 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Data.T4.Entities;
+using MineSharp.Data.Entities;
 using Spectre.Console;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Entity {

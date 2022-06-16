@@ -1,8 +1,8 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.T4.Biomes;
-using MineSharp.Data.T4.Blocks;
+using MineSharp.Data.Biomes;
+using MineSharp.Data.Blocks;
 using MineSharp.Physics;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;

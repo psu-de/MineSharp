@@ -4,10 +4,10 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="E:\Programming\MineSharp\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
+<#@ assembly name="$(SolutionDir)\MineSharp.Data\bin\Debug\net6.0\MineSharp.Data.dll" #>
 
-<#@ import namespace="MineSharp.Data.T4" #>
-<#@ import namespace="MineSharp.Data.T4.Effects" #>
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Effects" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 
@@ -18,16 +18,16 @@
 
 using MineSharp.Core.Types;
 
-namespace MineSharp.Data.T4.Effects {
+namespace MineSharp.Data.Effects {
 
 	<#
-		var effectData = MinecraftData.LoadJson<EffectJsonInfo>(MinecraftData.Version, "effects");
+		var effectData = MinecraftData.LoadJson<EffectJsonInfo[]>(MinecraftData.Version, "effects");
 	#>
 
 
 	public static class EffectPalette {
 
-					public static Type GetEffectById(int id) => id switch {
+		public static Type GetEffectTypeById(int id) => id switch {
 		<#
 			foreach (var effect in effectData) { #>
 				<#= effect.Id #> => typeof(<# WriteName(effect.Name); #>),
@@ -36,6 +36,26 @@ namespace MineSharp.Data.T4.Effects {
 			};
 
 		public static Type[] AllEffects = new Type[] { <# foreach (var effect in effectData) {#> typeof(<# WriteName(effect.Name); #>), <#}#> };
+	
+		public static Effect CreateEffect(Type type, 
+							int amplifier, DateTime startTime, int duration) {
+
+				if (!type.IsAssignableTo(typeof(Effect)))
+					throw new ArgumentException();
+				
+				object[] parameters = new object[] { 
+					amplifier, startTime, duration
+				};
+
+				return (Effect)Activator.CreateInstance(type, parameters)!;
+			}
+
+			public static Effect CreateEffect(int id,
+							int amplifier, DateTime startTime, int duration) {
+				var type = GetEffectTypeById(id);
+				return CreateEffect(type, amplifier, startTime, duration);
+			}
+	
 	}
 
 	<# 

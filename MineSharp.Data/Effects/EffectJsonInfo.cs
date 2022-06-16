@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineSharp.Data.T4.Effects {
+namespace MineSharp.Data.Effects {
     public class EffectJsonInfo {
 
         [JsonProperty("id")]
