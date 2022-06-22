@@ -1,15 +1,11 @@
-﻿using MineSharp.Bot.Enums;
-using MineSharp.Bot.Modules;
+﻿using MineSharp.Bot.Modules;
 using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MineSharp.Core.Types.Enums;
 using MineSharp.Core.Versions;
-using MineSharp.Data.Entities;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets;
-using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Windows;
 
 using Item = MineSharp.Core.Types.Item;
@@ -76,6 +72,8 @@ namespace MineSharp.Bot {
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
             this.Client.PacketReceived += Events_PacketReceived;
+            
+
         }
 
         public async Task LoadModule(Module module) {
@@ -150,6 +148,7 @@ namespace MineSharp.Bot {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
+        [BotFunction("Basic", "Waits for a specific packet from the server")]
         public Task<T> WaitForPacket<T>() where T : Packet {
             Type packetType = typeof(T);
             if (!packetWaiters.TryGetValue(packetType, out var task)) {
@@ -160,7 +159,7 @@ namespace MineSharp.Bot {
             } else return (((TaskCompletionSource<T>?)task)?.Task) ?? throw new ArgumentNullException();
         }
 
-
+        [BotFunction("Basic", "Calls handler every time a specific packet is received")]
         public void On<T>(Func<T, Task> handler) where T : Packet {
             if (PacketHandlers.ContainsKey(typeof(T))) {
                 PacketHandlers[typeof(T)].Add((Packet p) => handler((T)p));
@@ -194,51 +193,14 @@ namespace MineSharp.Bot {
 
         #region Public Methods
 
+        [BotFunction("Basic", "Respawns the bot. Only possible when the bot is dead.")]
         public Task Respawn() => BaseModule.Respawn();
 
+        [BotFunction("Basic", "Attacks a given entity")]
+        public Task Attack(Entity entity) => BaseModule.Attack(entity);
 
-        /// <summary>
-        /// Attacks a given entity
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public Task Attack(Entity entity) {
-            // TODO: Cooldown
-            if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
-
-            var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, MovementControls.Sneak);
-            return this.Client.SendPacket(packet);
-        }
-
-        /// <summary>
-        /// Sends a public chat message to the server
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public Task Chat(string message) {
-            var packet = new Protocol.Packets.Serverbound.Play.ChatMessagePacket(message);
-            return this.Client.SendPacket(packet);
-        }
-
-        //public async Task<Window?> OpenChest(Block block) {
-        //    if (block.Info.Id != BlockType.Chest || block.Info.Id != BlockType.TrappedChest || block.Info.Id == BlockType.EnderChest) return null;
-
-        //    var packet = new PlayerBlockPlacementPacket(0, block.Position, BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Block Face 
-        //    await this.Client.SendPacket(packet);
-
-        //    var windowPacket = await WaitForPacket<Protocol.Packets.Clientbound.Play.OpenWindowPacket>() as Protocol.Packets.Clientbound.Play.OpenWindowPacket;
-
-        //    Window? window = GetWindow(windowPacket.WindowID);
-        //    if (window != null) { // Update window
-        //        throw new NotImplementedException();
-        //    }
-
-        //    window = Window.CreateWindowById(windowPacket.WindowID);
-        //    this.OpenWindows.Add(windowPacket.WindowID, window);
-        //    return window;
-        //}
-
+        [BotFunction("Basic", "Sends a chat message to the server")]
+        public Task Chat(string message) => BaseModule.Chat(message);
 
         #endregion
 

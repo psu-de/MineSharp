@@ -124,5 +124,29 @@ namespace MineSharp.Bot.Modules {
             if (BotEntity != null) return Task.CompletedTask;
             return BotInitializedTsc.Task;
         }
+
+        /// <summary>
+        /// Attacks a given entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public Task Attack(Entity entity) {
+            // TODO: Cooldown
+            if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
+
+            var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, Bot.MovementControls.Sneak);
+            return this.Bot.Client.SendPacket(packet);
+        }
+
+        /// <summary>
+        /// Sends a public chat message to the server
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public Task Chat(string message) {
+            var packet = new Protocol.Packets.Serverbound.Play.ChatMessagePacket(message);
+            return this.Bot.Client.SendPacket(packet);
+        }
     }
 }

@@ -25,6 +25,7 @@ namespace MineSharp.Bot {
         public Identifier CurrentDimension => BaseModule.CurrentDimension;
         public GameMode GameMode => BaseModule.GameMode;
 
+        [BotFunction("Basic", "Waits until the bot entity has loaded. BotEntity has been set at this point.")]
         public Task WaitForBot() => this.BaseModule.WaitForBot();
 
     }

@@ -52,7 +52,7 @@ namespace MineSharp.Data.Blocks {
 		public static BlockShape[] GetBlockShape(this Block block) {
 
 			var blockType = block.GetType();
-			var shapeIndices = (int[])blockType.GetProperty("", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
+			var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
 			float[][] shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[0]];
 
 			return shapeData.Select(x => new BlockShape(x)).ToArray();
