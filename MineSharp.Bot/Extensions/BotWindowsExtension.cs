@@ -5,6 +5,22 @@ namespace MineSharp.Bot {
     public partial class MinecraftBot {
 
         /// <summary>
+        /// Fires when a new window has been opened
+        /// </summary>
+        public event BotWindowEvent WindowOpened {
+            add { WindowsModule.WindowOpened += value; }
+            remove { WindowsModule.WindowOpened -= value; }
+        }
+
+        /// <summary>
+        /// Fires when the held item changed
+        /// </summary>
+        public event BotItemEvent HeldItemChanged {
+            add { WindowsModule.HeldItemChanged += value; }
+            remove { WindowsModule.HeldItemChanged -= value; }
+        }
+
+        /// <summary>
         /// The Bots Main Inventory. You can use <see cref="MineSharp.Data.Windows.PlayerWindowSlots"/> for indexing the slots
         /// </summary>
         public Window? Inventory => WindowsModule.Inventory;

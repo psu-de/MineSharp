@@ -9,19 +9,10 @@ namespace MineSharp.Bot.Modules {
     public class BaseModule : Module {
 
 
-        /// <summary>
-        /// This event fires whenever the Bots Health changed (<see cref="Protocol.Packets.Clientbound.Play.UpdateHealthPacket"/> is received). Food and Saturation were also updated when this event fires.
-        /// </summary>
         public event BotEmptyEvent HealthChanged;
 
-        /// <summary>
-        /// This event fires whenever the Bot respawned / changed dimension (<see cref="Protocol.Packets.Clientbound.Play.RespawnPacket"/> is received).
-        /// </summary>
         public event BotEmptyEvent Respawned;
 
-        /// <summary>
-        /// This event fires whenever the Bot dies (<see cref="Protocol.Packets.Clientbound.Play.DeathCombatEventPacket"/> is received).
-        /// </summary>
         public event BotChatEvent Died;
 
 

@@ -10,24 +10,12 @@ namespace MineSharp.Bot.Modules {
     public class EntityModule : Module {
         public EntityModule(MinecraftBot bot) : base(bot) { }
 
-        /// <summary>
-        /// Fires when an entity spawned in the players View Distance or when a player walks into View Distance
-        /// </summary>
         public event BotEntityEvent EntitySpawned;
 
-        /// <summary>
-        /// Fires when an entity despawned in the players View Distance
-        /// </summary>
         public event BotEntityEvent EntityDespawned;
 
-        /// <summary>
-        /// Fires when an entity moved
-        /// </summary>
         public event BotEntityEvent EntityMoved;
 
-        /// <summary>
-        /// Fires when an entity's effect is added / removed / updated
-        /// </summary>
         public event BotEntityEvent EntityEffectChanged;
 
 

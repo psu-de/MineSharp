@@ -93,7 +93,7 @@ namespace MineSharp.Bot.Modules {
 
             var receive = Bot.WaitForPacket<OpenWindowPacket>();
 
-            await Task.WhenAll(send, receive); //TODO: OpenWindowPacket gets not received
+            await Task.WhenAll(send, receive);
 
             var result = await receive;
 
