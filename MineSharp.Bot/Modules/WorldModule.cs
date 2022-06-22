@@ -1,4 +1,5 @@
 ﻿using MineSharp.Bot.Enums;
+using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Blocks;
 using MineSharp.Physics;
@@ -43,7 +44,10 @@ namespace MineSharp.Bot.Modules {
         }
 
         private Task handleBlockUpdate(MineSharp.Protocol.Packets.Clientbound.Play.BlockChangePacket packet) {
-            Block newBlock = new Block(BlockData.StateToBlockMap[packet.BlockID], packet.Location, packet.BlockID);
+
+            var blockId = BlockPalette.GetBlockIdByState(packet.BlockID);
+
+            Block newBlock = BlockFactory.CreateBlock(blockId, packet.BlockID, packet.Location!);
             World.SetBlock(newBlock);
             return Task.CompletedTask;
         }
@@ -68,17 +72,17 @@ namespace MineSharp.Bot.Modules {
         public Task<Block?> Raycast(int length = 100) {
             return Task.Run(() => {
 
-                var vc = this.Bot.BotEntity.GetDirectionVector() / 10; // TODO: Vector kann block überspringen
-                var lc = this.Bot.BotEntity.GetHeadPosition().Clone();
+                var vc = this.Bot.BotEntity!.GetDirectionVector() / 10; // TODO: Vector kann block überspringen
+                var lc = this.Bot.Player!.GetHeadPosition().Clone();
 
                 for (int i = 0; i < 10 * length; i++) {
                     try {
                         var b = this.World.GetBlockAt(lc.Floored());
-                        if (!b.IsAir()) {
+                        if (b.IsSolid()) {
                             List<AABB> boundingBoxes = new List<AABB>();
-                            foreach (float[] shape in b.GetBlockShape()) {
-                                var bb = new AABB(shape[0], shape[1], shape[2], shape[3], shape[4], shape[5]);
-                                bb.Offset(b.Position.X, b.Position.Y, b.Position.Z);
+                            foreach (BlockShape shape in b.GetBlockShape()) {
+                                var bb = shape.ToBoundingBox();
+                                bb.Offset(b.Position!.X, b.Position.Y, b.Position.Z);
                                 if (bb.Contains(lc.X, lc.Y, lc.Z))
                                     return b;
                             }
@@ -119,8 +123,8 @@ namespace MineSharp.Bot.Modules {
         public Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null) {
             return Task.Run(async () => {
 
-                if (!block.Info.Diggable) return MineBlockStatus.NotDiggable;
-                if (!World.IsBlockLoaded(block.Position)) return MineBlockStatus.BlockNotLoaded;
+                if (!block.Diggable) return MineBlockStatus.NotDiggable;
+                if (!World.IsBlockLoaded(block.Position!)) return MineBlockStatus.BlockNotLoaded;
 
 
                 if (face == null) {
@@ -133,7 +137,7 @@ namespace MineSharp.Bot.Modules {
 
                 await this.Bot.Client.SendPacket(packet);
 
-                int time = block.Info.CalculateBreakingTime(this.Bot.HeldItem?.Info, this.Bot.BotEntity);
+                int time = block.CalculateBreakingTime(this.Bot.HeldItem, this.Bot.BotEntity);
 
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
 

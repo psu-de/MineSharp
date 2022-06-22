@@ -5,14 +5,14 @@ using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Core.Versions;
-using MineSharp.Data.Blocks;
 using MineSharp.Data.Entities;
-using MineSharp.Data.Windows;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Windows;
+
+using Item = MineSharp.Core.Types.Item;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {
@@ -38,9 +38,9 @@ namespace MineSharp.Bot {
 
         public delegate void BotEmptyEvent(MinecraftBot sender);
         public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
-        public delegate void BotItemEvent(MinecraftBot sender, Data.Items.Item? item);
+        public delegate void BotItemEvent(MinecraftBot sender, Item? item);
 
-        public delegate void BotPlayerEvent(MinecraftBot sender, Player entity);
+        public delegate void BotPlayerEvent(MinecraftBot sender, MinecraftPlayer entity);
         public delegate void BotEntityEvent(MinecraftBot sender, Entity entity);
 
         public delegate void BotWindowEvent(MinecraftBot sender, Window window);

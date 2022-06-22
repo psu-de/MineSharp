@@ -1,0 +1,70 @@
+﻿
+<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
+
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Effects" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<# var msg = "  Generated Effect Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.Effects {
+
+	<#
+		var effectData = MinecraftData.LoadJson<EffectJsonInfo[]>(MinecraftData.Version, "effects");
+	#>
+
+
+	public static class EffectPalette {
+
+		public static Type GetEffectTypeById(int id) => id switch {
+		<#
+			foreach (var effect in effectData) { #>
+				<#= effect.Id #> => typeof(<# WriteName(effect.Name); #>),
+			<#} #>
+			_ => throw new ArgumentException("Effect with id " + id + " not found!")
+			};
+
+		public static Type[] AllEffects = new Type[] { <# foreach (var effect in effectData) {#> typeof(<# WriteName(effect.Name); #>), <#}#> };
+	
+	}
+
+	<# 
+	foreach (var effect in effectData) { #>
+public class <# WriteName(effect.Name); #> : Effect {
+		public const int EffectId = <#= effect.Id #>;
+		public const string EffectName = "<#= effect.Name #>";
+		public const string EffectDisplayName = "<#= effect.DisplayName #>";
+		public const bool EffectIsGood = <#= (effect.Type == "good").ToString().ToLower() #>;
+
+		public <# WriteName(effect.Name); #>() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
+		public <# WriteName(effect.Name); #>(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
+
+	}
+	<#}#>
+
+	public enum EffectType {
+		<#
+		foreach (var effect in effectData) { #>
+			<#= MinecraftData.GetCSharpName(effect.Name) #> = <#= effect.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		name += "Effect";
+		Write(name);
+	}
+#>

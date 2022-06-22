@@ -1,6 +1,5 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -54,11 +53,13 @@ namespace MineSharp.World {
                 int blockY = (int)(l & 0x0F);
                 int stateId = (int)(l >> 12);
 
-                var block = new Block(BlockData.StateToBlockMap[stateId], new Position(blockX, blockY, blockZ), stateId);
+                var blockId = BlockPalette.GetBlockIdByState(stateId);
+                var blockType = BlockPalette.GetBlockTypeById(blockId);
+                var block = (Block)Activator.CreateInstance(blockType, stateId, new Position(blockX, blockY, blockZ))!;
 
                 chunk.ChunkSections[cY].SetBlock(block);
 
-                block.Position = chunk.Chunk2WorldPos(block.Position, cY);
+                block.Position = chunk.Chunk2WorldPos(block.Position!, cY);
 
                 BlockUpdated?.Invoke(block);
             }
@@ -101,7 +102,7 @@ namespace MineSharp.World {
 
         public void SetBlock(Block block) {
 
-            ChunkCoordinates coords = GetChunkCoordinates(block.Position.X, block.Position.Z);
+            ChunkCoordinates coords = GetChunkCoordinates(block.Position!.X, block.Position.Z);
             if (!this.IsBlockLoaded(block.Position, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
                 chunk.SetBlock(block);
@@ -122,17 +123,17 @@ namespace MineSharp.World {
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
-                return chunk.GetBlockAt(pos);
+                return chunk!.GetBlockAt(pos);
             }
         }
 
-        public BiomeInfo GetBiomeAt(Position pos) {
+        public Biome GetBiomeAt(Position pos) {
             if (this.IsOutOfMap(pos)) throw new ArgumentException("Position is out of map");
             ChunkCoordinates coords = GetChunkCoordinates(pos.X, pos.Z);
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
-                return chunk.GetBiomeAt(pos);
+                return chunk!.GetBiomeAt(pos);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using MineSharp.Data.Blocks;
 using MineSharp.Data.Items;
+using MineSharp.Core.Types;
 using MineSharp.Windows;
 using System;
 using System.Collections.Generic;

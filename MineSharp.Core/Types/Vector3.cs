@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace MineSharp.Core.Types {
     public class Vector3 {
 
-        public static readonly Vector3 Zero = new Vector3(0, 0, 0);
-        public static readonly Vector3 Up    = new Vector3(0, 1, 0);
-        public static readonly Vector3 Down  = new Vector3(0, -1, 0);
-        public static readonly Vector3 North = new Vector3(0, 0, -1);
-        public static readonly Vector3 South = new Vector3(0, 0, 1);
-        public static readonly Vector3 West  = new Vector3(-1, 0, 0);
-        public static readonly Vector3 East  = new Vector3(1, 0, 0);
+        public static Vector3 Zero  => new Vector3(0, 0, 0);
+        public static Vector3 Up    => new Vector3(0, 1, 0);
+        public static Vector3 Down  => new Vector3(0, -1, 0);
+        public static Vector3 North => new Vector3(0, 0, -1);
+        public static Vector3 South => new Vector3(0, 0, 1);
+        public static Vector3 West  => new Vector3(-1, 0, 0);
+        public static Vector3 East  => new Vector3(1, 0, 0);
 
         public double X { get; set; }
         public double Y { get; set; }

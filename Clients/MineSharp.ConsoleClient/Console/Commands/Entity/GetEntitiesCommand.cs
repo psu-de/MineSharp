@@ -2,11 +2,6 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Data.Entities;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Entity {
     internal class GetEntitiesCommand : Command {
@@ -46,19 +41,19 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity {
                 range = r.Value;
             }
 
-            IEnumerable<Data.Entities.Entity> entities = BotClient.Bot.Entities.Values;
+            IEnumerable<Core.Types.Entity> entities = BotClient.Bot.Entities.Values;
             if (range != -1) {
-                entities = entities.Where(x => x.Position.Distance(BotClient.Bot.BotEntity.Position) < range).ToList();
+                entities = entities.Where(x => x.Position.Distance(BotClient.Bot.BotEntity!.Position) < range).ToList();
             }
             if (type != null) {
-                entities = entities.Where(x => x.EntityInfo.Type == type);
+                entities = entities.Where(x => x.Id == (int)type);
             }
 
             Table table = new Table();
 
             table.AddColumns("Entity Id", "Type", "Position");
             foreach (var e in entities) {
-                table.AddRow(e.Id.ToString(), e.EntityInfo.Name, e.Position.ToString());
+                table.AddRow(e.Id.ToString(), e.Name, e.Position.ToString());
             }
 
             if (table.Rows.Count > 0) {

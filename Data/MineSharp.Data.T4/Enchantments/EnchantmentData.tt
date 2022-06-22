@@ -1,0 +1,92 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Linq" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
+
+<#@ import namespace="MineSharp.Data" #>
+<#@ import namespace="MineSharp.Data.Enchantments" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<# var msg = "  Generated Enchantment Data for Minecraft Version " + MinecraftData.Version + "  "; #>
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+//<#= msg #>//
+//<#= new string(Enumerable.Repeat('/', msg.Length).ToArray()) #>//
+
+using MineSharp.Core.Types;
+
+namespace MineSharp.Data.Enchantments {
+
+	<#
+		var enchantmentData = MinecraftData.LoadJson<EnchantmentJsonInfo[]>(MinecraftData.Version, "enchantments");
+	#>
+
+    public static class EnchantmentPalette {
+
+	        public static Type[] AllEnchantments = new Type[] { <# foreach (var enchantment in enchantmentData) {#> typeof(<# WriteName(enchantment.Name); #>), <#}#> };
+
+
+        public static Type GetEnchantmentTypeById(int id) => id switch {
+        <#
+			foreach (var enchantment in enchantmentData) { #>
+				<#= enchantment.Id #> => typeof(<# WriteName(enchantment.Name); #>),
+			<#} #>
+			_ => throw new ArgumentException("Effect with id " + id + " not found!")
+
+        };
+	}
+
+		<# List<string> writtenCategories = new List<string>(); #>
+	public enum EnchantmentCategory {
+		<#  
+		foreach (var enchantment in enchantmentData) {
+			if (!writtenCategories.Contains(MinecraftData.GetCSharpName(enchantment.Category))) { #>
+				<#= MinecraftData.GetCSharpName(enchantment.Category) #> = <#= writtenCategories.Count #>,
+				<#
+				writtenCategories.Add(MinecraftData.GetCSharpName(enchantment.Category));
+			}
+		}
+		#>
+
+	}
+
+	<# 
+	foreach (var enchantment in enchantmentData) { #>
+public class <# WriteName(enchantment.Name); #> : Enchantment {
+		public const int EffectId = <#= enchantment.Id #>;
+		public const string EffectName = "<#= enchantment.Name #>";
+		public const string EffectDisplayName = "<#= enchantment.DisplayName #>";
+		
+		public const int EffectMaxLevel = <#= enchantment.MaxLevel #>;
+        public static readonly EnchantCost EffectMinCost = new EnchantCost(<#= enchantment.MinCost.A #>, <#= enchantment.MinCost.B #>);
+        public static readonly EnchantCost EffectMaxCost = new EnchantCost(<#= enchantment.MaxCost.A #>, <#= enchantment.MaxCost.B #>);
+        public const bool EffectTreasureOnly = <#= enchantment.TreasureOnly.ToString().ToLower() #>;
+        public const bool EffectCurse = <#= enchantment.Curse.ToString().ToLower() #>;
+        public static readonly Type[] EffectExclude = new Type[] { <# foreach (var ex in enchantment.Exclude) { #> typeof(<# WriteName(ex); #>), <#}#> };
+        public const int EffectCategory = <#= writtenCategories.IndexOf(MinecraftData.GetCSharpName(enchantment.Category)) #>;
+        public const int EffectWeight = <#= enchantment.Weight #>;
+        public const bool EffectDiscoverable = <#= enchantment.Discoverable.ToString().ToLower() #>;
+
+		public <# WriteName(enchantment.Name); #> () : base(EffectId, EffectName, EffectDisplayName, EffectMaxLevel, EffectMinCost, EffectMaxCost, EffectTreasureOnly, EffectCurse, EffectExclude, EffectCategory, EffectWeight, EffectDiscoverable) {}
+
+		public <# WriteName(enchantment.Name); #> (int level) : base(level, EffectId, EffectName, EffectDisplayName, EffectMaxLevel, EffectMinCost, EffectMaxCost, EffectTreasureOnly, EffectCurse, EffectExclude, EffectCategory, EffectWeight, EffectDiscoverable) {}
+	}
+	<#}#>
+
+	public enum EnchantmentType {
+		<#
+		foreach (var enchantment in enchantmentData) { #>
+			<#= MinecraftData.GetCSharpName(enchantment.Name) #> = <#= enchantment.Id #>,
+		<#}	#>
+	}
+}
+
+<#+ 
+	void WriteName(string name) {
+		name = MinecraftData.GetCSharpName(name);
+		name += "Enchantment";
+		Write(name);
+	}
+#>

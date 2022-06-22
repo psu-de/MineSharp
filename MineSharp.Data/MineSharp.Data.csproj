@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
+    <ProjectReference Include="..\Data\MineSharp.Data.T4\MineSharp.Data.T4.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

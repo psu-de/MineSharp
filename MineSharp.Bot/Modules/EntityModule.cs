@@ -49,14 +49,14 @@ namespace MineSharp.Bot.Modules {
         }
 
         private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {
-            Entity newEntity = new Entity(
-                Data.Entities.Entities.EntitiesByType[packet.Type],
-                packet.EntityId,
-                new Vector3(packet.X, packet.Y, packet.Z),
+
+            var newEntity = EntityFactory.CreateEntity(
+                packet.Type, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
                 packet.Pitch,
                 packet.Yaw,
                 new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
-                true);
+                true,
+                new Dictionary<int, Effect?>());
 
             Entities.TryAdd(packet.EntityId, newEntity);
             return Task.CompletedTask;
@@ -135,11 +135,11 @@ namespace MineSharp.Bot.Modules {
         private Task handleEntityEffect(EntityEffectPacket packet) {
             if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
                 return Task.CompletedTask;
-
-            var effect = new Effect(EffectData.Effects[packet.EffectID], packet.Amplifier, packet.Duration, packet.Flags);
+            var effectType = EffectPalette.GetEffectTypeById(packet.EffectID);
+            var effect = EffectFactory.CreateEffect(packet.EffectID, packet.Amplifier, DateTime.Now, packet.Duration);
 
             //TODO: Effect updating is so noch nich ganz richtig
-            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID].Amplifier) {
+            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID]!.Amplifier) {
                 entity.Effects[packet.EffectID] = effect;
             } else {
                 entity.Effects.Add(packet.EffectID, effect);

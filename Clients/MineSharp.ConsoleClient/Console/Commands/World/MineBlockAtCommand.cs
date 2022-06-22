@@ -1,12 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using PrettyPrompt.Highlighting;
+using MineSharp.Data.Blocks;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.World {
     internal class MineBlockAtCommand : Command {
@@ -33,7 +28,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             }
 
             var block = BotClient.Bot.World.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            var breakingTime = block.Info.CalculateBreakingTime(BotClient.Bot.HeldItem?.Info, BotClient.Bot.BotEntity);
+            var breakingTime = block.CalculateBreakingTime(BotClient.Bot.HeldItem, BotClient.Bot.BotEntity!);
 
             AnsiConsole.Progress()
                 .Start(ctx => {

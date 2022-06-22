@@ -33,7 +33,7 @@ namespace MineSharp.Bot {
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        public BiomeInfo GetBiomeAt(Position pos) => World.GetBiomeAt(pos);
+        public Biome GetBiomeAt(Position pos) => World.GetBiomeAt(pos);
 
         /// <summary>
         /// Searches through the loaded chunks for a specific block type 

@@ -55,19 +55,19 @@ namespace MineSharp.Windows {
             if (slots == null) {
                 this.ContainerSlots = new Slot[info.UniqueSlots];
                 for (int i = 0; i < info.UniqueSlots; i++) {
-                    this.ContainerSlots[i] = new Slot(-1, 0, 0, null, (short)i);
+                    this.ContainerSlots[i] = new Slot(null, (short)i);
                 }
             } else this.ContainerSlots = slots;
 
             if (info.HasOffHandSlot)
-                OffHandSlot = new Slot(-1, 0, 0, null, (short)(TotalSlotCount - 1));
+                OffHandSlot = new Slot(null, (short)(TotalSlotCount - 1));
         }
 
         public Window(int windowId, WindowInfo info, Slot[]? slots = null, int? stateId = null) : this(info, slots) {
             this.Id = windowId;
 
             this.StateId = stateId ?? 0;
-            this.SelectedSlot = new Slot(-1, 0, 0, null, null);
+            this.SelectedSlot = new Slot(null, -1);
         }
 
         public void ExtendPlayerInventory(Window playerInventory) {
@@ -78,7 +78,7 @@ namespace MineSharp.Windows {
         internal void SwapSelectedSlot(int slotNumber) {
             Slot t = this.SelectedSlot;
             this.SelectedSlot = GetSlot(slotNumber);
-            this.SelectedSlot.SlotNumber = null;
+            this.SelectedSlot.SlotNumber = -1;
 
             t.SlotNumber = (short)slotNumber;
             this.SetSlot(t);
@@ -144,7 +144,7 @@ namespace MineSharp.Windows {
             List<Slot> slots = GetContainerSlots().ToList();
 
             if (this.InventoryWindow != null) {
-                slots.AddRange(this.InventoryWindow.GetContainerSlots().Select(x => new Slot(x.ItemID, x.ItemDamage, x.Count, x.Nbt, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
+                slots.AddRange(this.InventoryWindow.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
             }
 
             if (OffHandSlot != null)
@@ -152,9 +152,9 @@ namespace MineSharp.Windows {
             return slots.ToArray();
         }
 
-        public Item?[] ContainerItems() => GetContainerSlots().Select(x => x.AsItem()).ToArray();
+        public Item?[] ContainerItems() => GetContainerSlots().Select(x => x.Item).ToArray();
 
-        public Item?[] AllItems() => GetAllSlots().Select(x => x.AsItem()).ToArray();
+        public Item?[] AllItems() => GetAllSlots().Select(x => x.Item).ToArray();
 
         /// <summary>
         /// When using MineSharp.Bot, please use Bot.CloseWindow(windowId) instead.
@@ -190,16 +190,16 @@ namespace MineSharp.Windows {
         public int AllEmptySlotCount => AllEmptySlots().Length;
 
 
-        private Slot? FindItem(Slot[] slots, ItemInfo itemInfo) => slots.FirstOrDefault(x => !x.IsEmpty() && x.GetItemInfo() == itemInfo);
+        private Slot? FindItem(Slot[] slots, Item searched) => slots.FirstOrDefault(x => !x.IsEmpty() && x.Item!.Id == searched.Id);
 
         /// <summary>
         /// Searches through the container slots for an item
         /// </summary>
         /// <param name="itemInfo"></param>
         /// <returns></returns>
-        public Slot? FindContainerItem(ItemInfo itemInfo) => FindItem(this.ContainerSlots, itemInfo);
+        public Slot? FindContainerItem(Item searched) => FindItem(this.ContainerSlots, searched);
 
-        public Slot? FindInventoryItem(ItemInfo itemInfo) => FindItem(this.InventoryWindow!.ContainerSlots, itemInfo);
+        public Slot? FindInventoryItem(Item searched) => FindItem(this.InventoryWindow!.ContainerSlots, searched);
 
         public void SwitchSlots(short slot1, short slot2) {
             Slot a = GetSlot(slot1);
@@ -213,20 +213,6 @@ namespace MineSharp.Windows {
 
             click = new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseLeft, a.IsEmpty() ? slot1 : slot2);
             this.PerformClick(click);
-        }
-
-        public void Put(ItemInfo itemInfo, int? count = null) {
-            if (this.InventoryWindow == null) 
-                throw new NotSupportedException("Window must include inventory window (WindowInfo.ExcludeInventory = false)");
-
-            var slotFrom = this.InventoryWindow.FindContainerItem(itemInfo);
-            if (slotFrom == null)
-                throw new KeyNotFoundException($"Item {itemInfo.Name} not found in bots inventory");
-
-            var emptySlots = EmptyContainerSlots();
-            if (emptySlots.Length == 0)
-                throw new InvalidOperationException("Container has no free slot");
-
         }
     }
 }

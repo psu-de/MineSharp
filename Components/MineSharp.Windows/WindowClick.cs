@@ -45,11 +45,11 @@ namespace MineSharp.Windows {
                 if (window.SelectedSlot.IsEmpty()) return;
 
                 if (Button == 0) // Drop entire stack
-                    window.SelectedSlot.ItemID = -1;
+                    window.SelectedSlot.Item = null;
                 else { // Drop one at a time
-                    window.SelectedSlot.Count--;
-                    if (window.SelectedSlot.Count == 0)
-                        window.SelectedSlot.ItemID = -1;
+                    window.SelectedSlot.Item!.Count--;
+                    if (window.SelectedSlot.Item!.Count == 0)
+                        window.SelectedSlot.Item = null;
                 }
                 return;
             }
@@ -64,18 +64,19 @@ namespace MineSharp.Windows {
 
                 if (window.SelectedSlot.IsEmpty()) { // Pickup half stack
                     var oldSlot = window.GetSlot(this.Slot);
-                    var count = (byte)Math.Ceiling(oldSlot.Count / 2.0F);
-                    window.SelectedSlot = new Slot(oldSlot.ItemID, oldSlot.ItemDamage, count, oldSlot.Nbt);
-                    oldSlot.Count -= count;
+                    var count = (byte)Math.Ceiling(oldSlot.Item!.Count / 2.0F);
+                    window.SelectedSlot = new Slot(oldSlot.Item, -1); // Clone Item?
+                    oldSlot.Item.Count -= count;
                     window.SetSlot(oldSlot);
                     return;
                 }
 
                 if (window.GetSlot(this.Slot).IsEmpty() || window.GetSlot(this.Slot).CanStack(window.SelectedSlot!)) { // Transfer one item from selectedSlot to slots[Slot]
                     var oldSlot = window.SelectedSlot;
-                    window.SetSlot(new Slot(oldSlot.ItemID, oldSlot.ItemDamage, 1, oldSlot.Nbt, this.Slot));
-                    oldSlot.Count--;
-                    if (oldSlot.Count == 0) oldSlot.ItemID = -1;
+                    window.SetSlot(new Slot(oldSlot.Item, this.Slot));// Clone Item?
+                    oldSlot.Item!.Count--;
+                    if (oldSlot.Item!.Count == 0) oldSlot.Item = null;
+                    oldSlot.SlotNumber = -1;
                     window.SelectedSlot = oldSlot;
                 } else {
                     window.SwapSelectedSlot(this.Slot);

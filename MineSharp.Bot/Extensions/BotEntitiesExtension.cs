@@ -1,10 +1,6 @@
-﻿using MineSharp.Core;
-using MineSharp.Core.Types;
-using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Effects;
+﻿using MineSharp.Core.Types;
 using MineSharp.Data.Entities;
 using System.Collections.Concurrent;
-using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoPacket;
 
 namespace MineSharp.Bot {
 
@@ -20,7 +16,7 @@ namespace MineSharp.Bot {
         /// </summary>
         public ConcurrentDictionary<int, Entity> Entities => EntityModule.Entities;
 
-        public ConcurrentDictionary<UUID, Player> PlayerMapping => PlayerModule.PlayerMapping;
-        public List<Player> PlayerList => PlayerMapping.Values.ToList();
+        public ConcurrentDictionary<UUID, MinecraftPlayer> PlayerMapping => PlayerModule.PlayerMapping;
+        public List<MinecraftPlayer> PlayerList => PlayerMapping.Values.ToList();
     }
 }
