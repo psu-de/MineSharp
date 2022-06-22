@@ -3,7 +3,7 @@
 <#@ assembly name="System.Runtime" #>
 <#@ assembly name="System.Linq" #>
 <#@ assembly name="System.Collections" #>
-<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.dll" #>
+<#@ assembly name="$(SolutionDir)\Data\MineSharp.Data.T4\bin\Debug\net6.0\MineSharp.Data.T4.dll" #>
 
 <#@ import namespace="MineSharp.Data" #>
 <#@ import namespace="MineSharp.Data.Enchantments" #>

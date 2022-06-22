@@ -14,7 +14,7 @@ namespace MineSharp.Data {
 
         public static string[] GetAvailableVersions() => DataPaths.PCVersions.Keys.ToArray();
 
-        private static string GetJsonPath(string version, string type) {
+        internal static string GetJsonPath(string version, string type) {
 
             var pathInfo = DataPaths.PCVersions[version];
             var key = Uppercase(type) + "Path";
