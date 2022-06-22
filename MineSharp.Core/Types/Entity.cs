@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Core.Types {
-	public class Entity {
+﻿namespace MineSharp.Core.Types {
+    public class Entity {
 
 		public int Id { get; }
 		public string Name { get; }

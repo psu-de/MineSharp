@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Protocol.Packets.Clientbound.Status {
+﻿namespace MineSharp.Protocol.Packets.Clientbound.Status {
     public class PongPacket : Packet {
 
         public long Payload { get; private set; }

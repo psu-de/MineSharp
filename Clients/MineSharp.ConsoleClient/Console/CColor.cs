@@ -1,10 +1,5 @@
 ﻿using PrettyPrompt.Highlighting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console {
     public static class CColor {

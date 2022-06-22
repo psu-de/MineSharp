@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MineSharp.Bot;
-
-
-namespace MineSharp.ConsoleClient.Client {
+﻿namespace MineSharp.ConsoleClient.Client {
     public static class BotClient {
 
         public static MemoryStream BotLog = new MemoryStream();

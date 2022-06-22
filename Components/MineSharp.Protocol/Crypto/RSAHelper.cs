@@ -1,13 +1,8 @@
 ﻿using MineSharp.Core.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Protocol.Crypto {
-	public class RSAHelper {
+    public class RSAHelper {
 		public static RSA DecodePublicKey(byte[] publicKeyBytes) {
 			MemoryStream ms = new MemoryStream(publicKeyBytes);
 			BinaryReader rd = new BinaryReader(ms);

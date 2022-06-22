@@ -132,6 +132,7 @@
             if (!(type.IsGenericType && type.Name.Contains('`')))
                 switch (type.Name)
                 {
+                    case "Byte": return "byte";
                     case "Single": return "float";
                     case "Double": return "double";
                     case "String": return "string";

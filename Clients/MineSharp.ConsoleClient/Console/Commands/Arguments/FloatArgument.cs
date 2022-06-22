@@ -1,9 +1,4 @@
 ﻿using PrettyPrompt.Completion;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
     internal class FloatArgument : Argument {

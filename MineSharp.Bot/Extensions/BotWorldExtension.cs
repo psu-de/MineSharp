@@ -1,19 +1,7 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
-using MineSharp.Physics;
-using MineSharp.Protocol.Packets;
-using MineSharp.Protocol.Packets.Serverbound.Play;
-using MineSharp.World;
-using MineSharp.World.Chunks;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {

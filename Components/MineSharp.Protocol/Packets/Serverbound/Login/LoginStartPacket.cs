@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Protocol.Packets.Serverbound.Login {
+﻿namespace MineSharp.Protocol.Packets.Serverbound.Login {
     public class LoginStartPacket : Packet {
 
         public string Username { get; private set; }

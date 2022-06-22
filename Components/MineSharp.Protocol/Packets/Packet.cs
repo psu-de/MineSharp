@@ -6,11 +6,6 @@ using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 using MineSharp.Protocol.Packets.Serverbound.Login;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Status;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Protocol.Packets {
     public abstract class Packet : IDisposable {

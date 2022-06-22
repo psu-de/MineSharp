@@ -1,11 +1,4 @@
-﻿using MineSharp.Protocol.Packets.Serverbound.Status;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Protocol.Packets.Serverbound.Handshaking {
+﻿namespace MineSharp.Protocol.Packets.Serverbound.Handshaking {
     public class HandshakePacket : Packet {
 
         public int? ProtocolVersion { get; private set; }

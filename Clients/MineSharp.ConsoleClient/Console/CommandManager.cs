@@ -1,17 +1,10 @@
-﻿using MineSharp.ConsoleClient.Console.Commands;
-using MineSharp.ConsoleClient.Console.Commands.Chat;
+﻿using MineSharp.ConsoleClient.Console.Commands.Chat;
 using MineSharp.ConsoleClient.Console.Commands.Entity;
 using MineSharp.ConsoleClient.Console.Commands.Misc;
 using MineSharp.ConsoleClient.Console.Commands.Player;
 using MineSharp.ConsoleClient.Console.Commands.Prompt;
 using MineSharp.ConsoleClient.Console.Commands.Windows;
 using MineSharp.ConsoleClient.Console.Commands.World;
-using PrettyPrompt.Highlighting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console {
     internal static class CommandManager {

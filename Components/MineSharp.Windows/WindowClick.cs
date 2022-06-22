@@ -1,12 +1,5 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Items;
-using MineSharp.Data.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Windows {
     public class WindowClick {

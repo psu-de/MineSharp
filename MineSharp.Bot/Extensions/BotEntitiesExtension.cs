@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Data.Entities;
 using System.Collections.Concurrent;
 
 namespace MineSharp.Bot {

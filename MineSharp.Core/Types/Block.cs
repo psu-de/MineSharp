@@ -1,7 +1,5 @@
-﻿using System.Reflection;
-
-namespace MineSharp.Core.Types {
-	public class BlockProperties {
+﻿namespace MineSharp.Core.Types {
+    public class BlockProperties {
 
 
 		public BlockStateProperty[] Properties;

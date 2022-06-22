@@ -44,7 +44,7 @@ Closes a window
 - `public Task CloseWindow(MineSharp.Windows.Window window)`   
 Closes a window 
   
-- `public Task SelectHotbarIndex(System.Byte hotbarIndex)`   
+- `public Task SelectHotbarIndex(byte hotbarIndex)`   
 Selects a slot on the hotbar 
   
 ### World 
@@ -68,6 +68,6 @@ Returns the block the bot is looking at
   
 - `public Task WaitForChunksToLoad(int length)`   
 Waits until the chunks around the bot have been loaded 
- 
+  
 
  

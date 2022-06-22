@@ -1,5 +1,4 @@
-﻿using fNbt;
-using MineSharp.Core.Types;
+﻿using MineSharp.Core.Types;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
 

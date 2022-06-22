@@ -3,11 +3,6 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Protocol.Crypto {
     public class AesStream : Stream {

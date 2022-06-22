@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Physics {
+﻿namespace MineSharp.Physics {
     public class PlayerControls {
 
         public bool Forward { get; set; } = false;

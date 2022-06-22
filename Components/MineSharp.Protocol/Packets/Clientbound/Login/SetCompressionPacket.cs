@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Protocol.Packets.Clientbound.Login {
+﻿namespace MineSharp.Protocol.Packets.Clientbound.Login {
     public class SetCompressionPacket : Packet {
 
         public int Threshold { get; private set; }

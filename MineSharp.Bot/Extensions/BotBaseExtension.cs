@@ -2,12 +2,6 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
-using MineSharp.Protocol.Packets.Serverbound.Play;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {

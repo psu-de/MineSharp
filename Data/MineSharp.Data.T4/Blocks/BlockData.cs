@@ -5,12 +5,11 @@
 /////////////////////////////////////////////////////////
 
 using MineSharp.Core.Types;
-using MineSharp.Data.Effects;
 
 namespace MineSharp.Data.Blocks {
 
-	
-	public static class BlockShapePalette {
+
+    public static class BlockShapePalette {
 
 
 		public static readonly Dictionary<int, float[][]> AllBlockShapes = new Dictionary<int, float[][]>() {

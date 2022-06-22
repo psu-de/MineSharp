@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Core.Types.Enums {
+﻿namespace MineSharp.Core.Types.Enums {
     public enum BlockEntityType {
         Furnace = 0,
         Chest = 1,

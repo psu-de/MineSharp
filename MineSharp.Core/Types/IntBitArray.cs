@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Core.Types {
+﻿namespace MineSharp.Core.Types {
     public class IntBitArray {
 
 

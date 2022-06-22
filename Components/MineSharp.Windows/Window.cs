@@ -1,9 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Data.Items;
 using MineSharp.Data.Windows;
-using MineSharp.Windows;
 
 namespace MineSharp.Windows {
     public class Window : IDisposable {

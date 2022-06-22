@@ -1,5 +1,3 @@
-using MineSharp.Core.Types;
-
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class ParticlePacket : Packet {
 

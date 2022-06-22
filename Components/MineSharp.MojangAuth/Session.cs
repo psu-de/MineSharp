@@ -3,7 +3,6 @@ using MineSharp.Core.Types;
 using MojangSharp.Endpoints;
 using MojangSharp.Responses;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace MineSharp.MojangAuth {
     public class Session {

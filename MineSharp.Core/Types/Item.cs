@@ -1,11 +1,4 @@
 ﻿using fNbt;
-using MineSharp.Core.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Core.Types {
     public class Item {

@@ -1,11 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Logging;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Misc {
     internal class BotLogCommand : Command {

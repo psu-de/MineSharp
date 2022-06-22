@@ -3,8 +3,6 @@ using MineSharp.Core.Versions;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
-using System.Diagnostics;
-using System.Net;
 using System.Net.Sockets;
 
 namespace MineSharp.Protocol {

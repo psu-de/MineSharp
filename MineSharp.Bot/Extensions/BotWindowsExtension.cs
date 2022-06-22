@@ -1,12 +1,5 @@
-﻿using MineSharp.Data.Blocks;
-using MineSharp.Data.Items;
-using MineSharp.Core.Types;
+﻿using MineSharp.Core.Types;
 using MineSharp.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {

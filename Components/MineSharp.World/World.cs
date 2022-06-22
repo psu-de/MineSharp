@@ -1,7 +1,6 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.World.Chunks;
 using System.Collections.Concurrent;

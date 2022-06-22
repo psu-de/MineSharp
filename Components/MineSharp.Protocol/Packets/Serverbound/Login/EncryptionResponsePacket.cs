@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Protocol.Packets.Serverbound.Login {
+﻿namespace MineSharp.Protocol.Packets.Serverbound.Login {
     public class EncryptionResponsePacket : Packet {
 
         public byte[] SharedSecret { get; private set; }

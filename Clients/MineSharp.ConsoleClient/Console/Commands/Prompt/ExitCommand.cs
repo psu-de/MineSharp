@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
+﻿namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
     internal class ExitCommand : Command {
 
         public ExitCommand() {

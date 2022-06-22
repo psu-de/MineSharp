@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using PrettyPrompt;
-using PrettyPrompt.Highlighting;
+﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Prompt {

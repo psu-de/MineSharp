@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace MineSharp.Core.Types {
+﻿namespace MineSharp.Core.Types {
     public class Biome {
 
         public int Id { get; }
