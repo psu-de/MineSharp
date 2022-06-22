@@ -38,9 +38,6 @@
   }
  #>
 
- 
-Docs will follow
-
  <#+ 
  
          public string GetSignature(MethodInfo method, bool callable = false)
