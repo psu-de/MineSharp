@@ -27,7 +27,7 @@
 	if (!categories.ContainsKey(attr.Category))
 		categories.Add(attr.Category, new List<string>());
 
-	categories[attr.Category].Add($"{GetSignature(func)}   \r\n{attr.Description} \r\n  ");
+	categories[attr.Category].Add($"`{GetSignature(func)}`   \r\n{attr.Description} \r\n  ");
   }
 
   foreach (var cat in categories) {
