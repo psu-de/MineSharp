@@ -68,9 +68,6 @@ Returns the block the bot is looking at
   
 - `public Task WaitForChunksToLoad(int length)`   
 Waits until the chunks around the bot have been loaded 
-  
-
  
-Docs will follow
 
  
