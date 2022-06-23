@@ -37,7 +37,7 @@ namespace MineSharp.Protocol {
 
 
         private TcpClient _client;
-        private MinecraftStream Stream;
+        private MinecraftStream? Stream;
 
 
         private CancellationTokenSource CancellationTokenSource;
@@ -110,12 +110,12 @@ namespace MineSharp.Protocol {
             }
         }
 
-        byte[] sharedSecret;
+        byte[]? sharedSecret;
         internal void SetEncryptionKey(byte[] key) {
             sharedSecret = key;
         }
 
-        internal void EnableEncryption() => this.Stream.EnableEncryption(sharedSecret);
+        internal void EnableEncryption() => this.Stream!.EnableEncryption(sharedSecret!);
 
         internal void SetCompressionThreshold(int compressionThreshold) {
             this.CompressionThreshold = compressionThreshold;
@@ -142,8 +142,8 @@ namespace MineSharp.Protocol {
 
 
         private async Task streamLoop() {
-            async void readPacket () {
-                int length = this.Stream.ReadVarInt();
+            Task readPacket () {
+                int length = this.Stream!.ReadVarInt();
                 int uncompressedLength = 0;
 
                 if (this.CompressionThreshold > 0) {
@@ -161,16 +161,17 @@ namespace MineSharp.Protocol {
                     } catch (Exception e) {
                         Logger.Error("There occured an error while handling the packet: \n" + e.ToString());
                     }});
+                return Task.CompletedTask;
             }
 
             while (!this.CancellationToken.IsCancellationRequested) {
                 try {
 
                     if (this.GameState != GameState.PLAY) {
-                        if (this._client.Available > 0) readPacket();
+                        if (this._client.Available > 0) await readPacket();
                         await Task.Delay(1);
                     } else {
-                        while (this._client.Available > 0) { readPacket(); }
+                        while (this._client.Available > 0) { await readPacket(); }
                         await Task.Delay(1);
                     }
 
@@ -190,7 +191,7 @@ namespace MineSharp.Protocol {
                             packetBuffer = PacketBuffer.Compress(packetBuffer, this.CompressionThreshold);
                         }
 
-                        this.Stream.DispatchPacket(packetBuffer);
+                        this.Stream!.DispatchPacket(packetBuffer);
 
                         packet.SendingCompletionSource.TrySetResult(true);
                         ThreadPool.QueueUserWorkItem(async (object? _) => {

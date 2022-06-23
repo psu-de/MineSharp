@@ -3,7 +3,7 @@ using MineSharp.Core.Types;
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class TagsPacket : Packet {
 
-        public (Identifier, (Identifier, int[])[])[] Data { get; private set; }
+        public (Identifier, (Identifier, int[])[])[]? Data { get; private set; }
 
         public TagsPacket() { }
 

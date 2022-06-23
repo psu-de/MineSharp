@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hawezo.MojangSharp" Version="0.5.1" />
+    <PackageReference Include="ChangFeng.MojangSharpCore" Version="0.0.1" />
   </ItemGroup>
 
   <ItemGroup>

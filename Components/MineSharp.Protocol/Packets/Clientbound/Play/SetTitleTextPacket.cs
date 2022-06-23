@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteChat(this.TitleText);
+            buffer.WriteChat(this.TitleText!);
         }
     }
 }

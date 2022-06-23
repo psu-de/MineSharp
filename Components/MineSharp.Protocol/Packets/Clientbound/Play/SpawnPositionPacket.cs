@@ -18,7 +18,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteFloat(this.Angle);
         }
     }

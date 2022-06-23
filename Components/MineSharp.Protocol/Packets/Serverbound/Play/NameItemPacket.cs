@@ -1,7 +1,7 @@
 namespace MineSharp.Protocol.Packets.Serverbound.Play {
     public class NameItemPacket : Packet {
 
-        public string Itemname { get; private set; }
+        public string? Itemname { get; private set; }
 
         public NameItemPacket() { }
 
@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(this.Itemname);
+            buffer.WriteString(this.Itemname!);
         }
     }
 }

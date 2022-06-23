@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public PlayerListHeaderAndFooterPacket() { }
 
-        public PlayerListHeaderAndFooterPacket(Chat? header, Chat? footer) {
+        public PlayerListHeaderAndFooterPacket(Chat header, Chat footer) {
             this.Header = header;
             this.Footer = footer;
         }
@@ -18,8 +18,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteChat(this.Header);
-            buffer.WriteChat(this.Footer);
+            buffer.WriteChat(this.Header!);
+            buffer.WriteChat(this.Footer!);
         }
     }
 }

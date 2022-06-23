@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public BlockBreakAnimationPacket() { }
 
-        public BlockBreakAnimationPacket(int entityid, Position? location, byte destroystage) {
+        public BlockBreakAnimationPacket(int entityid, Position location, byte destroystage) {
             this.EntityID = entityid;
             this.Location = location;
             this.DestroyStage = destroystage;
@@ -23,7 +23,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteByte(this.DestroyStage);
         }
     }

@@ -4,7 +4,7 @@ using MineSharp.Core.Types.Enums;
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class PlayerInfoPacket : Packet {
         public PlayerInfoAction Action { get; private set; }
-        public (UUID, object)[] Players { get; private set; }
+        public (UUID, object)[]? Players { get; private set; }
 
 
         public override void Read(PacketBuffer buffer) {
@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             this.Players = new (UUID, object)[length];
             for (int i = 0; i < length; i++) {
                 UUID uuid = buffer.ReadUUID();
-                object props = null;
+                object? props = null;
                 switch (this.Action) {
                     case PlayerInfoAction.AddPlayer:
                         string name = buffer.ReadString();
@@ -51,7 +51,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
                         break;
                 }
 
-                this.Players[i] = (uuid, props);
+                this.Players[i] = (uuid!, props!);
             }
         }
 

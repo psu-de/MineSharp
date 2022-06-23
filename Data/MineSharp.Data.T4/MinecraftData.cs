@@ -52,6 +52,7 @@ namespace MineSharp.Data {
             return char.ToUpper(str[0]) + str.Substring(1);
         }
 
+#pragma warning disable CS8618
         private struct GenerateInfoJson {
             [JsonProperty("attributes")]
             public string AttributesPath { get; set; }
@@ -94,12 +95,15 @@ namespace MineSharp.Data {
         }
 
         private struct DataPathsJson {
+#pragma warning disable CS0649
             [JsonProperty("pc")]
             public Dictionary<string, GenerateInfoJson> PCVersions;
             [JsonProperty("bedrock")]
             public Dictionary<string, object> BedrockVersions;
+#pragma warning restore CS0649
         }
     }
+#pragma warning restore CS8618
 
 
 }

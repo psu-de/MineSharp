@@ -1,7 +1,7 @@
 ﻿namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class DestroyEntitiesPacket : Packet {
 
-        public int[] EntityIds { get; private set; }
+        public int[]? EntityIds { get; private set; }
 
         public DestroyEntitiesPacket() { }
         public DestroyEntitiesPacket(int[] EntityIds) {

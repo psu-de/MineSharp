@@ -10,7 +10,7 @@ namespace MineSharp.Core.Logging {
         public static List<LogMessage> LogMessages = new List<LogMessage>();
 
         public delegate void LogMessageEvent(LogMessage message);
-        public static event LogMessageEvent OnLogMessageReceieved;
+        public static event LogMessageEvent? OnLogMessageReceieved;
 
         public struct LogMessage {
             public LogLevel Level;
@@ -47,6 +47,7 @@ namespace MineSharp.Core.Logging {
                     LogLevel.DEBUG => "cyan1",
                     LogLevel.DEBUG2 => "magenta1",
                     LogLevel.DEBUG3 => "magenta2",
+                    _ => throw new Exception()
                 };
 
                 var str = this.ToString();
@@ -66,8 +67,8 @@ namespace MineSharp.Core.Logging {
             Type declaringType;
             int skipFrames = 2;
             do {
-                MethodBase method = new StackFrame(skipFrames, false).GetMethod();
-                declaringType = method.DeclaringType;
+                MethodBase method = new StackFrame(skipFrames, false).GetMethod()!;
+                declaringType = method.DeclaringType!;
                 if (declaringType == null) {
                     return method.Name;
                 }
@@ -75,7 +76,7 @@ namespace MineSharp.Core.Logging {
             }
             while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase));
 
-            string[] modules = declaringType.Namespace.Split('.');
+            string[] modules = declaringType.Namespace!.Split('.');
 
             if (declaringType.Namespace.StartsWith("MineSharp")) {
                 return modules[1];

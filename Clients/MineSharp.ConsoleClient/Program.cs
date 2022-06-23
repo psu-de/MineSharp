@@ -80,7 +80,7 @@ AnsiConsole.Status()
         BotClient.Initialize(loginOptions);
         MineSharp.Core.Logging.Logger.OnLogMessageReceieved += LogMessage;
 
-        var successful = BotClient.Bot.Connect().GetAwaiter().GetResult();
+        var successful = BotClient.Bot!.Connect().GetAwaiter().GetResult();
         thresholdLogLevel = MineSharp.Core.Logging.LogLevel.ERROR;
 
         if (!successful) {

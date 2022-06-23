@@ -19,11 +19,11 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
 
         public override void DoAction(string[] argv, CancellationToken cancellation) {
             AnsiConsole.Status()
-                .Start("Searching for [yellow]" + argv[0] + "[/]", async ctx => {
+                .Start("Searching for [yellow]" + argv[0] + "[/]", ctx => {
                     var blockType = BlockTypeArgument.GetValue(argv[0]);
 
 
-                    var block = BotClient.Bot.FindBlockAsync(blockType, cancellation).GetAwaiter().GetResult();
+                    var block = BotClient.Bot!.FindBlockAsync(blockType, cancellation).GetAwaiter().GetResult();
                     if (cancellation.IsCancellationRequested) return;
 
                     if (block != null) {

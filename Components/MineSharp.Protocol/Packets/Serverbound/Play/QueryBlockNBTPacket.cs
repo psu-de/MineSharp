@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public QueryBlockNBTPacket() { }
 
-        public QueryBlockNBTPacket(int transactionid, Position? location) {
+        public QueryBlockNBTPacket(int transactionid, Position location) {
             this.TransactionID = transactionid;
             this.Location = location;
         }
@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.TransactionID);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
         }
     }
 }

@@ -28,8 +28,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
                 return;
             }
 
-            var block = BotClient.Bot.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            var biome = BotClient.Bot.GetBiomeAt(new Core.Types.Position((int)x, (int)y, (int)z));
+            var block = BotClient.Bot!.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
+            var biome = BotClient.Bot!.GetBiomeAt(new Core.Types.Position((int)x, (int)y, (int)z));
             var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties", "Biome");
 
             string propGetValue(BlockStateProperty prop) {

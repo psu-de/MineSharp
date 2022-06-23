@@ -2,7 +2,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class EntityMetadataPacket : Packet {
 
         public int EntityID { get; private set; }
-        public byte[] Data { get; private set; }
+        public byte[]? Data { get; private set; }
 
 
         public EntityMetadataPacket() { }
@@ -19,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WriteRaw(this.Data);
+            buffer.WriteRaw(this.Data!);
         }
     }
 }

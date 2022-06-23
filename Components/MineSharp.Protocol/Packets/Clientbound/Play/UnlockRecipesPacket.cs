@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public bool BlastFurnaceRecipeBookFilterActive { get; private set; }
         public bool SmokerRecipeBookOpen { get; private set; }
         public bool SmokerRecipeBookFilterActive { get; private set; }
-        public Identifier[] RecipeIDs { get; private set; }
+        public Identifier[]? RecipeIDs { get; private set; }
         public Identifier[]? RecipeIDs2 { get; private set; }
 
         public UnlockRecipesPacket(UnlockRecipesAction action, bool craftingRecipeBookOpen, bool craftingRecipeBookFilterActive, bool smeltingRecipeBookOpen, bool smeltingRecipeBookFilterActive, bool blastFurnaceRecipeBookOpen, bool blastFurnaceRecipeBookFilterActive, bool smokerRecipeBookOpen, bool smokerRecipeBookFilterActive, Identifier[] recipeIDs, Identifier[]? recipeIDs2) {

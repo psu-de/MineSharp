@@ -28,7 +28,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 AnsiConsole.MarkupLine($"[{CColor.Error}]Invalid yaw![/]");
             }
 
-            BotClient.Bot.ForceSetRotation(yaw.Value, pitch.Value);
+            BotClient.Bot!.ForceSetRotation(yaw!.Value, pitch!.Value);
         }
     }
 }

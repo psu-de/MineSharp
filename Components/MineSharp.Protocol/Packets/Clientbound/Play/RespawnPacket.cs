@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public RespawnPacket() { }
 
-        public RespawnPacket(NbtCompound? dimension, Identifier? dimensionname, long hashedseed, byte gamemode, byte previousgamemode, bool isdebug, bool isflat, bool copymetadata) {
+        public RespawnPacket(NbtCompound? dimension, Identifier dimensionname, long hashedseed, byte gamemode, byte previousgamemode, bool isdebug, bool isflat, bool copymetadata) {
             this.Dimension = dimension;
             this.DimensionName = dimensionname;
             this.Hashedseed = hashedseed;
@@ -38,7 +38,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteNBTCompound(this.Dimension);
-            buffer.WriteIdentifier(this.DimensionName);
+            buffer.WriteIdentifier(this.DimensionName!);
             buffer.WriteLong(this.Hashedseed);
             buffer.WriteByte(this.Gamemode);
             buffer.WriteByte(this.PreviousGamemode);

@@ -4,7 +4,7 @@ using MineSharp.Core.Types.Enums;
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class DeclareCommandsPacket : Packet {
 
-        public CommandNode[] Nodes { get; private set; }
+        public CommandNode[]? Nodes { get; private set; }
         public int RootIndex { get; private set; }
 
         public DeclareCommandsPacket() { }

@@ -3,7 +3,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public int EntityID { get; private set; }
         public int PassengerCount { get; private set; }
-        public int[] Passengers { get; private set; }
+        public int[]? Passengers { get; private set; }
 
         public SetPassengersPacket() { }
 
@@ -19,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WriteVarIntArray(this.Passengers);
+            buffer.WriteVarIntArray(this.Passengers!);
         }
     }
 }

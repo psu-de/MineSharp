@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MineSharp.Data.Biomes {
+#pragma warning disable CS8618
     public class BiomeJsonInfo {
         [JsonProperty("id")]
         public int Id;
@@ -23,4 +24,5 @@ namespace MineSharp.Data.Biomes {
         [JsonProperty("rainfall")]
         public float Rainfall;
     }
+#pragma warning restore CS8618
 }

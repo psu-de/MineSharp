@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public BlockActionPacket() { }
 
-        public BlockActionPacket(Position? location, byte actionid, byte actionparam, int blocktype) {
+        public BlockActionPacket(Position location, byte actionid, byte actionparam, int blocktype) {
             this.Location = location;
             this.ActionID = actionid;
             this.ActionParam = actionparam;
@@ -25,7 +25,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteByte(this.ActionID);
             buffer.WriteByte(this.ActionParam);
             buffer.WriteVarInt(this.BlockType);

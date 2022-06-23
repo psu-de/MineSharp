@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public JoinGamePacket() { }
 
-        public JoinGamePacket(int entityid, bool ishardcore, GameMode gamemode, GameMode previousgamemode, Identifier[]? dimensionnames, NbtCompound? dimensioncodec, NbtCompound? dimension, Identifier? dimensionname, long hashedseed, int maxplayers, int viewdistance, int simulationdistance, bool reduceddebuginfo, bool enablerespawnscreen, bool isdebug, bool isflat) {
+        public JoinGamePacket(int entityid, bool ishardcore, GameMode gamemode, GameMode previousgamemode, Identifier[] dimensionnames, NbtCompound? dimensioncodec, NbtCompound? dimension, Identifier dimensionname, long hashedseed, int maxplayers, int viewdistance, int simulationdistance, bool reduceddebuginfo, bool enablerespawnscreen, bool isdebug, bool isflat) {
             this.EntityID = entityid;
             this.Ishardcore = ishardcore;
             this.Gamemode = gamemode;
@@ -67,10 +67,10 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteBoolean(this.Ishardcore);
             buffer.WriteByte((byte)this.Gamemode);
             buffer.WriteByte((byte)this.PreviousGamemode);
-            buffer.WriteIdentifierArray(this.DimensionNames);
+            buffer.WriteIdentifierArray(this.DimensionNames!);
             buffer.WriteNBTCompound(this.DimensionCodec);
             buffer.WriteNBTCompound(this.Dimension);
-            buffer.WriteIdentifier(this.DimensionName);
+            buffer.WriteIdentifier(this.DimensionName!);
             buffer.WriteLong(this.Hashedseed);
             buffer.WriteVarInt(this.MaxPlayers);
             buffer.WriteVarInt(this.ViewDistance);

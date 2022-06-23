@@ -5,7 +5,7 @@ using Spectre.Console;
 namespace MineSharp.ConsoleClient.Console.Commands.Misc {
     internal class ToggleModuleCommand : Command {
 
-        StringArgument ModuleArg = new StringArgument("module", false, BotClient.Bot.Modules.Select(x => x.GetType().Name).ToArray());
+        StringArgument ModuleArg = new StringArgument("module", false, BotClient.Bot!.Modules.Select(x => x.GetType().Name).ToArray());
         BoolArgument EnabledArg = new BoolArgument("enabled");
 
         public ToggleModuleCommand() {
@@ -15,7 +15,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
         }
 
         public override void DoAction(string[] argv, CancellationToken cancellation) {
-            var module = BotClient.Bot.Modules.FirstOrDefault(x => x.GetType().Name == ModuleArg.GetValue(argv[0]));
+            var module = BotClient.Bot!.Modules.FirstOrDefault(x => x.GetType().Name == ModuleArg.GetValue(argv[0]));
             if (module == null) {
                 AnsiConsole.MarkupLine($"[red]Module {ModuleArg.GetValue(argv[0])} not found [/]");
                 return;

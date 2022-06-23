@@ -14,8 +14,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
         public override void DoAction(string[] argv, CancellationToken cancellation) {
             try {
 
-                BotClient.Bot.Respawn();
-            } catch (Exception ex) {
+                BotClient.Bot!.Respawn();
+            } catch (Exception) {
                 AnsiConsole.MarkupLine("[red]Player is not dead![/]");
             }
         }

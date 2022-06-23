@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public SculkVibrationSignalPacket() { }
 
-        public SculkVibrationSignalPacket(Position? sourceposition, Identifier? destinationidentifier, int arrivalticks) {
+        public SculkVibrationSignalPacket(Position sourceposition, Identifier destinationidentifier, int arrivalticks) {
             this.SourcePosition = sourceposition;
             this.DestinationIdentifier = destinationidentifier;
             this.ArrivalTicks = arrivalticks;
@@ -21,8 +21,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.SourcePosition);
-            buffer.WriteIdentifier(this.DestinationIdentifier);
+            buffer.WritePosition(this.SourcePosition!);
+            buffer.WriteIdentifier(this.DestinationIdentifier!);
             buffer.WriteVarInt(this.ArrivalTicks);
         }
     }

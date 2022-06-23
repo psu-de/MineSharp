@@ -11,7 +11,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
 
         public override void DoAction(string[] argv, CancellationToken cancellation) {
 
-            BotClient.Bot.Physics.SimulatePlayer(BotClient.Bot.MovementControls);
+            BotClient.Bot!.Physics!.SimulatePlayer(BotClient.Bot.MovementControls);
         }
     }
 }

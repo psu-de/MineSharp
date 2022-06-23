@@ -22,7 +22,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteChat(this.JSONData);
+            buffer.WriteChat(this.JSONData!);
             buffer.WriteByte(this.Position);
             buffer.WriteUUID(this.Sender);
         }

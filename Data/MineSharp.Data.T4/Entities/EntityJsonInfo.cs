@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MineSharp.Data.Entities {
+#pragma warning disable CS8618
     public class EntityJsonInfo {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -26,4 +27,5 @@ namespace MineSharp.Data.Entities {
         [JsonProperty("category")]
         public string Category { get; set; }
     }
+#pragma warning restore CS8618
 }

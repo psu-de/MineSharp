@@ -37,9 +37,9 @@ namespace MineSharp.Protocol.Packets {
 
         public abstract void Read(PacketBuffer buffer);
         public abstract void Write(PacketBuffer buffer);
-        public virtual async Task Handle(MinecraftClient client) { }
+        public virtual Task Handle(MinecraftClient client) { return Task.CompletedTask; }
 
-        public virtual async Task Sent(MinecraftClient client) { }
+        public virtual Task Sent(MinecraftClient client) { return Task.CompletedTask; }
 
 
         protected static Logger Logger = Logger.GetLogger();

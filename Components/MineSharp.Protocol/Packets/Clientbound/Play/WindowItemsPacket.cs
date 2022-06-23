@@ -4,8 +4,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public byte WindowID { get; private set; }
         public int StateID { get; private set; }
-        public Slot[] SlotData { get; private set; }
-        public Slot CarriedItem { get; private set; }
+        public Slot[]? SlotData { get; private set; }
+        public Slot? CarriedItem { get; private set; }
 
         public WindowItemsPacket() { }
 
@@ -26,8 +26,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public override void Write(PacketBuffer buffer) {
             buffer.WriteByte(this.WindowID);
             buffer.WriteVarInt(this.StateID);
-            buffer.WriteSlotArray(this.SlotData);
-            buffer.WriteSlot(this.CarriedItem);
+            buffer.WriteSlotArray(this.SlotData!);
+            buffer.WriteSlot(this.CarriedItem!);
         }
     }
 }

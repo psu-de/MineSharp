@@ -8,8 +8,8 @@ using static MineSharp.Bot.MinecraftBot;
 namespace MineSharp.Bot.Modules {
     public class WindowsModule : Module {
 
-        public event BotWindowEvent WindowOpened;
-        public event BotItemEvent HeldItemChanged;
+        public event BotWindowEvent? WindowOpened;
+        public event BotItemEvent? HeldItemChanged;
 
         private Window MainInventory { get; set; }
 
@@ -88,7 +88,7 @@ namespace MineSharp.Bot.Modules {
             }
 
             var packet = new Protocol.Packets.Serverbound.Play.PlayerBlockPlacementPacket(
-                Core.Types.Enums.PlayerHand.MainHand, block.Position, Core.Types.Enums.BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Hardcoded values
+                Core.Types.Enums.PlayerHand.MainHand, block.Position!, Core.Types.Enums.BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Hardcoded values
             var send = Bot.Client.SendPacket(packet);
 
             var receive = Bot.WaitForPacket<OpenWindowPacket>();
@@ -167,7 +167,7 @@ namespace MineSharp.Bot.Modules {
                 return Task.CompletedTask;
             }
 
-            window.UpdateSlots(packet.SlotData);
+            window.UpdateSlots(packet.SlotData!);
             window.StateId = packet.StateID;
 
             if (window.Id == 0 && !inventoryLoadedTsc.Task.IsCompleted) {
@@ -219,7 +219,7 @@ namespace MineSharp.Bot.Modules {
 
         private void Window_Clicked(Window window, WindowClick click) {
             var windowClickPacket = new Protocol.Packets.Serverbound.Play.ClickWindowPacket(
-                (byte)window.Id, window.StateId, click.Slot, click.Button, click.ClickMode, window.GetAllSlots(), window.SelectedSlot);
+                (byte)window.Id, window.StateId, click.Slot, click.Button, click.ClickMode, window.GetAllSlots(), window.SelectedSlot!);
             this.Bot.Client.SendPacket(windowClickPacket);
         }
 

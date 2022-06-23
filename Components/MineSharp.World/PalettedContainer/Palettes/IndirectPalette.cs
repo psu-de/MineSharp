@@ -8,7 +8,7 @@ namespace MineSharp.World.PalettedContainer.Palettes {
         internal const int BIOME_MAX_BITS = 3;
         internal const int BIOME_MIN_BITS = 1;
 
-        public int[] Map;
+        public int[]? Map;
 
         public IndirectPalette() { }
 
@@ -17,16 +17,16 @@ namespace MineSharp.World.PalettedContainer.Palettes {
         }
 
         public int Get(int entry) {
-            return Map[entry];
+            return Map![entry];
         }
 
         public int GetStateIndex(int state) {
-            return Map.ToList().IndexOf(state);
+            return Map!.ToList().IndexOf(state);
         }
 
         public bool HasState(int minState, int maxState) {
 
-            for (int i = 0; i < Map.Length; i++) {
+            for (int i = 0; i < Map!.Length; i++) {
                 if (minState <= Map[i] && Map[i] <= maxState) return true;
             }
 
@@ -40,7 +40,7 @@ namespace MineSharp.World.PalettedContainer.Palettes {
         public IPalette AddState(int state, bool biomes, out byte newBitsPerEntry) {
             if (HasState(state, state)) throw new ArgumentException("Palette already contains state");
 
-            var newMapSize = Map.Length + 1;
+            var newMapSize = Map!.Length + 1;
             newBitsPerEntry = (byte)Math.Ceiling(Math.Log2(newMapSize));
             newBitsPerEntry = (byte)Math.Max(newBitsPerEntry, biomes ? BIOME_MIN_BITS : BLOCK_MIN_BITS);
 

@@ -146,7 +146,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public AreaEffectCloud () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public AreaEffectCloud (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -159,7 +158,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.975F;
         public const int EntityCategory = 0;
 
-		public ArmorStand () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ArmorStand (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -172,7 +170,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public Arrow () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Arrow (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -185,7 +182,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.42F;
         public const int EntityCategory = 0;
 
-		public Axolotl () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Axolotl (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -198,7 +194,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.9F;
         public const int EntityCategory = 0;
 
-		public Bat () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Bat (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -211,7 +206,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.6F;
         public const int EntityCategory = 0;
 
-		public Bee () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Bee (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -224,7 +218,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.8F;
         public const int EntityCategory = 0;
 
-		public Blaze () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Blaze (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -237,7 +230,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5625F;
         public const int EntityCategory = 0;
 
-		public Boat () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Boat (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -250,7 +242,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Cat () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Cat (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -263,7 +254,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public CaveSpider () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public CaveSpider (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -276,7 +266,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Chicken () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Chicken (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -289,7 +278,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3F;
         public const int EntityCategory = 0;
 
-		public Cod () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Cod (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -302,7 +290,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.4F;
         public const int EntityCategory = 0;
 
-		public Cow () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Cow (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -315,7 +302,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.7F;
         public const int EntityCategory = 0;
 
-		public Creeper () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Creeper (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -328,7 +314,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.6F;
         public const int EntityCategory = 0;
 
-		public Dolphin () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Dolphin (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -341,7 +326,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.5F;
         public const int EntityCategory = 0;
 
-		public Donkey () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Donkey (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -354,7 +338,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1F;
         public const int EntityCategory = 0;
 
-		public DragonFireball () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public DragonFireball (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -367,7 +350,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Drowned () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Drowned (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -380,7 +362,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.9975F;
         public const int EntityCategory = 0;
 
-		public ElderGuardian () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ElderGuardian (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -393,7 +374,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2F;
         public const int EntityCategory = 0;
 
-		public EndCrystal () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public EndCrystal (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -406,7 +386,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 8F;
         public const int EntityCategory = 0;
 
-		public EnderDragon () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public EnderDragon (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -419,7 +398,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.9F;
         public const int EntityCategory = 0;
 
-		public Enderman () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Enderman (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -432,7 +410,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3F;
         public const int EntityCategory = 0;
 
-		public Endermite () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Endermite (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -445,7 +422,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Evoker () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Evoker (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -458,7 +434,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.8F;
         public const int EntityCategory = 0;
 
-		public EvokerFangs () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public EvokerFangs (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -471,7 +446,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public ExperienceOrb () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ExperienceOrb (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -484,7 +458,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public EyeOfEnder () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public EyeOfEnder (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -497,7 +470,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.98F;
         public const int EntityCategory = 0;
 
-		public FallingBlock () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public FallingBlock (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -510,7 +482,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public FireworkRocket () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public FireworkRocket (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -523,7 +494,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Fox () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Fox (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -536,7 +506,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 4F;
         public const int EntityCategory = 0;
 
-		public Ghast () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Ghast (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -549,7 +518,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 12F;
         public const int EntityCategory = 0;
 
-		public Giant () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Giant (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -562,7 +530,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public GlowItemFrame () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public GlowItemFrame (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -575,7 +542,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.8F;
         public const int EntityCategory = 0;
 
-		public GlowSquid () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public GlowSquid (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -588,7 +554,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.3F;
         public const int EntityCategory = 0;
 
-		public Goat () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Goat (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -601,7 +566,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.85F;
         public const int EntityCategory = 0;
 
-		public Guardian () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Guardian (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -614,7 +578,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.4F;
         public const int EntityCategory = 0;
 
-		public Hoglin () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Hoglin (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -627,7 +590,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.6F;
         public const int EntityCategory = 0;
 
-		public Horse () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Horse (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -640,7 +602,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Husk () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Husk (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -653,7 +614,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Illusioner () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Illusioner (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -666,7 +626,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.7F;
         public const int EntityCategory = 0;
 
-		public IronGolem () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public IronGolem (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -679,7 +638,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public Item () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Item (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -692,7 +650,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public ItemFrame () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ItemFrame (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -705,7 +662,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1F;
         public const int EntityCategory = 0;
 
-		public Fireball () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Fireball (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -718,7 +674,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public LeashKnot () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public LeashKnot (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -731,7 +686,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0F;
         public const int EntityCategory = 0;
 
-		public LightningBolt () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public LightningBolt (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -744,7 +698,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.87F;
         public const int EntityCategory = 0;
 
-		public Llama () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Llama (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -757,7 +710,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public LlamaSpit () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public LlamaSpit (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -770,7 +722,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.04F;
         public const int EntityCategory = 0;
 
-		public MagmaCube () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public MagmaCube (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -783,7 +734,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0F;
         public const int EntityCategory = 0;
 
-		public Marker () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Marker (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -796,7 +746,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Minecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Minecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -809,7 +758,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public ChestMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ChestMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -822,7 +770,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public CommandBlockMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public CommandBlockMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -835,7 +782,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public FurnaceMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public FurnaceMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -848,7 +794,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public HopperMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public HopperMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -861,7 +806,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public SpawnerMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public SpawnerMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -874,7 +818,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public TntMinecart () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public TntMinecart (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -887,7 +830,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.6F;
         public const int EntityCategory = 0;
 
-		public Mule () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Mule (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -900,7 +842,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.4F;
         public const int EntityCategory = 0;
 
-		public Mooshroom () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Mooshroom (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -913,7 +854,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Ocelot () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Ocelot (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -926,7 +866,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public Painting () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Painting (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -939,7 +878,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.25F;
         public const int EntityCategory = 0;
 
-		public Panda () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Panda (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -952,7 +890,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.9F;
         public const int EntityCategory = 0;
 
-		public Parrot () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Parrot (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -965,7 +902,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public Phantom () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Phantom (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -978,7 +914,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.9F;
         public const int EntityCategory = 0;
 
-		public Pig () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Pig (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -991,7 +926,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Piglin () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Piglin (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1004,7 +938,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public PiglinBrute () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public PiglinBrute (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1017,7 +950,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Pillager () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Pillager (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1030,7 +962,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.4F;
         public const int EntityCategory = 0;
 
-		public PolarBear () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public PolarBear (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1043,7 +974,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.98F;
         public const int EntityCategory = 0;
 
-		public Tnt () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Tnt (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1056,7 +986,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.7F;
         public const int EntityCategory = 0;
 
-		public Pufferfish () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Pufferfish (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1069,7 +998,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public Rabbit () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Rabbit (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1082,7 +1010,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.2F;
         public const int EntityCategory = 0;
 
-		public Ravager () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Ravager (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1095,7 +1022,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.4F;
         public const int EntityCategory = 0;
 
-		public Salmon () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Salmon (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1108,7 +1034,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.3F;
         public const int EntityCategory = 0;
 
-		public Sheep () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Sheep (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1121,7 +1046,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1F;
         public const int EntityCategory = 0;
 
-		public Shulker () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Shulker (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1134,7 +1058,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3125F;
         public const int EntityCategory = 0;
 
-		public ShulkerBullet () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ShulkerBullet (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1147,7 +1070,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3F;
         public const int EntityCategory = 0;
 
-		public Silverfish () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Silverfish (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1160,7 +1082,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.99F;
         public const int EntityCategory = 0;
 
-		public Skeleton () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Skeleton (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1173,7 +1094,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.6F;
         public const int EntityCategory = 0;
 
-		public SkeletonHorse () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public SkeletonHorse (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1186,7 +1106,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.04F;
         public const int EntityCategory = 0;
 
-		public Slime () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Slime (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1199,7 +1118,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3125F;
         public const int EntityCategory = 0;
 
-		public SmallFireball () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public SmallFireball (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1212,7 +1130,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.9F;
         public const int EntityCategory = 0;
 
-		public SnowGolem () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public SnowGolem (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1225,7 +1142,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public Snowball () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Snowball (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1238,7 +1154,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public SpectralArrow () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public SpectralArrow (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1251,7 +1166,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.9F;
         public const int EntityCategory = 0;
 
-		public Spider () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Spider (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1264,7 +1178,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.8F;
         public const int EntityCategory = 0;
 
-		public Squid () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Squid (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1277,7 +1190,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.99F;
         public const int EntityCategory = 0;
 
-		public Stray () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Stray (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1290,7 +1202,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.7F;
         public const int EntityCategory = 0;
 
-		public Strider () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Strider (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1303,7 +1214,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public Egg () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Egg (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1316,7 +1226,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public EnderPearl () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public EnderPearl (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1329,7 +1238,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public ExperienceBottle () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ExperienceBottle (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1342,7 +1250,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public Potion () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Potion (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1355,7 +1262,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.5F;
         public const int EntityCategory = 0;
 
-		public Trident () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Trident (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1368,7 +1274,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.87F;
         public const int EntityCategory = 0;
 
-		public TraderLlama () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public TraderLlama (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1381,7 +1286,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.4F;
         public const int EntityCategory = 0;
 
-		public TropicalFish () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public TropicalFish (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1394,7 +1298,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.4F;
         public const int EntityCategory = 0;
 
-		public Turtle () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Turtle (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1407,7 +1310,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.8F;
         public const int EntityCategory = 0;
 
-		public Vex () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Vex (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1420,7 +1322,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Villager () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Villager (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1433,7 +1334,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Vindicator () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Vindicator (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1446,7 +1346,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public WanderingTrader () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public WanderingTrader (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1459,7 +1358,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Witch () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Witch (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1472,7 +1370,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 3.5F;
         public const int EntityCategory = 0;
 
-		public Wither () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Wither (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1485,7 +1382,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 2.4F;
         public const int EntityCategory = 0;
 
-		public WitherSkeleton () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public WitherSkeleton (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1498,7 +1394,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.3125F;
         public const int EntityCategory = 0;
 
-		public WitherSkull () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public WitherSkull (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1511,7 +1406,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.85F;
         public const int EntityCategory = 0;
 
-		public Wolf () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Wolf (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1524,7 +1418,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.4F;
         public const int EntityCategory = 0;
 
-		public Zoglin () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Zoglin (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1537,7 +1430,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public Zombie () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Zombie (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1550,7 +1442,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.6F;
         public const int EntityCategory = 0;
 
-		public ZombieHorse () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ZombieHorse (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1563,7 +1454,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public ZombieVillager () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ZombieVillager (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1576,7 +1466,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.95F;
         public const int EntityCategory = 0;
 
-		public ZombifiedPiglin () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public ZombifiedPiglin (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1589,7 +1478,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 1.8F;
         public const int EntityCategory = 0;
 
-		public Player () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public Player (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}
@@ -1602,7 +1490,6 @@ namespace MineSharp.Data.Entities {
         public const float EntityHeight = 0.25F;
         public const int EntityCategory = 0;
 
-		public FishingBobber () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public FishingBobber (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}

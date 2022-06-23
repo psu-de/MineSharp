@@ -3,8 +3,8 @@
 namespace MineSharp.Protocol.Packets.Clientbound.Login {
     public class LoginSuccessPacket : Packet {
 
-        public UUID UUID { get; private set; }
-        public string Username { get; private set; }
+        public UUID? UUID { get; private set; }
+        public string? Username { get; private set; }
 
         public LoginSuccessPacket() { }
         public LoginSuccessPacket(UUID uuid, string username) {
@@ -23,8 +23,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteUUID(this.UUID);
-            buffer.WriteString(this.Username);
+            buffer.WriteUUID((UUID)this.UUID!);
+            buffer.WriteString(this.Username!);
         }
     }
 }

@@ -5,6 +5,7 @@ using MineSharp.ConsoleClient.Console.Commands.Player;
 using MineSharp.ConsoleClient.Console.Commands.Prompt;
 using MineSharp.ConsoleClient.Console.Commands.Windows;
 using MineSharp.ConsoleClient.Console.Commands.World;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.ConsoleClient.Console {
     internal static class CommandManager {
@@ -19,7 +20,7 @@ namespace MineSharp.ConsoleClient.Console {
             Commands.Add(command.Name, command);
         }
 
-        public static bool TryGetCommand(string name, out Command command) {
+        public static bool TryGetCommand(string name, [NotNullWhen(true)] out  Command? command) {
             if (!Commands.ContainsKey(name)) {
                 command = null;
                 return false;

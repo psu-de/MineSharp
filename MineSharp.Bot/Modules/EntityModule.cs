@@ -10,13 +10,13 @@ namespace MineSharp.Bot.Modules {
     public class EntityModule : Module {
         public EntityModule(MinecraftBot bot) : base(bot) { }
 
-        public event BotEntityEvent EntitySpawned;
+        public event BotEntityEvent? EntitySpawned;
 
-        public event BotEntityEvent EntityDespawned;
+        public event BotEntityEvent? EntityDespawned;
 
-        public event BotEntityEvent EntityMoved;
+        public event BotEntityEvent? EntityMoved;
 
-        public event BotEntityEvent EntityEffectChanged;
+        public event BotEntityEvent? EntityEffectChanged;
 
 
         public ConcurrentDictionary<int, Entity> Entities = new ConcurrentDictionary<int, Entity>();
@@ -40,18 +40,19 @@ namespace MineSharp.Bot.Modules {
 
             var newEntity = EntityFactory.CreateEntity(
                 packet.Type, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
-                packet.Pitch,
-                packet.Yaw,
+                packet.Pitch!,
+                packet.Yaw!,
                 new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
                 true,
                 new Dictionary<int, Effect?>());
 
             Entities.TryAdd(packet.EntityId, newEntity);
+            this.EntitySpawned?.Invoke(this.Bot, newEntity);
             return Task.CompletedTask;
         }
 
         private Task handleDestroyEntities(DestroyEntitiesPacket packet) {
-            for (int i = 0; i < packet.EntityIds.Length; i++) {
+            for (int i = 0; i < packet.EntityIds!.Length; i++) {
                 if (!this.Entities.TryRemove(packet.EntityIds[i], out var entity)) 
                     continue; 
                 this.EntityDespawned?.Invoke(this.Bot, entity);
@@ -85,8 +86,8 @@ namespace MineSharp.Bot.Modules {
                 return Task.CompletedTask;
 
             entity.Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
-            entity.Yaw = packet.Yaw;
-            entity.Pitch = packet.Pitch;
+            entity.Yaw = packet.Yaw!;
+            entity.Pitch = packet.Pitch!;
             entity.IsOnGround = packet.OnGround;
 
             EntityMoved?.Invoke(this.Bot, entity);
@@ -98,8 +99,8 @@ namespace MineSharp.Bot.Modules {
             if (!Entities.TryGetValue(packet.EntityID, out var entity)) 
                 return Task.CompletedTask;
 
-            entity.Yaw = packet.Yaw;
-            entity.Pitch = packet.Pitch;
+            entity.Yaw = packet.Yaw!;
+            entity.Pitch = packet.Pitch!;
             entity.IsOnGround = packet.OnGround;
 
             EntityMoved?.Invoke(this.Bot, entity);
@@ -114,8 +115,9 @@ namespace MineSharp.Bot.Modules {
             entity.Position.Y = packet.Y;
             entity.Position.Z = packet.Z;
 
-            entity.Yaw = packet.Yaw;
-            entity.Pitch = packet.Pitch;
+            entity.Yaw = packet.Yaw!;
+            entity.Pitch = packet.Pitch!;
+            this.EntityMoved?.Invoke(this.Bot, entity);
 
             return Task.CompletedTask;
         }
@@ -144,6 +146,7 @@ namespace MineSharp.Bot.Modules {
             if (entity.Effects.ContainsKey(packet.EffectID)) {
                 entity.Effects.Remove(packet.EffectID);
             }
+            EntityEffectChanged?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 

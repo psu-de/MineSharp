@@ -30,7 +30,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
         public T? GetValue(string str) {
             if (!Enum.TryParse(typeof(T), str, out var bt))
                 return default(T);
-            return (T)bt;
+            return (T?)bt;
         }
     }
 }

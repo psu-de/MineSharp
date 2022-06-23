@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public EntityTeleportPacket() { }
 
-        public EntityTeleportPacket(int entityid, double x, double y, double z, Angle? yaw, Angle? pitch, bool onground) {
+        public EntityTeleportPacket(int entityid, double x, double y, double z, Angle yaw, Angle pitch, bool onground) {
             this.EntityID = entityid;
             this.X = x;
             this.Y = y;
@@ -37,8 +37,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteDouble(this.X);
             buffer.WriteDouble(this.Y);
             buffer.WriteDouble(this.Z);
-            buffer.WriteAngle(this.Yaw);
-            buffer.WriteAngle(this.Pitch);
+            buffer.WriteAngle(this.Yaw!);
+            buffer.WriteAngle(this.Pitch!);
             buffer.WriteBoolean(this.OnGround);
         }
     }

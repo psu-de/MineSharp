@@ -33,7 +33,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteIdentifier(this.SoundName);
+            buffer.WriteIdentifier(this.SoundName!);
             buffer.WriteVarInt(this.SoundCategory);
             buffer.WriteInt(this.EffectPositionX);
             buffer.WriteInt(this.EffectPositionY);

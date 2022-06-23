@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public EntityPositionAndRotationPacket() { }
 
-        public EntityPositionAndRotationPacket(int entityid, short deltax, short deltay, short deltaz, Angle? yaw, Angle? pitch, bool onground) {
+        public EntityPositionAndRotationPacket(int entityid, short deltax, short deltay, short deltaz, Angle yaw, Angle pitch, bool onground) {
             this.EntityID = entityid;
             this.DeltaX = deltax;
             this.DeltaY = deltay;
@@ -37,8 +37,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteShort(this.DeltaX);
             buffer.WriteShort(this.DeltaY);
             buffer.WriteShort(this.DeltaZ);
-            buffer.WriteAngle(this.Yaw);
-            buffer.WriteAngle(this.Pitch);
+            buffer.WriteAngle(this.Yaw!);
+            buffer.WriteAngle(this.Pitch!);
             buffer.WriteBoolean(this.OnGround);
         }
     }

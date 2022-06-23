@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public PlayerBlockPlacementPacket() { }
 
-        public PlayerBlockPlacementPacket(PlayerHand hand, Position? location, BlockFace face, float cursorpositionx, float cursorpositiony, float cursorpositionz, bool insideblock) {
+        public PlayerBlockPlacementPacket(PlayerHand hand, Position location, BlockFace face, float cursorpositionx, float cursorpositiony, float cursorpositionz, bool insideblock) {
             this.Hand = hand;
             this.Location = location;
             this.Face = face;
@@ -36,7 +36,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt((int)this.Hand);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteVarInt((int)this.Face);
             buffer.WriteFloat(this.CursorPositionX);
             buffer.WriteFloat(this.CursorPositionY);

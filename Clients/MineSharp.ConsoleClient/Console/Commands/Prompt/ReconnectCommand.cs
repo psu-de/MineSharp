@@ -9,7 +9,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
             this.Initialize("reconnect", desc, CColor.PromptCommand, new Commands.Arguments.Argument[] { });
         }
         public override void DoAction(string[] argv, CancellationToken cancellation) {
-            var options = BotClient.Bot.Options;
+            var options = BotClient.Bot!.Options;
             BotClient.Bot.Client.ForceDisconnect("");
             BotClient.Bot = new Bot.MinecraftBot(options);
             if (!BotClient.Bot.Connect().GetAwaiter().GetResult()) {

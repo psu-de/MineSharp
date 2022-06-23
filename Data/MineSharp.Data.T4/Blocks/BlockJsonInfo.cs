@@ -2,11 +2,12 @@
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Blocks {
+#pragma warning disable CS8618
     public class BlockJsonInfo {
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("displayName")]   
+        [JsonProperty("displayName")]
         public string DisplayName { get; set; }
 
         [JsonProperty("name")]
@@ -85,4 +86,5 @@ namespace MineSharp.Data.Blocks {
             }
         }
     }
+#pragma warning restore CS8618
 }

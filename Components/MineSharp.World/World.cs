@@ -4,6 +4,7 @@ using MineSharp.Data.Blocks;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.World.Chunks;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.World {
     public class World {
@@ -17,11 +18,11 @@ namespace MineSharp.World {
         public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
 
         public delegate void BlockEvent(Block block);
-        public event BlockEvent BlockUpdated;
+        public event BlockEvent? BlockUpdated;
 
         public delegate void ChunkEvent(Chunk chunk);
-        public event ChunkEvent ChunkLoaded;
-        public event ChunkEvent ChunkUnloaded;
+        public event ChunkEvent? ChunkLoaded;
+        public event ChunkEvent? ChunkUnloaded;
 
         public World() {
 
@@ -37,7 +38,7 @@ namespace MineSharp.World {
                 }
                 else Logger.Error("Could not add chunk!");
             } else {
-                chunk.Load(packet.Data);
+                chunk.Load(packet.Data!);
                 ChunkLoaded?.Invoke(chunk);
             }
         }
@@ -92,7 +93,7 @@ namespace MineSharp.World {
             return GetChunkAt(coords) != null;
         }
 
-        public bool IsBlockLoaded(Position blockPos, out Chunk? chunk) {
+        public bool IsBlockLoaded(Position blockPos, [NotNullWhen(true)] out Chunk? chunk) {
 
             ChunkCoordinates coords = GetChunkCoordinates(blockPos.X, blockPos.Z);
             chunk = GetChunkAt(coords);
@@ -104,7 +105,7 @@ namespace MineSharp.World {
             ChunkCoordinates coords = GetChunkCoordinates(block.Position!.X, block.Position.Z);
             if (!this.IsBlockLoaded(block.Position, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
-                chunk.SetBlock(block);
+                chunk!.SetBlock(block);
                 BlockUpdated?.Invoke(block);
             }
         }

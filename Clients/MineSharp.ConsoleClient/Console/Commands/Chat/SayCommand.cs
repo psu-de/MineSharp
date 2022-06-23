@@ -17,7 +17,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Chat {
         }
 
         public override void DoAction(string[] argv, CancellationToken cancellation) {
-            BotClient.Bot.Chat(Message.GetValue(argv[0]));
+            BotClient.Bot!.Chat(Message.GetValue(argv[0]));
             AnsiConsole.MarkupLine("[green] Wrote message " + Message.GetValue(argv[0]) + "[/]");
         }
     }

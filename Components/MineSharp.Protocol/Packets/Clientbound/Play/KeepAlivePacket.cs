@@ -10,7 +10,7 @@
         }
 
         public override async Task Handle(MinecraftClient client) {
-            client.SendPacket(new Serverbound.Play.KeepAlivePacket(this.KeepAliveID));
+            var _ = client.SendPacket(new Serverbound.Play.KeepAlivePacket(this.KeepAliveID));
             await base.Handle(client);
         }
 

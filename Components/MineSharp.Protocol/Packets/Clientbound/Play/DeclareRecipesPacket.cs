@@ -3,7 +3,7 @@
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class DeclareRecipesPacket : Packet {
 
-        public Recipe[] Recipes { get; private set; }
+        public Recipe[]? Recipes { get; private set; }
 
         public DeclareRecipesPacket() { }
         public DeclareRecipesPacket(Recipe[] recipes) { this.Recipes = recipes; }

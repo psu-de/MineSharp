@@ -5,11 +5,15 @@ using Spectre.Console;
 namespace MineSharp.ConsoleClient.Console {
     internal abstract class Command {
 
+        #pragma warning disable CS8618
+
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Color { get; private set; }
         private bool _isInitialized = false;
         public List<Argument> Arguments;
+
+        #pragma warning restore CS8618
 
         public void Initialize(string name, string description, string color, params Argument[] arguments) {
 

@@ -17,7 +17,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
         }
 
         private List<CompletionItem> GetWindowIdItems(string arg) {
-            return BotClient.Bot.OpenedWindows.Select(x => {
+            return BotClient.Bot!.OpenedWindows.Select(x => {
                 return new CompletionItem(
                     replacementText: x.Key.ToString(),
                     displayText: CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Info.Name})[/]"));
@@ -27,7 +27,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
         public override void DoAction(string[] argv, CancellationToken cancellation) {
             var windowId = new IntegerArgument("").GetValue(argv[0]);
 
-            if (!BotClient.Bot.OpenedWindows.TryGetValue((int)windowId!, out var window)) {
+            if (!BotClient.Bot!.OpenedWindows.TryGetValue((int)windowId!, out var window)) {
                 AnsiConsole.MarkupLine($"[red]Window with id={windowId} not opened![/]");
                 return;
             }
@@ -41,7 +41,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
             }
 
             foreach (var slot in window.GetAllSlots()) {
-                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item.Count.ToString());
+                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item!.Count.ToString());
             }
             AnsiConsole.Write(windowTable);
         }

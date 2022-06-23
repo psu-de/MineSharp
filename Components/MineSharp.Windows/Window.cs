@@ -20,9 +20,9 @@ namespace MineSharp.Windows {
         /// <summary>
         /// This event fires when the window has already been disposed.
         /// </summary>
-        public event WindowClosedEvent WindowClosed;
-        public event WindowClickedEvent WindowClicked;
-        public event WindowSlotEvent WindowSlotUpdated;
+        public event WindowClosedEvent? WindowClosed;
+        public event WindowClickedEvent? WindowClicked;
+        public event WindowSlotEvent? WindowSlotUpdated;
 
         public WindowInfo Info { get; private set; }
 
@@ -41,7 +41,7 @@ namespace MineSharp.Windows {
 
         public Window? InventoryWindow { get; private set; }
 
-        public Slot SelectedSlot { get; set; }
+        public Slot? SelectedSlot { get; set; }
         public int StateId { get; set; }
 
 
@@ -74,7 +74,7 @@ namespace MineSharp.Windows {
         }
 
         internal void SwapSelectedSlot(int slotNumber) {
-            Slot t = this.SelectedSlot;
+            Slot t = this.SelectedSlot!;
             this.SelectedSlot = GetSlot(slotNumber);
             this.SelectedSlot.SlotNumber = -1;
 
@@ -88,8 +88,6 @@ namespace MineSharp.Windows {
         }
 
         public void SetSlot(Slot slot) {
-
-            if (slot.SlotNumber == null) throw new ArgumentNullException("slot.SlotNumber");
             
             if (OffHandSlot != null && OffHandSlot.SlotNumber == slot.SlotNumber) {
                 OffHandSlot = slot;
@@ -163,9 +161,8 @@ namespace MineSharp.Windows {
         }
 
         public void Dispose() {
-            this.ContainerSlots = null;
+            this.ContainerSlots = new Slot[0];
             this.InventoryWindow = null;
-            this.Info = null;
         }
 
         public Slot[] EmptyContainerSlots() {

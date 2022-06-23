@@ -4,7 +4,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         public int /* TODO: Enum! */ Hand { get; private set; }
 public int Count { get; private set; }
 public bool Hastitle { get; private set; }
-public string Title { get; private set; }
+public string? Title { get; private set; }
 
         public EditBookPacket() { }
 
@@ -26,7 +26,7 @@ this.Title = buffer.ReadString();
             buffer.WriteVarInt(this.Hand);
 buffer.WriteVarInt(this.Count);
 buffer.WriteBoolean(this.Hastitle);
-buffer.WriteString(this.Title);
+buffer.WriteString(this.Title!);
         }
     }
 }

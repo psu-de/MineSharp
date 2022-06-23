@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public SpectatePacket() { }
 
-        public SpectatePacket(UUID? targetplayer) {
+        public SpectatePacket(UUID targetplayer) {
             this.TargetPlayer = targetplayer;
         }
 
@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteUUID((UUID)this.TargetPlayer);
+            buffer.WriteUUID((UUID)this.TargetPlayer!);
         }
     }
 }

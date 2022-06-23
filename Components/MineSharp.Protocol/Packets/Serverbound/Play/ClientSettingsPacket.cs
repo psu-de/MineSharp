@@ -1,7 +1,7 @@
 namespace MineSharp.Protocol.Packets.Serverbound.Play {
     public class ClientSettingsPacket : Packet {
 
-        public string Locale { get; private set; }
+        public string? Locale { get; private set; }
 public byte ViewDistance { get; private set; }
 public int /* TODO: Enum! */ ChatMode { get; private set; }
 public bool ChatColors { get; private set; }
@@ -35,7 +35,7 @@ this.Allowserverlistings = buffer.ReadBoolean();
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(this.Locale);
+            buffer.WriteString(this.Locale!);
 buffer.WriteByte(this.ViewDistance);
 buffer.WriteVarInt(this.ChatMode);
 buffer.WriteBoolean(this.ChatColors);

@@ -9,8 +9,8 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         public short Slot { get; private set; }
         public byte Button { get; private set; }
         public WindowOperationMode Mode { get; private set; }
-        public Slot[] SlotData { get; private set; }
-        public Slot ClickedItem { get; private set; }
+        public Slot[]? SlotData { get; private set; }
+        public Slot? ClickedItem { get; private set; }
 
         public ClickWindowPacket() { }
 
@@ -34,7 +34,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
             buffer.WriteShort(this.Slot);
             buffer.WriteByte(this.Button);
             buffer.WriteVarInt((int)this.Mode);
-            buffer.WriteSlotArray(this.SlotData);
+            buffer.WriteSlotArray(this.SlotData!);
             buffer.WriteSlot(this.ClickedItem);
         }
     }

@@ -35,7 +35,7 @@ namespace MineSharp.World.Chunks {
             }
         }
 
-        public Chunk(ChunkDataAndLightUpdatePacket packet) : this(packet.ChunkX, packet.ChunkZ, packet.Data, packet.BlockEntities) { }
+        public Chunk(ChunkDataAndLightUpdatePacket packet) : this(packet.ChunkX, packet.ChunkZ, packet.Data!, packet.BlockEntities!) { }
 
         public void Load(byte[] data) {
             PacketBuffer buffer = new PacketBuffer(data);
@@ -63,7 +63,7 @@ namespace MineSharp.World.Chunks {
         }
 
         public void SetBlock(Block block) {
-            int sectionIndex = GetSectionIndex(block.Position.Y);
+            int sectionIndex = GetSectionIndex(block.Position!.Y);
             block.Position = this.World2ChunkPos(block.Position);
             this.ChunkSections[sectionIndex].SetBlock(block);
         }
@@ -112,7 +112,7 @@ namespace MineSharp.World.Chunks {
                 if (cancellation?.IsCancellationRequested ?? false) return null;
 
                 if (sectionBlocks != null) {
-                    sectionBlocks = sectionBlocks.Select(block => { block.Position = Chunk2WorldPos(block.Position, i); return block; }).ToArray();
+                    sectionBlocks = sectionBlocks.Select(block => { block.Position = Chunk2WorldPos(block.Position!, i); return block; }).ToArray();
                     blocks.AddRange(sectionBlocks);
                     if (count > 0 && blocks.Count >= count) {
                         return blocks.Take(count).ToArray();

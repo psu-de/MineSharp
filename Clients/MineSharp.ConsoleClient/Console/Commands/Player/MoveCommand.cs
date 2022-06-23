@@ -17,23 +17,23 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
             var dir = DirectionArg.GetValue(argv[0]);
             switch (dir) {
                 case MoveOptions.Forward:
-                    BotClient.Bot.MovementControls.Forward = true;
+                    BotClient.Bot!.MovementControls.Forward = true;
                     break;
                 case MoveOptions.Backward:
-                    BotClient.Bot.MovementControls.Back = true;
+                    BotClient.Bot!.MovementControls.Back = true;
                     break;
                 case MoveOptions.Left:
-                    BotClient.Bot.MovementControls.Left = true;
+                    BotClient.Bot!.MovementControls.Left = true;
                     break;
                 case MoveOptions.Right:
-                    BotClient.Bot.MovementControls.Right = true;
+                    BotClient.Bot!.MovementControls.Right = true;
                     break;
                 case MoveOptions.Jump:
-                    BotClient.Bot.Physics.PlayerState.JumpQueued = true;
+                    BotClient.Bot!.Physics!.PlayerState.JumpQueued = true;
                     BotClient.Bot.MovementControls.Jump = true;
                     break;
                 case MoveOptions.Reset:
-                    BotClient.Bot.MovementControls.Forward = false;
+                    BotClient.Bot!.MovementControls.Forward = false;
                     BotClient.Bot.MovementControls.Back = false;
                     BotClient.Bot.MovementControls.Right = false;
                     BotClient.Bot.MovementControls.Left = false;

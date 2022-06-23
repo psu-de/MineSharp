@@ -1,7 +1,7 @@
 ﻿namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class TeamsPacket : Packet {
 
-        public string TeamName { get; private set; }
+        public string? TeamName { get; private set; }
         public TeamsMode Mode { get; private set; }
         public object? Properties { get; private set; }
 

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MineSharp.Data.Enchantments {
+#pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
     public class MaxCost {
         [JsonProperty("a")]
         public int A { get; set; }
@@ -57,4 +58,5 @@ namespace MineSharp.Data.Enchantments {
         [JsonProperty("discoverable")]
         public bool Discoverable { get; set; }
     }
+#pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 }

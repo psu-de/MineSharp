@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public PluginMessagePacket() { }
 
-        public PluginMessagePacket(Identifier? channel, byte[]? data) {
+        public PluginMessagePacket(Identifier channel, byte[] data) {
             this.Channel = channel;
             this.Data = data;
         }
@@ -19,8 +19,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteIdentifier(this.Channel);
-            buffer.WriteByteArray(this.Data);
+            buffer.WriteIdentifier(this.Channel!);
+            buffer.WriteByteArray(this.Data!);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public CraftRecipeResponsePacket() { }
 
-        public CraftRecipeResponsePacket(byte windowid, Identifier? recipe) {
+        public CraftRecipeResponsePacket(byte windowid, Identifier recipe) {
             this.WindowID = windowid;
             this.Recipe = recipe;
         }
@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteByte(this.WindowID);
-            buffer.WriteIdentifier(this.Recipe);
+            buffer.WriteIdentifier(this.Recipe!);
         }
     }
 }

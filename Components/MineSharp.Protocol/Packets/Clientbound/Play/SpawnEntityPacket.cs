@@ -55,8 +55,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteDouble(this.X);
             buffer.WriteDouble(this.Y);
             buffer.WriteDouble(this.Z);
-            buffer.WriteByte(this.Pitch.ToByte());
-            buffer.WriteByte(this.Yaw.ToByte());
+            buffer.WriteByte(this.Pitch!.ToByte());
+            buffer.WriteByte(this.Yaw!.ToByte());
             buffer.WriteInt(this.Data);
             buffer.WriteShort(this.VelocityX);
             buffer.WriteShort(this.VelocityY);

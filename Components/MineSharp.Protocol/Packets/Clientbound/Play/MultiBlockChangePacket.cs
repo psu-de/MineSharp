@@ -3,7 +3,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public long Chunksectionposition { get; private set; }
         public bool Inverse { get; private set; }
-        public long[] Blocks { get; private set; }
+        public long[]? Blocks { get; private set; }
 
         public MultiBlockChangePacket() { }
 
@@ -22,7 +22,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public override void Write(PacketBuffer buffer) {
             buffer.WriteLong(this.Chunksectionposition);
             buffer.WriteBoolean(this.Inverse);
-            buffer.WriteVarLongArray(this.Blocks);
+            buffer.WriteVarLongArray(this.Blocks!);
         }
     }
 }

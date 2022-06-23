@@ -5,7 +5,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class TradeListPacket : Packet {
 
         public int WindowId { get; private set; }
-        public VillagerTrade[] Trades { get; private set; }
+        public VillagerTrade[]? Trades { get; private set; }
         public VillagerLevel VillagerLevel { get; private set; }
         public int Experience { get; private set; }
         public bool IsRegularVillager { get; private set; }

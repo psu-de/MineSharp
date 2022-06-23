@@ -10,7 +10,7 @@ namespace MineSharp.Bot.Modules {
     public class WorldModule : Module {
 
 
-        public World.World World { get; private set; }
+        public World.World? World { get; private set; }
 
         public WorldModule(Bot.MinecraftBot bot) : base(bot) { }
 
@@ -28,12 +28,12 @@ namespace MineSharp.Bot.Modules {
 
 
         private Task handleChunkDataAndLightUpdate(MineSharp.Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket packet) {
-            World.LoadChunkPacket(packet);
+            World!.LoadChunkPacket(packet);
             return Task.CompletedTask;
         }
 
         private Task handleUnloadChunk(MineSharp.Protocol.Packets.Clientbound.Play.UnloadChunkPacket packet) {
-            World.UnloadChunk(new ChunkCoordinates(packet.ChunkX, packet.ChunkZ));
+            World!.UnloadChunk(new ChunkCoordinates(packet.ChunkX, packet.ChunkZ));
             return Task.CompletedTask;
         }
 
@@ -42,7 +42,7 @@ namespace MineSharp.Bot.Modules {
             var blockId = BlockPalette.GetBlockIdByState(packet.BlockID);
 
             Block newBlock = BlockFactory.CreateBlock(blockId, packet.BlockID, packet.Location!);
-            World.SetBlock(newBlock);
+            World!.SetBlock(newBlock);
             return Task.CompletedTask;
         }
 
@@ -57,7 +57,7 @@ namespace MineSharp.Bot.Modules {
 
             sectionY += Math.Abs(MineSharp.World.World.MinY / MineSharp.World.Chunks.Chunk.ChunkSectionLength);
 
-            this.World.MultiblockUpdate(packet.Blocks, sectionX, sectionY, sectionZ);
+            this.World!.MultiblockUpdate(packet.Blocks!, sectionX, sectionY, sectionZ);
             return Task.CompletedTask;
         }
 
@@ -71,7 +71,7 @@ namespace MineSharp.Bot.Modules {
 
                 for (int i = 0; i < 10 * length; i++) {
                     try {
-                        var b = this.World.GetBlockAt(lc.Floored());
+                        var b = this.World!.GetBlockAt(lc.Floored());
                         if (b.IsSolid()) {
                             List<AABB> boundingBoxes = new List<AABB>();
                             foreach (BlockShape shape in b.GetBlockShape()) {
@@ -99,7 +99,7 @@ namespace MineSharp.Bot.Modules {
 
             await Bot.WaitForBot();
 
-            var playerChunk = World.GetChunkCoordinates((int)this.Bot.BotEntity.Position.X, (int)this.Bot.BotEntity.Position.Z);
+            var playerChunk = World!.GetChunkCoordinates((int)this.Bot.BotEntity!.Position.X, (int)this.Bot.BotEntity.Position.Z);
             for (int x = playerChunk.X - length; x < playerChunk.X + length; x++) {
                 for (int z = playerChunk.Z - length; z < playerChunk.Z + length; z++) {
                     while (World.GetChunkAt(new ChunkCoordinates(x, z)) == null) await Task.Delay(10);
@@ -115,10 +115,11 @@ namespace MineSharp.Bot.Modules {
         /// <param name="cancellation"></param>
         /// <returns></returns>
         public Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null) {
+            
             return Task.Run(async () => {
 
                 if (!block.Diggable) return MineBlockStatus.NotDiggable;
-                if (!World.IsBlockLoaded(block.Position!)) return MineBlockStatus.BlockNotLoaded;
+                if (!World!.IsBlockLoaded(block.Position!)) return MineBlockStatus.BlockNotLoaded;
 
 
                 if (face == null) {
@@ -127,11 +128,11 @@ namespace MineSharp.Bot.Modules {
 
                 if (cancellation?.IsCancellationRequested ?? false) return MineBlockStatus.Cancelled;
 
-                var packet = new PlayerDiggingPacket(DiggingStatus.StartedDigging, block.Position, face ?? BlockFace.Top);
+                var packet = new PlayerDiggingPacket(DiggingStatus.StartedDigging, block.Position!, face ?? BlockFace.Top);
 
                 await this.Bot.Client.SendPacket(packet);
 
-                int time = block.CalculateBreakingTime(this.Bot.HeldItem, this.Bot.BotEntity);
+                int time = block.CalculateBreakingTime(this.Bot.HeldItem, this.Bot.BotEntity!);
 
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
 
@@ -149,7 +150,7 @@ namespace MineSharp.Bot.Modules {
                 var ack = await Bot.WaitForPacket<AcknowledgePlayerDiggingPacket>();
                 if (cancellation?.IsCancellationRequested ?? false) {
                     cancelToken.Cancel();
-                    await this.Bot.Client.SendPacket(new PlayerDiggingPacket(DiggingStatus.CancelledDigging, block.Position, face ?? BlockFace.Top));
+                    await this.Bot.Client.SendPacket(new PlayerDiggingPacket(DiggingStatus.CancelledDigging, block.Position!, face ?? BlockFace.Top));
                     return MineBlockStatus.Cancelled;
                 }
 

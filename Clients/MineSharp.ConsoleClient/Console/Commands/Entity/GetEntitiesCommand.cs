@@ -41,7 +41,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity {
                 range = r.Value;
             }
 
-            IEnumerable<Core.Types.Entity> entities = BotClient.Bot.Entities.Values;
+            IEnumerable<Core.Types.Entity> entities = BotClient.Bot!.Entities.Values;
             if (range != -1) {
                 entities = entities.Where(x => x.Position.Distance(BotClient.Bot.BotEntity!.Position) < range).ToList();
             }

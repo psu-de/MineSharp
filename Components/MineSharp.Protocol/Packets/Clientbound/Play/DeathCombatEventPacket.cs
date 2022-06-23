@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public DeathCombatEventPacket() { }
 
-        public DeathCombatEventPacket(int playerid, int entityid, Chat? message) {
+        public DeathCombatEventPacket(int playerid, int entityid, Chat message) {
             this.PlayerID = playerid;
             this.EntityID = entityid;
             this.Message = message;
@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.PlayerID);
             buffer.WriteInt(this.EntityID);
-            buffer.WriteChat(this.Message);
+            buffer.WriteChat(this.Message!);
         }
     }
 }

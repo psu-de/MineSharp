@@ -1,13 +1,19 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Physics;
+using static MineSharp.Bot.MinecraftBot;
 
 namespace MineSharp.Bot.Modules {
     public class PhysicsModule : TickedModule {
 
-        public Physics.Physics Physics;
+        public Physics.Physics? Physics;
 
         public PlayerControls MovementControls = new PlayerControls();
         private PlayerInfoState LastPlayerState = new PlayerInfoState();
+
+        /// <summary>
+        /// Fires when the Bot <see cref="BotEntity"/> moves
+        /// </summary>
+        public event BotPlayerEvent? BotMoved;
 
 
         private struct PlayerInfoState {
@@ -32,20 +38,20 @@ namespace MineSharp.Bot.Modules {
 
             await UpdateServerPos();
 
-            this.Physics = new Physics.Physics(Bot.BotEntity!, Bot.World);
+            this.Physics = new Physics.Physics(Bot.BotEntity!, Bot.World!);
             await this.SetEnabled(true);
         }
 
         public override Task Tick() {
             return Task.Run(async () => {
-                this.Physics.SimulatePlayer(this.MovementControls);
+                this.Physics!.SimulatePlayer(this.MovementControls);
                 await UpdateServerPositionIfNeeded();
             });
         }
 
 
         private async Task UpdateServerPositionIfNeeded () {
-            if (LastPlayerState.X != Bot.BotEntity.Position.X ||
+            if (LastPlayerState.X != Bot.BotEntity!.Position.X ||
                 LastPlayerState.Y != Bot.BotEntity.Position.Y ||
                 LastPlayerState.Z != Bot.BotEntity.Position.Z ||
                 LastPlayerState.Yaw != Bot.BotEntity.Yaw || 
@@ -57,7 +63,7 @@ namespace MineSharp.Bot.Modules {
 
         private async Task UpdateServerPos() {
             var packet = new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
-               Bot.BotEntity.Position.X, Bot.BotEntity.Position.Y, Bot.BotEntity.Position.Z, 
+               Bot.BotEntity!.Position.X, Bot.BotEntity.Position.Y, Bot.BotEntity.Position.Z, 
                Bot.BotEntity.Yaw, Bot.BotEntity.Pitch,
                Bot.BotEntity.IsOnGround);
 
@@ -70,6 +76,7 @@ namespace MineSharp.Bot.Modules {
             LastPlayerState.IsOnGround = Bot.BotEntity.IsOnGround;
 
             await Bot.Client.SendPacket(packet);
+            BotMoved?.Invoke(this.Bot, this.Bot.Player!);
         }
 
 

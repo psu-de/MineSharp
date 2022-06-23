@@ -6,16 +6,16 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public int ChunkX { get; private set; }
         public int ChunkZ { get; private set; }
-        public NbtCompound Heigtmaps { get; private set; }
-        public byte[] Data { get; private set; }
-        public BlockEntity[] BlockEntities { get; private set; }
+        public NbtCompound? Heigtmaps { get; private set; }
+        public byte[]? Data { get; private set; }
+        public BlockEntity[]? BlockEntities { get; private set; }
         public bool TrustEdges { get; private set; }
-        public BitSet SkyLightMask { get; private set; }
-        public BitSet BlockLightMask { get; private set; }
-        public BitSet EmptySkyLightMask { get; private set; }
-        public BitSet EmptyBlockLightMask { get; private set; }
-        public byte[][] SkyLightArray { get; private set; }
-        public byte[][] BlockLightArray { get; private set; }
+        public BitSet? SkyLightMask { get; private set; }
+        public BitSet? BlockLightMask { get; private set; }
+        public BitSet? EmptySkyLightMask { get; private set; }
+        public BitSet? EmptyBlockLightMask { get; private set; }
+        public byte[][]? SkyLightArray { get; private set; }
+        public byte[][]? BlockLightArray { get; private set; }
 
 
         public ChunkDataAndLightUpdatePacket() { }
@@ -50,7 +50,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
                 int z = packedXZ & 0xF;
                 short y = buffer.ReadShort();
                 int type = buffer.ReadVarInt();
-                NbtCompound nbt = buffer.ReadNBTCompound();
+                NbtCompound nbt = buffer.ReadNBTCompound()!;
 
                 this.BlockEntities[i] = new BlockEntity(new Position(x, y, z), (Core.Types.Enums.BlockEntityType)type, nbt);
             }

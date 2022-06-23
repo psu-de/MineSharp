@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public PlayerDiggingPacket() { }
 
-        public PlayerDiggingPacket(DiggingStatus status, Position? location, BlockFace face) {
+        public PlayerDiggingPacket(DiggingStatus status, Position location, BlockFace face) {
             this.Status = status;
             this.Location = location;
             this.Face = face;
@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt((int)this.Status);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteByte((byte)this.Face);
         }
     }

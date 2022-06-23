@@ -6,7 +6,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public int ID { get; private set; }
         public int Start { get; private set; }
         public int Length { get; private set; }
-        public (string, bool, Chat?)[] Matches { get; private set; }
+        public (string, bool, Chat?)[]? Matches { get; private set; }
 
         public TabCompletePacket() { }
 

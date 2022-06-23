@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public AcknowledgePlayerDiggingPacket() { }
 
-        public AcknowledgePlayerDiggingPacket(Position? location, int block, DiggingStatus status, bool successful) {
+        public AcknowledgePlayerDiggingPacket(Position location, int block, DiggingStatus status, bool successful) {
             this.Location = location;
             this.Block = block;
             this.Status = status;
@@ -26,7 +26,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteVarInt(this.Block);
             buffer.WriteVarInt((int)this.Status);
             buffer.WriteBoolean(this.Successful);

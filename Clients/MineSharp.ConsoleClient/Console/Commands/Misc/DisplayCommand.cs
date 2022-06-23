@@ -41,7 +41,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
         void WritePlayerTable() {
             var output = new Table()
                         .AddColumns("Player Name", "Position", "ID", "UUID");
-            foreach (var player in BotClient.Bot.PlayerList) {
+            foreach (var player in BotClient.Bot!.PlayerList) {
                 output.AddRow(player.Username, player.Entity.Position.ToString(), player.Entity.ServerId.ToString(), player.UUID.ToString());
             }
             AnsiConsole.Write(output);
@@ -52,7 +52,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             var inventory = new Table()
                 .AddColumns("Slot Id", "Item Name", "Count");
 
-            if (BotClient.Bot.Inventory == null) {
+            if (BotClient.Bot!.Inventory == null) {
                 AnsiConsole.MarkupLine("[red] Inventory not loaded yet.[/]");
                 return;
             }
@@ -65,7 +65,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
 
         void WritePlayerInfo() {
 
-            if (BotClient.Bot.BotEntity == null) {
+            if (BotClient.Bot!.BotEntity == null) {
                 AnsiConsole.MarkupLine($"[red]Player is not loaded yet[/]");
                 return;
             }

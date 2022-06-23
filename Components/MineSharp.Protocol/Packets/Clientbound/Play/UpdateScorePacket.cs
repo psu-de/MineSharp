@@ -1,9 +1,9 @@
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class UpdateScorePacket : Packet {
 
-        public string EntityName { get; private set; }
+        public string? EntityName { get; private set; }
 public byte Action { get; private set; }
-public string ObjectiveName { get; private set; }
+public string? ObjectiveName { get; private set; }
 
         public UpdateScorePacket() { }
 
@@ -20,9 +20,9 @@ this.ObjectiveName = buffer.ReadString();
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(this.EntityName);
+            buffer.WriteString(this.EntityName!);
 buffer.WriteByte(this.Action);
-buffer.WriteString(this.ObjectiveName);
+buffer.WriteString(this.ObjectiveName!);
         }
     }
 }

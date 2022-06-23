@@ -397,7 +397,7 @@ namespace MineSharp.Physics {
             var curlevel = GetRenderedDepth(block);
             var flow = new Vector3(0, 0, 0);
             foreach ((int dx, int dz) in new[] { (0, 1), (-1, 0), (0, -1), (1, 0) }) {
-                var adjBlock = this.World.GetBlockAt(((Vector3)block.Position).Plus(new Vector3(dx, 0, dz)));
+                var adjBlock = this.World.GetBlockAt(((Vector3)block.Position!).Plus(new Vector3(dx, 0, dz)));
                 var adjLevel = GetRenderedDepth(adjBlock);
                 if (adjLevel < 0) {
                     if (adjBlock.IsSolid() && adjBlock.BoundingBox != "empty") {
@@ -418,7 +418,7 @@ namespace MineSharp.Physics {
             if (block.Metadata >= 8) {
                 foreach ((int dx, int dz) in new [] { (0, 1), (-1, 0), (0, -1), (1, 0) }) {
 
-                    var bPos1 = new Position(block.Position.X + dx, block.Position.Y, block.Position.Z + dz);
+                    var bPos1 = new Position(block.Position!.X + dx, block.Position.Y, block.Position.Z + dz);
                     var bPos2 = new Position(block.Position.X + dx, block.Position.Y + 1, block.Position.Z + dz);
 
                     var adjBlock = this.World.GetBlockAt(bPos1);

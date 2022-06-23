@@ -20,22 +20,22 @@ namespace MineSharp.Bot.Modules {
         /// <summary>
         /// Fires whenever the weather has changed
         /// </summary>
-        public event BotEmptyEvent WeatherChanged;
+        public event BotEmptyEvent? WeatherChanged;
 
         /// <summary>
         /// Fires when a player joins the server (also fires when the bot itself joins the server). Warning: Entity is probably not loaded when this event fires!
         /// </summary>
-        public event BotPlayerEvent PlayerJoined;
+        public event BotPlayerEvent? PlayerJoined;
 
         /// <summary>
         /// Fires when a players leaves the server. 
         /// </summary>
-        public event BotPlayerEvent PlayerLeft;
+        public event BotPlayerEvent? PlayerLeft;
 
         /// <summary>
         /// Fires when a player comes into View Distance of the bot and (Position, etc...) has been loaded (<see cref="Protocol.Packets.Clientbound.Play.SpawnPlayerPacket"/>)
         /// </summary>
-        public event BotPlayerEvent PlayerLoaded;
+        public event BotPlayerEvent? PlayerLoaded;
 
         protected override async Task Load() {
 
@@ -79,7 +79,7 @@ namespace MineSharp.Bot.Modules {
         private Task handlePlayerInfo(PlayerInfoPacket packet) {
             switch (packet.Action) {
                 case PlayerInfoAction.AddPlayer: //TODO: Nich ganz korrekt, wird auch gesendet wenn davor schon spieler aufm server waren
-                    foreach ((UUID uuid, object? data) in packet.Players) {
+                    foreach ((UUID uuid, object? data) in packet.Players!) {
 
                         PlayerInfo dat = (PlayerInfo)data;
                         string name = dat.Name;
@@ -100,7 +100,7 @@ namespace MineSharp.Bot.Modules {
                     }
                     break;
                 case PlayerInfoAction.RemovePlayer:
-                    foreach ((UUID uuid, object? data) in packet.Players) {
+                    foreach ((UUID uuid, object? data) in packet.Players!) {
                         if (!PlayerMapping.TryRemove(uuid, out var player)) continue;
                         PlayerLeft?.Invoke(this.Bot, player);
                     }
@@ -115,19 +115,19 @@ namespace MineSharp.Bot.Modules {
             }
 
             player.Entity.Position = new Vector3(packet.X, packet.Y, packet.Z);
-            player.Entity.Yaw = packet.Yaw;
-            player.Entity.Pitch = packet.Pitch;
+            player.Entity.Yaw = packet.Yaw!;
+            player.Entity.Pitch = packet.Pitch!;
             player.Entity.ServerId = packet.EntityID;
 
-            this.Bot.EntityModule.AddEntity(player.Entity);
+            this.Bot.EntityModule!.AddEntity(player.Entity);
             PlayerLoaded?.Invoke(this.Bot, player);
             return Task.CompletedTask;
         }
 
         private async Task handlePlayerPositionAndLook(PlayerPositionAndLookPacket packet) {
 
-            if ((packet.Flags & 0x01) == 0x01) this.Bot.BotEntity.Position.X += packet.X;
-            else this.Bot.BotEntity.Position.X = packet.X;
+            if ((packet.Flags & 0x01) == 0x01) this.Bot.BotEntity!.Position.X += packet.X;
+            else this.Bot.BotEntity!.Position.X = packet.X;
 
             if ((packet.Flags & 0x02) == 0x02) this.Bot.BotEntity.Position.Y += packet.Y;
             else this.Bot.BotEntity.Position.Y = packet.Y;

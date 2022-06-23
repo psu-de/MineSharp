@@ -3,8 +3,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class EntityEquipmentPacket : Packet {
 
         public int EntityID { get; private set; }
-        public Slot Equipment { get; private set; }
-        public Slot Item { get; private set; }
+        public Slot? Equipment { get; private set; }
+        public Slot? Item { get; private set; }
 
         public EntityEquipmentPacket() { }
 

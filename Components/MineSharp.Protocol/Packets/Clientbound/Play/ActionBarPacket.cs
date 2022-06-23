@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public ActionBarPacket() { }
 
-        public ActionBarPacket(Chat? actionbartext) {
+        public ActionBarPacket(Chat actionbartext) {
             this.Actionbartext = actionbartext;
         }
 
@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteChat(this.Actionbartext);
+            buffer.WriteChat(this.Actionbartext!);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
         }
 
         private List<CompletionItem> GetWindowIdItems(string arg) {
-            return BotClient.Bot.OpenedWindows.Select(x => {
+            return BotClient.Bot!.OpenedWindows.Select(x => {
                 return new CompletionItem(
                     replacementText: x.Key.ToString(),
                     displayText: CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Info.Name})[/]"));
@@ -56,7 +56,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
             if (slot == null || button >= short.MaxValue) throw new ArgumentException("slot");
 
             WindowClick click = new WindowClick(clickMode, (byte)button, (short)slot);
-            BotClient.Bot.OpenedWindows.TryGetValue((int)windowId, out var window);
+            BotClient.Bot!.OpenedWindows.TryGetValue((int)windowId, out var window);
 
             if (window == null) throw new ArgumentException($"Window with id={windowId} not opened");
 

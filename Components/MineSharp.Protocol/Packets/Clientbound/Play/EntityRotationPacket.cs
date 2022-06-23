@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public EntityRotationPacket() { }
 
-        public EntityRotationPacket(int entityid, Angle? yaw, Angle? pitch, bool onground) {
+        public EntityRotationPacket(int entityid, Angle yaw, Angle pitch, bool onground) {
             this.EntityID = entityid;
             this.Yaw = yaw;
             this.Pitch = pitch;
@@ -25,8 +25,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WriteAngle(this.Yaw);
-            buffer.WriteAngle(this.Pitch);
+            buffer.WriteAngle(this.Yaw!);
+            buffer.WriteAngle(this.Pitch!);
             buffer.WriteBoolean(this.OnGround);
         }
     }

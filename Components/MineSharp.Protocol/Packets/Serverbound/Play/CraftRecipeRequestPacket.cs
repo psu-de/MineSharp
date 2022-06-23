@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public CraftRecipeRequestPacket() { }
 
-        public CraftRecipeRequestPacket(byte windowid, Identifier? recipe, bool makeall) {
+        public CraftRecipeRequestPacket(byte windowid, Identifier recipe, bool makeall) {
             this.WindowID = windowid;
             this.Recipe = recipe;
             this.Makeall = makeall;
@@ -23,7 +23,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteByte(this.WindowID);
-            buffer.WriteIdentifier(this.Recipe);
+            buffer.WriteIdentifier(this.Recipe!);
             buffer.WriteBoolean(this.Makeall);
         }
     }

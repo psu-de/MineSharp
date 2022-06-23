@@ -11,8 +11,6 @@ namespace MineSharp.Data.Blocks {
 
 		public static int CalculateBreakingTime(this Block block, Item? heldItem, Entity miner) {
 
-			if (block.Hardness == null) throw new InvalidDataException("Hardness is null");
-
 			//TODO: Gamemode creative
 			//if (miner.GameMode == Core.Types.Enums.GameMode.Creative) return 0;
 

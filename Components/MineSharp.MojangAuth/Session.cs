@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MojangSharp.Endpoints;
-using MojangSharp.Responses;
+using MojangSharpCore.Endpoints;
+using MojangSharpCore.Responses;
 using Newtonsoft.Json;
 
 namespace MineSharp.MojangAuth {
@@ -28,7 +28,7 @@ namespace MineSharp.MojangAuth {
 
                     string? username = await reader.ReadLineAsync();
                     string? password = await reader.ReadLineAsync();
-                    UUID uuid     = UUID.Parse(await reader.ReadLineAsync());
+                    UUID uuid     = UUID.Parse(await reader.ReadLineAsync() ?? throw new ArgumentException("Invalid file"));
                     string? cToken   = await reader.ReadLineAsync();
                     string? sToken   = await reader.ReadLineAsync();
                     string? isOnline = await reader.ReadLineAsync();

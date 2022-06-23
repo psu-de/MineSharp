@@ -2,7 +2,7 @@
     public static class BotClient {
 
         public static MemoryStream BotLog = new MemoryStream();
-        private static StreamWriter BotLogWriter;
+        private static StreamWriter? BotLogWriter;
 
         public static void Initialize (Bot.MinecraftBot.BotOptions options) {
             BotLogWriter = new StreamWriter(BotLog);
@@ -12,7 +12,7 @@
             Bot = new MineSharp.Bot.MinecraftBot(options);
         }
 
-        public static Bot.MinecraftBot Bot;
+        public static Bot.MinecraftBot? Bot;
 
     }
 }

@@ -6,7 +6,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public OpenSignEditorPacket() { }
 
-        public OpenSignEditorPacket(Position? location) {
+        public OpenSignEditorPacket(Position location) {
             this.Location = location;
         }
 
@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
         }
     }
 }

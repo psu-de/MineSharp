@@ -7,12 +7,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         public Identifier? Name { get; private set; }
         public Identifier? Target { get; private set; }
         public Identifier? Pool { get; private set; }
-        public string Finalstate { get; private set; }
-        public string Jointtype { get; private set; }
+        public string? Finalstate { get; private set; }
+        public string? Jointtype { get; private set; }
 
         public UpdateJigsawBlockPacket() { }
 
-        public UpdateJigsawBlockPacket(Position? location, Identifier? name, Identifier? target, Identifier? pool, string finalstate, string jointtype) {
+        public UpdateJigsawBlockPacket(Position? location, Identifier name, Identifier target, Identifier pool, string finalstate, string jointtype) {
             this.Location = location;
             this.Name = name;
             this.Target = target;
@@ -32,12 +32,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
-            buffer.WriteIdentifier(this.Name);
-            buffer.WriteIdentifier(this.Target);
-            buffer.WriteIdentifier(this.Pool);
-            buffer.WriteString(this.Finalstate);
-            buffer.WriteString(this.Jointtype);
+            buffer.WritePosition(this.Location!);
+            buffer.WriteIdentifier(this.Name!);
+            buffer.WriteIdentifier(this.Target!);
+            buffer.WriteIdentifier(this.Pool!);
+            buffer.WriteString(this.Finalstate!);
+            buffer.WriteString(this.Jointtype!);
         }
     }
 }

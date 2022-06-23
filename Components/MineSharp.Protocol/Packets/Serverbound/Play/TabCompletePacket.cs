@@ -2,7 +2,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
     public class TabCompletePacket : Packet {
 
         public int TransactionId { get; private set; }
-        public string Text { get; private set; }
+        public string? Text { get; private set; }
 
         public TabCompletePacket() { }
 
@@ -18,7 +18,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.TransactionId);
-            buffer.WriteString(this.Text);
+            buffer.WriteString(this.Text!);
         }
     }
 }

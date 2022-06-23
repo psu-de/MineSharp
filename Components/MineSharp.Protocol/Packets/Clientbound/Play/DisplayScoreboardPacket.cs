@@ -2,7 +2,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class DisplayScoreboardPacket : Packet {
 
         public byte Position { get; private set; }
-public string ScoreName { get; private set; }
+public string? ScoreName { get; private set; }
 
         public DisplayScoreboardPacket() { }
 
@@ -18,7 +18,7 @@ this.ScoreName = buffer.ReadString();
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteByte(this.Position);
-buffer.WriteString(this.ScoreName);
+buffer.WriteString(this.ScoreName!);
         }
     }
 }

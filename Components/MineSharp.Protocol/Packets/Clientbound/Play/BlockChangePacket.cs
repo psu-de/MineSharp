@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public BlockChangePacket() { }
 
-        public BlockChangePacket(Position? location, int blockid) {
+        public BlockChangePacket(Position location, int blockid) {
             this.Location = location;
             this.BlockID = blockid;
         }
@@ -19,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteVarInt(this.BlockID);
         }
     }

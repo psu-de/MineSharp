@@ -3,7 +3,7 @@
 namespace MineSharp.Protocol.Packets.Clientbound.Login {
     public class DisconnectPacket : Packet {
 
-        public Chat Reason { get; private set; }
+        public Chat? Reason { get; private set; }
 
         public DisconnectPacket() { }
         public DisconnectPacket(Chat chat) {
@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
         }
 
         public override async Task Handle(MinecraftClient client) {
-            client.ForceDisconnect(Reason.JSON);
+            client.ForceDisconnect(Reason!.JSON);
             await base.Handle(client);
         }
 
@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteChat(this.Reason);
+            buffer.WriteChat(this.Reason!);
         }
     }
 }

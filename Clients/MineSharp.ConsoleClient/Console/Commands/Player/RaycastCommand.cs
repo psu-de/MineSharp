@@ -20,7 +20,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 length = LengthArgument.GetValue(argv[0]) ?? throw new Exception("Argument invalid");
             }
 
-            var block = BotClient.Bot.Raycast(length).GetAwaiter().GetResult();
+            var block = BotClient.Bot!.Raycast(length).GetAwaiter().GetResult();
             if (block != null) {
                 AnsiConsole.MarkupLine($"[green]{block}[/]");
             } else {

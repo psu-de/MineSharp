@@ -45,18 +45,18 @@ namespace MineSharp.Bot {
 
         private Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
         private Dictionary<Type, List<Func<Packet, Task>>> PacketHandlers = new Dictionary<Type, List<Func<Packet, Task>>>();
-        private Task TickLoopTask;
+        private Task? TickLoopTask;
 
         public List<Module> Modules = new List<Module>();
         private List<TickedModule> TickedModules = new List<TickedModule>();
 
-        public BaseModule BaseModule;
+        public BaseModule? BaseModule;
 
-        public EntityModule EntityModule;
-        public PlayerModule PlayerModule;
-        public WorldModule WorldModule;
-        public PhysicsModule PhysicsModule;
-        public WindowsModule WindowsModule;
+        public EntityModule? EntityModule;
+        public PlayerModule? PlayerModule;
+        public WorldModule? WorldModule;
+        public PhysicsModule? PhysicsModule;
+        public WindowsModule? WindowsModule;
 
         public MinecraftBot(BotOptions options) {
             this.Options = options;
@@ -193,14 +193,7 @@ namespace MineSharp.Bot {
 
         #region Public Methods
 
-        [BotFunction("Basic", "Respawns the bot. Only possible when the bot is dead.")]
-        public Task Respawn() => BaseModule.Respawn();
 
-        [BotFunction("Basic", "Attacks a given entity")]
-        public Task Attack(Entity entity) => BaseModule.Attack(entity);
-
-        [BotFunction("Basic", "Sends a chat message to the server")]
-        public Task Chat(string message) => BaseModule.Chat(message);
 
         #endregion
 

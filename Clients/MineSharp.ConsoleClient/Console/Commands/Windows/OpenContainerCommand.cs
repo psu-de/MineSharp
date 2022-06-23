@@ -22,7 +22,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
 
             AnsiConsole.MarkupLine($"[green] Opening container at ({x} / {y} / {z}) [/]");
 
-            var block = BotClient.Bot.GetBlockAt(new Core.Types.Position(x, y, z));
+            var block = BotClient.Bot!.GetBlockAt(new Core.Types.Position(x, y, z));
             var window = BotClient.Bot.OpenContainer(block).GetAwaiter().GetResult();
 
             AnsiConsole.MarkupLine($"[green]Opened window with id={window.Id}[/]");

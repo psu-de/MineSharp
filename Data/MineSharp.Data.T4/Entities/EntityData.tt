@@ -62,7 +62,6 @@ public class <# WriteName(entity.Name); #> : Entity {
         public const float EntityHeight = <#= entity.Height #>F;
         public const int EntityCategory = <#= writtenCategories.IndexOf(MinecraftData.GetCSharpName(entity.Category)) #>;
 
-		public <# WriteName(entity.Name); #> () : base(EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 		public <# WriteName(entity.Name); #> (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {}
 
 	}

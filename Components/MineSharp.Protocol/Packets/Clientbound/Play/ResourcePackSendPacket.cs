@@ -1,8 +1,8 @@
 namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class ResourcePackSendPacket : Packet {
 
-        public string URL { get; private set; }
-public string Hash { get; private set; }
+        public string? URL { get; private set; }
+public string? Hash { get; private set; }
 public bool Forced { get; private set; }
 public bool HasPromptMessage { get; private set; }
 
@@ -23,8 +23,8 @@ this.HasPromptMessage = buffer.ReadBoolean();
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(this.URL);
-buffer.WriteString(this.Hash);
+            buffer.WriteString(this.URL!);
+buffer.WriteString(this.Hash!);
 buffer.WriteBoolean(this.Forced);
 buffer.WriteBoolean(this.HasPromptMessage);
         }

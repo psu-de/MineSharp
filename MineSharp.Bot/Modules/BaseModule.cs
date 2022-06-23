@@ -9,21 +9,21 @@ namespace MineSharp.Bot.Modules {
     public class BaseModule : Module {
 
 
-        public event BotEmptyEvent HealthChanged;
+        public event BotEmptyEvent? HealthChanged;
 
-        public event BotEmptyEvent Respawned;
+        public event BotEmptyEvent? Respawned;
 
-        public event BotChatEvent Died;
+        public event BotChatEvent? Died;
 
 
-        public Player BotEntity { get; private set; }
-        public MinecraftPlayer Player { get; private set; }
+        public Player? BotEntity { get; private set; }
+        public MinecraftPlayer? Player { get; private set; }
         public float Health { get; private set; }
         public bool IsAlive => Health > 0;
         public float Food { get; private set; }
         public float Saturation { get; private set; }
-        public Identifier CurrentDimension { get; private set; }
-        public GameMode GameMode => Player.GameMode;
+        public Identifier? CurrentDimension { get; private set; }
+        public GameMode? GameMode => Player?.GameMode;
 
         private TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
@@ -83,16 +83,15 @@ namespace MineSharp.Bot.Modules {
 
         private Task handleDeathCombat(DeathCombatEventPacket packet) {
             this.Health = 0;
-            this.Died?.Invoke(Bot, packet.Message);
+            this.Died?.Invoke(Bot, packet.Message!);
             return Task.CompletedTask;
         }
 
         private Task handleRespawnPacket(RespawnPacket packet) {
-            this.CurrentDimension = packet.DimensionName;
+            this.CurrentDimension = packet.DimensionName!;
             this.Respawned?.Invoke(Bot);
             return Task.CompletedTask;
         }
-
 
 
         /// <summary>
@@ -124,7 +123,9 @@ namespace MineSharp.Bot.Modules {
         /// <exception cref="InvalidOperationException"></exception>
         public Task Attack(Entity entity) {
             // TODO: Cooldown
-            if (entity.Position.DistanceSquared(this.BotEntity.Position) > 36) throw new InvalidOperationException("Too far");
+            Bot.AssertPlayerLoaded();
+
+            if (entity.Position.DistanceSquared(this.BotEntity!.Position) > 36) throw new InvalidOperationException("Too far");
 
             var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, Bot.MovementControls.Sneak);
             return this.Bot.Client.SendPacket(packet);

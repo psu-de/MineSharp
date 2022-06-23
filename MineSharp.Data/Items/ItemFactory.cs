@@ -8,7 +8,7 @@ namespace MineSharp.Data.Items {
             if (!type.IsAssignableTo(typeof(Item)))
                 throw new ArgumentException();
 
-            object[] parameters = new object[] {
+            object?[] parameters = new object?[] {
                 count, damage, metadata
             };
 

@@ -2,7 +2,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class SelectAdvancementTabPacket : Packet {
 
         public bool Hasid { get; private set; }
-public string OptionalIdentifier { get; private set; }
+public string? OptionalIdentifier { get; private set; }
 
         public SelectAdvancementTabPacket() { }
 
@@ -18,7 +18,7 @@ this.OptionalIdentifier = buffer.ReadString();
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteBoolean(this.Hasid);
-buffer.WriteString(this.OptionalIdentifier);
+buffer.WriteString(this.OptionalIdentifier!);
         }
     }
 }

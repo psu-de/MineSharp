@@ -5,7 +5,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public float Y { get; private set; }
         public float Z { get; private set; }
         public float Strength { get; private set; }
-        public sbyte[] Records { get; private set; }
+        public sbyte[]? Records { get; private set; }
         public float PlayerMotionX { get; private set; }
         public float PlayerMotionY { get; private set; }
         public float PlayerMotionZ { get; private set; }
@@ -43,7 +43,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteFloat(this.Y);
             buffer.WriteFloat(this.Z);
             buffer.WriteFloat(this.Strength);
-            buffer.WriteByteArray(this.Records.Cast<byte>().ToArray());
+            buffer.WriteByteArray(this.Records!.Cast<byte>().ToArray());
             buffer.WriteFloat(this.PlayerMotionX);
             buffer.WriteFloat(this.PlayerMotionY);
             buffer.WriteFloat(this.PlayerMotionZ);

@@ -35,7 +35,7 @@ namespace MineSharp.Windows {
                 throw new NotSupportedException();
 
             if (Slot == OutsideSlot) { // Clicked outside, drop item stack
-                if (window.SelectedSlot.IsEmpty()) return;
+                if (window.SelectedSlot!.IsEmpty()) return;
 
                 if (Button == 0) // Drop entire stack
                     window.SelectedSlot.Item = null;
@@ -52,7 +52,7 @@ namespace MineSharp.Windows {
                 return;
             } else {
 
-                if (window.SelectedSlot.IsEmpty() && window.GetSlot(this.Slot).IsEmpty()) 
+                if (window.SelectedSlot!.IsEmpty() && window.GetSlot(this.Slot).IsEmpty()) 
                     return;
 
                 if (window.SelectedSlot.IsEmpty()) { // Pickup half stack

@@ -1,7 +1,7 @@
 ﻿namespace MineSharp.Protocol.Packets.Serverbound.Play {
     public class ChatMessagePacket : Packet {
 
-        public string Message { get; private set; }
+        public string? Message { get; private set; }
 
         public ChatMessagePacket() { }
         public ChatMessagePacket(string message) {
@@ -13,7 +13,7 @@
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(this.Message);
+            buffer.WriteString(this.Message!);
         }
     }
 }

@@ -19,8 +19,8 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteIdentifier(this.Channel);
-            buffer.WriteByteArray(this.Data);
+            buffer.WriteIdentifier(this.Channel!);
+            buffer.WriteByteArray(this.Data!);
         }
     }
 }

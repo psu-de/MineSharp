@@ -7,9 +7,9 @@ using System.Text;
 namespace MineSharp.Protocol.Packets.Clientbound.Login {
     public class EncryptionRequestPacket : Packet {
 
-        public string ServerID { get; private set; }
-        public byte[] PublicKey { get; private set; }
-        public byte[] VerifyToken { get; private set; }
+        public string? ServerID { get; private set; }
+        public byte[]? PublicKey { get; private set; }
+        public byte[]? VerifyToken { get; private set; }
 
         public EncryptionRequestPacket() { }
         public EncryptionRequestPacket(string serverId, byte[] publicKey, byte[] verifyToken) {
@@ -25,7 +25,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
             aes.GenerateKey();
             client.SetEncryptionKey(aes.Key);
 
-            byte[] hash = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(ServerID).Concat(aes.Key).Concat(PublicKey).ToArray());
+            byte[] hash = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(ServerID!).Concat(aes.Key).Concat(PublicKey!).ToArray());
             Array.Reverse(hash);
             BigInteger b = new BigInteger(hash);
             // very annoyingly, BigInteger in C# tries to be smart and puts in
@@ -47,12 +47,15 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
                 }
             }
 
-            RSA rsa = RSAHelper.DecodePublicKey(this.PublicKey);
+            RSA? rsa = RSAHelper.DecodePublicKey(this.PublicKey!);
+            if (rsa == null) {
+                throw new Exception("Could not decode public key");
+            }
             byte[] encrypted = rsa.Encrypt(aes.Key, RSAEncryptionPadding.Pkcs1);
-            byte[] encVerTok = rsa.Encrypt(this.VerifyToken, RSAEncryptionPadding.Pkcs1);
+            byte[] encVerTok = rsa.Encrypt(this.VerifyToken!, RSAEncryptionPadding.Pkcs1);
 
             EncryptionResponsePacket response = new EncryptionResponsePacket(encrypted, encVerTok);
-            client.SendPacket(response); // TODO: Should this be awaited?
+            _ = client.SendPacket(response); // TODO: Should this be awaited?
 
             await base.Handle(client);
         }
@@ -64,9 +67,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(ServerID);
-            buffer.WriteByteArray(PublicKey);
-            buffer.WriteByteArray(VerifyToken);
+            buffer.WriteString(ServerID!);
+            buffer.WriteByteArray(PublicKey!);
+            buffer.WriteByteArray(VerifyToken!);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
     public class CreativeInventoryActionPacket : Packet {
 
         public short Slot { get; private set; }
-        public Slot ClickedItem { get; private set; }
+        public Slot? ClickedItem { get; private set; }
 
         public CreativeInventoryActionPacket() { }
 

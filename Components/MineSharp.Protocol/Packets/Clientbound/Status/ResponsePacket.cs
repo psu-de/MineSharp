@@ -2,7 +2,7 @@
     public class ResponsePacket : Packet {
 
 
-        public string JSONResponse { get; private set; }
+        public string? JSONResponse { get; private set; }
 
         public ResponsePacket() { }
         public ResponsePacket(string jsonResponse) {
@@ -14,7 +14,7 @@
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WriteString(JSONResponse);
+            buffer.WriteString(JSONResponse!);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public BlockEntityDataPacket() { }
 
-        public BlockEntityDataPacket(Position? location, int type, NbtCompound? nbtdata) {
+        public BlockEntityDataPacket(Position location, int type, NbtCompound? nbtdata) {
             this.Location = location;
             this.Type = type;
             this.NBTData = nbtdata;
@@ -23,7 +23,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteVarInt(this.Type);
             buffer.WriteNBTCompound(this.NBTData);
         }

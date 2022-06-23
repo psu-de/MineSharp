@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public OpenWindowPacket() { }
 
-        public OpenWindowPacket(int windowid, int windowtype, Chat? windowtitle) {
+        public OpenWindowPacket(int windowid, int windowtype, Chat windowtitle) {
             this.WindowID = windowid;
             this.WindowType = windowtype;
             this.WindowTitle = windowtitle;
@@ -23,7 +23,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.WindowID);
             buffer.WriteVarInt(this.WindowType);
-            buffer.WriteChat(this.WindowTitle);
+            buffer.WriteChat(this.WindowTitle!);
         }
     }
 }

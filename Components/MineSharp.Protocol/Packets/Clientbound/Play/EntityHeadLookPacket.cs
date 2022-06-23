@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public EntityHeadLookPacket() { }
 
-        public EntityHeadLookPacket(int entityid, Angle? headyaw) {
+        public EntityHeadLookPacket(int entityid, Angle headyaw) {
             this.EntityID = entityid;
             this.HeadYaw = headyaw;
         }
@@ -19,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WriteAngle(this.HeadYaw);
+            buffer.WriteAngle(this.HeadYaw!);
         }
     }
 }

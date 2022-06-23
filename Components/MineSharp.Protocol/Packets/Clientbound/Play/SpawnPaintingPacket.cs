@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public SpawnPaintingPacket() { }
 
-        public SpawnPaintingPacket(int entityid, UUID? entityuuid, int motive, Position? location, byte direction) {
+        public SpawnPaintingPacket(int entityid, UUID entityuuid, int motive, Position location, byte direction) {
             this.EntityID = entityid;
             this.EntityUUID = entityuuid;
             this.Motive = motive;
@@ -28,9 +28,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteVarInt(this.EntityID);
-            buffer.WriteUUID((UUID)this.EntityUUID);
+            buffer.WriteUUID((UUID)this.EntityUUID!);
             buffer.WriteVarInt(this.Motive);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteByte(this.Direction);
         }
     }

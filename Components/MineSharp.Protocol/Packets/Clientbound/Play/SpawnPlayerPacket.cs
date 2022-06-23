@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public SpawnPlayerPacket() { }
 
-        public SpawnPlayerPacket(int entityid, UUID playeruuid, double x, double y, double z, Angle? yaw, Angle? pitch) {
+        public SpawnPlayerPacket(int entityid, UUID playeruuid, double x, double y, double z, Angle yaw, Angle pitch) {
             this.EntityID = entityid;
             this.PlayerUUID = playeruuid;
             this.X = x;
@@ -38,8 +38,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
             buffer.WriteDouble(this.X);
             buffer.WriteDouble(this.Y);
             buffer.WriteDouble(this.Z);
-            buffer.WriteAngle(this.Yaw);
-            buffer.WriteAngle(this.Pitch);
+            buffer.WriteAngle(this.Yaw!);
+            buffer.WriteAngle(this.Pitch!);
         }
     }
 }

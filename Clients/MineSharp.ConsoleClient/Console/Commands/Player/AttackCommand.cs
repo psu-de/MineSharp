@@ -21,7 +21,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player {
                 return;
             }
 
-            if (!BotClient.Bot.Entities.ContainsKey(eId.Value)) {
+            if (!BotClient.Bot!.Entities.ContainsKey(eId.Value)) {
                 AnsiConsole.MarkupLine($"[red]Entity with id {eId.Value} does not exist[/]");
                 return;
             }

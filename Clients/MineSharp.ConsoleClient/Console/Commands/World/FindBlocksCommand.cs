@@ -42,9 +42,9 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
             int? blockCount = null;
 
             AnsiConsole.Status()
-                .Start($"Searching for [lightgreen]{(count < 0 ? new string("Infinity") : count.ToString())}[/] [yellow]{argv[0]}[/]", async ctx => {
+                .Start($"Searching for [lightgreen]{(count < 0 ? new string("Infinity") : count.ToString())}[/] [yellow]{argv[0]}[/]", ctx => {
                     var blockType = BlockTypeArgument.GetValue(argv[0]);
-                    var block = BotClient.Bot.FindBlocksAsync(blockType, (int)count, cancellation).GetAwaiter().GetResult();
+                    var block = BotClient.Bot!.FindBlocksAsync(blockType, (int)count, cancellation).GetAwaiter().GetResult();
                     if (cancellation.IsCancellationRequested) return;
 
                     if (block != null) {

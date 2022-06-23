@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MineSharp.Data.Items {
+#pragma warning disable CS8618
     public class ItemJsonInfo {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -23,4 +24,5 @@ namespace MineSharp.Data.Items {
         [JsonProperty("repairWith")]
         public string[] RepairWith { get; set; }
     }
+#pragma warning restore CS8618
 }

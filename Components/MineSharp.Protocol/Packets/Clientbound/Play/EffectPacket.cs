@@ -25,7 +25,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
 
         public override void Write(PacketBuffer buffer) {
             buffer.WriteInt(this.EffectID);
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteInt(this.Data);
             buffer.WriteBoolean(this.DisableRelativeVolume);
         }

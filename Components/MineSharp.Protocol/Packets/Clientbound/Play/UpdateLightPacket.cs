@@ -7,12 +7,12 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
         public int ChunkX { get; private set; }
         public int ChunkZ { get; private set; }
         public bool TrustEdges { get; private set; }
-        public BitSet SkyLightMask { get; private set; }
-        public BitSet BlockLightMask { get; private set; }
-        public BitSet EmptySkyLightMask { get; private set; }
-        public BitSet EmptyBlockLightMask { get; private set; }
-        public byte[][] SkyLightArray { get; private set; }
-        public byte[][] BlockLightArray { get; private set; }
+        public BitSet? SkyLightMask { get; private set; }
+        public BitSet? BlockLightMask { get; private set; }
+        public BitSet? EmptySkyLightMask { get; private set; }
+        public BitSet? EmptyBlockLightMask { get; private set; }
+        public byte[][]? SkyLightArray { get; private set; }
+        public byte[][]? BlockLightArray { get; private set; }
 
         public override void Read(PacketBuffer buffer) {
             this.ChunkX = buffer.ReadVarInt();

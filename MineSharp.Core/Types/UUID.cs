@@ -55,7 +55,7 @@
         /// </summary>
         /// <param name="obj">The object to compare with this instance.</param>
         /// <returns>true if o is a <paramref name="obj"/> that has the same value as this instance; otherwise, false.</returns>
-        public override bool Equals(object obj) {
+        public override bool Equals(object? obj) {
             if (!(obj is UUID)) {
                 return false;
             }

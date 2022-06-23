@@ -4,9 +4,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play {
     public class AdvancementsPacket : Packet {
 
         public bool ResetClear { get; private set; }
-        public Dictionary<Identifier, Advancement> AdvancementMapping { get; private set; }
+        public Dictionary<Identifier, Advancement>? AdvancementMapping { get; private set; }
         public Identifier[]? Identifiers { get; private set; }
-        public Dictionary<Identifier, (Identifier, (bool, long?))[]> Progress { get; private set; }
+        public Dictionary<Identifier, (Identifier, (bool, long?))[]>? Progress { get; private set; }
 
         public AdvancementsPacket() { }
 

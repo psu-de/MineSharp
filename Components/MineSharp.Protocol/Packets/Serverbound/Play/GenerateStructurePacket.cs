@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
 
         public GenerateStructurePacket() { }
 
-        public GenerateStructurePacket(Position? location, int levels, bool keepjigsaws) {
+        public GenerateStructurePacket(Position location, int levels, bool keepjigsaws) {
             this.Location = location;
             this.Levels = levels;
             this.KeepJigsaws = keepjigsaws;
@@ -22,7 +22,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play {
         }
 
         public override void Write(PacketBuffer buffer) {
-            buffer.WritePosition(this.Location);
+            buffer.WritePosition(this.Location!);
             buffer.WriteVarInt(this.Levels);
             buffer.WriteBoolean(this.KeepJigsaws);
         }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MineSharp.Data.Effects {
+#pragma warning disable CS8618
     public class EffectJsonInfo {
 
         [JsonProperty("id")]
@@ -13,4 +14,5 @@ namespace MineSharp.Data.Effects {
         public string Type;
 
     }
+#pragma warning restore CS8618
 }

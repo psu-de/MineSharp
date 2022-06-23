@@ -54,7 +54,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
                 AnsiConsole.MarkupLine("[red] ERROR: Could not find command " + commandName + "[/]");
             }
 
-            command.PrintHelp();
+            command!.PrintHelp();
         }
     }
 }
