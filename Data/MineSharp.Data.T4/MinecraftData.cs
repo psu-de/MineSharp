@@ -4,6 +4,20 @@ using System.Text.RegularExpressions;
 
 namespace MineSharp.Data {
 
+    public static class Program {
+        public static void Main(string[] args) {
+            Environment.SetEnvironmentVariable("ProjectPath", @"E:\Programming\MineSharp\Data\MineSharp.Data.T4\Protocol");
+
+            foreach (var dir in new[] { "clientbound", "serverbound" }) {
+
+                foreach (var ns in Protocol.ProtocolWriter.GetNamespaces()) {
+                    var packets = Protocol.ProtocolWriter.GetPackets(ns, dir);
+                }
+            }
+
+        }
+    }
+
     public class MinecraftData {
 
         public const string Version = "1.18.1";
@@ -50,6 +64,10 @@ namespace MineSharp.Data {
 
         public static string Uppercase(string str) {
             return char.ToUpper(str[0]) + str.Substring(1);
+        }
+
+        public static string Lowercase(string str) {
+            return char.ToLower(str[0]) + str.Substring(1);
         }
 
 #pragma warning disable CS8618

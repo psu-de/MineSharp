@@ -3,6 +3,7 @@ using MineSharp.Core.Versions;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
+using System.Net;
 using System.Net.Sockets;
 
 namespace MineSharp.Protocol {
@@ -12,7 +13,7 @@ namespace MineSharp.Protocol {
 
         public string Version { get; private set; }
         public GameState GameState { get; private set; }
-        public string Hostname { get; private set; }
+        public string IPAddress { get; private set; }
         public int Port { get; private set; }
 
         public Session Session { get; private set; }
@@ -52,7 +53,7 @@ namespace MineSharp.Protocol {
             this.Version = version;
             this.Session = session;
             this.GameState = GameState.HANDSHAKING;
-            this.Hostname = host;
+            this.IPAddress = GetIpAddress(host);
             this.Port = port;
             this.CancellationTokenSource = new CancellationTokenSource();
             this.CancellationToken = CancellationTokenSource.Token;
@@ -64,6 +65,21 @@ namespace MineSharp.Protocol {
             this._client = new TcpClient();
         }
 
+        private string GetIpAddress(string host) {
+
+            var type = Uri.CheckHostName(host);
+            return type switch {
+                UriHostNameType.Dns => 
+                (Dns.GetHostEntry(host).AddressList.FirstOrDefault() 
+                ?? throw new Exception($"Could not find ip for hostname ('{host}')")).ToString(),
+
+                UriHostNameType.IPv4 => host,
+
+                _ => throw new Exception("Hostname not supported: " + host)
+            };
+
+        }
+
         /// <summary>
         /// Connects to the server and making the handshake
         /// </summary>
@@ -72,7 +88,7 @@ namespace MineSharp.Protocol {
         public async Task<bool> Connect (GameState nextState) {
             Logger.Debug("Connecting...");
             try {
-                await this._client.ConnectAsync(this.Hostname, this.Port);
+                await this._client.ConnectAsync(this.IPAddress, this.Port);
 
                 // Start Reading / Writing Loops
                 this.Stream = new MinecraftStream(this._client.GetStream());
@@ -101,7 +117,7 @@ namespace MineSharp.Protocol {
         }
 
         private async Task makeHandshake(GameState nextState) {
-            await this.SendPacket(new HandshakePacket(ProtocolVersion.GetVersionNumber(this.Version), this.Hostname, (ushort)this.Port, nextState));
+            await this.SendPacket(new HandshakePacket(ProtocolVersion.GetVersionNumber(this.Version), this.IPAddress, (ushort)this.Port, nextState));
 
             if (nextState == GameState.STATUS) {
                 await this.SendPacket(new Packets.Serverbound.Status.RequestPacket());
