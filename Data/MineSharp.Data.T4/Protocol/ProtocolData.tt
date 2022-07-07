@@ -17,10 +17,32 @@
 
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Protocol;
+using MineSharp.Core.Types.Enums;
 using fNbt;
 
 namespace MineSharp.Data.Protocol {
 	
+	public abstract partial class Packet {
+		public static Type GetPacketType(GameState state, PacketFlow direction, int id) {
+			return direction switch {
+			<# foreach (var direction in new string[] { "clientbound", "serverbound" }) { #>
+				PacketFlow.<#= direction.ToUpper() #> => state switch {
+			 <# foreach (var ns in ProtocolWriter.GetNamespaces()) { #>
+					GameState.<#= ns.ToUpper() #> => id switch {
+			  <# foreach (var packet in ProtocolWriter.GetPackets(ns, direction)) { #> 
+				<#= packet.Id #> => typeof(<#= MinecraftData.Uppercase(direction) #>.<#= MinecraftData.Uppercase(ns) #>.<#= packet.StructureName #>),<# } #>
+			   _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+			  },
+			 <# } #>
+			 _ => throw new Exception($"Unknown packet State={state}, Direction={direction}"),
+			 },
+            <# } #> 
+			_ => throw new Exception($"Unknown packet Direction={direction}"),
+			};
+		}
+
+	}
+
 	public abstract partial class PacketBuffer {
 
 		public abstract void Write<T>(T value);

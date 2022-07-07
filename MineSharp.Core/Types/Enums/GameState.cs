@@ -1,4 +1,4 @@
-﻿namespace MineSharp.Protocol {
+﻿namespace MineSharp.Core.Types.Enums {
     public enum GameState {
 
         HANDSHAKING = -1,

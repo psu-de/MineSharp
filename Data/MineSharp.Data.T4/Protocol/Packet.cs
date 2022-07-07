@@ -11,7 +11,7 @@ namespace MineSharp.Data.Protocol {
         public void Write(PacketBuffer buffer);
     }
 
-    public abstract class Packet : IPacketPayload {
+    public abstract partial class Packet : IPacketPayload {
 
         public int PacketId { get; private set; }
 

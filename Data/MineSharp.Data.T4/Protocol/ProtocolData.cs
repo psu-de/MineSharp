@@ -1,14 +1,227 @@
 ﻿
-
 ////////////////////////////////////////////////////////////
 //  Generated Protocol Data for Minecraft Version 1.18.1  //
 ////////////////////////////////////////////////////////////
 
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Protocol;
+using MineSharp.Core.Types.Enums;
 using fNbt;
 
 namespace MineSharp.Data.Protocol {
+
+    public abstract partial class Packet {
+        public static Type GetPacketType(GameState state, PacketFlow direction, int id) {
+            return direction switch {
+                PacketFlow.CLIENTBOUND => state switch {
+                    GameState.HANDSHAKING => id switch {
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.STATUS => id switch {
+
+                        0x00 => typeof(Clientbound.Status.ServerInfoPacket),
+                        0x01 => typeof(Clientbound.Status.PingPacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.LOGIN => id switch {
+
+                        0x00 => typeof(Clientbound.Login.DisconnectPacket),
+                        0x01 => typeof(Clientbound.Login.EncryptionBeginPacket),
+                        0x02 => typeof(Clientbound.Login.SuccessPacket),
+                        0x03 => typeof(Clientbound.Login.CompressPacket),
+                        0x04 => typeof(Clientbound.Login.LoginPluginRequestPacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.PLAY => id switch {
+
+                        0x00 => typeof(Clientbound.Play.SpawnEntityPacket),
+                        0x01 => typeof(Clientbound.Play.SpawnEntityExperienceOrbPacket),
+                        0x02 => typeof(Clientbound.Play.SpawnEntityLivingPacket),
+                        0x03 => typeof(Clientbound.Play.SpawnEntityPaintingPacket),
+                        0x04 => typeof(Clientbound.Play.NamedEntitySpawnPacket),
+                        0x06 => typeof(Clientbound.Play.AnimationPacket),
+                        0x07 => typeof(Clientbound.Play.StatisticsPacket),
+                        0x63 => typeof(Clientbound.Play.AdvancementsPacket),
+                        0x09 => typeof(Clientbound.Play.BlockBreakAnimationPacket),
+                        0x0a => typeof(Clientbound.Play.TileEntityDataPacket),
+                        0x0b => typeof(Clientbound.Play.BlockActionPacket),
+                        0x0c => typeof(Clientbound.Play.BlockChangePacket),
+                        0x0d => typeof(Clientbound.Play.BossBarPacket),
+                        0x0e => typeof(Clientbound.Play.DifficultyPacket),
+                        0x11 => typeof(Clientbound.Play.TabCompletePacket),
+                        0x12 => typeof(Clientbound.Play.DeclareCommandsPacket),
+                        0x37 => typeof(Clientbound.Play.FacePlayerPacket),
+                        0x60 => typeof(Clientbound.Play.NbtQueryResponsePacket),
+                        0x0f => typeof(Clientbound.Play.ChatPacket),
+                        0x3f => typeof(Clientbound.Play.MultiBlockChangePacket),
+                        0x13 => typeof(Clientbound.Play.CloseWindowPacket),
+                        0x2e => typeof(Clientbound.Play.OpenWindowPacket),
+                        0x14 => typeof(Clientbound.Play.WindowItemsPacket),
+                        0x15 => typeof(Clientbound.Play.CraftProgressBarPacket),
+                        0x16 => typeof(Clientbound.Play.SetSlotPacket),
+                        0x17 => typeof(Clientbound.Play.SetCooldownPacket),
+                        0x18 => typeof(Clientbound.Play.CustomPayloadPacket),
+                        0x19 => typeof(Clientbound.Play.NamedSoundEffectPacket),
+                        0x1a => typeof(Clientbound.Play.KickDisconnectPacket),
+                        0x1b => typeof(Clientbound.Play.EntityStatusPacket),
+                        0x1c => typeof(Clientbound.Play.ExplosionPacket),
+                        0x1d => typeof(Clientbound.Play.UnloadChunkPacket),
+                        0x1e => typeof(Clientbound.Play.GameStateChangePacket),
+                        0x1f => typeof(Clientbound.Play.OpenHorseWindowPacket),
+                        0x21 => typeof(Clientbound.Play.KeepAlivePacket),
+                        0x22 => typeof(Clientbound.Play.MapChunkPacket),
+                        0x23 => typeof(Clientbound.Play.WorldEventPacket),
+                        0x24 => typeof(Clientbound.Play.WorldParticlesPacket),
+                        0x25 => typeof(Clientbound.Play.UpdateLightPacket),
+                        0x26 => typeof(Clientbound.Play.LoginPacket),
+                        0x27 => typeof(Clientbound.Play.MapPacket),
+                        0x28 => typeof(Clientbound.Play.TradeListPacket),
+                        0x29 => typeof(Clientbound.Play.RelEntityMovePacket),
+                        0x2a => typeof(Clientbound.Play.EntityMoveLookPacket),
+                        0x2b => typeof(Clientbound.Play.EntityLookPacket),
+                        0x2c => typeof(Clientbound.Play.VehicleMovePacket),
+                        0x2d => typeof(Clientbound.Play.OpenBookPacket),
+                        0x2f => typeof(Clientbound.Play.OpenSignEntityPacket),
+                        0x31 => typeof(Clientbound.Play.CraftRecipeResponsePacket),
+                        0x32 => typeof(Clientbound.Play.AbilitiesPacket),
+                        0x33 => typeof(Clientbound.Play.EndCombatEventPacket),
+                        0x34 => typeof(Clientbound.Play.EnterCombatEventPacket),
+                        0x35 => typeof(Clientbound.Play.DeathCombatEventPacket),
+                        0x36 => typeof(Clientbound.Play.PlayerInfoPacket),
+                        0x38 => typeof(Clientbound.Play.PositionPacket),
+                        0x39 => typeof(Clientbound.Play.UnlockRecipesPacket),
+                        0x3a => typeof(Clientbound.Play.EntityDestroyPacket),
+                        0x3b => typeof(Clientbound.Play.RemoveEntityEffectPacket),
+                        0x3c => typeof(Clientbound.Play.ResourcePackSendPacket),
+                        0x3d => typeof(Clientbound.Play.RespawnPacket),
+                        0x3e => typeof(Clientbound.Play.EntityHeadRotationPacket),
+                        0x47 => typeof(Clientbound.Play.CameraPacket),
+                        0x48 => typeof(Clientbound.Play.HeldItemSlotPacket),
+                        0x49 => typeof(Clientbound.Play.UpdateViewPositionPacket),
+                        0x4a => typeof(Clientbound.Play.UpdateViewDistancePacket),
+                        0x4c => typeof(Clientbound.Play.ScoreboardDisplayObjectivePacket),
+                        0x4d => typeof(Clientbound.Play.EntityMetadataPacket),
+                        0x4e => typeof(Clientbound.Play.AttachEntityPacket),
+                        0x4f => typeof(Clientbound.Play.EntityVelocityPacket),
+                        0x50 => typeof(Clientbound.Play.EntityEquipmentPacket),
+                        0x51 => typeof(Clientbound.Play.ExperiencePacket),
+                        0x52 => typeof(Clientbound.Play.UpdateHealthPacket),
+                        0x53 => typeof(Clientbound.Play.ScoreboardObjectivePacket),
+                        0x54 => typeof(Clientbound.Play.SetPassengersPacket),
+                        0x55 => typeof(Clientbound.Play.TeamsPacket),
+                        0x56 => typeof(Clientbound.Play.ScoreboardScorePacket),
+                        0x4b => typeof(Clientbound.Play.SpawnPositionPacket),
+                        0x59 => typeof(Clientbound.Play.UpdateTimePacket),
+                        0x5c => typeof(Clientbound.Play.EntitySoundEffectPacket),
+                        0x5e => typeof(Clientbound.Play.StopSoundPacket),
+                        0x5d => typeof(Clientbound.Play.SoundEffectPacket),
+                        0x5f => typeof(Clientbound.Play.PlayerlistHeaderPacket),
+                        0x61 => typeof(Clientbound.Play.CollectPacket),
+                        0x62 => typeof(Clientbound.Play.EntityTeleportPacket),
+                        0x64 => typeof(Clientbound.Play.EntityUpdateAttributesPacket),
+                        0x65 => typeof(Clientbound.Play.EntityEffectPacket),
+                        0x40 => typeof(Clientbound.Play.SelectAdvancementTabPacket),
+                        0x66 => typeof(Clientbound.Play.DeclareRecipesPacket),
+                        0x67 => typeof(Clientbound.Play.TagsPacket),
+                        0x08 => typeof(Clientbound.Play.AcknowledgePlayerDiggingPacket),
+                        0x05 => typeof(Clientbound.Play.SculkVibrationSignalPacket),
+                        0x10 => typeof(Clientbound.Play.ClearTitlesPacket),
+                        0x20 => typeof(Clientbound.Play.InitializeWorldBorderPacket),
+                        0x41 => typeof(Clientbound.Play.ActionBarPacket),
+                        0x42 => typeof(Clientbound.Play.WorldBorderCenterPacket),
+                        0x43 => typeof(Clientbound.Play.WorldBorderLerpSizePacket),
+                        0x44 => typeof(Clientbound.Play.WorldBorderSizePacket),
+                        0x45 => typeof(Clientbound.Play.WorldBorderWarningDelayPacket),
+                        0x46 => typeof(Clientbound.Play.WorldBorderWarningReachPacket),
+                        0x30 => typeof(Clientbound.Play.PingPacket),
+                        0x58 => typeof(Clientbound.Play.SetTitleSubtitlePacket),
+                        0x5a => typeof(Clientbound.Play.SetTitleTextPacket),
+                        0x5b => typeof(Clientbound.Play.SetTitleTimePacket),
+                        0x57 => typeof(Clientbound.Play.SimulationDistancePacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    _ => throw new Exception($"Unknown packet State={state}, Direction={direction}"),
+                },
+                PacketFlow.SERVERBOUND => state switch {
+                    GameState.HANDSHAKING => id switch {
+
+                        0x00 => typeof(Serverbound.Handshaking.SetProtocolPacket),
+                        0xfe => typeof(Serverbound.Handshaking.LegacyServerListPingPacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.STATUS => id switch {
+
+                        0x00 => typeof(Serverbound.Status.PingStartPacket),
+                        0x01 => typeof(Serverbound.Status.PingPacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.LOGIN => id switch {
+
+                        0x00 => typeof(Serverbound.Login.LoginStartPacket),
+                        0x01 => typeof(Serverbound.Login.EncryptionBeginPacket),
+                        0x02 => typeof(Serverbound.Login.LoginPluginResponsePacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    GameState.PLAY => id switch {
+
+                        0x00 => typeof(Serverbound.Play.TeleportConfirmPacket),
+                        0x01 => typeof(Serverbound.Play.QueryBlockNbtPacket),
+                        0x02 => typeof(Serverbound.Play.SetDifficultyPacket),
+                        0x0b => typeof(Serverbound.Play.EditBookPacket),
+                        0x0c => typeof(Serverbound.Play.QueryEntityNbtPacket),
+                        0x17 => typeof(Serverbound.Play.PickItemPacket),
+                        0x20 => typeof(Serverbound.Play.NameItemPacket),
+                        0x23 => typeof(Serverbound.Play.SelectTradePacket),
+                        0x24 => typeof(Serverbound.Play.SetBeaconEffectPacket),
+                        0x26 => typeof(Serverbound.Play.UpdateCommandBlockPacket),
+                        0x27 => typeof(Serverbound.Play.UpdateCommandBlockMinecartPacket),
+                        0x2a => typeof(Serverbound.Play.UpdateStructureBlockPacket),
+                        0x06 => typeof(Serverbound.Play.TabCompletePacket),
+                        0x03 => typeof(Serverbound.Play.ChatPacket),
+                        0x04 => typeof(Serverbound.Play.ClientCommandPacket),
+                        0x05 => typeof(Serverbound.Play.SettingsPacket),
+                        0x07 => typeof(Serverbound.Play.EnchantItemPacket),
+                        0x08 => typeof(Serverbound.Play.WindowClickPacket),
+                        0x09 => typeof(Serverbound.Play.CloseWindowPacket),
+                        0x0a => typeof(Serverbound.Play.CustomPayloadPacket),
+                        0x0d => typeof(Serverbound.Play.UseEntityPacket),
+                        0x0e => typeof(Serverbound.Play.GenerateStructurePacket),
+                        0x0f => typeof(Serverbound.Play.KeepAlivePacket),
+                        0x10 => typeof(Serverbound.Play.LockDifficultyPacket),
+                        0x11 => typeof(Serverbound.Play.PositionPacket),
+                        0x12 => typeof(Serverbound.Play.PositionLookPacket),
+                        0x13 => typeof(Serverbound.Play.LookPacket),
+                        0x14 => typeof(Serverbound.Play.FlyingPacket),
+                        0x15 => typeof(Serverbound.Play.VehicleMovePacket),
+                        0x16 => typeof(Serverbound.Play.SteerBoatPacket),
+                        0x18 => typeof(Serverbound.Play.CraftRecipeRequestPacket),
+                        0x19 => typeof(Serverbound.Play.AbilitiesPacket),
+                        0x1a => typeof(Serverbound.Play.BlockDigPacket),
+                        0x1b => typeof(Serverbound.Play.EntityActionPacket),
+                        0x1c => typeof(Serverbound.Play.SteerVehiclePacket),
+                        0x1f => typeof(Serverbound.Play.DisplayedRecipePacket),
+                        0x1e => typeof(Serverbound.Play.RecipeBookPacket),
+                        0x21 => typeof(Serverbound.Play.ResourcePackReceivePacket),
+                        0x25 => typeof(Serverbound.Play.HeldItemSlotPacket),
+                        0x28 => typeof(Serverbound.Play.SetCreativeSlotPacket),
+                        0x29 => typeof(Serverbound.Play.UpdateJigsawBlockPacket),
+                        0x2b => typeof(Serverbound.Play.UpdateSignPacket),
+                        0x2c => typeof(Serverbound.Play.ArmAnimationPacket),
+                        0x2d => typeof(Serverbound.Play.SpectatePacket),
+                        0x2e => typeof(Serverbound.Play.BlockPlacePacket),
+                        0x2f => typeof(Serverbound.Play.UseItemPacket),
+                        0x22 => typeof(Serverbound.Play.AdvancementTabPacket),
+                        0x1d => typeof(Serverbound.Play.PongPacket),
+                        _ => throw new Exception($"Unknown packet id: {id}, State={state}, Direction={direction}"),
+                    },
+                    _ => throw new Exception($"Unknown packet State={state}, Direction={direction}"),
+                },
+
+                _ => throw new Exception($"Unknown packet Direction={direction}"),
+            };
+        }
+
+    }
 
     public abstract partial class PacketBuffer {
 
@@ -76,7 +289,6 @@ namespace MineSharp.Data.Protocol {
 
 
 }
-
 
 namespace MineSharp.Data.Protocol.Clientbound.Handshaking {
 
@@ -7115,4 +7327,3 @@ namespace MineSharp.Data.Protocol.Serverbound.Play {
 
 
 }
-

@@ -1,4 +1,4 @@
-﻿namespace MineSharp.Protocol.Packets {
+﻿namespace MineSharp.Core.Types.Enums {
     public enum PacketFlow {
         SERVERBOUND,
         CLIENTBOUND
