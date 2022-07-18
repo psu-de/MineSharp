@@ -2,12 +2,12 @@
 using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using MineSharp.Core.Types.Enums;
 using MineSharp.Core.Versions;
+using MineSharp.Data.Protocol;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
-using MineSharp.Protocol.Packets;
 using MineSharp.Windows;
-
 using Item = MineSharp.Core.Types.Item;
 
 namespace MineSharp.Bot {
@@ -44,7 +44,7 @@ namespace MineSharp.Bot {
         #endregion
 
         private Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
-        private Dictionary<Type, List<Func<Packet, Task>>> PacketHandlers = new Dictionary<Type, List<Func<Packet, Task>>>();
+        private Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
         private Task? TickLoopTask;
 
         public List<Module> Modules = new List<Module>();
@@ -149,7 +149,7 @@ namespace MineSharp.Bot {
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [BotFunction("Basic", "Waits for a specific packet from the server")]
-        public Task<T> WaitForPacket<T>() where T : Packet {
+        public Task<T> WaitForPacket<T>() where T : IPacketPayload {
             Type packetType = typeof(T);
             if (!packetWaiters.TryGetValue(packetType, out var task)) {
                 TaskCompletionSource<T> tsc = new TaskCompletionSource<T>();
@@ -160,15 +160,15 @@ namespace MineSharp.Bot {
         }
 
         [BotFunction("Basic", "Calls handler every time a specific packet is received")]
-        public void On<T>(Func<T, Task> handler) where T : Packet {
+        public void On<T>(Func<T, Task> handler) where T : IPacketPayload {
             if (PacketHandlers.ContainsKey(typeof(T))) {
-                PacketHandlers[typeof(T)].Add((Packet p) => handler((T)p));
+                PacketHandlers[typeof(T)].Add((IPacketPayload p) => handler((T)p));
             } else {
-                PacketHandlers.Add(typeof(T), new List<Func<Packet, Task>>() { (Packet p) => handler((T)p) });
+                PacketHandlers.Add(typeof(T), new List<Func<IPacketPayload, Task>>() { (IPacketPayload p) => handler((T)p) });
             }
         }
 
-        private void Events_PacketReceived(MinecraftClient client, Packet packet) {
+        private void Events_PacketReceived(MinecraftClient client, IPacketPayload packet) {
 
             Type packetType = packet.GetType();
             if (packetWaiters.TryGetValue(packetType, out var tsc)) {

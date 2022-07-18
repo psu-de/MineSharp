@@ -1,4 +1,5 @@
-﻿using MineSharp.Protocol.Packets;
+﻿using MineSharp.Data.Protocol;
+using MineSharp.Protocol;
 
 namespace MineSharp.World.PalettedContainer.Palettes {
     internal class IndirectPalette : IPalette {
@@ -34,7 +35,7 @@ namespace MineSharp.World.PalettedContainer.Palettes {
         }
 
         public void Read(PacketBuffer buffer) {
-            this.Map = buffer.ReadVarIntArray();
+            this.Map = buffer.ReadArray<int>(buffer.ReadVarInt(), (buffer) => buffer.ReadVarInt()); // TODO: Varint
         }
 
         public IPalette AddState(int state, bool biomes, out byte newBitsPerEntry) {

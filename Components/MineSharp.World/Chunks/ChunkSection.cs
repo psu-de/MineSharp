@@ -1,7 +1,8 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets;
+using MineSharp.Data.Protocol;
+using MineSharp.Protocol;
 using MineSharp.World.PalettedContainer;
 
 
@@ -11,7 +12,7 @@ namespace MineSharp.World.Chunks {
         // Positions used in this Class should be local coordinates, relative to the chunk
 
         public static ChunkSection Read(PacketBuffer buffer) {
-            short solidBlockCount = buffer.ReadShort();
+            short solidBlockCount = buffer.ReadI16();
             BlockPalettedContainer blockContainer = BlockPalettedContainer.Read(buffer);
             BiomePalettedContainer biomeContainer = BiomePalettedContainer.Read(buffer);
 

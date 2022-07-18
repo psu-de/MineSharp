@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Data\MineSharp.Data.T4\MineSharp.Data.T4.csproj" />
     <ProjectReference Include="..\..\MineSharp.Bot\MineSharp.Bot.csproj" />  
   </ItemGroup>
 

@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MineSharp.Protocol.Packets;
+using MineSharp.Data.Protocol;
+using MineSharp.Protocol;
 using MineSharp.World.PalettedContainer.Palettes;
 
 namespace MineSharp.World.PalettedContainer {
@@ -9,12 +10,12 @@ namespace MineSharp.World.PalettedContainer {
         static Logger Logger = Logger.GetLogger();
 
         public static BlockPalettedContainer Read(PacketBuffer buffer) {
-            byte bitsPerEntry = buffer.ReadByte();
+            byte bitsPerEntry = buffer.ReadU8();
             var palette = GetPalette(bitsPerEntry);
             palette.Read(buffer);
 
             long[] data = new long[buffer.ReadVarInt()];
-            for (int i = 0; i < data.Length; i++) data[i] = buffer.ReadLong();
+            for (int i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
 
             return new BlockPalettedContainer(palette, new IntBitArray(data, bitsPerEntry));
         }

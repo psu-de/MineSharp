@@ -1,17 +1,18 @@
 ﻿using MineSharp.Core.Types;
-using MineSharp.Protocol.Packets;
+using MineSharp.Data.Protocol;
+using MineSharp.Protocol;
 using MineSharp.World.PalettedContainer.Palettes;
 
 namespace MineSharp.World.PalettedContainer {
     public class BiomePalettedContainer : IPalettedContainer {
 
         public static BiomePalettedContainer Read(PacketBuffer buffer) {
-            byte bitsPerEntry = buffer.ReadByte();
+            byte bitsPerEntry = buffer.ReadU8();
             var palette = GetPalette(bitsPerEntry);
             palette.Read(buffer);
 
             long[] data = new long[buffer.ReadVarInt()];
-            for (int i = 0; i < data.Length; i++) data[i] = buffer.ReadLong();
+            for (int i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
 
             return new BiomePalettedContainer(palette, new IntBitArray(data, bitsPerEntry));
         }

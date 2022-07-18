@@ -62,7 +62,7 @@ namespace MineSharp.Bot.Modules {
         }
 
         private async Task UpdateServerPos() {
-            var packet = new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
+            var packet = new Data.Protocol.Play.Serverbound.PacketPositionLook(
                Bot.BotEntity!.Position.X, Bot.BotEntity.Position.Y, Bot.BotEntity.Position.Z, 
                Bot.BotEntity.Yaw, Bot.BotEntity.Pitch,
                Bot.BotEntity.IsOnGround);

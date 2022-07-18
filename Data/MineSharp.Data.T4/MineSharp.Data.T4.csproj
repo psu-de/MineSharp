@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>MineSharp.Data</RootNamespace>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,6 +53,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ItemData.tt</DependentUpon>
     </Compile>
+    <Compile Update="Protocol\ProtocolData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ProtocolData.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +84,10 @@
     <None Update="Items\ItemData.tt">
       <LastGenOutput>ItemData.cs</LastGenOutput>
       <Generator>TextTemplatingFileGeneratorCore</Generator>
+    </None>
+    <None Update="Protocol\ProtocolData.tt">
+      <Generator>TextTemplatingFileGeneratorCore</Generator>
+      <LastGenOutput>ProtocolData.cs</LastGenOutput>
     </None>
   </ItemGroup>
 

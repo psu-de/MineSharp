@@ -1,9 +1,10 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Data;
 using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets.Clientbound.Play;
-using MineSharp.Protocol.Packets.Serverbound.Play;
+using MineSharp.Data.Protocol.Play.Clientbound;
+using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.World.Chunks;
 
 namespace MineSharp.Bot.Modules {
@@ -18,38 +19,38 @@ namespace MineSharp.Bot.Modules {
 
             World = new World.World();
 
-            Bot.On<ChunkDataAndLightUpdatePacket>(handleChunkDataAndLightUpdate);
-            Bot.On<UnloadChunkPacket>(handleUnloadChunk);
-            Bot.On<BlockChangePacket>(handleBlockUpdate);
-            Bot.On<MultiBlockChangePacket>(handleMultiBlockChange);
+            Bot.On<PacketMapChunk>(handleChunkDataAndLightUpdate);
+            Bot.On<PacketUnloadChunk>(handleUnloadChunk);
+            Bot.On<PacketBlockChange>(handleBlockUpdate);
+            Bot.On<PacketMultiBlockChange>(handleMultiBlockChange);
 
             return Task.CompletedTask;
         }
 
 
-        private Task handleChunkDataAndLightUpdate(MineSharp.Protocol.Packets.Clientbound.Play.ChunkDataAndLightUpdatePacket packet) {
+        private Task handleChunkDataAndLightUpdate(PacketMapChunk packet) {
             World!.LoadChunkPacket(packet);
             return Task.CompletedTask;
         }
 
-        private Task handleUnloadChunk(MineSharp.Protocol.Packets.Clientbound.Play.UnloadChunkPacket packet) {
+        private Task handleUnloadChunk(PacketUnloadChunk packet) {
             World!.UnloadChunk(new ChunkCoordinates(packet.ChunkX, packet.ChunkZ));
             return Task.CompletedTask;
         }
 
-        private Task handleBlockUpdate(MineSharp.Protocol.Packets.Clientbound.Play.BlockChangePacket packet) {
+        private Task handleBlockUpdate(PacketBlockChange packet) {
 
-            var blockId = BlockPalette.GetBlockIdByState(packet.BlockID);
+            var blockId = BlockPalette.GetBlockIdByState(packet.Type!);
 
-            Block newBlock = BlockFactory.CreateBlock(blockId, packet.BlockID, packet.Location!);
+            Block newBlock = BlockFactory.CreateBlock(blockId, packet.Type!, new Position(packet.Location.Value));
             World!.SetBlock(newBlock);
             return Task.CompletedTask;
         }
 
-        private Task handleMultiBlockChange(MineSharp.Protocol.Packets.Clientbound.Play.MultiBlockChangePacket packet) {
-            int sectionX = (int)(packet.Chunksectionposition >> 42);
-            int sectionY = (int)(packet.Chunksectionposition & 0xFFFFF);
-            int sectionZ = (int)((packet.Chunksectionposition >> 20) & 0x3FFFFF);
+        private Task handleMultiBlockChange(PacketMultiBlockChange packet) {
+            int sectionX = packet.ChunkCoordinates.X;
+            int sectionY = packet.ChunkCoordinates.Y;
+            int sectionZ = packet.ChunkCoordinates.Z;
 
             if (sectionX > Math.Pow(2, 21)) sectionX -= (int)Math.Pow(2, 22);
             if (sectionY > Math.Pow(2, 19)) sectionY -= (int)Math.Pow(2, 20);
@@ -57,7 +58,7 @@ namespace MineSharp.Bot.Modules {
 
             sectionY += Math.Abs(MineSharp.World.World.MinY / MineSharp.World.Chunks.Chunk.ChunkSectionLength);
 
-            this.World!.MultiblockUpdate(packet.Blocks!, sectionX, sectionY, sectionZ);
+            this.World!.MultiblockUpdate(packet.Records!.Select(x => (long)x).ToArray(), sectionX, sectionY, sectionZ);
             return Task.CompletedTask;
         }
 
@@ -128,7 +129,7 @@ namespace MineSharp.Bot.Modules {
 
                 if (cancellation?.IsCancellationRequested ?? false) return MineBlockStatus.Cancelled;
 
-                var packet = new PlayerDiggingPacket(DiggingStatus.StartedDigging, block.Position!, face ?? BlockFace.Top);
+                var packet = new PacketBlockDig((int)DiggingStatus.StartedDigging, block.Position!.ToProtocolPosition(), (sbyte)(face ?? BlockFace.Top));
 
                 await this.Bot.Client.SendPacket(packet);
 
@@ -138,23 +139,23 @@ namespace MineSharp.Bot.Modules {
 
                 cancellation?.Register(() => cancelToken.Cancel());
 
-                Task<AcknowledgePlayerDiggingPacket?> sendAgain = Task.Run(async () => {
+                Task<PacketAcknowledgePlayerDigging?> sendAgain = Task.Run(async () => {
                     await Task.Delay(time, cancelToken.Token);
                     if (cancelToken.Token.IsCancellationRequested) return null;
 
-                    packet.Status = DiggingStatus.FinishedDigging;
+                    packet.Status = (int)DiggingStatus.FinishedDigging;
                     await this.Bot.Client.SendPacket(packet);
-                    return await Bot.WaitForPacket<AcknowledgePlayerDiggingPacket>();
+                    return await Bot.WaitForPacket<PacketAcknowledgePlayerDigging>();
                 });
 
-                var ack = await Bot.WaitForPacket<AcknowledgePlayerDiggingPacket>();
+                var ack = await Bot.WaitForPacket<PacketAcknowledgePlayerDigging>();
                 if (cancellation?.IsCancellationRequested ?? false) {
                     cancelToken.Cancel();
-                    await this.Bot.Client.SendPacket(new PlayerDiggingPacket(DiggingStatus.CancelledDigging, block.Position!, face ?? BlockFace.Top));
+                    await this.Bot.Client.SendPacket(new PacketBlockDig((int)DiggingStatus.CancelledDigging, block.Position!.ToProtocolPosition(), (sbyte)(face ?? BlockFace.Top)));
                     return MineBlockStatus.Cancelled;
                 }
 
-                if (ack.Status != DiggingStatus.StartedDigging) {
+                if (ack.Status! != (int)DiggingStatus.StartedDigging) {
                     return MineBlockStatus.Failed;
                 }
 
