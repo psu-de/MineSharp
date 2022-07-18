@@ -1,5 +1,5 @@
 ﻿namespace MineSharp.Core.Types {
-    public class Slot {
+    public partial class Slot {
 
         public Item? Item { get; set; } = null;
         public short SlotNumber { get; set; }

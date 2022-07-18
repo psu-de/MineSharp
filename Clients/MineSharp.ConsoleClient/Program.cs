@@ -6,8 +6,6 @@ using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Net;
 
-
-
 //Credentials
 MineSharp.Bot.MinecraftBot.BotOptions loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions();
 
@@ -16,7 +14,7 @@ if (true /*args.Length == 1*/) {
         Host = "127.0.0.1",
         Port = 25565,
         Offline = true,
-        UsernameOrEmail = "lessgo",
+        UsernameOrEmail = "MineSharp Bot",
         Version = "1.18.1"
     };
     // Parse credential file

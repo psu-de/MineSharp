@@ -1,8 +1,8 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
-using MineSharp.Protocol.Packets.Clientbound.Play;
-using MineSharp.Protocol.Packets.Serverbound.Play;
+using MineSharp.Data.Protocol.Play.Clientbound;
+using MineSharp.Data.Protocol.Play.Serverbound;
 using static MineSharp.Bot.MinecraftBot;
 
 namespace MineSharp.Bot.Modules {
@@ -32,29 +32,29 @@ namespace MineSharp.Bot.Modules {
         protected override async Task Load() {
             await this.SetEnabled(true);
 
-            var task1 = this.Bot.WaitForPacket<Protocol.Packets.Clientbound.Play.JoinGamePacket>();
-            var task2 = this.Bot.WaitForPacket<Protocol.Packets.Clientbound.Play.PlayerPositionAndLookPacket>();
+            var task1 = this.Bot.WaitForPacket<PacketLogin>();
+            var task2 = this.Bot.WaitForPacket<MineSharp.Data.Protocol.Play.Clientbound.PacketPosition>();
 
             await Task.WhenAll(task1, task2);
             var packet1 = await task1;
             var packet2 = await task2;
 
             this.BotEntity = new Player(
-                packet1.EntityID,
-                new Vector3(packet2.X, packet2.Y, packet2.Z),
-                packet2.Pitch,
-                packet2.Yaw,
+                packet1.EntityId!,
+                new Vector3(packet2.X!, packet2.Y!, packet2.Z!),
+                packet2.Pitch!,
+                packet2.Yaw!,
                 new Vector3(0, 0, 0),
                 true,
                 new Dictionary<int, Effect?>());
 
             this.Player = new MinecraftPlayer(Bot.Options.UsernameOrEmail,
-                Bot.Session.UUID, 0, packet1.Gamemode, this.BotEntity);
+                Bot.Session.UUID, 0, (GameMode)packet1.GameMode!, this.BotEntity);
 
             this.Health = 20.0f;
             this.Saturation = 20.0f;
             this.Food = 20.0f;
-            this.CurrentDimension = packet1.DimensionName;
+            this.CurrentDimension = (Identifier)packet1.WorldName!;
 
             Logger.Info($"Initialized Player entity: Location=({packet2.X} / {packet2.Y} / {packet2.Z})");
 
@@ -62,33 +62,33 @@ namespace MineSharp.Bot.Modules {
 
             //TODO: Add to entities and players mapping
 
-            this.Bot.On<UpdateHealthPacket>(handleUpdateHealth);
-            this.Bot.On<DeathCombatEventPacket>(handleDeathCombat);
-            this.Bot.On<RespawnPacket>(handleRespawnPacket);
+            this.Bot.On<PacketUpdateHealth>(handleUpdateHealth);
+            this.Bot.On<PacketDeathCombatEvent>(handleDeathCombat);
+            this.Bot.On<PacketRespawn>(handleRespawnPacket);
 
-            await this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.PlayerPositionAndRotationPacket(
-                packet2.X, packet2.Y, packet2.Z, packet2.Yaw, packet2.Pitch, this.BotEntity.IsOnGround));
+            await this.Bot.Client.SendPacket(new Data.Protocol.Play.Serverbound.PacketPositionLook(
+                packet2.X!, packet2.Y!, packet2.Z!, packet2.Yaw!, packet2.Pitch!, this.BotEntity.IsOnGround));
 
             await this.SetEnabled(true);
         }
 
 
-        private Task handleUpdateHealth(UpdateHealthPacket packet) {
-            this.Health = packet.Health;
-            this.Food = packet.Food;
-            this.Saturation = packet.FoodSaturation;
+        private Task handleUpdateHealth(PacketUpdateHealth packet) {
+            this.Health = packet.Health!;
+            this.Food = packet.Food!;
+            this.Saturation = packet.FoodSaturation!;
             this.HealthChanged?.Invoke(Bot);
             return Task.CompletedTask;
         }
 
-        private Task handleDeathCombat(DeathCombatEventPacket packet) {
+        private Task handleDeathCombat(PacketDeathCombatEvent packet) {
             this.Health = 0;
-            this.Died?.Invoke(Bot, packet.Message!);
+            this.Died?.Invoke(Bot, new Chat(packet.Message!));
             return Task.CompletedTask;
         }
 
-        private Task handleRespawnPacket(RespawnPacket packet) {
-            this.CurrentDimension = packet.DimensionName!;
+        private Task handleRespawnPacket(PacketRespawn packet) {
+            this.CurrentDimension = (Identifier)packet.WorldName!;
             this.Respawned?.Invoke(Bot);
             return Task.CompletedTask;
         }
@@ -103,7 +103,7 @@ namespace MineSharp.Bot.Modules {
             if (this.IsAlive) throw new InvalidOperationException("Cannot respawn the bot when its still living");
 
             await this.Bot.Client.SendPacket(
-                new ClientStatusPacket(ClientStatusPacket.ClientStatusAction.PerformRespawn))
+                new PacketClientCommand(0))
                 .ContinueWith((x) => this.Health = 20.0f);
         }
 
@@ -127,7 +127,7 @@ namespace MineSharp.Bot.Modules {
 
             if (entity.Position.DistanceSquared(this.BotEntity!.Position) > 36) throw new InvalidOperationException("Too far");
 
-            var packet = new Protocol.Packets.Serverbound.Play.InteractEntityPacket(entity.Id, InteractEntityPacket.InteractMode.Attack, Bot.MovementControls.Sneak);
+            var packet = new Data.Protocol.Play.Serverbound.PacketEntityAction(entity.Id, 1, Bot.MovementControls.Sneak ? 0 : 1); // Maybe invert sneak?
             return this.Bot.Client.SendPacket(packet);
         }
 
@@ -137,7 +137,7 @@ namespace MineSharp.Bot.Modules {
         /// <param name="message"></param>
         /// <returns></returns>
         public Task Chat(string message) {
-            var packet = new Protocol.Packets.Serverbound.Play.ChatMessagePacket(message);
+            var packet = new Data.Protocol.Play.Serverbound.PacketChat(message);
             return this.Bot.Client.SendPacket(packet);
         }
     }

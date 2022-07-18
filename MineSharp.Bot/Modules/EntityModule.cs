@@ -2,7 +2,7 @@
 using MineSharp.Core.Types;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
-using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Data.Protocol.Play.Clientbound;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
 
@@ -23,35 +23,35 @@ namespace MineSharp.Bot.Modules {
 
         protected async override Task Load() {
 
-            this.Bot.On<SpawnLivingEntityPacket>(handleSpawnLivingEntity);
-            this.Bot.On<DestroyEntitiesPacket>(handleDestroyEntities);
-            this.Bot.On<EntityVelocityPacket>(handleUpdateEntityVelocity);
-            this.Bot.On<EntityPositionPacket>(handleEntityPosition);
-            this.Bot.On<EntityPositionAndRotationPacket>(handleEntityPositionAndRotation);
-            this.Bot.On<EntityRotationPacket>(handleEntityRotation);
-            this.Bot.On<EntityTeleportPacket>(handleEntityTeleport);
-            this.Bot.On<EntityEffectPacket>(handleEntityEffect);
-            this.Bot.On<RemoveEntityEffectPacket>(handleRemoveEntityEffect);
+            this.Bot.On<PacketSpawnEntityLiving>(handleSpawnLivingEntity);
+            this.Bot.On<PacketEntityDestroy>(handleDestroyEntities);
+            this.Bot.On<PacketEntityVelocity>(handleUpdateEntityVelocity);
+            this.Bot.On<PacketRelEntityMove>(handleEntityPosition);
+            this.Bot.On<PacketEntityMoveLook>(handleEntityPositionAndRotation);
+            this.Bot.On<PacketEntityLook>(handleEntityRotation);
+            this.Bot.On<PacketEntityTeleport>(handleEntityTeleport);
+            this.Bot.On<PacketEntityEffect>(handleEntityEffect);
+            this.Bot.On<PacketRemoveEntityEffect>(handleRemoveEntityEffect);
 
             await this.SetEnabled(true);
         }
 
-        private Task handleSpawnLivingEntity(SpawnLivingEntityPacket packet) {
+        private Task handleSpawnLivingEntity(PacketSpawnEntityLiving packet) {
 
             var newEntity = EntityFactory.CreateEntity(
-                packet.Type, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
+                packet.Type!, packet.EntityId!, new Vector3(packet.X!, packet.Y!, packet.Z!),
                 packet.Pitch!,
                 packet.Yaw!,
-                new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock),
+                new Vector3(packet.VelocityX! / MinecraftConst.VelocityToBlock, packet.VelocityY! / MinecraftConst.VelocityToBlock, packet.VelocityZ! / MinecraftConst.VelocityToBlock),
                 true,
                 new Dictionary<int, Effect?>());
 
-            Entities.TryAdd(packet.EntityId, newEntity);
+            Entities.TryAdd(packet.EntityId!, newEntity);
             this.EntitySpawned?.Invoke(this.Bot, newEntity);
             return Task.CompletedTask;
         }
 
-        private Task handleDestroyEntities(DestroyEntitiesPacket packet) {
+        private Task handleDestroyEntities(PacketEntityDestroy packet) {
             for (int i = 0; i < packet.EntityIds!.Length; i++) {
                 if (!this.Entities.TryRemove(packet.EntityIds[i], out var entity)) 
                     continue; 
@@ -60,60 +60,60 @@ namespace MineSharp.Bot.Modules {
             return Task.CompletedTask;  
         }
 
-        private Task handleUpdateEntityVelocity(EntityVelocityPacket packet) {
-            if (!Entities.TryGetValue(packet.EntityID, out var entity))
+        private Task handleUpdateEntityVelocity(PacketEntityVelocity packet) {
+            if (!Entities.TryGetValue(packet.EntityId!, out var entity))
                 return Task.CompletedTask;
 
-            entity.Velocity = new Vector3(packet.VelocityX / MinecraftConst.VelocityToBlock, packet.VelocityY / MinecraftConst.VelocityToBlock, packet.VelocityZ / MinecraftConst.VelocityToBlock);
+            entity.Velocity = new Vector3(packet.VelocityX! / MinecraftConst.VelocityToBlock, packet.VelocityY! / MinecraftConst.VelocityToBlock, packet.VelocityZ! / MinecraftConst.VelocityToBlock);
             return Task.CompletedTask;
         }
 
-        private Task handleEntityPosition(EntityPositionPacket packet) {
+        private Task handleEntityPosition(PacketRelEntityMove packet) {
 
-            if (!Entities.TryGetValue(packet.EntityID, out var entity)) 
+            if (!Entities.TryGetValue(packet.EntityId!, out var entity)) 
                 return Task.CompletedTask;
 
-            entity.Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
-            entity.IsOnGround = packet.OnGround;
+            entity.Position.Add(new Vector3(packet.DX! / (128 * 32d), packet.DY! / (128 * 32d), packet.DZ! / (128 * 32d)));
+            entity.IsOnGround = packet.OnGround!;
 
             EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
-        private Task handleEntityPositionAndRotation(EntityPositionAndRotationPacket packet) {
+        private Task handleEntityPositionAndRotation(PacketEntityMoveLook packet) {
 
-            if (!Entities.TryGetValue(packet.EntityID, out var entity)) 
+            if (!Entities.TryGetValue(packet.EntityId!, out var entity)) 
                 return Task.CompletedTask;
 
-            entity.Position.Add(new Vector3(packet.DeltaX / (128 * 32d), packet.DeltaY / (128 * 32d), packet.DeltaZ / (128 * 32d)));
+            entity.Position.Add(new Vector3(packet.DX! / (128 * 32d), packet.DY! / (128 * 32d), packet.DZ! / (128 * 32d)));
             entity.Yaw = packet.Yaw!;
             entity.Pitch = packet.Pitch!;
-            entity.IsOnGround = packet.OnGround;
+            entity.IsOnGround = packet.OnGround!;
 
             EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
-        private Task handleEntityRotation(EntityRotationPacket packet) {
+        private Task handleEntityRotation(PacketEntityLook packet) {
 
-            if (!Entities.TryGetValue(packet.EntityID, out var entity)) 
+            if (!Entities.TryGetValue(packet.EntityId!, out var entity)) 
                 return Task.CompletedTask;
 
             entity.Yaw = packet.Yaw!;
             entity.Pitch = packet.Pitch!;
-            entity.IsOnGround = packet.OnGround;
+            entity.IsOnGround = packet.OnGround!;
 
             EntityMoved?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
-        private Task handleEntityTeleport(EntityTeleportPacket packet) {
-            if (!Entities.TryGetValue(packet.EntityID, out var entity)) 
+        private Task handleEntityTeleport(PacketEntityTeleport packet) {
+            if (!Entities.TryGetValue(packet.EntityId!, out var entity)) 
                 return Task.CompletedTask;
 
-            entity.Position.X = packet.X;
-            entity.Position.Y = packet.Y;
-            entity.Position.Z = packet.Z;
+            entity.Position.X = packet.X!;
+            entity.Position.Y = packet.Y!;
+            entity.Position.Z = packet.Z!;
 
             entity.Yaw = packet.Yaw!;
             entity.Pitch = packet.Pitch!;
@@ -122,29 +122,29 @@ namespace MineSharp.Bot.Modules {
             return Task.CompletedTask;
         }
 
-        private Task handleEntityEffect(EntityEffectPacket packet) {
-            if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
+        private Task handleEntityEffect(PacketEntityEffect packet) {
+            if (!this.Entities.TryGetValue(packet.EntityId!, out var entity)) 
                 return Task.CompletedTask;
-            var effectType = EffectPalette.GetEffectTypeById(packet.EffectID);
-            var effect = EffectFactory.CreateEffect(packet.EffectID, packet.Amplifier, DateTime.Now, packet.Duration);
+            var effectType = EffectPalette.GetEffectTypeById(packet.EffectId!);
+            var effect = EffectFactory.CreateEffect((int)packet.EffectId!, packet.Amplifier!, DateTime.Now, packet.Duration!);
 
             //TODO: Effect updating is so noch nich ganz richtig
-            if (entity.Effects.ContainsKey(packet.EffectID) && effect.Amplifier >= entity.Effects[packet.EffectID]!.Amplifier) {
-                entity.Effects[packet.EffectID] = effect;
+            if (entity.Effects.ContainsKey(packet.EffectId!) && effect.Amplifier >= entity.Effects[packet.EffectId!]!.Amplifier) {
+                entity.Effects[packet.EffectId!] = effect;
             } else {
-                entity.Effects.Add(packet.EffectID, effect);
+                entity.Effects.Add(packet.EffectId!, effect);
             }
 
             EntityEffectChanged?.Invoke(this.Bot, entity);
             return Task.CompletedTask;
         }
 
-        private Task handleRemoveEntityEffect(RemoveEntityEffectPacket packet) {
-            if (!this.Entities.TryGetValue(packet.EntityID, out var entity)) 
+        private Task handleRemoveEntityEffect(PacketRemoveEntityEffect packet) {
+            if (!this.Entities.TryGetValue(packet.EffectId!, out var entity)) 
                 return Task.CompletedTask;
 
-            if (entity.Effects.ContainsKey(packet.EffectID)) {
-                entity.Effects.Remove(packet.EffectID);
+            if (entity.Effects.ContainsKey(packet.EffectId!)) {
+                entity.Effects.Remove(packet.EffectId!);
             }
             EntityEffectChanged?.Invoke(this.Bot, entity);
             return Task.CompletedTask;

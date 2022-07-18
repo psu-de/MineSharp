@@ -1,11 +1,10 @@
 ﻿namespace MineSharp.Core.Types {
     public struct UUID : IEquatable<UUID> {
-        public readonly static UUID Empty;
+        public static readonly UUID Empty;
 
         static UUID() {
             Empty = new UUID();
         }
-
 
         private readonly long _leastSignificantBits;
         private readonly long _mostSignificantBits;

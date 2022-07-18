@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.World.Chunks;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -28,8 +28,8 @@ namespace MineSharp.World {
 
         }
 
-        public void LoadChunkPacket(ChunkDataAndLightUpdatePacket packet) {
-            var chunkCoords = new ChunkCoordinates(packet.ChunkX, packet.ChunkZ);
+        public void LoadChunkPacket(PacketMapChunk packet) {
+            var chunkCoords = new ChunkCoordinates(packet.X, packet.Z);
             var chunk = this.GetChunkAt(chunkCoords);
             if (chunk == null) {
                 chunk = new Chunk(packet);
@@ -38,7 +38,7 @@ namespace MineSharp.World {
                 }
                 else Logger.Error("Could not add chunk!");
             } else {
-                chunk.Load(packet.Data!);
+                chunk.Load(packet.ChunkData!);
                 ChunkLoaded?.Invoke(chunk);
             }
         }

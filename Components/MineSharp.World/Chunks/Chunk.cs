@@ -1,8 +1,9 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-using MineSharp.Protocol.Packets;
-using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Data.Protocol;
+using MineSharp.Data.Protocol.Play.Clientbound;
+using MineSharp.Protocol;
 
 namespace MineSharp.World.Chunks {
     public class Chunk {
@@ -19,23 +20,23 @@ namespace MineSharp.World.Chunks {
         public int X { get; set; }
         public int Z { get; set; }
         public ChunkSection[] ChunkSections { get; set; }
-        public Dictionary<Position, BlockEntity> BlockEntities { get; set; }
+        public Dictionary<Position, ChunkBlockEntity> BlockEntities { get; set; }
 
 
-        public Chunk(int x, int z, byte[] data, BlockEntity[] blockEntities) {
+        public Chunk(int x, int z, byte[] data, ChunkBlockEntity[] blockEntities) {
             this.X = x;
             this.Z = z;
             this.ChunkSections = new ChunkSection[GetSectionCount()];
 
             this.Load(data);
 
-            this.BlockEntities = new Dictionary<Position, BlockEntity>();
+            this.BlockEntities = new Dictionary<Position, ChunkBlockEntity>();
             foreach (var blockEntity in blockEntities) {
-                this.BlockEntities.Add(blockEntity.Position, blockEntity);
+                this.BlockEntities.Add(new Position(blockEntity.X, blockEntity.Y, blockEntity.Z), blockEntity);
             }
         }
 
-        public Chunk(ChunkDataAndLightUpdatePacket packet) : this(packet.ChunkX, packet.ChunkZ, packet.Data!, packet.BlockEntities!) { }
+        public Chunk(PacketMapChunk packet) : this(packet.X, packet.Z, packet.ChunkData!, packet.BlockEntities) { }
 
         public void Load(byte[] data) {
             PacketBuffer buffer = new PacketBuffer(data);

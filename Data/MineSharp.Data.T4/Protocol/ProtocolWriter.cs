@@ -130,6 +130,17 @@ namespace MineSharp.Data.Protocol {
                         }
 
                     }
+                    if (field.Type is ProtoArray) {
+                        try {
+                            var arr = (ProtoArray)field.Type;
+                            if (arr.Count != null) {
+                                arr.CountFieldType = fields.First(x => x.Name == arr.Count).Type;
+                            }
+
+                        } catch (Exception e) {
+                            throw new Exception(opts.Path, e);
+                        }
+                    }
                     fields.Add(field);
                 }
                 return new PacketType(fields.ToArray());
@@ -192,7 +203,7 @@ namespace MineSharp.Data.Protocol {
                     "U16" => "ushort",
                     "U32" => "uint",
                     "U64" => "ulong",
-                    "Varint" => "int",
+                    "Varint" => "Varint",
                     "String" => "string",
                     "Buffer" => "byte[]",
                     "UUID" => "UUID",
@@ -267,6 +278,28 @@ namespace MineSharp.Data.Protocol {
 
 
                     }
+                    if (field.Type is ProtoArray) {
+                        try {
+                            var arr = (ProtoArray)field.Type;
+
+                            while (true) {
+                                if (arr.Count != null) {
+                                    try {
+                                        arr.CountFieldType = fields.First(x => x.Name == MinecraftData.Uppercase(arr.Count)).Type;
+                                    } catch (Exception e) {
+                                        throw new Exception(arr.Count, e);
+                                    }
+                                }
+                                if (arr.Type is ProtoArray) {
+                                    arr = (ProtoArray)arr.Type;
+                                } else break;
+                            }
+
+
+                        } catch (Exception e) {
+                            throw new Exception(opts.Path, e);
+                        }
+                    }
                     fields.Add(field);
                 }
                 return new ProtoContainer(fields.ToArray());
@@ -296,6 +329,7 @@ namespace MineSharp.Data.Protocol {
                 Dictionary<string, ProtoType> switchMap = new Dictionary<string, ProtoType>();
 
                 foreach (var prop in ((JObject)args.GetValue("fields")!).Properties()) {
+                    var type = ProtoType.Parse(prop.Value);
                     switchMap.Add(prop.Name, ProtoType.Parse(prop.Value));
                 }
 
@@ -354,9 +388,10 @@ namespace MineSharp.Data.Protocol {
             public ProtoType? CountType;
             public ProtoType Type;
             public string? Count;
+            public ProtoType? CountFieldType;
 
-            public override string Reader => $"buffer.ReadArray<{Type.GetCSharpName()}>({(CountType == null ? $"(int){MinecraftData.Uppercase(Count!)}!" : CountType.Reader)})";
-            //public override string Writer => $"buffer.WriteArray<{Type.GetCSharpName()}>(%value%)";
+            public override string Reader => $"buffer.ReadArray<{Type.GetCSharpName()}>({(CountType == null ? $"(int){MinecraftData.Uppercase(Count!)}!" : CountType.Reader)}, () => {Type.Reader})";
+            public override string Writer => $"buffer.WriteArray<{Type.GetCSharpName()}>(({Type.GetCSharpName()}[])%value%!, (Action<{(CountType ?? CountFieldType)!.GetCSharpName()}>)buffer.Write{(CountType ?? CountFieldType)!.Name})";
 
             public ProtoArray(ProtoType type, ProtoType? countType, string? count) : base("Array", false) {
                 this.CountType = countType;
@@ -446,7 +481,7 @@ namespace MineSharp.Data.Protocol {
 
         public class ProtoTopBitSetTerminatedArray : ProtoType {
 
-            public ProtoType Type; 
+            public ProtoType Type;
             public override string Reader => $"buffer.ReadTopBitSetTerminatedArray<{Type.GetCSharpName()}>()";
 
             public ProtoTopBitSetTerminatedArray(ProtoType type) : base("TopBitSetTerminatedArray", false) {

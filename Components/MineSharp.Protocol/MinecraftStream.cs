@@ -1,9 +1,12 @@
-﻿using MineSharp.Protocol.Crypto;
-using MineSharp.Protocol.Packets;
+﻿using MineSharp.Core.Logging;
+using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Crypto;
 using System.Net.Sockets;
 
 namespace MineSharp.Protocol {
     internal class MinecraftStream : Stream {
+
+        private static Logger Logger = Logger.GetLogger();
 
         private NetworkStream _networkStream;
         private AesStream? _encryptionStream;
