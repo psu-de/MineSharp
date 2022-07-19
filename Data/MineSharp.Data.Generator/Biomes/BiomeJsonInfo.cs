@@ -2,6 +2,7 @@
 
 namespace MineSharp.Data.Generator.Biomes {
 #pragma warning disable CS8618
+#pragma warning disable CS0649
     internal class BiomeJsonInfo {
         [JsonProperty("id")]
         public int Id;
@@ -25,4 +26,5 @@ namespace MineSharp.Data.Generator.Biomes {
         public float Rainfall;
     }
 #pragma warning restore CS8618
+#pragma warning restore CS0649
 }

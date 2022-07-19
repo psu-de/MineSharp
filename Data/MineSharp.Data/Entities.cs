@@ -2,7 +2,7 @@
 //   Generated Entity Data for Minecraft Version 1.18.1   //
 ////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-
+using System.Collections.Generic;
 namespace MineSharp.Data.Entities {
 	public static class EntityPalette {
 		public static Type GetEntityTypeById(int id) => id switch {

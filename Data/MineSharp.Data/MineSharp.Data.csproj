@@ -6,6 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;8620;8600;8634;8629;8604</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;8620;8600;8634;8629;8604</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MiNET.fnbt" Version="1.0.22" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 //   Generated Block Data for Minecraft Version 1.18.1   //
 ///////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-
+using System.Collections.Generic;
 namespace MineSharp.Data.Blocks {
 	public static class BlockShapePalette {
 		public static readonly Dictionary<int, float[][]> AllBlockShapes = new Dictionary<int, float[][]>() {

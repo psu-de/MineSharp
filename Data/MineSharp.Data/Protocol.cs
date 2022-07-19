@@ -1,7 +1,9 @@
 //////////////////////////////////////////////////////////////
 //   Generated Protocol Data for Minecraft Version 1.18.1   //
 //////////////////////////////////////////////////////////////
-
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MineSharp.Core.Types;
 using fNbt;
@@ -486,7 +488,7 @@ namespace MineSharp.Data.Protocol {
 				switch (state) {
 					case false: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					case true: ((Action<PacketBuffer, AnonSwitchStatetrueContainer>)((buffer, value) => value.Write(buffer )))(buffer, (AnonSwitchStatetrueContainer)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static AnonSwitch Read(PacketBuffer buffer, bool state) {
@@ -657,7 +659,7 @@ namespace MineSharp.Data.Protocol {
 					switch (state) {
 						case "minecraft:block": ((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, (PositionBitfield)this); break;
 						case "minecraft:entity": ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
-						default: throw new Exception($"Invalid value: '{state}'"); break;
+						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
 				public static DestinationSwitch Read(PacketBuffer buffer, string state) {
@@ -845,7 +847,7 @@ namespace MineSharp.Data.Protocol {
 				case 16: ((Action<PacketBuffer, EntityMetadataItemSwitchState16>)((buffer, value) => value.Write(buffer )))(buffer, (EntityMetadataItemSwitchState16)this); break;
 				case 17: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 				case 18: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
-				default: throw new Exception($"Invalid value: '{state}'"); break;
+				default: throw new Exception($"Invalid value: '{state}'");
 			}
 		}
 		public static EntityMetadataItemSwitch Read(PacketBuffer buffer, VarInt state) {
@@ -2136,7 +2138,7 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 				switch (state) {
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 1: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static TabIdSwitch Read(PacketBuffer buffer, VarInt state) {
@@ -2235,7 +2237,7 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 					case "use_item": ((Action<PacketBuffer, PacketUseItem>)((buffer, value) => value.Write(buffer )))(buffer, (PacketUseItem)this); break;
 					case "advancement_tab": ((Action<PacketBuffer, PacketAdvancementTab>)((buffer, value) => value.Write(buffer )))(buffer, (PacketAdvancementTab)this); break;
 					case "pong": ((Action<PacketBuffer, PacketPong>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPong)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -3836,7 +3838,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 						case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 						case 2: ((Action<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer, value) => value.Write(buffer , @flags)))(buffer, (ExtraNodeDataSwitchState2Container)this); break;
-						default: throw new Exception($"Invalid value: '{state}'"); break;
+						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
 				public static ExtraNodeDataSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
@@ -6570,7 +6572,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						case "minecraft:campfire_cooking": ((Action<PacketBuffer, MinecraftSmeltingFormat>)((buffer, value) => value.Write(buffer )))(buffer, (MinecraftSmeltingFormat)this); break;
 						case "minecraft:stonecutting": ((Action<PacketBuffer, DataSwitchStateminecraftStonecuttingContainer>)((buffer, value) => value.Write(buffer )))(buffer, (DataSwitchStateminecraftStonecuttingContainer)this); break;
 						case "minecraft:smithing": ((Action<PacketBuffer, DataSwitchStateminecraftSmithingContainer>)((buffer, value) => value.Write(buffer )))(buffer, (DataSwitchStateminecraftSmithingContainer)this); break;
-						default: throw new Exception($"Invalid value: '{state}'"); break;
+						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
 				public static DataSwitch Read(PacketBuffer buffer, string state) {
@@ -7078,7 +7080,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					case "set_title_subtitle": ((Action<PacketBuffer, PacketSetTitleSubtitle>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetTitleSubtitle)this); break;
 					case "set_title_text": ((Action<PacketBuffer, PacketSetTitleText>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetTitleText)this); break;
 					case "set_title_time": ((Action<PacketBuffer, PacketSetTitleTime>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetTitleTime)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -7616,7 +7618,7 @@ namespace MineSharp.Data.Protocol.Login.Serverbound {
 					case "login_start": ((Action<PacketBuffer, PacketLoginStart>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLoginStart)this); break;
 					case "encryption_begin": ((Action<PacketBuffer, PacketEncryptionBegin>)((buffer, value) => value.Write(buffer )))(buffer, (PacketEncryptionBegin)this); break;
 					case "login_plugin_response": ((Action<PacketBuffer, PacketLoginPluginResponse>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLoginPluginResponse)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -7776,7 +7778,7 @@ namespace MineSharp.Data.Protocol.Login.Clientbound {
 					case "success": ((Action<PacketBuffer, PacketSuccess>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSuccess)this); break;
 					case "compress": ((Action<PacketBuffer, PacketCompress>)((buffer, value) => value.Write(buffer )))(buffer, (PacketCompress)this); break;
 					case "login_plugin_request": ((Action<PacketBuffer, PacketLoginPluginRequest>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLoginPluginRequest)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -7892,7 +7894,7 @@ namespace MineSharp.Data.Protocol.Status.Serverbound {
 				switch (state) {
 					case "ping_start": ((Action<PacketBuffer, PacketPingStart>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPingStart)this); break;
 					case "ping": ((Action<PacketBuffer, PacketPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPing)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -7986,7 +7988,7 @@ namespace MineSharp.Data.Protocol.Status.Clientbound {
 				switch (state) {
 					case "server_info": ((Action<PacketBuffer, PacketServerInfo>)((buffer, value) => value.Write(buffer )))(buffer, (PacketServerInfo)this); break;
 					case "ping": ((Action<PacketBuffer, PacketPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPing)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -8106,7 +8108,7 @@ namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 				switch (state) {
 					case "set_protocol": ((Action<PacketBuffer, PacketSetProtocol>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetProtocol)this); break;
 					case "legacy_server_list_ping": ((Action<PacketBuffer, PacketLegacyServerListPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLegacyServerListPing)this); break;
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
@@ -8172,7 +8174,7 @@ namespace MineSharp.Data.Protocol.Handshaking.Clientbound {
 			}
 			public void Write(PacketBuffer buffer, string state) {
 				switch (state) {
-					default: throw new Exception($"Invalid value: '{state}'"); break;
+					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
 			public static ParamsSwitch Read(PacketBuffer buffer, string state) {

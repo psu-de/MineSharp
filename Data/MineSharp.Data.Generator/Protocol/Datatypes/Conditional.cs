@@ -97,7 +97,7 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
             if (DefaultType != null)
                 codeGenerator.WriteLine($"default: {DefaultType.GetWriter()}(buffer, ({DefaultType.CSharpType})Value); break;");
             else
-                codeGenerator.WriteLine($@"default: throw new Exception($""Invalid value: '{{state}}'""); break;");
+                codeGenerator.WriteLine($@"default: throw new Exception($""Invalid value: '{{state}}'"");");
             codeGenerator.Finish();
             codeGenerator.Finish();
 
