@@ -4,7 +4,6 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
-using static MineSharp.Data.Protocol.Play.Clientbound.PacketPlayerInfo;
 
 namespace MineSharp.Bot.Modules {
     public class PlayerModule : Module {

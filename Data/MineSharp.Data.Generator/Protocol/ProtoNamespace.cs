@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using MineSharp.Data.Generator.Protocol.Datatypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Data.Generator.Protocol {
     internal class ProtoNamespace {

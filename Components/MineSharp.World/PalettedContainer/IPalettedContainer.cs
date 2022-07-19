@@ -1,6 +1,5 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Protocol;
-using MineSharp.Protocol;
 using MineSharp.World.PalettedContainer.Palettes;
 
 namespace MineSharp.World.PalettedContainer {

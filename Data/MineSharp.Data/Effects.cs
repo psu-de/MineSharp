@@ -2,7 +2,7 @@
 //   Generated Effect Data for Minecraft Version 1.18.1   //
 ////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-using System.Collections.Generic;
+
 namespace MineSharp.Data.Effects {
 	public static class EffectPalette {
 		public static Type GetEffectTypeById(int id) => id switch {

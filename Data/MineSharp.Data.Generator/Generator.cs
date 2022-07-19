@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSharp.Data.Generator {
+﻿namespace MineSharp.Data.Generator {
     internal abstract class Generator {
 
         public MinecraftDataHelper Wrapper { get; set; }

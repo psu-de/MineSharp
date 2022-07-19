@@ -1,9 +1,4 @@
 ﻿using MineSharp.Data.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Protocol.Handlers {
     public class PlayPacketHandler : IPacketHandler {

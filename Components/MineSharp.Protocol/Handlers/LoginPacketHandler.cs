@@ -4,7 +4,6 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Crypto;
 using System.Numerics;
 using System.Security.Cryptography;
-using MineSharp.Data.Protocol.Login.Serverbound;
 using MineSharp.Data.Protocol.Login.Clientbound;
 using System.Text;
 

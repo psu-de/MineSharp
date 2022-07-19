@@ -1,9 +1,4 @@
 ﻿using MineSharp.Data.Items;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MineSharp.Data {
     public static class SlotExtensions {

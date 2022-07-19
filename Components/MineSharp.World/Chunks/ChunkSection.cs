@@ -2,7 +2,6 @@
 using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
-using MineSharp.Protocol;
 using MineSharp.World.PalettedContainer;
 
 

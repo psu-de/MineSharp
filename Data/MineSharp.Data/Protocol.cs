@@ -1,9 +1,7 @@
 //////////////////////////////////////////////////////////////
 //   Generated Protocol Data for Minecraft Version 1.18.1   //
 //////////////////////////////////////////////////////////////
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using MineSharp.Core.Types;
 using fNbt;

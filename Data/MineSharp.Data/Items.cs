@@ -2,7 +2,7 @@
 //   Generated Item Data for Minecraft Version 1.18.1   //
 //////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-using fNbt;
+
 namespace MineSharp.Data.Items {
 	public static class ItemPalette {
 		public static Type GetItemTypeById(int id) => id switch {

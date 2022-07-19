@@ -2,7 +2,7 @@
 //   Generated Enchantment Data for Minecraft Version 1.18.1   //
 /////////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-using System.Collections.Generic;
+
 namespace MineSharp.Data.Enchantments {
 	public static class EnchantmentPalette {
 		public static Type GetEnchantmentTypeById(int id) => id switch {
