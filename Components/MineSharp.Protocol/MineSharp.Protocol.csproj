@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj" />
     <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
-    <ProjectReference Include="..\..\MineSharp.Data\MineSharp.Data.csproj" />
     <ProjectReference Include="..\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
   </ItemGroup>
 
