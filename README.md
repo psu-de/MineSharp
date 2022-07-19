@@ -6,30 +6,39 @@ Create Minecraft bots with C#
 Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer)
 
 # Projects
-### MineSharp.Core
+## MineSharp.Core
 Contains core functionality like Logging, Basic Minecraft Types and versioning
 
 ToDo's
  - Versioning
 
 ### MineSharp.Data
-Contains mostly (generated) static code for
+Dont reference this project directly, use MineSharp.Data.Wrapper
+Contains mostly (generated) code for
  - Biomes
  - Blocks
  - Effects
+ - Enchantments
  - Entities
  - Items
+ - Protocol
  - (Windows)
 
 ToDo's:
  - Block Loot
- - Enchantments
+ - ~~Enchantments~~
  - Entity Loot
  - Materials
  - Recipies
  - Foods
  - Attributes?
  - Tints?
+
+### MineSharp.Data.Generator
+Transforms the json data from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) into C# source code
+
+### MineSharp.Data.Wrapper
+This is really the MineSharp.Data module. It helps with the (sometimes weird) generated data from MineSharp.Data
 
 ### MineSharp.Bot
  Functions and logic to directly interact with a minecraft server\
@@ -49,10 +58,10 @@ ToDo's:
  - Jumping doesnt work
 
 ### MineSharp.Protocol
-Contains all Minecraft Packets and Logic to connect and join a Minecraft Server
+Implements the Minecraft Protocol. Contains logic to connect to a Minecraft server and read/write packets from/to it.
 
 ### Minesharp.World
-Basic functionality to represend a Minecraft World
+Basic functionality to represent a Minecraft World
 
 ## Clients
 ### MineSharp.ConsoleClient
