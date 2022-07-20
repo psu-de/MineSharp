@@ -5,6 +5,8 @@
 Create Minecraft bots with C#
 Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer)
 
+If you're interested in this project, feel free to contribute!
+
 # Projects
 ## MineSharp.Core
 Contains core functionality like Logging, Basic Minecraft Types and versioning
