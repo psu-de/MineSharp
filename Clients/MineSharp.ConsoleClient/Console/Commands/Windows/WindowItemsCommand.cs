@@ -41,7 +41,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
             }
 
             foreach (var slot in window.GetAllSlots()) {
-                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item!.Count.ToString());
+                windowTable.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item?.Count.ToString() ?? "");
             }
             AnsiConsole.Write(windowTable);
         }

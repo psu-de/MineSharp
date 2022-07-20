@@ -58,7 +58,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc {
             }
 
             foreach (var slot in BotClient.Bot.Inventory!.GetAllSlots()) {
-                inventory.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item!.Count.ToString());
+                inventory.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item?.Count.ToString() ?? "");
             }
             AnsiConsole.Write(inventory);
         }

@@ -43,7 +43,7 @@ namespace MineSharp.Bot.Modules {
         public Task WaitForInventory() => inventoryLoadedTsc.Task;
 
 
-        private List<int> AllowedBlocksToOpen = new List<int>() {
+        private readonly List<int> AllowedBlocksToOpen = new List<int>() {
             (int)BlockType.Chest,
             (int)BlockType.TrappedChest,
             (int)BlockType.EnderChest,
@@ -163,7 +163,11 @@ namespace MineSharp.Bot.Modules {
                 return Task.CompletedTask;
             }
 
-            window.UpdateSlots(packet.Items!.Select(x => x.ToSlot()).ToArray());
+            window.UpdateSlots(packet.Items!.Select((x, i) => {
+                var slot = x.ToSlot();
+                slot.SlotNumber = (short)i;
+                return slot;
+            }).ToArray());
             window.StateId = packet.StateId!;
 
             if (window.Id == 0 && !inventoryLoadedTsc.Task.IsCompleted) {
@@ -188,10 +192,7 @@ namespace MineSharp.Bot.Modules {
                 throw new ArgumentException("Window with id " + id + " already opened");
             }
 
-            var window = new Window(id, windowInfo);
-            if (!windowInfo.ExcludeInventory) {
-                window.ExtendPlayerInventory(this.MainInventory);
-            }
+            var window = new Window(id, windowInfo, playerInventory: (windowInfo.ExcludeInventory ? null : this.MainInventory));
             window.WindowClicked += Window_Clicked;
 
             OpenedWindows.Add(id, window);

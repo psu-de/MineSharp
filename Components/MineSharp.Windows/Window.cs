@@ -37,7 +37,8 @@ namespace MineSharp.Windows {
 
         public int Id { get; private set; }
         private Slot[] ContainerSlots { get; set; }
-        private Slot? OffHandSlot { get; set; }
+        private Slot? OffHandSlot { get; 
+            set; }
 
         public Window? InventoryWindow { get; private set; }
 
@@ -45,8 +46,10 @@ namespace MineSharp.Windows {
         public int StateId { get; set; }
 
 
-        public Window(WindowInfo info, Slot[]? slots = null) {
+        public Window(WindowInfo info, Slot[]? slots = null, Window? playerInventory = null) {
             this.Info = info;
+            this.InventoryWindow = playerInventory;
+
             if (slots != null && slots.Length != info.UniqueSlots)
                 throw new ArgumentException($"Invalid slot count ({slots.Length}) for window ({Info.Name}). Expected {TotalSlotCount}");
 
@@ -61,21 +64,16 @@ namespace MineSharp.Windows {
                 OffHandSlot = new Slot(null, (short)(TotalSlotCount - 1));
         }
 
-        public Window(int windowId, WindowInfo info, Slot[]? slots = null, int? stateId = null) : this(info, slots) {
+        public Window(int windowId, WindowInfo info, Slot[]? slots = null, int? stateId = null, Window? playerInventory = null) : this(info, slots, playerInventory) {
             this.Id = windowId;
 
             this.StateId = stateId ?? 0;
             this.SelectedSlot = new Slot(null, -1);
         }
 
-        public void ExtendPlayerInventory(Window playerInventory) {
-            if (this.InventoryWindow != null) throw new NotSupportedException("Window already extended");
-            this.InventoryWindow = playerInventory;
-        }
-
         internal void SwapSelectedSlot(int slotNumber) {
             Slot t = this.SelectedSlot!;
-            this.SelectedSlot = GetSlot(slotNumber);
+            this.SelectedSlot = GetSlot(slotNumber).Clone();
             this.SelectedSlot.SlotNumber = -1;
 
             t.SlotNumber = (short)slotNumber;
@@ -88,6 +86,11 @@ namespace MineSharp.Windows {
         }
 
         public void SetSlot(Slot slot) {
+
+            if (OffHandSlot?.SlotNumber == -1)
+            {
+
+            }
             
             if (OffHandSlot != null && OffHandSlot.SlotNumber == slot.SlotNumber) {
                 OffHandSlot = slot;
@@ -96,7 +99,7 @@ namespace MineSharp.Windows {
             }
 
             if (slot.SlotNumber! >= ContainerSlots.Length) {
-                if (this.InventoryWindow == null) throw new ArgumentOutOfRangeException("SlotNumber out of range");
+                if (this.Info.ExcludeInventory || this.InventoryWindow == null) throw new ArgumentOutOfRangeException("SlotNumber out of range");
 
                 slot.SlotNumber -= (short)this.ContainerSlots.Length;
                 this.InventoryWindow.SetSlot(slot);
@@ -113,7 +116,7 @@ namespace MineSharp.Windows {
             }
 
             if (index >= ContainerSlots.Length) {
-                if (this.InventoryWindow == null) throw new ArgumentOutOfRangeException("index out of range");
+                if (this.Info.ExcludeInventory || this.InventoryWindow == null) throw new ArgumentOutOfRangeException("index out of range");
 
                 index -= (short)this.ContainerSlots.Length;
                 return this.InventoryWindow.GetSlot(index);
@@ -139,12 +142,10 @@ namespace MineSharp.Windows {
         public Slot[] GetAllSlots() {
             List<Slot> slots = GetContainerSlots().ToList();
 
-            if (this.InventoryWindow != null) {
-                slots.AddRange(this.InventoryWindow.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
+            if (this.Info.ExcludeInventory || this.InventoryWindow != null) {
+                slots.AddRange(this.InventoryWindow!.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
             }
 
-            if (OffHandSlot != null)
-                slots.Add(OffHandSlot);
             return slots.ToArray();
         }
 
@@ -161,7 +162,7 @@ namespace MineSharp.Windows {
         }
 
         public void Dispose() {
-            this.ContainerSlots = new Slot[0];
+            this.ContainerSlots = Array.Empty<Slot>();
             this.InventoryWindow = null;
         }
 
@@ -175,7 +176,7 @@ namespace MineSharp.Windows {
 
         public Slot[] AllEmptySlots() {
             var emptySlots = EmptyContainerSlots().ToList();
-            if (InventoryWindow != null) {
+            if (!this.Info.ExcludeInventory && InventoryWindow != null) {
                 emptySlots.AddRange(InventoryWindow.EmptyContainerSlots());
             }
             return emptySlots.ToArray();

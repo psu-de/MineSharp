@@ -3,7 +3,7 @@
 namespace MineSharp.Data {
     public static class SlotExtensions {
         public static MineSharp.Data.Protocol.Slot ToProtocolSlot(this Core.Types.Slot slot) {
-            return new Data.Protocol.Slot(slot.IsEmpty(), new Data.Protocol.Slot.AnonSwitch(slot.IsEmpty() ? null : new Data.Protocol.Slot.AnonSwitch.AnonSwitchStatetrueContainer(slot.Item!.Id, (sbyte)slot.Item!.Count, slot.Item!.Metadata)));
+            return new Data.Protocol.Slot(!slot.IsEmpty(), new Data.Protocol.Slot.AnonSwitch(slot.IsEmpty() ? null : new Data.Protocol.Slot.AnonSwitch.AnonSwitchStatetrueContainer(slot.Item!.Id, (sbyte)slot.Item!.Count, slot.Item!.Metadata)));
         }
 
         public static MineSharp.Core.Types.Slot ToSlot(this Data.Protocol.Slot slot) {

@@ -27,5 +27,9 @@
 
             } else return false;
         }
+
+        public Slot Clone() {
+            return new Slot(this.Item, this.SlotNumber);
+        }
     }
 }
