@@ -66,6 +66,7 @@ Basic functionality to represent a Minecraft World
 ## Clients
 ### MineSharp.ConsoleClient
 Console Prompt for MineSharp.Bot\
-Used for testing
+Used for testing\
+See [MineSharp.ConsoleClient README](https://github.com/psu-de/MineSharp/blob/main/Clients/MineSharp.ConsoleClient/README.md) for a list of commands
 
  ![MineSharp.ConsoleClient](https://i.ibb.co/HgYtkN0/Bild-2022-07-20-141355981.png)
