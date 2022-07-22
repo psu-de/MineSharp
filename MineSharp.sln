@@ -36,6 +36,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data.Wrapper", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data", "Data\MineSharp.Data\MineSharp.Data.csproj", "{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{86FCE8BE-FF97-42F5-B900-6BDF352FD51C}"
+	ProjectSection(SolutionItems) = preProject
+		Testing\README.md = Testing\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{5FA10AD1-B6EF-4BCC-8E15-636672373B81}"
+	ProjectSection(SolutionItems) = preProject
+		Testing\Server\Dockerfile = Testing\Server\Dockerfile
+		Testing\Server\README.md = Testing\Server\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,6 +111,7 @@ Global
 		{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
 		{9A77DBB2-843E-4140-AD8D-417623C5D41E} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
 		{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
+		{5FA10AD1-B6EF-4BCC-8E15-636672373B81} = {86FCE8BE-FF97-42F5-B900-6BDF352FD51C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {99F4A2BF-3065-4FF7-BE16-2955F75BCDF5}
