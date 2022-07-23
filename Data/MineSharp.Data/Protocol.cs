@@ -750,7 +750,7 @@ namespace MineSharp.Data.Protocol {
 		}
 		public int X { 
 		    get { 
-		        return (int)(((int)Value! >> 38 & (33554432)));
+		        return (int)(((int)Value! >> 38 & (67108863)));
 		    }
 			set { 
 		        var val = value << 38; 
@@ -760,7 +760,7 @@ namespace MineSharp.Data.Protocol {
 		}
 		public int Z { 
 		    get { 
-		        return (int)(((int)Value! >> 12 & (33554432)));
+		        return (int)(((int)Value! >> 12 & (67108863)));
 		    }
 			set { 
 		        var val = value << 12; 
@@ -770,7 +770,7 @@ namespace MineSharp.Data.Protocol {
 		}
 		public short Y { 
 		    get { 
-		        return (short)(((short)Value! >> 0 & (2048)));
+		        return (short)(((short)Value! >> 0 & (4095)));
 		    }
 			set { 
 		        var val = value << 0; 
@@ -992,7 +992,7 @@ namespace MineSharp.Data.Protocol {
 			}
 			public byte X { 
 			    get { 
-			        return (byte)(((byte)Value! >> 4 & (8)));
+			        return (byte)(((byte)Value! >> 4 & (15)));
 			    }
 				set { 
 			        var val = value << 4; 
@@ -1002,7 +1002,7 @@ namespace MineSharp.Data.Protocol {
 			}
 			public byte Z { 
 			    get { 
-			        return (byte)(((byte)Value! >> 0 & (8)));
+			        return (byte)(((byte)Value! >> 0 & (15)));
 			    }
 				set { 
 			        var val = value << 0; 
@@ -2750,7 +2750,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						}
 						public uint Unused { 
 						    get { 
-						        return (uint)(((uint)Value! >> 3 & (268435456)));
+						        return (uint)(((uint)Value! >> 3 & (536870911)));
 						    }
 							set { 
 						        var val = value << 3; 
@@ -3269,7 +3269,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				}
 				public byte Unused { 
 				    get { 
-				        return (byte)(((byte)Value! >> 5 & (4)));
+				        return (byte)(((byte)Value! >> 5 & (7)));
 				    }
 					set { 
 				        var val = value << 5; 
@@ -3309,7 +3309,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				}
 				public byte CommandNodeType { 
 				    get { 
-				        return (byte)(((byte)Value! >> 0 & (2)));
+				        return (byte)(((byte)Value! >> 0 & (3)));
 				    }
 					set { 
 				        var val = value << 0; 
@@ -3350,7 +3350,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								}
 								public byte Unused { 
 								    get { 
-								        return (byte)(((byte)Value! >> 2 & (32)));
+								        return (byte)(((byte)Value! >> 2 & (63)));
 								    }
 									set { 
 								        var val = value << 2; 
@@ -3449,7 +3449,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								}
 								public byte Unused { 
 								    get { 
-								        return (byte)(((byte)Value! >> 2 & (32)));
+								        return (byte)(((byte)Value! >> 2 & (63)));
 								    }
 									set { 
 								        var val = value << 2; 
@@ -3548,7 +3548,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								}
 								public byte Unused { 
 								    get { 
-								        return (byte)(((byte)Value! >> 2 & (32)));
+								        return (byte)(((byte)Value! >> 2 & (63)));
 								    }
 									set { 
 								        var val = value << 2; 
@@ -3647,7 +3647,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								}
 								public byte Unused { 
 								    get { 
-								        return (byte)(((byte)Value! >> 2 & (32)));
+								        return (byte)(((byte)Value! >> 2 & (63)));
 								    }
 									set { 
 								        var val = value << 2; 
@@ -4020,7 +4020,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 			public int X { 
 			    get { 
-			        return (int)(((int)Value! >> 42 & (2097152)));
+			        return (int)(((int)Value! >> 42 & (4194303)));
 			    }
 				set { 
 			        var val = value << 42; 
@@ -4030,7 +4030,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 			public int Z { 
 			    get { 
-			        return (int)(((int)Value! >> 20 & (2097152)));
+			        return (int)(((int)Value! >> 20 & (4194303)));
 			    }
 				set { 
 			        var val = value << 20; 
@@ -4040,7 +4040,7 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 			public int Y { 
 			    get { 
-			        return (int)(((int)Value! >> 0 & (524288)));
+			        return (int)(((int)Value! >> 0 & (1048575)));
 			    }
 				set { 
 			        var val = value << 0; 
