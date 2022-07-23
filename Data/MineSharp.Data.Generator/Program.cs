@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
-using MineSharp.Data.Generator;
+﻿using MineSharp.Data.Generator;
 using MineSharp.Data.Generator.Biomes;
 using MineSharp.Data.Generator.Blocks;
 using MineSharp.Data.Generator.Effects;
