@@ -56,9 +56,9 @@ namespace MineSharp.Bot.Modules {
             if (sectionY > Math.Pow(2, 19)) sectionY -= (int)Math.Pow(2, 20);
             if (sectionZ > Math.Pow(2, 21)) sectionZ -= (int)Math.Pow(2, 22);
 
-            sectionY += Math.Abs(MineSharp.World.World.MinY / MineSharp.World.Chunks.Chunk.ChunkSectionLength);
+            sectionY += Math.Abs(MineSharp.World.World.MinY / Chunk.ChunkSectionLength);
 
-            this.World!.MultiblockUpdate(packet.Records!.Select(x => (long)x).ToArray(), sectionX, sectionY, sectionZ);
+            this.World!.MultiblockUpdate(packet.Records!.Select(x => x.Value).ToArray(), sectionX, sectionY, sectionZ);
             return Task.CompletedTask;
         }
 
