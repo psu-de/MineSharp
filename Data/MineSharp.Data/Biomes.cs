@@ -1,6 +1,6 @@
-///////////////////////////////////////////////////////////
-//   Generated Biome Data for Minecraft Version 1.18.1   //
-///////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+//   Generated Biome Data for Minecraft Version 1.19   //
+/////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
 namespace MineSharp.Data.Biomes {
 	public static class BiomePalette {
@@ -12,67 +12,69 @@ namespace MineSharp.Data.Biomes {
 			4 => typeof(IceSpikes),
 			5 => typeof(Desert),
 			6 => typeof(Swamp),
-			7 => typeof(Forest),
-			8 => typeof(FlowerForest),
-			9 => typeof(BirchForest),
-			10 => typeof(DarkForest),
-			11 => typeof(OldGrowthBirchForest),
-			12 => typeof(OldGrowthPineTaiga),
-			13 => typeof(OldGrowthSpruceTaiga),
-			14 => typeof(Taiga),
-			15 => typeof(SnowyTaiga),
-			16 => typeof(Savanna),
-			17 => typeof(SavannaPlateau),
-			18 => typeof(WindsweptHills),
-			19 => typeof(WindsweptGravellyHills),
-			20 => typeof(WindsweptForest),
-			21 => typeof(WindsweptSavanna),
-			22 => typeof(Jungle),
-			23 => typeof(SparseJungle),
-			24 => typeof(BambooJungle),
-			25 => typeof(Badlands),
-			26 => typeof(ErodedBadlands),
-			27 => typeof(WoodedBadlands),
-			28 => typeof(Meadow),
-			29 => typeof(Grove),
-			30 => typeof(SnowySlopes),
-			31 => typeof(FrozenPeaks),
-			32 => typeof(JaggedPeaks),
-			33 => typeof(StonyPeaks),
-			34 => typeof(River),
-			35 => typeof(FrozenRiver),
-			36 => typeof(Beach),
-			37 => typeof(SnowyBeach),
-			38 => typeof(StonyShore),
-			39 => typeof(WarmOcean),
-			40 => typeof(LukewarmOcean),
-			41 => typeof(DeepLukewarmOcean),
-			42 => typeof(Ocean),
-			43 => typeof(DeepOcean),
-			44 => typeof(ColdOcean),
-			45 => typeof(DeepColdOcean),
-			46 => typeof(FrozenOcean),
-			47 => typeof(DeepFrozenOcean),
-			48 => typeof(MushroomFields),
-			49 => typeof(DripstoneCaves),
-			50 => typeof(LushCaves),
-			51 => typeof(NetherWastes),
-			52 => typeof(WarpedForest),
-			53 => typeof(CrimsonForest),
-			54 => typeof(SoulSandValley),
-			55 => typeof(BasaltDeltas),
-			56 => typeof(TheEnd),
-			57 => typeof(EndHighlands),
-			58 => typeof(EndMidlands),
-			59 => typeof(SmallEndIslands),
-			60 => typeof(EndBarrens),
+			7 => typeof(MangroveSwamp),
+			8 => typeof(Forest),
+			9 => typeof(FlowerForest),
+			10 => typeof(BirchForest),
+			11 => typeof(DarkForest),
+			12 => typeof(OldGrowthBirchForest),
+			13 => typeof(OldGrowthPineTaiga),
+			14 => typeof(OldGrowthSpruceTaiga),
+			15 => typeof(Taiga),
+			16 => typeof(SnowyTaiga),
+			17 => typeof(Savanna),
+			18 => typeof(SavannaPlateau),
+			19 => typeof(WindsweptHills),
+			20 => typeof(WindsweptGravellyHills),
+			21 => typeof(WindsweptForest),
+			22 => typeof(WindsweptSavanna),
+			23 => typeof(Jungle),
+			24 => typeof(SparseJungle),
+			25 => typeof(BambooJungle),
+			26 => typeof(Badlands),
+			27 => typeof(ErodedBadlands),
+			28 => typeof(WoodedBadlands),
+			29 => typeof(Meadow),
+			30 => typeof(Grove),
+			31 => typeof(SnowySlopes),
+			32 => typeof(FrozenPeaks),
+			33 => typeof(JaggedPeaks),
+			34 => typeof(StonyPeaks),
+			35 => typeof(River),
+			36 => typeof(FrozenRiver),
+			37 => typeof(Beach),
+			38 => typeof(SnowyBeach),
+			39 => typeof(StonyShore),
+			40 => typeof(WarmOcean),
+			41 => typeof(LukewarmOcean),
+			42 => typeof(DeepLukewarmOcean),
+			43 => typeof(Ocean),
+			44 => typeof(DeepOcean),
+			45 => typeof(ColdOcean),
+			46 => typeof(DeepColdOcean),
+			47 => typeof(FrozenOcean),
+			48 => typeof(DeepFrozenOcean),
+			49 => typeof(MushroomFields),
+			50 => typeof(DripstoneCaves),
+			51 => typeof(LushCaves),
+			52 => typeof(DeepDark),
+			53 => typeof(NetherWastes),
+			54 => typeof(WarpedForest),
+			55 => typeof(CrimsonForest),
+			56 => typeof(SoulSandValley),
+			57 => typeof(BasaltDeltas),
+			58 => typeof(TheEnd),
+			59 => typeof(EndHighlands),
+			60 => typeof(EndMidlands),
+			61 => typeof(SmallEndIslands),
+			62 => typeof(EndBarrens),
 			_ => throw new ArgumentException($"Biome with id {id} not found!")
 		};
 	}
 	public enum BiomeCategory {
 		None = 0,
 		Plains = 1,
-		Icy = 2,
+		Ice = 2,
 		Desert = 3,
 		Swamp = 4,
 		Forest = 5,
@@ -98,7 +100,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 0;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 0;
 		public const float BiomeRainfall = 0.5F;
@@ -113,7 +115,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 1;
 		public const float BiomeTemperature = 0.8F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.125F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 9286496;
 		public const float BiomeRainfall = 0.4F;
@@ -128,7 +130,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 1;
 		public const float BiomeTemperature = 0.8F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.125F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 11918216;
 		public const float BiomeRainfall = 0.4F;
@@ -140,7 +142,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeId = 3;
 		public const string BiomeName = "snowy_plains";
 		public const string BiomeDisplayName = "Snowy Plains";
-		public const int BiomeCategory = 2;
+		public const int BiomeCategory = 1;
 		public const float BiomeTemperature = 0F;
 		public const string BiomePrecipitation = "snow";
 		public const float BiomeDepth = 0F;
@@ -158,7 +160,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 2;
 		public const float BiomeTemperature = 0F;
 		public const string BiomePrecipitation = "snow";
-		public const float BiomeDepth = 0.425F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 11853020;
 		public const float BiomeRainfall = 0.5F;
@@ -173,7 +175,7 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 3;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.125F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 16421912;
 		public const float BiomeRainfall = 0F;
@@ -188,22 +190,37 @@ namespace MineSharp.Data.Biomes {
 		public const int BiomeCategory = 4;
 		public const float BiomeTemperature = 0.8F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -0.2F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 522674;
 		public const float BiomeRainfall = 0.9F;
 		
 		public Swamp() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) { }
 	}
-	public class Forest : Biome {
+	public class MangroveSwamp : Biome {
 		
 		public const int BiomeId = 7;
+		public const string BiomeName = "mangrove_swamp";
+		public const string BiomeDisplayName = "Mangrove Swamp";
+		public const int BiomeCategory = 5;
+		public const float BiomeTemperature = 0.8F;
+		public const string BiomePrecipitation = "rain";
+		public const float BiomeDepth = 0F;
+		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
+		public const int BiomeColor = 0;
+		public const float BiomeRainfall = 0.9F;
+		
+		public MangroveSwamp() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) { }
+	}
+	public class Forest : Biome {
+		
+		public const int BiomeId = 8;
 		public const string BiomeName = "forest";
 		public const string BiomeDisplayName = "Forest";
 		public const int BiomeCategory = 5;
 		public const float BiomeTemperature = 0.7F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 353825;
 		public const float BiomeRainfall = 0.8F;
@@ -212,13 +229,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class FlowerForest : Biome {
 		
-		public const int BiomeId = 8;
+		public const int BiomeId = 9;
 		public const string BiomeName = "flower_forest";
 		public const string BiomeDisplayName = "Flower Forest";
 		public const int BiomeCategory = 5;
 		public const float BiomeTemperature = 0.7F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 2985545;
 		public const float BiomeRainfall = 0.8F;
@@ -227,13 +244,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class BirchForest : Biome {
 		
-		public const int BiomeId = 9;
+		public const int BiomeId = 10;
 		public const string BiomeName = "birch_forest";
 		public const string BiomeDisplayName = "Birch Forest";
 		public const int BiomeCategory = 5;
 		public const float BiomeTemperature = 0.6F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 3175492;
 		public const float BiomeRainfall = 0.6F;
@@ -242,13 +259,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DarkForest : Biome {
 		
-		public const int BiomeId = 10;
+		public const int BiomeId = 11;
 		public const string BiomeName = "dark_forest";
 		public const string BiomeDisplayName = "Dark Forest";
 		public const int BiomeCategory = 5;
 		public const float BiomeTemperature = 0.7F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 4215066;
 		public const float BiomeRainfall = 0.8F;
@@ -257,7 +274,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class OldGrowthBirchForest : Biome {
 		
-		public const int BiomeId = 11;
+		public const int BiomeId = 12;
 		public const string BiomeName = "old_growth_birch_forest";
 		public const string BiomeDisplayName = "Old Growth Birch Forest";
 		public const int BiomeCategory = 5;
@@ -272,7 +289,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class OldGrowthPineTaiga : Biome {
 		
-		public const int BiomeId = 12;
+		public const int BiomeId = 13;
 		public const string BiomeName = "old_growth_pine_taiga";
 		public const string BiomeDisplayName = "Old Growth Pine Taiga";
 		public const int BiomeCategory = 6;
@@ -287,7 +304,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class OldGrowthSpruceTaiga : Biome {
 		
-		public const int BiomeId = 13;
+		public const int BiomeId = 14;
 		public const string BiomeName = "old_growth_spruce_taiga";
 		public const string BiomeDisplayName = "Old Growth Spruce Taiga";
 		public const int BiomeCategory = 6;
@@ -302,13 +319,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Taiga : Biome {
 		
-		public const int BiomeId = 14;
+		public const int BiomeId = 15;
 		public const string BiomeName = "taiga";
 		public const string BiomeDisplayName = "Taiga";
 		public const int BiomeCategory = 6;
 		public const float BiomeTemperature = 0.25F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.2F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 747097;
 		public const float BiomeRainfall = 0.8F;
@@ -317,13 +334,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SnowyTaiga : Biome {
 		
-		public const int BiomeId = 15;
+		public const int BiomeId = 16;
 		public const string BiomeName = "snowy_taiga";
 		public const string BiomeDisplayName = "Snowy Taiga";
 		public const int BiomeCategory = 6;
 		public const float BiomeTemperature = -0.5F;
 		public const string BiomePrecipitation = "snow";
-		public const float BiomeDepth = 0.2F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 3233098;
 		public const float BiomeRainfall = 0.4F;
@@ -332,13 +349,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Savanna : Biome {
 		
-		public const int BiomeId = 16;
+		public const int BiomeId = 17;
 		public const string BiomeName = "savanna";
 		public const string BiomeDisplayName = "Savanna";
 		public const int BiomeCategory = 7;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.125F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 12431967;
 		public const float BiomeRainfall = 0F;
@@ -347,13 +364,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SavannaPlateau : Biome {
 		
-		public const int BiomeId = 17;
+		public const int BiomeId = 18;
 		public const string BiomeName = "savanna_plateau";
 		public const string BiomeDisplayName = "Savanna Plateau";
 		public const int BiomeCategory = 7;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 1.5F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 10984804;
 		public const float BiomeRainfall = 0F;
@@ -362,7 +379,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WindsweptHills : Biome {
 		
-		public const int BiomeId = 18;
+		public const int BiomeId = 19;
 		public const string BiomeName = "windswept_hills";
 		public const string BiomeDisplayName = "Windswept Hills";
 		public const int BiomeCategory = 8;
@@ -377,7 +394,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WindsweptGravellyHills : Biome {
 		
-		public const int BiomeId = 19;
+		public const int BiomeId = 20;
 		public const string BiomeName = "windswept_gravelly_hills";
 		public const string BiomeDisplayName = "Windswept Gravelly Hills";
 		public const int BiomeCategory = 8;
@@ -392,10 +409,10 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WindsweptForest : Biome {
 		
-		public const int BiomeId = 20;
+		public const int BiomeId = 21;
 		public const string BiomeName = "windswept_forest";
 		public const string BiomeDisplayName = "Windswept Forest";
-		public const int BiomeCategory = 8;
+		public const int BiomeCategory = 5;
 		public const float BiomeTemperature = 0.2F;
 		public const string BiomePrecipitation = "rain";
 		public const float BiomeDepth = 0F;
@@ -407,7 +424,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WindsweptSavanna : Biome {
 		
-		public const int BiomeId = 21;
+		public const int BiomeId = 22;
 		public const string BiomeName = "windswept_savanna";
 		public const string BiomeDisplayName = "Windswept Savanna";
 		public const int BiomeCategory = 7;
@@ -422,13 +439,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Jungle : Biome {
 		
-		public const int BiomeId = 22;
+		public const int BiomeId = 23;
 		public const string BiomeName = "jungle";
 		public const string BiomeDisplayName = "Jungle";
 		public const int BiomeCategory = 9;
 		public const float BiomeTemperature = 0.95F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 5470985;
 		public const float BiomeRainfall = 0.9F;
@@ -437,7 +454,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SparseJungle : Biome {
 		
-		public const int BiomeId = 23;
+		public const int BiomeId = 24;
 		public const string BiomeName = "sparse_jungle";
 		public const string BiomeDisplayName = "Sparse Jungle";
 		public const int BiomeCategory = 9;
@@ -452,13 +469,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class BambooJungle : Biome {
 		
-		public const int BiomeId = 24;
+		public const int BiomeId = 25;
 		public const string BiomeName = "bamboo_jungle";
 		public const string BiomeDisplayName = "Bamboo Jungle";
 		public const int BiomeCategory = 9;
 		public const float BiomeTemperature = 0.95F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 7769620;
 		public const float BiomeRainfall = 0.9F;
@@ -467,13 +484,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Badlands : Biome {
 		
-		public const int BiomeId = 25;
+		public const int BiomeId = 26;
 		public const string BiomeName = "badlands";
 		public const string BiomeDisplayName = "Badlands";
 		public const int BiomeCategory = 10;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 14238997;
 		public const float BiomeRainfall = 0F;
@@ -482,13 +499,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class ErodedBadlands : Biome {
 		
-		public const int BiomeId = 26;
+		public const int BiomeId = 27;
 		public const string BiomeName = "eroded_badlands";
 		public const string BiomeDisplayName = "Eroded Badlands";
 		public const int BiomeCategory = 10;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 16739645;
 		public const float BiomeRainfall = 0F;
@@ -497,7 +514,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WoodedBadlands : Biome {
 		
-		public const int BiomeId = 27;
+		public const int BiomeId = 28;
 		public const string BiomeName = "wooded_badlands";
 		public const string BiomeDisplayName = "Wooded Badlands";
 		public const int BiomeCategory = 10;
@@ -512,7 +529,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Meadow : Biome {
 		
-		public const int BiomeId = 28;
+		public const int BiomeId = 29;
 		public const string BiomeName = "meadow";
 		public const string BiomeDisplayName = "Meadow";
 		public const int BiomeCategory = 11;
@@ -527,7 +544,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Grove : Biome {
 		
-		public const int BiomeId = 29;
+		public const int BiomeId = 30;
 		public const string BiomeName = "grove";
 		public const string BiomeDisplayName = "Grove";
 		public const int BiomeCategory = 5;
@@ -542,7 +559,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SnowySlopes : Biome {
 		
-		public const int BiomeId = 30;
+		public const int BiomeId = 31;
 		public const string BiomeName = "snowy_slopes";
 		public const string BiomeDisplayName = "Snowy Slopes";
 		public const int BiomeCategory = 11;
@@ -557,10 +574,10 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class FrozenPeaks : Biome {
 		
-		public const int BiomeId = 31;
+		public const int BiomeId = 32;
 		public const string BiomeName = "frozen_peaks";
 		public const string BiomeDisplayName = "Frozen Peaks";
-		public const int BiomeCategory = 11;
+		public const int BiomeCategory = 2;
 		public const float BiomeTemperature = -0.7F;
 		public const string BiomePrecipitation = "snow";
 		public const float BiomeDepth = 0F;
@@ -572,7 +589,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class JaggedPeaks : Biome {
 		
-		public const int BiomeId = 32;
+		public const int BiomeId = 33;
 		public const string BiomeName = "jagged_peaks";
 		public const string BiomeDisplayName = "Jagged Peaks";
 		public const int BiomeCategory = 11;
@@ -587,7 +604,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class StonyPeaks : Biome {
 		
-		public const int BiomeId = 33;
+		public const int BiomeId = 34;
 		public const string BiomeName = "stony_peaks";
 		public const string BiomeDisplayName = "Stony Peaks";
 		public const int BiomeCategory = 11;
@@ -602,13 +619,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class River : Biome {
 		
-		public const int BiomeId = 34;
+		public const int BiomeId = 35;
 		public const string BiomeName = "river";
 		public const string BiomeDisplayName = "River";
 		public const int BiomeCategory = 12;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -0.5F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 255;
 		public const float BiomeRainfall = 0.5F;
@@ -617,13 +634,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class FrozenRiver : Biome {
 		
-		public const int BiomeId = 35;
+		public const int BiomeId = 36;
 		public const string BiomeName = "frozen_river";
 		public const string BiomeDisplayName = "Frozen River";
-		public const int BiomeCategory = 12;
+		public const int BiomeCategory = 2;
 		public const float BiomeTemperature = 0F;
 		public const string BiomePrecipitation = "snow";
-		public const float BiomeDepth = -0.5F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 10526975;
 		public const float BiomeRainfall = 0.5F;
@@ -632,7 +649,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Beach : Biome {
 		
-		public const int BiomeId = 36;
+		public const int BiomeId = 37;
 		public const string BiomeName = "beach";
 		public const string BiomeDisplayName = "Beach";
 		public const int BiomeCategory = 13;
@@ -647,7 +664,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SnowyBeach : Biome {
 		
-		public const int BiomeId = 37;
+		public const int BiomeId = 38;
 		public const string BiomeName = "snowy_beach";
 		public const string BiomeDisplayName = "Snowy Beach";
 		public const int BiomeCategory = 13;
@@ -662,7 +679,7 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class StonyShore : Biome {
 		
-		public const int BiomeId = 38;
+		public const int BiomeId = 39;
 		public const string BiomeName = "stony_shore";
 		public const string BiomeDisplayName = "Stony Shore";
 		public const int BiomeCategory = 13;
@@ -677,13 +694,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WarmOcean : Biome {
 		
-		public const int BiomeId = 39;
+		public const int BiomeId = 40;
 		public const string BiomeName = "warm_ocean";
 		public const string BiomeDisplayName = "Warm Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 172;
 		public const float BiomeRainfall = 0.5F;
@@ -692,13 +709,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class LukewarmOcean : Biome {
 		
-		public const int BiomeId = 40;
+		public const int BiomeId = 41;
 		public const string BiomeName = "lukewarm_ocean";
 		public const string BiomeDisplayName = "Lukewarm Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 144;
 		public const float BiomeRainfall = 0.5F;
@@ -707,13 +724,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DeepLukewarmOcean : Biome {
 		
-		public const int BiomeId = 41;
+		public const int BiomeId = 42;
 		public const string BiomeName = "deep_lukewarm_ocean";
 		public const string BiomeDisplayName = "Deep Lukewarm Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1.8F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 64;
 		public const float BiomeRainfall = 0.5F;
@@ -722,13 +739,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class Ocean : Biome {
 		
-		public const int BiomeId = 42;
+		public const int BiomeId = 43;
 		public const string BiomeName = "ocean";
 		public const string BiomeDisplayName = "Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 112;
 		public const float BiomeRainfall = 0.5F;
@@ -737,13 +754,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DeepOcean : Biome {
 		
-		public const int BiomeId = 43;
+		public const int BiomeId = 44;
 		public const string BiomeName = "deep_ocean";
 		public const string BiomeDisplayName = "Deep Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1.8F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 48;
 		public const float BiomeRainfall = 0.5F;
@@ -752,13 +769,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class ColdOcean : Biome {
 		
-		public const int BiomeId = 44;
+		public const int BiomeId = 45;
 		public const string BiomeName = "cold_ocean";
 		public const string BiomeDisplayName = "Cold Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 2105456;
 		public const float BiomeRainfall = 0.5F;
@@ -767,13 +784,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DeepColdOcean : Biome {
 		
-		public const int BiomeId = 45;
+		public const int BiomeId = 46;
 		public const string BiomeName = "deep_cold_ocean";
 		public const string BiomeDisplayName = "Deep Cold Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1.8F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 2105400;
 		public const float BiomeRainfall = 0.5F;
@@ -782,13 +799,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class FrozenOcean : Biome {
 		
-		public const int BiomeId = 46;
+		public const int BiomeId = 47;
 		public const string BiomeName = "frozen_ocean";
 		public const string BiomeDisplayName = "Frozen Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0F;
 		public const string BiomePrecipitation = "snow";
-		public const float BiomeDepth = -1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 7368918;
 		public const float BiomeRainfall = 0.5F;
@@ -797,13 +814,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DeepFrozenOcean : Biome {
 		
-		public const int BiomeId = 47;
+		public const int BiomeId = 48;
 		public const string BiomeName = "deep_frozen_ocean";
 		public const string BiomeDisplayName = "Deep Frozen Ocean";
 		public const int BiomeCategory = 14;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = -1.8F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 4210832;
 		public const float BiomeRainfall = 0.5F;
@@ -812,13 +829,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class MushroomFields : Biome {
 		
-		public const int BiomeId = 48;
+		public const int BiomeId = 49;
 		public const string BiomeName = "mushroom_fields";
 		public const string BiomeDisplayName = "Mushroom Fields";
 		public const int BiomeCategory = 15;
 		public const float BiomeTemperature = 0.9F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.2F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 16711935;
 		public const float BiomeRainfall = 1F;
@@ -827,13 +844,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class DripstoneCaves : Biome {
 		
-		public const int BiomeId = 49;
+		public const int BiomeId = 50;
 		public const string BiomeName = "dripstone_caves";
 		public const string BiomeDisplayName = "Dripstone Caves";
 		public const int BiomeCategory = 16;
 		public const float BiomeTemperature = 0.8F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.125F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 12690831;
 		public const float BiomeRainfall = 0.4F;
@@ -842,28 +859,43 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class LushCaves : Biome {
 		
-		public const int BiomeId = 50;
+		public const int BiomeId = 51;
 		public const string BiomeName = "lush_caves";
 		public const string BiomeDisplayName = "Lush Caves";
 		public const int BiomeCategory = 16;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "rain";
-		public const float BiomeDepth = 0.5F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
 		public const int BiomeColor = 14652980;
 		public const float BiomeRainfall = 0.5F;
 		
 		public LushCaves() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) { }
 	}
+	public class DeepDark : Biome {
+		
+		public const int BiomeId = 52;
+		public const string BiomeName = "deep_dark";
+		public const string BiomeDisplayName = "Deep Dark";
+		public const int BiomeCategory = 16;
+		public const float BiomeTemperature = 0.8F;
+		public const string BiomePrecipitation = "rain";
+		public const float BiomeDepth = 0F;
+		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Overworld;
+		public const int BiomeColor = 0;
+		public const float BiomeRainfall = 0.4F;
+		
+		public DeepDark() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) { }
+	}
 	public class NetherWastes : Biome {
 		
-		public const int BiomeId = 51;
+		public const int BiomeId = 53;
 		public const string BiomeName = "nether_wastes";
 		public const string BiomeDisplayName = "Nether Wastes";
 		public const int BiomeCategory = 17;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Nether;
 		public const int BiomeColor = 12532539;
 		public const float BiomeRainfall = 0F;
@@ -872,13 +904,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class WarpedForest : Biome {
 		
-		public const int BiomeId = 52;
+		public const int BiomeId = 54;
 		public const string BiomeName = "warped_forest";
 		public const string BiomeDisplayName = "Warped Forest";
 		public const int BiomeCategory = 17;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Nether;
 		public const int BiomeColor = 4821115;
 		public const float BiomeRainfall = 0F;
@@ -887,13 +919,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class CrimsonForest : Biome {
 		
-		public const int BiomeId = 53;
+		public const int BiomeId = 55;
 		public const string BiomeName = "crimson_forest";
 		public const string BiomeDisplayName = "Crimson Forest";
 		public const int BiomeCategory = 17;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Nether;
 		public const int BiomeColor = 14485512;
 		public const float BiomeRainfall = 0F;
@@ -902,13 +934,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SoulSandValley : Biome {
 		
-		public const int BiomeId = 54;
+		public const int BiomeId = 56;
 		public const string BiomeName = "soul_sand_valley";
 		public const string BiomeDisplayName = "Soul Sand Valley";
 		public const int BiomeCategory = 17;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Nether;
 		public const int BiomeColor = 6174768;
 		public const float BiomeRainfall = 0F;
@@ -917,13 +949,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class BasaltDeltas : Biome {
 		
-		public const int BiomeId = 55;
+		public const int BiomeId = 57;
 		public const string BiomeName = "basalt_deltas";
 		public const string BiomeDisplayName = "Basalt Deltas";
 		public const int BiomeCategory = 17;
 		public const float BiomeTemperature = 2F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.Nether;
 		public const int BiomeColor = 4208182;
 		public const float BiomeRainfall = 0F;
@@ -932,13 +964,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class TheEnd : Biome {
 		
-		public const int BiomeId = 56;
+		public const int BiomeId = 58;
 		public const string BiomeName = "the_end";
 		public const string BiomeDisplayName = "The End";
 		public const int BiomeCategory = 18;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.End;
 		public const int BiomeColor = 8421631;
 		public const float BiomeRainfall = 0.5F;
@@ -947,13 +979,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class EndHighlands : Biome {
 		
-		public const int BiomeId = 57;
+		public const int BiomeId = 59;
 		public const string BiomeName = "end_highlands";
 		public const string BiomeDisplayName = "End Highlands";
 		public const int BiomeCategory = 18;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.End;
 		public const int BiomeColor = 12828041;
 		public const float BiomeRainfall = 0.5F;
@@ -962,13 +994,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class EndMidlands : Biome {
 		
-		public const int BiomeId = 58;
+		public const int BiomeId = 60;
 		public const string BiomeName = "end_midlands";
 		public const string BiomeDisplayName = "End Midlands";
 		public const int BiomeCategory = 18;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.End;
 		public const int BiomeColor = 15464630;
 		public const float BiomeRainfall = 0.5F;
@@ -977,13 +1009,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class SmallEndIslands : Biome {
 		
-		public const int BiomeId = 59;
+		public const int BiomeId = 61;
 		public const string BiomeName = "small_end_islands";
 		public const string BiomeDisplayName = "Small End Islands";
 		public const int BiomeCategory = 18;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.End;
 		public const int BiomeColor = 42;
 		public const float BiomeRainfall = 0.5F;
@@ -992,13 +1024,13 @@ namespace MineSharp.Data.Biomes {
 	}
 	public class EndBarrens : Biome {
 		
-		public const int BiomeId = 60;
+		public const int BiomeId = 62;
 		public const string BiomeName = "end_barrens";
 		public const string BiomeDisplayName = "End Barrens";
 		public const int BiomeCategory = 18;
 		public const float BiomeTemperature = 0.5F;
 		public const string BiomePrecipitation = "none";
-		public const float BiomeDepth = 0.1F;
+		public const float BiomeDepth = 0F;
 		public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.End;
 		public const int BiomeColor = 9474162;
 		public const float BiomeRainfall = 0.5F;
@@ -1013,59 +1045,61 @@ namespace MineSharp.Data.Biomes {
 		IceSpikes = 4,
 		Desert = 5,
 		Swamp = 6,
-		Forest = 7,
-		FlowerForest = 8,
-		BirchForest = 9,
-		DarkForest = 10,
-		OldGrowthBirchForest = 11,
-		OldGrowthPineTaiga = 12,
-		OldGrowthSpruceTaiga = 13,
-		Taiga = 14,
-		SnowyTaiga = 15,
-		Savanna = 16,
-		SavannaPlateau = 17,
-		WindsweptHills = 18,
-		WindsweptGravellyHills = 19,
-		WindsweptForest = 20,
-		WindsweptSavanna = 21,
-		Jungle = 22,
-		SparseJungle = 23,
-		BambooJungle = 24,
-		Badlands = 25,
-		ErodedBadlands = 26,
-		WoodedBadlands = 27,
-		Meadow = 28,
-		Grove = 29,
-		SnowySlopes = 30,
-		FrozenPeaks = 31,
-		JaggedPeaks = 32,
-		StonyPeaks = 33,
-		River = 34,
-		FrozenRiver = 35,
-		Beach = 36,
-		SnowyBeach = 37,
-		StonyShore = 38,
-		WarmOcean = 39,
-		LukewarmOcean = 40,
-		DeepLukewarmOcean = 41,
-		Ocean = 42,
-		DeepOcean = 43,
-		ColdOcean = 44,
-		DeepColdOcean = 45,
-		FrozenOcean = 46,
-		DeepFrozenOcean = 47,
-		MushroomFields = 48,
-		DripstoneCaves = 49,
-		LushCaves = 50,
-		NetherWastes = 51,
-		WarpedForest = 52,
-		CrimsonForest = 53,
-		SoulSandValley = 54,
-		BasaltDeltas = 55,
-		TheEnd = 56,
-		EndHighlands = 57,
-		EndMidlands = 58,
-		SmallEndIslands = 59,
-		EndBarrens = 60,
+		MangroveSwamp = 7,
+		Forest = 8,
+		FlowerForest = 9,
+		BirchForest = 10,
+		DarkForest = 11,
+		OldGrowthBirchForest = 12,
+		OldGrowthPineTaiga = 13,
+		OldGrowthSpruceTaiga = 14,
+		Taiga = 15,
+		SnowyTaiga = 16,
+		Savanna = 17,
+		SavannaPlateau = 18,
+		WindsweptHills = 19,
+		WindsweptGravellyHills = 20,
+		WindsweptForest = 21,
+		WindsweptSavanna = 22,
+		Jungle = 23,
+		SparseJungle = 24,
+		BambooJungle = 25,
+		Badlands = 26,
+		ErodedBadlands = 27,
+		WoodedBadlands = 28,
+		Meadow = 29,
+		Grove = 30,
+		SnowySlopes = 31,
+		FrozenPeaks = 32,
+		JaggedPeaks = 33,
+		StonyPeaks = 34,
+		River = 35,
+		FrozenRiver = 36,
+		Beach = 37,
+		SnowyBeach = 38,
+		StonyShore = 39,
+		WarmOcean = 40,
+		LukewarmOcean = 41,
+		DeepLukewarmOcean = 42,
+		Ocean = 43,
+		DeepOcean = 44,
+		ColdOcean = 45,
+		DeepColdOcean = 46,
+		FrozenOcean = 47,
+		DeepFrozenOcean = 48,
+		MushroomFields = 49,
+		DripstoneCaves = 50,
+		LushCaves = 51,
+		DeepDark = 52,
+		NetherWastes = 53,
+		WarpedForest = 54,
+		CrimsonForest = 55,
+		SoulSandValley = 56,
+		BasaltDeltas = 57,
+		TheEnd = 58,
+		EndHighlands = 59,
+		EndMidlands = 60,
+		SmallEndIslands = 61,
+		EndBarrens = 62,
 	}
 }

@@ -1,6 +1,6 @@
-//////////////////////////////////////////////////////////////
-//   Generated Protocol Data for Minecraft Version 1.18.1   //
-//////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+//   Generated Protocol Data for Minecraft Version 1.19   //
+////////////////////////////////////////////////////////////
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -5433,18 +5433,18 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 	}
 	public class PacketRemoveEntityEffect : IPacketPayload {
 		public VarInt EntityId { get; set; }
-		public sbyte EffectId { get; set; }
-		public PacketRemoveEntityEffect(VarInt @entityId, sbyte @effectId) {
+		public VarInt EffectId { get; set; }
+		public PacketRemoveEntityEffect(VarInt @entityId, VarInt @effectId) {
 			this.EntityId = @entityId;
 			this.EffectId = @effectId;
 		}
 		public void Write(PacketBuffer buffer ) {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
-			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.EffectId);
+			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EffectId);
 		}
 		public static PacketRemoveEntityEffect Read(PacketBuffer buffer ) {
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
-			sbyte @effectId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			VarInt @effectId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketRemoveEntityEffect(@entityId, @effectId);
 		}
 	}
@@ -6409,11 +6409,11 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 	}
 	public class PacketEntityEffect : IPacketPayload {
 		public VarInt EntityId { get; set; }
-		public sbyte EffectId { get; set; }
+		public VarInt EffectId { get; set; }
 		public sbyte Amplifier { get; set; }
 		public VarInt Duration { get; set; }
 		public sbyte HideParticles { get; set; }
-		public PacketEntityEffect(VarInt @entityId, sbyte @effectId, sbyte @amplifier, VarInt @duration, sbyte @hideParticles) {
+		public PacketEntityEffect(VarInt @entityId, VarInt @effectId, sbyte @amplifier, VarInt @duration, sbyte @hideParticles) {
 			this.EntityId = @entityId;
 			this.EffectId = @effectId;
 			this.Amplifier = @amplifier;
@@ -6422,14 +6422,14 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public void Write(PacketBuffer buffer ) {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
-			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.EffectId);
+			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EffectId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Amplifier);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Duration);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.HideParticles);
 		}
 		public static PacketEntityEffect Read(PacketBuffer buffer ) {
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
-			sbyte @effectId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			VarInt @effectId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @amplifier = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			VarInt @duration = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @hideParticles = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);

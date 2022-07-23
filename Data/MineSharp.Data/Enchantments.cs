@@ -1,6 +1,6 @@
-/////////////////////////////////////////////////////////////////
-//   Generated Enchantment Data for Minecraft Version 1.18.1   //
-/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+//   Generated Enchantment Data for Minecraft Version 1.19   //
+///////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
 using System.Collections.Generic;
 namespace MineSharp.Data.Enchantments {
@@ -18,32 +18,33 @@ namespace MineSharp.Data.Enchantments {
 			9 => typeof(FrostWalker),
 			10 => typeof(BindingCurse),
 			11 => typeof(SoulSpeed),
-			12 => typeof(Sharpness),
-			13 => typeof(Smite),
-			14 => typeof(BaneOfArthropods),
-			15 => typeof(Knockback),
-			16 => typeof(FireAspect),
-			17 => typeof(Looting),
-			18 => typeof(Sweeping),
-			19 => typeof(Efficiency),
-			20 => typeof(SilkTouch),
-			21 => typeof(Unbreaking),
-			22 => typeof(Fortune),
-			23 => typeof(Power),
-			24 => typeof(Punch),
-			25 => typeof(Flame),
-			26 => typeof(Infinity),
-			27 => typeof(LuckOfTheSea),
-			28 => typeof(Lure),
-			29 => typeof(Loyalty),
-			30 => typeof(Impaling),
-			31 => typeof(Riptide),
-			32 => typeof(Channeling),
-			33 => typeof(Multishot),
-			34 => typeof(QuickCharge),
-			35 => typeof(Piercing),
-			36 => typeof(Mending),
-			37 => typeof(VanishingCurse),
+			12 => typeof(SwiftSneak),
+			13 => typeof(Sharpness),
+			14 => typeof(Smite),
+			15 => typeof(BaneOfArthropods),
+			16 => typeof(Knockback),
+			17 => typeof(FireAspect),
+			18 => typeof(Looting),
+			19 => typeof(Sweeping),
+			20 => typeof(Efficiency),
+			21 => typeof(SilkTouch),
+			22 => typeof(Unbreaking),
+			23 => typeof(Fortune),
+			24 => typeof(Power),
+			25 => typeof(Punch),
+			26 => typeof(Flame),
+			27 => typeof(Infinity),
+			28 => typeof(LuckOfTheSea),
+			29 => typeof(Lure),
+			30 => typeof(Loyalty),
+			31 => typeof(Impaling),
+			32 => typeof(Riptide),
+			33 => typeof(Channeling),
+			34 => typeof(Multishot),
+			35 => typeof(QuickCharge),
+			36 => typeof(Piercing),
+			37 => typeof(Mending),
+			38 => typeof(VanishingCurse),
 			_ => throw new ArgumentException($"Enchantment with id {id} not found!")
 		};
 	}
@@ -53,14 +54,15 @@ namespace MineSharp.Data.Enchantments {
 		ArmorHead = 2,
 		ArmorChest = 3,
 		Wearable = 4,
-		Weapon = 5,
-		Digger = 6,
-		Breakable = 7,
-		Bow = 8,
-		FishingRod = 9,
-		Trident = 10,
-		Crossbow = 11,
-		Vanishable = 12,
+		ArmorLegs = 5,
+		Weapon = 6,
+		Digger = 7,
+		Breakable = 8,
+		Bow = 9,
+		FishingRod = 10,
+		Trident = 11,
+		Crossbow = 12,
+		Vanishable = 13,
 	}
 	public class Protection : Enchantment {
 		
@@ -314,9 +316,30 @@ namespace MineSharp.Data.Enchantments {
 		
 		public SoulSpeed (int level) : base(level, EnchantmentId, EnchantmentName, EnchantmentDisplayName, EnchantmentMaxLevel, EnchantmentMinCost, EnchantmentMaxCost, EnchantmentTreasureOnly, EnchantmentCurse, EnchantmentExclude, EnchantmentCategory, EnchantmentWeight, EnchantmentDiscoverable) {}
 	}
-	public class Sharpness : Enchantment {
+	public class SwiftSneak : Enchantment {
 		
 		public const int EnchantmentId = 12;
+		public const string EnchantmentName = "swift_sneak";
+		public const string EnchantmentDisplayName = "Swift Sneak";
+		
+		public const int EnchantmentMaxLevel = 3;
+		public static readonly EnchantCost EnchantmentMinCost = new EnchantCost(25, 0);
+		public static readonly EnchantCost EnchantmentMaxCost = new EnchantCost(25, 50);
+		public const bool EnchantmentTreasureOnly = true;
+		public const bool EnchantmentCurse = false;
+		public static readonly Type[] EnchantmentExclude = new Type[] {  };
+		public const int EnchantmentCategory = 5;
+		public const int EnchantmentWeight = 1;
+		public const bool EnchantmentDiscoverable = false;
+		
+		
+		public SwiftSneak () : base(EnchantmentId, EnchantmentName, EnchantmentDisplayName, EnchantmentMaxLevel, EnchantmentMinCost, EnchantmentMaxCost, EnchantmentTreasureOnly, EnchantmentCurse, EnchantmentExclude, EnchantmentCategory, EnchantmentWeight, EnchantmentDiscoverable) {}
+		
+		public SwiftSneak (int level) : base(level, EnchantmentId, EnchantmentName, EnchantmentDisplayName, EnchantmentMaxLevel, EnchantmentMinCost, EnchantmentMaxCost, EnchantmentTreasureOnly, EnchantmentCurse, EnchantmentExclude, EnchantmentCategory, EnchantmentWeight, EnchantmentDiscoverable) {}
+	}
+	public class Sharpness : Enchantment {
+		
+		public const int EnchantmentId = 13;
 		public const string EnchantmentName = "sharpness";
 		public const string EnchantmentDisplayName = "Sharpness";
 		
@@ -326,7 +349,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Sharpness), typeof(Sharpness) };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 10;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -337,7 +360,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Smite : Enchantment {
 		
-		public const int EnchantmentId = 13;
+		public const int EnchantmentId = 14;
 		public const string EnchantmentName = "smite";
 		public const string EnchantmentDisplayName = "Smite";
 		
@@ -347,7 +370,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Smite), typeof(Smite) };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -358,7 +381,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class BaneOfArthropods : Enchantment {
 		
-		public const int EnchantmentId = 14;
+		public const int EnchantmentId = 15;
 		public const string EnchantmentName = "bane_of_arthropods";
 		public const string EnchantmentDisplayName = "Bane of Arthropods";
 		
@@ -368,7 +391,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(BaneOfArthropods), typeof(BaneOfArthropods) };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -379,7 +402,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Knockback : Enchantment {
 		
-		public const int EnchantmentId = 15;
+		public const int EnchantmentId = 16;
 		public const string EnchantmentName = "knockback";
 		public const string EnchantmentDisplayName = "Knockback";
 		
@@ -389,7 +412,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -400,7 +423,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class FireAspect : Enchantment {
 		
-		public const int EnchantmentId = 16;
+		public const int EnchantmentId = 17;
 		public const string EnchantmentName = "fire_aspect";
 		public const string EnchantmentDisplayName = "Fire Aspect";
 		
@@ -410,7 +433,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -421,7 +444,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Looting : Enchantment {
 		
-		public const int EnchantmentId = 17;
+		public const int EnchantmentId = 18;
 		public const string EnchantmentName = "looting";
 		public const string EnchantmentDisplayName = "Looting";
 		
@@ -431,7 +454,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Looting) };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -442,7 +465,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Sweeping : Enchantment {
 		
-		public const int EnchantmentId = 18;
+		public const int EnchantmentId = 19;
 		public const string EnchantmentName = "sweeping";
 		public const string EnchantmentDisplayName = "Sweeping Edge";
 		
@@ -452,7 +475,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 5;
+		public const int EnchantmentCategory = 6;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -463,7 +486,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Efficiency : Enchantment {
 		
-		public const int EnchantmentId = 19;
+		public const int EnchantmentId = 20;
 		public const string EnchantmentName = "efficiency";
 		public const string EnchantmentDisplayName = "Efficiency";
 		
@@ -473,7 +496,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 6;
+		public const int EnchantmentCategory = 7;
 		public const int EnchantmentWeight = 10;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -484,7 +507,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class SilkTouch : Enchantment {
 		
-		public const int EnchantmentId = 20;
+		public const int EnchantmentId = 21;
 		public const string EnchantmentName = "silk_touch";
 		public const string EnchantmentDisplayName = "Silk Touch";
 		
@@ -494,7 +517,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(SilkTouch), typeof(SilkTouch), typeof(SilkTouch) };
-		public const int EnchantmentCategory = 6;
+		public const int EnchantmentCategory = 7;
 		public const int EnchantmentWeight = 1;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -505,7 +528,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Unbreaking : Enchantment {
 		
-		public const int EnchantmentId = 21;
+		public const int EnchantmentId = 22;
 		public const string EnchantmentName = "unbreaking";
 		public const string EnchantmentDisplayName = "Unbreaking";
 		
@@ -515,7 +538,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 7;
+		public const int EnchantmentCategory = 8;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -526,7 +549,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Fortune : Enchantment {
 		
-		public const int EnchantmentId = 22;
+		public const int EnchantmentId = 23;
 		public const string EnchantmentName = "fortune";
 		public const string EnchantmentDisplayName = "Fortune";
 		
@@ -536,7 +559,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Fortune) };
-		public const int EnchantmentCategory = 6;
+		public const int EnchantmentCategory = 7;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -547,7 +570,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Power : Enchantment {
 		
-		public const int EnchantmentId = 23;
+		public const int EnchantmentId = 24;
 		public const string EnchantmentName = "power";
 		public const string EnchantmentDisplayName = "Power";
 		
@@ -557,7 +580,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 8;
+		public const int EnchantmentCategory = 9;
 		public const int EnchantmentWeight = 10;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -568,7 +591,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Punch : Enchantment {
 		
-		public const int EnchantmentId = 24;
+		public const int EnchantmentId = 25;
 		public const string EnchantmentName = "punch";
 		public const string EnchantmentDisplayName = "Punch";
 		
@@ -578,7 +601,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 8;
+		public const int EnchantmentCategory = 9;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -589,7 +612,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Flame : Enchantment {
 		
-		public const int EnchantmentId = 25;
+		public const int EnchantmentId = 26;
 		public const string EnchantmentName = "flame";
 		public const string EnchantmentDisplayName = "Flame";
 		
@@ -599,7 +622,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 8;
+		public const int EnchantmentCategory = 9;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -610,7 +633,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Infinity : Enchantment {
 		
-		public const int EnchantmentId = 26;
+		public const int EnchantmentId = 27;
 		public const string EnchantmentName = "infinity";
 		public const string EnchantmentDisplayName = "Infinity";
 		
@@ -620,7 +643,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Infinity) };
-		public const int EnchantmentCategory = 8;
+		public const int EnchantmentCategory = 9;
 		public const int EnchantmentWeight = 1;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -631,7 +654,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class LuckOfTheSea : Enchantment {
 		
-		public const int EnchantmentId = 27;
+		public const int EnchantmentId = 28;
 		public const string EnchantmentName = "luck_of_the_sea";
 		public const string EnchantmentDisplayName = "Luck of the Sea";
 		
@@ -641,7 +664,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(LuckOfTheSea) };
-		public const int EnchantmentCategory = 9;
+		public const int EnchantmentCategory = 10;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -652,7 +675,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Lure : Enchantment {
 		
-		public const int EnchantmentId = 28;
+		public const int EnchantmentId = 29;
 		public const string EnchantmentName = "lure";
 		public const string EnchantmentDisplayName = "Lure";
 		
@@ -662,7 +685,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 9;
+		public const int EnchantmentCategory = 10;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -673,7 +696,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Loyalty : Enchantment {
 		
-		public const int EnchantmentId = 29;
+		public const int EnchantmentId = 30;
 		public const string EnchantmentName = "loyalty";
 		public const string EnchantmentDisplayName = "Loyalty";
 		
@@ -683,7 +706,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Loyalty) };
-		public const int EnchantmentCategory = 10;
+		public const int EnchantmentCategory = 11;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -694,7 +717,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Impaling : Enchantment {
 		
-		public const int EnchantmentId = 30;
+		public const int EnchantmentId = 31;
 		public const string EnchantmentName = "impaling";
 		public const string EnchantmentDisplayName = "Impaling";
 		
@@ -704,7 +727,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 10;
+		public const int EnchantmentCategory = 11;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -715,7 +738,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Riptide : Enchantment {
 		
-		public const int EnchantmentId = 31;
+		public const int EnchantmentId = 32;
 		public const string EnchantmentName = "riptide";
 		public const string EnchantmentDisplayName = "Riptide";
 		
@@ -725,7 +748,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Riptide), typeof(Riptide) };
-		public const int EnchantmentCategory = 10;
+		public const int EnchantmentCategory = 11;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -736,7 +759,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Channeling : Enchantment {
 		
-		public const int EnchantmentId = 32;
+		public const int EnchantmentId = 33;
 		public const string EnchantmentName = "channeling";
 		public const string EnchantmentDisplayName = "Channeling";
 		
@@ -746,7 +769,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Channeling) };
-		public const int EnchantmentCategory = 10;
+		public const int EnchantmentCategory = 11;
 		public const int EnchantmentWeight = 1;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -757,7 +780,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Multishot : Enchantment {
 		
-		public const int EnchantmentId = 33;
+		public const int EnchantmentId = 34;
 		public const string EnchantmentName = "multishot";
 		public const string EnchantmentDisplayName = "Multishot";
 		
@@ -767,7 +790,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Multishot) };
-		public const int EnchantmentCategory = 11;
+		public const int EnchantmentCategory = 12;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -778,7 +801,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class QuickCharge : Enchantment {
 		
-		public const int EnchantmentId = 34;
+		public const int EnchantmentId = 35;
 		public const string EnchantmentName = "quick_charge";
 		public const string EnchantmentDisplayName = "Quick Charge";
 		
@@ -788,7 +811,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 11;
+		public const int EnchantmentCategory = 12;
 		public const int EnchantmentWeight = 5;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -799,7 +822,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Piercing : Enchantment {
 		
-		public const int EnchantmentId = 35;
+		public const int EnchantmentId = 36;
 		public const string EnchantmentName = "piercing";
 		public const string EnchantmentDisplayName = "Piercing";
 		
@@ -809,7 +832,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = false;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Piercing) };
-		public const int EnchantmentCategory = 11;
+		public const int EnchantmentCategory = 12;
 		public const int EnchantmentWeight = 10;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -820,7 +843,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class Mending : Enchantment {
 		
-		public const int EnchantmentId = 36;
+		public const int EnchantmentId = 37;
 		public const string EnchantmentName = "mending";
 		public const string EnchantmentDisplayName = "Mending";
 		
@@ -830,7 +853,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = true;
 		public const bool EnchantmentCurse = false;
 		public static readonly Type[] EnchantmentExclude = new Type[] { typeof(Mending) };
-		public const int EnchantmentCategory = 7;
+		public const int EnchantmentCategory = 8;
 		public const int EnchantmentWeight = 2;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -841,7 +864,7 @@ namespace MineSharp.Data.Enchantments {
 	}
 	public class VanishingCurse : Enchantment {
 		
-		public const int EnchantmentId = 37;
+		public const int EnchantmentId = 38;
 		public const string EnchantmentName = "vanishing_curse";
 		public const string EnchantmentDisplayName = "Curse of Vanishing";
 		
@@ -851,7 +874,7 @@ namespace MineSharp.Data.Enchantments {
 		public const bool EnchantmentTreasureOnly = true;
 		public const bool EnchantmentCurse = true;
 		public static readonly Type[] EnchantmentExclude = new Type[] {  };
-		public const int EnchantmentCategory = 12;
+		public const int EnchantmentCategory = 13;
 		public const int EnchantmentWeight = 1;
 		public const bool EnchantmentDiscoverable = true;
 		
@@ -873,31 +896,32 @@ namespace MineSharp.Data.Enchantments {
 		FrostWalker = 9,
 		BindingCurse = 10,
 		SoulSpeed = 11,
-		Sharpness = 12,
-		Smite = 13,
-		BaneOfArthropods = 14,
-		Knockback = 15,
-		FireAspect = 16,
-		Looting = 17,
-		Sweeping = 18,
-		Efficiency = 19,
-		SilkTouch = 20,
-		Unbreaking = 21,
-		Fortune = 22,
-		Power = 23,
-		Punch = 24,
-		Flame = 25,
-		Infinity = 26,
-		LuckOfTheSea = 27,
-		Lure = 28,
-		Loyalty = 29,
-		Impaling = 30,
-		Riptide = 31,
-		Channeling = 32,
-		Multishot = 33,
-		QuickCharge = 34,
-		Piercing = 35,
-		Mending = 36,
-		VanishingCurse = 37,
+		SwiftSneak = 12,
+		Sharpness = 13,
+		Smite = 14,
+		BaneOfArthropods = 15,
+		Knockback = 16,
+		FireAspect = 17,
+		Looting = 18,
+		Sweeping = 19,
+		Efficiency = 20,
+		SilkTouch = 21,
+		Unbreaking = 22,
+		Fortune = 23,
+		Power = 24,
+		Punch = 25,
+		Flame = 26,
+		Infinity = 27,
+		LuckOfTheSea = 28,
+		Lure = 29,
+		Loyalty = 30,
+		Impaling = 31,
+		Riptide = 32,
+		Channeling = 33,
+		Multishot = 34,
+		QuickCharge = 35,
+		Piercing = 36,
+		Mending = 37,
+		VanishingCurse = 38,
 	}
 }

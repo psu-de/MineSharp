@@ -1,6 +1,6 @@
-////////////////////////////////////////////////////////////
-//   Generated Effect Data for Minecraft Version 1.18.1   //
-////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+//   Generated Effect Data for Minecraft Version 1.19   //
+//////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
 using System.Collections.Generic;
 namespace MineSharp.Data.Effects {
@@ -38,6 +38,7 @@ namespace MineSharp.Data.Effects {
 			30 => typeof(DolphinsgraceEffect),
 			31 => typeof(BadomenEffect),
 			32 => typeof(HeroofthevillageEffect),
+			33 => typeof(DarknessEffect),
 			_ => throw new ArgumentException($"Effect with id {id} not found!")
 		};
 	}
@@ -393,6 +394,17 @@ namespace MineSharp.Data.Effects {
 		        public HeroofthevillageEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
 				public HeroofthevillageEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
 	}
+	public class DarknessEffect : Effect {
+		
+		public const int EffectId = 33;
+				public const string EffectName = "Darkness";
+				public const string EffectDisplayName = "Darkness";
+		        public const bool EffectIsGood = false;
+		
+		
+		        public DarknessEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
+				public DarknessEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
+	}
 	public enum EffectType {
 		Speed = 1,
 		Slowness = 2,
@@ -426,5 +438,6 @@ namespace MineSharp.Data.Effects {
 		Dolphinsgrace = 30,
 		Badomen = 31,
 		Heroofthevillage = 32,
+		Darkness = 33,
 	}
 }
