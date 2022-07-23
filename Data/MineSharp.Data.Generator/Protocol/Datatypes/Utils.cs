@@ -97,7 +97,7 @@ public void WriteBuffer(byte[] array, Action<PacketBuffer, VarInt> lengthEncoder
                 codeGenerator.WriteBlock(
 $@"public {field.Type.CSharpType} {Compiler.GetCSharpName(field.Name)} {{ 
     get {{ 
-        return ({field.Type.CSharpType})((({field.Type.CSharpType})Value! >> {BitCount - (field.Bits + bitCount)} & ({1 << field.Bits - 1})));
+        return ({field.Type.CSharpType})((({field.Type.CSharpType})Value! >> {BitCount - (field.Bits + bitCount)} & ({(1 << field.Bits) - 1})));
     }}
 	set {{ 
         var val = value << {BitCount - (field.Bits + bitCount)}; 
