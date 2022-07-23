@@ -42,6 +42,7 @@ Dictionary<string, Generator> dataGenerators = new Dictionary<string, Generator>
     { "Entities", new EntityGenerator(dataHelper, version) },
     { "Items", new ItemGenerator(dataHelper, version) },
     { "Protocol", new ProtocolGenerator(dataHelper, version) },
+    { "MinecraftData", new MinecraftDataGenerator(dataHelper, version) }
 };
 
 foreach (var dataGen in dataGenerators) {

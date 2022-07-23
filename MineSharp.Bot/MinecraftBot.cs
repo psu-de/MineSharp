@@ -3,7 +3,6 @@ using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Core.Versions;
 using MineSharp.Data.Protocol;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
@@ -23,8 +22,7 @@ namespace MineSharp.Bot {
             public string Host;
             public ushort? Port;
         }
-
-        public MinecraftVersion Version { get; private set; }
+        
         public MinecraftClient Client { get; private set; }
         public BotOptions Options { get; private set; }
         public Session Session { get; private set; }
@@ -60,7 +58,6 @@ namespace MineSharp.Bot {
 
         public MinecraftBot(BotOptions options) {
             this.Options = options;
-            this.Version = new MinecraftVersion(this.Options.Version);
 
             if (this.Options.Offline == true) {
                 this.Session = Session.OfflineSession(this.Options.UsernameOrEmail);

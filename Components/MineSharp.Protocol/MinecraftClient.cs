@@ -1,11 +1,11 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types.Enums;
-using MineSharp.Core.Versions;
 using MineSharp.Data.Protocol;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol.Handlers;
 using System.Net;
 using System.Net.Sockets;
+using MineSharp.Data;
 
 namespace MineSharp.Protocol {
     public class MinecraftClient {
@@ -126,7 +126,12 @@ namespace MineSharp.Protocol {
         }
 
         private async Task MakeHandshake(GameState nextState) {
-            await this.SendPacket(new Data.Protocol.Handshaking.Serverbound.PacketSetProtocol(ProtocolVersion.GetVersionNumber(this.Version), this.IPAddress, (ushort)this.Port, (int)nextState));
+            await this.SendPacket(
+                new Data.Protocol.Handshaking.Serverbound.PacketSetProtocol(
+                    MinecraftData.ProtocolVersion, 
+                    this.IPAddress, 
+                    (ushort)this.Port, 
+                    (int)nextState));
 
             await (nextState switch {
                 GameState.STATUS => this.SendPacket(new MineSharp.Data.Protocol.Status.Serverbound.PacketPingStart()),
