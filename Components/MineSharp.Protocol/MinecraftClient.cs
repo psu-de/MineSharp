@@ -212,6 +212,14 @@ namespace MineSharp.Protocol {
                         continue;
                     }
 
+                    if (packetTask.Packet == null) // https://github.com/psu-de/MineSharp/issues/8#issue-1315635361
+                    {
+                        // for now just ignore the packet,
+                        // since i have no idea why this happens
+                        packetTask.SendingTsc.TrySetCanceled();
+                        continue;
+                    }
+
                     var packetBuffer = PacketFactory.WritePacket(packetTask.Packet);
 
                     this._stream!.DispatchPacket(packetBuffer);
