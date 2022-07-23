@@ -60,7 +60,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
 
             if (window == null) throw new ArgumentException($"Window with id={windowId} not opened");
 
-            window.PerformClick(click);
+            window.PerformClick(click).Wait(cancellation);
         }
     }
 }

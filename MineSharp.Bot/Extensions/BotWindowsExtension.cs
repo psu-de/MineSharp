@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Bot.Helpers;
+using MineSharp.Core.Types;
 using MineSharp.Windows;
 
 namespace MineSharp.Bot {
@@ -8,16 +9,16 @@ namespace MineSharp.Bot {
         /// Fires when a new window has been opened
         /// </summary>
         public event BotWindowEvent WindowOpened {
-            add { WindowsModule!.WindowOpened += value; }
-            remove { WindowsModule!.WindowOpened -= value; }
+            add => WindowsModule!.WindowOpened += value;
+            remove => WindowsModule!.WindowOpened -= value; 
         }
 
         /// <summary>
         /// Fires when the held item changed
         /// </summary>
         public event BotItemEvent HeldItemChanged {
-            add { WindowsModule!.HeldItemChanged += value; }
-            remove { WindowsModule!.HeldItemChanged -= value; }
+            add => WindowsModule!.HeldItemChanged += value;
+            remove => WindowsModule!.HeldItemChanged -= value;
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace MineSharp.Bot {
         /// <summary>
         /// All currently opened windows. Mapped from the WindowId to the corresponding <see cref="Window"/>
         /// </summary>
-        public Dictionary<int, Window> OpenedWindows => WindowsModule!.OpenedWindows;
+        public Dictionary<int, BotWindow> OpenedWindows => WindowsModule!.OpenedWindows;
 
         /// <summary>
         /// The Item the bot is currently holding in the main hand

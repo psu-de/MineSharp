@@ -14,10 +14,10 @@ if (true /*args.Length == 1*/) {
         Host = "127.0.0.1",
         Port = 25565,
         Offline = true,
-        UsernameOrEmail = "MineSharp Bot",
+        UsernameOrEmail = "MineSharpBot",
         Version = "1.18.1"
     };
-    // Parse credential file
+    // TODO: Parse credential file
 } else {
     AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
     AnsiConsole.MarkupLine("Please login:");
