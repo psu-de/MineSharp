@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/MineSharp-net/community.svg)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 # Minesharp
 
 **This Project is not finished and under development!**
