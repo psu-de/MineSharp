@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Types;
+using Attribute = MineSharp.Core.Types.Attribute;
 
 namespace MineSharp.Data.Entities {
     public class EntityFactory {
@@ -7,7 +8,7 @@ namespace MineSharp.Data.Entities {
 				int serverId, Vector3 position,
 				float pitch, float yaw,
 				Vector3 velocity, bool isOnGround,
-				Dictionary<int, Effect?> effects) {
+				Dictionary<int, Effect?> effects) { 
 
 			if (!type.IsAssignableTo(typeof(Entity)))
 				throw new ArgumentException();

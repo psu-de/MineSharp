@@ -5,6 +5,7 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
+using Attribute = MineSharp.Core.Types.Attribute;
 
 namespace MineSharp.Bot.Modules {
     public class EntityModule : Module {
@@ -32,6 +33,7 @@ namespace MineSharp.Bot.Modules {
             this.Bot.On<PacketEntityTeleport>(handleEntityTeleport);
             this.Bot.On<PacketEntityEffect>(handleEntityEffect);
             this.Bot.On<PacketRemoveEntityEffect>(handleRemoveEntityEffect);
+            this.Bot.On<PacketEntityUpdateAttributes>(handleEntityUpdateAttributes);
 
             await this.SetEnabled(true);
         }
@@ -147,6 +149,31 @@ namespace MineSharp.Bot.Modules {
                 entity.Effects.Remove(packet.EffectId!);
             }
             EntityEffectChanged?.Invoke(this.Bot, entity);
+            return Task.CompletedTask;
+        }
+
+        private Task handleEntityUpdateAttributes(PacketEntityUpdateAttributes packet)
+        {
+            if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+                return Task.CompletedTask;
+
+            foreach (var attr in packet.Properties)
+            {
+                var attribute = new Attribute(attr.Key, 
+                                              attr.Value, 
+                                              attr.Modifiers
+                                                .Select(m =>
+                                                    new Modifier(m.Uuid, m.Amount, (byte)m.Operation)).ToList());
+                if (entity.Attributes.ContainsKey(attr.Key))
+                {
+                    entity.Attributes[attr.Key] = attribute;
+                } else
+                {
+                    entity.Attributes.Add(attr.Key, attribute);
+                }
+            }
+
+
             return Task.CompletedTask;
         }
 

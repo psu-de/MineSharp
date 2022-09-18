@@ -18,8 +18,9 @@
         public Vector3 Velocity { get; set; }
         public bool IsOnGround { get; set; }
         public Dictionary<int, Effect?> Effects { get; set; }
+        public Dictionary<string, Attribute> Attributes { get; set; }
 
-        public Entity(int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects,
+        public Entity(int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects, 
             int id, string name, string displayName, float width, float height, int category) {
             Id = id;
             Name = name;
@@ -34,6 +35,7 @@
             Velocity = velocity;
             IsOnGround = isOnGround;
             Effects = effects;
+            Attributes = new Dictionary<string, Attribute>();
         }
 
         public int? GetEffectLevel(int effectId) {
