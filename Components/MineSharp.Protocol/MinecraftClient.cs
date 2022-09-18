@@ -221,7 +221,8 @@ namespace MineSharp.Protocol {
                     {
                         // for now just ignore the packet,
                         // since i have no idea why this happens
-                        packetTask.SendingTsc.TrySetCanceled();
+                        if (packetTask.SendingTsc != null)
+                            packetTask.SendingTsc.TrySetCanceled();
                         continue;
                     }
 
