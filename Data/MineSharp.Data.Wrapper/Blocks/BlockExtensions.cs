@@ -6,7 +6,7 @@ namespace MineSharp.Data.Blocks {
 
 		public static bool IsSolid(this Block block) {
 			var id = block.Id;
-			return id == Air.BlockId || id == CaveAir.BlockId || id == VoidAir.BlockId;
+			return !(id == Air.BlockId || id == CaveAir.BlockId || id == VoidAir.BlockId);
 		}
 
 		public static int CalculateBreakingTime(this Block block, Item? heldItem, Entity miner) {
@@ -55,5 +55,13 @@ namespace MineSharp.Data.Blocks {
 
 			return shapeData.Select(x => new BlockShape(x)).ToArray();
 		}
+
+		public static AABB[] GetBoundingBoxes(this Block block)
+		{
+			var blockType = block.GetType();
+            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
+			float[][] shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[0]];
+			return shapeData.Select(x => new BlockShape(x).ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)).ToArray();
+        }
 	}
 }

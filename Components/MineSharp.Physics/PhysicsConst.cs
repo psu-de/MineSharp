@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
+using System.Data;
 
 namespace MineSharp.Physics {
     public static class PhysicsConst {
@@ -34,6 +35,10 @@ namespace MineSharp.Physics {
         public const double SlowFalling = 0.125f;
         public const double SpeedEffect = 1.2f;
         public const double SlowEffect = 0.85f;
+        public const string MovementSpeedAttribute = "generic.movement_speed";
+        public static readonly UUID SprintingUUID = UUID.Parse("662a6b8d-da3e-4c1c-8813-96ea6097278d");
+        public const double PlayerSpeed = 0.1d;
+        public const double MaxFallDistance = 0.625d;
 
         public static List<int> WaterLikeBlocks = new List<int>() {
             Seagrass.BlockId,

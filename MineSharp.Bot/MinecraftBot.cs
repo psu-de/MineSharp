@@ -69,8 +69,6 @@ namespace MineSharp.Bot {
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
             this.Client.PacketReceived += Events_PacketReceived;
-            
-
         }
 
         public async Task LoadModule(Module module) {

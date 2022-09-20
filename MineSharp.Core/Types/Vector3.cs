@@ -1,19 +1,21 @@
-﻿namespace MineSharp.Core.Types {
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace MineSharp.Core.Types {
     public class Vector3 {
 
-        public static Vector3 Zero  => new Vector3(0, 0, 0);
-        public static Vector3 Up    => new Vector3(0, 1, 0);
-        public static Vector3 Down  => new Vector3(0, -1, 0);
+        public static Vector3 Zero => new Vector3(0, 0, 0);
+        public static Vector3 Up => new Vector3(0, 1, 0);
+        public static Vector3 Down => new Vector3(0, -1, 0);
         public static Vector3 North => new Vector3(0, 0, -1);
         public static Vector3 South => new Vector3(0, 0, 1);
-        public static Vector3 West  => new Vector3(-1, 0, 0);
-        public static Vector3 East  => new Vector3(1, 0, 0);
+        public static Vector3 West => new Vector3(-1, 0, 0);
+        public static Vector3 East => new Vector3(1, 0, 0);
 
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
 
-        public static implicit operator Position(Vector3 x) => new Position((int)x.X, (int)x.Y, (int)x.Z);  
+        public static implicit operator Position(Vector3 x) => new Position((int)Math.Floor(x.X), (int)Math.Ceiling(x.Y), (int)Math.Floor(x.Z));
         public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
 
         public Vector3(double x, double y, double z) {
@@ -62,6 +64,17 @@
             return new Vector3(this.X - v.X, this.Y - v.Y, this.Z - v.Z);
         }
 
+        public void Mul(Vector3 v)
+        {
+            this.X *= v.X;
+            this.Y *= v.Y;
+            this.Z *= v.Z;
+        }
+
+        public Vector3 Multiply(Vector3 v)
+        {
+            return new Vector3(this.X * v.X, this.Y * v.Y, this.Z * v.Z);
+        }
 
         public double DistanceSquared(Vector3 v) {
             var diff = this.Minus(v);
