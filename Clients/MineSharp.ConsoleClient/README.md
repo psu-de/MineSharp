@@ -3,11 +3,12 @@ Command Prompt for [MineSharp.Bot](https://github.com/psu-de/MineSharp/tree/main
 
  ![console picture](https://i.ibb.co/HgYtkN0/Bild-2022-07-20-141355981.png)
 
-## Commands
-Supports following commands by now:
-
+ 
 ToDo's:
  - Exit the prompt when the bot disconnects
+
+## Commands
+Supports following commands by now:
 
 
 ### Prompt specific commands
