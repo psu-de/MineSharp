@@ -135,16 +135,16 @@ namespace MineSharp.Physics
             var moveVector = Vector3.Zero;
 
             if (controls.Forward)
-                moveVector.Z += 1;
-
-            if (controls.Back)
-                moveVector.Z -= 1;
-
-            if (controls.Left)
                 moveVector.X += 1;
 
-            if (controls.Right)
+            if (controls.Back)
                 moveVector.X -= 1;
+
+            if (controls.Left)
+                moveVector.Z += 1;
+
+            if (controls.Right)
+                moveVector.Z -= 1;
 
             return moveVector;
         }
@@ -859,7 +859,7 @@ namespace MineSharp.Physics
             strafe *= speed;
             forward *= speed;
 
-            var rotationYaw = -this.Player.Yaw;
+            var rotationYaw = this.Player.Yaw;
             var sinYaw = MathF.Sin(rotationYaw * MathF.PI / 180.0F);
             var cosYaw = MathF.Cos(rotationYaw * MathF.PI / 180.0F);
 
