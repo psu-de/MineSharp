@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
+using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
 
 /*
@@ -12,7 +13,7 @@ using MineSharp.Data.Entities;
 
 namespace MineSharp.Physics
 {
-    public class Physics
+    public class PhysicsEngine
     {
         static Logger Logger = Logger.GetLogger();
 
@@ -20,14 +21,14 @@ namespace MineSharp.Physics
         public PlayerState PlayerState;
         public World.World World;
 
-        public Physics(Player player, World.World world)
+        public PhysicsEngine(Player player, World.World world)
         {
             this.World = world;
             this.Player = player;
             this.PlayerState = new PlayerState(player);
         }
 
-        public void SimulatePlayer(PlayerControls controls)
+        public void SimulatePlayer(MovementControls controls)
         {
             Logger.Debug2($"---- ---- ---- Physics Tick ---- ---- ----");
             Logger.Debug2($"Start: Vel={this.Player.Velocity} Pos={this.Player.Position}");
@@ -53,7 +54,7 @@ namespace MineSharp.Physics
             }
 
             var movementFactor = movementFactorAttr.Value;
-            Logger.Debug($"MovementFactor: {movementFactor}, sprinting={controls.Sprint}");
+            Logger.Debug2($"MovementFactor: {movementFactor}, sprinting={controls.Sprint}");
             var slipperiness = 0.91d;
 
             if (this.PlayerState.IsInWater)
@@ -80,7 +81,22 @@ namespace MineSharp.Physics
                 }
             }
 
-            Logger.Debug($"MovementFactor Applied: {movementFactor}, sprinting={controls.Sprint}");
+            Logger.Debug2($"MovementFactor Applied: {movementFactor}, sprinting={controls.Sprint}");
+
+            if (controls.Jump)
+            {
+                if (onGround)
+                {
+                    var blockUnder = this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down));
+                    this.Player.Velocity.Y += 0.42d * (blockUnder.Id == HoneyBlock.BlockId ? PhysicsConst.HoneyblockJumpSpeed : 1);
+
+                    var effectLevel = this.Player.GetEffectLevel(JumpboostEffect.EffectId);
+                    if (effectLevel.HasValue)
+                    {
+                        this.Player.Velocity.Y += 0.1d * effectLevel.Value;
+                    }
+                }
+            }
 
             var heading = CalculateHeading(controls);
             Logger.Debug2($"Heading: {heading}");
@@ -142,7 +158,7 @@ namespace MineSharp.Physics
             return clone;
         }
 
-        private Vector3 CalculateHeading(PlayerControls controls)
+        private Vector3 CalculateHeading(MovementControls controls)
         {
             var moveVector = Vector3.Zero;
 
@@ -166,11 +182,10 @@ namespace MineSharp.Physics
             var w = PhysicsConst.PlayerHalfWidth;
             var bb = new AABB(-w, 0, -w, w, PhysicsConst.PlayerHeight, w)
                 .Offset(pos.X, pos.Y, pos.Z);
-            Logger.Debug2($"PlayerBB: {bb}");
             return bb;
         }
 
-        private void Move(PlayerControls controls, Vector3 amount)
+        private void Move(MovementControls controls, Vector3 amount)
         {
             var wasOnGround = this.Player.IsOnGround;
             Logger.Debug2($"Move by amount: {amount}, wasOnGround={wasOnGround}");
@@ -204,6 +219,7 @@ namespace MineSharp.Physics
         {
             Logger.Debug2($"Checking on ground...");
             var entityBoundingBox = GetPlayerBB(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
+            Logger.Debug2($"PlayerBB: {entityBoundingBox}");
 
             var offset = 0f;
 
@@ -227,7 +243,6 @@ namespace MineSharp.Physics
                 for (int z = (int)(Math.Floor(minZ)); z <= (int)(Math.Ceiling(maxZ)); z++)
                 {
                     var block = this.World.GetBlockAt(new Position(x, y, z));
-                    Logger.Debug2($"Checking {block.Position}: {block}");
 
                     if (!block.IsSolid())
                         continue;
@@ -236,9 +251,6 @@ namespace MineSharp.Physics
 
                     foreach (var box in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                     {
-                        Logger.Debug2($"Block Collision box: {box}");
-                        Logger.Debug2($"Intersects: {box.Intersects(entityBoundingBox)}");
-
                         if (box.Intersects(entityBoundingBox))
                         {
                             return true;

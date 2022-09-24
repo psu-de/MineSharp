@@ -60,7 +60,6 @@ namespace MineSharp.ConsoleClient.Console {
                 RegisterCommand(new SetRotationCommand());
                 RegisterCommand(new LookAtCommand());
                 RegisterCommand(new MoveCommand());
-                RegisterCommand(new PhysicsTickCommand());
                 RegisterCommand(new SelectHotbarSlotCommand());
                 RegisterCommand(new RaycastCommand());
 

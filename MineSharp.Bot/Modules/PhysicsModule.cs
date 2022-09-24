@@ -1,13 +1,14 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Bot.Modules.Physics;
+using MineSharp.Core.Types;
 using MineSharp.Physics;
 using static MineSharp.Bot.MinecraftBot;
 
 namespace MineSharp.Bot.Modules {
     public class PhysicsModule : TickedModule {
 
-        public Physics.Physics? Physics;
+        public PhysicsEngine? Physics;
 
-        public PlayerControls MovementControls = new PlayerControls();
+        public PlayerControls PlayerControls;
         private PlayerInfoState LastPlayerState = new PlayerInfoState();
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace MineSharp.Bot.Modules {
         }
 
         public PhysicsModule(MinecraftBot bot) : base(bot) {
+            PlayerControls = new PlayerControls(bot);
         }
 
         protected override async Task Load() {
@@ -38,13 +40,13 @@ namespace MineSharp.Bot.Modules {
 
             await UpdateServerPos();
 
-            this.Physics = new Physics.Physics(Bot.BotEntity!, Bot.World!);
+            this.Physics = new PhysicsEngine(Bot.BotEntity!, Bot.World!);
             await this.SetEnabled(true);
         }
 
         public override Task Tick() {
             return Task.Run(async () => {
-                this.Physics!.SimulatePlayer(this.MovementControls);
+                this.Physics!.SimulatePlayer(this.PlayerControls.PrepareForPhysicsTick());
                 await UpdateServerPos();
             });
         }

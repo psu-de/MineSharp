@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Bot.Modules.Physics;
+using MineSharp.Core.Types;
 using MineSharp.Physics;
 
 namespace MineSharp.Bot {
@@ -13,8 +14,8 @@ namespace MineSharp.Bot {
         }
 
 
-        public Physics.Physics? Physics => PhysicsModule!.Physics;
-        public PlayerControls MovementControls => PhysicsModule!.MovementControls;
+        public Physics.PhysicsEngine? Physics => PhysicsModule!.Physics;
+        public PlayerControls PlayerControls => PhysicsModule!.PlayerControls;
 
         [BotFunction("Physics", "Sets the bots rotation to a given yaw and pitch")]
         public void ForceSetRotation(float yaw, float pitch) => this.PhysicsModule!.ForceSetRotation(yaw, pitch);

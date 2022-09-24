@@ -127,7 +127,7 @@ namespace MineSharp.Bot.Modules {
 
             if (entity.Position.DistanceSquared(this.BotEntity!.Position) > 36) throw new InvalidOperationException("Too far");
 
-            var packet = new Data.Protocol.Play.Serverbound.PacketEntityAction(entity.Id, 1, Bot.MovementControls.Sneak ? 0 : 1); // Maybe invert sneak?
+            var packet = new PacketEntityAction(entity.Id, 1, Bot.PlayerControls.IsSneaking ? 0 : 1); // Maybe invert sneak?
             return this.Bot.Client.SendPacket(packet);
         }
 
