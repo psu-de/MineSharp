@@ -5,11 +5,12 @@
         private static StreamWriter? BotLogWriter;
 
         public static void Initialize (Bot.MinecraftBot.BotOptions options) {
-            BotLogWriter = new StreamWriter(BotLog);
-            BotLogWriter.AutoFlush = true;
+            BotLogWriter = new StreamWriter(BotLog) {
+                AutoFlush = true,
+            };
 
-            MineSharp.Core.Logging.Logger.LogWriter = BotLogWriter;
-            Bot = new MineSharp.Bot.MinecraftBot(options);
+            Core.Logging.Logger.AddScope(Core.Logging.LogLevel.DEBUG3, (s) => BotLogWriter.WriteLine(s));
+            Bot = new Bot.MinecraftBot(options);
         }
 
         public static Bot.MinecraftBot? Bot;

@@ -7,6 +7,15 @@ using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Net;
 
+const string DEBUG_LOG_FILE = "log_full.txt";
+const string LOG_FILE = "log.txt";
+const bool APPEND_LOG = true;
+
+var logfileWriter = new StreamWriter(LOG_FILE, APPEND_LOG) { AutoFlush = true };
+var debugFileWriter = new StreamWriter(DEBUG_LOG_FILE, APPEND_LOG) { AutoFlush = true };
+Logger.AddScope(LogLevel.DEBUG, (s) => logfileWriter.WriteLine(s));
+Logger.AddScope(LogLevel.DEBUG3, (s) => debugFileWriter.WriteLine(s));
+
 //Credentials
 MineSharp.Bot.MinecraftBot.BotOptions loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions();
 

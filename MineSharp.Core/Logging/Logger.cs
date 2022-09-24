@@ -6,7 +6,7 @@ namespace MineSharp.Core.Logging {
 
         public static LogLevel Threshold = LogLevel.DEBUG3;
 
-        public static TextWriter LogWriter = Console.Out;
+        internal static List<LogScope> Scopes = new List<LogScope>();
         public static List<LogMessage> LogMessages = new List<LogMessage>();
 
         public delegate void LogMessageEvent(LogMessage message);
@@ -57,6 +57,10 @@ namespace MineSharp.Core.Logging {
             }
         }
 
+        public static void AddScope(LogLevel threshold, Action<string> writeLine)
+        {
+            Scopes.Add(new LogScope(threshold, writeLine));
+        }
         
 
         public static Logger GetLogger(string? module = null) {
@@ -109,10 +113,13 @@ namespace MineSharp.Core.Logging {
                 Message = message
             };
 
-
-            LogWriter.WriteLine(log.ToString());
-            if (level <= LogLevel.DEBUG) {
-                System.Diagnostics.Debug.WriteLine(log.ToString());
+            var msg = log.ToString();
+            foreach (var scope in Scopes)
+            {
+                if (level <= scope.Threshold)
+                {
+                    scope.WriteLine(msg);
+                }
             }
 
             if (level == LogLevel.DEBUG3) {

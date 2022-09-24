@@ -7,10 +7,16 @@ using MineSharp.Data.Protocol;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Windows;
+using System.Diagnostics;
 using Item = MineSharp.Core.Types.Item;
 
 namespace MineSharp.Bot {
     public partial class MinecraftBot {
+
+        static MinecraftBot()
+        {
+            Logger.AddScope(LogLevel.DEBUG, (s) => Debug.WriteLine(s));
+        }
 
         private static Logger Logger = Logger.GetLogger();
 
