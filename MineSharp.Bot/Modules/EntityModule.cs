@@ -163,7 +163,7 @@ namespace MineSharp.Bot.Modules {
                                               attr.Value, 
                                               attr.Modifiers
                                                 .Select(m =>
-                                                    new Modifier(m.Uuid, m.Amount, (byte)m.Operation)).ToList());
+                                                    new Modifier(m.Uuid, m.Amount, (ModifierOp)m.Operation)).ToList());
                 if (entity.Attributes.ContainsKey(attr.Key))
                 {
                     entity.Attributes[attr.Key] = attribute;

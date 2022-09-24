@@ -43,7 +43,17 @@ namespace MineSharp.Physics
                     PhysicsConst.PlayerSpeed,
                     new List<Modifier>());
             }
+            
+            if (controls.Sprint)
+            {
+                if(!movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod)) {
+                    spMod = new Modifier(PhysicsConst.SprintingUUID, PhysicsConst.SprintSpeed, ModifierOp.Multiply);
+                    movementFactorAttr.Modifiers.Add(PhysicsConst.SprintingUUID, spMod);
+                }
+            }
+
             var movementFactor = movementFactorAttr.Value;
+            Logger.Debug($"MovementFactor: {movementFactor}, sprinting={controls.Sprint}");
             var slipperiness = 0.91d;
 
             if (this.PlayerState.IsInWater)
@@ -69,6 +79,8 @@ namespace MineSharp.Physics
                     movementFactor = 0.02d;
                 }
             }
+
+            Logger.Debug($"MovementFactor Applied: {movementFactor}, sprinting={controls.Sprint}");
 
             var heading = CalculateHeading(controls);
             Logger.Debug2($"Heading: {heading}");
@@ -191,7 +203,7 @@ namespace MineSharp.Physics
         private bool DetectOnGround()
         {
             Logger.Debug2($"Checking on ground...");
-            var entityBoundingBox = GetPlayerBB(this.Player.Position);
+            var entityBoundingBox = GetPlayerBB(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
 
             var offset = 0f;
 
@@ -222,13 +234,10 @@ namespace MineSharp.Physics
 
                     var coords = new Vector3(x, y, z);
 
-                    foreach (var box in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)).OrderBy(x => x.MaxY))
+                    foreach (var box in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                     {
                         Logger.Debug2($"Block Collision box: {box}");
-                        var yDifference = Math.Abs(entityBoundingBox.MinY - box.MaxY); // <= 0.01f
-
-                        if (yDifference > 0.015f)
-                            continue;
+                        Logger.Debug2($"Intersects: {box.Intersects(entityBoundingBox)}");
 
                         if (box.Intersects(entityBoundingBox))
                         {

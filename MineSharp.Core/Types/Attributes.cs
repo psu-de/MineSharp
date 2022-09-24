@@ -17,9 +17,9 @@ namespace MineSharp.Core.Types
                                             var op = t.Key;
                                             var modifiers = t.Select(x => x.Value);
                                             return op switch {
-                                                0 => modifiers.Aggregate(x, (y, t) => y += t.Amount),
-                                                1 => x * (1 + modifiers.Select(x => x.Amount).Sum()),
-                                                2 => modifiers.Aggregate(x, (y, t) => y *= 1 + t.Amount),
+                                                ModifierOp.Add => modifiers.Aggregate(x, (y, t) => y += t.Amount),
+                                                ModifierOp.MultiplyBase => x * (1 + modifiers.Select(x => x.Amount).Sum()),
+                                                ModifierOp.Multiply => modifiers.Aggregate(x, (y, t) => y *= 1 + t.Amount),
                                                 _ => throw new NotSupportedException($"Modifier operation {op} not supported")
                                             };
                                         });
@@ -32,13 +32,20 @@ namespace MineSharp.Core.Types
         }
     }
 
+    public enum ModifierOp
+    {
+        Add = 0,
+        MultiplyBase = 1,
+        Multiply = 2
+    }
+
     public struct Modifier
     {
         public UUID UUID { get; set; }
         public double Amount { get; set; }
-        public byte Operation { get; set; }
+        public ModifierOp Operation { get; set; }
 
-        public Modifier(UUID uuid, double amount, byte operation)
+        public Modifier(UUID uuid, double amount, ModifierOp operation)
         {
             this.UUID = uuid;
             this.Amount = amount;

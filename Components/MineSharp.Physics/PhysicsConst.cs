@@ -11,7 +11,7 @@ namespace MineSharp.Physics {
         public const double Airdrag = 0.98f; 
         public const double YawSpeed = 3.0f;
         public const double PitchSpeed = 3.0f;
-        public const double SprintSpeed = 1.3f;
+        public const double SprintSpeed = 0.3d;
         public const double SneakSpeed = 0.3f;
         public const double StepHeight = 0.6f;
         public const double NegligeableVelocity = 0.003f;

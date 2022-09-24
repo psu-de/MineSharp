@@ -113,9 +113,21 @@
         }
 
         public bool Intersects(AABB other) {
-            return this.MinX < other.MaxX && this.MaxX > other.MinX &&
-                   this.MinY < other.MaxY && this.MaxY > other.MinY &&
-                   this.MinZ < other.MaxZ && this.MaxZ > other.MinZ;
+            if (this.MaxX >= other.MinX && this.MinX <= other.MaxX)
+            {
+                if (this.MaxY < other.MinY || this.MinY > other.MaxY)
+                {
+                    return false;
+                }
+                else
+                {
+                    return this.MaxZ >= other.MinZ && this.MinZ <= other.MaxZ;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool Contains(double x, double y, double z) {
