@@ -51,7 +51,12 @@ namespace MineSharp.Data.Blocks {
 
 			var blockType = block.GetType();
 			var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
-			float[][] shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[0]];
+			var idx = 0;
+			if (shapeIndices.Length > 1)
+			{
+				idx = block.Metadata;
+			}
+			float[][] shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[idx]];
 
 			return shapeData.Select(x => new BlockShape(x)).ToArray();
 		}

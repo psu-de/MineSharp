@@ -3,6 +3,7 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
+using System.Diagnostics;
 
 /*
  Thanks to https://github.com/ConcreteMC/Alex
@@ -30,10 +31,6 @@ namespace MineSharp.Physics
 
         public void SimulatePlayer(MovementControls controls)
         {
-            Logger.Debug2($"---- ---- ---- Physics Tick ---- ---- ----");
-            Logger.Debug2($"Start: Vel={this.Player.Velocity} Pos={this.Player.Position}");
-            Logger.Debug2($"       OnGround={this.Player.IsOnGround}");
-
             var playerBB = GetPlayerBB(this.Player.Position);
             var onGround = this.Player.IsOnGround;
             if (!this.Player.Attributes.TryGetValue(
@@ -54,7 +51,6 @@ namespace MineSharp.Physics
             }
 
             var movementFactor = movementFactorAttr.Value;
-            Logger.Debug2($"MovementFactor: {movementFactor}, sprinting={controls.Sprint}");
             var slipperiness = 0.91d;
 
             if (this.PlayerState.IsInWater)
@@ -81,7 +77,6 @@ namespace MineSharp.Physics
                 }
             }
 
-            Logger.Debug2($"MovementFactor Applied: {movementFactor}, sprinting={controls.Sprint}");
 
             if (controls.Jump)
             {
@@ -99,7 +94,6 @@ namespace MineSharp.Physics
             }
 
             var heading = CalculateHeading(controls);
-            Logger.Debug2($"Heading: {heading}");
             // TODO: When swimming rotate heading vector
             //       by Pitch radians 
 
@@ -113,7 +107,6 @@ namespace MineSharp.Physics
             }
 
             heading = ApplyHeading(strafing, forward, movementFactor);
-            Logger.Debug2($"Applied heading: {heading}");
 
             this.Player.Velocity.Add(heading);
 
@@ -121,7 +114,6 @@ namespace MineSharp.Physics
 
             if (!this.Player.IsOnGround)
             {
-                Logger.Debug2($"Applying gravity");
                 var gravity = PhysicsConst.Gravity;
 
                 if (this.PlayerState.IsInWater)
@@ -141,9 +133,6 @@ namespace MineSharp.Physics
             }
 
             this.Player.Velocity = TruncateVector(this.Player.Velocity);
-
-            Logger.Debug2($"Start: Vel={this.Player.Velocity} Pos={this.Player.Position}");
-            Logger.Debug2($"---- ---- ---- - End Tick - ---- ---- ----");
         }
 
         private Vector3 TruncateVector(Vector3 vector)
@@ -188,7 +177,6 @@ namespace MineSharp.Physics
         private void Move(MovementControls controls, Vector3 amount)
         {
             var wasOnGround = this.Player.IsOnGround;
-            Logger.Debug2($"Move by amount: {amount}, wasOnGround={wasOnGround}");
 
             bool collideY = CheckY(ref amount, false);
             bool collideX = CheckX(ref amount, false);
@@ -203,7 +191,6 @@ namespace MineSharp.Physics
             {
                 collideZ = true;
             }
-            Logger.Debug2($"CollidedX: {collideX} CollidedY: {collideY} CollidedZ: {collideZ}");
 
             if (controls.Sneak && wasOnGround)
             {
@@ -212,15 +199,12 @@ namespace MineSharp.Physics
 
             this.Player.Position.Add(amount);
             this.Player.IsOnGround = DetectOnGround();
-            Logger.Debug2($"New OnGround: {this.Player.IsOnGround}");
         }
 
         private bool DetectOnGround()
         {
-            Logger.Debug2($"Checking on ground...");
             var entityBoundingBox = GetPlayerBB(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
-            Logger.Debug2($"PlayerBB: {entityBoundingBox}");
-
+         
             var offset = 0f;
 
             if (entityBoundingBox.MinY % 1 < 0.05f)
@@ -236,7 +220,6 @@ namespace MineSharp.Physics
             var maxZ = entityBoundingBox.MaxZ;
 
             var y = (int)Math.Floor(entityBoundingBox.MinY + offset);
-            Logger.Debug2($"Y: {y}");
 
             for (int x = (int)(Math.Floor(minX)); x <= (int)(Math.Ceiling(maxX)); x++)
             {
@@ -324,7 +307,7 @@ namespace MineSharp.Physics
 
         private IEnumerable<AABB> GetIntersecting(AABB box)
         {
-            var minX = (int)Math.Floor(box.MinY);
+            var minX = (int)Math.Floor(box.MinX);
             var maxX = (int)Math.Ceiling(box.MaxX);
 
             var minZ = (int)Math.Floor(box.MinZ);
@@ -342,6 +325,7 @@ namespace MineSharp.Physics
                         var coords = new Vector3(x, y, z);
 
                         var block = this.World.GetBlockAt(new Position(x, y, z));
+
 
                         if (block == null)
                             continue;
@@ -393,7 +377,6 @@ namespace MineSharp.Physics
         {
             if (!TestTerrainCollisionX(amount, out _, out var collisionX, checkOther))
                 return false;
-
             var climbingResult = CheckClimbing(amount, out double yValue);
             if (climbingResult == CollisionResult.ClimbHalfBlock)
             {
@@ -417,6 +400,7 @@ namespace MineSharp.Physics
                 return false;
 
             var climbingResult = CheckClimbing(amount, out double yValue);
+
             if (climbingResult == CollisionResult.ClimbHalfBlock)
             {
                 amount.Y = yValue;
@@ -535,7 +519,9 @@ namespace MineSharp.Physics
 
             bool negative;
 
-            var entityBox = GetPlayerBB(this.Player.Position);
+            var p = this.Player.Position;
+            if (includeOther) p = p.Plus(velocity);
+            var entityBox = GetPlayerBB(p);
             AABB testBox;
 
             Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
@@ -671,7 +657,9 @@ namespace MineSharp.Physics
 
             bool negative;
 
-            var entityBox = GetPlayerBB(this.Player.Position);
+            var p = this.Player.Position;
+            if (includeOther) p = p.Plus(velocity);
+            var entityBox = GetPlayerBB(p);
             AABB testBox;
 
             Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
@@ -815,12 +803,12 @@ namespace MineSharp.Physics
                 canJump = true;
                 var adjusted = GetPlayerBB(this.Player.Position.Plus(amount));
                 var intersecting = GetIntersecting(adjusted);
+
                 var targetY = 0d;
 
                 foreach (var box in intersecting)
                 {
                     var yDifference = box.MaxY - adjusted.MinY;
-
                     if (yDifference > PhysicsConst.StepHeight)
                     {
                         canJump = false;
