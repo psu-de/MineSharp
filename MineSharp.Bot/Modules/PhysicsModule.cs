@@ -47,7 +47,7 @@ namespace MineSharp.Bot.Modules {
         public override Task Tick() {
             return Task.Run(async () => {
                 this.Physics!.SimulatePlayer(this.PlayerControls.PrepareForPhysicsTick());
-                await UpdateServerPos();
+                await UpdateServerPositionIfNeeded();
             });
         }
 
