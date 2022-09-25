@@ -24,5 +24,10 @@
             this.Duration = duration;
         }
 
+        public override string ToString()
+        {
+            return $"Effect (Name={Name} Id={Id} Amplifier={Amplifier} Duration={Duration})";
+        }
+
     }
 }

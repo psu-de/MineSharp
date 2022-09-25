@@ -4,8 +4,6 @@
         public Item? Item { get; set; } = null;
         public short SlotNumber { get; set; }
 
-        public Slot() { }
-
         public Slot(Item? item, short slotNumber) {
             this.Item = item;
             this.SlotNumber = slotNumber;
@@ -30,6 +28,11 @@
 
         public Slot Clone() {
             return new Slot(this.Item, this.SlotNumber);
+        }
+
+        public override string ToString()
+        {
+            return $"Slot (Index={SlotNumber} Item={Item?.ToString() ?? "None"})";
         }
     }
 }

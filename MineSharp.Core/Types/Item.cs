@@ -32,7 +32,7 @@ namespace MineSharp.Core.Types {
         }
 
         public override string ToString() {
-            return $"Item(id={this.Id}, Name={this.Name}, Count={Count}, Metadata={(Metadata == null ? "None" : Metadata.ToString())})";
+            return $"Item (Name={this.Name} Id={this.Id} Count={Count} Metadata={(Metadata == null ? "None" : Metadata.ToString())})";
         }
 
 

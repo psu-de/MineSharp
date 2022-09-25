@@ -126,5 +126,10 @@
 			this.Position = pos; 
 			this.Properties.Set(this.Metadata);
 		}
+
+		public override string ToString()
+		{
+			return $"Block (Name={Name} Id={Id} StateId={State} Position={Position})";
+		}
 	}
 }

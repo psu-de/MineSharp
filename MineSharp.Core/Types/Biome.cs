@@ -24,5 +24,10 @@
             this.Color = color;
             this.Rainfall = rainfall;
         }
+
+        public override string ToString()
+        {
+            return $"Biome (Name={Name} Id={Id})";
+        }
     }
 }

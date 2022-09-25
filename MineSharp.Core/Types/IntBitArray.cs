@@ -1,8 +1,5 @@
 ﻿namespace MineSharp.Core.Types {
     public class IntBitArray {
-
-
-
         public long[] Data { get; private set; }
         public byte BitsPerEntry { get; private set; }
         public int Capacity => ValuesPerLong * Data.Length;

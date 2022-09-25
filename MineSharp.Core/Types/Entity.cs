@@ -54,5 +54,10 @@
                 -Math.Sin(PitchRadians),
                 len * Math.Cos(YawRadians));
         }
+
+        public override string ToString()
+        {
+            return $"Entity (Name={Name} Id={Id} Position={Position})";
+        }
     }
 }

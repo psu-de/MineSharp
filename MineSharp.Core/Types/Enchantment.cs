@@ -48,5 +48,10 @@
             {
             this.Level = level;
         }
+
+        public override string ToString()
+        {
+            return $"Enchantment (Name={Name} Id={Id} Level={Level})";
+        }
     }
 }
