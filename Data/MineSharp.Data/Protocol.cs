@@ -1039,6 +1039,822 @@ namespace MineSharp.Data.Protocol {
 			return new ChunkBlockEntity(@anon, @y, @type, @nbtData);
 		}
 	}
+	public class CommandNode {
+		public class FlagsBitfield {
+			public byte Value { get; set; }
+			public FlagsBitfield(byte value) {
+				this.Value = value;
+			}
+			public byte Unused { 
+			    get { 
+			        return (byte)(((byte)Value! >> 5 & (7)));
+			    }
+				set { 
+			        var val = value << 5; 
+			        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+			        this.Value = (byte)((byte)x | (byte)val); 
+			    }
+			}
+			public byte HasCustomSuggestions { 
+			    get { 
+			        return (byte)(((byte)Value! >> 4 & (1)));
+			    }
+				set { 
+			        var val = value << 4; 
+			        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+			        this.Value = (byte)((byte)x | (byte)val); 
+			    }
+			}
+			public byte HasRedirectNode { 
+			    get { 
+			        return (byte)(((byte)Value! >> 3 & (1)));
+			    }
+				set { 
+			        var val = value << 3; 
+			        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+			        this.Value = (byte)((byte)x | (byte)val); 
+			    }
+			}
+			public byte HasCommand { 
+			    get { 
+			        return (byte)(((byte)Value! >> 2 & (1)));
+			    }
+				set { 
+			        var val = value << 2; 
+			        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+			        this.Value = (byte)((byte)x | (byte)val); 
+			    }
+			}
+			public byte CommandNodeType { 
+			    get { 
+			        return (byte)(((byte)Value! >> 0 & (3)));
+			    }
+				set { 
+			        var val = value << 0; 
+			        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+			        this.Value = (byte)((byte)x | (byte)val); 
+			    }
+			}
+		}
+		public class RedirectNodeSwitch {
+			public object? Value { get; set; }
+			public RedirectNodeSwitch(object? value) {
+				this.Value = value;
+			}
+			public void Write(PacketBuffer buffer, byte state) {
+				switch (state) {
+					case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
+					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+				}
+			}
+			public static RedirectNodeSwitch Read(PacketBuffer buffer, byte state) {
+				object? value = state switch {
+					1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
+					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+				};
+				return new RedirectNodeSwitch(value);
+			}
+			public static implicit operator VarInt?(RedirectNodeSwitch value) => (VarInt?)value.Value;
+			public static implicit operator RedirectNodeSwitch?(VarInt? value) => new RedirectNodeSwitch(value);
+		}
+		public class ExtraNodeDataSwitch {
+			public class ExtraNodeDataSwitchState1Container {
+				public string Name { get; set; }
+				public ExtraNodeDataSwitchState1Container(string @name) {
+					this.Name = @name;
+				}
+				public void Write(PacketBuffer buffer ) {
+					((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
+				}
+				public static ExtraNodeDataSwitchState1Container Read(PacketBuffer buffer ) {
+					string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+					return new ExtraNodeDataSwitchState1Container(@name);
+				}
+			}
+			public class ExtraNodeDataSwitchState2Container {
+				public class PropertiesSwitch {
+					public class PropertiesSwitchStatebrigadierFloatContainer {
+						public class FlagsBitfield {
+							public byte Value { get; set; }
+							public FlagsBitfield(byte value) {
+								this.Value = value;
+							}
+							public byte Unused { 
+							    get { 
+							        return (byte)(((byte)Value! >> 2 & (63)));
+							    }
+								set { 
+							        var val = value << 2; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MaxPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 1 & (1)));
+							    }
+								set { 
+							        var val = value << 1; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MinPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 0 & (1)));
+							    }
+								set { 
+							        var val = value << 0; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+						}
+						public class MinSwitch {
+							public object? Value { get; set; }
+							public MinSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MinSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MinSwitch(value);
+							}
+							public static implicit operator float?(MinSwitch value) => (float?)value.Value;
+							public static implicit operator MinSwitch?(float? value) => new MinSwitch(value);
+						}
+						public class MaxSwitch {
+							public object? Value { get; set; }
+							public MaxSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MaxSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MaxSwitch(value);
+							}
+							public static implicit operator float?(MaxSwitch value) => (float?)value.Value;
+							public static implicit operator MaxSwitch?(float? value) => new MaxSwitch(value);
+						}
+						public FlagsBitfield Flags { get; set; }
+						public MinSwitch Min { get; set; }
+						public MaxSwitch Max { get; set; }
+						public PropertiesSwitchStatebrigadierFloatContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							this.Flags = @flags;
+							this.Min = @min;
+							this.Max = @max;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
+							((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
+							((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
+						}
+						public static PropertiesSwitchStatebrigadierFloatContainer Read(PacketBuffer buffer ) {
+							FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
+							MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
+							MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
+							return new PropertiesSwitchStatebrigadierFloatContainer(@flags, @min, @max);
+						}
+					}
+					public class PropertiesSwitchStatebrigadierDoubleContainer {
+						public class FlagsBitfield {
+							public byte Value { get; set; }
+							public FlagsBitfield(byte value) {
+								this.Value = value;
+							}
+							public byte Unused { 
+							    get { 
+							        return (byte)(((byte)Value! >> 2 & (63)));
+							    }
+								set { 
+							        var val = value << 2; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MaxPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 1 & (1)));
+							    }
+								set { 
+							        var val = value << 1; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MinPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 0 & (1)));
+							    }
+								set { 
+							        var val = value << 0; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+						}
+						public class MinSwitch {
+							public object? Value { get; set; }
+							public MinSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MinSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MinSwitch(value);
+							}
+							public static implicit operator double?(MinSwitch value) => (double?)value.Value;
+							public static implicit operator MinSwitch?(double? value) => new MinSwitch(value);
+						}
+						public class MaxSwitch {
+							public object? Value { get; set; }
+							public MaxSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MaxSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MaxSwitch(value);
+							}
+							public static implicit operator double?(MaxSwitch value) => (double?)value.Value;
+							public static implicit operator MaxSwitch?(double? value) => new MaxSwitch(value);
+						}
+						public FlagsBitfield Flags { get; set; }
+						public MinSwitch Min { get; set; }
+						public MaxSwitch Max { get; set; }
+						public PropertiesSwitchStatebrigadierDoubleContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							this.Flags = @flags;
+							this.Min = @min;
+							this.Max = @max;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
+							((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
+							((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
+						}
+						public static PropertiesSwitchStatebrigadierDoubleContainer Read(PacketBuffer buffer ) {
+							FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
+							MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
+							MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
+							return new PropertiesSwitchStatebrigadierDoubleContainer(@flags, @min, @max);
+						}
+					}
+					public class PropertiesSwitchStatebrigadierIntegerContainer {
+						public class FlagsBitfield {
+							public byte Value { get; set; }
+							public FlagsBitfield(byte value) {
+								this.Value = value;
+							}
+							public byte Unused { 
+							    get { 
+							        return (byte)(((byte)Value! >> 2 & (63)));
+							    }
+								set { 
+							        var val = value << 2; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MaxPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 1 & (1)));
+							    }
+								set { 
+							        var val = value << 1; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MinPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 0 & (1)));
+							    }
+								set { 
+							        var val = value << 0; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+						}
+						public class MinSwitch {
+							public object? Value { get; set; }
+							public MinSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MinSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MinSwitch(value);
+							}
+							public static implicit operator int?(MinSwitch value) => (int?)value.Value;
+							public static implicit operator MinSwitch?(int? value) => new MinSwitch(value);
+						}
+						public class MaxSwitch {
+							public object? Value { get; set; }
+							public MaxSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MaxSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MaxSwitch(value);
+							}
+							public static implicit operator int?(MaxSwitch value) => (int?)value.Value;
+							public static implicit operator MaxSwitch?(int? value) => new MaxSwitch(value);
+						}
+						public FlagsBitfield Flags { get; set; }
+						public MinSwitch Min { get; set; }
+						public MaxSwitch Max { get; set; }
+						public PropertiesSwitchStatebrigadierIntegerContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							this.Flags = @flags;
+							this.Min = @min;
+							this.Max = @max;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
+							((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
+							((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
+						}
+						public static PropertiesSwitchStatebrigadierIntegerContainer Read(PacketBuffer buffer ) {
+							FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
+							MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
+							MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
+							return new PropertiesSwitchStatebrigadierIntegerContainer(@flags, @min, @max);
+						}
+					}
+					public class PropertiesSwitchStatebrigadierLongContainer {
+						public class FlagsBitfield {
+							public byte Value { get; set; }
+							public FlagsBitfield(byte value) {
+								this.Value = value;
+							}
+							public byte Unused { 
+							    get { 
+							        return (byte)(((byte)Value! >> 2 & (63)));
+							    }
+								set { 
+							        var val = value << 2; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MaxPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 1 & (1)));
+							    }
+								set { 
+							        var val = value << 1; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+							public byte MinPresent { 
+							    get { 
+							        return (byte)(((byte)Value! >> 0 & (1)));
+							    }
+								set { 
+							        var val = value << 0; 
+							        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+							        this.Value = (byte)((byte)x | (byte)val); 
+							    }
+							}
+						}
+						public class MinSwitch {
+							public object? Value { get; set; }
+							public MinSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MinSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MinSwitch(value);
+							}
+							public static implicit operator long?(MinSwitch value) => (long?)value.Value;
+							public static implicit operator MinSwitch?(long? value) => new MinSwitch(value);
+						}
+						public class MaxSwitch {
+							public object? Value { get; set; }
+							public MaxSwitch(object? value) {
+								this.Value = value;
+							}
+							public void Write(PacketBuffer buffer, byte state) {
+								switch (state) {
+									case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
+									default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+								}
+							}
+							public static MaxSwitch Read(PacketBuffer buffer, byte state) {
+								object? value = state switch {
+									1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
+									_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+								};
+								return new MaxSwitch(value);
+							}
+							public static implicit operator long?(MaxSwitch value) => (long?)value.Value;
+							public static implicit operator MaxSwitch?(long? value) => new MaxSwitch(value);
+						}
+						public FlagsBitfield Flags { get; set; }
+						public MinSwitch Min { get; set; }
+						public MaxSwitch Max { get; set; }
+						public PropertiesSwitchStatebrigadierLongContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							this.Flags = @flags;
+							this.Min = @min;
+							this.Max = @max;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
+							((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
+							((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
+						}
+						public static PropertiesSwitchStatebrigadierLongContainer Read(PacketBuffer buffer ) {
+							FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
+							MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
+							MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
+							return new PropertiesSwitchStatebrigadierLongContainer(@flags, @min, @max);
+						}
+					}
+					public class PropertiesSwitchStateminecraftEntityBitfield {
+						public byte Value { get; set; }
+						public PropertiesSwitchStateminecraftEntityBitfield(byte value) {
+							this.Value = value;
+						}
+						public byte Unused { 
+						    get { 
+						        return (byte)(((byte)Value! >> 2 & (63)));
+						    }
+							set { 
+						        var val = value << 2; 
+						        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+						        this.Value = (byte)((byte)x | (byte)val); 
+						    }
+						}
+						public byte OnlyAllowPlayers { 
+						    get { 
+						        return (byte)(((byte)Value! >> 1 & (1)));
+						    }
+							set { 
+						        var val = value << 1; 
+						        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+						        this.Value = (byte)((byte)x | (byte)val); 
+						    }
+						}
+						public byte OnlyAllowEntities { 
+						    get { 
+						        return (byte)(((byte)Value! >> 0 & (1)));
+						    }
+							set { 
+						        var val = value << 0; 
+						        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+						        this.Value = (byte)((byte)x | (byte)val); 
+						    }
+						}
+					}
+					public class PropertiesswitchstateminecraftScoreHolderBitfield {
+						public byte Value { get; set; }
+						public PropertiesswitchstateminecraftScoreHolderBitfield(byte value) {
+							this.Value = value;
+						}
+						public byte Unused { 
+						    get { 
+						        return (byte)(((byte)Value! >> 1 & (127)));
+						    }
+							set { 
+						        var val = value << 1; 
+						        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+						        this.Value = (byte)((byte)x | (byte)val); 
+						    }
+						}
+						public byte AllowMultiple { 
+						    get { 
+						        return (byte)(((byte)Value! >> 0 & (1)));
+						    }
+							set { 
+						        var val = value << 0; 
+						        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
+						        this.Value = (byte)((byte)x | (byte)val); 
+						    }
+						}
+					}
+					public class PropertiesSwitchStateminecraftRangeContainer {
+						public bool AllowDecimals { get; set; }
+						public PropertiesSwitchStateminecraftRangeContainer(bool @allowDecimals) {
+							this.AllowDecimals = @allowDecimals;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.AllowDecimals);
+						}
+						public static PropertiesSwitchStateminecraftRangeContainer Read(PacketBuffer buffer ) {
+							bool @allowDecimals = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
+							return new PropertiesSwitchStateminecraftRangeContainer(@allowDecimals);
+						}
+					}
+					public class PropertiesswitchstateminecraftResourceOrTagContainer {
+						public string Registry { get; set; }
+						public PropertiesswitchstateminecraftResourceOrTagContainer(string @registry) {
+							this.Registry = @registry;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Registry);
+						}
+						public static PropertiesswitchstateminecraftResourceOrTagContainer Read(PacketBuffer buffer ) {
+							string @registry = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+							return new PropertiesswitchstateminecraftResourceOrTagContainer(@registry);
+						}
+					}
+					public class PropertiesSwitchStateminecraftResourceContainer {
+						public string Registry { get; set; }
+						public PropertiesSwitchStateminecraftResourceContainer(string @registry) {
+							this.Registry = @registry;
+						}
+						public void Write(PacketBuffer buffer ) {
+							((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Registry);
+						}
+						public static PropertiesSwitchStateminecraftResourceContainer Read(PacketBuffer buffer ) {
+							string @registry = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+							return new PropertiesSwitchStateminecraftResourceContainer(@registry);
+						}
+					}
+					public object? Value { get; set; }
+					public PropertiesSwitch(object? value) {
+						this.Value = value;
+					}
+					public void Write(PacketBuffer buffer, string state) {
+						switch (state) {
+							case "brigadier:bool": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "brigadier:float": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierFloatContainer)this); break;
+							case "brigadier:double": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierDoubleContainer)this); break;
+							case "brigadier:integer": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierIntegerContainer)this); break;
+							case "brigadier:long": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierLongContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierLongContainer)this); break;
+							case "brigadier:string": ((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "SINGLE_WORD" => 0, "QUOTABLE_PHRASE" => 1, "GREEDY_PHRASE" => 2, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, (string)this); break;
+							case "minecraft:entity": ((Action<PacketBuffer, PropertiesSwitchStateminecraftEntityBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, (PropertiesSwitchStateminecraftEntityBitfield)this); break;
+							case "minecraft:game_profile": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:block_pos": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:column_pos": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:vec3": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:vec2": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:block_state": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:block_predicate": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:item_stack": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:item_predicate": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:color": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:component": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:message": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:nbt": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:nbt_path": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:objective": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:objective_criteria": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:operation": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:particle": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:angle": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:rotation": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:scoreboard_slot": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:score_holder": ((Action<PacketBuffer, PropertiesswitchstateminecraftScoreHolderBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, (PropertiesswitchstateminecraftScoreHolderBitfield)this); break;
+							case "minecraft:swizzle": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:team": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:item_slot": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:resource_location": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:mob_effect": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:function": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:entity_anchor": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:range": ((Action<PacketBuffer, PropertiesSwitchStateminecraftRangeContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStateminecraftRangeContainer)this); break;
+							case "minecraft:int_range": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:float_range": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:item_enchantment": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:entity_summon": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:dimension": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:nbt_compound_tag": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:time": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							case "minecraft:resource_or_tag": ((Action<PacketBuffer, PropertiesswitchstateminecraftResourceOrTagContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesswitchstateminecraftResourceOrTagContainer)this); break;
+							case "minecraft:resource": ((Action<PacketBuffer, PropertiesSwitchStateminecraftResourceContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStateminecraftResourceContainer)this); break;
+							case "minecraft:uuid": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+							default: throw new Exception($"Invalid value: '{state}'");
+						}
+					}
+					public static PropertiesSwitch Read(PacketBuffer buffer, string state) {
+						object? value = state switch {
+							"brigadier:bool" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"brigadier:float" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierFloatContainer.Read(buffer )))(buffer),
+							"brigadier:double" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierDoubleContainer.Read(buffer )))(buffer),
+							"brigadier:integer" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierIntegerContainer.Read(buffer )))(buffer),
+							"brigadier:long" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierLongContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierLongContainer.Read(buffer )))(buffer),
+							"brigadier:string" => ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0 => "SINGLE_WORD", 1 => "QUOTABLE_PHRASE", 2 => "GREEDY_PHRASE", _ => throw new Exception() }))(buffer),
+							"minecraft:entity" => ((Func<PacketBuffer, PropertiesSwitchStateminecraftEntityBitfield>)((buffer) => new PropertiesSwitchStateminecraftEntityBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer),
+							"minecraft:game_profile" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:block_pos" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:column_pos" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:vec3" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:vec2" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:block_state" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:block_predicate" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:item_stack" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:item_predicate" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:color" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:component" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:message" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:nbt" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:nbt_path" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:objective" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:objective_criteria" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:operation" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:particle" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:angle" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:rotation" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:scoreboard_slot" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:score_holder" => ((Func<PacketBuffer, PropertiesswitchstateminecraftScoreHolderBitfield>)((buffer) => new PropertiesswitchstateminecraftScoreHolderBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer),
+							"minecraft:swizzle" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:team" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:item_slot" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:resource_location" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:mob_effect" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:function" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:entity_anchor" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:range" => ((Func<PacketBuffer, PropertiesSwitchStateminecraftRangeContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStateminecraftRangeContainer.Read(buffer )))(buffer),
+							"minecraft:int_range" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:float_range" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:item_enchantment" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:entity_summon" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:dimension" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:nbt_compound_tag" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:time" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							"minecraft:resource_or_tag" => ((Func<PacketBuffer, PropertiesswitchstateminecraftResourceOrTagContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesswitchstateminecraftResourceOrTagContainer.Read(buffer )))(buffer),
+							"minecraft:resource" => ((Func<PacketBuffer, PropertiesSwitchStateminecraftResourceContainer>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStateminecraftResourceContainer.Read(buffer )))(buffer),
+							"minecraft:uuid" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+							 _ => throw new Exception($"Invalid value: '{state}'")
+						};
+						return new PropertiesSwitch(value);
+					}
+					public static implicit operator PropertiesSwitchStatebrigadierFloatContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierFloatContainer?)value.Value;
+					public static implicit operator PropertiesSwitchStatebrigadierDoubleContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierDoubleContainer?)value.Value;
+					public static implicit operator PropertiesSwitchStatebrigadierIntegerContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierIntegerContainer?)value.Value;
+					public static implicit operator PropertiesSwitchStatebrigadierLongContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierLongContainer?)value.Value;
+					public static implicit operator string?(PropertiesSwitch value) => (string?)value.Value;
+					public static implicit operator PropertiesSwitchStateminecraftEntityBitfield?(PropertiesSwitch value) => (PropertiesSwitchStateminecraftEntityBitfield?)value.Value;
+					public static implicit operator PropertiesswitchstateminecraftScoreHolderBitfield?(PropertiesSwitch value) => (PropertiesswitchstateminecraftScoreHolderBitfield?)value.Value;
+					public static implicit operator PropertiesSwitchStateminecraftRangeContainer?(PropertiesSwitch value) => (PropertiesSwitchStateminecraftRangeContainer?)value.Value;
+					public static implicit operator PropertiesswitchstateminecraftResourceOrTagContainer?(PropertiesSwitch value) => (PropertiesswitchstateminecraftResourceOrTagContainer?)value.Value;
+					public static implicit operator PropertiesSwitchStateminecraftResourceContainer?(PropertiesSwitch value) => (PropertiesSwitchStateminecraftResourceContainer?)value.Value;
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierFloatContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierDoubleContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierIntegerContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierLongContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(string? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStateminecraftEntityBitfield? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesswitchstateminecraftScoreHolderBitfield? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStateminecraftRangeContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesswitchstateminecraftResourceOrTagContainer? value) => new PropertiesSwitch(value);
+					public static implicit operator PropertiesSwitch?(PropertiesSwitchStateminecraftResourceContainer? value) => new PropertiesSwitch(value);
+				}
+				public class SuggestionTypeSwitch {
+					public object? Value { get; set; }
+					public SuggestionTypeSwitch(object? value) {
+						this.Value = value;
+					}
+					public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
+						switch (state) {
+							case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
+							default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
+						}
+					}
+					public static SuggestionTypeSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
+						object? value = state switch {
+							1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
+							_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
+						};
+						return new SuggestionTypeSwitch(value);
+					}
+					public static implicit operator string?(SuggestionTypeSwitch value) => (string?)value.Value;
+					public static implicit operator SuggestionTypeSwitch?(string? value) => new SuggestionTypeSwitch(value);
+				}
+				public string Name { get; set; }
+				public string Parser { get; set; }
+				public PropertiesSwitch Properties { get; set; }
+				public SuggestionTypeSwitch SuggestionType { get; set; }
+				public ExtraNodeDataSwitchState2Container(string @name, string @parser, PropertiesSwitch @properties, SuggestionTypeSwitch @suggestionType) {
+					this.Name = @name;
+					this.Parser = @parser;
+					this.Properties = @properties;
+					this.SuggestionType = @suggestionType;
+				}
+				public void Write(PacketBuffer buffer , FlagsBitfield @flags) {
+					((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
+					((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Parser);
+					((Action<PacketBuffer, PropertiesSwitch>)((buffer, value) => value.Write(buffer, Parser)))(buffer, this.Properties);
+					((Action<PacketBuffer, SuggestionTypeSwitch>)((buffer, value) => value.Write(buffer, @flags.HasCustomSuggestions, @flags)))(buffer, this.SuggestionType);
+				}
+				public static ExtraNodeDataSwitchState2Container Read(PacketBuffer buffer , FlagsBitfield @flags) {
+					string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+					string @parser = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+					PropertiesSwitch @properties = ((Func<PacketBuffer, PropertiesSwitch>)((buffer) => PropertiesSwitch.Read(buffer, @parser)))(buffer);
+					SuggestionTypeSwitch @suggestionType = ((Func<PacketBuffer, SuggestionTypeSwitch>)((buffer) => SuggestionTypeSwitch.Read(buffer, @flags.HasCustomSuggestions, @flags)))(buffer);
+					return new ExtraNodeDataSwitchState2Container(@name, @parser, @properties, @suggestionType);
+				}
+			}
+			public object? Value { get; set; }
+			public ExtraNodeDataSwitch(object? value) {
+				this.Value = value;
+			}
+			public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
+				switch (state) {
+					case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
+					case 1: ((Action<PacketBuffer, ExtraNodeDataSwitchState1Container>)((buffer, value) => value.Write(buffer )))(buffer, (ExtraNodeDataSwitchState1Container)this); break;
+					case 2: ((Action<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer, value) => value.Write(buffer , @flags)))(buffer, (ExtraNodeDataSwitchState2Container)this); break;
+					default: throw new Exception($"Invalid value: '{state}'");
+				}
+			}
+			public static ExtraNodeDataSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
+				object? value = state switch {
+					0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
+					1 => ((Func<PacketBuffer, ExtraNodeDataSwitchState1Container>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState1Container.Read(buffer )))(buffer),
+					2 => ((Func<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer) => MineSharp.Data.Protocol.CommandNode.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.Read(buffer , @flags)))(buffer),
+					 _ => throw new Exception($"Invalid value: '{state}'")
+				};
+				return new ExtraNodeDataSwitch(value);
+			}
+			public static implicit operator ExtraNodeDataSwitchState1Container?(ExtraNodeDataSwitch value) => (ExtraNodeDataSwitchState1Container?)value.Value;
+			public static implicit operator ExtraNodeDataSwitchState2Container?(ExtraNodeDataSwitch value) => (ExtraNodeDataSwitchState2Container?)value.Value;
+			public static implicit operator ExtraNodeDataSwitch?(ExtraNodeDataSwitchState1Container? value) => new ExtraNodeDataSwitch(value);
+			public static implicit operator ExtraNodeDataSwitch?(ExtraNodeDataSwitchState2Container? value) => new ExtraNodeDataSwitch(value);
+		}
+		public FlagsBitfield Flags { get; set; }
+		public VarInt[] Children { get; set; }
+		public RedirectNodeSwitch RedirectNode { get; set; }
+		public ExtraNodeDataSwitch ExtraNodeData { get; set; }
+		public CommandNode(FlagsBitfield @flags, VarInt[] @children, RedirectNodeSwitch @redirectNode, ExtraNodeDataSwitch @extraNodeData) {
+			this.Flags = @flags;
+			this.Children = @children;
+			this.RedirectNode = @redirectNode;
+			this.ExtraNodeData = @extraNodeData;
+		}
+		public void Write(PacketBuffer buffer ) {
+			((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
+			((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Children);
+			((Action<PacketBuffer, RedirectNodeSwitch>)((buffer, value) => value.Write(buffer, Flags.HasRedirectNode)))(buffer, this.RedirectNode);
+			((Action<PacketBuffer, ExtraNodeDataSwitch>)((buffer, value) => value.Write(buffer, Flags.CommandNodeType, Flags)))(buffer, this.ExtraNodeData);
+		}
+		public static CommandNode Read(PacketBuffer buffer ) {
+			FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
+			VarInt[] @children = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
+			RedirectNodeSwitch @redirectNode = ((Func<PacketBuffer, RedirectNodeSwitch>)((buffer) => RedirectNodeSwitch.Read(buffer, @flags.HasRedirectNode)))(buffer);
+			ExtraNodeDataSwitch @extraNodeData = ((Func<PacketBuffer, ExtraNodeDataSwitch>)((buffer) => ExtraNodeDataSwitch.Read(buffer, @flags.CommandNodeType, @flags)))(buffer);
+			return new CommandNode(@flags, @children, @redirectNode, @extraNodeData);
+		}
+	}
 }
 namespace MineSharp.Data.Protocol {
 	public partial class PacketBuffer {
@@ -1255,19 +2071,19 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public VarInt Action { get; set; }
 		public VarInt Mode { get; set; }
 		public string Name { get; set; }
-		public byte OffsetX { get; set; }
-		public byte OffsetY { get; set; }
-		public byte OffsetZ { get; set; }
-		public byte SizeX { get; set; }
-		public byte SizeY { get; set; }
-		public byte SizeZ { get; set; }
+		public sbyte OffsetX { get; set; }
+		public sbyte OffsetY { get; set; }
+		public sbyte OffsetZ { get; set; }
+		public sbyte SizeX { get; set; }
+		public sbyte SizeY { get; set; }
+		public sbyte SizeZ { get; set; }
 		public VarInt Mirror { get; set; }
 		public VarInt Rotation { get; set; }
 		public string Metadata { get; set; }
 		public float Integrity { get; set; }
 		public VarInt Seed { get; set; }
 		public byte Flags { get; set; }
-		public PacketUpdateStructureBlock(PositionBitfield @location, VarInt @action, VarInt @mode, string @name, byte @offsetX, byte @offsetY, byte @offsetZ, byte @sizeX, byte @sizeY, byte @sizeZ, VarInt @mirror, VarInt @rotation, string @metadata, float @integrity, VarInt @seed, byte @flags) {
+		public PacketUpdateStructureBlock(PositionBitfield @location, VarInt @action, VarInt @mode, string @name, sbyte @offsetX, sbyte @offsetY, sbyte @offsetZ, sbyte @sizeX, sbyte @sizeY, sbyte @sizeZ, VarInt @mirror, VarInt @rotation, string @metadata, float @integrity, VarInt @seed, byte @flags) {
 			this.Location = @location;
 			this.Action = @action;
 			this.Mode = @mode;
@@ -1290,12 +2106,12 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Mode);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.OffsetX);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.OffsetY);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.OffsetZ);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.SizeX);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.SizeY);
-			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.SizeZ);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.OffsetX);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.OffsetY);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.OffsetZ);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.SizeX);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.SizeY);
+			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.SizeZ);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Mirror);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Rotation);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Metadata);
@@ -1308,12 +2124,12 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @mode = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
-			byte @offsetX = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
-			byte @offsetY = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
-			byte @offsetZ = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
-			byte @sizeX = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
-			byte @sizeY = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
-			byte @sizeZ = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
+			sbyte @offsetX = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			sbyte @offsetY = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			sbyte @offsetZ = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			sbyte @sizeX = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			sbyte @sizeY = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			sbyte @sizeZ = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			VarInt @mirror = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @rotation = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @metadata = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
@@ -1851,21 +2667,21 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		}
 	}
 	public class PacketBlockDig : IPacketPayload {
-		public sbyte Status { get; set; }
+		public VarInt Status { get; set; }
 		public PositionBitfield Location { get; set; }
 		public sbyte Face { get; set; }
-		public PacketBlockDig(sbyte @status, PositionBitfield @location, sbyte @face) {
+		public PacketBlockDig(VarInt @status, PositionBitfield @location, sbyte @face) {
 			this.Status = @status;
 			this.Location = @location;
 			this.Face = @face;
 		}
 		public void Write(PacketBuffer buffer ) {
-			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Status);
+			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Status);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Face);
 		}
 		public static PacketBlockDig Read(PacketBuffer buffer ) {
-			sbyte @status = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			VarInt @status = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			sbyte @face = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketBlockDig(@status, @location, @face);
@@ -3261,636 +4077,18 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 	}
 	public class PacketDeclareCommands : IPacketPayload {
-		public class NodesElementContainer {
-			public class FlagsBitfield {
-				public byte Value { get; set; }
-				public FlagsBitfield(byte value) {
-					this.Value = value;
-				}
-				public byte Unused { 
-				    get { 
-				        return (byte)(((byte)Value! >> 5 & (7)));
-				    }
-					set { 
-				        var val = value << 5; 
-				        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-				        this.Value = (byte)((byte)x | (byte)val); 
-				    }
-				}
-				public byte HasCustomSuggestions { 
-				    get { 
-				        return (byte)(((byte)Value! >> 4 & (1)));
-				    }
-					set { 
-				        var val = value << 4; 
-				        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-				        this.Value = (byte)((byte)x | (byte)val); 
-				    }
-				}
-				public byte HasRedirectNode { 
-				    get { 
-				        return (byte)(((byte)Value! >> 3 & (1)));
-				    }
-					set { 
-				        var val = value << 3; 
-				        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-				        this.Value = (byte)((byte)x | (byte)val); 
-				    }
-				}
-				public byte HasCommand { 
-				    get { 
-				        return (byte)(((byte)Value! >> 2 & (1)));
-				    }
-					set { 
-				        var val = value << 2; 
-				        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-				        this.Value = (byte)((byte)x | (byte)val); 
-				    }
-				}
-				public byte CommandNodeType { 
-				    get { 
-				        return (byte)(((byte)Value! >> 0 & (3)));
-				    }
-					set { 
-				        var val = value << 0; 
-				        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-				        this.Value = (byte)((byte)x | (byte)val); 
-				    }
-				}
-			}
-			public class RedirectNodeSwitch {
-				public object? Value { get; set; }
-				public RedirectNodeSwitch(object? value) {
-					this.Value = value;
-				}
-				public void Write(PacketBuffer buffer, byte state) {
-					switch (state) {
-						case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
-						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-					}
-				}
-				public static RedirectNodeSwitch Read(PacketBuffer buffer, byte state) {
-					object? value = state switch {
-						1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
-						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-					};
-					return new RedirectNodeSwitch(value);
-				}
-				public static implicit operator VarInt?(RedirectNodeSwitch value) => (VarInt?)value.Value;
-				public static implicit operator RedirectNodeSwitch?(VarInt? value) => new RedirectNodeSwitch(value);
-			}
-			public class ExtraNodeDataSwitch {
-				public class ExtraNodeDataSwitchState2Container {
-					public class PropertiesSwitch {
-						public class PropertiesSwitchStatebrigadierDoubleContainer {
-							public class FlagsBitfield {
-								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
-									this.Value = value;
-								}
-								public byte Unused { 
-								    get { 
-								        return (byte)(((byte)Value! >> 2 & (63)));
-								    }
-									set { 
-								        var val = value << 2; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MaxPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 1 & (1)));
-								    }
-									set { 
-								        var val = value << 1; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MinPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 0 & (1)));
-								    }
-									set { 
-								        var val = value << 0; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-							}
-							public class MinSwitch {
-								public object? Value { get; set; }
-								public MinSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MinSwitch(value);
-								}
-								public static implicit operator double?(MinSwitch value) => (double?)value.Value;
-								public static implicit operator MinSwitch?(double? value) => new MinSwitch(value);
-							}
-							public class MaxSwitch {
-								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MaxSwitch(value);
-								}
-								public static implicit operator double?(MaxSwitch value) => (double?)value.Value;
-								public static implicit operator MaxSwitch?(double? value) => new MaxSwitch(value);
-							}
-							public FlagsBitfield Flags { get; set; }
-							public MinSwitch Min { get; set; }
-							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierDoubleContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
-								this.Flags = @flags;
-								this.Min = @min;
-								this.Max = @max;
-							}
-							public void Write(PacketBuffer buffer ) {
-								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
-								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
-								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
-							}
-							public static PropertiesSwitchStatebrigadierDoubleContainer Read(PacketBuffer buffer ) {
-								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
-								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
-								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
-								return new PropertiesSwitchStatebrigadierDoubleContainer(@flags, @min, @max);
-							}
-						}
-						public class PropertiesSwitchStatebrigadierFloatContainer {
-							public class FlagsBitfield {
-								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
-									this.Value = value;
-								}
-								public byte Unused { 
-								    get { 
-								        return (byte)(((byte)Value! >> 2 & (63)));
-								    }
-									set { 
-								        var val = value << 2; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MaxPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 1 & (1)));
-								    }
-									set { 
-								        var val = value << 1; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MinPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 0 & (1)));
-								    }
-									set { 
-								        var val = value << 0; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-							}
-							public class MinSwitch {
-								public object? Value { get; set; }
-								public MinSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MinSwitch(value);
-								}
-								public static implicit operator float?(MinSwitch value) => (float?)value.Value;
-								public static implicit operator MinSwitch?(float? value) => new MinSwitch(value);
-							}
-							public class MaxSwitch {
-								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MaxSwitch(value);
-								}
-								public static implicit operator float?(MaxSwitch value) => (float?)value.Value;
-								public static implicit operator MaxSwitch?(float? value) => new MaxSwitch(value);
-							}
-							public FlagsBitfield Flags { get; set; }
-							public MinSwitch Min { get; set; }
-							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierFloatContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
-								this.Flags = @flags;
-								this.Min = @min;
-								this.Max = @max;
-							}
-							public void Write(PacketBuffer buffer ) {
-								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
-								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
-								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
-							}
-							public static PropertiesSwitchStatebrigadierFloatContainer Read(PacketBuffer buffer ) {
-								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
-								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
-								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
-								return new PropertiesSwitchStatebrigadierFloatContainer(@flags, @min, @max);
-							}
-						}
-						public class PropertiesSwitchStatebrigadierIntegerContainer {
-							public class FlagsBitfield {
-								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
-									this.Value = value;
-								}
-								public byte Unused { 
-								    get { 
-								        return (byte)(((byte)Value! >> 2 & (63)));
-								    }
-									set { 
-								        var val = value << 2; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MaxPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 1 & (1)));
-								    }
-									set { 
-								        var val = value << 1; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MinPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 0 & (1)));
-								    }
-									set { 
-								        var val = value << 0; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-							}
-							public class MinSwitch {
-								public object? Value { get; set; }
-								public MinSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MinSwitch(value);
-								}
-								public static implicit operator int?(MinSwitch value) => (int?)value.Value;
-								public static implicit operator MinSwitch?(int? value) => new MinSwitch(value);
-							}
-							public class MaxSwitch {
-								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MaxSwitch(value);
-								}
-								public static implicit operator int?(MaxSwitch value) => (int?)value.Value;
-								public static implicit operator MaxSwitch?(int? value) => new MaxSwitch(value);
-							}
-							public FlagsBitfield Flags { get; set; }
-							public MinSwitch Min { get; set; }
-							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierIntegerContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
-								this.Flags = @flags;
-								this.Min = @min;
-								this.Max = @max;
-							}
-							public void Write(PacketBuffer buffer ) {
-								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
-								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
-								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
-							}
-							public static PropertiesSwitchStatebrigadierIntegerContainer Read(PacketBuffer buffer ) {
-								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
-								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
-								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
-								return new PropertiesSwitchStatebrigadierIntegerContainer(@flags, @min, @max);
-							}
-						}
-						public class PropertiesSwitchStatebrigadierLongContainer {
-							public class FlagsBitfield {
-								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
-									this.Value = value;
-								}
-								public byte Unused { 
-								    get { 
-								        return (byte)(((byte)Value! >> 2 & (63)));
-								    }
-									set { 
-								        var val = value << 2; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MaxPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 1 & (1)));
-								    }
-									set { 
-								        var val = value << 1; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-								public byte MinPresent { 
-								    get { 
-								        return (byte)(((byte)Value! >> 0 & (1)));
-								    }
-									set { 
-								        var val = value << 0; 
-								        var inv = ~val; var x = (byte)this.Value! & (byte)inv; 
-								        this.Value = (byte)((byte)x | (byte)val); 
-								    }
-								}
-							}
-							public class MinSwitch {
-								public object? Value { get; set; }
-								public MinSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MinSwitch(value);
-								}
-								public static implicit operator long?(MinSwitch value) => (long?)value.Value;
-								public static implicit operator MinSwitch?(long? value) => new MinSwitch(value);
-							}
-							public class MaxSwitch {
-								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
-									this.Value = value;
-								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
-										case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
-										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-									}
-								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
-										1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
-										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-									};
-									return new MaxSwitch(value);
-								}
-								public static implicit operator long?(MaxSwitch value) => (long?)value.Value;
-								public static implicit operator MaxSwitch?(long? value) => new MaxSwitch(value);
-							}
-							public FlagsBitfield Flags { get; set; }
-							public MinSwitch Min { get; set; }
-							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierLongContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
-								this.Flags = @flags;
-								this.Min = @min;
-								this.Max = @max;
-							}
-							public void Write(PacketBuffer buffer ) {
-								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
-								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
-								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
-							}
-							public static PropertiesSwitchStatebrigadierLongContainer Read(PacketBuffer buffer ) {
-								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
-								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
-								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
-								return new PropertiesSwitchStatebrigadierLongContainer(@flags, @min, @max);
-							}
-						}
-						public object? Value { get; set; }
-						public PropertiesSwitch(object? value) {
-							this.Value = value;
-						}
-						public void Write(PacketBuffer buffer, string state) {
-							switch (state) {
-								case "brigadier:double": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierDoubleContainer)this); break;
-								case "brigadier:float": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierFloatContainer)this); break;
-								case "brigadier:integer": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierIntegerContainer)this); break;
-								case "brigadier:long": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierLongContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierLongContainer)this); break;
-								case "brigadier:string": ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
-								case "minecraft:entity": ((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, (sbyte)this); break;
-								case "minecraft:score_holder": ((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, (sbyte)this); break;
-								case "minecraft:range": ((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, (bool)this); break;
-								default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-							}
-						}
-						public static PropertiesSwitch Read(PacketBuffer buffer, string state) {
-							object? value = state switch {
-								"brigadier:double" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierDoubleContainer.Read(buffer )))(buffer),
-								"brigadier:float" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierFloatContainer.Read(buffer )))(buffer),
-								"brigadier:integer" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierIntegerContainer.Read(buffer )))(buffer),
-								"brigadier:long" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierLongContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierLongContainer.Read(buffer )))(buffer),
-								"brigadier:string" => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
-								"minecraft:entity" => ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer),
-								"minecraft:score_holder" => ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer),
-								"minecraft:range" => ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer),
-								_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-							};
-							return new PropertiesSwitch(value);
-						}
-						public static implicit operator PropertiesSwitchStatebrigadierDoubleContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierDoubleContainer?)value.Value;
-						public static implicit operator PropertiesSwitchStatebrigadierFloatContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierFloatContainer?)value.Value;
-						public static implicit operator PropertiesSwitchStatebrigadierIntegerContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierIntegerContainer?)value.Value;
-						public static implicit operator PropertiesSwitchStatebrigadierLongContainer?(PropertiesSwitch value) => (PropertiesSwitchStatebrigadierLongContainer?)value.Value;
-						public static implicit operator VarInt?(PropertiesSwitch value) => (VarInt?)value.Value;
-						public static implicit operator sbyte?(PropertiesSwitch value) => (sbyte?)value.Value;
-						public static implicit operator bool?(PropertiesSwitch value) => (bool?)value.Value;
-						public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierDoubleContainer? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierFloatContainer? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierIntegerContainer? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(PropertiesSwitchStatebrigadierLongContainer? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(VarInt? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(sbyte? value) => new PropertiesSwitch(value);
-						public static implicit operator PropertiesSwitch?(bool? value) => new PropertiesSwitch(value);
-					}
-					public class SuggestsSwitch {
-						public object? Value { get; set; }
-						public SuggestsSwitch(object? value) {
-							this.Value = value;
-						}
-						public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-							switch (state) {
-								case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
-								default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
-							}
-						}
-						public static SuggestsSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-							object? value = state switch {
-								1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
-								_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
-							};
-							return new SuggestsSwitch(value);
-						}
-						public static implicit operator string?(SuggestsSwitch value) => (string?)value.Value;
-						public static implicit operator SuggestsSwitch?(string? value) => new SuggestsSwitch(value);
-					}
-					public string Name { get; set; }
-					public string Parser { get; set; }
-					public PropertiesSwitch Properties { get; set; }
-					public SuggestsSwitch Suggests { get; set; }
-					public ExtraNodeDataSwitchState2Container(string @name, string @parser, PropertiesSwitch @properties, SuggestsSwitch @suggests) {
-						this.Name = @name;
-						this.Parser = @parser;
-						this.Properties = @properties;
-						this.Suggests = @suggests;
-					}
-					public void Write(PacketBuffer buffer , FlagsBitfield @flags) {
-						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
-						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Parser);
-						((Action<PacketBuffer, PropertiesSwitch>)((buffer, value) => value.Write(buffer, Parser)))(buffer, this.Properties);
-						((Action<PacketBuffer, SuggestsSwitch>)((buffer, value) => value.Write(buffer, @flags.HasCustomSuggestions, @flags)))(buffer, this.Suggests);
-					}
-					public static ExtraNodeDataSwitchState2Container Read(PacketBuffer buffer , FlagsBitfield @flags) {
-						string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
-						string @parser = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
-						PropertiesSwitch @properties = ((Func<PacketBuffer, PropertiesSwitch>)((buffer) => PropertiesSwitch.Read(buffer, @parser)))(buffer);
-						SuggestsSwitch @suggests = ((Func<PacketBuffer, SuggestsSwitch>)((buffer) => SuggestsSwitch.Read(buffer, @flags.HasCustomSuggestions, @flags)))(buffer);
-						return new ExtraNodeDataSwitchState2Container(@name, @parser, @properties, @suggests);
-					}
-				}
-				public object? Value { get; set; }
-				public ExtraNodeDataSwitch(object? value) {
-					this.Value = value;
-				}
-				public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-					switch (state) {
-						case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
-						case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
-						case 2: ((Action<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer, value) => value.Write(buffer , @flags)))(buffer, (ExtraNodeDataSwitchState2Container)this); break;
-						default: throw new Exception($"Invalid value: '{state}'");
-					}
-				}
-				public static ExtraNodeDataSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-					object? value = state switch {
-						0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
-						1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
-						2 => ((Func<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.Read(buffer , @flags)))(buffer),
-						 _ => throw new Exception($"Invalid value: '{state}'")
-					};
-					return new ExtraNodeDataSwitch(value);
-				}
-				public static implicit operator string?(ExtraNodeDataSwitch value) => (string?)value.Value;
-				public static implicit operator ExtraNodeDataSwitchState2Container?(ExtraNodeDataSwitch value) => (ExtraNodeDataSwitchState2Container?)value.Value;
-				public static implicit operator ExtraNodeDataSwitch?(string? value) => new ExtraNodeDataSwitch(value);
-				public static implicit operator ExtraNodeDataSwitch?(ExtraNodeDataSwitchState2Container? value) => new ExtraNodeDataSwitch(value);
-			}
-			public FlagsBitfield Flags { get; set; }
-			public VarInt[] Children { get; set; }
-			public RedirectNodeSwitch RedirectNode { get; set; }
-			public ExtraNodeDataSwitch ExtraNodeData { get; set; }
-			public NodesElementContainer(FlagsBitfield @flags, VarInt[] @children, RedirectNodeSwitch @redirectNode, ExtraNodeDataSwitch @extraNodeData) {
-				this.Flags = @flags;
-				this.Children = @children;
-				this.RedirectNode = @redirectNode;
-				this.ExtraNodeData = @extraNodeData;
-			}
-			public void Write(PacketBuffer buffer ) {
-				((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
-				((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Children);
-				((Action<PacketBuffer, RedirectNodeSwitch>)((buffer, value) => value.Write(buffer, Flags.HasRedirectNode)))(buffer, this.RedirectNode);
-				((Action<PacketBuffer, ExtraNodeDataSwitch>)((buffer, value) => value.Write(buffer, Flags.CommandNodeType, Flags)))(buffer, this.ExtraNodeData);
-			}
-			public static NodesElementContainer Read(PacketBuffer buffer ) {
-				FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
-				VarInt[] @children = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
-				RedirectNodeSwitch @redirectNode = ((Func<PacketBuffer, RedirectNodeSwitch>)((buffer) => RedirectNodeSwitch.Read(buffer, @flags.HasRedirectNode)))(buffer);
-				ExtraNodeDataSwitch @extraNodeData = ((Func<PacketBuffer, ExtraNodeDataSwitch>)((buffer) => ExtraNodeDataSwitch.Read(buffer, @flags.CommandNodeType, @flags)))(buffer);
-				return new NodesElementContainer(@flags, @children, @redirectNode, @extraNodeData);
-			}
-		}
-		public NodesElementContainer[] Nodes { get; set; }
+		public CommandNode[] Nodes { get; set; }
 		public VarInt RootIndex { get; set; }
-		public PacketDeclareCommands(NodesElementContainer[] @nodes, VarInt @rootIndex) {
+		public PacketDeclareCommands(CommandNode[] @nodes, VarInt @rootIndex) {
 			this.Nodes = @nodes;
 			this.RootIndex = @rootIndex;
 		}
 		public void Write(PacketBuffer buffer ) {
-			((Action<PacketBuffer, NodesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, NodesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Nodes);
+			((Action<PacketBuffer, CommandNode[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, CommandNode>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Nodes);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.RootIndex);
 		}
 		public static PacketDeclareCommands Read(PacketBuffer buffer ) {
-			NodesElementContainer[] @nodes = ((Func<PacketBuffer, NodesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, NodesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.Read(buffer ))))))(buffer);
+			CommandNode[] @nodes = ((Func<PacketBuffer, CommandNode[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, CommandNode>)((buffer) => MineSharp.Data.Protocol.CommandNode.Read(buffer ))))))(buffer);
 			VarInt @rootIndex = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketDeclareCommands(@nodes, @rootIndex);
 		}
@@ -6068,14 +6266,14 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public ValueSwitch(object? value) {
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
+			public void Write(PacketBuffer buffer, VarInt state) {
 				switch (state) {
 					case 1: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)Value); break;
 				}
 			}
-			public static ValueSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static ValueSwitch Read(PacketBuffer buffer, VarInt state) {
+				object? value = state.Value switch {
 					1 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer)
 				};
@@ -6083,10 +6281,10 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 		}
 		public string ItemName { get; set; }
-		public sbyte Action { get; set; }
+		public VarInt Action { get; set; }
 		public string ScoreName { get; set; }
 		public ValueSwitch Value { get; set; }
-		public PacketScoreboardScore(string @itemName, sbyte @action, string @scoreName, ValueSwitch @value) {
+		public PacketScoreboardScore(string @itemName, VarInt @action, string @scoreName, ValueSwitch @value) {
 			this.ItemName = @itemName;
 			this.Action = @action;
 			this.ScoreName = @scoreName;
@@ -6094,13 +6292,13 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public void Write(PacketBuffer buffer ) {
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ItemName);
-			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Action);
+			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ScoreName);
 			((Action<PacketBuffer, ValueSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Value);
 		}
 		public static PacketScoreboardScore Read(PacketBuffer buffer ) {
 			string @itemName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
-			sbyte @action = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
+			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @scoreName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			ValueSwitch @value = ((Func<PacketBuffer, ValueSwitch>)((buffer) => ValueSwitch.Read(buffer, @action)))(buffer);
 			return new PacketScoreboardScore(@itemName, @action, @scoreName, @value);

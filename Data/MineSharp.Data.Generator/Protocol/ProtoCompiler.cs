@@ -66,7 +66,8 @@ namespace MineSharp.Data.Generator.Protocol {
                 { "f32", new NumericDatatypeGenerator(this, "F32", "float") },
                 { "f64", new NumericDatatypeGenerator(this, "F64", "double") },
 
-                { "varint", new VarIntDatatypeGenerator(this) }
+                { "varint", new VarIntDatatypeGenerator(this) },
+                { "varlong", new VarIntDatatypeGenerator(this) }
             };
 
             var structuresTypes = new Dictionary<string, DatatypeGenerator>() {
