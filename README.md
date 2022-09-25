@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/MineSharp-net/community.svg)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+﻿[![Gitter](https://badges.gitter.im/MineSharp-net/community.svg)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Minesharp
 
@@ -10,6 +10,26 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer)
 If you're interested in this project, feel free to contribute!
 
 Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to provide support for mutliple versions tho.
+
+# Current features
+ - ✨Supported Version: Minecraft Java 1.18.1
+ - 📈 Player Stats
+ - ⚡ Events
+ - 🐖 Entity tracking
+ - 🌍 World tracking (query the world for blocks)
+ - ⛏️ Mining
+ - 👷‍♂️ Building
+ - 🪟 Low-Level window api (needs some more work)
+ - ⚔️ Attacking entities
+ - 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
+ - 📝 Chat (Reading and Writing)
+
+# Roadmap
+  - 🪟 Finish the window api
+  - 🏊 Support more forms of movement (Swimming, climbing, maybe flying)
+  - 🔎 Pathfinder to automate navigation
+  - 🪄 Support more versions
+
 
 # Projects Overview
 ## [MineSharp.Core](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Core)
