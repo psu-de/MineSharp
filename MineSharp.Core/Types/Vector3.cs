@@ -1,6 +1,5 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace MineSharp.Core.Types {
+﻿namespace MineSharp.Core.Types
+{
     public class Vector3 {
 
         public static Vector3 Zero => new Vector3(0, 0, 0);

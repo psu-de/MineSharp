@@ -1,8 +1,8 @@
-﻿using MineSharp.Core.Types;
-using MineSharp.Data.Protocol;
+﻿using MineSharp.Data.Protocol;
 
 
-namespace MineSharp.Protocol.Handlers {
+namespace MineSharp.Protocol.Handlers
+{
     internal class HandshakePacketHandler : IPacketHandler {
         public Task HandleIncomming(IPacketPayload packet, MinecraftClient client) {
 

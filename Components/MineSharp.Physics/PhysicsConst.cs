@@ -1,8 +1,8 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-using System.Data;
 
-namespace MineSharp.Physics {
+namespace MineSharp.Physics
+{
     public static class PhysicsConst {
 
         public const double Gravity = 0.08f;

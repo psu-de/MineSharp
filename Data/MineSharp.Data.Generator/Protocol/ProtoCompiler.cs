@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using MineSharp.Data.Generator.Protocol.Datatypes;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Linq;
 
-namespace MineSharp.Data.Generator.Protocol {
+namespace MineSharp.Data.Generator.Protocol
+{
 
     internal class StructureScope {
         public List<string> BlockedNames { get; set; }

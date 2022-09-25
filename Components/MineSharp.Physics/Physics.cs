@@ -3,7 +3,6 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
-using System.Diagnostics;
 
 /*
  Thanks to https://github.com/ConcreteMC/Alex

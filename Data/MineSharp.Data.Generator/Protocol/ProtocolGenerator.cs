@@ -1,13 +1,8 @@
 ﻿using MineSharp.Data.Generator.Protocol.Datatypes;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MineSharp.Data.Generator.Protocol {
+namespace MineSharp.Data.Generator.Protocol
+{
     internal class ProtocolGenerator : Generator {
 
         private ProtoCompiler Compiler;

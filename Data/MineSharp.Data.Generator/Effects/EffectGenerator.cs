@@ -1,12 +1,7 @@
-﻿using MineSharp.Core.Types;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
-namespace MineSharp.Data.Generator.Effects {
+namespace MineSharp.Data.Generator.Effects
+{
     internal class EffectGenerator : Generator {
         public EffectGenerator(MinecraftDataHelper wrapper, string version) : base(wrapper, version) {
         }

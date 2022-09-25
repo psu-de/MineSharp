@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Types;
-using Attribute = MineSharp.Core.Types.Attribute;
 
-namespace MineSharp.Data.Entities {
+namespace MineSharp.Data.Entities
+{
     public class EntityFactory {
 
 		public static Entity CreateEntity(Type type,

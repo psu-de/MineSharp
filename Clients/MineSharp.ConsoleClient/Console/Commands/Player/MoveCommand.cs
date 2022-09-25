@@ -1,8 +1,8 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Data.Items;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Player {
+namespace MineSharp.ConsoleClient.Console.Commands.Player
+{
     internal class MoveCommand : Command {
 
         EnumArgument<MoveOptions> DirectionArg;

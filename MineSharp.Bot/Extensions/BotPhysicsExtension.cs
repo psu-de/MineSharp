@@ -1,8 +1,8 @@
 ﻿using MineSharp.Bot.Modules.Physics;
 using MineSharp.Core.Types;
-using MineSharp.Physics;
 
-namespace MineSharp.Bot {
+namespace MineSharp.Bot
+{
     public partial class MinecraftBot {
 
         /// <summary>
