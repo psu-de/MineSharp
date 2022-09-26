@@ -78,10 +78,5 @@ namespace MineSharp.Physics
                     return PhysicsConst.DefaultSlipperiness;
             }
         }
-
-        public static AABB GetPlayerBoundingBox(Vector3 pos) {
-            var w = PhysicsConst.PlayerHalfWidth;
-            return new AABB(-w, 0, -w, w, PhysicsConst.PlayerHeight, w).Offset(pos.X, pos.Y, pos.Z);
-        }
     }
 }

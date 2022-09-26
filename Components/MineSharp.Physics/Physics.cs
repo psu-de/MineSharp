@@ -31,6 +31,12 @@ namespace MineSharp.Physics
         public void SimulatePlayer(MovementControls controls)
         {
             var playerBB = GetPlayerBB(this.Player.Position);
+
+            var waterBB = playerBB.Clone().Contract(0.001d, 0.4d, 0.001d);
+            var lavaBB = playerBB.Clone().Contract(0.1d, 0.4d, 0.1d);
+
+            this.PlayerState.IsInWater = CheckInWaterAndAppyCurrent(waterBB, this.Player.Velocity);
+
             var onGround = this.Player.IsOnGround;
             if (!this.Player.Attributes.TryGetValue(
                 PhysicsConst.MovementSpeedAttribute, out var movementFactorAttr))
@@ -40,10 +46,11 @@ namespace MineSharp.Physics
                     PhysicsConst.PlayerSpeed,
                     new List<Modifier>());
             }
-            
+
             if (controls.Sprint)
             {
-                if(!movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod)) {
+                if (!movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod))
+                {
                     spMod = new Modifier(PhysicsConst.SprintingUUID, PhysicsConst.SprintSpeed, ModifierOp.Multiply);
                     movementFactorAttr.Modifiers.Add(PhysicsConst.SprintingUUID, spMod);
                 }
@@ -109,7 +116,19 @@ namespace MineSharp.Physics
 
             this.Player.Velocity.Add(heading);
 
+            if (IsOnLadder(this.Player.Position))
+            {
+                this.Player.Velocity.X = Math.Clamp(this.Player.Velocity.X , - PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.Z = Math.Clamp(this.Player.Velocity.Z , - PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.Y = Math.Max(this.Player.Velocity.Y, controls.Sneak ? 0 : -PhysicsConst.LadderMaxSpeed);
+            }
+
             Move(controls, TruncateVector(this.Player.Velocity));
+
+            if (IsOnLadder(this.Player.Position) && (this.PlayerState.IsCollidedHorizontally || controls.Jump))
+            {
+                this.Player.Velocity.Y = PhysicsConst.LadderClimbSpeed;
+            }
 
             if (!this.Player.IsOnGround)
             {
@@ -196,6 +215,9 @@ namespace MineSharp.Physics
                 FixSneaking(ref amount);
             }
 
+            this.PlayerState.IsCollidedHorizontally = collideX || collideZ;
+            this.PlayerState.IsCollidedVertically = collideY;
+
             this.Player.Position.Add(amount);
             this.Player.IsOnGround = DetectOnGround();
         }
@@ -203,7 +225,7 @@ namespace MineSharp.Physics
         private bool DetectOnGround()
         {
             var entityBoundingBox = GetPlayerBB(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
-         
+
             var offset = 0f;
 
             if (entityBoundingBox.MinY % 1 < 0.05f)
@@ -348,7 +370,7 @@ namespace MineSharp.Physics
         {
             if (direction == Vector3.Down)
             {
-                this.Player.IsOnGround = true;   
+                this.Player.IsOnGround = true;
             }
             return 0;
         }
@@ -872,6 +894,105 @@ namespace MineSharp.Physics
             var cosYaw = MathF.Cos(rotationYaw * MathF.PI / 180.0F);
 
             return new Vector3(strafe * cosYaw - forward * sinYaw, 0, forward * cosYaw + strafe * sinYaw);
+        }
+
+        private float GetRenderedDepth(Block block)
+        {
+            if (PhysicsConst.WaterLikeBlocks.Contains(block.Id)) return 0;
+            if (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false) return 0;
+            if (block.Id != Water.BlockId) return -1;
+            var meta = block.Metadata;
+            return meta >= 8 ? 0 : meta;
+        }
+
+        private bool CheckInWaterAndAppyCurrent(AABB bb, Vector3 vel)
+        {
+            var acc = new Vector3(0, 0, 0);
+            var waterBlocks = new List<Block>();
+            var cursor = new Vector3(0, 0, 0);
+
+            for (cursor.Y = Math.Floor(bb.MinY); cursor.Y <= Math.Floor(bb.MaxY); cursor.Y++)
+            {
+                for (cursor.Z = Math.Floor(bb.MinZ); cursor.Z <= Math.Floor(bb.MaxZ); cursor.Z++)
+                {
+                    for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++)
+                    {
+                        var block = this.World.GetBlockAt(cursor);
+                        if (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false))
+                        {
+                            var waterLevel = cursor.Y + 1 - ((GetRenderedDepth(block) + 1) / 9);
+                            if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
+                        }
+                    }
+                }
+            }
+
+            bool isInWater = waterBlocks.Count > 0;
+            foreach (var block in waterBlocks)
+            {
+                var curLevel = GetRenderedDepth(block);
+                var flow = new Vector3(0, 0, 0);
+                var offsets = new[] { new Vector3(0, 0, 1), new Vector3(-1, 0, 0), new Vector3(0, 0, -1), new Vector3(1, 0, 0) };
+                var p = (Vector3)block.Position!;
+
+                foreach (var offset in offsets)
+                {
+                    var adjBlock = this.World.GetBlockAt(p.Plus(offset));
+                    var adjLevel = GetRenderedDepth(adjBlock);
+                    if (adjLevel < 0)
+                    {
+                        if (adjBlock.BoundingBox != "empty")
+                        {
+                            var adjLevel2 = GetRenderedDepth(this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Down)));
+                            if (adjLevel2 >= 0)
+                            {
+                                var f = adjLevel2 - (curLevel - 8);
+                                flow.X += offset.X * f;
+                                flow.Z += offset.Z * f;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var f = adjLevel - curLevel;
+                        flow.X += offset.X * f;
+                        flow.Z += offset.Z * f;
+                    }
+                }
+
+                if (block.Metadata >= 8)
+                {
+                    foreach (var offset in offsets)
+                    {
+                        var adjBlock = this.World.GetBlockAt(p.Plus(offset));
+                        var adjUpBlock = this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Up));
+                        if (adjBlock.BoundingBox != "empty" || adjUpBlock.BoundingBox != "empty")
+                        {
+                            flow = flow.Normalized().Plus(new Vector3(0, -6, 0));
+                        }
+                    }
+                }
+
+                flow = flow.Normalized();
+                acc.Add(flow);
+            }
+
+            var len = acc.Length();
+
+            if (len > 0)
+            {
+                vel.X += acc.X / len * 0.014;
+                vel.Y += acc.Y / len * 0.014;
+                vel.Z += acc.Z / len * 0.014;
+            }
+
+            return isInWater;
+        }
+
+        private bool IsOnLadder(Vector3 pos)
+        {
+            var block = this.World.GetBlockAt(pos);
+            return block.Id == Ladder.BlockId || block.Id == Vine.BlockId;
         }
     }
 }

@@ -100,6 +100,12 @@ namespace MineSharp.Bot {
                 }
                 await Task.WhenAll(tasks);
 
+                var errors = tasks.Where(x => x.Exception != null);
+                foreach (var err in errors)
+                {
+                    Logger.Error($"Error in Module: {err.Exception}");
+                }
+
                 var deltaTime = MinecraftConst.TickMs - (int)(DateTime.Now - start).TotalMilliseconds;
                 if (deltaTime < 0) {
                     Logger.Warning($"Ticked modules taking too long, {-deltaTime}ms behind");
