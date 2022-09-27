@@ -7,9 +7,9 @@ using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Net;
 
-const string DEBUG_LOG_FILE = "log_full.txt";
+const string DEBUG_LOG_FILE = "log_debug.txt";
 const string LOG_FILE = "log.txt";
-const bool APPEND_LOG = true;
+const bool APPEND_LOG = false;
 
 var logfileWriter = new StreamWriter(LOG_FILE, APPEND_LOG) { AutoFlush = true };
 var debugFileWriter = new StreamWriter(DEBUG_LOG_FILE, APPEND_LOG) { AutoFlush = true };
