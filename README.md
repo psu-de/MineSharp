@@ -27,7 +27,7 @@ Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to prov
 # Roadmap
   - 🪟 Finish the window api
   - 🏊 Support more forms of movement (Swimming, climbing, maybe flying)
-  - 🔎 Pathfinder to automate navigation
+  - 🔎 Pathfinder to automate navigation (work in progress)
   - 🪄 Support more versions
 
 
