@@ -11,6 +11,8 @@ namespace MineSharp.Bot.Modules {
         public PlayerControls PlayerControls;
         private PlayerInfoState LastPlayerState = new PlayerInfoState();
 
+        private List<(Vector3, TaskCompletionSource)> AwaitedPositions = new List<(Vector3, TaskCompletionSource)>();
+        
         /// <summary>
         /// Fires when the Bot <see cref="BotEntity"/> moves
         /// </summary>
@@ -32,6 +34,7 @@ namespace MineSharp.Bot.Modules {
 
         public PhysicsModule(MinecraftBot bot) : base(bot) {
             PlayerControls = new PlayerControls(bot);
+            BotMoved += handleBotMoved;
         }
 
         protected override async Task Load() {
@@ -86,9 +89,7 @@ namespace MineSharp.Bot.Modules {
             await Bot.Client.SendPacket(packet);
             BotMoved?.Invoke(this.Bot, this.Bot.Player!);
         }
-
-
-
+        
         /// <summary>
         /// Forces the bots rotation to the given yaw and pitch (in degrees)
         /// </summary>
@@ -111,6 +112,33 @@ namespace MineSharp.Bot.Modules {
             if (yaw < 0) yaw = 360 + yaw;
             double pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
             ForceSetRotation((float)yaw, (float)pitch);
+        }
+
+        private const double POSITION_THRESHOLD = 0.2d; 
+        private void handleBotMoved(MinecraftBot sender, MinecraftPlayer entity)
+        {
+            foreach ((var pos, var tsc) in AwaitedPositions.ToArray())
+            {
+                if (Math.Truncate(pos.Y) == Math.Truncate(entity.Entity.Position.Y))
+                {
+                    var dx = pos.X - entity.Entity.Position.X;
+                    var dz = pos.Z - entity.Entity.Position.Z;
+                    var length = dx * dx + dz * dz;
+                    
+                    if (dx * dx + dz * dz < POSITION_THRESHOLD * POSITION_THRESHOLD)
+                    {
+                        tsc.SetResult();
+                        AwaitedPositions.Remove((pos, tsc));
+                    }
+                }
+            }
+        }
+        
+        public Task WaitUntilReached(Vector3 pos)
+        {
+            var tsc = new TaskCompletionSource();
+            AwaitedPositions.Add((pos, tsc));
+            return tsc.Task;
         }
     }
 }

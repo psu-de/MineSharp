@@ -22,5 +22,8 @@ namespace MineSharp.Bot
 
         [BotFunction("Physics", "Forces the bot to look at a given position")]
         public void ForceLookAt(Position pos) => this.PhysicsModule!.ForceLookAt(pos);
+
+        [BotFunction("physics", "Waits until the bot has reached the position")]
+        public Task WaitUntilReached(Vector3 pos) => this.PhysicsModule!.WaitUntilReached(pos);
     }
 }

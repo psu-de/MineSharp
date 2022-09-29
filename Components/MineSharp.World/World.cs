@@ -17,6 +17,8 @@ namespace MineSharp.World {
 
         public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
 
+        internal TemporaryBlockCache? TempCache = null;
+
         public delegate void BlockEvent(Block block);
         public event BlockEvent? BlockUpdated;
 
@@ -118,12 +120,28 @@ namespace MineSharp.World {
         }
 
         public Block GetBlockAt(Position pos) {
+
+            if (this.TempCache != null)
+            {
+                if (this.TempCache.Cache.TryGetValue(pos.ToULong(), out var block))
+                {
+                    return block;
+                }
+            }
+
             if (this.IsOutOfMap(pos)) throw new ArgumentException("Position is out of map");
             ChunkCoordinates coords = GetChunkCoordinates(pos.X, pos.Z);
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
             else {
-                return chunk!.GetBlockAt(pos);
+                var block = chunk!.GetBlockAt(pos);
+
+                if (this.TempCache != null)
+                {
+                    this.TempCache.Cache.TryAdd(pos.ToULong(), block); 
+                }
+
+                return block;
             }
         }
 

@@ -17,10 +17,12 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
         IntegerArgument X = new IntegerArgument("x");
         IntegerArgument Y = new IntegerArgument("y");
         IntegerArgument Z = new IntegerArgument("z");
+
+        FloatArgument Timeout = new FloatArgument("timeout", true);
         public PathfindCommand()
         {
             string desc = $"Tries to find a path to the [{X.Color}]x y z[/] coordinates";
-            this.Initialize("pathfind", desc, CColor.PlayerCommand, X, Y, Z);
+            this.Initialize("pathfind", desc, CColor.PlayerCommand, X, Y, Z, Timeout);
         }
 
         public override async void DoAction(string[] argv, CancellationToken cancellation)
@@ -28,6 +30,10 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
             int? x = X.GetValue(argv[0]);
             int? y = Y.GetValue(argv[1]);
             int? z = Z.GetValue(argv[2]);
+
+            float? timeout = null;
+            if (argv.Length > 3) 
+                timeout = Timeout.GetValue(argv[3]);
 
             if (x == null || y == null || z == null)
             {
@@ -41,7 +47,13 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
             await pathfinder.Initialize();
             await AnsiConsole.Status()
                 .StartAsync("Pathfinding...", async ctx => {
-                    await pathfinder.GoTo(goal);
+                    try
+                    {
+                        await pathfinder.GoTo(goal, timeout: timeout ?? 10000);
+                    } catch (Exception e)
+                    {
+                        AnsiConsole.WriteException(e);
+                    }
                 });
         }
     }
