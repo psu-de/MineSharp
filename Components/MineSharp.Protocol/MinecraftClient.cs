@@ -164,7 +164,7 @@ namespace MineSharp.Protocol {
         /// <returns>A task that will be completed when the packet has been written into the tcp stream</returns>
         public Task SendPacket(IPacketPayload packet, CancellationToken? cancellation = null) {
             if (packet == null) throw new ArgumentNullException();
-            Logger.Debug3("Queueing packet: " + packet.GetType().Name);
+            //Logger.Debug3("Queueing packet: " + packet.GetType().Name);
 
             var sendTask = new PacketSendTask(cancellation, packet, new TaskCompletionSource());
             this.PacketQueue.Enqueue(sendTask);

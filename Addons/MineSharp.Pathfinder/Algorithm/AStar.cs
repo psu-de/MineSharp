@@ -10,7 +10,7 @@ namespace MineSharp.Pathfinding.Algorithm
 {
     public class AStar
     {
-        static readonly Logger Logger = Logger.GetLogger();
+        private static readonly Logger Logger = Logger.GetLogger();
         
         public MinecraftPlayer Player { get; set; }
         public World.World World { get; set; }
@@ -31,7 +31,7 @@ namespace MineSharp.Pathfinding.Algorithm
             var closedSet = new HashSet<Node>();
             var nodes = new Dictionary<ulong, Node>();
 
-            var pos = Player.Entity.Position.Clone();
+            var pos = Player.Entity.Position.Floored();
 
             using (_ = new TemporaryBlockCache(this.World))
             {
@@ -79,6 +79,7 @@ namespace MineSharp.Pathfinding.Algorithm
                             path.Add(currentNode!);
                             currentNode = currentNode!.Parent!;
                         }
+                        path.Add(startNode);
                         path.Reverse();
                         Logger.Debug($"Found Path with {path.Count} nodes");
                         return path.ToArray();
@@ -111,7 +112,6 @@ namespace MineSharp.Pathfinding.Algorithm
 
             throw new Exception("No path found");
         }
-
 
         private List<Node> GetNeighbors(Node node, ref Dictionary<ulong, Node> nodes)
         {

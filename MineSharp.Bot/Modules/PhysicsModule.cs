@@ -18,6 +18,10 @@ namespace MineSharp.Bot.Modules {
         /// </summary>
         public event BotPlayerEvent? BotMoved;
 
+        /// <summary>
+        /// Fires just before executing a physics tick
+        /// </summary>
+        public event BotEmptyEvent? PhysicsTick;
 
         private struct PlayerInfoState {
             public double X;
@@ -48,6 +52,7 @@ namespace MineSharp.Bot.Modules {
         }
 
         public override Task Tick() {
+            this.PhysicsTick?.Invoke(this.Bot);
             return Task.Run(async () => {
                 try
                 {

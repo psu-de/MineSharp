@@ -12,6 +12,15 @@ namespace MineSharp.Bot
             add { PhysicsModule!.BotMoved += value; }
             remove { PhysicsModule!.BotMoved -= value; }
         }
+        
+        /// <summary>
+        /// Fires just before a physics tick
+        /// </summary>
+        public event BotEmptyEvent PhysicsTick
+        {
+            add { PhysicsModule!.PhysicsTick += value; }
+            remove { PhysicsModule!.PhysicsTick -= value; }
+        }
 
 
         public Physics.PhysicsEngine? Physics => PhysicsModule!.Physics;
