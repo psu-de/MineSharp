@@ -5,12 +5,14 @@ using MineSharp.Pathfinding.Goals;
 using MineSharp.Pathfinding.Moves;
 using MineSharp.World;
 using System.Reflection.Metadata;
+using Priority_Queue;
 
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class AStar
     {
         private static readonly Logger Logger = Logger.GetLogger();
+        public const int DEFAULT_MAX_NODES = 5000;
         
         public MinecraftPlayer Player { get; set; }
         public World.World World { get; set; }
@@ -23,11 +25,11 @@ namespace MineSharp.Pathfinding.Algorithm
             this.Movements = movements ?? new Movements();
         }
 
-        public Node[] ComputePath(Goal goal, double? timeout = null)
+        public Node[] ComputePath(Goal goal, double? timeout = null, int maxNodes = DEFAULT_MAX_NODES)
         {
             var startTime = DateTime.Now;
 
-            var openSet = new List<Node>();
+            var openSet = new FastPriorityQueue<Node>(maxNodes);
             var closedSet = new HashSet<Node>();
             var nodes = new Dictionary<ulong, Node>();
 
@@ -43,7 +45,7 @@ namespace MineSharp.Pathfinding.Algorithm
                     throw new Exception($"Target block is not walkable");
                 }
 
-                openSet.Add(startNode);
+                openSet.Enqueue(startNode, startNode.fCost);
 
                 while (openSet.Count > 0)
                 {
@@ -52,20 +54,9 @@ namespace MineSharp.Pathfinding.Algorithm
                         throw new Exception($"Could not find a path after {Math.Round((DateTime.Now - startTime).TotalMilliseconds * 10) / 10}ms");
                     }
 
-                    var node = openSet[0];
-                    for (int i = 1; i < openSet.Count; i++)
-                    {
-                        if (openSet[i].fCost < node.fCost || openSet[i].fCost == node.fCost)
-                        {
-                            if (openSet[i].hCost < node.hCost)
-                            {
-                                node = openSet[i];
-                            }
-                        }
-                    }
+                    var node = openSet.Dequeue();
                     Logger.Debug($"Checking {node}");
 
-                    openSet.Remove(node);
                     closedSet.Add(node);
 
                     if (node.Position == goal.Target.Floored())
@@ -94,16 +85,20 @@ namespace MineSharp.Pathfinding.Algorithm
                             continue;
                         }
 
-                        var newCost = node.gCost + goal.Target.DistanceSquared(neighbor.Position);
+                        var newCost = node.gCost + (float)goal.Target.DistanceSquared(neighbor.Position);
                         if (newCost < neighbor.gCost || !openSet.Contains(node))
                         {
                             neighbor.gCost = newCost;
-                            neighbor.hCost = goal.Target.DistanceSquared(neighbor.Position);
+                            neighbor.hCost = (float)goal.Target.DistanceSquared(neighbor.Position);
                             neighbor.Parent = node;
 
                             if (!openSet.Contains(neighbor))
                             {
-                                openSet.Add(neighbor);
+                                openSet.Enqueue(neighbor, neighbor.fCost);
+                            }
+                            else
+                            {
+                                openSet.UpdatePriority(neighbor, neighbor.fCost);
                             }
                         }
                     }

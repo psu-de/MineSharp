@@ -9,9 +9,9 @@ namespace MineSharp.Pathfinding.Algorithm
         public Vector3 Position { get; set; }
         public bool Walkable { get; set; }
 
-        public double gCost { get; set; }
-        public double hCost { get; set; }
-        public double fCost => gCost + hCost;
+        public float gCost { get; set; }
+        public float hCost { get; set; }
+        public float fCost => gCost + hCost;
 
 
         public Node? Parent;
