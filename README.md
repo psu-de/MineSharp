@@ -1,4 +1,7 @@
-﻿[![Gitter](https://badges.gitter.im/MineSharp-net/community.svg)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+[![Gitter](https://img.shields.io/gitter/room/MineSharp-net/community?style=for-the-badge)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
+
 
 # Minesharp
 
