@@ -1,5 +1,6 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Bot.Modules;
+using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Algorithm;
 using MineSharp.Pathfinding.Goals;
 using MineSharp.Pathfinding.Moves;
@@ -42,7 +43,6 @@ namespace MineSharp.Pathfinding
                 var diff = nodeTo.Position.Minus(nodeFrom.Position);
                 var move = movements.GetMoveByVector(diff);
                 moves.Add(move);
-                Logger.Debug($"Move from {nodeFrom.Position} => {nodeTo.Position}");
             }
             Logger.Debug($"Found {moves.Count} moves");
 
