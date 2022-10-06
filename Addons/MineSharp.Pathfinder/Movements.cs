@@ -38,36 +38,21 @@ namespace MineSharp.Pathfinding
         {
             List<Move> moves = new();
 
-            Vector3[] directions = new Vector3[] {
+            var directions = new Vector3[] {
                 // direct neighbors
                 Vector3.North,
                 Vector3.East,
                 Vector3.South,
                 Vector3.West,
-                //diagonal neighbors
-                // Vector3.North.Plus(Vector3.East),
-                // Vector3.North.Plus(Vector3.West),
-                // Vector3.South.Plus(Vector3.East),
-                // Vector3.South.Plus(Vector3.West),
             };
 
-            foreach (var direction in directions)
-            {
-                moves.Add(new DirectMove(this, direction));
-            }
+            moves.AddRange(directions.Select(dir => new DirectMove(this, dir)));
+            moves.AddRange(directions.Select(dir => new DownMove(this, dir)));
 
-            // foreach (var direction in directions)
-            // {
-            //     moves.Add(new DownMove(this, direction));
-            // }
-            //
-            // if (this.AllowJumping)
-            // {
-            //     foreach (var direction in directions)
-            //     {
-            //         moves.Add(new JumpMove(this, direction));
-            //     }
-            // }
+            if (this.AllowJumping)
+            {
+                moves.AddRange(directions.Select(dir => new JumpUpMove(this, dir)));
+            }
 
             return moves.ToArray();
         }

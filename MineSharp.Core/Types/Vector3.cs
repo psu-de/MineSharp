@@ -49,7 +49,7 @@
         }
 
         public Vector3 Floored() {
-            return new Vector3(Math.Floor(X), Math.Floor(Y), Math.Floor(Z));    
+            return new Vector3(Math.Floor(X), Math.Floor(Y + 0.001), Math.Floor(Z));    
         }
 
         public Vector3 Ceiled() {
