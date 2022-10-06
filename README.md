@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
 
 
-# Minesharp
+# MineSharp
 
 **This Project is not finished and under development!**
 
