@@ -2,6 +2,7 @@
 {
     public class Vector3 {
 
+        public static Vector3 One => new Vector3(1, 1, 1);
         public static Vector3 Zero => new Vector3(0, 0, 0);
         public static Vector3 Up => new Vector3(0, 1, 0);
         public static Vector3 Down => new Vector3(0, -1, 0);
@@ -48,7 +49,7 @@
         }
 
         public Vector3 Floored() {
-            return new Vector3(Math.Floor(X), Math.Floor(Y), Math.Floor(Z));    
+            return new Vector3(Math.Floor(X), Math.Floor(Y + 0.001), Math.Floor(Z));    
         }
 
         public Vector3 Ceiled() {

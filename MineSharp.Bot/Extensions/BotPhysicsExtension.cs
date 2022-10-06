@@ -12,6 +12,15 @@ namespace MineSharp.Bot
             add { PhysicsModule!.BotMoved += value; }
             remove { PhysicsModule!.BotMoved -= value; }
         }
+        
+        /// <summary>
+        /// Fires just before a physics tick
+        /// </summary>
+        public event BotEmptyEvent PhysicsTick
+        {
+            add { PhysicsModule!.PhysicsTick += value; }
+            remove { PhysicsModule!.PhysicsTick -= value; }
+        }
 
 
         public Physics.PhysicsEngine? Physics => PhysicsModule!.Physics;
@@ -22,5 +31,8 @@ namespace MineSharp.Bot
 
         [BotFunction("Physics", "Forces the bot to look at a given position")]
         public void ForceLookAt(Position pos) => this.PhysicsModule!.ForceLookAt(pos);
+
+        [BotFunction("physics", "Waits until the bot has reached the position")]
+        public Task WaitUntilReached(Vector3 pos) => this.PhysicsModule!.WaitUntilReached(pos);
     }
 }

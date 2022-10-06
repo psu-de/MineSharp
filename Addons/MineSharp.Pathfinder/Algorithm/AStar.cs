@@ -2,112 +2,149 @@
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Pathfinding.Goals;
-using Org.BouncyCastle.Asn1;
+using MineSharp.Pathfinding.Moves;
+using MineSharp.World;
+using System.Reflection.Metadata;
 using Priority_Queue;
-using Spectre.Console;
 
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class AStar
     {
-        static readonly Logger Logger = Logger.GetLogger();
-        public const int DEFAULT_MAX_NODES = 1000;
-
+        private static readonly Logger Logger = Logger.GetLogger();
+        public const int DEFAULT_MAX_NODES = 5000;
+        
         public MinecraftPlayer Player { get; set; }
         public World.World World { get; set; }
+        public Movements Movements { get; set; }
 
-        public AStar(MinecraftPlayer player, World.World world)
+        public AStar(MinecraftPlayer player, World.World world, Movements? movements = null)
         {
             this.Player = player;
             this.World = world;
+            this.Movements = movements ?? new Movements();
         }
 
-        public Node[] ComputePath(Goal goal)
+        public Node[] ComputePath(Goal goal, double? timeout = null, int maxNodes = DEFAULT_MAX_NODES)
         {
-            List<Node> openSet = new();
-            HashSet<Node> closedSet = new HashSet<Node>();
-            Dictionary<ulong, Node> nodes = new Dictionary<ulong, Node>();
+            var startTime = DateTime.Now;
 
-            var pos = Player.Entity.Position.Clone();
+            var openSet = new FastPriorityQueue<Node>(maxNodes);
+            var closedSet = new HashSet<Node>();
+            var nodes = new Dictionary<ulong, Node>();
 
-            var startNode = GetNodeForBlock(pos, ref nodes);
-            openSet.Add(startNode);
+            var pos = Player.Entity.Position.Floored();
 
-            while (openSet.Count > 0)
+            using (_ = new TemporaryBlockCache(this.World))
             {
-                var node = openSet[0];
-                for (int i = 1; i < openSet.Count; i++)
+                var startNode = GetNodeForBlock(pos, ref nodes);
+                var endNode = GetNodeForBlock(goal.Target, ref nodes);
+
+                if (!endNode.Walkable)
                 {
-                    if (openSet[i].fCost < node.fCost || openSet[i].fCost == node.fCost)
+                    throw new Exception($"Target block is not walkable");
+                }
+
+                openSet.Enqueue(startNode, startNode.fCost);
+
+                while (openSet.Count > 0)
+                {
+                    if (timeout != null && (DateTime.Now - startTime).TotalMilliseconds > timeout)
                     {
-                        if (openSet[i].hCost < node.hCost)
+                        throw new Exception($"Could not find a path after {Math.Round((DateTime.Now - startTime).TotalMilliseconds * 10) / 10}ms");
+                    }
+
+                    var node = openSet.Dequeue();
+                    Logger.Debug($"Checking {node}");
+
+                    closedSet.Add(node);
+
+                    if (node.Position == goal.Target.Floored())
+                    {
+                        Logger.Debug($"Checked {nodes.Count} nodes");
+                        var path = new List<Node>();
+                        var currentNode = node;
+
+                        while (currentNode != startNode)
                         {
-                            node = openSet[i];
+                            path.Add(currentNode!);
+                            currentNode = currentNode!.Parent!;
                         }
-                    }
-                }
-                Logger.Debug($"Checking {node}");
-
-                openSet.Remove(node);
-                closedSet.Add(node);
-
-                Logger.Debug($"{node.Position} == {goal.Target.Floored()}: {node.Position == goal.Target.Floored()}");
-                if (node.Position == goal.Target.Floored())
-                {
-                    List<Node> path = new List<Node>();
-                    Node currentNode = node;
-
-                    while (currentNode != startNode)
-                    {
-                        path.Add(currentNode!);
-                        currentNode = currentNode!.Parent!;
-                    }
-                    path.Reverse();
-                    return path.ToArray();
-                }
-
-                var neighbors = GetNeighbors(node, ref nodes).ToArray();
-                Logger.Debug($"Found {neighbors.Length} neighbors");
-
-                foreach (var neighbor in neighbors)
-                {
-                    if (!neighbor.Walkable || closedSet.Contains(neighbor))
-                    {
-                        continue;
+                        path.Add(startNode);
+                        path.Reverse();
+                        Logger.Debug($"Found Path with {path.Count} nodes");
+                        return path.ToArray();
                     }
 
-                    var newCost = node.gCost + goal.Target.DistanceSquared(neighbor.Position);
-                    if (newCost < neighbor.gCost || !openSet.Contains(node))
-                    {
-                        neighbor.gCost = newCost;
-                        neighbor.hCost = goal.Target.DistanceSquared(neighbor.Position);
-                        neighbor.Parent = node;
+                    var neighbors = GetNeighbors(node, ref nodes).ToArray();
 
-                        if (!openSet.Contains(neighbor))
+                    foreach (var neighbor in neighbors)
+                    {
+                        if (!neighbor.Walkable || closedSet.Contains(neighbor))
                         {
-                            openSet.Add(neighbor);
+                            continue;
+                        }
+
+                        var newCost = node.gCost + (float)goal.Target.DistanceSquared(neighbor.Position);
+                        if (newCost < neighbor.gCost || !openSet.Contains(node))
+                        {
+                            neighbor.gCost = newCost;
+                            neighbor.hCost = (float)goal.Target.DistanceSquared(neighbor.Position);
+                            neighbor.Parent = node;
+
+                            if (!openSet.Contains(neighbor))
+                            {
+                                openSet.Enqueue(neighbor, neighbor.fCost);
+                            }
+                            else
+                            {
+                                openSet.UpdatePriority(neighbor, neighbor.fCost);
+                            }
                         }
                     }
                 }
             }
+
             throw new Exception("No path found");
         }
 
         private List<Node> GetNeighbors(Node node, ref Dictionary<ulong, Node> nodes)
         {
-            var offsets = new Vector3[] {
-                Vector3.North, Vector3.East, Vector3.South, Vector3.West
-            };
+            var neighbors = new List<Node>();    
 
-            List<Node> neighbors = new List<Node>();    
-
-            foreach (var offset in offsets)
+            foreach (var move in this.Movements.PossibleMoves)
             {
-                var pos = node.Position.Plus(offset);
-                neighbors.Add(GetNodeForBlock(pos, ref nodes));
+                var pos = node.Position.Plus(move.MoveVector);
+                var neighborNode = GetNodeForBlock(pos, ref nodes);
+                neighbors.Add(neighborNode);
             }
 
             return neighbors;
+        }
+
+        private bool IsPositionWalkable(Vector3 pos)
+        {
+            /*
+             * Currently, a position is considered walkable,
+             * when the block at the position has an empty bounding box, 
+             * the block above has an empty bounding box,
+             * and the block has a bounding box of type block
+             * 
+             * TODO: Instead of using block.BoundingBox use AABB's
+             */
+
+            var block = World.GetBlockAt(pos);
+            if (block.BoundingBox == "empty")
+            {
+                var blockAbove = World.GetBlockAt(pos.Plus(Vector3.Up));
+                var blockBelow = World.GetBlockAt(pos.Plus(Vector3.Down));
+                if (blockAbove.BoundingBox == "empty" && blockBelow.BoundingBox == "block")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private Node GetNodeForBlock(Vector3 pos, ref Dictionary<ulong, Node> nodes)
@@ -115,21 +152,10 @@ namespace MineSharp.Pathfinding.Algorithm
             pos = pos.Floored();
             if (nodes.TryGetValue(((Position)pos).ToULong(), out var node))
             {
-                Logger.Debug("Reusing node");
                 return node;
             }
 
-            var block = World.GetBlockAt(pos);
-            bool walkable = false;
-
-            if (block.BoundingBox == "empty") {
-                var blockAbove = World.GetBlockAt(pos.Plus(Vector3.Up));
-                var blockBelow = World.GetBlockAt(pos.Plus(Vector3.Down));
-                if (blockAbove.BoundingBox == "empty" && World.GetBlockAt(pos.Plus(Vector3.Down)).IsSolid())
-                {
-                    walkable = true;
-                }
-            }
+            var walkable = IsPositionWalkable(pos);
 
             var newNode = new Node(pos, walkable, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);
