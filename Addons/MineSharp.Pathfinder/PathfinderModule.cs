@@ -7,9 +7,9 @@ using MineSharp.Pathfinding.Moves;
 
 namespace MineSharp.Pathfinding
 {
-    public class Pathfinder : Module
+    public class PathfinderModule : Module
     {
-        public Pathfinder(MinecraftBot bot) : base(bot)
+        public PathfinderModule(MinecraftBot bot) : base(bot)
         {
         }
 

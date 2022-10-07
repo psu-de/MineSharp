@@ -87,6 +87,12 @@ namespace MineSharp.Bot {
             Logger.Info("Loaded module: " + module.GetType().Name);
         }
 
+        public T? GetModule<T>() where T : Module
+        {
+            var module = this.Modules.FirstOrDefault(x => x.GetType() == typeof(T));
+            return (T?)module;
+        }
+
         private async Task TickLoop () {
             while (true) {
                 var start = DateTime.Now;

@@ -36,7 +36,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
             }
 
             var goal = new GoalXYZ(x.Value, y.Value, z.Value);
-            var pathfinder = new Pathfinder(BotClient.Bot!);
+            var pathfinder = new PathfinderModule(BotClient.Bot!);
             await pathfinder.Initialize();
             AnsiConsole.Status()
                 .Start("Pathfinding...", ctx => {
