@@ -25,12 +25,12 @@ Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to prov
  - 🪟 Low-Level window api (needs some more work)
  - ⚔️ Attacking entities
  - 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
+ - 🔎 Simple Pathfinder
  - 📝 Chat (Reading and Writing)
 
 # Roadmap
   - 🪟 Finish the window api
   - 🏊 Support more forms of movement (Swimming, climbing, maybe flying)
-  - 🔎 Pathfinder to automate navigation (work in progress)
   - 🪄 Support more versions
 
 
