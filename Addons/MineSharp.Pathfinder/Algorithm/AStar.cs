@@ -55,13 +55,11 @@ namespace MineSharp.Pathfinding.Algorithm
                     }
 
                     var node = openSet.Dequeue();
-                    Logger.Debug($"Checking {node}");
-
                     closedSet.Add(node);
 
                     if (node.Position == goal.Target.Floored())
                     {
-                        Logger.Debug($"Checked {nodes.Count} nodes");
+                        Logger.Debug($"Checked {nodes.Count} nodes in {Math.Round((DateTime.Now - startTime).TotalMilliseconds * 10) / 10}ms");
                         var path = new List<Node>();
                         var currentNode = node;
 
@@ -126,19 +124,19 @@ namespace MineSharp.Pathfinding.Algorithm
         {
             /*
              * Currently, a position is considered walkable,
-             * when the block at the position has an empty bounding box, 
-             * the block above has an empty bounding box,
+             * when the block at the position is not solid,
+             * the block above is not solid,
              * and the block has a bounding box of type block
              * 
              * TODO: Instead of using block.BoundingBox use AABB's
              */
 
             var block = World.GetBlockAt(pos);
-            if (block.BoundingBox == "empty")
+            if (!block.IsSolid())
             {
                 var blockAbove = World.GetBlockAt(pos.Plus(Vector3.Up));
                 var blockBelow = World.GetBlockAt(pos.Plus(Vector3.Down));
-                if (blockAbove.BoundingBox == "empty" && blockBelow.BoundingBox == "block")
+                if (!blockAbove.IsSolid() && blockBelow.BoundingBox == "block")
                 {
                     return true;
                 }

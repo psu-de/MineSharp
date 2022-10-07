@@ -24,7 +24,6 @@ namespace MineSharp.Pathfinding.Moves
                 .Plus(this.MoveVector)
                 .Plus(new Vector3(0.5, 0, 0.5));
          
-            Logger.Debug($"From {bot.Player!.Entity.Position} => {bot.Player!.Entity.Position.Floored()}");
             Logger.Debug($"DownMove: Target={this._target}");
             return Task.CompletedTask;
         }
@@ -47,9 +46,6 @@ namespace MineSharp.Pathfinding.Moves
                     return;
                 }
             }
-            
-            Logger.Debug($"Distance to target: {delta.Length()}");
-            Logger.Debug($"DeltaY: {deltaY}");
 
             var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
             sender.ForceSetRotation((float)yaw, 0);

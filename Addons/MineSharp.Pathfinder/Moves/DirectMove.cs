@@ -41,12 +41,9 @@ namespace MineSharp.Pathfinding.Moves
 
             if (length <= THRESHOLD)
             {
-                Logger.Debug($"Reached target");
                 this.TSC.SetResult();
                 return;
             }
-            
-            Logger.Debug($"Distance to target: {delta.Length()}");
 
             var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
             sender.ForceSetRotation((float)yaw, 0);

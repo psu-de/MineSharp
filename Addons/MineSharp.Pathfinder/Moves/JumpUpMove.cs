@@ -45,9 +45,7 @@ namespace MineSharp.Pathfinding.Moves
             sender.ForceSetRotation((float)yaw, 0);
             
             sender.PlayerControls.Walk(WalkDirection.Forward);
-            Logger.Debug($"DY: {deltaY}");
-
-
+            
             if (deltaY > 0.6)
             {
                 sender.PlayerControls.Jump();
