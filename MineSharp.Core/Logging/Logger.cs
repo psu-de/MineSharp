@@ -18,12 +18,11 @@ namespace MineSharp.Core.Logging {
             public DateTime Time;
             public string Message;
 
+            private string Format(string val) {
+                return val.PadLeft(2, '0');
+            }
+            
             public override string ToString() {
-
-                string Format(string val) {
-                    return val.PadLeft(2, '0');
-                }
-
                 string time = $"{Format(Time.Hour.ToString())}:{Format(Time.Minute.ToString())}:{Format(Time.Second.ToString())}";
                 string logl = Level switch {
                     LogLevel.INFO => "INFO ",
