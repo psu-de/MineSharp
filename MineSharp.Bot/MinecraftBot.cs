@@ -38,6 +38,7 @@ namespace MineSharp.Bot {
 
         public delegate void BotEmptyEvent(MinecraftBot sender);
         public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
+        public delegate void BotChatSenderEvent(MinecraftBot sender, Chat chat, MinecraftPlayer messageSender);
         public delegate void BotItemEvent(MinecraftBot sender, Item? item);
 
         public delegate void BotPlayerEvent(MinecraftBot sender, MinecraftPlayer entity);
@@ -75,6 +76,13 @@ namespace MineSharp.Bot {
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
             this.Client.PacketReceived += Events_PacketReceived;
+            
+            this.BaseModule = new BaseModule(this);
+            this.EntityModule = new EntityModule(this);
+            this.PlayerModule = new PlayerModule(this);
+            this.PhysicsModule = new PhysicsModule(this);
+            this.WorldModule = new WorldModule(this);
+            this.WindowsModule = new WindowsModule(this);
         }
 
         public async Task LoadModule(Module module) {
@@ -122,13 +130,6 @@ namespace MineSharp.Bot {
 
 
         private async Task LoadModules () {
-            this.BaseModule = new BaseModule(this);
-            this.EntityModule = new EntityModule(this);
-            this.PlayerModule = new PlayerModule(this);
-            this.PhysicsModule = new PhysicsModule(this);
-            this.WorldModule = new WorldModule(this);
-            this.WindowsModule = new WindowsModule(this);
-
             await Task.WhenAll(new Task[] {
                 LoadModule(this.BaseModule),
                 LoadModule(this.EntityModule),

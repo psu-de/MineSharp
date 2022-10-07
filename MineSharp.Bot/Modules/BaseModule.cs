@@ -4,6 +4,7 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using static MineSharp.Bot.MinecraftBot;
+using PacketChat = MineSharp.Data.Protocol.Play.Clientbound.PacketChat;
 
 namespace MineSharp.Bot.Modules {
     public class BaseModule : Module {
@@ -14,6 +15,8 @@ namespace MineSharp.Bot.Modules {
         public event BotEmptyEvent? Respawned;
 
         public event BotChatEvent? Died;
+
+        public event BotChatSenderEvent? ChatReceived;
 
 
         public Player? BotEntity { get; private set; }
@@ -65,6 +68,7 @@ namespace MineSharp.Bot.Modules {
             this.Bot.On<PacketUpdateHealth>(handleUpdateHealth);
             this.Bot.On<PacketDeathCombatEvent>(handleDeathCombat);
             this.Bot.On<PacketRespawn>(handleRespawnPacket);
+            this.Bot.On<PacketChat>(handleChatPacket);
 
             await this.Bot.Client.SendPacket(new Data.Protocol.Play.Serverbound.PacketPositionLook(
                 packet2.X!, packet2.Y!, packet2.Z!, packet2.Yaw!, packet2.Pitch!, this.BotEntity.IsOnGround));
@@ -93,6 +97,23 @@ namespace MineSharp.Bot.Modules {
             return Task.CompletedTask;
         }
 
+        private Task handleChatPacket(PacketChat packet)
+        {
+            // TODO: handle other chat positions
+            if (packet.Position == 0)
+            {
+                if (!this.Bot.PlayerMapping.TryGetValue(packet.Sender, out var player))
+                {
+                    Logger.Warning($"Unknown player uuid: {packet.Sender}");
+                }
+                else
+                {
+                    this.ChatReceived?.Invoke(this.Bot, new Chat(packet.Message), player);
+                }
+            }
+
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Respawns the bot

@@ -29,6 +29,15 @@ namespace MineSharp.Bot {
             add { BaseModule!.Died += value; }
             remove { BaseModule!.Died -= value; }
         }
+        
+        /// <summary>
+        /// Fires when a chat message from another player is received
+        /// </summary>
+        public event BotChatSenderEvent ChatReceived
+        {
+            add { BaseModule!.ChatReceived += value; }
+            remove { BaseModule!.ChatReceived -= value; }
+        }
 
 
         public Player? BotEntity => this.BaseModule?.BotEntity;

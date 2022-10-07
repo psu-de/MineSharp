@@ -74,9 +74,9 @@ if (true /*args.Length == 1*/) {
 AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
 AnsiConsole.Write(new FigletText("MineSharp Alpha").Centered());
 
-MineSharp.Core.Logging.LogLevel thresholdLogLevel = MineSharp.Core.Logging.LogLevel.INFO;
+LogLevel thresholdLogLevel = LogLevel.INFO;
 
-void LogMessage(MineSharp.Core.Logging.Logger.LogMessage log) {
+void LogMessage(Logger.LogMessage log) {
     if (log.Level <= thresholdLogLevel) {
         AnsiConsole.MarkupLine(log.Markup(Markup.Escape));
     }
@@ -117,37 +117,41 @@ while (true) {
         // optionally, use response.CancellationToken so the user can
         // cancel long-running processing of their response via ctrl-c
 
-        string cmdL = response.Text.TrimStart();
-        if (string.IsNullOrEmpty(cmdL)) continue;
-
-        var cmdName = cmdL.Split(' ')[0];
-        if (!CommandManager.TryGetCommand(cmdName, out var command)) {
-            AnsiConsole.MarkupLine("[red]ERROR: Command " + cmdName + " not found![/]");
-            continue;
-        } else {
-            var startTime = DateTime.Now;
-            try {
-                command.Execute(cmdL.Substring(cmdName.Length), response.CancellationToken);
-            } catch (Exception ex) {
-                AnsiConsole.MarkupLine("[red]An error occurred while performing command![/]");
-                AnsiConsole.WriteException(ex);
-            }
-
-            if (response.CancellationToken.IsCancellationRequested) {
-                AnsiConsole.MarkupLine("[red]Aborted.[/]");
-                continue;
-            }
-
-            var timeTaken = DateTime.Now - startTime;
-            string time = "";
-            if (timeTaken.TotalMilliseconds < 1000) {
-                time = $"{timeTaken.TotalMilliseconds.ToString("0.00")}ms";
-            } else {
-                time = $"{timeTaken.TotalSeconds.ToString("0.00")}s";
-            }
-
-            AnsiConsole.MarkupLine($"[green]Command finished in[/] [olive]{time}[/]");
-        }
+        ExecuteCommand(response.Text, response.CancellationToken);
     }
 }
 
+// TODO: Maybe check if a command is already running
+void ExecuteCommand(string cmdL, CancellationToken cancellationToken)
+{
+    if (string.IsNullOrEmpty(cmdL)) return;
+
+    var cmdName = cmdL.Split(' ')[0];
+    if (!CommandManager.TryGetCommand(cmdName, out var command)) {
+        AnsiConsole.MarkupLine("[red]ERROR: Command " + cmdName + " not found![/]");
+        return;
+    } else {
+        var startTime = DateTime.Now;
+        try {
+            command.Execute(cmdL.Substring(cmdName.Length), cancellationToken);
+        } catch (Exception ex) {
+            AnsiConsole.MarkupLine("[red]An error occurred while performing command![/]");
+            AnsiConsole.WriteException(ex);
+        }
+
+        if (cancellationToken.IsCancellationRequested) {
+            AnsiConsole.MarkupLine("[red]Aborted.[/]");
+            return;
+        }
+
+        var timeTaken = DateTime.Now - startTime;
+        string time = "";
+        if (timeTaken.TotalMilliseconds < 1000) {
+            time = $"{timeTaken.TotalMilliseconds.ToString("0.00")}ms";
+        } else {
+            time = $"{timeTaken.TotalSeconds.ToString("0.00")}s";
+        }
+
+        AnsiConsole.MarkupLine($"[green]Command finished in[/] [olive]{time}[/]");
+    }
+}
