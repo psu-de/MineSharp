@@ -53,7 +53,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity {
 
             table.AddColumns("Entity Id", "Type", "Position");
             foreach (var e in entities) {
-                table.AddRow(e.Id.ToString(), e.Name, e.Position.ToString());
+                table.AddRow(e.ServerId.ToString(), e.Name, e.Position.ToString());
             }
 
             if (table.Rows.Count > 0) {

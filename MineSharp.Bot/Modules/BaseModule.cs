@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
+using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using static MineSharp.Bot.MinecraftBot;
@@ -148,7 +149,12 @@ namespace MineSharp.Bot.Modules {
 
             if (entity.Position.DistanceSquared(this.BotEntity!.Position) > 36) throw new InvalidOperationException("Too far");
 
-            var packet = new PacketEntityAction(entity.Id, 1, Bot.PlayerControls.IsSneaking ? 0 : 1); // Maybe invert sneak?
+            var packet = new PacketUseEntity(
+                entity.ServerId, 
+                1, 
+                new PacketUseEntity.XSwitch(null), new PacketUseEntity.YSwitch(null), new PacketUseEntity.ZSwitch(null),
+                new PacketUseEntity.HandSwitch(0),
+                Bot.PlayerControls.IsSneaking); // Maybe invert sneak?
             return this.Bot.Client.SendPacket(packet);
         }
 

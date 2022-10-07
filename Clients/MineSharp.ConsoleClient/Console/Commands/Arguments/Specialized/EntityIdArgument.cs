@@ -12,11 +12,11 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized {
 
             foreach (var e in BotClient.Bot!.Entities.Values) {
 
-                string displayText = $"[{Color}]{e.Id} ({e.Name})[/]";
+                string displayText = $"[{Color}]{e.ServerId} ({e.Name})[/]";
 
                 items.Add(
                     new CompletionItem(
-                        replacementText: e.Id.ToString(),
+                        replacementText: e.ServerId.ToString(),
                         displayText: CColor.FromMarkup(displayText)));
             }
             return items;
