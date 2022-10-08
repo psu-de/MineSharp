@@ -2,6 +2,7 @@
 using MineSharp.Data.Items;
 using MineSharp.Data.Protocol;
 using Slot = MineSharp.Data.Protocol.Slot;
+
 namespace MineSharp.Data
 {
     public static class SlotExtensions

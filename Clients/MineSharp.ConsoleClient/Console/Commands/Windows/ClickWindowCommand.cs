@@ -5,6 +5,7 @@ using MineSharp.Core.Types.Enums;
 using MineSharp.Windows;
 using PrettyPrompt.Completion;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Windows
 {
     internal class ClickWindowCommand : Command

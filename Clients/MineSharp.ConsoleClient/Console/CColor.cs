@@ -1,6 +1,7 @@
 ﻿using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Reflection;
+
 namespace MineSharp.ConsoleClient.Console
 {
     public static class CColor

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Logging;
+
 namespace MineSharp.Bot.Modules
 {
     public abstract class Module

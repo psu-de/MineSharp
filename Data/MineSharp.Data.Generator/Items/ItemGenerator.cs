@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+
 namespace MineSharp.Data.Generator.Items
 {
     internal class ItemGenerator : Generator

@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
+
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot

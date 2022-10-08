@@ -6,6 +6,7 @@ using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.World.Chunks;
+
 namespace MineSharp.Bot.Modules
 {
     public class WorldModule : Module

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Types;
+
 namespace MineSharp.Pathfinding.Goals
 {
     public class GoalXYZ : Goal

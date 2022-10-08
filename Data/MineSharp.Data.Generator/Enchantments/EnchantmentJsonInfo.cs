@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+
 namespace MineSharp.Data.Generator.Enchantments
 {
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.

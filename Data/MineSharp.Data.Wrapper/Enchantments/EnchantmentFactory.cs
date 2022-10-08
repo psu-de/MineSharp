@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Types;
+
 namespace MineSharp.Data.Enchantments
 {
     public static class EnchantmentFactory

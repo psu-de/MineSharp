@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 namespace MineSharp.Data.Generator.Entities
 {
     internal class EntityGenerator : Generator

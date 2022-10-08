@@ -1,5 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using PrettyPrompt.Completion;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized
 {
     internal class EntityIdArgument : IntegerArgument

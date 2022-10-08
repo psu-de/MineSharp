@@ -1,5 +1,6 @@
 ﻿using MineSharp.Data.Generator.Protocol.Datatypes;
 using Newtonsoft.Json.Linq;
+
 namespace MineSharp.Data.Generator.Protocol
 {
     internal class ProtocolGenerator : Generator

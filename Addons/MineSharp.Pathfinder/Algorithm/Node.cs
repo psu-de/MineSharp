@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Moves;
 using Priority_Queue;
+
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class Node : FastPriorityQueueNode

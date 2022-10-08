@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Types;
+
 namespace MineSharp.Data.Biomes
 {
     public static class BiomeFactory

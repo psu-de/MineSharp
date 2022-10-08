@@ -1,4 +1,5 @@
 ﻿using fNbt;
+
 namespace MineSharp.Core.Types
 {
     public class Item

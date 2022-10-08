@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 namespace MineSharp.Data.Generator.Biomes
 {
     internal class BiomeGenerator : Generator

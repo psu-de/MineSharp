@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+
 namespace MineSharp.Windows
 {
     public class WindowClick

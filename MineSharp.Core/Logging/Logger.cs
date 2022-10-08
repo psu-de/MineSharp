@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 namespace MineSharp.Core.Logging
 {
     public class Logger

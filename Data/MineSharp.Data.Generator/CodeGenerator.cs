@@ -1,4 +1,5 @@
 ﻿using System.Text;
+
 namespace MineSharp.Data.Generator
 {
     internal class CodeGenerator

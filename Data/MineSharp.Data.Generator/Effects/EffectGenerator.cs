@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 namespace MineSharp.Data.Generator.Effects
 {
     internal class EffectGenerator : Generator

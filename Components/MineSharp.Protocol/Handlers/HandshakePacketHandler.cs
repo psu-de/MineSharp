@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Handshaking.Serverbound;
+
 namespace MineSharp.Protocol.Handlers
 {
     internal class HandshakePacketHandler : IPacketHandler

@@ -1,4 +1,5 @@
 ﻿using PrettyPrompt.Completion;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized
 {
     internal class CustomAutocompleteArgument : Argument

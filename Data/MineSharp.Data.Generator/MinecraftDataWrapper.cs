@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
+
 namespace MineSharp.Data.Generator
 {
     internal class MinecraftDataHelper

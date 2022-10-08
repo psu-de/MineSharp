@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
+
 namespace MineSharp.Physics
 {
     public static class PhysicsConst

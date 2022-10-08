@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+
 namespace MineSharp.Data.Generator
 {
     internal class MinecraftDataGenerator : Generator

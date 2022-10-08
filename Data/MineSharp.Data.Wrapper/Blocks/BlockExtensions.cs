@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Effects;
 using System.Reflection;
+
 namespace MineSharp.Data.Blocks
 {
     public static class BlockExtensions

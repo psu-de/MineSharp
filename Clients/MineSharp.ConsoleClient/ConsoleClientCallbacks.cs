@@ -4,6 +4,7 @@ using PrettyPrompt.Completion;
 using PrettyPrompt.Consoles;
 using PrettyPrompt.Documents;
 using PrettyPrompt.Highlighting;
+
 namespace MineSharp.ConsoleClient
 {
     internal class ConsoleClientCallbacks : PromptCallbacks

@@ -6,6 +6,7 @@ using MineSharp.Pathfinding.Moves;
 using MineSharp.Physics;
 using MineSharp.World;
 using Priority_Queue;
+
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class AStar

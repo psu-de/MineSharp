@@ -3,6 +3,7 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized;
 using PrettyPrompt.Completion;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Windows
 {
     internal class WindowItemsCommand : Command

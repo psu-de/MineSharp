@@ -7,6 +7,7 @@ using MineSharp.Data.Protocol.Login.Clientbound;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Status.Clientbound;
 using Packet = MineSharp.Data.Protocol.Handshaking.Clientbound.Packet;
+
 namespace MineSharp.Protocol
 {
     internal class PacketFactory

@@ -3,6 +3,7 @@ using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.World.PalettedContainer;
+
 namespace MineSharp.World.Chunks
 {
     public class ChunkSection

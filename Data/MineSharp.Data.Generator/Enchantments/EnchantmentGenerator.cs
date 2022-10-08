@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 namespace MineSharp.Data.Generator.Enchantments
 {
     internal class EnchantmentGenerator : Generator

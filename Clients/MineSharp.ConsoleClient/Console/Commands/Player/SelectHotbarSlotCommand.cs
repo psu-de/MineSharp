@@ -1,6 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class SelectHotbarSlotCommand : Command

@@ -1,5 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Prompt
 {
     internal class HelpCommand : Command

@@ -9,6 +9,7 @@ using MineSharp.MojangAuth;
 using MineSharp.Protocol.Handlers;
 using System.Net;
 using System.Net.Sockets;
+
 namespace MineSharp.Protocol
 {
     public class MinecraftClient

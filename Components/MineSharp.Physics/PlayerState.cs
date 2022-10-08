@@ -1,5 +1,6 @@
 ﻿using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
+
 namespace MineSharp.Physics
 {
     public class PlayerState

@@ -1,6 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.ConsoleClient.Client;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Prompt
 {
     internal class ReconnectCommand : Command

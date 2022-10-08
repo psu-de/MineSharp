@@ -5,6 +5,7 @@ using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.World.Chunks;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+
 namespace MineSharp.World
 {
     public class World

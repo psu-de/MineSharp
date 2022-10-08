@@ -8,6 +8,7 @@ using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Windows;
 using System.Diagnostics;
+
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot
@@ -237,5 +238,6 @@ namespace MineSharp.Bot
 
 
         #endregion
+
     }
 }

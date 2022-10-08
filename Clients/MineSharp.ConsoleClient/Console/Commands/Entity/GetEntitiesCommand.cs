@@ -2,6 +2,7 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Data.Entities;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Entity
 {
     internal class GetEntitiesCommand : Command

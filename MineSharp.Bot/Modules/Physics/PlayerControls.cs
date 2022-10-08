@@ -1,6 +1,7 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.Physics;
+
 namespace MineSharp.Bot.Modules.Physics
 {
     public class PlayerControls

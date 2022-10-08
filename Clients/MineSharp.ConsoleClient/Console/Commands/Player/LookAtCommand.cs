@@ -2,6 +2,7 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class LookAtCommand : Command

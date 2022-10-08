@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Types.Enums;
+
 namespace MineSharp.Core.Types
 {
     public class Biome

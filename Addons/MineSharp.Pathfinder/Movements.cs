@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Moves;
+
 namespace MineSharp.Pathfinding
 {
     public class Movements

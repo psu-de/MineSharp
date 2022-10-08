@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Windows;
+
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot

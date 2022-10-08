@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
+
 namespace MineSharp.Data.Generator.Protocol
 {
 

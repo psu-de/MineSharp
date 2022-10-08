@@ -2,6 +2,7 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.World
 {
     internal class FindBlocksCommand : Command

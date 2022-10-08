@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Logging;
 using System.Diagnostics;
 using System.Security.Cryptography;
+
 namespace MineSharp.Protocol.Crypto
 {
     public class RSAHelper

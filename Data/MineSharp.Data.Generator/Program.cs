@@ -8,6 +8,7 @@ using MineSharp.Data.Generator.Items;
 using MineSharp.Data.Generator.Protocol;
 using Spectre.Console;
 using System.Reflection;
+
 var projectPath = "";
 try
 {

@@ -2,6 +2,7 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Windows;
+
 namespace MineSharp.Windows
 {
     public class Window : IDisposable

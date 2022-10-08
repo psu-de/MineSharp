@@ -4,6 +4,7 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.World
 {
     internal class MineBlockAtCommand : Command

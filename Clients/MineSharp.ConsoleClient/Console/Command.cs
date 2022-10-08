@@ -1,6 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console
 {
     internal abstract class Command

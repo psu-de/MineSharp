@@ -3,6 +3,7 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Pathfinding;
 using MineSharp.Pathfinding.Goals;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class PathfindCommand : Command

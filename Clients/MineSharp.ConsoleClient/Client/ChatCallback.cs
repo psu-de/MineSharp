@@ -1,5 +1,6 @@
 using MineSharp.Bot;
 using MineSharp.Core.Types;
+
 namespace MineSharp.ConsoleClient.Client
 {
     public class ChatCallback

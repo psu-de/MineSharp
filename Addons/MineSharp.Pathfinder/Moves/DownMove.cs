@@ -3,6 +3,7 @@ using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
+
 namespace MineSharp.Pathfinding.Moves
 {
     public class DownMove : Move

@@ -1,5 +1,6 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class RespawnCommand : Command

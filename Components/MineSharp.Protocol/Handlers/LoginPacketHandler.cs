@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using PacketEncryptionBegin = MineSharp.Data.Protocol.Login.Serverbound.PacketEncryptionBegin;
+
 namespace MineSharp.Protocol.Handlers
 {
     internal class LoginPacketHandler : IPacketHandler
@@ -117,5 +118,6 @@ namespace MineSharp.Protocol.Handlers
 
 
         #endregion
+
     }
 }

@@ -2,6 +2,7 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core;
 using Spectre.Console;
+
 namespace MineSharp.ConsoleClient.Console.Commands.Misc
 {
     internal class DisplayCommand : Command

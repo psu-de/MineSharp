@@ -2,6 +2,7 @@
 using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+
 namespace MineSharp.Pathfinding.Moves
 {
     public class DirectMove : Move

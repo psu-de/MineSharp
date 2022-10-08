@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 namespace MineSharp.Data.Generator.Blocks
 {
 #pragma warning disable CS8618

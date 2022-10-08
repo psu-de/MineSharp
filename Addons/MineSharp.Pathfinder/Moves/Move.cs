@@ -2,6 +2,7 @@
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Physics;
+
 namespace MineSharp.Pathfinding.Moves
 {
     public abstract class Move

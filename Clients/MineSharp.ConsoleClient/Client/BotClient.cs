@@ -1,5 +1,6 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Core.Logging;
+
 namespace MineSharp.ConsoleClient.Client
 {
     public static class BotClient

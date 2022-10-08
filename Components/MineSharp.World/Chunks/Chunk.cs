@@ -3,6 +3,7 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
+
 namespace MineSharp.World.Chunks
 {
     public class Chunk
