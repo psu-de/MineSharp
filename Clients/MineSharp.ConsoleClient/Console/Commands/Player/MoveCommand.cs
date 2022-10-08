@@ -3,20 +3,24 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
-    internal class MoveCommand : Command {
+    internal class MoveCommand : Command
+    {
 
-        EnumArgument<MoveOptions> DirectionArg;
+        private EnumArgument<MoveOptions> DirectionArg;
 
-        public MoveCommand() {
-            DirectionArg = new EnumArgument<MoveOptions>("direction");
-            var desc = $"Toggles the bot's movement controls for a [{DirectionArg.Color}]state[/]";
-            this.Initialize("move", desc, CColor.PlayerCommand, DirectionArg);
+        public MoveCommand()
+        {
+            this.DirectionArg = new EnumArgument<MoveOptions>("direction");
+            var desc = $"Toggles the bot's movement controls for a [{this.DirectionArg.Color}]state[/]";
+            this.Initialize("move", desc, CColor.PlayerCommand, this.DirectionArg);
         }
 
-        public override async void DoAction(string[] argv, CancellationToken cancellation) {
+        public override async void DoAction(string[] argv, CancellationToken cancellation)
+        {
 
-            var dir = DirectionArg.GetValue(argv[0]);
-            switch (dir) {
+            var dir = this.DirectionArg.GetValue(argv[0]);
+            switch (dir)
+            {
                 case MoveOptions.Forward:
                     BotClient.Bot!.PlayerControls.IsWalkingForward = !BotClient.Bot.PlayerControls.IsWalkingForward;
                     break;
@@ -61,7 +65,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
         }
 
 
-        enum MoveOptions {
+        private enum MoveOptions
+        {
             Forward,
             Backward,
             Left,

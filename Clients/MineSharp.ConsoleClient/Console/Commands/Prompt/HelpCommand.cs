@@ -1,37 +1,48 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
-    internal class HelpCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.Prompt
+{
+    internal class HelpCommand : Command
+    {
 
-        CommandNameArgument CommandNameArg;
+        private CommandNameArgument CommandNameArg;
 
-        public HelpCommand() {
-            CommandNameArg = new CommandNameArgument("command", isOptional: true);
+        public HelpCommand()
+        {
+            this.CommandNameArg = new CommandNameArgument("command", true);
 
-            var desc = $"Lists all commands or displays [{CColor.PromptCommand}]help[/] for another [{CommandNameArg.Color}]command[/]";
+            var desc = $"Lists all commands or displays [{CColor.PromptCommand}]help[/] for another [{this.CommandNameArg.Color}]command[/]";
 
 
-            this.Initialize("help", desc, CColor.PromptCommand, CommandNameArg);
+            this.Initialize("help", desc, CColor.PromptCommand, this.CommandNameArg);
         }
 
-        void PrintCommands() {
-            Dictionary<string, List<Command>> commands = new Dictionary<string, List<Command>>();
-            foreach (var c in CommandManager.Commands.Values) {
+        private void PrintCommands()
+        {
+            var commands = new Dictionary<string, List<Command>>();
+            foreach (var c in CommandManager.Commands.Values)
+            {
                 var commandType = c.GetType().Namespace?.Split('.').Last() ?? "Unknown";
                 commandType += " Commands";
-                if (commands.ContainsKey(commandType)) {
+                if (commands.ContainsKey(commandType))
+                {
                     commands[commandType].Add(c);
-                } else {
-                    commands[commandType] = new List<Command>() { c };
+                } else
+                {
+                    commands[commandType] = new List<Command>() {
+                        c
+                    };
                 }
             }
 
-            Table masterTable = new Table().AddColumns("Category", "");
+            var masterTable = new Table().AddColumns("Category", "");
 
-            foreach (var group in commands) {
+            foreach (var group in commands)
+            {
                 var table = new Table().AddColumns("Command", "Help");
-                foreach (var c in group.Value) {
+                foreach (var c in group.Value)
+                {
                     table.AddRow(new Markup($"\n[{c.Color}]{c.Name}[/]"), new Panel(c.Description));
                 }
                 masterTable.AddRow(new Text("\n" + group.Key), table.Width(1000));
@@ -41,16 +52,19 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
             AnsiConsole.WriteLine();
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
 
-            if (argv.Length == 0) {
-                PrintCommands();
+            if (argv.Length == 0)
+            {
+                this.PrintCommands();
                 return;
             }
 
-            string commandName = argv[0];
+            var commandName = argv[0];
 
-            if(!CommandManager.TryGetCommand(commandName, out var command)) {
+            if (!CommandManager.TryGetCommand(commandName, out var command))
+            {
                 AnsiConsole.MarkupLine("[red] ERROR: Could not find command " + commandName + "[/]");
             }
 

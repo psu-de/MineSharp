@@ -9,14 +9,9 @@ namespace MineSharp.Pathfinding
 {
     public class PathfinderModule : Module
     {
-        public PathfinderModule(MinecraftBot bot) : base(bot)
-        {
-        }
+        public PathfinderModule(MinecraftBot bot) : base(bot) {}
 
-        protected override Task Load()
-        {
-            return Task.CompletedTask;
-        }
+        protected override Task Load() => Task.CompletedTask;
 
         public async Task GoTo(Goal goal, Movements? movements = null, double? timeout = null, CancellationToken? cancellation = null)
         {
@@ -26,7 +21,7 @@ namespace MineSharp.Pathfinding
             {
                 await this.Bot.WaitForChunksToLoad();
             }
-            
+
             if (this.Bot.Player == null)
             {
                 await this.Bot.WaitForBot();
@@ -36,11 +31,11 @@ namespace MineSharp.Pathfinding
             var path = await Task.Run(() => astar.ComputePath(goal, timeout)).WaitAsync(cancellation.Value);
 
             var moves = path.Skip(1).Select(x => x.Move!).ToList();
-            Logger.Debug($"Found {moves.Count} moves");
+            this.Logger.Debug($"Found {moves.Count} moves");
 
             foreach (var move in moves)
             {
-                if (cancellation.Value.IsCancellationRequested) 
+                if (cancellation.Value.IsCancellationRequested)
                 {
                     await this.Bot.PlayerControls.Reset();
                     return;

@@ -17,7 +17,7 @@ namespace MineSharp.Pathfinding.Moves
         private const double THRESHOLD = 0.0525d;
 
         private Vector3? _target;
-        
+
         internal DirectMove(Movements movements, Vector3 direction) : base(movements)
         {
             this.MoveVector = direction;
@@ -38,12 +38,9 @@ namespace MineSharp.Pathfinding.Moves
             return Task.CompletedTask;
         }
 
-        protected override Task Finish(MinecraftBot bot)
-        {
-            return bot.PlayerControls.Reset();
-        }
-        
-        protected override void OnTick (MinecraftBot sender)
+        protected override Task Finish(MinecraftBot bot) => bot.PlayerControls.Reset();
+
+        protected override void OnTick(MinecraftBot sender)
         {
             var delta = sender.BotEntity!.Position.Minus(this._target!);
             var length = delta.Length();
@@ -58,7 +55,7 @@ namespace MineSharp.Pathfinding.Moves
             sender.ForceSetRotation((float)yaw, 0);
 
             sender.PlayerControls.Walk(WalkDirection.Forward);
-            if (Movements.AllowSprinting)
+            if (this.Movements.AllowSprinting)
             {
                 _ = sender.PlayerControls.StartSprinting();
             }

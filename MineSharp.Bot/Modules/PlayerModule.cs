@@ -5,10 +5,12 @@ using MineSharp.Data.Protocol.Play.Clientbound;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
 
-namespace MineSharp.Bot.Modules {
-    public class PlayerModule : Module {
+namespace MineSharp.Bot.Modules
+{
+    public class PlayerModule : Module
+    {
 
-        public PlayerModule(MinecraftBot bot) : base(bot) { }
+        public PlayerModule(MinecraftBot bot) : base(bot) {}
 
         public ConcurrentDictionary<UUID, MinecraftPlayer> PlayerMapping = new ConcurrentDictionary<UUID, MinecraftPlayer>();
 
@@ -36,35 +38,38 @@ namespace MineSharp.Bot.Modules {
         /// </summary>
         public event BotPlayerEvent? PlayerLoaded;
 
-        protected override async Task Load() {
+        protected override async Task Load()
+        {
 
-            this.Bot.On<PacketPlayerInfo>(handlePlayerInfo);
-            this.Bot.On<PacketNamedEntitySpawn>(handleSpawnPlayer);
-            this.Bot.On<PacketPosition>(handlePlayerPositionAndLook);
-            this.Bot.On<PacketGameStateChange>(handleChangeGameState);
+            this.Bot.On<PacketPlayerInfo>(this.handlePlayerInfo);
+            this.Bot.On<PacketNamedEntitySpawn>(this.handleSpawnPlayer);
+            this.Bot.On<PacketPosition>(this.handlePlayerPositionAndLook);
+            this.Bot.On<PacketGameStateChange>(this.handleChangeGameState);
 
             await this.SetEnabled(true);
         }
 
-        private Task handleChangeGameState(PacketGameStateChange packet) {
+        private Task handleChangeGameState(PacketGameStateChange packet)
+        {
 
             //TODO: Implement all GameState Reasons
-            switch ((GameStateReason)packet.Reason!) {
+            switch ((GameStateReason)packet.Reason!)
+            {
                 case GameStateReason.BeginRaining:
-                    IsRaining = true;
-                    WeatherChanged?.Invoke(this.Bot);
+                    this.IsRaining = true;
+                    this.WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.EndRaining:
-                    IsRaining = false;
-                    WeatherChanged?.Invoke(this.Bot);
+                    this.IsRaining = false;
+                    this.WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.RainLevelChanged:
-                    RainLevel = packet.Reason!;
-                    WeatherChanged?.Invoke(this.Bot);
+                    this.RainLevel = packet.Reason!;
+                    this.WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.ThunderLevelChanged:
-                    ThunderLevel = packet.Reason!;
-                    WeatherChanged?.Invoke(this.Bot);
+                    this.ThunderLevel = packet.Reason!;
+                    this.WeatherChanged?.Invoke(this.Bot);
                     break;
                 case GameStateReason.ChangeGameMode:
                     var gameMode = (GameMode)packet.Reason!;
@@ -75,41 +80,52 @@ namespace MineSharp.Bot.Modules {
             return Task.CompletedTask;
         }
 
-        private Task handlePlayerInfo(PacketPlayerInfo packet) {
-            switch (packet.Action!.Value) {
+        private Task handlePlayerInfo(PacketPlayerInfo packet)
+        {
+            switch (packet.Action!.Value)
+            {
                 case 0: // Add player //TODO: Nich ganz korrekt, wird auch gesendet wenn davor schon spieler aufm server waren
-                    foreach (var data in packet.Data!) {
+                    foreach (var data in packet.Data!)
+                    {
 
-                        
-                        string name = (string)data.Name!.Value!;
-                        if (name == Bot.Session.Username) continue;
 
-                        GameMode gm = (GameMode)((Data.Protocol.VarInt)data.Gamemode!.Value!).Value;
+                        var name = (string)data.Name!.Value!;
+                        if (name == this.Bot.Session.Username) continue;
+
+                        var gm = (GameMode)((Data.Protocol.VarInt)data.Gamemode!.Value!).Value;
                         int ping = (Data.Protocol.VarInt)data.Ping!.Value!;
-                        if (this.PlayerMapping.ContainsKey(data.UUID!)) {
+                        if (this.PlayerMapping.ContainsKey(data.UUID!))
+                        {
                             this.PlayerMapping[data.UUID!].Username = name;
                             this.PlayerMapping[data.UUID!].Ping = ping;
                             this.PlayerMapping[data.UUID!].GameMode = gm;
                             continue;
                         }
 
-                        MinecraftPlayer newPlayer = new MinecraftPlayer(name, data.UUID!, ping, gm, new Player(-1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN, Vector3.Zero, true, new Dictionary<int, Effect?>()));
-                        if (!PlayerMapping.TryAdd(data.UUID!, newPlayer)) { Logger.Debug("Could not add player"); return Task.CompletedTask; }
-                        PlayerJoined?.Invoke(this.Bot, newPlayer);
+                        var newPlayer = new MinecraftPlayer(name, data.UUID!, ping, gm, new Player(-1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN, Vector3.Zero, true, new Dictionary<int, Effect?>()));
+                        if (!this.PlayerMapping.TryAdd(data.UUID!, newPlayer))
+                        {
+                            this.Logger.Debug("Could not add player");
+                            return Task.CompletedTask;
+                        }
+                        this.PlayerJoined?.Invoke(this.Bot, newPlayer);
                     }
                     break;
                 case 4: // Remove player:
-                    foreach (var data in packet.Data!) {
-                        if (!PlayerMapping.TryRemove(data.UUID!, out var player)) continue;
-                        PlayerLeft?.Invoke(this.Bot, player);
+                    foreach (var data in packet.Data!)
+                    {
+                        if (!this.PlayerMapping.TryRemove(data.UUID!, out var player)) continue;
+                        this.PlayerLeft?.Invoke(this.Bot, player);
                     }
                     break;
             }
             return Task.CompletedTask;
         }
 
-        private Task handleSpawnPlayer(PacketNamedEntitySpawn packet) {
-            if (!PlayerMapping.TryGetValue(packet.PlayerUUID!, out var player)) {
+        private Task handleSpawnPlayer(PacketNamedEntitySpawn packet)
+        {
+            if (!this.PlayerMapping.TryGetValue(packet.PlayerUUID!, out var player))
+            {
                 return Task.CompletedTask;
             }
 
@@ -119,11 +135,12 @@ namespace MineSharp.Bot.Modules {
             player.Entity.ServerId = packet.EntityId!;
 
             this.Bot.EntityModule!.AddEntity(player.Entity);
-            PlayerLoaded?.Invoke(this.Bot, player);
+            this.PlayerLoaded?.Invoke(this.Bot, player);
             return Task.CompletedTask;
         }
 
-        private async Task handlePlayerPositionAndLook(PacketPosition packet) {
+        private async Task handlePlayerPositionAndLook(PacketPosition packet)
+        {
 
             if ((packet.Flags & 0x01) == 0x01) this.Bot.BotEntity!.Position.X += packet.X!;
             else this.Bot.BotEntity!.Position.X = packet.X!;

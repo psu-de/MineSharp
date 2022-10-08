@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace MineSharp.Core.Logging {
-    public class Logger {
+namespace MineSharp.Core.Logging
+{
+    public class Logger
+    {
 
         public static LogLevel Threshold = LogLevel.DEBUG3;
 
@@ -12,19 +14,19 @@ namespace MineSharp.Core.Logging {
         public delegate void LogMessageEvent(LogMessage message);
         public static event LogMessageEvent? OnLogMessageReceieved;
 
-        public struct LogMessage {
+        public struct LogMessage
+        {
             public LogLevel Level;
             public string Caller;
             public DateTime Time;
             public string Message;
 
-            private string Format(string val) {
-                return val.PadLeft(2, '0');
-            }
-            
-            public override string ToString() {
-                string time = $"{Format(Time.Hour.ToString())}:{Format(Time.Minute.ToString())}:{Format(Time.Second.ToString())}";
-                string logl = Level switch {
+            private string Format(string val) => val.PadLeft(2, '0');
+
+            public override string ToString()
+            {
+                var time = $"{this.Format(this.Time.Hour.ToString())}:{this.Format(this.Time.Minute.ToString())}:{this.Format(this.Time.Second.ToString())}";
+                var logl = this.Level switch {
                     LogLevel.INFO => "INFO ",
                     LogLevel.DEBUG3 => "DEBUG",
                     LogLevel.DEBUG2 => "DEBUG",
@@ -33,13 +35,14 @@ namespace MineSharp.Core.Logging {
                     LogLevel.ERROR => "ERROR",
                     _ => "-----"
                 };
-                string name = Caller.PadRight(10, ' ').Substring(0, 10);
+                var name = this.Caller.PadRight(10, ' ').Substring(0, 10);
 
-                return $"[{logl}][{time}][{name}] > {Message}";
+                return $"[{logl}][{time}][{name}] > {this.Message}";
             }
 
-            public string Markup(Func<string, string>? escape = null) {
-                string color = this.Level switch {
+            public string Markup(Func<string, string>? escape = null)
+            {
+                var color = this.Level switch {
                     LogLevel.INFO => "white",
                     LogLevel.WARN => "orange1",
                     LogLevel.ERROR => "red",
@@ -60,28 +63,30 @@ namespace MineSharp.Core.Logging {
         {
             Scopes.Add(new LogScope(threshold, writeLine));
         }
-        
 
-        public static Logger GetLogger(string? module = null) {
-            return new Logger(module ?? NamespaceOfCallingClass());
-        }
 
-        private static string NamespaceOfCallingClass() {
+        public static Logger GetLogger(string? module = null) => new Logger(module ?? NamespaceOfCallingClass());
+
+        private static string NamespaceOfCallingClass()
+        {
             Type declaringType;
-            int skipFrames = 2;
-            do {
-                MethodBase method = new StackFrame(skipFrames, false).GetMethod()!;
+            var skipFrames = 2;
+            do
+            {
+                var method = new StackFrame(skipFrames, false).GetMethod()!;
                 declaringType = method.DeclaringType!;
-                if (declaringType == null) {
+                if (declaringType == null)
+                {
                     return method.Name;
                 }
                 skipFrames++;
             }
             while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase));
 
-            string[] modules = declaringType.Namespace!.Split('.');
+            var modules = declaringType.Namespace!.Split('.');
 
-            if (declaringType.Namespace.StartsWith("MineSharp")) {
+            if (declaringType.Namespace.StartsWith("MineSharp"))
+            {
                 return modules[1];
             } else return modules.Last();
         }
@@ -89,7 +94,8 @@ namespace MineSharp.Core.Logging {
 
         public string Name { get; private set; }
 
-        public Logger(string name) {
+        public Logger(string name)
+        {
             this.Name = name;
         }
 
@@ -102,7 +108,8 @@ namespace MineSharp.Core.Logging {
         public void Info(string message) => this.Log(message, LogLevel.INFO);
 
 
-        public void Log(string message, LogLevel level) {
+        public void Log(string message, LogLevel level)
+        {
             if ((int)level > (int)Threshold) return;
 
             var log = new LogMessage() {
@@ -121,7 +128,8 @@ namespace MineSharp.Core.Logging {
                 }
             }
 
-            if (level == LogLevel.DEBUG3) {
+            if (level == LogLevel.DEBUG3)
+            {
                 LogMessages.RemoveAll(x => x.Level == LogLevel.DEBUG3 && (DateTime.Now - x.Time).TotalMinutes >= 5);
             }
             LogMessages.Add(log);

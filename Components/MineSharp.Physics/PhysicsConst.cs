@@ -3,12 +3,13 @@ using MineSharp.Data.Blocks;
 
 namespace MineSharp.Physics
 {
-    public static class PhysicsConst {
+    public static class PhysicsConst
+    {
 
         public const double Gravity = 0.08f;
         public const double WaterGravity = Gravity / 16;
         public const double LavaGravity = Gravity / 4;
-        public const double Airdrag = 0.98f; 
+        public const double Airdrag = 0.98f;
         public const double YawSpeed = 3.0f;
         public const double PitchSpeed = 3.0f;
         public const double SprintSpeed = 0.3d;
@@ -44,17 +45,19 @@ namespace MineSharp.Physics
             Seagrass.BlockId,
             TallSeagrass.BlockId,
             Kelp.BlockId,
-            BubbleColumn.BlockId,
+            BubbleColumn.BlockId
         };
 
-        public class BubbleColumnDragC {
+        public class BubbleColumnDragC
+        {
 
             public double Down { get; set; }
             public double MaxDown { get; set; }
             public double Up { get; set; }
             public double MaxUp { get; set; }
 
-            public BubbleColumnDragC(double down, double maxDown, double up, double maxUp) {
+            public BubbleColumnDragC(double down, double maxDown, double up, double maxUp)
+            {
                 this.Down = down;
                 this.MaxDown = maxDown;
                 this.Up = up;
@@ -62,8 +65,10 @@ namespace MineSharp.Physics
             }
         }
 
-        public static double GetBlockSlipperiness(int blockId) {
-            switch (blockId) {
+        public static double GetBlockSlipperiness(int blockId)
+        {
+            switch (blockId)
+            {
                 case SlimeBlock.BlockId:
                     return 0.8f;
                 case Ice.BlockId:
@@ -75,13 +80,13 @@ namespace MineSharp.Physics
                 case BlueIce.BlockId:
                     return 0.989f;
                 default:
-                    return PhysicsConst.DefaultSlipperiness;
+                    return DefaultSlipperiness;
             }
         }
 
         public static AABB GetPlayerBoundingBox(Vector3 pos)
         {
-            var bb = new AABB(-PhysicsConst.PlayerHalfWidth, 0, -PhysicsConst.PlayerHalfWidth, PhysicsConst.PlayerHalfWidth, PhysicsConst.PlayerHeight, PhysicsConst.PlayerHalfWidth)
+            var bb = new AABB(-PlayerHalfWidth, 0, -PlayerHalfWidth, PlayerHalfWidth, PlayerHeight, PlayerHalfWidth)
                 .Offset(pos.X, pos.Y, pos.Z);
             return bb;
         }

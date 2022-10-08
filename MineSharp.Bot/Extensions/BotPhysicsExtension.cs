@@ -3,28 +3,30 @@ using MineSharp.Core.Types;
 
 namespace MineSharp.Bot
 {
-    public partial class MinecraftBot {
+    public partial class MinecraftBot
+    {
 
         /// <summary>
         /// Fires when the Bot <see cref="BotEntity"/> moves
         /// </summary>
-        public event BotPlayerEvent BotMoved {
-            add { PhysicsModule!.BotMoved += value; }
-            remove { PhysicsModule!.BotMoved -= value; }
+        public event BotPlayerEvent BotMoved
+        {
+            add => this.PhysicsModule!.BotMoved += value;
+            remove => this.PhysicsModule!.BotMoved -= value;
         }
-        
+
         /// <summary>
         /// Fires just before a physics tick
         /// </summary>
         public event BotEmptyEvent PhysicsTick
         {
-            add { PhysicsModule!.PhysicsTick += value; }
-            remove { PhysicsModule!.PhysicsTick -= value; }
+            add => this.PhysicsModule!.PhysicsTick += value;
+            remove => this.PhysicsModule!.PhysicsTick -= value;
         }
 
 
-        public Physics.PhysicsEngine? Physics => PhysicsModule!.Physics;
-        public PlayerControls PlayerControls => PhysicsModule!.PlayerControls;
+        public Physics.PhysicsEngine? Physics => this.PhysicsModule!.Physics;
+        public PlayerControls PlayerControls => this.PhysicsModule!.PlayerControls;
 
         [BotFunction("Physics", "Sets the bots rotation to a given yaw and pitch")]
         public void ForceSetRotation(float yaw, float pitch) => this.PhysicsModule!.ForceSetRotation(yaw, pitch);

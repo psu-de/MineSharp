@@ -3,6 +3,7 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
+using Attribute = MineSharp.Core.Types.Attribute;
 
 /*
  Thanks to https://github.com/ConcreteMC/Alex
@@ -15,7 +16,7 @@ namespace MineSharp.Physics
 {
     public class PhysicsEngine
     {
-        static Logger Logger = Logger.GetLogger();
+        private static Logger Logger = Logger.GetLogger();
 
         public Player Player;
         public PlayerState PlayerState;
@@ -35,13 +36,13 @@ namespace MineSharp.Physics
             var waterBB = playerBB.Clone().Contract(0.001d, 0.4d, 0.001d);
             var lavaBB = playerBB.Clone().Contract(0.1d, 0.4d, 0.1d);
 
-            this.PlayerState.IsInWater = CheckInWaterAndAppyCurrent(waterBB, this.Player.Velocity);
+            this.PlayerState.IsInWater = this.CheckInWaterAndAppyCurrent(waterBB, this.Player.Velocity);
 
             var onGround = this.Player.IsOnGround;
             if (!this.Player.Attributes.TryGetValue(
-                PhysicsConst.MovementSpeedAttribute, out var movementFactorAttr))
+                    PhysicsConst.MovementSpeedAttribute, out var movementFactorAttr))
             {
-                movementFactorAttr = new Core.Types.Attribute(
+                movementFactorAttr = new Attribute(
                     PhysicsConst.MovementSpeedAttribute,
                     PhysicsConst.PlayerSpeed,
                     new List<Modifier>());
@@ -63,21 +64,17 @@ namespace MineSharp.Physics
             {
                 movementFactor = 0.2d;
                 slipperiness = 0.8d;
-            }
-            else
+            } else
             {
                 if (onGround)
                 {
                     var blockUnder =
-                        playerBB.MinY % 1 < 0.05f ?
-                        this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down)) :
-                        this.World.GetBlockAt(this.Player.Position);
+                        playerBB.MinY % 1 < 0.05f ? this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down)) : this.World.GetBlockAt(this.Player.Position);
                     slipperiness *= PhysicsConst.GetBlockSlipperiness(blockUnder.Id);
 
                     var acceleration = 0.1627714d / Math.Pow(slipperiness, 3);
                     movementFactor *= acceleration;
-                }
-                else
+                } else
                 {
                     movementFactor = 0.02d;
                 }
@@ -99,7 +96,7 @@ namespace MineSharp.Physics
                 }
             }
 
-            var heading = CalculateHeading(controls);
+            var heading = this.CalculateHeading(controls);
             // TODO: When swimming rotate heading vector
             //       by Pitch radians 
 
@@ -112,20 +109,20 @@ namespace MineSharp.Physics
                 forward *= 0.3d;
             }
 
-            heading = ApplyHeading(strafing, forward, movementFactor);
+            heading = this.ApplyHeading(strafing, forward, movementFactor);
 
             this.Player.Velocity.Add(heading);
 
-            if (IsOnLadder(this.Player.Position))
+            if (this.IsOnLadder(this.Player.Position))
             {
-                this.Player.Velocity.X = Math.Clamp(this.Player.Velocity.X , - PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
-                this.Player.Velocity.Z = Math.Clamp(this.Player.Velocity.Z , - PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.X = Math.Clamp(this.Player.Velocity.X, -PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.Z = Math.Clamp(this.Player.Velocity.Z, -PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
                 this.Player.Velocity.Y = Math.Max(this.Player.Velocity.Y, controls.Sneak ? 0 : -PhysicsConst.LadderMaxSpeed);
             }
 
-            Move(controls, TruncateVector(this.Player.Velocity));
+            this.Move(controls, this.TruncateVector(this.Player.Velocity));
 
-            if (IsOnLadder(this.Player.Position) && (this.PlayerState.IsCollidedHorizontally || controls.Jump))
+            if (this.IsOnLadder(this.Player.Position) && (this.PlayerState.IsCollidedHorizontally || controls.Jump))
             {
                 this.Player.Velocity.Y = PhysicsConst.LadderClimbSpeed;
             }
@@ -144,13 +141,12 @@ namespace MineSharp.Physics
             if (this.PlayerState.IsInWater)
             {
                 this.Player.Velocity.Mul(new Vector3(slipperiness, slipperiness, slipperiness));
-            }
-            else
+            } else
             {
                 this.Player.Velocity.Mul(new Vector3(slipperiness, 0.98d, slipperiness));
             }
 
-            this.Player.Velocity = TruncateVector(this.Player.Velocity);
+            this.Player.Velocity = this.TruncateVector(this.Player.Velocity);
         }
 
         private Vector3 TruncateVector(Vector3 vector)
@@ -188,30 +184,30 @@ namespace MineSharp.Physics
         {
             var wasOnGround = this.Player.IsOnGround;
 
-            bool collideY = CheckY(ref amount, false);
-            bool collideX = CheckX(ref amount, false);
-            bool collideZ = CheckZ(ref amount, false);
+            var collideY = this.CheckY(ref amount, false);
+            var collideX = this.CheckX(ref amount, false);
+            var collideZ = this.CheckZ(ref amount, false);
 
-            if (!collideX && CheckX(ref amount, true))
+            if (!collideX && this.CheckX(ref amount, true))
             {
                 collideX = true;
             }
 
-            if (collideZ && CheckZ(ref amount, true))
+            if (collideZ && this.CheckZ(ref amount, true))
             {
                 collideZ = true;
             }
 
             if (controls.Sneak && wasOnGround)
             {
-                FixSneaking(ref amount);
+                this.FixSneaking(ref amount);
             }
 
             this.PlayerState.IsCollidedHorizontally = collideX || collideZ;
             this.PlayerState.IsCollidedVertically = collideY;
 
             this.Player.Position.Add(amount);
-            this.Player.IsOnGround = DetectOnGround();
+            this.Player.IsOnGround = this.DetectOnGround();
         }
 
         private bool DetectOnGround()
@@ -234,9 +230,9 @@ namespace MineSharp.Physics
 
             var y = (int)Math.Floor(entityBoundingBox.MinY + offset);
 
-            for (int x = (int)(Math.Floor(minX)); x <= (int)(Math.Ceiling(maxX)); x++)
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
             {
-                for (int z = (int)(Math.Floor(minZ)); z <= (int)(Math.Ceiling(maxZ)); z++)
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
                 {
                     var block = this.World.GetBlockAt(new Position(x, y, z));
 
@@ -268,7 +264,7 @@ namespace MineSharp.Physics
 
             var boundingBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
 
-            while (dX != 0.0f && !GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, 0d)).Any())
+            while (dX != 0.0f && !this.GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, 0d)).Any())
             {
                 if (dX < increment && dX >= -increment)
                     dX = 0.0f;
@@ -280,7 +276,7 @@ namespace MineSharp.Physics
                 correctedX = dX;
             }
 
-            while (dZ != 0.0f && !GetIntersecting(boundingBox.Offset(0d, -PhysicsConst.MaxFallDistance, dZ)).Any())
+            while (dZ != 0.0f && !this.GetIntersecting(boundingBox.Offset(0d, -PhysicsConst.MaxFallDistance, dZ)).Any())
             {
                 if (dZ < increment && dZ >= -increment)
                     dZ = 0.0f;
@@ -292,7 +288,7 @@ namespace MineSharp.Physics
                 correctedZ = dZ;
             }
 
-            while (dX != 0.0f && dZ != 0.0f && !GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, dZ)).Any())
+            while (dX != 0.0f && dZ != 0.0f && !this.GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, dZ)).Any())
             {
                 if (dX < increment && dX >= -increment)
                     dX = 0.0f;
@@ -329,11 +325,11 @@ namespace MineSharp.Physics
             var minY = (int)Math.Floor(box.MinY);
             var maxY = (int)Math.Ceiling(box.MaxY);
 
-            for (int x = minX; x < maxX; x++)
+            for (var x = minX; x < maxX; x++)
             {
-                for (int y = minY; y < maxY; y++)
+                for (var y = minY; y < maxY; y++)
                 {
-                    for (int z = minZ; z < maxZ; z++)
+                    for (var z = minZ; z < maxZ; z++)
                     {
                         var coords = new Vector3(x, y, z);
 
@@ -371,10 +367,10 @@ namespace MineSharp.Physics
         {
             var beforeAdjustment = amount.Y;
 
-            if (!TestTerrainCollisionY(ref amount, out var yCollisionPoint, out var collisionY))
+            if (!this.TestTerrainCollisionY(ref amount, out var yCollisionPoint, out var collisionY))
                 return false;
 
-            var yVelocity = CollidedWithWorld(beforeAdjustment < 0 ? Vector3.Down : Vector3.Up, yCollisionPoint, beforeAdjustment);
+            var yVelocity = this.CollidedWithWorld(beforeAdjustment < 0 ? Vector3.Down : Vector3.Up, yCollisionPoint, beforeAdjustment);
 
             if (MathF.Abs(yVelocity) < 0.005f)
                 yVelocity = 0;
@@ -388,14 +384,13 @@ namespace MineSharp.Physics
 
         private bool CheckX(ref Vector3 amount, bool checkOther)
         {
-            if (!TestTerrainCollisionX(amount, out _, out var collisionX, checkOther))
+            if (!this.TestTerrainCollisionX(amount, out _, out var collisionX, checkOther))
                 return false;
-            var climbingResult = CheckClimbing(amount, out double yValue);
+            var climbingResult = this.CheckClimbing(amount, out var yValue);
             if (climbingResult == CollisionResult.ClimbHalfBlock)
             {
                 amount.Y = yValue;
-            }
-            else
+            } else
             {
                 if (collisionX < 0f)
                     collisionX -= 0.005f;
@@ -409,16 +404,15 @@ namespace MineSharp.Physics
 
         private bool CheckZ(ref Vector3 amount, bool checkOther)
         {
-            if (!TestTerrainCollisionZ(amount, out _, out var collisionZ, checkOther))
+            if (!this.TestTerrainCollisionZ(amount, out _, out var collisionZ, checkOther))
                 return false;
 
-            var climbingResult = CheckClimbing(amount, out double yValue);
+            var climbingResult = this.CheckClimbing(amount, out var yValue);
 
             if (climbingResult == CollisionResult.ClimbHalfBlock)
             {
                 amount.Y = yValue;
-            }
-            else
+            } else
             {
                 if (collisionZ < 0f)
                     collisionZ -= 0.005f;
@@ -446,8 +440,7 @@ namespace MineSharp.Physics
                 testBox.MinY += velocity.Y;
 
                 negative = true;
-            }
-            else
+            } else
             {
                 testBox = entityBox.Clone();
                 testBox.MaxY += velocity.Y;
@@ -457,11 +450,11 @@ namespace MineSharp.Physics
 
             double? collisionExtent = null;
 
-            for (int x = (int)(Math.Floor(testBox.MinX)); x <= (int)(Math.Ceiling(testBox.MaxX)); x++)
+            for (var x = (int)Math.Floor(testBox.MinX); x <= (int)Math.Ceiling(testBox.MaxX); x++)
             {
-                for (int z = (int)(Math.Floor(testBox.MinZ)); z <= (int)(Math.Ceiling(testBox.MaxZ)); z++)
+                for (var z = (int)Math.Floor(testBox.MinZ); z <= (int)Math.Ceiling(testBox.MaxZ); z++)
                 {
-                    for (int y = (int)(Math.Floor(testBox.MinY)); y <= (int)(Math.Ceiling(testBox.MaxY)); y++)
+                    for (var y = (int)Math.Floor(testBox.MinY); y <= (int)Math.Ceiling(testBox.MaxY); y++)
                     {
                         var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
@@ -476,8 +469,7 @@ namespace MineSharp.Physics
                             {
                                 if (entityBox.MinY - box.MaxY < 0)
                                     continue;
-                            }
-                            else
+                            } else
                             {
                                 if (box.MinY - entityBox.MaxY < 0)
                                     continue;
@@ -487,15 +479,14 @@ namespace MineSharp.Physics
                             {
                                 if (negative)
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value < box.MaxY))
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxY)
                                     {
                                         collisionExtent = box.MaxY;
                                         collisionPoint = coords;
                                     }
-                                }
-                                else
+                                } else
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value > box.MinY))
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinY)
                                     {
                                         collisionExtent = box.MinY;
                                         collisionPoint = coords;
@@ -537,15 +528,14 @@ namespace MineSharp.Physics
             var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
             AABB testBox;
 
-            Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
-            Vector3 max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
+            var min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
+            var max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
 
             if (velocity.X < 0)
             {
                 min.X += velocity.X;
                 negative = true;
-            }
-            else
+            } else
             {
                 max.X += velocity.X;
                 negative = false;
@@ -556,8 +546,7 @@ namespace MineSharp.Physics
                 if (velocity.Z < 0)
                 {
                     min.Z += velocity.Z;
-                }
-                else
+                } else
                 {
                     max.Z += velocity.Z;
                 }
@@ -565,8 +554,7 @@ namespace MineSharp.Physics
                 if (velocity.Y < 0)
                 {
                     min.Y += velocity.Y;
-                }
-                else
+                } else
                 {
                     max.Y += velocity.Y;
                 }
@@ -585,11 +573,11 @@ namespace MineSharp.Physics
 
             double? collisionExtent = null;
 
-            for (int x = (int)(Math.Floor(minX)); x <= (int)(Math.Ceiling(maxX)); x++)
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
             {
-                for (int z = (int)(Math.Floor(minZ)); z <= (int)(Math.Ceiling(maxZ)); z++)
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
                 {
-                    for (int y = (int)(Math.Floor(minY)); y <= (int)(Math.Ceiling(maxY)); y++)
+                    for (var y = (int)Math.Floor(minY); y <= (int)Math.Ceiling(maxY); y++)
                     {
                         var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
@@ -609,8 +597,7 @@ namespace MineSharp.Physics
 
                                 if (entityBox.MinX - box.MaxX < 0)
                                     continue;
-                            }
-                            else
+                            } else
                             {
                                 if (box.MinX >= maxX)
                                     continue;
@@ -623,15 +610,14 @@ namespace MineSharp.Physics
                             {
                                 if (negative)
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value < box.MaxX))
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxX)
                                     {
                                         collisionExtent = box.MaxX;
                                         collisionPoint = coords;
                                     }
-                                }
-                                else
+                                } else
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value > box.MinX))
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinX)
                                     {
                                         collisionExtent = box.MinX;
                                         collisionPoint = coords;
@@ -649,11 +635,10 @@ namespace MineSharp.Physics
 
                 if (negative)
                 {
-                    diff = (collisionExtent.Value - minX) + 0.01f;
-                }
-                else
+                    diff = collisionExtent.Value - minX + 0.01f;
+                } else
                 {
-                    diff = (collisionExtent.Value - maxX);
+                    diff = collisionExtent.Value - maxX;
                 }
 
                 result = (float)diff;
@@ -675,15 +660,14 @@ namespace MineSharp.Physics
             var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
             AABB testBox;
 
-            Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
-            Vector3 max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
+            var min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
+            var max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
 
             if (velocity.Z < 0)
             {
                 min.Z += velocity.Z;
                 negative = true;
-            }
-            else
+            } else
             {
                 max.Z += velocity.Z;
                 negative = false;
@@ -694,8 +678,7 @@ namespace MineSharp.Physics
                 if (velocity.X < 0)
                 {
                     min.X += velocity.X;
-                }
-                else
+                } else
                 {
                     max.X += velocity.X;
                 }
@@ -703,8 +686,7 @@ namespace MineSharp.Physics
                 if (velocity.Y < 0)
                 {
                     min.Y += velocity.Y;
-                }
-                else
+                } else
                 {
                     max.Y += velocity.Y;
                 }
@@ -723,11 +705,11 @@ namespace MineSharp.Physics
 
             double? collisionExtent = null;
 
-            for (int x = (int)(Math.Floor(minX)); x <= (int)(Math.Ceiling(maxX)); x++)
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
             {
-                for (int z = (int)(Math.Floor(minZ)); z <= (int)(Math.Ceiling(maxZ)); z++)
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
                 {
-                    for (int y = (int)(Math.Floor(minY)); y <= (int)(Math.Ceiling(maxY)); y++)
+                    for (var y = (int)Math.Floor(minY); y <= (int)Math.Ceiling(maxY); y++)
                     {
                         var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
@@ -747,8 +729,7 @@ namespace MineSharp.Physics
 
                                 if (entityBox.MinZ - box.MaxZ < 0)
                                     continue;
-                            }
-                            else
+                            } else
                             {
                                 if (box.MinZ >= maxZ)
                                     continue;
@@ -761,15 +742,14 @@ namespace MineSharp.Physics
                             {
                                 if (negative)
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value < box.MaxZ))
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxZ)
                                     {
                                         collisionExtent = box.MaxZ;
                                         collisionPoint = coords;
                                     }
-                                }
-                                else
+                                } else
                                 {
-                                    if ((collisionExtent == null || collisionExtent.Value > box.MinZ))
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinZ)
                                     {
                                         collisionExtent = box.MinZ;
                                         collisionPoint = coords;
@@ -788,9 +768,9 @@ namespace MineSharp.Physics
                 double diff;
 
                 if (negative)
-                    diff = (cp - minZ) + 0.01f;
+                    diff = cp - minZ + 0.01f;
                 else
-                    diff = (cp - maxZ);
+                    diff = cp - maxZ;
 
                 //velocity.Z = (float)diff;	
                 result = (float)diff;
@@ -815,7 +795,7 @@ namespace MineSharp.Physics
             {
                 canJump = true;
                 var adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(amount));
-                var intersecting = GetIntersecting(adjusted);
+                var intersecting = this.GetIntersecting(adjusted);
 
                 var targetY = 0d;
 
@@ -836,13 +816,12 @@ namespace MineSharp.Physics
                 {
                     adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(new Vector3(amount.X, targetY, amount.Z)));
 
-                    if (GetIntersecting(adjusted).Any(
+                    if (this.GetIntersecting(adjusted).Any(
                             bb => bb.MaxY > adjusted.MinY && bb.MinY <= adjusted.MaxY))
                     {
                         canJump = false;
                     }
-                }
-                else
+                } else
                 {
                     canJump = false;
                 }
@@ -912,30 +891,35 @@ namespace MineSharp.Physics
                         var block = this.World.GetBlockAt(cursor);
                         if (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false))
                         {
-                            var waterLevel = cursor.Y + 1 - ((GetRenderedDepth(block) + 1) / 9);
+                            var waterLevel = cursor.Y + 1 - (this.GetRenderedDepth(block) + 1) / 9;
                             if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
                         }
                     }
                 }
             }
 
-            bool isInWater = waterBlocks.Count > 0;
+            var isInWater = waterBlocks.Count > 0;
             foreach (var block in waterBlocks)
             {
-                var curLevel = GetRenderedDepth(block);
+                var curLevel = this.GetRenderedDepth(block);
                 var flow = new Vector3(0, 0, 0);
-                var offsets = new[] { new Vector3(0, 0, 1), new Vector3(-1, 0, 0), new Vector3(0, 0, -1), new Vector3(1, 0, 0) };
+                var offsets = new[] {
+                    new Vector3(0, 0, 1),
+                    new Vector3(-1, 0, 0),
+                    new Vector3(0, 0, -1),
+                    new Vector3(1, 0, 0)
+                };
                 var p = (Vector3)block.Position!;
 
                 foreach (var offset in offsets)
                 {
                     var adjBlock = this.World.GetBlockAt(p.Plus(offset));
-                    var adjLevel = GetRenderedDepth(adjBlock);
+                    var adjLevel = this.GetRenderedDepth(adjBlock);
                     if (adjLevel < 0)
                     {
                         if (adjBlock.BoundingBox != "empty")
                         {
-                            var adjLevel2 = GetRenderedDepth(this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Down)));
+                            var adjLevel2 = this.GetRenderedDepth(this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Down)));
                             if (adjLevel2 >= 0)
                             {
                                 var f = adjLevel2 - (curLevel - 8);
@@ -943,8 +927,7 @@ namespace MineSharp.Physics
                                 flow.Z += offset.Z * f;
                             }
                         }
-                    }
-                    else
+                    } else
                     {
                         var f = adjLevel - curLevel;
                         flow.X += offset.X * f;

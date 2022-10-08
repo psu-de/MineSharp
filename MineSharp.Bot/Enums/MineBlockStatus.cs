@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Bot.Enums {
-    public enum MineBlockStatus {
+﻿namespace MineSharp.Bot.Enums
+{
+    public enum MineBlockStatus
+    {
 
         Finished,
         BlockNotLoaded,

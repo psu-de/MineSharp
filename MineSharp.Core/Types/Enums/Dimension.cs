@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Types.Enums {
-    public enum Dimension {
+﻿namespace MineSharp.Core.Types.Enums
+{
+    public enum Dimension
+    {
 
         Overworld,
         Nether,

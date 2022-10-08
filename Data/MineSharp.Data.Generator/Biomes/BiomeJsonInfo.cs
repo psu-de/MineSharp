@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace MineSharp.Data.Generator.Biomes {
+namespace MineSharp.Data.Generator.Biomes
+{
 #pragma warning disable CS8618
 #pragma warning disable CS0649
-    internal class BiomeJsonInfo {
+    internal class BiomeJsonInfo
+    {
         [JsonProperty("id")]
         public int Id;
         [JsonProperty("name")]

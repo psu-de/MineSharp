@@ -7,8 +7,8 @@
 
         public LogScope(LogLevel threshold, Action<string> writeLine)
         {
-            Threshold = threshold;
-            WriteLine = writeLine;
+            this.Threshold = threshold;
+            this.WriteLine = writeLine;
         }
     }
 }

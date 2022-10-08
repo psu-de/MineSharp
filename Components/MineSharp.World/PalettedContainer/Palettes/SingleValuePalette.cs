@@ -1,24 +1,26 @@
 ﻿using MineSharp.Data.Protocol;
 
-namespace MineSharp.World.PalettedContainer.Palettes {
-    internal class SingleValuePalette : IPalette {
+namespace MineSharp.World.PalettedContainer.Palettes
+{
+    internal class SingleValuePalette : IPalette
+    {
 
         public int Value;
 
-        public int Get(int entry) {
-            return Value;
-        }
+        public int Get(int entry) => this.Value;
 
-        public bool HasState(int minState, int maxState) {
-            return minState <= Value && Value <= maxState;
-        }
+        public bool HasState(int minState, int maxState) => minState <= this.Value && this.Value <= maxState;
 
-        public void Read(PacketBuffer buffer) {
+        public void Read(PacketBuffer buffer)
+        {
             this.Value = buffer.ReadVarInt();
         }
 
-        public IndirectPalette ConvertToIndirectPalette(int newState) {
-            return new IndirectPalette(new int[] { this.Value, newState });
+        public IndirectPalette ConvertToIndirectPalette(int newState)
+        {
+            return new IndirectPalette(new int[] {
+                this.Value, newState
+            });
         }
     }
 }

@@ -2,26 +2,32 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Player {
-    internal class AttackCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.Player
+{
+    internal class AttackCommand : Command
+    {
 
-        EntityIdArgument EntityIdArg = new EntityIdArgument("entityId");
-        public AttackCommand() {
-            string desc = $"Attacks an [purple]Entity[/] specified by the [{EntityIdArg.Color}]Entity Id[/]";
+        private EntityIdArgument EntityIdArg = new EntityIdArgument("entityId");
+        public AttackCommand()
+        {
+            var desc = $"Attacks an [purple]Entity[/] specified by the [{this.EntityIdArg.Color}]Entity Id[/]";
 
-            this.Initialize("attack", desc, CColor.PlayerCommand, EntityIdArg);
+            this.Initialize("attack", desc, CColor.PlayerCommand, this.EntityIdArg);
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
 
-            int? eId = EntityIdArg.GetValue(argv[0]);
+            var eId = this.EntityIdArg.GetValue(argv[0]);
 
-            if (null == eId) {
+            if (null == eId)
+            {
                 AnsiConsole.MarkupLine($"[red]Invalid entity id[/]");
                 return;
             }
 
-            if (!BotClient.Bot!.Entities.ContainsKey(eId.Value)) {
+            if (!BotClient.Bot!.Entities.ContainsKey(eId.Value))
+            {
                 AnsiConsole.MarkupLine($"[red]Entity with id {eId.Value} does not exist[/]");
                 return;
             }

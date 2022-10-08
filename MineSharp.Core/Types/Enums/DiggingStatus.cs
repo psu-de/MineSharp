@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Types.Enums {
-    public enum DiggingStatus {
+﻿namespace MineSharp.Core.Types.Enums
+{
+    public enum DiggingStatus
+    {
         StartedDigging = 0,
         CancelledDigging = 1,
         FinishedDigging = 2,

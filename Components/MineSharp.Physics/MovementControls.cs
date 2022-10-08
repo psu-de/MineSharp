@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Physics {
-    public class MovementControls {
+﻿namespace MineSharp.Physics
+{
+    public class MovementControls
+    {
 
         public bool Forward { get; set; } = false;
         public bool Back { get; set; } = false;

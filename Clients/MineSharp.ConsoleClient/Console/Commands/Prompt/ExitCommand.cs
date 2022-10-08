@@ -1,12 +1,16 @@
-﻿namespace MineSharp.ConsoleClient.Console.Commands.Prompt {
-    internal class ExitCommand : Command {
+﻿namespace MineSharp.ConsoleClient.Console.Commands.Prompt
+{
+    internal class ExitCommand : Command
+    {
 
-        public ExitCommand() {
+        public ExitCommand()
+        {
             var desc = $"Exits the prompt.";
-            this.Initialize("exit", desc, CColor.PromptCommand, new Commands.Arguments.Argument[] { });
+            this.Initialize("exit", desc, CColor.PromptCommand, new Arguments.Argument[] {});
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
             Environment.Exit(0);
         }
     }

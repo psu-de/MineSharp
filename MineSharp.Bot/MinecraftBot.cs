@@ -10,8 +10,10 @@ using MineSharp.Windows;
 using System.Diagnostics;
 using Item = MineSharp.Core.Types.Item;
 
-namespace MineSharp.Bot {
-    public partial class MinecraftBot {
+namespace MineSharp.Bot
+{
+    public partial class MinecraftBot
+    {
 
         static MinecraftBot()
         {
@@ -20,7 +22,8 @@ namespace MineSharp.Bot {
 
         private static Logger Logger = Logger.GetLogger();
 
-        public struct BotOptions {
+        public struct BotOptions
+        {
             public string Version;
             public string UsernameOrEmail;
             public string? Password;
@@ -28,13 +31,14 @@ namespace MineSharp.Bot {
             public string Host;
             public ushort? Port;
         }
-        
+
         public MinecraftClient Client { get; private set; }
         public BotOptions Options { get; private set; }
         public Session Session { get; private set; }
 
 
-        #region Events 
+        #region Events
+
 
         public delegate void BotEmptyEvent(MinecraftBot sender);
         public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
@@ -45,6 +49,7 @@ namespace MineSharp.Bot {
         public delegate void BotEntityEvent(MinecraftBot sender, Entity entity);
 
         public delegate void BotWindowEvent(MinecraftBot sender, Window window);
+
 
         #endregion
 
@@ -63,20 +68,23 @@ namespace MineSharp.Bot {
         public PhysicsModule? PhysicsModule;
         public WindowsModule? WindowsModule;
 
-        public MinecraftBot(BotOptions options) {
+        public MinecraftBot(BotOptions options)
+        {
             this.Options = options;
 
-            if (this.Options.Offline == true) {
+            if (this.Options.Offline == true)
+            {
                 this.Session = Session.OfflineSession(this.Options.UsernameOrEmail);
-            } else {
+            } else
+            {
                 if (this.Options.Password == null) throw new Exception("Password cannot be null when Offline=false");
                 this.Session = Session.Login(this.Options.UsernameOrEmail, this.Options.Password).GetAwaiter().GetResult();
                 Logger.Info("UUID: " + this.Session.UUID);
             }
 
             this.Client = new MinecraftClient(this.Options.Version, this.Session, this.Options.Host, this.Options.Port ?? 25565);
-            this.Client.PacketReceived += Events_PacketReceived;
-            
+            this.Client.PacketReceived += this.Events_PacketReceived;
+
             this.BaseModule = new BaseModule(this);
             this.EntityModule = new EntityModule(this);
             this.PlayerModule = new PlayerModule(this);
@@ -85,11 +93,11 @@ namespace MineSharp.Bot {
             this.WindowsModule = new WindowsModule(this);
         }
 
-        public async Task LoadModule(Module module) {
+        public async Task LoadModule(Module module)
+        {
 
             this.Modules.Add(module);
-            if (module is TickedModule)
-                this.TickedModules.Add((TickedModule)module);
+            if (module is TickedModule) this.TickedModules.Add((TickedModule)module);
 
             await module.Initialize();
             Logger.Info("Loaded module: " + module.GetType().Name);
@@ -101,14 +109,18 @@ namespace MineSharp.Bot {
             return (T?)module;
         }
 
-        private async Task TickLoop () {
-            while (true) {
+        private async Task TickLoop()
+        {
+            while (true)
+            {
                 var start = DateTime.Now;
 
                 var tasks = new List<Task>();
 
-                foreach (var tickedModule in TickedModules) {
-                    if (tickedModule.IsEnabled) {
+                foreach (var tickedModule in this.TickedModules)
+                {
+                    if (tickedModule.IsEnabled)
+                    {
                         tasks.Add(tickedModule.Tick());
                     }
                 }
@@ -121,22 +133,24 @@ namespace MineSharp.Bot {
                 }
 
                 var deltaTime = MinecraftConst.TickMs - (int)(DateTime.Now - start).TotalMilliseconds;
-                if (deltaTime < 0) {
+                if (deltaTime < 0)
+                {
                     Logger.Warning($"Ticked modules taking too long, {-deltaTime}ms behind");
-                }else    
+                } else
                     await Task.Delay(deltaTime);
             }
         }
 
 
-        private async Task LoadModules () {
+        private async Task LoadModules()
+        {
             await Task.WhenAll(new Task[] {
-                LoadModule(this.BaseModule),
-                LoadModule(this.EntityModule),
-                LoadModule(this.PlayerModule),
-                LoadModule(this.PhysicsModule),
-                LoadModule(this.WorldModule),
-                LoadModule(this.WindowsModule),
+                this.LoadModule(this.BaseModule),
+                this.LoadModule(this.EntityModule),
+                this.LoadModule(this.PlayerModule),
+                this.LoadModule(this.PhysicsModule),
+                this.LoadModule(this.WorldModule),
+                this.LoadModule(this.WindowsModule)
             });
         }
 
@@ -145,14 +159,16 @@ namespace MineSharp.Bot {
         /// Connects the bot to the server
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> Connect() {
-            if (!await this.Client.Connect(GameState.LOGIN)) {
+        public async Task<bool> Connect()
+        {
+            if (!await this.Client.Connect(GameState.LOGIN))
+            {
                 return false;
             }
 
-            await LoadModules();
+            await this.LoadModules();
 
-            TickLoopTask = TickLoop();
+            this.TickLoopTask = this.TickLoop();
             return true;
         }
 
@@ -163,39 +179,53 @@ namespace MineSharp.Bot {
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [BotFunction("Basic", "Waits for a specific packet from the server")]
-        public Task<T> WaitForPacket<T>() where T : IPacketPayload {
-            Type packetType = typeof(T);
-            if (!packetWaiters.TryGetValue(packetType, out var task)) {
-                TaskCompletionSource<T> tsc = new TaskCompletionSource<T>();
+        public Task<T> WaitForPacket<T>() where T : IPacketPayload
+        {
+            var packetType = typeof(T);
+            if (!this.packetWaiters.TryGetValue(packetType, out var task))
+            {
+                var tsc = new TaskCompletionSource<T>();
                 this.packetWaiters.Add(packetType, tsc);
 
                 return tsc.Task ?? throw new ArgumentNullException();
-            } else return (((TaskCompletionSource<T>?)task)?.Task) ?? throw new ArgumentNullException();
+            } else return ((TaskCompletionSource<T>?)task)?.Task ?? throw new ArgumentNullException();
         }
 
         [BotFunction("Basic", "Calls handler every time a specific packet is received")]
-        public void On<T>(Func<T, Task> handler) where T : IPacketPayload {
-            if (PacketHandlers.ContainsKey(typeof(T))) {
-                PacketHandlers[typeof(T)].Add((IPacketPayload p) => handler((T)p));
-            } else {
-                PacketHandlers.Add(typeof(T), new List<Func<IPacketPayload, Task>>() { (IPacketPayload p) => handler((T)p) });
+        public void On<T>(Func<T, Task> handler) where T : IPacketPayload
+        {
+            if (this.PacketHandlers.ContainsKey(typeof(T)))
+            {
+                this.PacketHandlers[typeof(T)].Add((IPacketPayload p) => handler((T)p));
+            } else
+            {
+                this.PacketHandlers.Add(typeof(T), new List<Func<IPacketPayload, Task>>() {
+                    (IPacketPayload p) => handler((T)p)
+                });
             }
         }
 
-        private void Events_PacketReceived(MinecraftClient client, IPacketPayload packet) {
+        private void Events_PacketReceived(MinecraftClient client, IPacketPayload packet)
+        {
 
-            Type packetType = packet.GetType();
-            if (packetWaiters.TryGetValue(packetType, out var tsc)) {
-                if (null == typeof(TaskCompletionSource<>).MakeGenericType(packetType).GetMethod("TrySetResult")?.Invoke(tsc, new[] { packet })) {
+            var packetType = packet.GetType();
+            if (this.packetWaiters.TryGetValue(packetType, out var tsc))
+            {
+                if (null == typeof(TaskCompletionSource<>).MakeGenericType(packetType).GetMethod("TrySetResult")?.Invoke(tsc, new[] {
+                        packet
+                    }))
+                {
                     throw new InvalidOperationException();
                 }
-                
-                packetWaiters.Remove(packetType);
+
+                this.packetWaiters.Remove(packetType);
             }
 
-            List<Task> tasks = new List<Task>();
-            if (PacketHandlers.TryGetValue(packetType, out var handlers)) {
-                foreach (var handler in handlers) {
+            var tasks = new List<Task>();
+            if (this.PacketHandlers.TryGetValue(packetType, out var handlers))
+            {
+                foreach (var handler in handlers)
+                {
                     tasks.Add(handler(packet));
                 }
             }
@@ -206,7 +236,6 @@ namespace MineSharp.Bot {
 
 
         #region Public Methods
-
 
 
         #endregion

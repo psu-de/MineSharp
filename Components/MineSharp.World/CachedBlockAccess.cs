@@ -20,14 +20,14 @@ namespace MineSharp.World
                 throw new InvalidOperationException($"World is already using a {nameof(TemporaryBlockCache)}");
             }
 
-            Cache = new ConcurrentDictionary<ulong, Block>();
-            World = world;
-            World.TempCache = this;
+            this.Cache = new ConcurrentDictionary<ulong, Block>();
+            this.World = world;
+            this.World.TempCache = this;
         }
 
         public void Dispose()
         {
-            World.TempCache = null;
+            this.World.TempCache = null;
         }
     }
 }

@@ -3,15 +3,18 @@ using MineSharp.Core.Logging;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Protocol;
 
-namespace MineSharp.Protocol {
-    internal class PacketFactory {
+namespace MineSharp.Protocol
+{
+    internal class PacketFactory
+    {
 
         private static Logger Logger = Logger.GetLogger();
         private MinecraftClient client;
         private Dictionary<GameState, IPacketFactory> ClientboundPacketFactories;
         private Dictionary<GameState, IPacketFactory> ServerboundPacketFactories;
 
-        public PacketFactory(MinecraftClient client) {
+        public PacketFactory(MinecraftClient client)
+        {
             this.client = client;
 
             this.ClientboundPacketFactories = new Dictionary<GameState, IPacketFactory>();
@@ -28,36 +31,40 @@ namespace MineSharp.Protocol {
             this.ServerboundPacketFactories.Add(GameState.PLAY, new MineSharp.Data.Protocol.Play.Serverbound.PlayPacketFactory());
         }
 
-        public static PacketBuffer Decompress(byte[] buffer, int length) {
+        public static PacketBuffer Decompress(byte[] buffer, int length)
+        {
             if (length == 0) return new PacketBuffer(buffer);
 
             var inflater = new Inflater();
 
             inflater.SetInput(buffer);
-            byte[] abyte1 = new byte[length];
+            var abyte1 = new byte[length];
             inflater.Inflate(abyte1);
             inflater.Reset();
             return new PacketBuffer(abyte1);
         }
 
-        public static PacketBuffer Compress(PacketBuffer input, int compressionThreshold) {
-            PacketBuffer output = new PacketBuffer();
-            if (input.Size < compressionThreshold) {
+        public static PacketBuffer Compress(PacketBuffer input, int compressionThreshold)
+        {
+            var output = new PacketBuffer();
+            if (input.Size < compressionThreshold)
+            {
                 output.WriteVarInt(0);
                 output.WriteRaw(input.ToArray());
                 return output;
             }
 
-            byte[] buffer = input.ToArray();
+            var buffer = input.ToArray();
             output.WriteVarInt(buffer.Length);
 
             var deflater = new Deflater();
             deflater.SetInput(buffer);
             deflater.Finish();
 
-            byte[] deflateBuf = new byte[8192];
-            while (!deflater.IsFinished) {
-                int j = deflater.Deflate(deflateBuf);
+            var deflateBuf = new byte[8192];
+            while (!deflater.IsFinished)
+            {
+                var j = deflater.Deflate(deflateBuf);
                 output.WriteRaw(deflateBuf, 0, j);
             }
             deflater.Reset();
@@ -65,13 +72,15 @@ namespace MineSharp.Protocol {
         }
 
 
-        public IPacketPayload? BuildPacket(byte[] data, int uncompressedLength) {
+        public IPacketPayload? BuildPacket(byte[] data, int uncompressedLength)
+        {
             PacketBuffer packetBuffer;
-            if (uncompressedLength > 0) packetBuffer = PacketFactory.Decompress(data, uncompressedLength);
+            if (uncompressedLength > 0) packetBuffer = Decompress(data, uncompressedLength);
             else packetBuffer = new PacketBuffer(data);
 
-            try {
-                IPacket packet = ClientboundPacketFactories[client.GameState].ReadPacket(packetBuffer);
+            try
+            {
+                var packet = this.ClientboundPacketFactories[this.client.GameState].ReadPacket(packetBuffer);
                 if (packetBuffer.ReadableBytes > 0)
                     Logger.Debug3($"PacketBuffer should be empty after reading ({packet.GetType().Name})"); //throw new Exception("PacketBuffer must be empty after reading");
 
@@ -82,24 +91,29 @@ namespace MineSharp.Protocol {
                     MineSharp.Data.Protocol.Play.Clientbound.Packet cpPacket => (IPacketPayload)cpPacket.Params.Value!,
                     _ => throw new Exception()
                 };
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 Logger.Error($"Error reading packet!");
                 Logger.Error(e.ToString());
                 return null;
             }
         }
 
-        public PacketBuffer WritePacket(IPacketPayload packet) {
-            try {
-                PacketBuffer packetBuffer = new PacketBuffer();
+        public PacketBuffer WritePacket(IPacketPayload packet)
+        {
+            try
+            {
+                var packetBuffer = new PacketBuffer();
 
-                ServerboundPacketFactories[client.GameState].WritePacket(packetBuffer, packet);
+                this.ServerboundPacketFactories[this.client.GameState].WritePacket(packetBuffer, packet);
 
-                if (client.CompressionThreshold > 0) {
-                    packetBuffer = PacketFactory.Compress(packetBuffer, client.CompressionThreshold);
+                if (this.client.CompressionThreshold > 0)
+                {
+                    packetBuffer = Compress(packetBuffer, this.client.CompressionThreshold);
                 }
                 return packetBuffer;
-            } catch (Exception ex) {
+            } catch (Exception ex)
+            {
                 Logger.Error($"Error while writing packet of type {packet.GetType().FullName}: " + ex.ToString());
                 throw new Exception($"Error while writing packet of type {packet.GetType().FullName}", ex);
             }

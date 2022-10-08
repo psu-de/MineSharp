@@ -1,23 +1,28 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace MineSharp.Data.Generator.Protocol.Datatypes {
-    internal class UUIDDatatypeGenerator : DatatypeGenerator<UUIDDatatype> {
-        public UUIDDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {
+namespace MineSharp.Data.Generator.Protocol.Datatypes
+{
+    internal class UUIDDatatypeGenerator : DatatypeGenerator<UUIDDatatype>
+    {
+        public UUIDDatatypeGenerator(ProtoCompiler compiler) : base(compiler)
+        {
             compiler.UsedNamespaces.Add("MineSharp.Core.Types");
         }
 
         public override string TypeName => "UUID";
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public UUID ReadUUID() {{
+                $@"public UUID ReadUUID() {{
     long l1 = ReadI64();
     long l2 = ReadI64();
     return new UUID(l1, l2);
 }}");
         }
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public void WriteUUID(UUID value) {{
+                $@"public void WriteUUID(UUID value) {{
     WriteI64(value.MostSignificantBits);
     WriteI64(value.LeastSignificantBits);
 }}");
@@ -25,30 +30,27 @@ $@"public void WriteUUID(UUID value) {{
         public override bool IsGeneric => false;
     }
 
-    internal class UUIDDatatype : Datatype {
-        public UUIDDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
+    internal class UUIDDatatype : Datatype
+    {
+        public UUIDDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => "UUID";
         public override string TypeName => "UUID";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))";
-        }
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) { }
+        public override string GetReader() => $"((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))";
+        public override string GetWriter() => $"((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))";
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {}
     }
 
-    internal class EntityMetadataLoopGenerator : DatatypeGenerator<EntityMetadataLoopDatatype> {
-        public EntityMetadataLoopGenerator(ProtoCompiler compiler) : base(compiler) {
-        }
+    internal class EntityMetadataLoopGenerator : DatatypeGenerator<EntityMetadataLoopDatatype>
+    {
+        public EntityMetadataLoopGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "entityMetadataLoop";
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-    @$"public T[] ReadEntityMetadataLoop<T>(int endVal, Func<PacketBuffer, T> reader) {{
+                @$"public T[] ReadEntityMetadataLoop<T>(int endVal, Func<PacketBuffer, T> reader) {{
     List<T> data = new List<T>();
     
     while (true) {{
@@ -62,54 +64,55 @@ $@"public void WriteUUID(UUID value) {{
 }}");
         }
 
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-    @$"public void WriteEntityMetadataLoop<T>(T[] values, int endVal, Action<PacketBuffer, T> encoder) {{ 
+                @$"public void WriteEntityMetadataLoop<T>(T[] values, int endVal, Action<PacketBuffer, T> encoder) {{ 
     for (byte b = 0; b < values.Length; b++) {{
         WriteU8(b);
         encoder(this, values[b]);
     }}
     WriteU8(0xFF);
 }}"
-    );
+                );
         }
         public override bool IsGeneric => false;
     }
 
-    internal class EntityMetadataLoopDatatype : Datatype {
+    internal class EntityMetadataLoopDatatype : Datatype
+    {
 
-        Datatype InnerType;
-        int EndVal;
+        private Datatype InnerType;
+        private int EndVal;
 
-        public EntityMetadataLoopDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-            this.InnerType = Datatype.Parse(compiler, ((JObject)options!).GetValue("type")!, name + "LoopElement", container, outerStructure);
+        public EntityMetadataLoopDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
+        {
+            this.InnerType = Parse(compiler, ((JObject)options!).GetValue("type")!, name + "LoopElement", container, outerStructure);
             this.EndVal = (int)((JObject)options!).GetValue("endVal")!;
         }
 
-        public override string CSharpType => $"{InnerType.CSharpType}[]";
+        public override string CSharpType => $"{this.InnerType.CSharpType}[]";
         public override string TypeName => "entityMetadataLoop";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, {CSharpType}>)((buffer) => buffer.ReadEntityMetadataLoop({EndVal}, {InnerType.GetReader()})))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, {this.CSharpType}>)((buffer) => buffer.ReadEntityMetadataLoop({this.EndVal}, {this.InnerType.GetReader()})))";
 
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, {CSharpType}>)((buffer, value) => buffer.WriteEntityMetadataLoop(value, {EndVal}, {InnerType.GetWriter()})))";
-        }
+        public override string GetWriter() => $"((Action<PacketBuffer, {this.CSharpType}>)((buffer, value) => buffer.WriteEntityMetadataLoop(value, {this.EndVal}, {this.InnerType.GetWriter()})))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
-            InnerType.DoWriteStructure(codeGenerator, parent);
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent)
+        {
+            this.InnerType.DoWriteStructure(codeGenerator, parent);
         }
     }
 
-    internal class TopBitSetTerminatedArrayGenerator : DatatypeGenerator<TopBitSetTerminatedArrayDatatype> {
-        public TopBitSetTerminatedArrayGenerator(ProtoCompiler compiler) : base(compiler) {
-        }
+    internal class TopBitSetTerminatedArrayGenerator : DatatypeGenerator<TopBitSetTerminatedArrayDatatype>
+    {
+        public TopBitSetTerminatedArrayGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "topBitSetTerminatedArray";
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@$"public T[] ReadTopBitSetTerminatedArray<T>(Func<PacketBuffer, T> reader) {{
+                @$"public T[] ReadTopBitSetTerminatedArray<T>(Func<PacketBuffer, T> reader) {{
     List<T> data = new List<T>();
     
     while (true) {{
@@ -126,9 +129,10 @@ $@"public void WriteUUID(UUID value) {{
 }}");
         }
 
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@$"public void WriteTopBitSetTerminatedArray<T>(T[] values, Action<PacketBuffer, T> encoder) {{ 
+                @$"public void WriteTopBitSetTerminatedArray<T>(T[] values, Action<PacketBuffer, T> encoder) {{ 
     for (int i = 0; i < values.Length; i++) {{
         long pos = this._buffer.Position;
         encoder(this, values[i]);
@@ -148,75 +152,74 @@ $@"public void WriteUUID(UUID value) {{
         }}
     }}
 }}"
-    );
+                );
         }
         public override bool IsGeneric => true;
     }
-    internal class TopBitSetTerminatedArrayDatatype : Datatype {
-        Datatype InnerType;
+    internal class TopBitSetTerminatedArrayDatatype : Datatype
+    {
+        private Datatype InnerType;
 
-        public TopBitSetTerminatedArrayDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-            this.InnerType = Datatype.Parse(compiler, ((JObject)options!).GetValue("type")!, name + "LoopElement", container, outerStructure);
+        public TopBitSetTerminatedArrayDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
+        {
+            this.InnerType = Parse(compiler, ((JObject)options!).GetValue("type")!, name + "LoopElement", container, outerStructure);
         }
         public override string CSharpType => $"{this.InnerType.CSharpType}[]";
 
         public override string TypeName => "topBitSetTerminatedArray";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, {CSharpType}>)((buffer) => buffer.ReadTopBitSetTerminatedArray({InnerType.GetReader()})))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, {CSharpType}>)((buffer, value) => buffer.WriteTopBitSetTerminatedArray(value, {InnerType.GetWriter()})))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, {this.CSharpType}>)((buffer) => buffer.ReadTopBitSetTerminatedArray({this.InnerType.GetReader()})))";
+        public override string GetWriter() => $"((Action<PacketBuffer, {this.CSharpType}>)((buffer, value) => buffer.WriteTopBitSetTerminatedArray(value, {this.InnerType.GetWriter()})))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
-            InnerType.DoWriteStructure(codeGenerator, parent);
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent)
+        {
+            this.InnerType.DoWriteStructure(codeGenerator, parent);
         }
     }
 
-    internal class RestBufferGenerator : DatatypeGenerator<RestBufferDatatype> {
-        public RestBufferGenerator(ProtoCompiler compiler) : base(compiler) {
-        }
+    internal class RestBufferGenerator : DatatypeGenerator<RestBufferDatatype>
+    {
+        public RestBufferGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "restBuffer";
 
         public override bool IsGeneric => false;
 
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@$"public byte[] ReadRestBuffer() {{
+                @$"public byte[] ReadRestBuffer() {{
     return ReadRaw((int)ReadableBytes);
 }}");
         }
 
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@$"public void WriteRestBuffer(byte[] value) {{
+                @$"public void WriteRestBuffer(byte[] value) {{
     WriteRaw(value);
 }}");
         }
     }
 
-    internal class RestBufferDatatype : Datatype {
-        public RestBufferDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
+    internal class RestBufferDatatype : Datatype
+    {
+        public RestBufferDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => "byte[]";
 
         public override string TypeName => "restBuffer";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer()))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value)))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer()))";
+        public override string GetWriter() => $"((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value)))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) { }
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {}
     }
 
-    internal class NbtDatatypeGenerator : DatatypeGenerator<NbtDatatype> {
-        public NbtDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {
+    internal class NbtDatatypeGenerator : DatatypeGenerator<NbtDatatype>
+    {
+        public NbtDatatypeGenerator(ProtoCompiler compiler) : base(compiler)
+        {
             compiler.UsedNamespaces.Add("fNbt");
         }
 
@@ -224,9 +227,10 @@ $@"public void WriteUUID(UUID value) {{
 
         public override bool IsGeneric => false;
 
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public NbtCompound ReadNbt() {{
+                $@"public NbtCompound ReadNbt() {{
     NbtTagType t = (NbtTagType)ReadU8();
     if (t != NbtTagType.Compound) return null;
     _buffer.Position--;
@@ -240,9 +244,10 @@ $@"public NbtCompound ReadNbt() {{
 ");
         }
 
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public void WriteNbt(NbtCompound value) {{
+                $@"public void WriteNbt(NbtCompound value) {{
     if (value == null) {{
         WriteU8(0);
         return;
@@ -254,28 +259,25 @@ $@"public void WriteNbt(NbtCompound value) {{
         }
     }
 
-    internal class NbtDatatype : Datatype {
-        public NbtDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
+    internal class NbtDatatype : Datatype
+    {
+        public NbtDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => "NbtCompound";
 
         public override string TypeName => "nbt";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, NbtCompound>)((buffer) => buffer.ReadNbt()))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, NbtCompound>)((buffer, value) => buffer.WriteNbt(value)))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, NbtCompound>)((buffer) => buffer.ReadNbt()))";
+        public override string GetWriter() => $"((Action<PacketBuffer, NbtCompound>)((buffer, value) => buffer.WriteNbt(value)))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
-        }
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {}
     }
 
 
-    internal class OptionalNbtGenerator : DatatypeGenerator<OptionalNbtDatatype> {
-        public OptionalNbtGenerator(ProtoCompiler compiler) : base(compiler) {
+    internal class OptionalNbtGenerator : DatatypeGenerator<OptionalNbtDatatype>
+    {
+        public OptionalNbtGenerator(ProtoCompiler compiler) : base(compiler)
+        {
             compiler.UsedNamespaces.Add("fNbt");
         }
 
@@ -283,9 +285,10 @@ $@"public void WriteNbt(NbtCompound value) {{
 
         public override bool IsGeneric => false;
 
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public NbtCompound? ReadOptionalNbt() {{
+                $@"public NbtCompound? ReadOptionalNbt() {{
     NbtTagType t = (NbtTagType)ReadU8();
     if (t != NbtTagType.Compound) return null;
     _buffer.Position--;
@@ -299,9 +302,10 @@ $@"public NbtCompound? ReadOptionalNbt() {{
 ");
         }
 
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-$@"public void WriteOptionalNbt(NbtCompound? value) {{
+                $@"public void WriteOptionalNbt(NbtCompound? value) {{
     if (value == null) {{
         WriteU8(0);
         return;
@@ -313,23 +317,18 @@ $@"public void WriteOptionalNbt(NbtCompound? value) {{
         }
     }
 
-    internal class OptionalNbtDatatype : Datatype {
-        public OptionalNbtDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
+    internal class OptionalNbtDatatype : Datatype
+    {
+        public OptionalNbtDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => "NbtCompound?";
 
         public override string TypeName => "optionalNbt";
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, NbtCompound?>)((buffer) => buffer.ReadOptionalNbt()))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, NbtCompound?>)((buffer) => buffer.ReadOptionalNbt()))";
 
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))";
-        }
+        public override string GetWriter() => $"((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
-        }
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {}
     }
 }

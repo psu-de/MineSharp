@@ -1,21 +1,22 @@
 using MineSharp.Bot;
 using MineSharp.Pathfinding.Goals;
 
-namespace MineSharp.Pathfinding;
-
-public static class PathfinderExtensions
+namespace MineSharp.Pathfinding
 {
-
-    public static Task GoTo(this MinecraftBot bot, Goal goal, Movements? movements = null, double? timeout = null)
+    public static class PathfinderExtensions
     {
-        var module = bot.GetModule<PathfinderModule>();
-        if (module == null)
+
+        public static Task GoTo(this MinecraftBot bot, Goal goal, Movements? movements = null, double? timeout = null)
         {
-            throw new InvalidOperationException(
-                "Pathfinder module not loaded. Use bot.LoadPlugin(new PathfinderModule());");
+            var module = bot.GetModule<PathfinderModule>();
+            if (module == null)
+            {
+                throw new InvalidOperationException(
+                    "Pathfinder module not loaded. Use bot.LoadPlugin(new PathfinderModule());");
+            }
+
+            return module.GoTo(goal, movements, timeout);
         }
 
-        return module.GoTo(goal, movements, timeout);
     }
-    
 }

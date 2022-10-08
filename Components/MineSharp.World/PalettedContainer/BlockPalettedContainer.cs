@@ -3,18 +3,21 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Protocol;
 using MineSharp.World.PalettedContainer.Palettes;
 
-namespace MineSharp.World.PalettedContainer {
-    public class BlockPalettedContainer : IPalettedContainer {
+namespace MineSharp.World.PalettedContainer
+{
+    public class BlockPalettedContainer : IPalettedContainer
+    {
 
-        static Logger Logger = Logger.GetLogger();
+        private static Logger Logger = Logger.GetLogger();
 
-        public static BlockPalettedContainer Read(PacketBuffer buffer) {
-            byte bitsPerEntry = buffer.ReadU8();
+        public static BlockPalettedContainer Read(PacketBuffer buffer)
+        {
+            var bitsPerEntry = buffer.ReadU8();
             var palette = GetPalette(bitsPerEntry);
             palette.Read(buffer);
 
-            long[] data = new long[buffer.ReadVarInt()];
-            for (int i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
+            var data = new long[buffer.ReadVarInt()];
+            for (var i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
 
             return new BlockPalettedContainer(palette, new IntBitArray(data, bitsPerEntry));
         }
@@ -29,29 +32,34 @@ namespace MineSharp.World.PalettedContainer {
         public int Capacity => 16 * 16 * 16;
         public IntBitArray Data { get; set; }
 
-        public BlockPalettedContainer(IPalette palette, IntBitArray data) { 
-            Palette = palette;
-            Data = data;
+        public BlockPalettedContainer(IPalette palette, IntBitArray data)
+        {
+            this.Palette = palette;
+            this.Data = data;
         }
 
-        public int GetAt(int index) {
-            if (index < 0 || index >= Capacity) 
+        public int GetAt(int index)
+        {
+            if (index < 0 || index >= this.Capacity)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             if (this.Palette is SingleValuePalette)
                 return this.Palette.Get(0);
 
-            var value = Data.Get(index);
+            var value = this.Data.Get(index);
             return this.Palette.Get(value);
         }
 
-        public void SetAt(int index, int state) {
+        public void SetAt(int index, int state)
+        {
 
-            if (index < 0 || index >= Capacity)
+            if (index < 0 || index >= this.Capacity)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            if (this.Palette.HasState(state, state)) {
-                switch (this.Palette) {
+            if (this.Palette.HasState(state, state))
+            {
+                switch (this.Palette)
+                {
                     case SingleValuePalette svp: break;
                     case IndirectPalette ip:
                         var mapIndex = ip.GetStateIndex(state);
@@ -61,9 +69,11 @@ namespace MineSharp.World.PalettedContainer {
                         this.Data.Set(index, state);
                         break;
                 }
-            } else {
+            } else
+            {
 
-                switch (this.Palette) {
+                switch (this.Palette)
+                {
                     case SingleValuePalette svp:
                         Logger.Info($"Converting {nameof(SingleValuePalette)} to {nameof(IndirectPalette)}");
                         this.Palette = svp.ConvertToIndirectPalette(state);
@@ -72,18 +82,20 @@ namespace MineSharp.World.PalettedContainer {
                         break;
                     case IndirectPalette dp:
                         var newPalette = dp.AddState(state, false, out var newBitsPerEntry);
-                        Logger.Info($"Converting {nameof(IndirectPalette)} (bps={Data.BitsPerEntry}) to {newPalette.GetType().Name} (bps={newBitsPerEntry})");
+                        Logger.Info($"Converting {nameof(IndirectPalette)} (bps={this.Data.BitsPerEntry}) to {newPalette.GetType().Name} (bps={newBitsPerEntry})");
                         this.Data.ChangeBitsPerEntry(newBitsPerEntry);
 
-                        if (newPalette is DirectPalette) {
-                            for (int i = 0; i < Capacity; i++) {
-                                this.Data.Set(i, GetAt(i));
+                        if (newPalette is DirectPalette)
+                        {
+                            for (var i = 0; i < this.Capacity; i++)
+                            {
+                                this.Data.Set(i, this.GetAt(i));
                             }
                         }
 
                         if (newPalette is DirectPalette)
                             this.Data.Set(index, state);
-                        else 
+                        else
                             this.Data.Set(index, ((IndirectPalette)newPalette).GetStateIndex(state));
                         this.Palette = newPalette;
                         break;

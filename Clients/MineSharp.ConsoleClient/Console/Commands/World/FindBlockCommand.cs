@@ -1,34 +1,42 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
+using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.World {
-    internal class FindBlockCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.World
+{
+    internal class FindBlockCommand : Command
+    {
 
-        EnumArgument<BlockType> BlockTypeArgument;
+        private EnumArgument<BlockType> BlockTypeArgument;
 
-        public FindBlockCommand() {
+        public FindBlockCommand()
+        {
 
-            BlockTypeArgument = new EnumArgument<BlockType>("blockType");
+            this.BlockTypeArgument = new EnumArgument<BlockType>("blockType");
 
-            var desc = $"Searches for an Block of the specified [{BlockTypeArgument.Color}]Block Type[/]";
+            var desc = $"Searches for an Block of the specified [{this.BlockTypeArgument.Color}]Block Type[/]";
 
-            this.Initialize("findBlock", desc, CColor.WorldCommand, BlockTypeArgument);
+            this.Initialize("findBlock", desc, CColor.WorldCommand, this.BlockTypeArgument);
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
             AnsiConsole.Status()
-                .Start("Searching for [yellow]" + argv[0] + "[/]", ctx => {
-                    var blockType = BlockTypeArgument.GetValue(argv[0]);
+                .Start("Searching for [yellow]" + argv[0] + "[/]", ctx =>
+                {
+                    var blockType = this.BlockTypeArgument.GetValue(argv[0]);
 
 
                     var block = BotClient.Bot!.FindBlockAsync(blockType, cancellation).GetAwaiter().GetResult();
                     if (cancellation.IsCancellationRequested) return;
 
-                    if (block != null) {
+                    if (block != null)
+                    {
                         AnsiConsole.MarkupLine("[green] Found Block: " + block + "[/]");
-                    } else {
+                    } else
+                    {
                         AnsiConsole.MarkupLine("[darkorange] No block was found![/]");
                     }
 

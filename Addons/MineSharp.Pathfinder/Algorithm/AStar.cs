@@ -14,7 +14,7 @@ namespace MineSharp.Pathfinding.Algorithm
     {
         private static readonly Logger Logger = Logger.GetLogger();
         public const int DEFAULT_MAX_NODES = 5000;
-        
+
         public MinecraftPlayer Player { get; set; }
         public World.World World { get; set; }
         public Movements Movements { get; set; }
@@ -34,12 +34,12 @@ namespace MineSharp.Pathfinding.Algorithm
             var closedSet = new HashSet<Node>();
             var nodes = new Dictionary<ulong, Node>();
 
-            var pos = Player.Entity.Position.Floored();
+            var pos = this.Player.Entity.Position.Floored();
 
             using (_ = new TemporaryBlockCache(this.World))
             {
-                var startNode = GetNodeForBlock(pos, ref nodes);
-                var endNode = GetNodeForBlock(goal.Target, ref nodes);
+                var startNode = this.GetNodeForBlock(pos, ref nodes);
+                var endNode = this.GetNodeForBlock(goal.Target, ref nodes);
 
                 if (!endNode.Walkable)
                 {
@@ -75,7 +75,7 @@ namespace MineSharp.Pathfinding.Algorithm
                         return path.ToArray();
                     }
 
-                    var neighbors = GetNeighbors(node, ref nodes).ToArray();
+                    var neighbors = this.GetNeighbors(node, ref nodes).ToArray();
 
                     foreach ((var neighbor, var move) in neighbors)
                     {
@@ -95,8 +95,7 @@ namespace MineSharp.Pathfinding.Algorithm
                             if (!openSet.Contains(neighbor))
                             {
                                 openSet.Enqueue(neighbor, neighbor.fCost);
-                            }
-                            else
+                            } else
                             {
                                 openSet.UpdatePriority(neighbor, neighbor.fCost);
                             }
@@ -110,7 +109,7 @@ namespace MineSharp.Pathfinding.Algorithm
 
         private List<(Node, Move)> GetNeighbors(Node node, ref Dictionary<ulong, Node> nodes)
         {
-            var neighbors = new List<(Node, Move)>();    
+            var neighbors = new List<(Node, Move)>();
 
             foreach (var move in this.Movements.PossibleMoves)
             {
@@ -121,7 +120,7 @@ namespace MineSharp.Pathfinding.Algorithm
                     {
                         continue;
                     }
-                    var neighborNode = GetNodeForBlock(pos, ref nodes);
+                    var neighborNode = this.GetNodeForBlock(pos, ref nodes);
                     neighbors.Add((neighborNode, move));
                 }
             }
@@ -136,10 +135,10 @@ namespace MineSharp.Pathfinding.Algorithm
             {
                 return node;
             }
-            
+
             var block = this.World.GetBlockAt(pos);
-            bool walkable = !(block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id));
-            
+            var walkable = !(block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id));
+
             var newNode = new Node(pos, walkable, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);
             return newNode;

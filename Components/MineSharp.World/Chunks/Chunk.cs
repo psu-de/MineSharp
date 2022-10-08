@@ -4,17 +4,17 @@ using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
 
-namespace MineSharp.World.Chunks {
-    public class Chunk {
+namespace MineSharp.World.Chunks
+{
+    public class Chunk
+    {
 
         private static Logger Logger = Logger.GetLogger();
 
         public const int ChunkSectionLength = 16;
 
 
-        public static int GetSectionCount() {
-            return World.TotalHeight >> 4;
-        }
+        public static int GetSectionCount() => World.TotalHeight >> 4;
 
         public int X { get; set; }
         public int Z { get; set; }
@@ -22,7 +22,8 @@ namespace MineSharp.World.Chunks {
         public Dictionary<Position, ChunkBlockEntity> BlockEntities { get; set; }
 
 
-        public Chunk(int x, int z, byte[] data, ChunkBlockEntity[] blockEntities) {
+        public Chunk(int x, int z, byte[] data, ChunkBlockEntity[] blockEntities)
+        {
             this.X = x;
             this.Z = z;
             this.ChunkSections = new ChunkSection[GetSectionCount()];
@@ -30,91 +31,108 @@ namespace MineSharp.World.Chunks {
             this.Load(data);
 
             this.BlockEntities = new Dictionary<Position, ChunkBlockEntity>();
-            foreach (var blockEntity in blockEntities) {
+            foreach (var blockEntity in blockEntities)
+            {
                 this.BlockEntities.Add(new Position(blockEntity.X, blockEntity.Y, blockEntity.Z), blockEntity);
             }
         }
 
-        public Chunk(PacketMapChunk packet) : this(packet.X, packet.Z, packet.ChunkData!, packet.BlockEntities) { }
+        public Chunk(PacketMapChunk packet) : this(packet.X, packet.Z, packet.ChunkData!, packet.BlockEntities) {}
 
-        public void Load(byte[] data) {
-            PacketBuffer buffer = new PacketBuffer(data);
+        public void Load(byte[] data)
+        {
+            var buffer = new PacketBuffer(data);
 
-            for (int i = 0; i < this.ChunkSections.Length; i++) {
+            for (var i = 0; i < this.ChunkSections.Length; i++)
+            {
                 this.ChunkSections[i] = ChunkSection.Read(buffer);
             }
         }
 
-        public Position Chunk2WorldPos(Position pos, int sectionIndex) {
-            int x = (this.X * ChunkSectionLength) + pos.X;
-            int y = ((sectionIndex - 4) * ChunkSectionLength) + pos.Y;
-            int z = (this.Z * ChunkSectionLength) + pos.Z;
+        public Position Chunk2WorldPos(Position pos, int sectionIndex)
+        {
+            var x = this.X * ChunkSectionLength + pos.X;
+            var y = (sectionIndex - 4) * ChunkSectionLength + pos.Y;
+            var z = this.Z * ChunkSectionLength + pos.Z;
             return new Position(x, y, z);
         }
 
-        public Position World2ChunkPos(Position pos) {
-            int sectionIndex = GetSectionIndex(pos.Y);
+        public Position World2ChunkPos(Position pos)
+        {
+            var sectionIndex = this.GetSectionIndex(pos.Y);
 
-            int x = Math.Abs(Math.Abs(pos.X) - Math.Abs(X * ChunkSectionLength));
-            int y = Math.Abs(Math.Abs(pos.Y) - Math.Abs((sectionIndex - 4) * ChunkSectionLength));
-            int z = Math.Abs(Math.Abs(pos.Z) - Math.Abs(Z * ChunkSectionLength));
+            var x = Math.Abs(Math.Abs(pos.X) - Math.Abs(this.X * ChunkSectionLength));
+            var y = Math.Abs(Math.Abs(pos.Y) - Math.Abs((sectionIndex - 4) * ChunkSectionLength));
+            var z = Math.Abs(Math.Abs(pos.Z) - Math.Abs(this.Z * ChunkSectionLength));
 
             return new Position(x, y, z);
         }
 
-        public void SetBlock(Block block) {
-            int sectionIndex = GetSectionIndex(block.Position!.Y);
+        public void SetBlock(Block block)
+        {
+            var sectionIndex = this.GetSectionIndex(block.Position!.Y);
             block.Position = this.World2ChunkPos(block.Position);
             this.ChunkSections[sectionIndex].SetBlock(block);
         }
 
-        public Block GetBlockAt(Position pos) {
-            int sectionIndex = GetSectionIndex(pos.Y);
+        public Block GetBlockAt(Position pos)
+        {
+            var sectionIndex = this.GetSectionIndex(pos.Y);
             if (sectionIndex >= this.ChunkSections.Length) throw new Exception("Out of map");
             var chunkPos = this.World2ChunkPos(pos);
-            Block block = this.ChunkSections[sectionIndex].GetBlockAt(chunkPos);
+            var block = this.ChunkSections[sectionIndex].GetBlockAt(chunkPos);
             block.Position = pos;
             return block;
         }
 
-        public Biome GetBiomeAt(Position pos) {
-            int sectionIndex = GetSectionIndex(pos.Y);
+        public Biome GetBiomeAt(Position pos)
+        {
+            var sectionIndex = this.GetSectionIndex(pos.Y);
             if (sectionIndex >= this.ChunkSections.Length) throw new Exception("Out of map");
             var chunkPos = this.World2ChunkPos(pos);
-            Biome biome = this.ChunkSections[sectionIndex].GetBiomeAt(chunkPos);
+            var biome = this.ChunkSections[sectionIndex].GetBiomeAt(chunkPos);
             return biome;
         }
 
 
-        private int GetSectionIndex(int y) {
-            return (y - World.MinY) >> 4;
-        }
+        private int GetSectionIndex(int y) => y - World.MinY >> 4;
 
-        public async Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null) {
-            for (int i = 0; i < this.ChunkSections.Length; i++) {
+        public async Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null)
+        {
+            for (var i = 0; i < this.ChunkSections.Length; i++)
+            {
                 var block = await this.ChunkSections[i].FindBlockAsync(type, cancellation);
 
                 if (cancellation?.IsCancellationRequested ?? false) return null;
 
-                if (block != null) {
-                    block.Position = Chunk2WorldPos(block.Position!, i);
+                if (block != null)
+                {
+                    block.Position = this.Chunk2WorldPos(block.Position!, i);
                     return block;
                 }
             }
             return null;
         }
 
-        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) {
-            List<Block> blocks = new List<Block>();
+        public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null)
+        {
+            var blocks = new List<Block>();
 
-            for (int i = 0; i < this.ChunkSections.Length; i++) {
+            for (var i = 0; i < this.ChunkSections.Length; i++)
+            {
                 var sectionBlocks = await this.ChunkSections[i].FindBlocksAsync(type, count - blocks.Count, cancellation);
                 if (cancellation?.IsCancellationRequested ?? false) return null;
 
-                if (sectionBlocks != null) {
-                    sectionBlocks = sectionBlocks.Select(block => { block.Position = Chunk2WorldPos(block.Position!, i); return block; }).ToArray();
+                if (sectionBlocks != null)
+                {
+                    sectionBlocks = sectionBlocks.Select(block =>
+                    {
+                        block.Position = this.Chunk2WorldPos(block.Position!, i);
+                        return block;
+                    }).ToArray();
                     blocks.AddRange(sectionBlocks);
-                    if (count > 0 && blocks.Count >= count) {
+                    if (count > 0 && blocks.Count >= count)
+                    {
                         return blocks.Take(count).ToArray();
                     }
                 }

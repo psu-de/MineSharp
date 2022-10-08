@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj" />
-    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj"/>
+        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
+    </ItemGroup>
 
 </Project>

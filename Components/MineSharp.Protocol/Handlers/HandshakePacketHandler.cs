@@ -3,8 +3,10 @@
 
 namespace MineSharp.Protocol.Handlers
 {
-    internal class HandshakePacketHandler : IPacketHandler {
-        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client) {
+    internal class HandshakePacketHandler : IPacketHandler
+    {
+        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client)
+        {
 
             return packet switch {
                 _ => Task.CompletedTask
@@ -12,14 +14,16 @@ namespace MineSharp.Protocol.Handlers
 
         }
 
-        public Task HandleOutgoing(IPacketPayload packet, MinecraftClient client) {
+        public Task HandleOutgoing(IPacketPayload packet, MinecraftClient client)
+        {
             return packet switch {
-                MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol setProtocol => HandleSetProtocolPacket(setProtocol, client),
-                _ => Task.CompletedTask,
+                MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol setProtocol => this.HandleSetProtocolPacket(setProtocol, client),
+                _ => Task.CompletedTask
             };
         }
 
-        private Task HandleSetProtocolPacket(MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol packet, MinecraftClient client) {
+        private Task HandleSetProtocolPacket(MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol packet, MinecraftClient client)
+        {
             client.SetGameState((Core.Types.Enums.GameState)packet.NextState!.Value);
             return Task.CompletedTask;
         }

@@ -2,8 +2,10 @@
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console {
-    internal abstract class Command {
+namespace MineSharp.ConsoleClient.Console
+{
+    internal abstract class Command
+    {
 
         #pragma warning disable CS8618
 
@@ -15,10 +17,11 @@ namespace MineSharp.ConsoleClient.Console {
 
         #pragma warning restore CS8618
 
-        public void Initialize(string name, string description, string color, params Argument[] arguments) {
+        public void Initialize(string name, string description, string color, params Argument[] arguments)
+        {
 
-            if (_isInitialized) return;
-            _isInitialized = true;
+            if (this._isInitialized) return;
+            this._isInitialized = true;
 
             description += $"\nSyntax: [{color}]{name}[/] " + string.Join(" ", arguments.Select(x => x.IsOptional ? $"[{x.Color}](<{x.Name}>)[/]" : $"[{x.Color}]<{x.Name}>[/]"));
 
@@ -28,33 +31,40 @@ namespace MineSharp.ConsoleClient.Console {
             this.Arguments = arguments.ToList();
         }
 
-        public (Argument? arg, string remaining) GetCurrentArgument(string args) {
-            if (!_isInitialized) throw new InvalidOperationException("Not initialized");
+        public (Argument? arg, string remaining) GetCurrentArgument(string args)
+        {
+            if (!this._isInitialized) throw new InvalidOperationException("Not initialized");
 
-            string remaining = args;
-            for (int i = 0; i < Arguments.Count; i++) {
-                if (!Arguments[i].Match(ref remaining)) {
-                    return (Arguments[i], remaining);
+            var remaining = args;
+            for (var i = 0; i < this.Arguments.Count; i++)
+            {
+                if (!this.Arguments[i].Match(ref remaining))
+                {
+                    return (this.Arguments[i], remaining);
                 }
             }
 
             return (null, "");
         }
 
-        public List<FormatSpan> GetArgHighlighting(string args, int strOffset) {
+        public List<FormatSpan> GetArgHighlighting(string args, int strOffset)
+        {
 
-            List<FormatSpan> highlights = new List<FormatSpan>();
+            var highlights = new List<FormatSpan>();
 
-            int strIndex = strOffset;
-            for (int i = 0; i < Arguments.Count; i++) {
-                string beforeArgs = args;
-                int argLenBefore = args.Length;
-                bool complete = Arguments[i].Match(ref args);
-                int argLen = argLenBefore - args.Length;
+            var strIndex = strOffset;
+            for (var i = 0; i < this.Arguments.Count; i++)
+            {
+                var beforeArgs = args;
+                var argLenBefore = args.Length;
+                var complete = this.Arguments[i].Match(ref args);
+                var argLen = argLenBefore - args.Length;
 
-                if (Arguments[i].IsValid(beforeArgs.Substring(0, argLen).Trim())) {
-                    highlights.Add(new FormatSpan(strIndex, argLen, CColor.GetAnsiColor(Arguments[i].Color)));
-                } else {
+                if (this.Arguments[i].IsValid(beforeArgs.Substring(0, argLen).Trim()))
+                {
+                    highlights.Add(new FormatSpan(strIndex, argLen, CColor.GetAnsiColor(this.Arguments[i].Color)));
+                } else
+                {
                     highlights.Add(new FormatSpan(strIndex, argLen, AnsiColor.BrightRed));
                 }
                 strIndex += argLen;
@@ -62,27 +72,32 @@ namespace MineSharp.ConsoleClient.Console {
             return highlights;
         }
 
-        public virtual void PrintHelp() {
+        public virtual void PrintHelp()
+        {
             AnsiConsole.MarkupLine($"[green]Help: " + this.Name + "[/]");
             AnsiConsole.MarkupLine($"{this.Description}");
         }
 
-        public void Execute(string args, CancellationToken cancellation) {
+        public void Execute(string args, CancellationToken cancellation)
+        {
 
-            List<string> argv = new List<string>();
+            var argv = new List<string>();
 
-            string remaining = args;
-            for (int i = 0; i < Arguments.Count; i++) {
+            var remaining = args;
+            for (var i = 0; i < this.Arguments.Count; i++)
+            {
                 remaining = remaining.TrimStart();
-                string beforeArgs = remaining;
-                Arguments[i].Match(ref remaining);
-                string arg = beforeArgs.Substring(0, beforeArgs.Length - remaining.Length).Trim();
+                var beforeArgs = remaining;
+                this.Arguments[i].Match(ref remaining);
+                var arg = beforeArgs.Substring(0, beforeArgs.Length - remaining.Length).Trim();
 
-                if (string.IsNullOrEmpty(arg) && Arguments[i].IsOptional) {
+                if (string.IsNullOrEmpty(arg) && this.Arguments[i].IsOptional)
+                {
                     break;
                 }
 
-                if (!Arguments[i].IsOptional && !Arguments[i].IsValid(arg)) {
+                if (!this.Arguments[i].IsOptional && !this.Arguments[i].IsValid(arg))
+                {
                     System.Console.WriteLine("Error: Invalid argument at position " + (i + 1));
                     return;
                 }
@@ -90,7 +105,7 @@ namespace MineSharp.ConsoleClient.Console {
                 argv.Add(arg);
             }
 
-            DoAction(argv.ToArray(), cancellation);
+            this.DoAction(argv.ToArray(), cancellation);
         }
 
         public abstract void DoAction(string[] argv, CancellationToken cancellation);

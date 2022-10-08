@@ -1,58 +1,65 @@
-﻿namespace MineSharp.Core.Types {
-    public class IntBitArray {
+﻿namespace MineSharp.Core.Types
+{
+    public class IntBitArray
+    {
         public long[] Data { get; private set; }
         public byte BitsPerEntry { get; private set; }
-        public int Capacity => ValuesPerLong * Data.Length;
+        public int Capacity => this.ValuesPerLong * this.Data.Length;
 
-        private int ValuesPerLong => 64 / BitsPerEntry;
-        private long ValueMask => (1L << BitsPerEntry) - 1;
+        private int ValuesPerLong => 64 / this.BitsPerEntry;
+        private long ValueMask => (1L << this.BitsPerEntry) - 1;
 
-        public IntBitArray(long[] data, byte bitsPerEntry) {
+        public IntBitArray(long[] data, byte bitsPerEntry)
+        {
             this.Data = data;
             this.BitsPerEntry = bitsPerEntry;
         }
 
-        public void ChangeBitsPerEntry(byte newBitsPerEntry) {
-            if (newBitsPerEntry == BitsPerEntry) return;
+        public void ChangeBitsPerEntry(byte newBitsPerEntry)
+        {
+            if (newBitsPerEntry == this.BitsPerEntry) return;
 
             var old = new IntBitArray(this.Data, this.BitsPerEntry);
             var capacity = this.Capacity;
             this.BitsPerEntry = newBitsPerEntry;
 
-            this.Data = new long[(int)Math.Ceiling((float)capacity / ValuesPerLong)];
-            for (int i = 0; i < capacity; i++) {
+            this.Data = new long[(int)Math.Ceiling((float)capacity / this.ValuesPerLong)];
+            for (var i = 0; i < capacity; i++)
+            {
                 this.Set(i, old.Get(i));
             }
         }
 
-        public void Set(int idx, int value) {
+        public void Set(int idx, int value)
+        {
 
-            if (idx >= Capacity || idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
+            if (idx >= this.Capacity || idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
 
-            int longIndex = idx / ValuesPerLong;
-            int bitIndex = (idx % ValuesPerLong) * BitsPerEntry;
+            var longIndex = idx / this.ValuesPerLong;
+            var bitIndex = idx % this.ValuesPerLong * this.BitsPerEntry;
 
-            long l = Data[longIndex];
+            var l = this.Data[longIndex];
 
-            long shiftedValue = (value & ValueMask) << bitIndex;
+            var shiftedValue = (value & this.ValueMask) << bitIndex;
 
             l |= shiftedValue;
 
-            long mask = ~(ValueMask << bitIndex) | shiftedValue;
+            var mask = ~(this.ValueMask << bitIndex) | shiftedValue;
             l &= mask;
 
-            Data[longIndex] = l;
+            this.Data[longIndex] = l;
         }
 
-        public int Get(int idx) {
+        public int Get(int idx)
+        {
 
-            if (idx >= Capacity || idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
+            if (idx >= this.Capacity || idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
 
-            int longIndex = idx / ValuesPerLong;
-            int bitIndex = (idx % ValuesPerLong) * BitsPerEntry;
+            var longIndex = idx / this.ValuesPerLong;
+            var bitIndex = idx % this.ValuesPerLong * this.BitsPerEntry;
 
-            long l = Data[longIndex];
-            return (int)((l >> bitIndex) & ValueMask);
+            var l = this.Data[longIndex];
+            return (int)(l >> bitIndex & this.ValueMask);
         }
     }
 }

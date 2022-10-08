@@ -11,22 +11,19 @@ namespace MineSharp.Pathfinding.Algorithm
 
         public float gCost { get; set; }
         public float hCost { get; set; }
-        public float fCost => gCost + hCost;
+        public float fCost => this.gCost + this.hCost;
 
         public Move? Move;
         public Node? Parent;
 
         public Node(Vector3 position, bool walkable, int gCost, int hCost)
         {
-            Position = position;
-            Walkable = walkable;
+            this.Position = position;
+            this.Walkable = walkable;
             this.gCost = gCost;
             this.hCost = hCost;
         }
 
-        public override string ToString()
-        {
-            return $"Node (Pos={Position} Walkable={Walkable} gCost={gCost} hCost={hCost} fCost={fCost})";
-        }
+        public override string ToString() => $"Node (Pos={this.Position} Walkable={this.Walkable} gCost={this.gCost} hCost={this.hCost} fCost={this.fCost})";
     }
 }

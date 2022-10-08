@@ -3,37 +3,44 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.World {
-    internal class GetBlockAtCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.World
+{
+    internal class GetBlockAtCommand : Command
+    {
 
-        IntegerArgument X = new IntegerArgument("x");
-        IntegerArgument Y = new IntegerArgument("y");
-        IntegerArgument Z = new IntegerArgument("z");
+        private IntegerArgument X = new IntegerArgument("x");
+        private IntegerArgument Y = new IntegerArgument("y");
+        private IntegerArgument Z = new IntegerArgument("z");
 
-        public GetBlockAtCommand() {
+        public GetBlockAtCommand()
+        {
 
-            string desc = $"Gets a [purple]block[/] at the [{X.Color}]x y z[/] coordinates";
+            var desc = $"Gets a [purple]block[/] at the [{this.X.Color}]x y z[/] coordinates";
 
-            this.Initialize("getBlockAt", desc, CColor.WorldCommand, X, Y, Z);
+            this.Initialize("getBlockAt", desc, CColor.WorldCommand, this.X, this.Y, this.Z);
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
 
-            int? x = X.GetValue(argv[0]);
-            int? y = Y.GetValue(argv[1]);
-            int? z = Z.GetValue(argv[2]);
+            var x = this.X.GetValue(argv[0]);
+            var y = this.Y.GetValue(argv[1]);
+            var z = this.Z.GetValue(argv[2]);
 
-            if (x == null || y == null || z == null) {
+            if (x == null || y == null || z == null)
+            {
                 AnsiConsole.MarkupLine($"[red]Error: Coordinates invalid[/]");
                 return;
             }
 
-            var block = BotClient.Bot!.GetBlockAt(new Core.Types.Position((int)x, (int)y, (int)z));
-            var biome = BotClient.Bot!.GetBiomeAt(new Core.Types.Position((int)x, (int)y, (int)z));
+            var block = BotClient.Bot!.GetBlockAt(new Position((int)x, (int)y, (int)z));
+            var biome = BotClient.Bot!.GetBiomeAt(new Position((int)x, (int)y, (int)z));
             var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties", "Biome");
 
-            string propGetValue(BlockStateProperty prop) {
-                switch (prop.Type) {
+            string propGetValue(BlockStateProperty prop)
+            {
+                switch (prop.Type)
+                {
                     case BlockStateProperty.BlockStatePropertyType.Bool:
                         return prop.GetValue<bool>().ToString();
                     case BlockStateProperty.BlockStatePropertyType.Int:
@@ -45,7 +52,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World {
                 }
             }
 
-            string properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
+            var properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
 
             table.AddRow(block.Name, block.Position!.ToString(), block.Metadata.ToString(), properties, biome.Name);
             AnsiConsole.Write(table);

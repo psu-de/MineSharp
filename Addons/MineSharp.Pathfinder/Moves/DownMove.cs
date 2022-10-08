@@ -36,17 +36,17 @@ namespace MineSharp.Pathfinding.Moves
                     return true;
                 }
             }
-            
+
             return false;
         }
-        
+
         protected override Task Prepare(MinecraftBot bot)
         {
             this._target = bot.Player!.Entity.Position
                 .Floored()
                 .Plus(this.MoveVector)
                 .Plus(new Vector3(0.5, 0, 0.5));
-         
+
             Logger.Debug($"DownMove: Target={this._target}");
             return Task.CompletedTask;
         }
@@ -57,7 +57,7 @@ namespace MineSharp.Pathfinding.Moves
             var delta = sender.BotEntity!.Position.Minus(this._target!);
             var deltaY = Math.Abs(delta.Y);
             delta.Y = 0;
-            
+
             var length = delta.Length();
 
             if (length <= THRESHOLD)
@@ -73,7 +73,7 @@ namespace MineSharp.Pathfinding.Moves
             sender.ForceSetRotation((float)yaw, 0);
 
             sender.PlayerControls.Walk(WalkDirection.Forward);
-            if (Movements.AllowSprinting)
+            if (this.Movements.AllowSprinting)
             {
                 _ = sender.PlayerControls.StartSprinting();
             }

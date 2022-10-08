@@ -1,9 +1,12 @@
-﻿namespace MineSharp.Core.Types {
-    public class Chat {
+﻿namespace MineSharp.Core.Types
+{
+    public class Chat
+    {
 
         public string JSON { get; private set; }
 
-        public Chat(string json) {
+        public Chat(string json)
+        {
             this.JSON = json;
         }
 

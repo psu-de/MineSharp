@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-namespace MineSharp.Data.Generator.Effects {
+namespace MineSharp.Data.Generator.Effects
+{
 #pragma warning disable CS8618
-    internal class EffectJsonInfo {
+    internal class EffectJsonInfo
+    {
 
         [JsonProperty("id")]
         public int Id;

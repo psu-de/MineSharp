@@ -18,7 +18,7 @@ namespace MineSharp.Pathfinding.Moves
         /// The relative position after the mvoe
         /// </summary>
         public abstract Vector3 MoveVector { get; }
-        
+
         /// <summary>
         /// TSC should be set in the OnTick method when the bot has completed the move
         /// </summary>
@@ -26,7 +26,7 @@ namespace MineSharp.Pathfinding.Moves
 
         internal Move(Movements movements)
         {
-            Movements = movements;
+            this.Movements = movements;
         }
 
         /// <summary>
@@ -41,19 +41,13 @@ namespace MineSharp.Pathfinding.Moves
         /// Called just before performing the move
         /// </summary>
         /// <param name="bot"></param>
-        protected virtual Task Prepare(MinecraftBot bot)
-        {
-            return Task.CompletedTask; 
-        }
+        protected virtual Task Prepare(MinecraftBot bot) => Task.CompletedTask;
 
         /// <summary>
         /// Called right after the move has been completed
         /// </summary>
         /// <param name="bot"></param>
-        protected virtual Task Finish(MinecraftBot bot)
-        {
-            return Task.CompletedTask;
-        }
+        protected virtual Task Finish(MinecraftBot bot) => Task.CompletedTask;
 
         /// <summary>
         /// Perform the move
@@ -65,10 +59,10 @@ namespace MineSharp.Pathfinding.Moves
             cancellation = cancellation ?? CancellationToken.None;
             this.TSC = new TaskCompletionSource();
             await this.Prepare(bot);
-            
-            bot.PhysicsTick += OnTick;
+
+            bot.PhysicsTick += this.OnTick;
             await this.TSC.Task.WaitAsync(cancellation.Value);
-            bot.PhysicsTick -= OnTick;
+            bot.PhysicsTick -= this.OnTick;
 
             await this.Finish(bot);
         }
@@ -78,7 +72,7 @@ namespace MineSharp.Pathfinding.Moves
         protected bool HasBlockSpaceForStanding(Vector3 pos, World.World world)
         {
             var playerBB = PhysicsConst.GetPlayerBoundingBox(pos);
-            
+
             var targetBlock = world.GetBlockAt(pos.Floored());
             var targetBBs = targetBlock.GetBoundingBoxes();
             if (targetBBs.Length == 0 || !targetBBs.Any(x => playerBB.Intersects(x)))

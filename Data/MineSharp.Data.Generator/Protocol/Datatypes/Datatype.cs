@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace MineSharp.Data.Generator.Protocol.Datatypes {
+namespace MineSharp.Data.Generator.Protocol.Datatypes
+{
 
-    internal class DatatypeNotFoundException : Exception { }
+    internal class DatatypeNotFoundException : Exception {}
 
-    internal abstract class Datatype {
+    internal abstract class Datatype
+    {
 
         public ProtoCompiler Compiler { get; set; }
         public JToken? Options { get; set; }
@@ -19,49 +21,55 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
 
         private bool IsStructureWritten = false;
 
-        public Datatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) {
+        public Datatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure)
+        {
             this.Compiler = compiler;
             this.Options = options;
             this.Name = name;
-            Container = container;
-            OuterStructure = outerStructure;
+            this.Container = container;
+            this.OuterStructure = outerStructure;
 
-            if (options != null) {
-                Namespace = "";
-                List<string> namespaces = new List<string>();
-                string[] paths = options.Path.Split('.');
-                for (int i = 0; i < paths.Length; i++) {
+            if (options != null)
+            {
+                this.Namespace = "";
+                var namespaces = new List<string>();
+                var paths = options.Path.Split('.');
+                for (var i = 0; i < paths.Length; i++)
+                {
                     namespaces.Add(paths[i]);
                     if (paths[i] == "types") break;
                 }
-                Namespace = string.Join(".", namespaces);
-                if (Namespace == "")
-                    Namespace = "types";
+                this.Namespace = string.Join(".", namespaces);
+                if (this.Namespace == "") this.Namespace = "types";
             }
         }
 
-        public string GetCSharpNamespace() {
+        public string GetCSharpNamespace()
+        {
 
-            if (OuterStructure != null) {
-                return OuterStructure.GetCSharpNamespace() + "." + OuterStructure.CSharpType;
+            if (this.OuterStructure != null)
+            {
+                return this.OuterStructure.GetCSharpNamespace() + "." + this.OuterStructure.CSharpType;
             }
 
-            var namespaces = Namespace!.Split(".");
-            var thisNs = string.Join(".", namespaces.Take(namespaces.ToList().IndexOf("types")).Select(x => Compiler.GetCSharpName(x)))
+            var namespaces = this.Namespace!.Split(".");
+            var thisNs = string.Join(".", namespaces.Take(namespaces.ToList().IndexOf("types")).Select(x => this.Compiler.GetCSharpName(x)))
                 .Replace("ToClient", "Clientbound")
                 .Replace("ToServer", "Serverbound");
 
-            return $"{Compiler.BaseNamespace}{(thisNs != "" ? "." + thisNs : "")}";
+            return $"{this.Compiler.BaseNamespace}{(thisNs != "" ? "." + thisNs : "")}";
         }
 
-        public bool IsInParentNamespace(Datatype dtype) {
-            if (Namespace == null || dtype.Namespace == null) throw new Exception();
-            var thisPaths = Namespace.Split('.');
+        public bool IsInParentNamespace(Datatype dtype)
+        {
+            if (this.Namespace == null || dtype.Namespace == null) throw new Exception();
+            var thisPaths = this.Namespace.Split('.');
             var otherPaths = dtype.Namespace.Split('.');
 
             if (otherPaths.Length > thisPaths.Length) return false;
 
-            for (int i = 0; i < otherPaths.Length; i++) {
+            for (var i = 0; i < otherPaths.Length; i++)
+            {
                 if (otherPaths[i] == "types") return true;
                 if (otherPaths[i] != thisPaths[i]) return false;
             }
@@ -71,16 +79,19 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
         public abstract string GetReader();
         public abstract string GetWriter();
 
-        public static Datatype Parse(ProtoCompiler compiler, JToken token, string name, ContainerDatatype? parent, StructureDatatype? outerStructure) {
+        public static Datatype Parse(ProtoCompiler compiler, JToken token, string name, ContainerDatatype? parent, StructureDatatype? outerStructure)
+        {
 
             if (compiler.DatatypeCache.ContainsKey(token.Path)) return compiler.DatatypeCache[token.Path];
 
             string typeRef;
             JToken? options = null;
 
-            if (token.Type == JTokenType.String) {
+            if (token.Type == JTokenType.String)
+            {
                 typeRef = (string)token!;
-            } else {
+            } else
+            {
                 typeRef = (string)((JArray)token)[0]!;
                 options = token[1]!;
             }
@@ -90,27 +101,34 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
             return newDtype;
         }
 
-        public static Datatype Create(ProtoCompiler compiler, string typeRef, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure) {
+        public static Datatype Create(ProtoCompiler compiler, string typeRef, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure)
+        {
 
 
-            if (compiler.UsedNativeTypes!.ContainsKey(typeRef)) {
+            if (compiler.UsedNativeTypes!.ContainsKey(typeRef))
+            {
                 var generator = compiler.UsedNativeTypes[typeRef];
                 var datatype = generator.Create(compiler, options, name, parent, outerStructure);
                 return datatype;
             }
 
-            if (!compiler.DefinedTypes!.TryGetValue(typeRef, out var dtype)) {
-                if (compiler.NativeTypes!.TryGetValue(typeRef, out var dtypeGen)) {
+            if (!compiler.DefinedTypes!.TryGetValue(typeRef, out var dtype))
+            {
+                if (compiler.NativeTypes!.TryGetValue(typeRef, out var dtypeGen))
+                {
                     return dtypeGen!.Create(compiler, options, name, parent, outerStructure); // For some reason, the native type 'mapper' is not defined in the minecraft-data protocol json as a native type, but is still used
-                } else {
+                } else
+                {
                     throw new DatatypeNotFoundException();
                 }
-            } else {
+            } else
+            {
                 //if (options != null) {
                 //    options = MergeOptions((JObject)dtype.Options!, (JObject)options);
                 //    return Create(compiler, dtype.TypeName, options, name, parent, outerStructure);
                 //}
-                if (options != null) {
+                if (options != null)
+                {
                     dtype.ExtraOptions = options;
                 }
                 return dtype;
@@ -118,23 +136,27 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
 
         }
 
-        private static JObject MergeOptions(JObject baseObj, JObject extended) {
+        private static JObject MergeOptions(JObject baseObj, JObject extended)
+        {
             var clone = (JObject)baseObj.DeepClone();
-            foreach (var prop in extended.Properties()) {
+            foreach (var prop in extended.Properties())
+            {
                 clone[prop.Name] = prop.Value;
             }
             return clone;
         }
 
-        public void DoWriteStructure(CodeGenerator codeGenerator, Datatype? writer) { 
-            if (IsStructureWritten) return;
+        public void DoWriteStructure(CodeGenerator codeGenerator, Datatype? writer)
+        {
+            if (this.IsStructureWritten) return;
             // only write structure if in correct namespace
 
-            if (Container != writer) return;
+            if (this.Container != writer) return;
 
-            if (Compiler.CurrentProtoNamespace == this.Namespace) {
-                IsStructureWritten = true;
-                WriteStructure(codeGenerator, writer);
+            if (this.Compiler.CurrentProtoNamespace == this.Namespace)
+            {
+                this.IsStructureWritten = true;
+                this.WriteStructure(codeGenerator, writer);
                 return;
             }
         }
@@ -142,30 +164,28 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
         protected abstract void WriteStructure(CodeGenerator codeGenerator, Datatype? writer);
     }
 
-    internal abstract class SimpleCSharpTypeDatatype : Datatype {
+    internal abstract class SimpleCSharpTypeDatatype : Datatype
+    {
 
-        public SimpleCSharpTypeDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
+        public SimpleCSharpTypeDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, {CSharpType}>)((buffer) => buffer.Read{TypeName}()))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, {CSharpType}>)((buffer, value) => buffer.Write{TypeName}(value)))";
-        }
+        public override string GetReader() => $"((Func<PacketBuffer, {this.CSharpType}>)((buffer) => buffer.Read{this.TypeName}()))";
+        public override string GetWriter() => $"((Action<PacketBuffer, {this.CSharpType}>)((buffer, value) => buffer.Write{this.TypeName}(value)))";
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) { }
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {}
     }
 
 
-    internal abstract class DatatypeGenerator {
+    internal abstract class DatatypeGenerator
+    {
 
         public ProtoCompiler Compiler;
 
         public abstract string TypeName { get; }
         public abstract bool IsGeneric { get; }
 
-        public DatatypeGenerator(ProtoCompiler compiler) {
+        public DatatypeGenerator(ProtoCompiler compiler)
+        {
             this.Compiler = compiler;
         }
 
@@ -175,37 +195,51 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
         public abstract void WriteClassWriter(CodeGenerator codeGenerator);
     }
 
-    internal abstract class DatatypeGenerator<T> : DatatypeGenerator where T : Datatype {
+    internal abstract class DatatypeGenerator<T> : DatatypeGenerator where T : Datatype
+    {
 
-        public DatatypeGenerator(ProtoCompiler compiler) : base(compiler) { }
+        public DatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
-        public override Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure) {
+        public override Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure)
+        {
             var type = typeof(T);
-            return (Datatype)Activator.CreateInstance(type, new object?[] { compiler, options, name, parent, outerStructure })!;
+            return (Datatype)Activator.CreateInstance(type, new object?[] {
+                compiler,
+                options,
+                name,
+                parent,
+                outerStructure
+            })!;
         }
     }
 
-    internal abstract class StructureDatatype : Datatype {
+    internal abstract class StructureDatatype : Datatype
+    {
 
         internal Dictionary<string, Field> RequiredParentFields = new Dictionary<string, Field>();
-        protected StructureDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
+        protected StructureDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
+        {
             if (options == null) throw new Exception();
         }
 
-        internal class Field {
+        internal class Field
+        {
             public string Name;
             public Datatype Type;
 
-            public Field(string name, Datatype type) {
-                Name = name;
-                Type = type;
+            public Field(string name, Datatype type)
+            {
+                this.Name = name;
+                this.Type = type;
             }
 
-            public static Field Parse(JObject obj, ContainerDatatype current) {
+            public static Field Parse(JObject obj, ContainerDatatype current)
+            {
 
 
-                string? name = (string?)obj.GetValue("name");
-                if (name == null) {
+                var name = (string?)obj.GetValue("name");
+                if (name == null)
+                {
                     name = "Anon";
                 }
 

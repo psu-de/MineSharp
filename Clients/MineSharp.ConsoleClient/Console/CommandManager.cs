@@ -7,21 +7,27 @@ using MineSharp.ConsoleClient.Console.Commands.Windows;
 using MineSharp.ConsoleClient.Console.Commands.World;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MineSharp.ConsoleClient.Console {
-    internal static class CommandManager {
+namespace MineSharp.ConsoleClient.Console
+{
+    internal static class CommandManager
+    {
 
         public static Dictionary<string, Command> Commands = new Dictionary<string, Command>();
 
-        static CommandManager() {
+        static CommandManager()
+        {
             CommandPalette.Initialize();
         }
 
-        public static void RegisterCommand(Command command) {
+        public static void RegisterCommand(Command command)
+        {
             Commands.Add(command.Name, command);
         }
 
-        public static bool TryGetCommand(string name, [NotNullWhen(true)] out  Command? command) {
-            if (!Commands.ContainsKey(name)) {
+        public static bool TryGetCommand(string name, [NotNullWhen(true)] out Command? command)
+        {
+            if (!Commands.ContainsKey(name))
+            {
                 command = null;
                 return false;
             }
@@ -30,11 +36,13 @@ namespace MineSharp.ConsoleClient.Console {
             return true;
         }
 
-        private static class CommandPalette {
+        private static class CommandPalette
+        {
 
-            static bool _initialized = false;
+            private static bool _initialized = false;
 
-            public static void Initialize() {
+            public static void Initialize()
+            {
 
                 if (_initialized) return;
 

@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-namespace MineSharp.Data.Generator.Entities {
+namespace MineSharp.Data.Generator.Entities
+{
 #pragma warning disable CS8618
-    internal class EntityJsonInfo {
+    internal class EntityJsonInfo
+    {
         [JsonProperty("id")]
         public int Id { get; set; }
 

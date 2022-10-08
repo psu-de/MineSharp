@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Logging {
-    public enum LogLevel {
+﻿namespace MineSharp.Core.Logging
+{
+    public enum LogLevel
+    {
         DEBUG3 = 6,
         DEBUG2 = 5,
         DEBUG = 4,
