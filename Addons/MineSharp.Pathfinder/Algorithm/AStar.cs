@@ -3,6 +3,7 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Pathfinding.Goals;
 using MineSharp.Pathfinding.Moves;
+using MineSharp.Physics;
 using MineSharp.World;
 using System.Reflection.Metadata;
 using Priority_Queue;
@@ -116,6 +117,10 @@ namespace MineSharp.Pathfinding.Algorithm
                 if (move.IsMovePossible(node.Position, this.World))
                 {
                     var pos = node.Position.Plus(move.MoveVector);
+                    if (!this.World.IsBlockLoaded(pos))
+                    {
+                        continue;
+                    }
                     var neighborNode = GetNodeForBlock(pos, ref nodes);
                     neighbors.Add((neighborNode, move));
                 }
@@ -132,7 +137,10 @@ namespace MineSharp.Pathfinding.Algorithm
                 return node;
             }
             
-            var newNode = new Node(pos, true, 0, 0);
+            var block = this.World.GetBlockAt(pos);
+            bool walkable = !(block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id));
+            
+            var newNode = new Node(pos, walkable, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);
             return newNode;
         }
