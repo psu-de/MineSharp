@@ -24,13 +24,13 @@ namespace MineSharp.Protocol
 
         private readonly CancellationTokenSource CancellationTokenSource;
         private readonly PacketFactory PacketFactory;
+
+        private readonly Queue<PacketSendTask> PacketQueue;
         private MinecraftStream? _stream;
         private Task? _streamLoopTask;
         internal int CompressionThreshold = -1;
 
         public IPacketHandler? PacketHandler;
-
-        private readonly Queue<PacketSendTask> PacketQueue;
 
         private byte[]? sharedSecret;
 
@@ -50,22 +50,18 @@ namespace MineSharp.Protocol
             this._client = new TcpClient();
         }
 
-        public string Version
-        {
+        public string Version {
             get;
         }
         public GameState GameState { get; private set; }
-        public string IPAddress
-        {
+        public string IPAddress {
             get;
         }
-        public int Port
-        {
+        public int Port {
             get;
         }
 
-        public Session Session
-        {
+        public Session Session {
             get;
         }
 
@@ -294,16 +290,13 @@ namespace MineSharp.Protocol
 
         private struct PacketSendTask
         {
-            public CancellationToken? CancellationToken
-            {
+            public CancellationToken? CancellationToken {
                 get;
             }
-            public IPacketPayload Packet
-            {
+            public IPacketPayload Packet {
                 get;
             }
-            public TaskCompletionSource SendingTsc
-            {
+            public TaskCompletionSource SendingTsc {
                 get;
             }
 

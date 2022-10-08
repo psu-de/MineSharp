@@ -2,18 +2,18 @@
 {
     public class IntBitArray
     {
-        public long[] Data { get; private set; }
-        public byte BitsPerEntry { get; private set; }
-        public int Capacity => this.ValuesPerLong * this.Data.Length;
-
-        private int ValuesPerLong => 64 / this.BitsPerEntry;
-        private long ValueMask => (1L << this.BitsPerEntry) - 1;
 
         public IntBitArray(long[] data, byte bitsPerEntry)
         {
             this.Data = data;
             this.BitsPerEntry = bitsPerEntry;
         }
+        public long[] Data { get; private set; }
+        public byte BitsPerEntry { get; private set; }
+        public int Capacity => this.ValuesPerLong * this.Data.Length;
+
+        private int ValuesPerLong => 64 / this.BitsPerEntry;
+        private long ValueMask => (1L << this.BitsPerEntry) - 1;
 
         public void ChangeBitsPerEntry(byte newBitsPerEntry)
         {

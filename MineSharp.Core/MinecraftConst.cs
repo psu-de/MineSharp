@@ -5,6 +5,5 @@
 
         public const int TickMs = 50;
         public const double VelocityToBlock = 8000;
-
     }
 }

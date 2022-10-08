@@ -3,13 +3,6 @@
     public class AABB
     {
 
-        public double MinX { get; set; }
-        public double MinY { get; set; }
-        public double MinZ { get; set; }
-        public double MaxX { get; set; }
-        public double MaxY { get; set; }
-        public double MaxZ { get; set; }
-
 
         public AABB(double x0, double y0, double z0, double x1, double y1, double z1)
         {
@@ -20,6 +13,13 @@
             this.MaxY = y1;
             this.MaxZ = z1;
         }
+
+        public double MinX { get; set; }
+        public double MinY { get; set; }
+        public double MinZ { get; set; }
+        public double MaxX { get; set; }
+        public double MaxY { get; set; }
+        public double MaxZ { get; set; }
 
         public override string ToString() => $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
 
@@ -135,19 +135,14 @@
                 if (this.MaxY < other.MinY || this.MinY > other.MaxY)
                 {
                     return false;
-                } else
-                {
-                    return this.MaxZ >= other.MinZ && this.MinZ <= other.MaxZ;
                 }
-            } else
-            {
-                return false;
+                return this.MaxZ >= other.MinZ && this.MinZ <= other.MaxZ;
             }
+            return false;
         }
 
         public bool Contains(double x, double y, double z) => this.MinX <= x && this.MaxX >= x &&
                                                               this.MinY <= y && this.MaxY >= y &&
                                                               this.MinZ <= z && this.MaxZ >= z;
-
     }
 }

@@ -22,8 +22,7 @@ namespace MineSharp.World
         }
         public ConcurrentDictionary<ulong, Block> Cache { get; set; }
 
-        private World World
-        {
+        private World World {
             get;
         }
 

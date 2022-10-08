@@ -5,7 +5,6 @@
 <#@ assembly name="$(SolutionDir)\MineSharp.Bot\bin\Debug\net6.0\MineSharp.Bot.dll" #>
 <#@ output extension=".md" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
 <#@ import namespace="System.Runtime.CompilerServices" #>
 <#@ import namespace="System.Text" #>

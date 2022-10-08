@@ -1,14 +1,9 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Moves;
-
 namespace MineSharp.Pathfinding
 {
     public class Movements
     {
-        public bool AllowSprinting { get; set; }
-        public bool AllowJumping { get; set; }
-
-        public Move[] PossibleMoves { get; private set; }
 
         public Movements(bool allowSprinting, bool allowJumping)
         {
@@ -21,13 +16,19 @@ namespace MineSharp.Pathfinding
         public Movements() : this(
             true,
             true) {}
+        public bool AllowSprinting { get; set; }
+        public bool AllowJumping { get; set; }
+
+        public Move[] PossibleMoves {
+            get;
+        }
 
         public Move GetMoveByVector(Vector3 movement)
         {
             var vec = this.PossibleMoves.FirstOrDefault(x => x.MoveVector == movement);
             if (vec == null)
             {
-                throw new Exception($"Move not found");
+                throw new Exception("Move not found");
             }
 
             return vec;
@@ -37,7 +38,7 @@ namespace MineSharp.Pathfinding
         {
             var moves = new List<Move>();
 
-            var directions = new Vector3[] {
+            var directions = new[] {
                 // direct neighbors
                 Vector3.North,
                 Vector3.East,

@@ -17,8 +17,7 @@ namespace MineSharp.Core.Logging
         }
 
 
-        public string Name
-        {
+        public string Name {
             get;
         }
         public static event LogMessageEvent? OnLogMessageReceieved;

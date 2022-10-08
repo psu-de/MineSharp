@@ -1,21 +1,8 @@
 ﻿using fNbt;
-
 namespace MineSharp.Core.Types
 {
     public class Item
     {
-
-        public int Id { get; }
-        public string DisplayName { get; }
-        public string Name { get; }
-        public byte StackSize { get; }
-        public int? MaxDurability { get; }
-        public string[]? EnchantCategories { get; }
-        public string[]? RepairWith { get; }
-
-        public byte Count { get; set; }
-        public int? Damage { get; set; }
-        public NbtCompound? Metadata { get; set; } // TODO: Deconstruct metadata
 
         public Item(int id, string displayName, string name, byte stackSize, int? maxDurability, string[]? enchantCategories, string[]? repairWith)
         {
@@ -34,6 +21,18 @@ namespace MineSharp.Core.Types
             this.Damage = damage;
             this.Metadata = metadata;
         }
+
+        public int Id { get; }
+        public string DisplayName { get; }
+        public string Name { get; }
+        public byte StackSize { get; }
+        public int? MaxDurability { get; }
+        public string[]? EnchantCategories { get; }
+        public string[]? RepairWith { get; }
+
+        public byte Count { get; set; }
+        public int? Damage { get; set; }
+        public NbtCompound? Metadata { get; set; } // TODO: Deconstruct metadata
 
         public override string ToString() => $"Item (Name={this.Name} Id={this.Id} Count={this.Count} Metadata={(this.Metadata == null ? "None" : this.Metadata.ToString())})";
 

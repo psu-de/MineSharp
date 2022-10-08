@@ -7,10 +7,10 @@ namespace MineSharp.Data.Generator
     internal class MinecraftDataHelper
     {
 
+        private readonly DataPathsJson DataPaths;
+
 
         public string DataPath;
-
-        private readonly DataPathsJson DataPaths;
 
         public MinecraftDataHelper(string dataPath)
         {

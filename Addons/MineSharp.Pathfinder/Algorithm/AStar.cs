@@ -5,19 +5,13 @@ using MineSharp.Pathfinding.Goals;
 using MineSharp.Pathfinding.Moves;
 using MineSharp.Physics;
 using MineSharp.World;
-using System.Reflection.Metadata;
 using Priority_Queue;
-
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class AStar
     {
-        private static readonly Logger Logger = Logger.GetLogger();
         public const int DEFAULT_MAX_NODES = 5000;
-
-        public MinecraftPlayer Player { get; set; }
-        public World.World World { get; set; }
-        public Movements Movements { get; set; }
+        private static readonly Logger Logger = Logger.GetLogger();
 
         public AStar(MinecraftPlayer player, World.World world, Movements? movements = null)
         {
@@ -25,6 +19,10 @@ namespace MineSharp.Pathfinding.Algorithm
             this.World = world;
             this.Movements = movements ?? new Movements();
         }
+
+        public MinecraftPlayer Player { get; set; }
+        public World.World World { get; set; }
+        public Movements Movements { get; set; }
 
         public Node[] ComputePath(Goal goal, double? timeout = null, int maxNodes = DEFAULT_MAX_NODES)
         {
@@ -43,7 +41,7 @@ namespace MineSharp.Pathfinding.Algorithm
 
                 if (!endNode.Walkable)
                 {
-                    throw new Exception($"Target block is not walkable");
+                    throw new Exception("Target block is not walkable");
                 }
 
                 openSet.Enqueue(startNode, startNode.fCost);

@@ -1,10 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Bot.Modules;
-using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Algorithm;
 using MineSharp.Pathfinding.Goals;
-using MineSharp.Pathfinding.Moves;
-
 namespace MineSharp.Pathfinding
 {
     public class PathfinderModule : Module

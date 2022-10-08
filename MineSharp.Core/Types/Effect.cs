@@ -3,15 +3,6 @@
     public abstract class Effect
     {
 
-        public int Id { get; }
-        public string Name { get; }
-        public string DisplayName { get; }
-        public bool IsGood { get; }
-
-        public DateTime StartTime { get; set; }
-        public int Amplifier { get; set; }
-        public int Duration { get; set; }
-
         public Effect(int id, string name, string displayName, bool isGood)
         {
             this.Id = id;
@@ -28,7 +19,15 @@
             this.Duration = duration;
         }
 
-        public override string ToString() => $"Effect (Name={this.Name} Id={this.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
+        public int Id { get; }
+        public string Name { get; }
+        public string DisplayName { get; }
+        public bool IsGood { get; }
 
+        public DateTime StartTime { get; set; }
+        public int Amplifier { get; set; }
+        public int Duration { get; set; }
+
+        public override string ToString() => $"Effect (Name={this.Name} Id={this.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
     }
 }

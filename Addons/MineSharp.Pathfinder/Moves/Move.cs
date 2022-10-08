@@ -2,35 +2,36 @@
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Physics;
-
 namespace MineSharp.Pathfinding.Moves
 {
     public abstract class Move
     {
-        protected Movements Movements { get; private set; }
-
-        /// <summary>
-        /// Cost for A* Algorithm. With a higher cost, the move will be performed less likely.
-        /// </summary>
-        public abstract float MoveCost { get; }
-
-        /// <summary>
-        /// The relative position after the mvoe
-        /// </summary>
-        public abstract Vector3 MoveVector { get; }
-
-        /// <summary>
-        /// TSC should be set in the OnTick method when the bot has completed the move
-        /// </summary>
-        protected TaskCompletionSource TSC { get; private set; }
 
         internal Move(Movements movements)
         {
             this.Movements = movements;
         }
+        protected Movements Movements {
+            get;
+        }
 
         /// <summary>
-        /// Checks whether the move is possible from a given start position
+        ///     Cost for A* Algorithm. With a higher cost, the move will be performed less likely.
+        /// </summary>
+        public abstract float MoveCost { get; }
+
+        /// <summary>
+        ///     The relative position after the mvoe
+        /// </summary>
+        public abstract Vector3 MoveVector { get; }
+
+        /// <summary>
+        ///     TSC should be set in the OnTick method when the bot has completed the move
+        /// </summary>
+        protected TaskCompletionSource TSC { get; private set; }
+
+        /// <summary>
+        ///     Checks whether the move is possible from a given start position
         /// </summary>
         /// <param name="startPosition"></param>
         /// <param name="world"></param>
@@ -38,21 +39,21 @@ namespace MineSharp.Pathfinding.Moves
         public abstract bool IsMovePossible(Vector3 startPosition, World.World world);
 
         /// <summary>
-        /// Called just before performing the move
+        ///     Called just before performing the move
         /// </summary>
         /// <param name="bot"></param>
         protected virtual Task Prepare(MinecraftBot bot) => Task.CompletedTask;
 
         /// <summary>
-        /// Called right after the move has been completed
+        ///     Called right after the move has been completed
         /// </summary>
         /// <param name="bot"></param>
         protected virtual Task Finish(MinecraftBot bot) => Task.CompletedTask;
 
         /// <summary>
-        /// Perform the move
+        ///     Perform the move
         /// </summary>
-        /// <param name="bot">The <see cref="MinecraftBot"/> that should perform the move</param>
+        /// <param name="bot">The <see cref="MinecraftBot" /> that should perform the move</param>
         /// <returns></returns>
         public async Task PerformMove(MinecraftBot bot, CancellationToken? cancellation = null)
         {

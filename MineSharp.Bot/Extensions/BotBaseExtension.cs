@@ -22,8 +22,7 @@ namespace MineSharp.Bot
         ///     <see cref="Protocol.Packets.Clientbound.Play.UpdateHealthPacket" /> is received). Food and Saturation were also
         ///     updated when this event fires.
         /// </summary>
-        public event BotEmptyEvent HealthChanged
-        {
+        public event BotEmptyEvent HealthChanged {
             add => this.BaseModule!.HealthChanged += value;
             remove => this.BaseModule!.HealthChanged -= value;
         }
@@ -32,8 +31,7 @@ namespace MineSharp.Bot
         ///     This event fires whenever the Bot respawned / changed dimension (
         ///     <see cref="Protocol.Packets.Clientbound.Play.RespawnPacket" /> is received).
         /// </summary>
-        public event BotEmptyEvent Respawned
-        {
+        public event BotEmptyEvent Respawned {
             add => this.BaseModule!.Respawned += value;
             remove => this.BaseModule!.HealthChanged -= value;
         }
@@ -42,8 +40,7 @@ namespace MineSharp.Bot
         ///     This event fires whenever the Bot dies (<see cref="Protocol.Packets.Clientbound.Play.DeathCombatEventPacket" /> is
         ///     received).
         /// </summary>
-        public event BotChatEvent Died
-        {
+        public event BotChatEvent Died {
             add => this.BaseModule!.Died += value;
             remove => this.BaseModule!.Died -= value;
         }
@@ -51,8 +48,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when a chat message from another player is received
         /// </summary>
-        public event BotChatSenderEvent ChatReceived
-        {
+        public event BotChatSenderEvent ChatReceived {
             add => this.BaseModule!.ChatReceived += value;
             remove => this.BaseModule!.ChatReceived -= value;
         }

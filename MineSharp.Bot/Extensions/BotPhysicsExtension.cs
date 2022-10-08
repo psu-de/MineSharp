@@ -13,8 +13,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when the Bot <see cref="BotEntity" /> moves
         /// </summary>
-        public event BotPlayerEvent BotMoved
-        {
+        public event BotPlayerEvent BotMoved {
             add => this.PhysicsModule!.BotMoved += value;
             remove => this.PhysicsModule!.BotMoved -= value;
         }
@@ -22,8 +21,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires just before a physics tick
         /// </summary>
-        public event BotEmptyEvent PhysicsTick
-        {
+        public event BotEmptyEvent PhysicsTick {
             add => this.PhysicsModule!.PhysicsTick += value;
             remove => this.PhysicsModule!.PhysicsTick -= value;
         }

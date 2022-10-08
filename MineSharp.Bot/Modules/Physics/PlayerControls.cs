@@ -21,11 +21,9 @@ namespace MineSharp.Bot.Modules.Physics
         }
         public MinecraftBot Bot { get; set; }
 
-        public bool IsSprinting
-        {
+        public bool IsSprinting {
             get => this._isSprinting;
-            set
-            {
+            set {
                 if (value == this._isSprinting) return;
 
                 if (value)
@@ -37,11 +35,9 @@ namespace MineSharp.Bot.Modules.Physics
                 }
             }
         }
-        public bool IsSneaking
-        {
+        public bool IsSneaking {
             get => this._isSneaking;
-            set
-            {
+            set {
                 if (value == this._isSneaking) return;
 
                 if (value)
@@ -54,41 +50,33 @@ namespace MineSharp.Bot.Modules.Physics
             }
         }
 
-        public bool IsWalkingForward
-        {
+        public bool IsWalkingForward {
             get => this._walkForward;
-            set
-            {
+            set {
                 if (this._walkForward == value) return;
                 if (value) this.Walk(WalkDirection.Forward);
                 else this.StopWalk(WalkDirection.Forward);
             }
         }
-        public bool IsWalkingBackward
-        {
+        public bool IsWalkingBackward {
             get => this._walkBackward;
-            set
-            {
+            set {
                 if (this._walkBackward == value) return;
                 if (value) this.Walk(WalkDirection.Backward);
                 else this.StopWalk(WalkDirection.Backward);
             }
         }
-        public bool IsWalkingRight
-        {
+        public bool IsWalkingRight {
             get => this._walkRight;
-            set
-            {
+            set {
                 if (this._walkRight == value) return;
                 if (value) this.Walk(WalkDirection.Right);
                 else this.StopWalk(WalkDirection.Right);
             }
         }
-        public bool IsWalkingLeft
-        {
+        public bool IsWalkingLeft {
             get => this._walkLeft;
-            set
-            {
+            set {
                 if (this._walkLeft == value) return;
                 if (value) this.Walk(WalkDirection.Left);
                 else this.StopWalk(WalkDirection.Left);

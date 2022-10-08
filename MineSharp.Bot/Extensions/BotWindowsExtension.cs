@@ -28,8 +28,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when a new window has been opened
         /// </summary>
-        public event BotWindowEvent WindowOpened
-        {
+        public event BotWindowEvent WindowOpened {
             add => this.WindowsModule!.WindowOpened += value;
             remove => this.WindowsModule!.WindowOpened -= value;
         }
@@ -37,8 +36,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when the held item changed
         /// </summary>
-        public event BotItemEvent HeldItemChanged
-        {
+        public event BotItemEvent HeldItemChanged {
             add => this.WindowsModule!.HeldItemChanged += value;
             remove => this.WindowsModule!.HeldItemChanged -= value;
         }

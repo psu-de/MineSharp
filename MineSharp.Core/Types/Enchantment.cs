@@ -16,21 +16,6 @@
     public abstract class Enchantment
     {
 
-        public int Id { get; }
-        public string Name { get; }
-        public string DisplayName { get; }
-        public int MaxLevel { get; }
-        public EnchantCost MinCost { get; }
-        public EnchantCost MaxCost { get; }
-        public bool TreasureOnly { get; }
-        public bool Curse { get; }
-        public Type[] Exclude { get; }
-        public int Category { get; }
-        public int Weight { get; }
-        public bool Discoverable { get; }
-
-        public int Level { get; set; }
-
 
         public Enchantment(int id, string name, string displayName, int maxLevel, EnchantCost minCost, EnchantCost maxCost, bool treasureOnly, bool curse, Type[] exclude, int category, int weight, bool discoverable)
         {
@@ -53,6 +38,21 @@
         {
             this.Level = level;
         }
+
+        public int Id { get; }
+        public string Name { get; }
+        public string DisplayName { get; }
+        public int MaxLevel { get; }
+        public EnchantCost MinCost { get; }
+        public EnchantCost MaxCost { get; }
+        public bool TreasureOnly { get; }
+        public bool Curse { get; }
+        public Type[] Exclude { get; }
+        public int Category { get; }
+        public int Weight { get; }
+        public bool Discoverable { get; }
+
+        public int Level { get; set; }
 
         public override string ToString() => $"Enchantment (Name={this.Name} Id={this.Id} Level={this.Level})";
     }

@@ -14,8 +14,7 @@ namespace MineSharp.Bot.Modules
             this.Bot = bot;
         }
         public bool IsLoaded { get; private set; }
-        public bool IsEnabled
-        {
+        public bool IsEnabled {
             get;
             private set;
         }

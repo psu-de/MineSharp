@@ -175,9 +175,9 @@ public void WriteBuffer(byte[] array, Action<PacketBuffer, VarInt> lengthEncoder
 
     internal class MapperDatatype : Datatype
     {
+        private readonly Dictionary<string, string> Mapping;
 
         internal Datatype InnerType;
-        private readonly Dictionary<string, string> Mapping;
 
         public MapperDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
         {

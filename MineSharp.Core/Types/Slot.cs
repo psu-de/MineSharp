@@ -1,16 +1,16 @@
 ﻿namespace MineSharp.Core.Types
 {
-    public partial class Slot
+    public class Slot
     {
-
-        public Item? Item { get; set; } = null;
-        public short SlotNumber { get; set; }
 
         public Slot(Item? item, short slotNumber)
         {
             this.Item = item;
             this.SlotNumber = slotNumber;
         }
+
+        public Item? Item { get; set; }
+        public short SlotNumber { get; set; }
 
         public bool IsEmpty() => this.Item == null;
 
@@ -28,7 +28,8 @@
 
                 return this.Item!.StackSize - this.Item.Count > 0;
 
-            } else return false;
+            }
+            return false;
         }
 
         public Slot Clone() => new Slot(this.Item, this.SlotNumber);

@@ -3,10 +3,6 @@
     public class Position
     {
 
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public int Z { get; private set; }
-
         public Position(ulong value)
         {
             this.X = (int)(value >> 38);
@@ -23,6 +19,16 @@
             this.X = x;
             this.Y = y;
             this.Z = z;
+        }
+
+        public int X {
+            get;
+        }
+        public int Y {
+            get;
+        }
+        public int Z {
+            get;
         }
 
         public ulong ToULong() => ((ulong)this.X & 0x3FFFFFF) << 38 | ((ulong)this.Z & 0x3FFFFFF) << 12 | (ulong)this.Y & 0xFFF;

@@ -16,8 +16,7 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
 
 
         public string CSharpType { get; set; }
-        private string TypeRef
-        {
+        private string TypeRef {
             get;
         }
         public override void WriteClassReader(CodeGenerator codeGenerator)

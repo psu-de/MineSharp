@@ -5,9 +5,6 @@
 
         public const string DefaultNamespace = "minecraft";
 
-        public string Namespace { get; private set; }
-        public string Value { get; private set; }
-
         public Identifier(string identifier)
         {
             var namespaceSplit = identifier.IndexOf(":");
@@ -26,6 +23,13 @@
         {
             this.Namespace = Namespace;
             this.Value = value;
+        }
+
+        public string Namespace {
+            get;
+        }
+        public string Value {
+            get;
         }
 
         public override string ToString() => this.Namespace + ":" + this.Value;

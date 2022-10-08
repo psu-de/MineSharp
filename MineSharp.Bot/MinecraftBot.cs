@@ -14,18 +14,18 @@ namespace MineSharp.Bot
     {
 
         private static readonly Logger Logger = Logger.GetLogger();
+        private readonly Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
+
+        private readonly Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
+        private readonly List<TickedModule> TickedModules = new List<TickedModule>();
 
         public BaseModule? BaseModule;
 
         public EntityModule? EntityModule;
 
         public List<Module> Modules = new List<Module>();
-        private readonly Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
-
-        private readonly Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
         public PhysicsModule? PhysicsModule;
         public PlayerModule? PlayerModule;
-        private readonly List<TickedModule> TickedModules = new List<TickedModule>();
         private Task? TickLoopTask;
         public WindowsModule? WindowsModule;
         public WorldModule? WorldModule;
@@ -60,16 +60,13 @@ namespace MineSharp.Bot
             this.WindowsModule = new WindowsModule(this);
         }
 
-        public MinecraftClient Client
-        {
+        public MinecraftClient Client {
             get;
         }
-        public BotOptions Options
-        {
+        public BotOptions Options {
             get;
         }
-        public Session Session
-        {
+        public Session Session {
             get;
         }
 

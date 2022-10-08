@@ -22,8 +22,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when an entity spawned in the players View Distance or when a player walks into View Distance
         /// </summary>
-        public event BotEntityEvent EntitySpawned
-        {
+        public event BotEntityEvent EntitySpawned {
             add => this.EntityModule!.EntitySpawned += value;
             remove => this.EntityModule!.EntitySpawned -= value;
         }
@@ -31,8 +30,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when an entity despawned in the players View Distance
         /// </summary>
-        public event BotEntityEvent EntityDespawned
-        {
+        public event BotEntityEvent EntityDespawned {
             add => this.EntityModule!.EntityDespawned += value;
             remove => this.EntityModule!.EntityDespawned -= value;
         }
@@ -40,8 +38,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when an entity moved
         /// </summary>
-        public event BotEntityEvent EntityMoved
-        {
+        public event BotEntityEvent EntityMoved {
             add => this.EntityModule!.EntityMoved += value;
             remove => this.EntityModule!.EntityMoved -= value;
         }
@@ -49,8 +46,7 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when an entity's effect is added / removed / updated
         /// </summary>
-        public event BotEntityEvent EntityEffectChanged
-        {
+        public event BotEntityEvent EntityEffectChanged {
             add => this.EntityModule!.EntityEffectChanged += value;
             remove => this.EntityModule!.EntityEffectChanged -= value;
         }

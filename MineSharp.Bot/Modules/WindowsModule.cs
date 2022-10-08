@@ -66,8 +66,7 @@ namespace MineSharp.Bot.Modules
             this.MainInventory.WindowSlotUpdated += this.MainInventory_SlotUpdated;
         }
 
-        private Window MainInventory
-        {
+        private Window MainInventory {
             get;
         }
 

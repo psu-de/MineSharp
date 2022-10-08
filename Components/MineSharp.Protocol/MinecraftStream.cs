@@ -9,10 +9,10 @@ namespace MineSharp.Protocol
 
         private static Logger Logger = Logger.GetLogger();
 
+        private readonly NetworkStream _networkStream;
+
         private Stream _baseStream;
         private AesStream? _encryptionStream;
-
-        private readonly NetworkStream _networkStream;
 
         public MinecraftStream(NetworkStream stream)
         {

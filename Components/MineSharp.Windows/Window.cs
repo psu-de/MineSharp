@@ -47,8 +47,7 @@ namespace MineSharp.Windows
             this.SelectedSlot = new Slot(null, -1);
         }
 
-        public WindowInfo Info
-        {
+        public WindowInfo Info {
             get;
         }
 
@@ -61,13 +60,11 @@ namespace MineSharp.Windows
         public int TotalSlotCount => (this.Info.ExcludeInventory ? this.Info.UniqueSlots : this.HotbarEnd + 1) + (this.Info.HasOffHandSlot ? 1 : 0);
 
 
-        public int Id
-        {
+        public int Id {
             get;
         }
         private Slot[] ContainerSlots { get; set; }
-        private Slot? OffHandSlot
-        {
+        private Slot? OffHandSlot {
             get;
             set;
         }

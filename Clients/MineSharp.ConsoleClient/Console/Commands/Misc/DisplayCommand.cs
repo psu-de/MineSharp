@@ -109,7 +109,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
             {
                 if (effect == null) continue;
                 var eColor = effect.IsGood ? "springgreen2" : "red1";
-                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), (effect.Duration * MinecraftConst.TickMs / 1000) + "s");
+                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), effect.Duration * MinecraftConst.TickMs / 1000 + "s");
             }
 
             masterTable.AddRow(new Markup("\n[green underline]Effects[/]"), effectsInfo);

@@ -3,17 +3,12 @@ using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-
 namespace MineSharp.Pathfinding.Moves
 {
     public class JumpUpMove : Move
     {
-        private static readonly Logger Logger = Logger.GetLogger();
         private const double THRESHOLD = 0.525d;
-
-        public override float MoveCost => 5;
-
-        public override Vector3 MoveVector { get; }
+        private static readonly Logger Logger = Logger.GetLogger();
 
         private Vector3 _target;
 
@@ -21,6 +16,10 @@ namespace MineSharp.Pathfinding.Moves
         {
             this.MoveVector = direction.Plus(Vector3.Up);
         }
+
+        public override float MoveCost => 5;
+
+        public override Vector3 MoveVector { get; }
 
         public override bool IsMovePossible(Vector3 startPosition, World.World world)
         {
@@ -75,7 +74,6 @@ namespace MineSharp.Pathfinding.Moves
             if (deltaY < 0.2 && delta.Length() <= THRESHOLD)
             {
                 this.TSC.SetResult();
-                return;
             }
         }
     }

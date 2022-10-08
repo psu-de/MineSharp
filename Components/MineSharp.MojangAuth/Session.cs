@@ -22,28 +22,22 @@ namespace MineSharp.MojangAuth
         }
 
 
-        public string Username
-        {
+        public string Username {
             get;
         }
-        public string Password
-        {
+        public string Password {
             get;
         }
-        public UUID UUID
-        {
+        public UUID UUID {
             get;
         }
-        public string ClientToken
-        {
+        public string ClientToken {
             get;
         }
-        public string SessionToken
-        {
+        public string SessionToken {
             get;
         }
-        public bool OnlineSession
-        {
+        public bool OnlineSession {
             get;
         }
 

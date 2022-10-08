@@ -2,6 +2,13 @@
 {
     public class Attribute
     {
+
+        public Attribute(string key, double @base, List<Modifier> modifiers)
+        {
+            this.Key = key;
+            this.Base = @base;
+            this.Modifiers = modifiers.ToDictionary(x => x.UUID);
+        }
         public string Key { get; set; }
         public double Base { get; set; }
         public Dictionary<UUID, Modifier> Modifiers { get; set; }
@@ -19,13 +26,6 @@
                         _ => throw new NotSupportedException($"Modifier operation {op} not supported")
                     };
                 });
-
-        public Attribute(string key, double @base, List<Modifier> modifiers)
-        {
-            this.Key = key;
-            this.Base = @base;
-            this.Modifiers = modifiers.ToDictionary(x => x.UUID);
-        }
     }
 
     public enum ModifierOp

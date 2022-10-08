@@ -15,16 +15,13 @@ namespace MineSharp.Data.Windows
 
         public Identifier Name { get; set; }
         public string Title { get; set; }
-        public int UniqueSlots
-        {
+        public int UniqueSlots {
             get;
         }
-        public bool ExcludeInventory
-        {
+        public bool ExcludeInventory {
             get;
         }
-        public bool HasOffHandSlot
-        {
+        public bool HasOffHandSlot {
             get;
         }
     }

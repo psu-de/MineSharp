@@ -1,17 +1,10 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Pathfinding.Moves;
 using Priority_Queue;
-
 namespace MineSharp.Pathfinding.Algorithm
 {
     public class Node : FastPriorityQueueNode
     {
-        public Vector3 Position { get; set; }
-        public bool Walkable { get; set; }
-
-        public float gCost { get; set; }
-        public float hCost { get; set; }
-        public float fCost => this.gCost + this.hCost;
 
         public Move? Move;
         public Node? Parent;
@@ -23,6 +16,12 @@ namespace MineSharp.Pathfinding.Algorithm
             this.gCost = gCost;
             this.hCost = hCost;
         }
+        public Vector3 Position { get; set; }
+        public bool Walkable { get; set; }
+
+        public float gCost { get; set; }
+        public float hCost { get; set; }
+        public float fCost => this.gCost + this.hCost;
 
         public override string ToString() => $"Node (Pos={this.Position} Walkable={this.Walkable} gCost={this.gCost} hCost={this.hCost} fCost={this.fCost})";
     }
