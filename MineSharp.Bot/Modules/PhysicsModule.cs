@@ -1,5 +1,6 @@
 ﻿using MineSharp.Bot.Modules.Physics;
 using MineSharp.Core.Types;
+using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.Physics;
 using static MineSharp.Bot.MinecraftBot;
 
@@ -8,40 +9,30 @@ namespace MineSharp.Bot.Modules
     public class PhysicsModule : TickedModule
     {
 
+        private const double POSITION_THRESHOLD = 0.2d;
+
+        private readonly List<(Vector3, TaskCompletionSource)> AwaitedPositions = new List<(Vector3, TaskCompletionSource)>();
+        private PlayerInfoState LastPlayerState;
+
         public PhysicsEngine? Physics;
 
         public PlayerControls PlayerControls;
-        private PlayerInfoState LastPlayerState = new PlayerInfoState();
-
-        private List<(Vector3, TaskCompletionSource)> AwaitedPositions = new List<(Vector3, TaskCompletionSource)>();
-
-        /// <summary>
-        /// Fires when the Bot <see cref="BotEntity"/> moves
-        /// </summary>
-        public event BotPlayerEvent? BotMoved;
-
-        /// <summary>
-        /// Fires just before executing a physics tick
-        /// </summary>
-        public event BotEmptyEvent? PhysicsTick;
-
-        private struct PlayerInfoState
-        {
-            public double X;
-            public double Y;
-            public double Z;
-            public float Yaw;
-            public float Pitch;
-            public bool IsOnGround;
-
-            public override string ToString() => $"X={this.X} Y={this.Y} Z={this.Z} Yaw={this.Yaw} Pitch={this.Pitch} IsOnGround={this.IsOnGround}";
-        }
 
         public PhysicsModule(MinecraftBot bot) : base(bot)
         {
             this.PlayerControls = new PlayerControls(bot);
             this.BotMoved += this.handleBotMoved;
         }
+
+        /// <summary>
+        ///     Fires when the Bot <see cref="BotEntity" /> moves
+        /// </summary>
+        public event BotPlayerEvent? BotMoved;
+
+        /// <summary>
+        ///     Fires just before executing a physics tick
+        /// </summary>
+        public event BotEmptyEvent? PhysicsTick;
 
         protected override async Task Load()
         {
@@ -81,7 +72,7 @@ namespace MineSharp.Bot.Modules
 
         private async Task UpdateServerPos()
         {
-            var packet = new Data.Protocol.Play.Serverbound.PacketPositionLook(this.Bot.BotEntity!.Position.X, this.Bot.BotEntity.Position.Y, this.Bot.BotEntity.Position.Z, this.Bot.BotEntity.Yaw, this.Bot.BotEntity.Pitch, this.Bot.BotEntity.IsOnGround);
+            var packet = new PacketPositionLook(this.Bot.BotEntity!.Position.X, this.Bot.BotEntity.Position.Y, this.Bot.BotEntity.Position.Z, this.Bot.BotEntity.Yaw, this.Bot.BotEntity.Pitch, this.Bot.BotEntity.IsOnGround);
 
 
             this.LastPlayerState.X = this.Bot.BotEntity.Position.X;
@@ -96,7 +87,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Forces the bots rotation to the given yaw and pitch (in degrees)
+        ///     Forces the bots rotation to the given yaw and pitch (in degrees)
         /// </summary>
         /// <param name="yaw"></param>
         /// <param name="pitch"></param>
@@ -107,7 +98,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Forces the bot to look at given position
+        ///     Forces the bot to look at given position
         /// </summary>
         /// <param name="position"></param>
         public void ForceLookAt(Position position)
@@ -120,8 +111,6 @@ namespace MineSharp.Bot.Modules
             var pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
             this.ForceSetRotation((float)yaw, (float)pitch);
         }
-
-        private const double POSITION_THRESHOLD = 0.2d;
         private void handleBotMoved(MinecraftBot sender, MinecraftPlayer entity)
         {
             foreach ((var pos, var tsc) in this.AwaitedPositions.ToArray())
@@ -146,6 +135,18 @@ namespace MineSharp.Bot.Modules
             var tsc = new TaskCompletionSource();
             this.AwaitedPositions.Add((pos, tsc));
             return tsc.Task;
+        }
+
+        private struct PlayerInfoState
+        {
+            public double X;
+            public double Y;
+            public double Z;
+            public float Yaw;
+            public float Pitch;
+            public bool IsOnGround;
+
+            public override string ToString() => $"X={this.X} Y={this.Y} Z={this.Z} Yaw={this.Yaw} Pitch={this.Pitch} IsOnGround={this.IsOnGround}";
         }
     }
 }

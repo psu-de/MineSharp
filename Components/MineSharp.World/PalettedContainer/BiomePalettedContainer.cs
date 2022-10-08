@@ -1,39 +1,20 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Protocol;
 using MineSharp.World.PalettedContainer.Palettes;
-
 namespace MineSharp.World.PalettedContainer
 {
     public class BiomePalettedContainer : IPalettedContainer
     {
-
-        public static BiomePalettedContainer Read(PacketBuffer buffer)
-        {
-            var bitsPerEntry = buffer.ReadU8();
-            var palette = GetPalette(bitsPerEntry);
-            palette.Read(buffer);
-
-            var data = new long[buffer.ReadVarInt()];
-            for (var i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
-
-            return new BiomePalettedContainer(palette, new IntBitArray(data, bitsPerEntry));
-        }
-
-        private static IPalette GetPalette(byte bitsPerEntry) => bitsPerEntry switch {
-            0 => new SingleValuePalette(),
-            <= IndirectPalette.BIOME_MAX_BITS => new IndirectPalette(),
-            _ => new DirectPalette()
-        };
-
-        public IPalette Palette { get; set; }
-        public int Capacity => 4 * 4 * 4;
-        public IntBitArray Data { get; set; }
 
         public BiomePalettedContainer(IPalette palette, IntBitArray data)
         {
             this.Palette = palette;
             this.Data = data;
         }
+
+        public IPalette Palette { get; set; }
+        public int Capacity => 4 * 4 * 4;
+        public IntBitArray Data { get; set; }
 
         public int GetAt(int index)
         {
@@ -99,5 +80,23 @@ namespace MineSharp.World.PalettedContainer
             }
 
         }
+
+        public static BiomePalettedContainer Read(PacketBuffer buffer)
+        {
+            var bitsPerEntry = buffer.ReadU8();
+            var palette = GetPalette(bitsPerEntry);
+            palette.Read(buffer);
+
+            var data = new long[buffer.ReadVarInt()];
+            for (var i = 0; i < data.Length; i++) data[i] = buffer.ReadI64();
+
+            return new BiomePalettedContainer(palette, new IntBitArray(data, bitsPerEntry));
+        }
+
+        private static IPalette GetPalette(byte bitsPerEntry) => bitsPerEntry switch {
+            0 => new SingleValuePalette(),
+            <= IndirectPalette.BIOME_MAX_BITS => new IndirectPalette(),
+            _ => new DirectPalette()
+        };
     }
 }

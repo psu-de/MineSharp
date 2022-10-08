@@ -1,56 +1,38 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Data.Protocol.Handshaking.Serverbound;
+using MineSharp.Data.Protocol.Login.Serverbound;
+using MineSharp.Data.Protocol.Status.Serverbound;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol.Handlers;
 using System.Net;
 using System.Net.Sockets;
-using MineSharp.Data;
-
 namespace MineSharp.Protocol
 {
     public class MinecraftClient
     {
+        public delegate void ClientPacketEvent(MinecraftClient client, IPacketPayload packet);
+
+        public delegate void ClientStringEvent(MinecraftClient client, string message);
 
         private static readonly Logger Logger = Logger.GetLogger();
 
-        public string Version { get; private set; }
-        public GameState GameState { get; private set; }
-        public string IPAddress { get; private set; }
-        public int Port { get; private set; }
+        private readonly TcpClient _client;
+        private readonly CancellationToken CancellationToken;
 
-        public Session Session { get; private set; }
-
-        public delegate void ClientStringEvent(MinecraftClient client, string message);
-        public delegate void ClientPacketEvent(MinecraftClient client, IPacketPayload packet);
-
-        /// <summary>
-        /// Fires when the client Disconnected
-        /// </summary>
-        public event ClientStringEvent? Disconnected;
-
-        /// <summary>
-        /// Fires when a packet has been received
-        /// </summary>
-        public event ClientPacketEvent? PacketReceived;
-
-        /// <summary>
-        /// Fires when a packet has been sent
-        /// </summary>
-        public event ClientPacketEvent? PacketSent;
+        private readonly CancellationTokenSource CancellationTokenSource;
+        private readonly PacketFactory PacketFactory;
+        private MinecraftStream? _stream;
+        private Task? _streamLoopTask;
+        internal int CompressionThreshold = -1;
 
         public IPacketHandler? PacketHandler;
 
-        private readonly TcpClient _client;
-        private MinecraftStream? _stream;
+        private readonly Queue<PacketSendTask> PacketQueue;
 
-        private readonly CancellationTokenSource CancellationTokenSource;
-        private readonly CancellationToken CancellationToken;
-        private Task? _streamLoopTask;
-        private readonly PacketFactory PacketFactory;
-
-        private Queue<PacketSendTask> PacketQueue;
-        internal int CompressionThreshold = -1;
+        private byte[]? sharedSecret;
 
         public MinecraftClient(string version, Session session, string host, int port)
         {
@@ -67,6 +49,40 @@ namespace MineSharp.Protocol
 
             this._client = new TcpClient();
         }
+
+        public string Version
+        {
+            get;
+        }
+        public GameState GameState { get; private set; }
+        public string IPAddress
+        {
+            get;
+        }
+        public int Port
+        {
+            get;
+        }
+
+        public Session Session
+        {
+            get;
+        }
+
+        /// <summary>
+        ///     Fires when the client Disconnected
+        /// </summary>
+        public event ClientStringEvent? Disconnected;
+
+        /// <summary>
+        ///     Fires when a packet has been received
+        /// </summary>
+        public event ClientPacketEvent? PacketReceived;
+
+        /// <summary>
+        ///     Fires when a packet has been sent
+        /// </summary>
+        public event ClientPacketEvent? PacketSent;
 
         private string GetIpAddress(string host)
         {
@@ -95,9 +111,12 @@ namespace MineSharp.Protocol
         }
 
         /// <summary>
-        /// Connects to the server and making the handshake
+        ///     Connects to the server and making the handshake
         /// </summary>
-        /// <param name="nextState">In which <see cref="MineSharp.Protocol.GameState"/> the client and server should switch. Should be either <see cref="Protocol.GameState.LOGIN"/> or <see cref="Protocol.GameState.STATUS"/></param>
+        /// <param name="nextState">
+        ///     In which <see cref="MineSharp.Protocol.GameState" /> the client and server should switch.
+        ///     Should be either <see cref="Protocol.GameState.LOGIN" /> or <see cref="Protocol.GameState.STATUS" />
+        /// </param>
         /// <returns>A task that is completed as soon as the Handshake with the server is completed</returns>
         public async Task<bool> Connect(GameState nextState)
         {
@@ -116,13 +135,13 @@ namespace MineSharp.Protocol
                 return true;
             } catch (Exception ex)
             {
-                Logger.Error("Could not connect: " + ex.ToString());
+                Logger.Error("Could not connect: " + ex);
                 return false;
             }
         }
 
         /// <summary>
-        /// Closes the connection on the client side without
+        ///     Closes the connection on the client side without
         /// </summary>
         /// <param name="reason"></param>
         public void ForceDisconnect(string reason)
@@ -137,20 +156,18 @@ namespace MineSharp.Protocol
         private async Task MakeHandshake(GameState nextState)
         {
             await this.SendPacket(
-                new Data.Protocol.Handshaking.Serverbound.PacketSetProtocol(
+                new PacketSetProtocol(
                     MinecraftData.ProtocolVersion,
                     this.IPAddress,
                     (ushort)this.Port,
                     (int)nextState));
 
             await (nextState switch {
-                GameState.STATUS => this.SendPacket(new MineSharp.Data.Protocol.Status.Serverbound.PacketPingStart()),
-                GameState.LOGIN => this.SendPacket(new Data.Protocol.Login.Serverbound.PacketLoginStart(this.Session.Username)),
+                GameState.STATUS => this.SendPacket(new PacketPingStart()),
+                GameState.LOGIN => this.SendPacket(new PacketLoginStart(this.Session.Username)),
                 _ => throw new InvalidOperationException($"Next state '{nextState}' is not supported")
             });
         }
-
-        private byte[]? sharedSecret;
         public void SetEncryptionKey(byte[] key)
         {
             this.sharedSecret = key;
@@ -171,7 +188,7 @@ namespace MineSharp.Protocol
 
 
         /// <summary>
-        /// Sends a <see cref="Packet"/> to the Minecraft Server
+        ///     Sends a <see cref="Data.Protocol.Handshaking.Serverbound.Packet" /> to the Minecraft Server
         /// </summary>
         /// <param name="packet">Packet instance that will be sent</param>
         /// <returns>A task that will be completed when the packet has been written into the tcp stream</returns>
@@ -203,7 +220,7 @@ namespace MineSharp.Protocol
                 var data = this._stream.Read(length);
                 var packet = this.PacketFactory.BuildPacket(data, uncompressedLength);
                 if (packet != null)
-                    ThreadPool.QueueUserWorkItem((object? _) =>
+                    ThreadPool.QueueUserWorkItem(_ =>
                     {
                         //Logger.Debug3("Received packet: " + packet.GetType().Name); // Causes cpu usage spikes
                         try
@@ -212,7 +229,7 @@ namespace MineSharp.Protocol
                             this.PacketReceived?.Invoke(this, packet);
                         } catch (Exception e)
                         {
-                            Logger.Error("There occurred an error while handling the packet: \n" + e.ToString());
+                            Logger.Error("There occurred an error while handling the packet: \n" + e);
                         }
                     });
                 return Task.CompletedTask;
@@ -257,7 +274,7 @@ namespace MineSharp.Protocol
                     this._stream!.DispatchPacket(packetBuffer);
 
                     packetTask.SendingTsc.TrySetResult();
-                    ThreadPool.QueueUserWorkItem((object? _) =>
+                    ThreadPool.QueueUserWorkItem(_ =>
                     {
                         try
                         {
@@ -265,21 +282,30 @@ namespace MineSharp.Protocol
                             this.PacketSent?.Invoke(this, packetTask.Packet);
                         } catch (Exception e)
                         {
-                            Logger.Error("Error while handling sent event of packet: \n" + e.ToString());
+                            Logger.Error("Error while handling sent event of packet: \n" + e);
                         }
                     });
                 } catch (Exception e)
                 {
-                    Logger.Error("Error in readLoop: " + e.ToString());
+                    Logger.Error("Error in readLoop: " + e);
                 }
             }
         }
 
         private struct PacketSendTask
         {
-            public CancellationToken? CancellationToken { get; set; }
-            public IPacketPayload Packet { get; set; }
-            public TaskCompletionSource SendingTsc { get; set; }
+            public CancellationToken? CancellationToken
+            {
+                get;
+            }
+            public IPacketPayload Packet
+            {
+                get;
+            }
+            public TaskCompletionSource SendingTsc
+            {
+                get;
+            }
 
             public PacketSendTask(CancellationToken? cancellationToken, IPacketPayload packet, TaskCompletionSource tsc)
             {

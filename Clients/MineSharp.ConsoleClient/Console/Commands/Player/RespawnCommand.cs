@@ -1,6 +1,5 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class RespawnCommand : Command
@@ -9,9 +8,9 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
         public RespawnCommand()
         {
 
-            var desc = $"Respawns the Bot if it's dead";
+            var desc = "Respawns the Bot if it's dead";
 
-            this.Initialize("respawn", desc, CColor.PlayerCommand, new Arguments.Argument[] {});
+            this.Initialize("respawn", desc, CColor.PlayerCommand);
         }
 
         public override void DoAction(string[] argv, CancellationToken cancellation)

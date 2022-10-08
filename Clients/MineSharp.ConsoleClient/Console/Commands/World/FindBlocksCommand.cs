@@ -1,16 +1,14 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.World
 {
     internal class FindBlocksCommand : Command
     {
 
-        private EnumArgument<BlockType> BlockTypeArgument;
-        private IntegerArgument CountArgument;
+        private readonly EnumArgument<BlockType> BlockTypeArgument;
+        private readonly IntegerArgument CountArgument;
 
         public FindBlocksCommand()
         {
@@ -53,7 +51,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World
                 .Start($"Searching for [lightgreen]{(count < 0 ? new string("Infinity") : count.ToString())}[/] [yellow]{argv[0]}[/]", ctx =>
                 {
                     var blockType = this.BlockTypeArgument.GetValue(argv[0]);
-                    var block = BotClient.Bot!.FindBlocksAsync(blockType, (int)count, cancellation).GetAwaiter().GetResult();
+                    var block = BotClient.Bot!.FindBlocksAsync(blockType, count, cancellation).GetAwaiter().GetResult();
                     if (cancellation.IsCancellationRequested) return;
 
                     if (block != null)

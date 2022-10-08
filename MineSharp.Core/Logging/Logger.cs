@@ -1,18 +1,97 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-
 namespace MineSharp.Core.Logging
 {
     public class Logger
     {
+
+        public delegate void LogMessageEvent(LogMessage message);
 
         public static LogLevel Threshold = LogLevel.DEBUG3;
 
         internal static List<LogScope> Scopes = new List<LogScope>();
         public static List<LogMessage> LogMessages = new List<LogMessage>();
 
-        public delegate void LogMessageEvent(LogMessage message);
+        public Logger(string name)
+        {
+            this.Name = name;
+        }
+
+
+        public string Name
+        {
+            get;
+        }
         public static event LogMessageEvent? OnLogMessageReceieved;
+
+        public static void AddScope(LogLevel threshold, Action<string> writeLine)
+        {
+            Scopes.Add(new LogScope(threshold, writeLine));
+        }
+
+
+        public static Logger GetLogger(string? module = null) => new Logger(module ?? NamespaceOfCallingClass());
+
+        private static string NamespaceOfCallingClass()
+        {
+            Type declaringType;
+            var skipFrames = 2;
+            do
+            {
+                var method = new StackFrame(skipFrames, false).GetMethod()!;
+                declaringType = method.DeclaringType!;
+                if (declaringType == null)
+                {
+                    return method.Name;
+                }
+                skipFrames++;
+            }
+            while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase));
+
+            var modules = declaringType.Namespace!.Split('.');
+
+            if (declaringType.Namespace.StartsWith("MineSharp"))
+            {
+                return modules[1];
+            }
+            return modules.Last();
+        }
+
+
+        public void Debug3(string message) => this.Log(message, LogLevel.DEBUG3);
+        public void Debug2(string message) => this.Log(message, LogLevel.DEBUG2);
+        public void Debug(string message) => this.Log(message, LogLevel.DEBUG);
+        public void Error(string message) => this.Log(message, LogLevel.ERROR);
+        public void Warning(string message) => this.Log(message, LogLevel.WARN);
+        public void Info(string message) => this.Log(message, LogLevel.INFO);
+
+
+        public void Log(string message, LogLevel level)
+        {
+            if ((int)level > (int)Threshold) return;
+
+            var log = new LogMessage {
+                Level = level,
+                Time = DateTime.Now,
+                Caller = this.Name,
+                Message = message
+            };
+
+            var msg = log.ToString();
+            foreach (var scope in Scopes)
+            {
+                if (level <= scope.Threshold)
+                {
+                    scope.WriteLine(msg);
+                }
+            }
+
+            if (level == LogLevel.DEBUG3)
+            {
+                LogMessages.RemoveAll(x => x.Level == LogLevel.DEBUG3 && (DateTime.Now - x.Time).TotalMinutes >= 5);
+            }
+            LogMessages.Add(log);
+            OnLogMessageReceieved?.Invoke(log);
+        }
 
         public struct LogMessage
         {
@@ -57,83 +136,6 @@ namespace MineSharp.Core.Logging
                     str = escape(str);
                 return $"[{color}]{str}[/]";
             }
-        }
-
-        public static void AddScope(LogLevel threshold, Action<string> writeLine)
-        {
-            Scopes.Add(new LogScope(threshold, writeLine));
-        }
-
-
-        public static Logger GetLogger(string? module = null) => new Logger(module ?? NamespaceOfCallingClass());
-
-        private static string NamespaceOfCallingClass()
-        {
-            Type declaringType;
-            var skipFrames = 2;
-            do
-            {
-                var method = new StackFrame(skipFrames, false).GetMethod()!;
-                declaringType = method.DeclaringType!;
-                if (declaringType == null)
-                {
-                    return method.Name;
-                }
-                skipFrames++;
-            }
-            while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase));
-
-            var modules = declaringType.Namespace!.Split('.');
-
-            if (declaringType.Namespace.StartsWith("MineSharp"))
-            {
-                return modules[1];
-            } else return modules.Last();
-        }
-
-
-        public string Name { get; private set; }
-
-        public Logger(string name)
-        {
-            this.Name = name;
-        }
-
-
-        public void Debug3(string message) => this.Log(message, LogLevel.DEBUG3);
-        public void Debug2(string message) => this.Log(message, LogLevel.DEBUG2);
-        public void Debug(string message) => this.Log(message, LogLevel.DEBUG);
-        public void Error(string message) => this.Log(message, LogLevel.ERROR);
-        public void Warning(string message) => this.Log(message, LogLevel.WARN);
-        public void Info(string message) => this.Log(message, LogLevel.INFO);
-
-
-        public void Log(string message, LogLevel level)
-        {
-            if ((int)level > (int)Threshold) return;
-
-            var log = new LogMessage() {
-                Level = level,
-                Time = DateTime.Now,
-                Caller = this.Name,
-                Message = message
-            };
-
-            var msg = log.ToString();
-            foreach (var scope in Scopes)
-            {
-                if (level <= scope.Threshold)
-                {
-                    scope.WriteLine(msg);
-                }
-            }
-
-            if (level == LogLevel.DEBUG3)
-            {
-                LogMessages.RemoveAll(x => x.Level == LogLevel.DEBUG3 && (DateTime.Now - x.Time).TotalMinutes >= 5);
-            }
-            LogMessages.Add(log);
-            OnLogMessageReceieved?.Invoke(log);
         }
     }
 }

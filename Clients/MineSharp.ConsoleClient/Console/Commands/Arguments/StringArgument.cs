@@ -1,12 +1,11 @@
 ﻿using PrettyPrompt.Completion;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments
 {
     internal class StringArgument : Argument
     {
 
 
-        private string[]? Options = null;
+        private readonly string[]? Options;
         public StringArgument(string name, bool isOptional = false, string[]? options = null) : base(name, isOptional)
         {
 
@@ -30,10 +29,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments
             {
                 if (!str.StartsWith('"')) return false;
                 return str.EndsWith('"');
-            } else
-            {
-                return true;
             }
+            return true;
 
         }
 
@@ -51,16 +48,14 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments
                 }
                 str = remaining.Substring(idxTo + 1);
                 return true;
-            } else
-            {
-                var splits = str.Split(' ');
-                if (splits.Length > 1)
-                {
-
-                    str = splits[1];
-                } else str = "";
-                return splits.Length > 1;
             }
+            var splits = str.Split(' ');
+            if (splits.Length > 1)
+            {
+
+                str = splits[1];
+            } else str = "";
+            return splits.Length > 1;
         }
 
         public string GetValue(string val)
@@ -71,7 +66,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments
                 var to = text.IndexOf('"');
                 text = val.Substring(1, to);
                 return text;
-            } else return val;
+            }
+            return val;
         }
     }
 }

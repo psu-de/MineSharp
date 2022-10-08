@@ -1,53 +1,22 @@
 ﻿using MineSharp.Core.Types;
+using MineSharp.Core.Types.Enums;
+using MineSharp.Data;
 using MineSharp.Data.Blocks;
-using MineSharp.Data.Windows;
 using MineSharp.Data.Protocol.Play.Clientbound;
+using MineSharp.Data.Protocol.Play.Serverbound;
+using MineSharp.Data.Windows;
 using MineSharp.Windows;
 using static MineSharp.Bot.MinecraftBot;
-using MineSharp.Data;
+using PacketCloseWindow = MineSharp.Data.Protocol.Play.Clientbound.PacketCloseWindow;
+using PacketHeldItemSlot = MineSharp.Data.Protocol.Play.Clientbound.PacketHeldItemSlot;
 
 namespace MineSharp.Bot.Modules
 {
     public class WindowsModule : Module
     {
 
-        public event BotWindowEvent? WindowOpened;
-        public event BotItemEvent? HeldItemChanged;
 
-        private Window MainInventory { get; set; }
-
-        public Window? Inventory { get; private set; }
-        public Dictionary<int, Window> OpenedWindows = new Dictionary<int, Window>();
-
-
-        public byte SelectedHotbarIndex { get; private set; }
-        public Item? HeldItem => this.Inventory!.GetSlot((int)PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex).Item;
-
-        private TaskCompletionSource inventoryLoadedTsc;
-
-        public WindowsModule(MinecraftBot bot) : base(bot)
-        {
-            this.inventoryLoadedTsc = new TaskCompletionSource();
-            this.MainInventory = new Window(new WindowInfo((Identifier)"", "", 4 * 9, true));
-            this.MainInventory.WindowSlotUpdated += this.MainInventory_SlotUpdated;
-        }
-
-        protected override async Task Load()
-        {
-
-            this.Bot.On<PacketWindowItems>(this.handleWindowItems);
-            this.Bot.On<PacketSetSlot>(this.handleSetSlot);
-            this.Bot.On<PacketHeldItemSlot>(this.handleHeldItemChange);
-
-            this.Inventory = this.OpenWindow(0, new WindowInfo((Identifier)"Inventory", "Inventory", 9, hasOffHandSlot: true));
-
-            await this.SetEnabled(true);
-        }
-
-        public Task WaitForInventory() => this.inventoryLoadedTsc.Task;
-
-
-        private readonly List<int> AllowedBlocksToOpen = new List<int>() {
+        private readonly List<int> AllowedBlocksToOpen = new List<int> {
             (int)BlockType.Chest,
             (int)BlockType.TrappedChest,
             (int)BlockType.EnderChest,
@@ -86,6 +55,44 @@ namespace MineSharp.Bot.Modules
             (int)BlockType.Loom,
             (int)BlockType.Stonecutter
         };
+
+        private readonly TaskCompletionSource inventoryLoadedTsc;
+        public Dictionary<int, Window> OpenedWindows = new Dictionary<int, Window>();
+
+        public WindowsModule(MinecraftBot bot) : base(bot)
+        {
+            this.inventoryLoadedTsc = new TaskCompletionSource();
+            this.MainInventory = new Window(new WindowInfo((Identifier)"", "", 4 * 9, true));
+            this.MainInventory.WindowSlotUpdated += this.MainInventory_SlotUpdated;
+        }
+
+        private Window MainInventory
+        {
+            get;
+        }
+
+        public Window? Inventory { get; private set; }
+
+
+        public byte SelectedHotbarIndex { get; private set; }
+        public Item? HeldItem => this.Inventory!.GetSlot((int)PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex).Item;
+
+        public event BotWindowEvent? WindowOpened;
+        public event BotItemEvent? HeldItemChanged;
+
+        protected override async Task Load()
+        {
+
+            this.Bot.On<PacketWindowItems>(this.handleWindowItems);
+            this.Bot.On<PacketSetSlot>(this.handleSetSlot);
+            this.Bot.On<PacketHeldItemSlot>(this.handleHeldItemChange);
+
+            this.Inventory = this.OpenWindow(0, new WindowInfo((Identifier)"Inventory", "Inventory", 9, hasOffHandSlot: true));
+
+            await this.SetEnabled(true);
+        }
+
+        public Task WaitForInventory() => this.inventoryLoadedTsc.Task;
         public async Task<Window> OpenContainer(Block block)
         {
 
@@ -94,8 +101,8 @@ namespace MineSharp.Bot.Modules
                 throw new ArgumentException("Cannot open block of type " + block.Name);
             }
 
-            var packet = new Data.Protocol.Play.Serverbound.PacketBlockPlace(
-                (int)Core.Types.Enums.PlayerHand.MainHand, block.Position!.ToProtocolPosition(), (int)Core.Types.Enums.BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Hardcoded values
+            var packet = new PacketBlockPlace(
+                (int)PlayerHand.MainHand, block.Position!.ToProtocolPosition(), (int)BlockFace.Top, 0.5f, 0.5f, 0.5f, false); // TODO: Hardcoded values
             var send = this.Bot.Client.SendPacket(packet);
 
             var receive = this.Bot.WaitForPacket<PacketOpenWindow>();
@@ -136,6 +143,54 @@ namespace MineSharp.Bot.Modules
             this.HeldItemChanged?.Invoke(this.Bot, this.HeldItem);
         }
 
+        private Window OpenWindow(int id, WindowInfo windowInfo)
+        {
+            this.Logger.Debug("Opening window with id=" + id);
+
+            if (this.OpenedWindows.TryGetValue(id, out var existingWindow))
+            {
+                throw new ArgumentException("Window with id " + id + " already opened");
+            }
+
+            var window = new Window(id, windowInfo, playerInventory: windowInfo.ExcludeInventory ? null : this.MainInventory);
+            window.WindowClicked += this.Window_Clicked;
+
+            this.OpenedWindows.Add(id, window);
+            this.WindowOpened?.Invoke(this.Bot, window);
+
+            if (this.cachedWindowItemsPacket != null)
+            {
+                if (this.cachedWindowItemsPacket.WindowId == id && DateTime.Now - this.cacheTimestamp! <= TimeSpan.FromSeconds(5))
+                {
+                    // use cache
+                    this.Logger.Debug("Applying cache for window with id=" + id);
+                    this.handleWindowItems(this.cachedWindowItemsPacket!);
+                }
+
+                // delete cache
+                this.cachedWindowItemsPacket = null;
+                this.cacheTimestamp = null;
+            }
+
+
+            return window;
+        }
+
+        private void Window_Clicked(Window window, WindowClick click)
+        {
+            var windowClickPacket = new PacketWindowClick(
+                (byte)window.Id, window.StateId, click.Slot, (sbyte)click.Button, (sbyte)click.ClickMode, window.GetAllSlots().Select(x => new PacketWindowClick.ChangedSlotsElementContainer(x.SlotNumber, x.ToProtocolSlot())).ToArray(), window.SelectedSlot!.ToProtocolSlot());
+            this.Bot.Client.SendPacket(windowClickPacket);
+        }
+
+        private void MainInventory_SlotUpdated(Window window, int index)
+        {
+            if (index == 3 * 9 + 1 + this.SelectedHotbarIndex)
+            {
+                this.HeldItemChanged?.Invoke(this.Bot, window.GetSlot(index).Item);
+            }
+        }
+
         #region Handlers
 
 
@@ -164,8 +219,8 @@ namespace MineSharp.Bot.Modules
         }
 
 
-        private DateTime? cacheTimestamp = null;
-        private PacketWindowItems? cachedWindowItemsPacket = null;
+        private DateTime? cacheTimestamp;
+        private PacketWindowItems? cachedWindowItemsPacket;
         private Task handleWindowItems(PacketWindowItems packet)
         {
 
@@ -204,53 +259,5 @@ namespace MineSharp.Bot.Modules
 
 
         #endregion
-
-        private Window OpenWindow(int id, WindowInfo windowInfo)
-        {
-            this.Logger.Debug("Opening window with id=" + id);
-
-            if (this.OpenedWindows.TryGetValue(id, out var existingWindow))
-            {
-                throw new ArgumentException("Window with id " + id + " already opened");
-            }
-
-            var window = new Window(id, windowInfo, playerInventory: windowInfo.ExcludeInventory ? null : this.MainInventory);
-            window.WindowClicked += this.Window_Clicked;
-
-            this.OpenedWindows.Add(id, window);
-            this.WindowOpened?.Invoke(this.Bot, window);
-
-            if (this.cachedWindowItemsPacket != null)
-            {
-                if (this.cachedWindowItemsPacket.WindowId == id && DateTime.Now - this.cacheTimestamp! <= TimeSpan.FromSeconds(5))
-                {
-                    // use cache
-                    this.Logger.Debug("Applying cache for window with id=" + id);
-                    this.handleWindowItems(this.cachedWindowItemsPacket!);
-                }
-
-                // delete cache
-                this.cachedWindowItemsPacket = null;
-                this.cacheTimestamp = null;
-            }
-
-
-            return window;
-        }
-
-        private void Window_Clicked(Window window, WindowClick click)
-        {
-            var windowClickPacket = new Data.Protocol.Play.Serverbound.PacketWindowClick(
-                (byte)window.Id, window.StateId, click.Slot, (sbyte)click.Button, (sbyte)click.ClickMode, window.GetAllSlots().Select(x => new Data.Protocol.Play.Serverbound.PacketWindowClick.ChangedSlotsElementContainer(x.SlotNumber, x.ToProtocolSlot())).ToArray(), window.SelectedSlot!.ToProtocolSlot());
-            this.Bot.Client.SendPacket(windowClickPacket);
-        }
-
-        private void MainInventory_SlotUpdated(Window window, int index)
-        {
-            if (index == 3 * 9 + 1 + this.SelectedHotbarIndex)
-            {
-                this.HeldItemChanged?.Invoke(this.Bot, window.GetSlot(index).Item);
-            }
-        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-
 namespace MineSharp.Data.Generator.Effects
 {
     internal class EffectGenerator : Generator
@@ -32,7 +31,7 @@ namespace MineSharp.Data.Generator.Effects
             codeGenerator.Begin("public static Type GetEffectTypeById(int id) => id switch");
             foreach (var effect in effectData)
                 codeGenerator.WriteLine($"{effect.Id} => typeof({this.Wrapper.GetCSharpName(effect.Name)}Effect),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Effect with id {{id}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Effect with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
-
 namespace MineSharp.Data.Generator
 {
     internal class MinecraftDataHelper
@@ -9,7 +10,7 @@ namespace MineSharp.Data.Generator
 
         public string DataPath;
 
-        private DataPathsJson DataPaths;
+        private readonly DataPathsJson DataPaths;
 
         public MinecraftDataHelper(string dataPath)
         {
@@ -26,7 +27,7 @@ namespace MineSharp.Data.Generator
 
             var pathInfo = this.DataPaths.PCVersions[version];
             var key = this.Uppercase(type) + "Path";
-            var dataPath = (string)(pathInfo.GetType().GetProperty(key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)?.GetValue(this.DataPaths.PCVersions[version]) ?? throw new KeyNotFoundException(key));
+            var dataPath = (string)(pathInfo.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance)?.GetValue(this.DataPaths.PCVersions[version]) ?? throw new KeyNotFoundException(key));
             return Path.Join(this.DataPath, dataPath, type + ".json");
 
         }
@@ -41,7 +42,7 @@ namespace MineSharp.Data.Generator
 
         public string GetCSharpName(string name)
         {
-            var ti = new System.Globalization.CultureInfo("en-US", false).TextInfo;
+            var ti = new CultureInfo("en-US", false).TextInfo;
             name = name.Replace("_", " ");
             name = ti.ToTitleCase(name);
 
@@ -62,7 +63,6 @@ namespace MineSharp.Data.Generator
         public string Uppercase(string str) => char.ToUpper(str[0]) + str.Substring(1);
 
         public string Lowercase(string str) => char.ToLower(str[0]) + str.Substring(1);
-
 #pragma warning disable CS8618
         private struct GenerateInfoJson
         {

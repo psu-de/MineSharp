@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Enchantments
 {
     public static class EnchantmentFactory
@@ -23,6 +22,5 @@ namespace MineSharp.Data.Enchantments
             var type = EnchantmentPalette.GetEnchantmentTypeById(id);
             return CreateEnchantment(type, level);
         }
-
     }
 }

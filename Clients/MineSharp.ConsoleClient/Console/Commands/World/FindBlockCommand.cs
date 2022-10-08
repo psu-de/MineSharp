@@ -1,15 +1,13 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.World
 {
     internal class FindBlockCommand : Command
     {
 
-        private EnumArgument<BlockType> BlockTypeArgument;
+        private readonly EnumArgument<BlockType> BlockTypeArgument;
 
         public FindBlockCommand()
         {

@@ -1,6 +1,5 @@
 using MineSharp.Bot;
 using MineSharp.Pathfinding.Goals;
-
 namespace MineSharp.Pathfinding
 {
     public static class PathfinderExtensions
@@ -17,6 +16,5 @@ namespace MineSharp.Pathfinding
 
             return module.GoTo(goal, movements, timeout);
         }
-
     }
 }

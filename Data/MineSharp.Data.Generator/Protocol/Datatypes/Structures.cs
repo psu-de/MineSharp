@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Protocol.Datatypes
 {
 
@@ -9,46 +8,45 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
         public ArrayDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "array";
+
+        public override bool IsGeneric => false;
         public override void WriteClassReader(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
-                $@"public T[] ReadArray<T>(int length, Func<PacketBuffer, T> reader) {{
+                @"public T[] ReadArray<T>(int length, Func<PacketBuffer, T> reader) {
     T[] array = new T[length];
     for (int i = 0; i < length; i++)
         array[i] = reader(this);
     return array;
-}}");
+}");
         }
 
         public override void WriteClassWriter(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
-                $@"private void EncodeArray<T>(T[] array, Action<PacketBuffer, T> encoder) {{
+                @"private void EncodeArray<T>(T[] array, Action<PacketBuffer, T> encoder) {
     for (int i = 0; i < array.Length; i++)
         encoder(this, array[i]);
-}}
+}
 
-public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<PacketBuffer, byte> lengthEncoder) {{
+public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<PacketBuffer, byte> lengthEncoder) {
     lengthEncoder(this, (byte)array.Length);
     EncodeArray<T>(array, encoder);
-}}
+}
 
-public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<PacketBuffer, VarInt> lengthEncoder) {{
+public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<PacketBuffer, VarInt> lengthEncoder) {
     lengthEncoder(this, (VarInt)array.Length);
     EncodeArray<T>(array, encoder);
-}}");
+}");
         }
-
-        public override bool IsGeneric => false;
     }
 
     internal class ArrayDatatype : Datatype
     {
-        public override string TypeName => "array";
+        private readonly string? CountField;
+        private readonly Datatype? CountType;
 
-        private Datatype InnerType;
-        private Datatype? CountType;
-        private string? CountField;
+        private readonly Datatype InnerType;
 
         public ArrayDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
         {
@@ -65,6 +63,7 @@ public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<Pac
                 this.CountField = (string)args.GetValue("count")!;
             }
         }
+        public override string TypeName => "array";
 
         public override string CSharpType => this.InnerType.CSharpType + "[]";
 
@@ -81,24 +80,24 @@ public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<Pac
     internal class ContainerDatatypeGenerator : DatatypeGenerator<ContainerDatatype>
     {
 
+        public ContainerDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
+
         public override string TypeName => "container";
+        public override bool IsGeneric => true;
         public override void WriteClassReader(CodeGenerator codeGenerator) {}
         public override void WriteClassWriter(CodeGenerator codeGenerator) {}
-        public override bool IsGeneric => true;
-
-        public ContainerDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
     }
 
     internal class ContainerDatatype : StructureDatatype
     {
 
         internal List<Field>? Fields;
+
+        public ContainerDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
         internal Dictionary<string, Field>? FieldMap => this.Fields?.ToDictionary(x => x.Name, x => x);
 
 
         public override string TypeName => "container";
-
-        public ContainerDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => this.Compiler.GetCSharpName(this.Name) + (this.Container != null ? "Container" : "");
 
@@ -267,7 +266,7 @@ public void WriteArray<T>(T[] array, Action<PacketBuffer, T> encoder, Action<Pac
                     if (!(type.Type is StructureDatatype)) throw new Exception();
 
                     if (type.Type is ContainerDatatype) return ((ContainerDatatype)type.Type).GetField(string.Join('/', paths.Skip(i)));
-                    else if (type.Type is BitfieldDatatype)
+                    if (type.Type is BitfieldDatatype)
                     {
                         return ((BitfieldDatatype)type.Type).GetField(string.Join('/', paths.Skip(i + 1)));
                     }

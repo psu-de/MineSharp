@@ -2,11 +2,14 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Windows;
-
 namespace MineSharp.Windows
 {
     public class Window : IDisposable
     {
+        public delegate void WindowClickedEvent(Window sender, WindowClick click);
+
+        public delegate void WindowClosedEvent(Window window);
+        public delegate void WindowSlotEvent(Window sender, int slotIndex);
 
         //TODO: Window Slot events
 
@@ -14,41 +17,6 @@ namespace MineSharp.Windows
         public const int HotbarSlotCount = 9;
 
         private static Logger Logger = Logger.GetLogger();
-
-        public delegate void WindowClosedEvent(Window window);
-        public delegate void WindowClickedEvent(Window sender, WindowClick click);
-        public delegate void WindowSlotEvent(Window sender, int slotIndex);
-
-        /// <summary>
-        /// This event fires when the window has already been disposed.
-        /// </summary>
-        public event WindowClosedEvent? WindowClosed;
-        public event WindowClickedEvent? WindowClicked;
-        public event WindowSlotEvent? WindowSlotUpdated;
-
-        public WindowInfo Info { get; private set; }
-
-        public int ContainerStart => 0;
-        public int ContainerEnd => this.Info.UniqueSlots - 1;
-        public int InventoryStart => this.Info.ExcludeInventory ? throw new NotSupportedException() : this.Info.UniqueSlots;
-        public int InventoryEnd => this.InventoryStart + InventorySlotCount - 1;
-        public int HotbarStart => this.InventoryEnd + 1;
-        public int HotbarEnd => this.HotbarStart + HotbarSlotCount - 1;
-        public int TotalSlotCount => (this.Info.ExcludeInventory ? this.Info.UniqueSlots : this.HotbarEnd + 1) + (this.Info.HasOffHandSlot ? 1 : 0);
-
-
-        public int Id { get; private set; }
-        private Slot[] ContainerSlots { get; set; }
-        private Slot? OffHandSlot
-        {
-            get;
-            set;
-        }
-
-        public Window? InventoryWindow { get; private set; }
-
-        public Slot? SelectedSlot { get; set; }
-        public int StateId { get; set; }
 
 
         public Window(WindowInfo info, Slot[]? slots = null, Window? playerInventory = null)
@@ -79,6 +47,52 @@ namespace MineSharp.Windows
             this.SelectedSlot = new Slot(null, -1);
         }
 
+        public WindowInfo Info
+        {
+            get;
+        }
+
+        public int ContainerStart => 0;
+        public int ContainerEnd => this.Info.UniqueSlots - 1;
+        public int InventoryStart => this.Info.ExcludeInventory ? throw new NotSupportedException() : this.Info.UniqueSlots;
+        public int InventoryEnd => this.InventoryStart + InventorySlotCount - 1;
+        public int HotbarStart => this.InventoryEnd + 1;
+        public int HotbarEnd => this.HotbarStart + HotbarSlotCount - 1;
+        public int TotalSlotCount => (this.Info.ExcludeInventory ? this.Info.UniqueSlots : this.HotbarEnd + 1) + (this.Info.HasOffHandSlot ? 1 : 0);
+
+
+        public int Id
+        {
+            get;
+        }
+        private Slot[] ContainerSlots { get; set; }
+        private Slot? OffHandSlot
+        {
+            get;
+            set;
+        }
+
+        public Window? InventoryWindow { get; private set; }
+
+        public Slot? SelectedSlot { get; set; }
+        public int StateId { get; set; }
+
+        public int EmptySlotCount => this.EmptyContainerSlots().Length;
+        public int AllEmptySlotCount => this.AllEmptySlots().Length;
+
+        public void Dispose()
+        {
+            this.ContainerSlots = Array.Empty<Slot>();
+            this.InventoryWindow = null;
+        }
+
+        /// <summary>
+        ///     This event fires when the window has already been disposed.
+        /// </summary>
+        public event WindowClosedEvent? WindowClosed;
+        public event WindowClickedEvent? WindowClicked;
+        public event WindowSlotEvent? WindowSlotUpdated;
+
         internal void SwapSelectedSlot(int slotNumber)
         {
             var t = this.SelectedSlot!;
@@ -103,7 +117,7 @@ namespace MineSharp.Windows
             if (this.OffHandSlot != null && this.OffHandSlot.SlotNumber == slot.SlotNumber)
             {
                 this.OffHandSlot = slot;
-                this.WindowSlotUpdated?.Invoke(this, (int)this.OffHandSlot.SlotNumber!);
+                this.WindowSlotUpdated?.Invoke(this, this.OffHandSlot.SlotNumber!);
                 return;
             }
 
@@ -116,8 +130,8 @@ namespace MineSharp.Windows
                 return;
             }
 
-            this.ContainerSlots[(int)slot.SlotNumber!] = slot;
-            this.WindowSlotUpdated?.Invoke(this, (int)slot.SlotNumber!);
+            this.ContainerSlots[slot.SlotNumber!] = slot;
+            this.WindowSlotUpdated?.Invoke(this, slot.SlotNumber!);
         }
 
         public Slot GetSlot(int index)
@@ -170,18 +184,12 @@ namespace MineSharp.Windows
         public Item?[] AllItems() => this.GetAllSlots().Select(x => x.Item).ToArray();
 
         /// <summary>
-        /// When using MineSharp.Bot, please use Bot.CloseWindow(windowId) instead.
+        ///     When using MineSharp.Bot, please use Bot.CloseWindow(windowId) instead.
         /// </summary>
         public void Close()
         {
             this.Dispose();
             this.WindowClosed?.Invoke(this);
-        }
-
-        public void Dispose()
-        {
-            this.ContainerSlots = Array.Empty<Slot>();
-            this.InventoryWindow = null;
         }
 
         public Slot[] EmptyContainerSlots()
@@ -203,14 +211,11 @@ namespace MineSharp.Windows
             return emptySlots.ToArray();
         }
 
-        public int EmptySlotCount => this.EmptyContainerSlots().Length;
-        public int AllEmptySlotCount => this.AllEmptySlots().Length;
-
 
         private Slot? FindItem(Slot[] slots, Item searched) => slots.FirstOrDefault(x => !x.IsEmpty() && x.Item!.Id == searched.Id);
 
         /// <summary>
-        /// Searches through the container slots for an item
+        ///     Searches through the container slots for an item
         /// </summary>
         /// <param name="itemInfo"></param>
         /// <returns></returns>

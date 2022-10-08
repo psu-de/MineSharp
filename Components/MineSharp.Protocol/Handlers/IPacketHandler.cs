@@ -1,5 +1,4 @@
 ﻿using MineSharp.Data.Protocol;
-
 namespace MineSharp.Protocol.Handlers
 {
     public interface IPacketHandler

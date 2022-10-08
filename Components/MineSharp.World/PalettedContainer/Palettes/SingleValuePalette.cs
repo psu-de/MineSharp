@@ -1,5 +1,4 @@
 ﻿using MineSharp.Data.Protocol;
-
 namespace MineSharp.World.PalettedContainer.Palettes
 {
     internal class SingleValuePalette : IPalette
@@ -18,7 +17,7 @@ namespace MineSharp.World.PalettedContainer.Palettes
 
         public IndirectPalette ConvertToIndirectPalette(int newState)
         {
-            return new IndirectPalette(new int[] {
+            return new IndirectPalette(new[] {
                 this.Value, newState
             });
         }

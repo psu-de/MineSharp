@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Logging;
+using System.Diagnostics;
 using System.Security.Cryptography;
-
 namespace MineSharp.Protocol.Crypto
 {
     public class RSAHelper
@@ -48,7 +48,7 @@ namespace MineSharp.Protocol.Crypto
                         break;
 
                     default:
-                        Logger.GetLogger().Warning($"PublicKey Decode Returning null!");
+                        Logger.GetLogger().Warning("PublicKey Decode Returning null!");
 
                         return null;
                 }
@@ -64,7 +64,7 @@ namespace MineSharp.Protocol.Crypto
                     rd.ReadInt16();
                 else
                 {
-                    Logger.GetLogger().Warning($"PublicKey Decode Returning null! (shortvalue 1)");
+                    Logger.GetLogger().Warning("PublicKey Decode Returning null! (shortvalue 1)");
 
                     return null;
                 }
@@ -73,7 +73,7 @@ namespace MineSharp.Protocol.Crypto
 
                 if (byteValue != 0x00)
                 {
-                    Logger.GetLogger().Warning($"PublicKey Decode Returning null! (bytevalue)");
+                    Logger.GetLogger().Warning("PublicKey Decode Returning null! (bytevalue)");
 
                     return null;
                 }
@@ -85,7 +85,7 @@ namespace MineSharp.Protocol.Crypto
                     rd.ReadInt16();
                 else
                 {
-                    Logger.GetLogger().Warning($"PublicKey Decode Returning null! (Shortvalue 2)");
+                    Logger.GetLogger().Warning("PublicKey Decode Returning null! (Shortvalue 2)");
 
                     return null;
                 }
@@ -157,10 +157,8 @@ namespace MineSharp.Protocol.Crypto
                 }
 
                 return buf;
-            } else
-            {
-                return inputBytes;
             }
+            return inputBytes;
         }
 
         private static int DecodeIntegerSize(BinaryReader rd)
@@ -211,7 +209,7 @@ namespace MineSharp.Protocol.Crypto
             {
                 assumedLength = (int)(logbase + 1.0);
                 assumedLength = (int)Math.Pow(2, assumedLength);
-                System.Diagnostics.Debug.Assert(false);
+                Debug.Assert(false);
             }
 
             switch (assumedLength)
@@ -240,7 +238,7 @@ namespace MineSharp.Protocol.Crypto
                     break;
 
                 default:
-                    System.Diagnostics.Debug.Assert(false);
+                    Debug.Assert(false);
 
                     break;
             }

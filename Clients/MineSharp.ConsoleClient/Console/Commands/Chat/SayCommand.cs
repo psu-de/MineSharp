@@ -1,13 +1,12 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Chat
 {
     internal class SayCommand : Command
     {
 
-        private StringArgument Message;
+        private readonly StringArgument Message;
 
         public SayCommand()
         {

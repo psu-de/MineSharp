@@ -1,11 +1,9 @@
 ﻿using MineSharp.ConsoleClient.Console;
-using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using PrettyPrompt;
 using PrettyPrompt.Completion;
 using PrettyPrompt.Consoles;
 using PrettyPrompt.Documents;
 using PrettyPrompt.Highlighting;
-
 namespace MineSharp.ConsoleClient
 {
     internal class ConsoleClientCallbacks : PromptCallbacks
@@ -29,24 +27,21 @@ namespace MineSharp.ConsoleClient
                             getExtendedDescription: _ => Task.FromResult(CColor.FromMarkup(x.Description))
                             );
                     }).ToArray());
-            } else
-            {
-
-                var cmdName = text.TrimStart().Split(' ')[0];
-                if (!CommandManager.TryGetCommand(cmdName, out var command))
-                {
-                    return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
-                }
-
-                var args = text.Substring(cmdName.Length + (text.Length - text.TrimStart().Length)).TrimStart();
-                (var currentArg, var remaining) = command.GetCurrentArgument(args);
-                if (currentArg == null)
-                {
-                    return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
-                }
-
-                return Task.FromResult<IReadOnlyList<CompletionItem>>(currentArg.GetCompletionItems(remaining));
             }
+            var cmdName = text.TrimStart().Split(' ')[0];
+            if (!CommandManager.TryGetCommand(cmdName, out var command))
+            {
+                return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
+            }
+
+            var args = text.Substring(cmdName.Length + (text.Length - text.TrimStart().Length)).TrimStart();
+            (var currentArg, var remaining) = command.GetCurrentArgument(args);
+            if (currentArg == null)
+            {
+                return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
+            }
+
+            return Task.FromResult<IReadOnlyList<CompletionItem>>(currentArg.GetCompletionItems(remaining));
 
         }
 
@@ -74,7 +69,5 @@ namespace MineSharp.ConsoleClient
 
             return Task.FromResult<IReadOnlyCollection<FormatSpan>>(highlighting);
         }
-
-
     }
 }

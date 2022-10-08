@@ -1,47 +1,10 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
-
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot
     {
-
-        /// <summary>
-        /// This event fires whenever the Bots Health changed (<see cref="Protocol.Packets.Clientbound.Play.UpdateHealthPacket"/> is received). Food and Saturation were also updated when this event fires.
-        /// </summary>
-        public event BotEmptyEvent HealthChanged
-        {
-            add => this.BaseModule!.HealthChanged += value;
-            remove => this.BaseModule!.HealthChanged -= value;
-        }
-
-        /// <summary>
-        /// This event fires whenever the Bot respawned / changed dimension (<see cref="Protocol.Packets.Clientbound.Play.RespawnPacket"/> is received).
-        /// </summary>
-        public event BotEmptyEvent Respawned
-        {
-            add => this.BaseModule!.Respawned += value;
-            remove => this.BaseModule!.HealthChanged -= value;
-        }
-
-        /// <summary>
-        /// This event fires whenever the Bot dies (<see cref="Protocol.Packets.Clientbound.Play.DeathCombatEventPacket"/> is received).
-        /// </summary>
-        public event BotChatEvent Died
-        {
-            add => this.BaseModule!.Died += value;
-            remove => this.BaseModule!.Died -= value;
-        }
-
-        /// <summary>
-        /// Fires when a chat message from another player is received
-        /// </summary>
-        public event BotChatSenderEvent ChatReceived
-        {
-            add => this.BaseModule!.ChatReceived += value;
-            remove => this.BaseModule!.ChatReceived -= value;
-        }
 
 
         public Player? BotEntity => this.BaseModule?.BotEntity;
@@ -53,6 +16,46 @@ namespace MineSharp.Bot
         public float Saturation => this.BaseModule!.Saturation;
         public Identifier? CurrentDimension => this.BaseModule!.CurrentDimension;
         public GameMode? GameMode => this.BaseModule!.GameMode;
+
+        /// <summary>
+        ///     This event fires whenever the Bots Health changed (
+        ///     <see cref="Protocol.Packets.Clientbound.Play.UpdateHealthPacket" /> is received). Food and Saturation were also
+        ///     updated when this event fires.
+        /// </summary>
+        public event BotEmptyEvent HealthChanged
+        {
+            add => this.BaseModule!.HealthChanged += value;
+            remove => this.BaseModule!.HealthChanged -= value;
+        }
+
+        /// <summary>
+        ///     This event fires whenever the Bot respawned / changed dimension (
+        ///     <see cref="Protocol.Packets.Clientbound.Play.RespawnPacket" /> is received).
+        /// </summary>
+        public event BotEmptyEvent Respawned
+        {
+            add => this.BaseModule!.Respawned += value;
+            remove => this.BaseModule!.HealthChanged -= value;
+        }
+
+        /// <summary>
+        ///     This event fires whenever the Bot dies (<see cref="Protocol.Packets.Clientbound.Play.DeathCombatEventPacket" /> is
+        ///     received).
+        /// </summary>
+        public event BotChatEvent Died
+        {
+            add => this.BaseModule!.Died += value;
+            remove => this.BaseModule!.Died -= value;
+        }
+
+        /// <summary>
+        ///     Fires when a chat message from another player is received
+        /// </summary>
+        public event BotChatSenderEvent ChatReceived
+        {
+            add => this.BaseModule!.ChatReceived += value;
+            remove => this.BaseModule!.ChatReceived -= value;
+        }
 
         public void AssertPlayerLoaded()
         {

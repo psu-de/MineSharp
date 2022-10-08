@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Blocks
 {
     public static class BlockFactory

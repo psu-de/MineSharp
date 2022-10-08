@@ -1,14 +1,13 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class SetRotationCommand : Command
     {
 
-        private FloatArgument PitchArg;
-        private FloatArgument YawArg;
+        private readonly FloatArgument PitchArg;
+        private readonly FloatArgument YawArg;
 
         public SetRotationCommand()
         {

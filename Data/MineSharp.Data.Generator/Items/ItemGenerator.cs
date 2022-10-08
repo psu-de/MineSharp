@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Text;
-
 namespace MineSharp.Data.Generator.Items
 {
     internal class ItemGenerator : Generator
@@ -34,7 +33,7 @@ namespace MineSharp.Data.Generator.Items
             codeGenerator.Begin("public static Type GetItemTypeById(int id) => id switch");
             foreach (var item in itemData)
                 codeGenerator.WriteLine($"{item.Id} => typeof({this.Wrapper.GetCSharpName(item.Name)}Item),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Item with id {{id}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Item with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
@@ -69,15 +68,11 @@ namespace MineSharp.Data.Generator.Items
         private string WriteStringArray(string[]? arr)
         {
             if (arr == null) return "null";
-            else
-            {
-                var sb = new StringBuilder();
-                sb.Append("new string[] {");
-                sb.Append(string.Join(", ", arr.Select(x => '"' + x + '"')));
-                sb.Append("}");
-                return sb.ToString();
-
-            }
+            var sb = new StringBuilder();
+            sb.Append("new string[] {");
+            sb.Append(string.Join(", ", arr.Select(x => '"' + x + '"')));
+            sb.Append("}");
+            return sb.ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MineSharp.ConsoleClient;
+﻿using MineSharp.Bot;
+using MineSharp.ConsoleClient;
 using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console;
 using MineSharp.Core.Logging;
@@ -6,7 +7,6 @@ using PrettyPrompt;
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Net;
-
 const string DEBUG_LOG_FILE = "log_debug.txt";
 const string LOG_FILE = "log.txt";
 const bool APPEND_LOG = false;
@@ -17,15 +17,15 @@ var logfileWriter = new StreamWriter(LOG_FILE, APPEND_LOG) {
 var debugFileWriter = new StreamWriter(DEBUG_LOG_FILE, APPEND_LOG) {
     AutoFlush = true
 };
-Logger.AddScope(LogLevel.DEBUG, (s) => logfileWriter.WriteLine(s));
-Logger.AddScope(LogLevel.DEBUG3, (s) => debugFileWriter.WriteLine(s));
+Logger.AddScope(LogLevel.DEBUG, s => logfileWriter.WriteLine(s));
+Logger.AddScope(LogLevel.DEBUG3, s => debugFileWriter.WriteLine(s));
 
 //Credentials
-var loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions();
+var loginOptions = new MinecraftBot.BotOptions();
 
 if (true /*args.Length == 1*/)
 {
-    loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions() {
+    loginOptions = new MinecraftBot.BotOptions {
         Host = "127.0.0.1",
         Port = 25565,
         Offline = true,
@@ -38,7 +38,7 @@ if (true /*args.Length == 1*/)
     AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
     AnsiConsole.MarkupLine("Please login:");
     var username = AnsiConsole.Ask<string>("Username [red]or[/] Email: ");
-    var isOffline = AnsiConsole.Confirm("Offline Mode: ", true);
+    var isOffline = AnsiConsole.Confirm("Offline Mode: ");
     string? password = null;
 
     if (!isOffline)
@@ -51,17 +51,14 @@ if (true /*args.Length == 1*/)
         .Validate(i =>
         {
             if (IPAddress.TryParse(i, out _)) return ValidationResult.Success();
-            else
+            try
             {
-                try
-                {
-                    Dns.GetHostEntry(i);
-                    return ValidationResult.Success();
-                } catch (Exception)
-                {
+                Dns.GetHostEntry(i);
+                return ValidationResult.Success();
+            } catch (Exception)
+            {
 
-                    return ValidationResult.Error();
-                }
+                return ValidationResult.Error();
             }
         }));
 
@@ -71,7 +68,7 @@ if (true /*args.Length == 1*/)
 
     var version = AnsiConsole.Ask<string>("Minecraft version: ");
 
-    loginOptions = new MineSharp.Bot.MinecraftBot.BotOptions() {
+    loginOptions = new MinecraftBot.BotOptions {
         Host = host,
         Offline = isOffline,
         Password = password,
@@ -149,34 +146,32 @@ void ExecuteCommand(string cmdL, CancellationToken cancellationToken)
     {
         AnsiConsole.MarkupLine("[red]ERROR: Command " + cmdName + " not found![/]");
         return;
+    }
+    var startTime = DateTime.Now;
+    try
+    {
+        command.Execute(cmdL.Substring(cmdName.Length), cancellationToken);
+    } catch (Exception ex)
+    {
+        AnsiConsole.MarkupLine("[red]An error occurred while performing command![/]");
+        AnsiConsole.WriteException(ex);
+    }
+
+    if (cancellationToken.IsCancellationRequested)
+    {
+        AnsiConsole.MarkupLine("[red]Aborted.[/]");
+        return;
+    }
+
+    var timeTaken = DateTime.Now - startTime;
+    var time = "";
+    if (timeTaken.TotalMilliseconds < 1000)
+    {
+        time = $"{timeTaken.TotalMilliseconds.ToString("0.00")}ms";
     } else
     {
-        var startTime = DateTime.Now;
-        try
-        {
-            command.Execute(cmdL.Substring(cmdName.Length), cancellationToken);
-        } catch (Exception ex)
-        {
-            AnsiConsole.MarkupLine("[red]An error occurred while performing command![/]");
-            AnsiConsole.WriteException(ex);
-        }
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            AnsiConsole.MarkupLine("[red]Aborted.[/]");
-            return;
-        }
-
-        var timeTaken = DateTime.Now - startTime;
-        var time = "";
-        if (timeTaken.TotalMilliseconds < 1000)
-        {
-            time = $"{timeTaken.TotalMilliseconds.ToString("0.00")}ms";
-        } else
-        {
-            time = $"{timeTaken.TotalSeconds.ToString("0.00")}s";
-        }
-
-        AnsiConsole.MarkupLine($"[green]Command finished in[/] [olive]{time}[/]");
+        time = $"{timeTaken.TotalSeconds.ToString("0.00")}s";
     }
+
+    AnsiConsole.MarkupLine($"[green]Command finished in[/] [olive]{time}[/]");
 }

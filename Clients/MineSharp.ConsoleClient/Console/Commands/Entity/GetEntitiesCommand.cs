@@ -2,14 +2,13 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Data.Entities;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Entity
 {
     internal class GetEntitiesCommand : Command
     {
 
-        private IntegerArgument RangeArg;
-        private EnumArgument<EntityType> TypeArg;
+        private readonly IntegerArgument RangeArg;
+        private readonly EnumArgument<EntityType> TypeArg;
 
         public GetEntitiesCommand()
         {
@@ -73,7 +72,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity
                 AnsiConsole.MarkupLine($"[green]Found {entities.ToArray().Length} entities![/]");
             } else
             {
-                AnsiConsole.MarkupLine($"[red]Nothing found![/]");
+                AnsiConsole.MarkupLine("[red]Nothing found![/]");
             }
         }
     }

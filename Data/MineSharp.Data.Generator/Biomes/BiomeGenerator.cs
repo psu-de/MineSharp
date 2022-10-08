@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-
 namespace MineSharp.Data.Generator.Biomes
 {
     internal class BiomeGenerator : Generator
@@ -30,16 +29,16 @@ namespace MineSharp.Data.Generator.Biomes
 
             codeGenerator.Begin("namespace MineSharp.Data.Biomes");
 
-            codeGenerator.Begin($"public static class BiomePalette");
-            codeGenerator.Begin($"public static Type GetBiomeTypeById(int id) => id switch");
+            codeGenerator.Begin("public static class BiomePalette");
+            codeGenerator.Begin("public static Type GetBiomeTypeById(int id) => id switch");
             foreach (var biome in biomeData)
                 codeGenerator.WriteLine($"{biome.Id} => typeof({this.GetName(biome.Name)}),");
-            codeGenerator.WriteLine($@"_ => throw new ArgumentException($""Biome with id {{id}} not found!"")");
+            codeGenerator.WriteLine(@"_ => throw new ArgumentException($""Biome with id {id} not found!"")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
             codeGenerator.Begin("public enum BiomeCategory");
-            List<string>? categories = biomeData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
+            var categories = biomeData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
             foreach (var biomeCategory in categories)
                 codeGenerator.WriteLine($"{biomeCategory} = {categories.IndexOf(biomeCategory)},");
             codeGenerator.Finish();

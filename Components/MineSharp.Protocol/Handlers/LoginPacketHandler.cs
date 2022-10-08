@@ -1,24 +1,24 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Protocol;
+using MineSharp.Data.Protocol.Login.Clientbound;
 using MineSharp.Protocol.Crypto;
 using System.Numerics;
 using System.Security.Cryptography;
-using MineSharp.Data.Protocol.Login.Clientbound;
 using System.Text;
-
+using PacketEncryptionBegin = MineSharp.Data.Protocol.Login.Serverbound.PacketEncryptionBegin;
 namespace MineSharp.Protocol.Handlers
 {
     internal class LoginPacketHandler : IPacketHandler
     {
 
-        private static Logger Logger = Logger.GetLogger();
+        private static readonly Logger Logger = Logger.GetLogger();
 
         public Task HandleIncomming(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
                 PacketDisconnect disconnect => this.HandleDisconnectPacket(disconnect, client),
-                PacketEncryptionBegin encryptionBegin => this.HandleEncryptionBeginPacket(encryptionBegin, client),
+                Data.Protocol.Login.Clientbound.PacketEncryptionBegin encryptionBegin => this.HandleEncryptionBeginPacket(encryptionBegin, client),
                 PacketCompress compress => this.HandleCompressPacket(compress, client),
                 PacketLoginPluginRequest loginPluginRequest => this.HandleLoginPluginRequestPacket(loginPluginRequest, client),
                 PacketSuccess success => this.HandleSuccessPacket(success, client),
@@ -29,10 +29,22 @@ namespace MineSharp.Protocol.Handlers
         public Task HandleOutgoing(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
-                Data.Protocol.Login.Serverbound.PacketEncryptionBegin encryptionBegin => this.HandleOutgoingEncryptionBeginPacket(encryptionBegin, client),
+                PacketEncryptionBegin encryptionBegin => this.HandleOutgoingEncryptionBeginPacket(encryptionBegin, client),
                 _ => Task.CompletedTask
             };
         }
+
+        #region Handle Outgoing
+
+
+        private Task HandleOutgoingEncryptionBeginPacket(PacketEncryptionBegin packet, MinecraftClient client)
+        {
+            client.EnableEncryption();
+            return Task.CompletedTask;
+        }
+
+
+        #endregion
 
         #region Handle Incomming
 
@@ -52,7 +64,7 @@ namespace MineSharp.Protocol.Handlers
             return Task.CompletedTask;
         }
 
-        private async Task HandleEncryptionBeginPacket(PacketEncryptionBegin packet, MinecraftClient client)
+        private async Task HandleEncryptionBeginPacket(Data.Protocol.Login.Clientbound.PacketEncryptionBegin packet, MinecraftClient client)
         {
             var aes = Aes.Create();
             aes.KeySize = 128;
@@ -93,25 +105,13 @@ namespace MineSharp.Protocol.Handlers
             var encrypted = rsa.Encrypt(aes.Key, RSAEncryptionPadding.Pkcs1);
             var encVerTok = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);
 
-            var response = new Data.Protocol.Login.Serverbound.PacketEncryptionBegin(encrypted, encVerTok);
+            var response = new PacketEncryptionBegin(encrypted, encVerTok);
             _ = client.SendPacket(response); // TODO: Should this be awaited?
         }
 
         private Task HandleDisconnectPacket(PacketDisconnect packet, MinecraftClient client)
         {
             client.ForceDisconnect(packet.Reason!);
-            return Task.CompletedTask;
-        }
-
-
-        #endregion
-
-        #region Handle Outgoing
-
-
-        private Task HandleOutgoingEncryptionBeginPacket(Data.Protocol.Login.Serverbound.PacketEncryptionBegin packet, MinecraftClient client)
-        {
-            client.EnableEncryption();
             return Task.CompletedTask;
         }
 

@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Effects
 {
     public static class EffectFactory

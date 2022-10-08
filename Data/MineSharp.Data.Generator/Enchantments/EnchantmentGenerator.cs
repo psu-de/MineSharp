@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-
 namespace MineSharp.Data.Generator.Enchantments
 {
     internal class EnchantmentGenerator : Generator
@@ -33,12 +32,12 @@ namespace MineSharp.Data.Generator.Enchantments
             codeGenerator.Begin("public static Type GetEnchantmentTypeById(int id) => id switch");
             foreach (var enchantment in enchantmentData)
                 codeGenerator.WriteLine($"{enchantment.Id} => typeof({this.Wrapper.GetCSharpName(enchantment.Name)}),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Enchantment with id {{id}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Enchantment with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
             codeGenerator.Begin("public enum EnchantmentCategory");
-            List<string>? categories = enchantmentData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
+            var categories = enchantmentData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
             foreach (var category in categories)
                 codeGenerator.WriteLine($"{category} = {categories.IndexOf(category)},");
             codeGenerator.Finish();

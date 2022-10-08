@@ -1,21 +1,10 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console
 {
     internal abstract class Command
     {
-
-        #pragma warning disable CS8618
-
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Color { get; private set; }
-        private bool _isInitialized = false;
-        public List<Argument> Arguments;
-
-        #pragma warning restore CS8618
 
         public void Initialize(string name, string description, string color, params Argument[] arguments)
         {
@@ -74,7 +63,7 @@ namespace MineSharp.ConsoleClient.Console
 
         public virtual void PrintHelp()
         {
-            AnsiConsole.MarkupLine($"[green]Help: " + this.Name + "[/]");
+            AnsiConsole.MarkupLine("[green]Help: " + this.Name + "[/]");
             AnsiConsole.MarkupLine($"{this.Description}");
         }
 
@@ -109,5 +98,15 @@ namespace MineSharp.ConsoleClient.Console
         }
 
         public abstract void DoAction(string[] argv, CancellationToken cancellation);
+
+        #pragma warning disable CS8618
+
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public string Color { get; private set; }
+        private bool _isInitialized;
+        public List<Argument> Arguments;
+
+        #pragma warning restore CS8618
     }
 }

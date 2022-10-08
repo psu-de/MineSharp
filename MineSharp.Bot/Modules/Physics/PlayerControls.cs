@@ -1,20 +1,25 @@
 ﻿using MineSharp.Bot.Enums;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.Physics;
-
 namespace MineSharp.Bot.Modules.Physics
 {
     public class PlayerControls
     {
-        public MinecraftBot Bot { get; set; }
+        private bool _isSneaking;
 
-        private bool _isSprinting = false;
-        private bool _isSneaking = false;
-        private bool _walkBackward = false;
-        private bool _walkForward = false;
-        private bool _walkRight = false;
-        private bool _walkLeft = false;
-        private bool _jumpQueued = false;
+        private bool _isSprinting;
+        private bool _jumpQueued;
+        private bool _walkBackward;
+        private bool _walkForward;
+        private bool _walkLeft;
+        private bool _walkRight;
+
+
+        public PlayerControls(MinecraftBot bot)
+        {
+            this.Bot = bot;
+        }
+        public MinecraftBot Bot { get; set; }
 
         public bool IsSprinting
         {
@@ -88,12 +93,6 @@ namespace MineSharp.Bot.Modules.Physics
                 if (value) this.Walk(WalkDirection.Left);
                 else this.StopWalk(WalkDirection.Left);
             }
-        }
-
-
-        public PlayerControls(MinecraftBot bot)
-        {
-            this.Bot = bot;
         }
 
         public async Task Reset()
@@ -183,7 +182,7 @@ namespace MineSharp.Bot.Modules.Physics
 
         internal MovementControls PrepareForPhysicsTick()
         {
-            var controls = new MovementControls() {
+            var controls = new MovementControls {
                 Back = this._walkBackward,
                 Forward = this._walkForward,
                 Right = this._walkRight,

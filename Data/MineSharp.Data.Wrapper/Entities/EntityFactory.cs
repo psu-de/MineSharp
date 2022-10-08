@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Entities
 {
     public class EntityFactory
@@ -37,6 +36,5 @@ namespace MineSharp.Data.Entities
             var type = EntityPalette.GetEntityTypeById(id);
             return CreateEntity(type, serverId, position, pitch, yaw, velocity, isOnGround, effects);
         }
-
     }
 }

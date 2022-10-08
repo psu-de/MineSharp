@@ -1,12 +1,11 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Prompt
 {
     internal class HelpCommand : Command
     {
 
-        private CommandNameArgument CommandNameArg;
+        private readonly CommandNameArgument CommandNameArg;
 
         public HelpCommand()
         {
@@ -30,7 +29,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt
                     commands[commandType].Add(c);
                 } else
                 {
-                    commands[commandType] = new List<Command>() {
+                    commands[commandType] = new List<Command> {
                         c
                     };
                 }

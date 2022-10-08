@@ -1,17 +1,16 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class SelectHotbarSlotCommand : Command
     {
 
-        private IntegerArgument SlotId = new IntegerArgument("slotNumber");
+        private readonly IntegerArgument SlotId = new IntegerArgument("slotNumber");
 
         public SelectHotbarSlotCommand()
         {
-            var desc = $"Switches the selected hotbar slot";
+            var desc = "Switches the selected hotbar slot";
 
             this.Initialize("selectHotbarSlot", desc, CColor.PlayerCommand, this.SlotId);
         }

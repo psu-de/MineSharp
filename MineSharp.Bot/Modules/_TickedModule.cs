@@ -5,6 +5,5 @@
         protected TickedModule(MinecraftBot bot) : base(bot) {}
 
         public abstract Task Tick();
-
     }
 }

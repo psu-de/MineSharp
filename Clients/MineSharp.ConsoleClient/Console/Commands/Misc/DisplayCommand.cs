@@ -1,9 +1,7 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core;
-using MineSharp.Core.Types;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Misc
 {
     internal class DisplayCommand : Command
@@ -87,7 +85,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
 
             if (BotClient.Bot!.BotEntity == null)
             {
-                AnsiConsole.MarkupLine($"[red]Player is not loaded yet[/]");
+                AnsiConsole.MarkupLine("[red]Player is not loaded yet[/]");
                 return;
             }
 
@@ -111,7 +109,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
             {
                 if (effect == null) continue;
                 var eColor = effect.IsGood ? "springgreen2" : "red1";
-                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), (effect.Duration * MinecraftConst.TickMs / 1000).ToString() + "s");
+                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), (effect.Duration * MinecraftConst.TickMs / 1000) + "s");
             }
 
             masterTable.AddRow(new Markup("\n[green underline]Effects[/]"), effectsInfo);

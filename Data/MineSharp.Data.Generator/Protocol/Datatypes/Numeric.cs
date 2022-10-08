@@ -1,13 +1,25 @@
 ﻿using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Protocol.Datatypes
 {
 
     internal class NumericDatatypeGenerator : DatatypeGenerator
     {
 
+        public NumericDatatypeGenerator(ProtoCompiler compiler, string typeName, string csharpType) : base(compiler)
+        {
+            this.TypeRef = typeName;
+            this.CSharpType = csharpType;
+        }
+
         public override bool IsGeneric => false;
         public override string TypeName => this.TypeRef;
+
+
+        public string CSharpType { get; set; }
+        private string TypeRef
+        {
+            get;
+        }
         public override void WriteClassReader(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
@@ -38,16 +50,6 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
 }}");
             }
 
-        }
-
-
-        public string CSharpType { get; set; }
-        private string TypeRef { get; set; }
-
-        public NumericDatatypeGenerator(ProtoCompiler compiler, string typeName, string csharpType) : base(compiler)
-        {
-            this.TypeRef = typeName;
-            this.CSharpType = csharpType;
         }
 
         public override Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure)
@@ -95,14 +97,16 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
         public VarIntDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "varint";
+
+        public override bool IsGeneric => false;
         public override void WriteClassReader(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
-                @$"public VarInt ReadVarInt() {{
+                @"public VarInt ReadVarInt() {
     long value = 0;
     int shift = 0;
 
-    while (true) {{
+    while (true) {
         byte b = ReadU8();
         value |= ((b & (long)0x7f) << shift); // Add the bits to our number, except MSB
         if ((b & 0x80) == 0x00)  // If the MSB is not set, we return the number
@@ -110,26 +114,24 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
 
         shift += 7; // we only have 7 bits, MSB being the return-trigger
         if (shift >= 64) throw new Exception(""varint is too big""); // Make sure our shift don't overflow.
-    }}
+    }
 
     return new VarInt(value);
-}}");
+}");
         }
 
         public override void WriteClassWriter(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
-                $@"public void WriteVarInt(VarInt value) {{
+                @"public void WriteVarInt(VarInt value) {
     var Value = value.Value;
-    while ((Value & ~0x7F) != 0x00) {{
+    while ((Value & ~0x7F) != 0x00) {
         this.WriteU8((byte)((Value & 0xFF) | 0x80));
         Value >>= 7;
-    }}
+    }
     this.WriteU8((byte)Value);
-}}");
+}");
         }
-
-        public override bool IsGeneric => false;
 
         public override Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure) => new VarIntDatatype(compiler, options, name, parent, outerStructure);
     }

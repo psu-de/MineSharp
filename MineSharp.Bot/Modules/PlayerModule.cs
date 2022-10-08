@@ -1,40 +1,45 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
+using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
+using MineSharp.Data.Protocol.Play.Serverbound;
 using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
+using PacketPosition = MineSharp.Data.Protocol.Play.Clientbound.PacketPosition;
 
 namespace MineSharp.Bot.Modules
 {
     public class PlayerModule : Module
     {
 
-        public PlayerModule(MinecraftBot bot) : base(bot) {}
-
         public ConcurrentDictionary<UUID, MinecraftPlayer> PlayerMapping = new ConcurrentDictionary<UUID, MinecraftPlayer>();
+
+        public PlayerModule(MinecraftBot bot) : base(bot) {}
 
         public bool IsRaining { get; private set; }
         public float RainLevel { get; private set; }
         public float ThunderLevel { get; private set; }
 
         /// <summary>
-        /// Fires whenever the weather has changed
+        ///     Fires whenever the weather has changed
         /// </summary>
         public event BotEmptyEvent? WeatherChanged;
 
         /// <summary>
-        /// Fires when a player joins the server (also fires when the bot itself joins the server). Warning: Entity is probably not loaded when this event fires!
+        ///     Fires when a player joins the server (also fires when the bot itself joins the server). Warning: Entity is probably
+        ///     not loaded when this event fires!
         /// </summary>
         public event BotPlayerEvent? PlayerJoined;
 
         /// <summary>
-        /// Fires when a players leaves the server. 
+        ///     Fires when a players leaves the server.
         /// </summary>
         public event BotPlayerEvent? PlayerLeft;
 
         /// <summary>
-        /// Fires when a player comes into View Distance of the bot and (Position, etc...) has been loaded (<see cref="Protocol.Packets.Clientbound.Play.SpawnPlayerPacket"/>)
+        ///     Fires when a player comes into View Distance of the bot and (Position, etc...) has been loaded (
+        ///     <see cref="Protocol.Packets.Clientbound.Play.SpawnPlayerPacket" />)
         /// </summary>
         public event BotPlayerEvent? PlayerLoaded;
 
@@ -92,8 +97,8 @@ namespace MineSharp.Bot.Modules
                         var name = (string)data.Name!.Value!;
                         if (name == this.Bot.Session.Username) continue;
 
-                        var gm = (GameMode)((Data.Protocol.VarInt)data.Gamemode!.Value!).Value;
-                        int ping = (Data.Protocol.VarInt)data.Ping!.Value!;
+                        var gm = (GameMode)((VarInt)data.Gamemode!.Value!).Value;
+                        int ping = (VarInt)data.Ping!.Value!;
                         if (this.PlayerMapping.ContainsKey(data.UUID!))
                         {
                             this.PlayerMapping[data.UUID!].Username = name;
@@ -159,7 +164,7 @@ namespace MineSharp.Bot.Modules
 
             // TODO: Dismount Vehicle
 
-            await this.Bot.Client.SendPacket(new Data.Protocol.Play.Serverbound.PacketTeleportConfirm(packet.TeleportId!));
+            await this.Bot.Client.SendPacket(new PacketTeleportConfirm(packet.TeleportId!));
         }
     }
 }

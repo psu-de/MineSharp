@@ -1,6 +1,6 @@
-﻿using MineSharp.Data.Protocol;
-
-
+﻿using MineSharp.Core.Types.Enums;
+using MineSharp.Data.Protocol;
+using MineSharp.Data.Protocol.Handshaking.Serverbound;
 namespace MineSharp.Protocol.Handlers
 {
     internal class HandshakePacketHandler : IPacketHandler
@@ -17,14 +17,14 @@ namespace MineSharp.Protocol.Handlers
         public Task HandleOutgoing(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
-                MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol setProtocol => this.HandleSetProtocolPacket(setProtocol, client),
+                PacketSetProtocol setProtocol => this.HandleSetProtocolPacket(setProtocol, client),
                 _ => Task.CompletedTask
             };
         }
 
-        private Task HandleSetProtocolPacket(MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol packet, MinecraftClient client)
+        private Task HandleSetProtocolPacket(PacketSetProtocol packet, MinecraftClient client)
         {
-            client.SetGameState((Core.Types.Enums.GameState)packet.NextState!.Value);
+            client.SetGameState((GameState)packet.NextState!.Value);
             return Task.CompletedTask;
         }
     }

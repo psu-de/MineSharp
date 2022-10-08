@@ -1,6 +1,5 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
-
 namespace MineSharp.Physics
 {
     public static class PhysicsConst
@@ -31,39 +30,22 @@ namespace MineSharp.Physics
         public const double DefaultSlipperiness = 0.6f;
         public const double OutOfLiquidImpulse = 0.3f;
         public const int AutoJumpCooldown = 10;
-        public static BubbleColumnDragC BubbleColumnSurfaceDrag = new BubbleColumnDragC(0.03f, -0.9f, 0.1f, 1.8f);
-        public static BubbleColumnDragC BubbleColumnDrag = new BubbleColumnDragC(0.03f, -0.03f, 0.06f, 0.7f);
         public const double SlowFalling = 0.125f;
         public const double SpeedEffect = 1.2f;
         public const double SlowEffect = 0.85f;
         public const string MovementSpeedAttribute = "generic.movement_speed";
-        public static readonly UUID SprintingUUID = UUID.Parse("662a6b8d-da3e-4c1c-8813-96ea6097278d");
         public const double PlayerSpeed = 0.1d;
         public const double MaxFallDistance = 0.625d;
+        public static BubbleColumnDragC BubbleColumnSurfaceDrag = new BubbleColumnDragC(0.03f, -0.9f, 0.1f, 1.8f);
+        public static BubbleColumnDragC BubbleColumnDrag = new BubbleColumnDragC(0.03f, -0.03f, 0.06f, 0.7f);
+        public static readonly UUID SprintingUUID = UUID.Parse("662a6b8d-da3e-4c1c-8813-96ea6097278d");
 
-        public static List<int> WaterLikeBlocks = new List<int>() {
+        public static List<int> WaterLikeBlocks = new List<int> {
             Seagrass.BlockId,
             TallSeagrass.BlockId,
             Kelp.BlockId,
             BubbleColumn.BlockId
         };
-
-        public class BubbleColumnDragC
-        {
-
-            public double Down { get; set; }
-            public double MaxDown { get; set; }
-            public double Up { get; set; }
-            public double MaxUp { get; set; }
-
-            public BubbleColumnDragC(double down, double maxDown, double up, double maxUp)
-            {
-                this.Down = down;
-                this.MaxDown = maxDown;
-                this.Up = up;
-                this.MaxUp = maxUp;
-            }
-        }
 
         public static double GetBlockSlipperiness(int blockId)
         {
@@ -89,6 +71,23 @@ namespace MineSharp.Physics
             var bb = new AABB(-PlayerHalfWidth, 0, -PlayerHalfWidth, PlayerHalfWidth, PlayerHeight, PlayerHalfWidth)
                 .Offset(pos.X, pos.Y, pos.Z);
             return bb;
+        }
+
+        public class BubbleColumnDragC
+        {
+
+            public BubbleColumnDragC(double down, double maxDown, double up, double maxUp)
+            {
+                this.Down = down;
+                this.MaxDown = maxDown;
+                this.Up = up;
+                this.MaxUp = maxUp;
+            }
+
+            public double Down { get; set; }
+            public double MaxDown { get; set; }
+            public double Up { get; set; }
+            public double MaxUp { get; set; }
         }
     }
 }

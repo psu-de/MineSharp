@@ -3,15 +3,14 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
-
 namespace MineSharp.Protocol.Crypto
 {
     public class AesStream : Stream
     {
+        private readonly Stream BaseStream;
+        private readonly BufferedBlockCipher DecryptCipher;
 
-        private BufferedBlockCipher EncryptCipher;
-        private BufferedBlockCipher DecryptCipher;
-        private Stream BaseStream;
+        private readonly BufferedBlockCipher EncryptCipher;
 
         public AesStream(Stream stream, byte[] key)
         {

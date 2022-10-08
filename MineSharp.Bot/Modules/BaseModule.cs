@@ -1,7 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
-using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using static MineSharp.Bot.MinecraftBot;
@@ -13,14 +12,9 @@ namespace MineSharp.Bot.Modules
     public class BaseModule : Module
     {
 
+        private readonly TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
-        public event BotEmptyEvent? HealthChanged;
-
-        public event BotEmptyEvent? Respawned;
-
-        public event BotChatEvent? Died;
-
-        public event BotChatSenderEvent? ChatReceived;
+        public BaseModule(MinecraftBot bot) : base(bot) {}
 
 
         public Player? BotEntity { get; private set; }
@@ -32,9 +26,14 @@ namespace MineSharp.Bot.Modules
         public Identifier? CurrentDimension { get; private set; }
         public GameMode? GameMode => this.Player?.GameMode;
 
-        private TaskCompletionSource BotInitializedTsc = new TaskCompletionSource();
 
-        public BaseModule(MinecraftBot bot) : base(bot) {}
+        public event BotEmptyEvent? HealthChanged;
+
+        public event BotEmptyEvent? Respawned;
+
+        public event BotChatEvent? Died;
+
+        public event BotChatSenderEvent? ChatReceived;
 
         protected override async Task Load()
         {
@@ -122,7 +121,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Respawns the bot
+        ///     Respawns the bot
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">Thrown when bot is still alive</exception>
@@ -132,11 +131,11 @@ namespace MineSharp.Bot.Modules
 
             await this.Bot.Client.SendPacket(
                     new PacketClientCommand(0))
-                .ContinueWith((x) => this.Health = 20.0f);
+                .ContinueWith(x => this.Health = 20.0f);
         }
 
         /// <summary>
-        /// Returns a Task that finishes once <see cref="BotEntity"/> has been initialized.
+        ///     Returns a Task that finishes once <see cref="BotEntity" /> has been initialized.
         /// </summary>
         public Task WaitForBot()
         {
@@ -145,7 +144,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Attacks a given entity
+        ///     Attacks a given entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -166,7 +165,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Sends a public chat message to the server
+        ///     Sends a public chat message to the server
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>

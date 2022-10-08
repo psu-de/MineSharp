@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Protocol.Datatypes
 {
 
@@ -8,18 +7,8 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
     internal abstract class Datatype
     {
 
-        public ProtoCompiler Compiler { get; set; }
-        public JToken? Options { get; set; }
-        public JToken? ExtraOptions { get; set; }
-        public string Name { get; set; }
-        public abstract string CSharpType { get; }
-        public abstract string TypeName { get; }
-        public ContainerDatatype? Container { get; set; }
-        public StructureDatatype? OuterStructure { get; set; }
-        public string? Namespace { get; set; }
 
-
-        private bool IsStructureWritten = false;
+        private bool IsStructureWritten;
 
         public Datatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure)
         {
@@ -43,6 +32,16 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
                 if (this.Namespace == "") this.Namespace = "types";
             }
         }
+
+        public ProtoCompiler Compiler { get; set; }
+        public JToken? Options { get; set; }
+        public JToken? ExtraOptions { get; set; }
+        public string Name { get; set; }
+        public abstract string CSharpType { get; }
+        public abstract string TypeName { get; }
+        public ContainerDatatype? Container { get; set; }
+        public StructureDatatype? OuterStructure { get; set; }
+        public string? Namespace { get; set; }
 
         public string GetCSharpNamespace()
         {
@@ -117,22 +116,18 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
                 if (compiler.NativeTypes!.TryGetValue(typeRef, out var dtypeGen))
                 {
                     return dtypeGen!.Create(compiler, options, name, parent, outerStructure); // For some reason, the native type 'mapper' is not defined in the minecraft-data protocol json as a native type, but is still used
-                } else
-                {
-                    throw new DatatypeNotFoundException();
                 }
-            } else
-            {
-                //if (options != null) {
-                //    options = MergeOptions((JObject)dtype.Options!, (JObject)options);
-                //    return Create(compiler, dtype.TypeName, options, name, parent, outerStructure);
-                //}
-                if (options != null)
-                {
-                    dtype.ExtraOptions = options;
-                }
-                return dtype;
+                throw new DatatypeNotFoundException();
             }
+            //if (options != null) {
+            //    options = MergeOptions((JObject)dtype.Options!, (JObject)options);
+            //    return Create(compiler, dtype.TypeName, options, name, parent, outerStructure);
+            //}
+            if (options != null)
+            {
+                dtype.ExtraOptions = options;
+            }
+            return dtype;
 
         }
 
@@ -157,7 +152,6 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
             {
                 this.IsStructureWritten = true;
                 this.WriteStructure(codeGenerator, writer);
-                return;
             }
         }
 
@@ -181,13 +175,13 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
 
         public ProtoCompiler Compiler;
 
-        public abstract string TypeName { get; }
-        public abstract bool IsGeneric { get; }
-
         public DatatypeGenerator(ProtoCompiler compiler)
         {
             this.Compiler = compiler;
         }
+
+        public abstract string TypeName { get; }
+        public abstract bool IsGeneric { get; }
 
         public abstract Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure);
 
@@ -203,13 +197,7 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
         public override Datatype Create(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? parent, StructureDatatype? outerStructure)
         {
             var type = typeof(T);
-            return (Datatype)Activator.CreateInstance(type, new object?[] {
-                compiler,
-                options,
-                name,
-                parent,
-                outerStructure
-            })!;
+            return (Datatype)Activator.CreateInstance(type, compiler, options, name, parent, outerStructure)!;
         }
     }
 

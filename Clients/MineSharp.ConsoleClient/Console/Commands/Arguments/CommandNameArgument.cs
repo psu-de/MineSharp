@@ -1,6 +1,5 @@
 ﻿using PrettyPrompt.Completion;
 using PrettyPrompt.Highlighting;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments
 {
     internal class CommandNameArgument : Argument

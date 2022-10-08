@@ -1,6 +1,6 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Data.Effects;
-
+using System.Reflection;
 namespace MineSharp.Data.Blocks
 {
     public static class BlockExtensions
@@ -27,7 +27,7 @@ namespace MineSharp.Data.Blocks
             toolMultiplier /= MathF.Pow(1.2f, hasteLevel);
             toolMultiplier *= MathF.Pow(0.3f, miningFatiqueLevel);
 
-            var damage = toolMultiplier / (float)block.Hardness;
+            var damage = toolMultiplier / block.Hardness;
 
             var canHarvest = block.CanBeHarvested(heldItem);
             if (canHarvest)
@@ -58,7 +58,7 @@ namespace MineSharp.Data.Blocks
         {
 
             var blockType = block.GetType();
-            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
+            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
             var idx = 0;
             if (shapeIndices.Length > 1)
             {
@@ -72,7 +72,7 @@ namespace MineSharp.Data.Blocks
         public static AABB[] GetBoundingBoxes(this Block block)
         {
             var blockType = block.GetType();
-            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.GetValue(null)!;
+            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
             var idx = shapeIndices.Length > 1 ? block.Metadata : 0;
             var shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[idx]];
             return shapeData.Select(x => new BlockShape(x).ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)).ToArray();

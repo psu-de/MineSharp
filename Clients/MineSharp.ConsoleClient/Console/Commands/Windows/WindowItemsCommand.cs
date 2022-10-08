@@ -1,11 +1,8 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized;
-using MineSharp.Core.Types;
-using MineSharp.Windows;
 using PrettyPrompt.Completion;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Windows
 {
     internal class WindowItemsCommand : Command
@@ -16,7 +13,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
         public WindowItemsCommand()
         {
             this.WindowIDArgument = new CustomAutocompleteArgument(new IntegerArgument("windowId"), this.GetWindowIdItems);
-            var desc = $"Shows a table of all items in the given window";
+            var desc = "Shows a table of all items in the given window";
 
             this.Initialize("windowItems", desc, CColor.WindowsCommand, this.WindowIDArgument);
         }

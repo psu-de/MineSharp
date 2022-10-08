@@ -1,7 +1,6 @@
 ﻿using MineSharp.Bot;
 using MineSharp.ConsoleClient.Client;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Prompt
 {
     internal class ReconnectCommand : Command
@@ -9,8 +8,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Prompt
 
         public ReconnectCommand()
         {
-            var desc = $"Reconnects the bot";
-            this.Initialize("reconnect", desc, CColor.PromptCommand, new Arguments.Argument[] {});
+            var desc = "Reconnects the bot";
+            this.Initialize("reconnect", desc, CColor.PromptCommand);
         }
         public override void DoAction(string[] argv, CancellationToken cancellation)
         {

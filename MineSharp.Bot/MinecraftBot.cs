@@ -8,65 +8,32 @@ using MineSharp.MojangAuth;
 using MineSharp.Protocol;
 using MineSharp.Windows;
 using System.Diagnostics;
-using Item = MineSharp.Core.Types.Item;
-
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot
     {
 
-        static MinecraftBot()
-        {
-            Logger.AddScope(LogLevel.DEBUG, (s) => Debug.WriteLine(s));
-        }
-
-        private static Logger Logger = Logger.GetLogger();
-
-        public struct BotOptions
-        {
-            public string Version;
-            public string UsernameOrEmail;
-            public string? Password;
-            public bool? Offline;
-            public string Host;
-            public ushort? Port;
-        }
-
-        public MinecraftClient Client { get; private set; }
-        public BotOptions Options { get; private set; }
-        public Session Session { get; private set; }
-
-
-        #region Events
-
-
-        public delegate void BotEmptyEvent(MinecraftBot sender);
-        public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
-        public delegate void BotChatSenderEvent(MinecraftBot sender, Chat chat, MinecraftPlayer messageSender);
-        public delegate void BotItemEvent(MinecraftBot sender, Item? item);
-
-        public delegate void BotPlayerEvent(MinecraftBot sender, MinecraftPlayer entity);
-        public delegate void BotEntityEvent(MinecraftBot sender, Entity entity);
-
-        public delegate void BotWindowEvent(MinecraftBot sender, Window window);
-
-
-        #endregion
-
-        private Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
-        private Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
-        private Task? TickLoopTask;
-
-        public List<Module> Modules = new List<Module>();
-        private List<TickedModule> TickedModules = new List<TickedModule>();
+        private static readonly Logger Logger = Logger.GetLogger();
 
         public BaseModule? BaseModule;
 
         public EntityModule? EntityModule;
-        public PlayerModule? PlayerModule;
-        public WorldModule? WorldModule;
+
+        public List<Module> Modules = new List<Module>();
+        private readonly Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
+
+        private readonly Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
         public PhysicsModule? PhysicsModule;
+        public PlayerModule? PlayerModule;
+        private readonly List<TickedModule> TickedModules = new List<TickedModule>();
+        private Task? TickLoopTask;
         public WindowsModule? WindowsModule;
+        public WorldModule? WorldModule;
+
+        static MinecraftBot()
+        {
+            Logger.AddScope(LogLevel.DEBUG, s => Debug.WriteLine(s));
+        }
 
         public MinecraftBot(BotOptions options)
         {
@@ -91,6 +58,19 @@ namespace MineSharp.Bot
             this.PhysicsModule = new PhysicsModule(this);
             this.WorldModule = new WorldModule(this);
             this.WindowsModule = new WindowsModule(this);
+        }
+
+        public MinecraftClient Client
+        {
+            get;
+        }
+        public BotOptions Options
+        {
+            get;
+        }
+        public Session Session
+        {
+            get;
         }
 
         public async Task LoadModule(Module module)
@@ -144,19 +124,12 @@ namespace MineSharp.Bot
 
         private async Task LoadModules()
         {
-            await Task.WhenAll(new Task[] {
-                this.LoadModule(this.BaseModule),
-                this.LoadModule(this.EntityModule),
-                this.LoadModule(this.PlayerModule),
-                this.LoadModule(this.PhysicsModule),
-                this.LoadModule(this.WorldModule),
-                this.LoadModule(this.WindowsModule)
-            });
+            await Task.WhenAll(this.LoadModule(this.BaseModule), this.LoadModule(this.EntityModule), this.LoadModule(this.PlayerModule), this.LoadModule(this.PhysicsModule), this.LoadModule(this.WorldModule), this.LoadModule(this.WindowsModule));
         }
 
 
         /// <summary>
-        /// Connects the bot to the server
+        ///     Connects the bot to the server
         /// </summary>
         /// <returns></returns>
         public async Task<bool> Connect()
@@ -173,7 +146,7 @@ namespace MineSharp.Bot
         }
 
         /// <summary>
-        /// Waits for a specific packet from the server
+        ///     Waits for a specific packet from the server
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -188,7 +161,8 @@ namespace MineSharp.Bot
                 this.packetWaiters.Add(packetType, tsc);
 
                 return tsc.Task ?? throw new ArgumentNullException();
-            } else return ((TaskCompletionSource<T>?)task)?.Task ?? throw new ArgumentNullException();
+            }
+            return ((TaskCompletionSource<T>?)task)?.Task ?? throw new ArgumentNullException();
         }
 
         [BotFunction("Basic", "Calls handler every time a specific packet is received")]
@@ -196,11 +170,11 @@ namespace MineSharp.Bot
         {
             if (this.PacketHandlers.ContainsKey(typeof(T)))
             {
-                this.PacketHandlers[typeof(T)].Add((IPacketPayload p) => handler((T)p));
+                this.PacketHandlers[typeof(T)].Add(p => handler((T)p));
             } else
             {
-                this.PacketHandlers.Add(typeof(T), new List<Func<IPacketPayload, Task>>() {
-                    (IPacketPayload p) => handler((T)p)
+                this.PacketHandlers.Add(typeof(T), new List<Func<IPacketPayload, Task>> {
+                    p => handler((T)p)
                 });
             }
         }
@@ -233,12 +207,38 @@ namespace MineSharp.Bot
             Task.WaitAll(tasks.ToArray());
         }
 
+        public struct BotOptions
+        {
+            public string Version;
+            public string UsernameOrEmail;
+            public string? Password;
+            public bool? Offline;
+            public string Host;
+            public ushort? Port;
+        }
+
+
+        #region Events
+
+
+        public delegate void BotEmptyEvent(MinecraftBot sender);
+        public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
+        public delegate void BotChatSenderEvent(MinecraftBot sender, Chat chat, MinecraftPlayer messageSender);
+        public delegate void BotItemEvent(MinecraftBot sender, Item? item);
+
+        public delegate void BotPlayerEvent(MinecraftBot sender, MinecraftPlayer entity);
+        public delegate void BotEntityEvent(MinecraftBot sender, Entity entity);
+
+        public delegate void BotWindowEvent(MinecraftBot sender, Window window);
+
+
+        #endregion
+
 
 
         #region Public Methods
 
 
         #endregion
-
     }
 }

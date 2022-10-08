@@ -1,15 +1,8 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Windows
 {
     public class WindowInfo
     {
-
-        public Identifier Name { get; set; }
-        public string Title { get; set; }
-        public int UniqueSlots { get; private set; }
-        public bool ExcludeInventory { get; private set; }
-        public bool HasOffHandSlot { get; private set; }
 
         public WindowInfo(Identifier name, string title, int uniqueSlots, bool excludeInventory = false, bool hasOffHandSlot = false)
         {
@@ -20,6 +13,20 @@ namespace MineSharp.Data.Windows
             this.HasOffHandSlot = hasOffHandSlot;
         }
 
+        public Identifier Name { get; set; }
+        public string Title { get; set; }
+        public int UniqueSlots
+        {
+            get;
+        }
+        public bool ExcludeInventory
+        {
+            get;
+        }
+        public bool HasOffHandSlot
+        {
+            get;
+        }
     }
 
     public enum PlayerWindowSlots

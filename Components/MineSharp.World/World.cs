@@ -5,30 +5,28 @@ using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.World.Chunks;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-
 namespace MineSharp.World
 {
     public class World
     {
 
-        private static Logger Logger = Logger.GetLogger();
+        public delegate void BlockEvent(Block block);
+
+        public delegate void ChunkEvent(Chunk chunk);
 
         public const int MaxY = 320;
         public const int MinY = -64;
         public const int TotalHeight = MaxY - MinY;
 
+        private static readonly Logger Logger = Logger.GetLogger();
+
         public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
 
         internal TemporaryBlockCache? TempCache = null;
 
-        public delegate void BlockEvent(Block block);
         public event BlockEvent? BlockUpdated;
-
-        public delegate void ChunkEvent(Chunk chunk);
         public event ChunkEvent? ChunkLoaded;
         public event ChunkEvent? ChunkUnloaded;
-
-        public World() {}
 
         public void LoadChunkPacket(PacketMapChunk packet)
         {
@@ -117,11 +115,8 @@ namespace MineSharp.World
 
             var coords = this.GetChunkCoordinates(block.Position!.X, block.Position.Z);
             if (!this.IsBlockLoaded(block.Position, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
-            else
-            {
-                chunk!.SetBlock(block);
-                this.BlockUpdated?.Invoke(block);
-            }
+            chunk!.SetBlock(block);
+            this.BlockUpdated?.Invoke(block);
         }
 
         public bool IsOutOfMap(Position pos)
@@ -147,7 +142,6 @@ namespace MineSharp.World
             var coords = this.GetChunkCoordinates(pos.X, pos.Z);
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
-            else
             {
                 var block = chunk!.GetBlockAt(pos);
 
@@ -166,10 +160,7 @@ namespace MineSharp.World
             var coords = this.GetChunkCoordinates(pos.X, pos.Z);
 
             if (!this.IsBlockLoaded(pos, out var chunk)) throw new Exception($"Chunk {coords} is not loaded");
-            else
-            {
-                return chunk!.GetBiomeAt(pos);
-            }
+            return chunk!.GetBiomeAt(pos);
         }
 
         public async Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null)

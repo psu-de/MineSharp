@@ -11,6 +11,9 @@ namespace MineSharp.Bot.Modules
 {
     public class EntityModule : Module
     {
+
+
+        public ConcurrentDictionary<int, Entity> Entities = new ConcurrentDictionary<int, Entity>();
         public EntityModule(MinecraftBot bot) : base(bot) {}
 
         public event BotEntityEvent? EntitySpawned;
@@ -20,9 +23,6 @@ namespace MineSharp.Bot.Modules
         public event BotEntityEvent? EntityMoved;
 
         public event BotEntityEvent? EntityEffectChanged;
-
-
-        public ConcurrentDictionary<int, Entity> Entities = new ConcurrentDictionary<int, Entity>();
 
         protected override async Task Load()
         {
@@ -140,7 +140,7 @@ namespace MineSharp.Bot.Modules
             if (!this.Entities.TryGetValue(packet.EntityId!, out var entity))
                 return Task.CompletedTask;
             var effectType = EffectPalette.GetEffectTypeById(packet.EffectId!);
-            var effect = EffectFactory.CreateEffect((int)packet.EffectId!, packet.Amplifier!, DateTime.Now, packet.Duration!);
+            var effect = EffectFactory.CreateEffect(packet.EffectId!, packet.Amplifier!, DateTime.Now, packet.Duration!);
 
             //TODO: Effect updating is so noch nich ganz richtig
             if (entity.Effects.ContainsKey(packet.EffectId!) && effect.Amplifier >= entity.Effects[packet.EffectId!]!.Amplifier)

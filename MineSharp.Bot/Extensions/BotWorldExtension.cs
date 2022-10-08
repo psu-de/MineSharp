@@ -2,7 +2,6 @@
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Blocks;
-
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot
@@ -12,7 +11,7 @@ namespace MineSharp.Bot
 
 
         /// <summary>
-        /// Returns the block at the given position
+        ///     Returns the block at the given position
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
@@ -20,7 +19,7 @@ namespace MineSharp.Bot
         public Block GetBlockAt(Position pos) => this.World!.GetBlockAt(pos);
 
         /// <summary>
-        /// Returns the biome at the given position
+        ///     Returns the biome at the given position
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
@@ -28,8 +27,8 @@ namespace MineSharp.Bot
         public Biome GetBiomeAt(Position pos) => this.World!.GetBiomeAt(pos);
 
         /// <summary>
-        /// Searches through the loaded chunks for a specific block type 
-        /// Can return less blocks than requested if not enough where found
+        ///     Searches through the loaded chunks for a specific block type
+        ///     Can return less blocks than requested if not enough where found
         /// </summary>
         /// <param name="type">Block type to search for</param>
         /// <param name="count">Number of blocks to return. Use Count < 0 for no limit</param>
@@ -39,7 +38,7 @@ namespace MineSharp.Bot
         public Task<Block[]?> FindBlocksAsync(BlockType type, int count = -1, CancellationToken? cancellation = null) => this.World!.FindBlocksAsync(type, count, cancellation);
 
         /// <summary>
-        /// Searches through the loaded chunks for one block of a specific block type 
+        ///     Searches through the loaded chunks for one block of a specific block type
         /// </summary>
         /// <param name="type"></param>
         /// <param name="cancellation"></param>
@@ -58,6 +57,5 @@ namespace MineSharp.Bot
 
         [BotFunction("World", "Waits until the chunks around the bot have been loaded")]
         public Task WaitForChunksToLoad(int length = 5) => this.WorldModule!.WaitForChunksToLoad(length);
-
     }
 }

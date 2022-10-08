@@ -1,5 +1,4 @@
 ﻿using MineSharp.Data.Protocol;
-
 namespace MineSharp.World.PalettedContainer.Palettes
 {
     internal class IndirectPalette : IPalette
@@ -21,8 +20,6 @@ namespace MineSharp.World.PalettedContainer.Palettes
 
         public int Get(int entry) => this.Map![entry];
 
-        public int GetStateIndex(int state) => this.Map!.ToList().IndexOf(state);
-
         public bool HasState(int minState, int maxState)
         {
 
@@ -36,8 +33,10 @@ namespace MineSharp.World.PalettedContainer.Palettes
 
         public void Read(PacketBuffer buffer)
         {
-            this.Map = buffer.ReadArray<int>(buffer.ReadVarInt(), (buffer) => buffer.ReadVarInt()); // TODO: Varint
+            this.Map = buffer.ReadArray<int>(buffer.ReadVarInt(), buffer => buffer.ReadVarInt()); // TODO: Varint
         }
+
+        public int GetStateIndex(int state) => this.Map!.ToList().IndexOf(state);
 
         public IPalette AddState(int state, bool biomes, out byte newBitsPerEntry)
         {
@@ -51,12 +50,10 @@ namespace MineSharp.World.PalettedContainer.Palettes
             {
                 // direct palette neeeded
                 return new DirectPalette();
-            } else
-            {
-                var newMap = this.Map.ToList();
-                newMap.Add(state);
-                return new IndirectPalette(newMap.ToArray());
             }
+            var newMap = this.Map.ToList();
+            newMap.Add(state);
+            return new IndirectPalette(newMap.ToArray());
         }
     }
 }

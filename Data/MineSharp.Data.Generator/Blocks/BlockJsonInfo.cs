@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Blocks
 {
 #pragma warning disable CS8618
@@ -87,12 +86,10 @@ namespace MineSharp.Data.Generator.Blocks
             if (obj is JArray)
             {
                 return ((JArray)obj).Select(x => (int)x).ToArray();
-            } else
-            {
-                return new int[] {
-                    (int)(long)obj
-                };
             }
+            return new[] {
+                (int)(long)obj
+            };
         }
     }
 #pragma warning restore CS8618

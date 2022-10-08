@@ -1,11 +1,10 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Windows
 {
     public static class WindowData
     {
 
-        private static bool isLoaded = false;
+        private static bool isLoaded;
 
         public static List<WindowInfo> Windows = new List<WindowInfo>();
         public static Dictionary<Identifier, WindowInfo> WindowMap = new Dictionary<Identifier, WindowInfo>();

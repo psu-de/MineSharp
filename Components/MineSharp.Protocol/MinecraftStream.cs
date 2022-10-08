@@ -2,7 +2,6 @@
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Crypto;
 using System.Net.Sockets;
-
 namespace MineSharp.Protocol
 {
     internal class MinecraftStream : Stream
@@ -10,16 +9,10 @@ namespace MineSharp.Protocol
 
         private static Logger Logger = Logger.GetLogger();
 
-        private NetworkStream _networkStream;
+        private Stream _baseStream;
         private AesStream? _encryptionStream;
 
-        private Stream _baseStream;
-
-        public override bool CanRead => this._baseStream.CanRead;
-        public override bool CanSeek => this._baseStream.CanSeek;
-        public override bool CanWrite => this._baseStream.CanWrite;
-        public override long Length => this._baseStream.Length;
-        public override long Position { get => this._baseStream.Position; set => this._baseStream.Position = value; }
+        private readonly NetworkStream _networkStream;
 
         public MinecraftStream(NetworkStream stream)
         {
@@ -27,14 +20,20 @@ namespace MineSharp.Protocol
             this._baseStream = this._networkStream;
         }
 
+        public override bool CanRead => this._baseStream.CanRead;
+        public override bool CanSeek => this._baseStream.CanSeek;
+        public override bool CanWrite => this._baseStream.CanWrite;
+        public override long Length => this._baseStream.Length;
+        public override long Position { get => this._baseStream.Position; set => this._baseStream.Position = value; }
+
+        public bool IsAvailable => this._networkStream.DataAvailable;
+
         public void EnableEncryption(byte[] sharedSecret)
         {
             var oldStream = this._baseStream;
             this._encryptionStream = new AesStream(oldStream, sharedSecret);
             this._baseStream = this._encryptionStream;
         }
-
-        public bool IsAvailable => this._networkStream.DataAvailable;
 
         public override void Flush()
         {

@@ -5,16 +5,15 @@ using MineSharp.Core.Types.Enums;
 using MineSharp.Windows;
 using PrettyPrompt.Completion;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Windows
 {
     internal class ClickWindowCommand : Command
     {
+        public IntegerArgument ButtonArgument;
+        public IntegerArgument SlotArgument;
 
         public CustomAutocompleteArgument WindowIDArgument;
         public EnumArgument<WindowOperationMode> WindowOperationModeArgument;
-        public IntegerArgument ButtonArgument;
-        public IntegerArgument SlotArgument;
 
         public ClickWindowCommand()
         {
@@ -24,7 +23,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
             this.SlotArgument = new IntegerArgument("slot");
 
 
-            var desc = $"Performs a [yellow]click[/] on a given windowId";
+            var desc = "Performs a [yellow]click[/] on a given windowId";
             this.Initialize("clickWindow", desc, CColor.WindowsCommand, this.WindowIDArgument, this.WindowOperationModeArgument, this.ButtonArgument, this.SlotArgument);
         }
 

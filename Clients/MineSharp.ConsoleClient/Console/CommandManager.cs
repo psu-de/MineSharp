@@ -6,7 +6,6 @@ using MineSharp.ConsoleClient.Console.Commands.Prompt;
 using MineSharp.ConsoleClient.Console.Commands.Windows;
 using MineSharp.ConsoleClient.Console.Commands.World;
 using System.Diagnostics.CodeAnalysis;
-
 namespace MineSharp.ConsoleClient.Console
 {
     internal static class CommandManager
@@ -39,7 +38,7 @@ namespace MineSharp.ConsoleClient.Console
         private static class CommandPalette
         {
 
-            private static bool _initialized = false;
+            private static bool _initialized;
 
             public static void Initialize()
             {
@@ -85,7 +84,6 @@ namespace MineSharp.ConsoleClient.Console
                 RegisterCommand(new OpenContainerCommand());
                 RegisterCommand(new WindowItemsCommand());
             }
-
         }
     }
 }

@@ -10,6 +10,5 @@
         public bool Jump { get; set; } = false;
         public bool Sprint { get; set; } = false;
         public bool Sneak { get; set; } = false;
-
     }
 }

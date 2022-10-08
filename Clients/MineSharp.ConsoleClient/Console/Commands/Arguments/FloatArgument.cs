@@ -1,5 +1,4 @@
 ﻿using PrettyPrompt.Completion;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments
 {
     internal class FloatArgument : Argument
@@ -26,8 +25,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Arguments
             if (!float.TryParse(str, out var value))
             {
                 return null;
-            } else return value;
+            }
+            return value;
         }
-
     }
 }

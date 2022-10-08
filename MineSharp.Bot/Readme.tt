@@ -3,13 +3,13 @@
 <#@ assembly name="System.Reflection" #>
 <#@ assembly name="System.Threading" #>
 <#@ assembly name="$(SolutionDir)\MineSharp.Bot\bin\Debug\net6.0\MineSharp.Bot.dll" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="MineSharp.Bot" #>
-<#@ import namespace="System.Reflection" #>
-<#@ import namespace="System.Threading.Tasks" #>
 <#@ output extension=".md" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Runtime.CompilerServices" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Threading.Tasks" #>
 
 
 # MineSharp.Bot
@@ -85,7 +85,7 @@
             if (firstParam)
             {
                 firstParam = false;
-                if (method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
+                if (method.IsDefined(typeof(ExtensionAttribute), false))
                 {
                     if (callable)
                     {
@@ -94,7 +94,7 @@
                     }
                     sigBuilder.Append("this ");
                 }
-            } else if (secondParam == true)
+            } else if (secondParam)
                 secondParam = false;
             else
                 sigBuilder.Append(", ");
@@ -114,7 +114,7 @@
     }
 
     /// <summary>
-    /// Get full type name with full namespace names
+    ///     Get full type name with full namespace names
     /// </summary>
     /// <param name="type">Type. May be generic or nullable</param>
     /// <returns>Full type name, fully qualified namespaces</returns>

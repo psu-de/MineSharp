@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Text;
-
 namespace MineSharp.Data.Generator.Blocks
 {
     internal class BlockGenerator : Generator
@@ -42,13 +41,13 @@ namespace MineSharp.Data.Generator.Blocks
             codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
             foreach (var block in blockData)
                 codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Block with state {{state}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
             codeGenerator.Finish(semicolon: true);
 
             codeGenerator.Begin("public static Type GetBlockTypeById(int id) => id switch");
             foreach (var block in blockData)
                 codeGenerator.WriteLine($"{block.Id} => typeof({this.Wrapper.GetCSharpName(block.Name)}),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Block with id {{id}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 

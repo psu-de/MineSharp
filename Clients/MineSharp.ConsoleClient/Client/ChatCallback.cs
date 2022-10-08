@@ -1,7 +1,5 @@
 using MineSharp.Bot;
 using MineSharp.Core.Types;
-using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Client
 {
     public class ChatCallback
@@ -19,6 +17,5 @@ namespace MineSharp.ConsoleClient.Client
                 // TODO: Parse the chat object
             }
         }
-
     }
 }

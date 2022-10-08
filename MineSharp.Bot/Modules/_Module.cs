@@ -1,21 +1,23 @@
 ﻿using MineSharp.Core.Logging;
-
 namespace MineSharp.Bot.Modules
 {
     public abstract class Module
     {
-        protected Logger Logger = Logger.GetLogger();
-        public bool IsLoaded { get; private set; } = false;
-        public bool IsEnabled => this._enabled;
-
-        private bool _enabled = false;
 
         public readonly MinecraftBot Bot;
+
+        protected Logger Logger = Logger.GetLogger();
 
 
         public Module(MinecraftBot bot)
         {
             this.Bot = bot;
+        }
+        public bool IsLoaded { get; private set; }
+        public bool IsEnabled
+        {
+            get;
+            private set;
         }
 
 
@@ -40,7 +42,7 @@ namespace MineSharp.Bot.Modules
             if (enabled) await this.EnablePlugin();
             else await this.DisablePlugin();
 
-            this._enabled = enabled;
+            this.IsEnabled = enabled;
         }
     }
 }

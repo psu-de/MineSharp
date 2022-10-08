@@ -1,18 +1,18 @@
-﻿using Newtonsoft.Json.Linq;
-using MineSharp.Data.Generator.Protocol.Datatypes;
+﻿using MineSharp.Data.Generator.Protocol.Datatypes;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.Text.RegularExpressions;
-
 namespace MineSharp.Data.Generator.Protocol
 {
 
     internal class StructureScope
     {
-        public List<string> BlockedNames { get; set; }
 
         public StructureScope()
         {
             this.BlockedNames = new List<string>();
         }
+        public List<string> BlockedNames { get; set; }
 
         public bool IsValid(string name)
         {
@@ -27,22 +27,19 @@ namespace MineSharp.Data.Generator.Protocol
             name = name.ToLower();
             return this.BlockedNames.Contains(name);
         }
-
     }
 
     internal class ProtoCompiler
     {
+        public string? BaseNamespace;
+
+        private ProtoNamespace? CurrentNamespace;
+        public string? CurrentProtoNamespace;
+        public Dictionary<string, Datatype> DatatypeCache = new Dictionary<string, Datatype>();
 
         public Dictionary<string, DatatypeGenerator> NativeTypes;
 
-        private ProtoNamespace? CurrentNamespace;
-        public Dictionary<string, Datatype>? DefinedTypes => this.CurrentNamespace?.AllTypes;
-        public Dictionary<string, DatatypeGenerator>? UsedNativeTypes => this.CurrentNamespace?.AllNativeTypes;
-
         public List<string> UsedNamespaces = new List<string>();
-        public Dictionary<string, Datatype> DatatypeCache = new Dictionary<string, Datatype>();
-        public string? CurrentProtoNamespace;
-        public string? BaseNamespace;
 
         public ProtoCompiler()
         {
@@ -50,10 +47,12 @@ namespace MineSharp.Data.Generator.Protocol
 
             this.LoadNativeTypes();
         }
+        public Dictionary<string, Datatype>? DefinedTypes => this.CurrentNamespace?.AllTypes;
+        public Dictionary<string, DatatypeGenerator>? UsedNativeTypes => this.CurrentNamespace?.AllNativeTypes;
 
         private void LoadNativeTypes()
         {
-            var conditionalTypes = new Dictionary<string, DatatypeGenerator>() {
+            var conditionalTypes = new Dictionary<string, DatatypeGenerator> {
                 {
                     "switch", new SwitchDatatypeGenerator(this)
                 }, {
@@ -61,7 +60,7 @@ namespace MineSharp.Data.Generator.Protocol
                 }
             };
 
-            var numericTypes = new Dictionary<string, DatatypeGenerator>() {
+            var numericTypes = new Dictionary<string, DatatypeGenerator> {
                 {
                     "u8", new NumericDatatypeGenerator(this, "U8", "byte")
                 }, {
@@ -89,7 +88,7 @@ namespace MineSharp.Data.Generator.Protocol
                 }
             };
 
-            var structuresTypes = new Dictionary<string, DatatypeGenerator>() {
+            var structuresTypes = new Dictionary<string, DatatypeGenerator> {
                 {
                     "array", new ArrayDatatypeGenerator(this)
                 }, {
@@ -97,7 +96,7 @@ namespace MineSharp.Data.Generator.Protocol
                 }
             };
 
-            var primitiveTypes = new Dictionary<string, DatatypeGenerator>() {
+            var primitiveTypes = new Dictionary<string, DatatypeGenerator> {
                 {
                     "bool", new NumericDatatypeGenerator(this, "Bool", "bool")
                 }, {
@@ -107,7 +106,7 @@ namespace MineSharp.Data.Generator.Protocol
                 }
             };
 
-            var utilTypes = new Dictionary<string, DatatypeGenerator>() {
+            var utilTypes = new Dictionary<string, DatatypeGenerator> {
                 {
                     "buffer", new BufferDatatypeGenerator(this)
                 }, {
@@ -177,7 +176,7 @@ namespace MineSharp.Data.Generator.Protocol
 
         internal string GetCSharpName(string name)
         {
-            var ti = new System.Globalization.CultureInfo("en-US", false).TextInfo;
+            var ti = new CultureInfo("en-US", false).TextInfo;
 
             if (name.Contains("_"))
             {

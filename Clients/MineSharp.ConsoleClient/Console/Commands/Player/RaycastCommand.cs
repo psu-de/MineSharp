@@ -1,19 +1,17 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-using MineSharp.Core.Types;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class RaycastCommand : Command
     {
 
-        private IntegerArgument LengthArgument;
+        private readonly IntegerArgument LengthArgument;
         public RaycastCommand()
         {
             this.LengthArgument = new IntegerArgument("length", true);
 
-            var desc = $"Tries to figure out at what block the bot is looking";
+            var desc = "Tries to figure out at what block the bot is looking";
             this.Initialize("raycast", desc, CColor.PlayerCommand, this.LengthArgument);
         }
 

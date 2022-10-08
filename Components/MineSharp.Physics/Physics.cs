@@ -841,13 +841,6 @@ namespace MineSharp.Physics
             return CollisionResult.DoNothing;
         }
 
-        internal enum CollisionResult
-        {
-            DoNothing,
-            ClimbHalfBlock,
-            VerticalClimb
-        }
-
         private Vector3 ApplyHeading(double strafe, double forward, double multiplier)
         {
             var speed = Math.Sqrt(strafe * strafe + forward * forward);
@@ -968,6 +961,13 @@ namespace MineSharp.Physics
         {
             var block = this.World.GetBlockAt(pos);
             return block.Id == Ladder.BlockId || block.Id == Vine.BlockId;
+        }
+
+        internal enum CollisionResult
+        {
+            DoNothing,
+            ClimbHalfBlock,
+            VerticalClimb
         }
     }
 }

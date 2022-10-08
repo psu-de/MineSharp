@@ -1,13 +1,12 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class AttackCommand : Command
     {
 
-        private EntityIdArgument EntityIdArg = new EntityIdArgument("entityId");
+        private readonly EntityIdArgument EntityIdArg = new EntityIdArgument("entityId");
         public AttackCommand()
         {
             var desc = $"Attacks an [purple]Entity[/] specified by the [{this.EntityIdArg.Color}]Entity Id[/]";
@@ -22,7 +21,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
 
             if (null == eId)
             {
-                AnsiConsole.MarkupLine($"[red]Invalid entity id[/]");
+                AnsiConsole.MarkupLine("[red]Invalid entity id[/]");
                 return;
             }
 

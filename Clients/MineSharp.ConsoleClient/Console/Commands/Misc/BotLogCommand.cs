@@ -1,14 +1,13 @@
 ﻿using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Logging;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Misc
 {
     internal class BotLogCommand : Command
     {
+        private readonly IntegerArgument CountArg = new IntegerArgument("count", true);
 
-        private EnumArgument<LogLevel> LogLevelArg = new EnumArgument<LogLevel>("logLevel", true);
-        private IntegerArgument CountArg = new IntegerArgument("count", true);
+        private readonly EnumArgument<LogLevel> LogLevelArg = new EnumArgument<LogLevel>("logLevel", true);
 
         public BotLogCommand()
         {
@@ -21,7 +20,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
         {
             base.PrintHelp();
 
-            AnsiConsole.WriteLine($"Use count=0 for infinite messages");
+            AnsiConsole.WriteLine("Use count=0 for infinite messages");
             AnsiConsole.WriteLine($"Use count<0 for the last [{this.CountArg.Color}]count[/] messages");
         }
 

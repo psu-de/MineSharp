@@ -1,7 +1,6 @@
 ﻿using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Reflection;
-
 namespace MineSharp.ConsoleClient.Console
 {
     public static class CColor
@@ -78,6 +77,5 @@ namespace MineSharp.ConsoleClient.Console
         }
 
         public static AnsiColor GetAnsiColor(Color color) => AnsiColor.Rgb(color.R, color.G, color.B);
-
     }
 }

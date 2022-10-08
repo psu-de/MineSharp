@@ -1,21 +1,19 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
-using MineSharp.Windows;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Windows
 {
     internal class OpenContainerCommand : Command
     {
 
-        private IntegerArgument X = new IntegerArgument("x");
-        private IntegerArgument Y = new IntegerArgument("y");
-        private IntegerArgument Z = new IntegerArgument("z");
+        private readonly IntegerArgument X = new IntegerArgument("x");
+        private readonly IntegerArgument Y = new IntegerArgument("y");
+        private readonly IntegerArgument Z = new IntegerArgument("z");
 
         public OpenContainerCommand()
         {
-            var desc = $"Opens a block at a given position";
+            var desc = "Opens a block at a given position";
             this.Initialize("openContainer", desc, CColor.WindowsCommand, this.X, this.Y, this.Z);
         }
 

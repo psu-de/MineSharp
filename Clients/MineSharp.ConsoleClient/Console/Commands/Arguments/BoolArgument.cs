@@ -1,14 +1,13 @@
 ﻿using PrettyPrompt.Completion;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Arguments
 {
     internal class BoolArgument : Argument
     {
-        public override string Color { get => "dodgerblue3"; set => throw new NotImplementedException(); }
 
         public BoolArgument(string name, bool isOptional = false) : base(name, isOptional) {}
+        public override string Color { get => "dodgerblue3"; set => throw new NotImplementedException(); }
 
-        public override List<CompletionItem> GetCompletionItems(string str) => new List<CompletionItem>() {
+        public override List<CompletionItem> GetCompletionItems(string str) => new List<CompletionItem> {
             new CompletionItem(
                 "true",
                 CColor.FromMarkup($"[{this.Color}]true[/]")),

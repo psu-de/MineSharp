@@ -1,26 +1,25 @@
 ﻿using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Protocol.Datatypes
 {
     internal class SwitchDatatypeGenerator : DatatypeGenerator<SwitchDatatype>
     {
 
+        public SwitchDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
+
         public override string TypeName => "switch";
+        public override bool IsGeneric => true;
         public override void WriteClassReader(CodeGenerator codeGenerator) {}
         public override void WriteClassWriter(CodeGenerator codeGenerator) {}
-        public override bool IsGeneric => true;
-
-        public SwitchDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
     }
 
     internal class SwitchDatatype : StructureDatatype
     {
         internal Field? CompareToField;
-        internal Dictionary<string, Datatype>? SwitchMap;
         internal Datatype? DefaultType;
+        internal Dictionary<string, Datatype>? SwitchMap;
+        public SwitchDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string TypeName => "switch";
-        public SwitchDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string CSharpType => this.Compiler.GetCSharpName(this.Name) + "Switch";
 
@@ -108,7 +107,7 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
             if (this.DefaultType != null)
                 codeGenerator.WriteLine($"default: {this.DefaultType.GetWriter()}(buffer, ({this.DefaultType.CSharpType})Value); break;");
             else
-                codeGenerator.WriteLine($@"default: throw new Exception($""Invalid value: '{{state}}'"");");
+                codeGenerator.WriteLine(@"default: throw new Exception($""Invalid value: '{state}'"");");
             codeGenerator.Finish();
             codeGenerator.Finish();
 
@@ -120,13 +119,13 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
             if (this.DefaultType != null)
                 codeGenerator.WriteLine($"_ => {this.DefaultType.GetReader()}(buffer)");
             else if (this.CompareToField!.Type.CSharpType != "bool")
-                codeGenerator.WriteLine($@" _ => throw new Exception($""Invalid value: '{{state}}'"")");
+                codeGenerator.WriteLine(@" _ => throw new Exception($""Invalid value: '{state}'"")");
 
             codeGenerator.Finish(semicolon: true);
             codeGenerator.WriteLine($"return new {this.CSharpType}(value);");
             codeGenerator.Finish();
 
-            List<string> conversions = this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")}({this.CSharpType} value) => ({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")})value.Value;").ToList();
+            var conversions = this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")}({this.CSharpType} value) => ({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")})value.Value;").ToList();
             conversions.AddRange(this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {this.CSharpType}?({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")} value) => new {this.CSharpType}(value);"));
             foreach (var conv in conversions.Distinct())
             {
@@ -188,6 +187,7 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes
         public OptionDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "option";
+        public override bool IsGeneric => true;
         public override void WriteClassReader(CodeGenerator codeGenerator)
         {
             codeGenerator.WriteBlock(
@@ -217,19 +217,18 @@ public void WriteOption<T>(Nullable<T> value, Action<PacketBuffer, T> encoder) w
 	encoder(this, value.Value);
 }");
         }
-        public override bool IsGeneric => true;
     }
 
     internal class OptionDatatype : Datatype
     {
 
-        private Datatype InnerType;
-        public override string TypeName => "options";
+        private readonly Datatype InnerType;
 
         public OptionDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
         {
             this.InnerType = Parse(compiler, options!, name, container, outerStructure);
         }
+        public override string TypeName => "options";
 
         public override string CSharpType => this.InnerType.CSharpType + "?";
 

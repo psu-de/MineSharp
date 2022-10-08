@@ -6,16 +6,15 @@ using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.World.Chunks;
-
 namespace MineSharp.Bot.Modules
 {
     public class WorldModule : Module
     {
 
+        public WorldModule(MinecraftBot bot) : base(bot) {}
+
 
         public World.World? World { get; private set; }
-
-        public WorldModule(MinecraftBot bot) : base(bot) {}
 
         protected override Task Load()
         {
@@ -106,7 +105,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Returns a Task that finishes once the Chunks in a square with length <paramref name="length"/> have been loaded
+        ///     Returns a Task that finishes once the Chunks in a square with length <paramref name="length" /> have been loaded
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
@@ -126,7 +125,7 @@ namespace MineSharp.Bot.Modules
         }
 
         /// <summary>
-        /// Tries to mine the block with the currently held item
+        ///     Tries to mine the block with the currently held item
         /// </summary>
         /// <param name="block"></param>
         /// <param name="face"></param>
@@ -159,7 +158,7 @@ namespace MineSharp.Bot.Modules
 
                 cancellation?.Register(() => cancelToken.Cancel());
 
-                Task<PacketAcknowledgePlayerDigging?> sendAgain = Task.Run(async () =>
+                var sendAgain = Task.Run(async () =>
                 {
                     await Task.Delay(time, cancelToken.Token);
                     if (cancelToken.Token.IsCancellationRequested) return null;

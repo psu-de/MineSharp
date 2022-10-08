@@ -1,5 +1,4 @@
 ﻿using System.Text;
-
 namespace MineSharp.Data.Generator
 {
     internal class CodeGenerator
@@ -8,15 +7,17 @@ namespace MineSharp.Data.Generator
         public const string Indent = "\t";
         public const string NewLine = "\r\n";
 
-        private int IndentCount = 0;
-        public string CurrentIndent => string.Join("", Enumerable.Repeat(Indent, this.IndentCount));
+        private readonly StringBuilder Builder;
 
-        private StringBuilder Builder;
+        private int IndentCount;
+
+        private int ScopeStack;
 
         public CodeGenerator()
         {
             this.Builder = new StringBuilder();
         }
+        public string CurrentIndent => string.Join("", Enumerable.Repeat(Indent, this.IndentCount));
 
         public void ClearIndent() => this.IndentCount = 0;
         public void PushIndent() => this.IndentCount++;
@@ -45,8 +46,6 @@ namespace MineSharp.Data.Generator
         }
 
         public override string ToString() => this.Builder.ToString();
-
-        private int ScopeStack = 0;
         public void Begin(string line)
         {
             this.WriteLine(line + " {");

@@ -3,23 +3,14 @@ using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Protocol.Play.Clientbound;
-
 namespace MineSharp.World.Chunks
 {
     public class Chunk
     {
 
-        private static Logger Logger = Logger.GetLogger();
-
         public const int ChunkSectionLength = 16;
 
-
-        public static int GetSectionCount() => World.TotalHeight >> 4;
-
-        public int X { get; set; }
-        public int Z { get; set; }
-        public ChunkSection[] ChunkSections { get; set; }
-        public Dictionary<Position, ChunkBlockEntity> BlockEntities { get; set; }
+        private static Logger Logger = Logger.GetLogger();
 
 
         public Chunk(int x, int z, byte[] data, ChunkBlockEntity[] blockEntities)
@@ -38,6 +29,14 @@ namespace MineSharp.World.Chunks
         }
 
         public Chunk(PacketMapChunk packet) : this(packet.X, packet.Z, packet.ChunkData!, packet.BlockEntities) {}
+
+        public int X { get; set; }
+        public int Z { get; set; }
+        public ChunkSection[] ChunkSections { get; set; }
+        public Dictionary<Position, ChunkBlockEntity> BlockEntities { get; set; }
+
+
+        public static int GetSectionCount() => World.TotalHeight >> 4;
 
         public void Load(byte[] data)
         {

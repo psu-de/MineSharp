@@ -3,12 +3,22 @@ using MineSharp.Data.Biomes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.World.PalettedContainer;
-
-
 namespace MineSharp.World.Chunks
 {
     public class ChunkSection
     {
+        private readonly BiomePalettedContainer BiomeStorage;
+        private readonly BlockPalettedContainer BlockStorage;
+
+        public ChunkSection(short blockCount, BlockPalettedContainer blockContainer, BiomePalettedContainer biomeContainer)
+        {
+            this.SolidBlockCount = blockCount;
+            this.BlockStorage = blockContainer;
+            this.BiomeStorage = biomeContainer;
+        }
+
+
+        public short SolidBlockCount { get; private set; }
 
         // Positions used in this Class should be local coordinates, relative to the chunk
 
@@ -19,18 +29,6 @@ namespace MineSharp.World.Chunks
             var biomeContainer = BiomePalettedContainer.Read(buffer);
 
             return new ChunkSection(solidBlockCount, blockContainer, biomeContainer);
-        }
-
-
-        public short SolidBlockCount { get; private set; }
-        private BlockPalettedContainer BlockStorage;
-        private BiomePalettedContainer BiomeStorage;
-
-        public ChunkSection(short blockCount, BlockPalettedContainer blockContainer, BiomePalettedContainer biomeContainer)
-        {
-            this.SolidBlockCount = blockCount;
-            this.BlockStorage = blockContainer;
-            this.BiomeStorage = biomeContainer;
         }
 
         public void Update(long[] blocks)

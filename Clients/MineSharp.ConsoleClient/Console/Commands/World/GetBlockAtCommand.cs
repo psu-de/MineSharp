@@ -2,15 +2,14 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.World
 {
     internal class GetBlockAtCommand : Command
     {
 
-        private IntegerArgument X = new IntegerArgument("x");
-        private IntegerArgument Y = new IntegerArgument("y");
-        private IntegerArgument Z = new IntegerArgument("z");
+        private readonly IntegerArgument X = new IntegerArgument("x");
+        private readonly IntegerArgument Y = new IntegerArgument("y");
+        private readonly IntegerArgument Z = new IntegerArgument("z");
 
         public GetBlockAtCommand()
         {
@@ -29,7 +28,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World
 
             if (x == null || y == null || z == null)
             {
-                AnsiConsole.MarkupLine($"[red]Error: Coordinates invalid[/]");
+                AnsiConsole.MarkupLine("[red]Error: Coordinates invalid[/]");
                 return;
             }
 

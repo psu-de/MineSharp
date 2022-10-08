@@ -5,8 +5,8 @@
 
         public ExitCommand()
         {
-            var desc = $"Exits the prompt.";
-            this.Initialize("exit", desc, CColor.PromptCommand, new Arguments.Argument[] {});
+            var desc = "Exits the prompt.";
+            this.Initialize("exit", desc, CColor.PromptCommand);
         }
 
         public override void DoAction(string[] argv, CancellationToken cancellation)

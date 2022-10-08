@@ -2,15 +2,14 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class LookAtCommand : Command
     {
 
-        private IntegerArgument X;
-        private IntegerArgument Y;
-        private IntegerArgument Z;
+        private readonly IntegerArgument X;
+        private readonly IntegerArgument Y;
+        private readonly IntegerArgument Z;
 
         public LookAtCommand()
         {
@@ -36,6 +35,5 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
 
             BotClient.Bot!.ForceLookAt(new Position(x!.Value, y!.Value, z!.Value));
         }
-
     }
 }

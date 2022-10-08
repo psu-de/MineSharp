@@ -1,32 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using MineSharp.Data.Generator.Protocol.Datatypes;
-
+﻿using MineSharp.Data.Generator.Protocol.Datatypes;
+using Newtonsoft.Json.Linq;
 namespace MineSharp.Data.Generator.Protocol
 {
     internal class ProtoNamespace
     {
-
-        public ProtoCompiler Compiler { get; set; }
         public ProtoNamespace? Parent;
-        public Dictionary<string, DatatypeGenerator> UsedNativeTypes = new Dictionary<string, DatatypeGenerator>();
-        public Dictionary<string, DatatypeGenerator> AllNativeTypes =>
-            new[] {
-                    this.UsedNativeTypes, this.Parent?.AllNativeTypes
-                }
-                .Where(x => x != null)
-                .SelectMany(dict => dict!)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
 
         public Dictionary<string, Datatype> Types;
-        public Dictionary<string, Datatype> AllTypes =>
-            new[] {
-                    this.Types, this.Parent?.AllTypes
-                }
-                .Where(x => x != null)
-                .SelectMany(dict => dict!)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
-        public string Namespace { get; set; }
-        internal JObject Token { get; set; }
+        public Dictionary<string, DatatypeGenerator> UsedNativeTypes = new Dictionary<string, DatatypeGenerator>();
 
         public ProtoNamespace(ProtoCompiler compiler, ProtoNamespace? parent, string @namespace, JObject token)
         {
@@ -36,6 +17,24 @@ namespace MineSharp.Data.Generator.Protocol
             this.Namespace = @namespace;
             this.Token = token;
         }
+
+        public ProtoCompiler Compiler { get; set; }
+        public Dictionary<string, DatatypeGenerator> AllNativeTypes =>
+            new[] {
+                    this.UsedNativeTypes, this.Parent?.AllNativeTypes
+                }
+                .Where(x => x != null)
+                .SelectMany(dict => dict!)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+        public Dictionary<string, Datatype> AllTypes =>
+            new[] {
+                    this.Types, this.Parent?.AllTypes
+                }
+                .Where(x => x != null)
+                .SelectMany(dict => dict!)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+        public string Namespace { get; set; }
+        internal JObject Token { get; set; }
 
         public ProtoNamespace[] Parse()
         {
@@ -88,7 +87,7 @@ namespace MineSharp.Data.Generator.Protocol
         private void WritePacketBuffer(CodeGenerator codeGenerator, string baseNamespace)
         {
             codeGenerator.Begin($"namespace {baseNamespace}");
-            codeGenerator.Begin($"public partial class PacketBuffer");
+            codeGenerator.Begin("public partial class PacketBuffer");
 
             codeGenerator.WriteLine("#region Reading");
             codeGenerator.WriteLine();
@@ -126,15 +125,15 @@ namespace MineSharp.Data.Generator.Protocol
                 var namespaces = this.Namespace.Split(".");
                 codeGenerator.Begin($"public class {this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])}PacketFactory : IPacketFactory");
 
-                codeGenerator.Begin($@"public IPacket ReadPacket(PacketBuffer buffer)");
+                codeGenerator.Begin(@"public IPacket ReadPacket(PacketBuffer buffer)");
                 codeGenerator.WriteLine($"return {this.Namespace}.Packet.Read(buffer);");
                 codeGenerator.Finish();
 
                 var packetType = (ContainerDatatype)this.Types["packet"];
                 var @params = (SwitchDatatype)packetType.FieldMap!["params"].Type;
 
-                codeGenerator.Begin($@"public void WritePacket(PacketBuffer buffer, IPacketPayload packet)");
-                codeGenerator.Begin($"switch (packet)");
+                codeGenerator.Begin(@"public void WritePacket(PacketBuffer buffer, IPacketPayload packet)");
+                codeGenerator.Begin("switch (packet)");
                 var i = 0;
                 foreach (var type in @params.SwitchMap!)
                 {

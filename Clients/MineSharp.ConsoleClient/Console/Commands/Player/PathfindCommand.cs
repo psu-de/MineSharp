@@ -3,16 +3,15 @@ using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Pathfinding;
 using MineSharp.Pathfinding.Goals;
 using Spectre.Console;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class PathfindCommand : Command
     {
-        private IntegerArgument X = new IntegerArgument("x");
-        private IntegerArgument Y = new IntegerArgument("y");
-        private IntegerArgument Z = new IntegerArgument("z");
 
-        private FloatArgument Timeout = new FloatArgument("timeout", true);
+        private readonly FloatArgument Timeout = new FloatArgument("timeout", true);
+        private readonly IntegerArgument X = new IntegerArgument("x");
+        private readonly IntegerArgument Y = new IntegerArgument("y");
+        private readonly IntegerArgument Z = new IntegerArgument("z");
         public PathfindCommand()
         {
             var desc = $"Tries to find a path to the [{this.X.Color}]x y z[/] coordinates";
@@ -31,7 +30,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
 
             if (x == null || y == null || z == null)
             {
-                AnsiConsole.MarkupLine($"[red]Error: Coordinates invalid[/]");
+                AnsiConsole.MarkupLine("[red]Error: Coordinates invalid[/]");
                 return;
             }
 

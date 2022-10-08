@@ -1,13 +1,17 @@
 ﻿using MineSharp.Bot.Modules.Physics;
 using MineSharp.Core.Types;
-
+using MineSharp.Physics;
 namespace MineSharp.Bot
 {
     public partial class MinecraftBot
     {
 
+
+        public PhysicsEngine? Physics => this.PhysicsModule!.Physics;
+        public PlayerControls PlayerControls => this.PhysicsModule!.PlayerControls;
+
         /// <summary>
-        /// Fires when the Bot <see cref="BotEntity"/> moves
+        ///     Fires when the Bot <see cref="BotEntity" /> moves
         /// </summary>
         public event BotPlayerEvent BotMoved
         {
@@ -16,17 +20,13 @@ namespace MineSharp.Bot
         }
 
         /// <summary>
-        /// Fires just before a physics tick
+        ///     Fires just before a physics tick
         /// </summary>
         public event BotEmptyEvent PhysicsTick
         {
             add => this.PhysicsModule!.PhysicsTick += value;
             remove => this.PhysicsModule!.PhysicsTick -= value;
         }
-
-
-        public Physics.PhysicsEngine? Physics => this.PhysicsModule!.Physics;
-        public PlayerControls PlayerControls => this.PhysicsModule!.PlayerControls;
 
         [BotFunction("Physics", "Sets the bots rotation to a given yaw and pitch")]
         public void ForceSetRotation(float yaw, float pitch) => this.PhysicsModule!.ForceSetRotation(yaw, pitch);

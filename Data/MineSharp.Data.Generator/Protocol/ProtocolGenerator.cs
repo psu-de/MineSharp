@@ -1,12 +1,11 @@
 ﻿using MineSharp.Data.Generator.Protocol.Datatypes;
 using Newtonsoft.Json.Linq;
-
 namespace MineSharp.Data.Generator.Protocol
 {
     internal class ProtocolGenerator : Generator
     {
 
-        private ProtoCompiler Compiler;
+        private readonly ProtoCompiler Compiler;
 
         public ProtocolGenerator(MinecraftDataHelper wrapper, string version) : base(wrapper, version)
         {

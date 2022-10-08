@@ -8,7 +8,6 @@ using MineSharp.Data.Generator.Items;
 using MineSharp.Data.Generator.Protocol;
 using Spectre.Console;
 using System.Reflection;
-
 var projectPath = "";
 try
 {
@@ -31,13 +30,13 @@ var version = AnsiConsole.Ask<string>("Minecraft Version: ", "1.18.1");
 if (!dataHelper.GetAvailableVersions().Contains(version))
 {
     AnsiConsole.MarkupLine($"[red]Version {version} not supported![/]");
-    AnsiConsole.MarkupLine($"[red]Available versions: [/]");
-    foreach (IGrouping<string, string>? availableVersion in dataHelper.GetAvailableVersions().GroupBy(x => !x.Contains(".") ? "Snapshots" : string.Join(".", x.Split(".").Take(2))))
+    AnsiConsole.MarkupLine("[red]Available versions: [/]");
+    foreach (var availableVersion in dataHelper.GetAvailableVersions().GroupBy(x => !x.Contains(".") ? "Snapshots" : string.Join(".", x.Split(".").Take(2))))
         AnsiConsole.MarkupLine($"[red]  - {availableVersion.Key} ({string.Join(", ", availableVersion)})[/]");
     Environment.Exit(0);
 }
 
-var dataGenerators = new Dictionary<string, Generator>() {
+var dataGenerators = new Dictionary<string, Generator> {
     {
         "Biomes", new BiomeGenerator(dataHelper, version)
     }, {

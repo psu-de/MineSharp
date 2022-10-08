@@ -1,12 +1,11 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
-
 namespace MineSharp.ConsoleClient.Console.Commands.Player
 {
     internal class MoveCommand : Command
     {
 
-        private EnumArgument<MoveOptions> DirectionArg;
+        private readonly EnumArgument<MoveOptions> DirectionArg;
 
         public MoveCommand()
         {

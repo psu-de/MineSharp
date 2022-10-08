@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-
 namespace MineSharp.Data.Generator.Entities
 {
     internal class EntityGenerator : Generator
@@ -33,12 +32,12 @@ namespace MineSharp.Data.Generator.Entities
             codeGenerator.Begin("public static Type GetEntityTypeById(int id) => id switch");
             foreach (var entity in entityData)
                 codeGenerator.WriteLine($"{entity.Id} => typeof({this.Wrapper.GetCSharpName(entity.Name)}),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Entity with id {{id}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Entity with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
             codeGenerator.Begin("public enum EntityCategory");
-            List<string>? categories = entityData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
+            var categories = entityData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
             foreach (var category in categories)
                 codeGenerator.WriteLine($"{category} = {categories.IndexOf(category)},");
             codeGenerator.Finish();

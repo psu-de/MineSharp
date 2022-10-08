@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Types;
-
 namespace MineSharp.Data.Biomes
 {
     public static class BiomeFactory
@@ -19,6 +18,5 @@ namespace MineSharp.Data.Biomes
             var type = BiomePalette.GetBiomeTypeById(id);
             return CreateBiome(type);
         }
-
     }
 }

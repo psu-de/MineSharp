@@ -1,5 +1,4 @@
 ﻿using MineSharp.Data.Protocol;
-
 namespace MineSharp.World.PalettedContainer.Palettes
 {
     internal class DirectPalette : IPalette
