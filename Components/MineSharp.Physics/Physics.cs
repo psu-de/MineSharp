@@ -30,7 +30,7 @@ namespace MineSharp.Physics
 
         public void SimulatePlayer(MovementControls controls)
         {
-            var playerBB = GetPlayerBB(this.Player.Position);
+            var playerBB = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
 
             var waterBB = playerBB.Clone().Contract(0.001d, 0.4d, 0.001d);
             var lavaBB = playerBB.Clone().Contract(0.1d, 0.4d, 0.1d);
@@ -184,14 +184,6 @@ namespace MineSharp.Physics
             return moveVector;
         }
 
-        public AABB GetPlayerBB(Vector3 pos)
-        {
-            var w = PhysicsConst.PlayerHalfWidth;
-            var bb = new AABB(-w, 0, -w, w, PhysicsConst.PlayerHeight, w)
-                .Offset(pos.X, pos.Y, pos.Z);
-            return bb;
-        }
-
         private void Move(MovementControls controls, Vector3 amount)
         {
             var wasOnGround = this.Player.IsOnGround;
@@ -224,7 +216,7 @@ namespace MineSharp.Physics
 
         private bool DetectOnGround()
         {
-            var entityBoundingBox = GetPlayerBB(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
+            var entityBoundingBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
 
             var offset = 0f;
 
@@ -274,7 +266,7 @@ namespace MineSharp.Physics
             var correctedZ = amount.Z;
             var increment = 0.05d;
 
-            var boundingBox = GetPlayerBB(this.Player.Position);
+            var boundingBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
 
             while (dX != 0.0f && !GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, 0d)).Any())
             {
@@ -445,7 +437,7 @@ namespace MineSharp.Physics
 
             bool negative;
 
-            var entityBox = GetPlayerBB(this.Player.Position);
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
             AABB testBox;
 
             if (velocity.Y < 0)
@@ -542,7 +534,7 @@ namespace MineSharp.Physics
 
             var p = this.Player.Position;
             if (includeOther) p = p.Plus(velocity);
-            var entityBox = GetPlayerBB(p);
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
             AABB testBox;
 
             Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
@@ -680,7 +672,7 @@ namespace MineSharp.Physics
 
             var p = this.Player.Position;
             if (includeOther) p = p.Plus(velocity);
-            var entityBox = GetPlayerBB(p);
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
             AABB testBox;
 
             Vector3 min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
@@ -822,7 +814,7 @@ namespace MineSharp.Physics
             if (this.Player.IsOnGround && Math.Abs(this.Player.Velocity.Y) < 0.001f)
             {
                 canJump = true;
-                var adjusted = GetPlayerBB(this.Player.Position.Plus(amount));
+                var adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(amount));
                 var intersecting = GetIntersecting(adjusted);
 
                 var targetY = 0d;
@@ -842,7 +834,7 @@ namespace MineSharp.Physics
 
                 if (canJump && targetY > 0f)
                 {
-                    adjusted = GetPlayerBB(this.Player.Position.Plus(new Vector3(amount.X, targetY, amount.Z)));
+                    adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(new Vector3(amount.X, targetY, amount.Z)));
 
                     if (GetIntersecting(adjusted).Any(
                             bb => bb.MaxY > adjusted.MinY && bb.MinY <= adjusted.MaxY))

@@ -13,7 +13,7 @@ namespace MineSharp.Pathfinding.Algorithm
         public float hCost { get; set; }
         public float fCost => gCost + hCost;
 
-
+        public Move? Move;
         public Node? Parent;
 
         public Node(Vector3 position, bool walkable, int gCost, int hCost)

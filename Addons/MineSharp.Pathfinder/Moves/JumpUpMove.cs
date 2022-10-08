@@ -2,12 +2,14 @@
 using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using MineSharp.Data.Blocks;
 
 namespace MineSharp.Pathfinding.Moves
 {
     public class JumpUpMove : Move
     {
         private static readonly Logger Logger = Logger.GetLogger();
+        private const double THRESHOLD = 0.525d;
         public override Vector3 MoveVector { get; }
 
         private Vector3 _target;
@@ -15,6 +17,23 @@ namespace MineSharp.Pathfinding.Moves
         internal JumpUpMove(Movements movements, Vector3 direction) : base(movements)
         {
             this.MoveVector = direction.Plus(Vector3.Up);
+        }
+
+        public override bool IsMovePossible(Vector3 startPosition, World.World world)
+        {
+            var target = startPosition.Plus(this.MoveVector);
+
+            if (this.HasBlockSpaceForStanding(target, world))
+            {
+                var blockAbove2 = world.GetBlockAt(startPosition.Plus(Vector3.Up * 2));
+                var blockAbove2BBs = blockAbove2.GetBoundingBoxes();
+                if (blockAbove2BBs.Length == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected override Task Prepare(MinecraftBot bot)
@@ -28,7 +47,6 @@ namespace MineSharp.Pathfinding.Moves
             return Task.CompletedTask;
         }
 
-        private const double THRESHOLD = 0.525d;
 
         protected override void OnTick(MinecraftBot sender)
         {

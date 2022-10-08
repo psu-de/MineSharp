@@ -48,7 +48,7 @@ namespace MineSharp.Pathfinding
 
             moves.AddRange(directions.Select(dir => new DirectMove(this, dir)));
             moves.AddRange(directions.Select(dir => new DownMove(this, dir)));
-
+            
             if (this.AllowJumping)
             {
                 moves.AddRange(directions.Select(dir => new JumpUpMove(this, dir)));

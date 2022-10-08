@@ -2,20 +2,28 @@
 using MineSharp.Bot;
 using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
+using MineSharp.Data.Blocks;
+using MineSharp.Physics;
 
 namespace MineSharp.Pathfinding.Moves
 {
     public class DirectMove : Move
     {
         private static readonly Logger Logger = Logger.GetLogger();
-        private Vector3 _direction;
-        public override Vector3 MoveVector => _direction;
-        
-        private Vector3 _target;
+        public override Vector3 MoveVector { get; }
+        private const double THRESHOLD = 0.0525d;
+
+        private Vector3? _target;
         
         internal DirectMove(Movements movements, Vector3 direction) : base(movements)
         {
-            this._direction = direction;
+            this.MoveVector = direction;
+        }
+
+        public override bool IsMovePossible(Vector3 startPosition, World.World world)
+        {
+            var target = startPosition.Plus(this.MoveVector);
+            return this.HasBlockSpaceForStanding(target, world);
         }
 
         protected override Task Prepare(MinecraftBot bot)
@@ -23,7 +31,7 @@ namespace MineSharp.Pathfinding.Moves
             this._target = bot.BotEntity!.Position.Floored()
                 .Plus(this.MoveVector)
                 .Plus(new Vector3(0.5d, 0, 0.5d));
-            Logger.Debug($"DirectMove: Target={this._target}");
+            Logger.Debug($"DirectMove: Target={this._target!}");
             return Task.CompletedTask;
         }
 
@@ -31,12 +39,10 @@ namespace MineSharp.Pathfinding.Moves
         {
             return bot.PlayerControls.Reset();
         }
-
-        private const double THRESHOLD = 0.0525d;
         
         protected override void OnTick (MinecraftBot sender)
         {
-            var delta = sender.BotEntity!.Position.Minus(this._target);
+            var delta = sender.BotEntity!.Position.Minus(this._target!);
             var length = delta.Length();
 
             if (length <= THRESHOLD)

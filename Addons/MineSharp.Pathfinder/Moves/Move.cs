@@ -1,5 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Core.Types;
+using MineSharp.Data.Blocks;
+using MineSharp.Physics;
 
 namespace MineSharp.Pathfinding.Moves
 {
@@ -21,6 +23,14 @@ namespace MineSharp.Pathfinding.Moves
         {
             Movements = movements;
         }
+
+        /// <summary>
+        /// Checks whether the move is possible from a given start position
+        /// </summary>
+        /// <param name="startPosition"></param>
+        /// <param name="world"></param>
+        /// <returns></returns>
+        public abstract bool IsMovePossible(Vector3 startPosition, World.World world);
 
         /// <summary>
         /// Called just before performing the move
@@ -59,5 +69,29 @@ namespace MineSharp.Pathfinding.Moves
         }
 
         protected abstract void OnTick(MinecraftBot sender);
+
+        protected bool HasBlockSpaceForStanding(Vector3 pos, World.World world)
+        {
+            var playerBB = PhysicsConst.GetPlayerBoundingBox(pos);
+            
+            var targetBlock = world.GetBlockAt(pos.Floored());
+            var targetBBs = targetBlock.GetBoundingBoxes();
+            if (targetBBs.Length == 0 || !targetBBs.Any(x => playerBB.Intersects(x)))
+            {
+                var blockBelow = world.GetBlockAt(pos.Plus(Vector3.Down));
+                var blockBelowBBs = blockBelow.GetBoundingBoxes();
+                if (blockBelowBBs.Length > 0 && blockBelowBBs.All(x => playerBB.MinY - x.MaxY is >= 0 and < 0.2))
+                {
+                    var blockAbove = world.GetBlockAt(pos.Plus(Vector3.Up));
+                    var blockAboveBBs = blockAbove.GetBoundingBoxes();
+                    if (blockAboveBBs.Length == 0 || blockAboveBBs.All(x => x.MinY >= playerBB.MaxY)) // TODO: Sneaking
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

@@ -35,16 +35,7 @@ namespace MineSharp.Pathfinding
             var astar = new AStar(this.Bot.Player!, this.Bot.World!, movements);
             var path = await Task.Run(() => astar.ComputePath(goal, timeout)).WaitAsync(cancellation.Value);
 
-            var moves = new List<Move>();
-            for (int i = 0; i < path.Length - 1; i++)
-            {
-                var nodeFrom = path[i];
-                var nodeTo = path[i + 1];
-
-                var diff = nodeTo.Position.Minus(nodeFrom.Position);
-                var move = movements.GetMoveByVector(diff);
-                moves.Add(move);
-            }
+            var moves = path.Skip(1).Select(x => x.Move!).ToList();
             Logger.Debug($"Found {moves.Count} moves");
 
             foreach (var move in moves)

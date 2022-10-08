@@ -76,7 +76,7 @@ namespace MineSharp.Pathfinding.Algorithm
 
                     var neighbors = GetNeighbors(node, ref nodes).ToArray();
 
-                    foreach (var neighbor in neighbors)
+                    foreach ((var neighbor, var move) in neighbors)
                     {
                         if (!neighbor.Walkable || closedSet.Contains(neighbor))
                         {
@@ -89,6 +89,7 @@ namespace MineSharp.Pathfinding.Algorithm
                             neighbor.gCost = newCost;
                             neighbor.hCost = (float)goal.Target.DistanceSquared(neighbor.Position);
                             neighbor.Parent = node;
+                            neighbor.Move = move;
 
                             if (!openSet.Contains(neighbor))
                             {
@@ -106,43 +107,21 @@ namespace MineSharp.Pathfinding.Algorithm
             throw new Exception("No path found");
         }
 
-        private List<Node> GetNeighbors(Node node, ref Dictionary<ulong, Node> nodes)
+        private List<(Node, Move)> GetNeighbors(Node node, ref Dictionary<ulong, Node> nodes)
         {
-            var neighbors = new List<Node>();    
+            var neighbors = new List<(Node, Move)>();    
 
             foreach (var move in this.Movements.PossibleMoves)
             {
-                var pos = node.Position.Plus(move.MoveVector);
-                var neighborNode = GetNodeForBlock(pos, ref nodes);
-                neighbors.Add(neighborNode);
-            }
-
-            return neighbors;
-        }
-
-        private bool IsPositionWalkable(Vector3 pos)
-        {
-            /*
-             * Currently, a position is considered walkable,
-             * when the block at the position is not solid,
-             * the block above is not solid,
-             * and the block has a bounding box of type block
-             * 
-             * TODO: Instead of using block.BoundingBox use AABB's
-             */
-
-            var block = World.GetBlockAt(pos);
-            if (!block.IsSolid())
-            {
-                var blockAbove = World.GetBlockAt(pos.Plus(Vector3.Up));
-                var blockBelow = World.GetBlockAt(pos.Plus(Vector3.Down));
-                if (!blockAbove.IsSolid() && blockBelow.BoundingBox == "block")
+                if (move.IsMovePossible(node.Position, this.World))
                 {
-                    return true;
+                    var pos = node.Position.Plus(move.MoveVector);
+                    var neighborNode = GetNodeForBlock(pos, ref nodes);
+                    neighbors.Add((neighborNode, move));
                 }
             }
 
-            return false;
+            return neighbors;
         }
 
         private Node GetNodeForBlock(Vector3 pos, ref Dictionary<ulong, Node> nodes)
@@ -152,10 +131,8 @@ namespace MineSharp.Pathfinding.Algorithm
             {
                 return node;
             }
-
-            var walkable = IsPositionWalkable(pos);
-
-            var newNode = new Node(pos, walkable, 0, 0);
+            
+            var newNode = new Node(pos, true, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);
             return newNode;
         }
