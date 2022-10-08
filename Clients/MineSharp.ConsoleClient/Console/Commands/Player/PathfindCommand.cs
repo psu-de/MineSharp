@@ -42,7 +42,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
                 .Start("Pathfinding...", ctx => {
                     try
                     {
-                        pathfinder.GoTo(goal, timeout: timeout ?? 10000).Wait(cancellation);
+                        pathfinder.GoTo(goal, timeout: timeout ?? 10000, cancellation: cancellation).GetAwaiter().GetResult();
                     } catch (Exception e)
                     {
                         AnsiConsole.WriteException(e);

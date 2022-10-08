@@ -45,13 +45,14 @@ namespace MineSharp.Pathfinding.Moves
         /// </summary>
         /// <param name="bot">The <see cref="MinecraftBot"/> that should perform the move</param>
         /// <returns></returns>
-        public async Task PerformMove(MinecraftBot bot)
+        public async Task PerformMove(MinecraftBot bot, CancellationToken? cancellation = null)
         {
+            cancellation = cancellation ?? CancellationToken.None;
             this.TSC = new TaskCompletionSource();
             await this.Prepare(bot);
             
             bot.PhysicsTick += OnTick;
-            await this.TSC.Task;
+            await this.TSC.Task.WaitAsync(cancellation.Value);
             bot.PhysicsTick -= OnTick;
 
             await this.Finish(bot);

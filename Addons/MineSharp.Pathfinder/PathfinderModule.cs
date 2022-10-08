@@ -18,8 +18,9 @@ namespace MineSharp.Pathfinding
             return Task.CompletedTask;
         }
 
-        public async Task GoTo(Goal goal, Movements? movements = null, double? timeout = null)
+        public async Task GoTo(Goal goal, Movements? movements = null, double? timeout = null, CancellationToken? cancellation = null)
         {
+            cancellation = cancellation ?? CancellationToken.None;
             movements = movements ?? new Movements();
             if (this.Bot.World == null)
             {
@@ -32,7 +33,7 @@ namespace MineSharp.Pathfinding
             }
 
             var astar = new AStar(this.Bot.Player!, this.Bot.World!, movements);
-            var path = astar.ComputePath(goal, timeout);
+            var path = await Task.Run(() => astar.ComputePath(goal, timeout)).WaitAsync(cancellation.Value);
 
             var moves = new List<Move>();
             for (int i = 0; i < path.Length - 1; i++)
@@ -48,7 +49,12 @@ namespace MineSharp.Pathfinding
 
             foreach (var move in moves)
             {
-                await move.PerformMove(this.Bot);
+                if (cancellation.Value.IsCancellationRequested) 
+                {
+                    await this.Bot.PlayerControls.Reset();
+                    return;
+                }
+                await move.PerformMove(this.Bot, cancellation.Value);
             }
 
             await this.Bot.PlayerControls.Reset();
