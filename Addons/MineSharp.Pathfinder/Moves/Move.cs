@@ -10,6 +10,11 @@ namespace MineSharp.Pathfinding.Moves
         protected Movements Movements { get; private set; }
 
         /// <summary>
+        /// Cost for A* Algorithm. With a higher cost, the move will be performed less likely.
+        /// </summary>
+        public abstract float MoveCost { get; }
+
+        /// <summary>
         /// The relative position after the mvoe
         /// </summary>
         public abstract Vector3 MoveVector { get; }

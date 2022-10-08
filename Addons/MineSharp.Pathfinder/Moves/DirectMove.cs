@@ -10,6 +10,9 @@ namespace MineSharp.Pathfinding.Moves
     public class DirectMove : Move
     {
         private static readonly Logger Logger = Logger.GetLogger();
+
+        public override float MoveCost => 0;
+
         public override Vector3 MoveVector { get; }
         private const double THRESHOLD = 0.0525d;
 

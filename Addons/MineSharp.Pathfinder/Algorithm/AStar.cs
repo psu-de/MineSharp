@@ -83,11 +83,11 @@ namespace MineSharp.Pathfinding.Algorithm
                             continue;
                         }
 
-                        var newCost = node.gCost + (float)goal.Target.DistanceSquared(neighbor.Position);
+                        var newCost = node.gCost + (float)goal.Target.Distance(neighbor.Position) + move.MoveCost;
                         if (newCost < neighbor.gCost || !openSet.Contains(node))
                         {
                             neighbor.gCost = newCost;
-                            neighbor.hCost = (float)goal.Target.DistanceSquared(neighbor.Position);
+                            neighbor.hCost = (float)goal.Target.Distance(neighbor.Position) + move.MoveCost;
                             neighbor.Parent = node;
                             neighbor.Move = move;
 

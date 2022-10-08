@@ -11,6 +11,9 @@ namespace MineSharp.Pathfinding.Moves
     {
         private static readonly Logger Logger = Logger.GetLogger();
         private const double THRESHOLD = 0.525d;
+
+        public override float MoveCost => 2;
+
         public override Vector3 MoveVector { get; }
 
         private Vector3? _target;
