@@ -1,11 +1,12 @@
 using MineSharp.Bot;
+using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 
 namespace MineSharp.ConsoleClient.Client
 {
     public class ChatCallback
     {
-
+        private static readonly Logger Logger = Logger.GetLogger();
         public ChatCallback(MinecraftBot bot)
         {
             bot.ChatReceived += this.OnChatReceived;
@@ -13,9 +14,11 @@ namespace MineSharp.ConsoleClient.Client
 
         private void OnChatReceived(MinecraftBot bot, Chat chat, MinecraftPlayer messageSender)
         {
+            Logger.Info($"Chat: " + chat.Message);
+            
             if (messageSender.Username != bot.Player!.Username)
             {
-                // TODO: Parse the chat object
+                // TODO: Execute commands
             }
         }
     }

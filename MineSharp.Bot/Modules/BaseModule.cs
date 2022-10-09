@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Entities;
+using MineSharp.Data.Languages;
 using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using static MineSharp.Bot.MinecraftBot;
@@ -92,7 +93,7 @@ namespace MineSharp.Bot.Modules
         private Task handleDeathCombat(PacketDeathCombatEvent packet)
         {
             this.Health = 0;
-            this.Died?.Invoke(this.Bot, new Chat(packet.Message!));
+            this.Died?.Invoke(this.Bot, new Chat(packet.Message, Language.GetRule));
             return Task.CompletedTask;
         }
 
@@ -113,7 +114,7 @@ namespace MineSharp.Bot.Modules
                     this.Logger.Warning($"Unknown player uuid: {packet.Sender}");
                 } else
                 {
-                    this.ChatReceived?.Invoke(this.Bot, new Chat(packet.Message), player);
+                    this.ChatReceived?.Invoke(this.Bot, new Chat(packet.Message, Language.GetRule), player);
                 }
             }
 
