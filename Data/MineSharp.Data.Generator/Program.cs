@@ -52,9 +52,12 @@ var dataGenerators = new Dictionary<string, Generator> {
 
 foreach (var dataGen in dataGenerators)
 {
+    DateTime startTime = DateTime.Now;
     var codeGenerator = new CodeGenerator();
     dataGen.Value.WriteCode(codeGenerator);
 
     var outputPath = Path.Join(outputProjPath, dataGen.Key + ".cs");
     File.WriteAllText(outputPath, codeGenerator.ToString());
+    
+    AnsiConsole.MarkupLine($"Completed [green]{dataGen.Key}Data[/] in [olive]{Math.Round((DateTime.Now - startTime).TotalMilliseconds)}ms[/]");
 }

@@ -18,10 +18,22 @@ namespace MineSharp.Data.Generator.Languages
 
             foreach (var kvp in rules)
             {
-                codeGenerator.WriteLine($"{{ \"{kvp.Key}\", \"{kvp.Value.Replace("\n", "\\n")}\" }},");
+                var val = kvp.Value
+                    .Replace("\n", "\\n")
+                    .Replace("\\", "\\\\")
+                    .Replace("\"", "\\\"");
+                codeGenerator.WriteLine($"{{ \"{kvp.Key}\", \"{val}\" }},");
             }
             
-            codeGenerator.Finish();
+            codeGenerator.Finish(semicolon: true);
+            
+            codeGenerator.WriteBlock(@"
+public static string? GetRule(string name) {
+    if (Rules.TryGetValue(name, out var rule)) {
+        return rule;
+    } else return null;
+}");
+            
             codeGenerator.Finish();
             codeGenerator.Finish();
         }
