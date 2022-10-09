@@ -9,15 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Include="Spectre.Console" Version="0.44.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Spectre.Console" Version="0.44.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
+        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}"/>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
 </Project>

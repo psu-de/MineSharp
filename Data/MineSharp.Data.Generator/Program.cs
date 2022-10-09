@@ -5,6 +5,7 @@ using MineSharp.Data.Generator.Effects;
 using MineSharp.Data.Generator.Enchantments;
 using MineSharp.Data.Generator.Entities;
 using MineSharp.Data.Generator.Items;
+using MineSharp.Data.Generator.Languages;
 using MineSharp.Data.Generator.Protocol;
 using Spectre.Console;
 using System.Reflection;
@@ -38,23 +39,15 @@ if (!dataHelper.GetAvailableVersions().Contains(version))
 }
 
 var dataGenerators = new Dictionary<string, Generator> {
-    {
-        "Biomes", new BiomeGenerator(dataHelper, version)
-    }, {
-        "Blocks", new BlockGenerator(dataHelper, version)
-    }, {
-        "Effects", new EffectGenerator(dataHelper, version)
-    }, {
-        "Enchantments", new EnchantmentGenerator(dataHelper, version)
-    }, {
-        "Entities", new EntityGenerator(dataHelper, version)
-    }, {
-        "Items", new ItemGenerator(dataHelper, version)
-    }, {
-        "Protocol", new ProtocolGenerator(dataHelper, version)
-    }, {
-        "MinecraftData", new MinecraftDataGenerator(dataHelper, version)
-    }
+    { "Biomes", new BiomeGenerator(dataHelper, version) }, 
+    { "Blocks", new BlockGenerator(dataHelper, version) }, 
+    { "Effects", new EffectGenerator(dataHelper, version)}, 
+    { "Enchantments", new EnchantmentGenerator(dataHelper, version) },
+    { "Entities", new EntityGenerator(dataHelper, version) },
+    { "Items", new ItemGenerator(dataHelper, version) }, 
+    { "Protocol", new ProtocolGenerator(dataHelper, version) }, 
+    { "Language", new LanguageGenerator(dataHelper, version) },
+    { "MinecraftData", new MinecraftDataGenerator(dataHelper, version) }
 };
 
 foreach (var dataGen in dataGenerators)

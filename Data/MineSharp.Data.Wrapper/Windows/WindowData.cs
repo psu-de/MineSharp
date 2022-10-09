@@ -5,15 +5,11 @@ namespace MineSharp.Data.Windows
     public static class WindowData
     {
 
-        private static bool isLoaded;
-
         public static List<WindowInfo> Windows = new List<WindowInfo>();
         public static Dictionary<Identifier, WindowInfo> WindowMap = new Dictionary<Identifier, WindowInfo>();
 
-        public static void Load()
+        static WindowData()
         {
-            if (isLoaded) return;
-
             Register(new WindowInfo((Identifier)"minecraft:generic_9x1", "", 9));
             Register(new WindowInfo((Identifier)"minecraft:generic_9x2", "", 18));
             Register(new WindowInfo((Identifier)"minecraft:generic_9x3", "", 27));
@@ -38,8 +34,6 @@ namespace MineSharp.Data.Windows
             Register(new WindowInfo((Identifier)"minecraft:smoker", "Smoker", 3));
             Register(new WindowInfo((Identifier)"minecraft:cartography", "Cartography Table", 3));
             Register(new WindowInfo((Identifier)"minecraft:stonecutter", "Stonecutter", 2));
-
-            isLoaded = true;
         }
 
         private static void Register(WindowInfo info)
