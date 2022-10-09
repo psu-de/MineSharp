@@ -57,14 +57,12 @@ namespace MineSharp.World.PalettedContainer
                 switch (this.Palette)
                 {
                     case SingleValuePalette svp:
-                        Logger.Info($"Converting {nameof(SingleValuePalette)} to {nameof(IndirectPalette)}");
                         this.Palette = svp.ConvertToIndirectPalette(state);
                         this.Data = new IntBitArray(new long[(int)Math.Ceiling((float)this.Capacity / (64 / IndirectPalette.BLOCK_MIN_BITS))], IndirectPalette.BLOCK_MIN_BITS);
                         this.Data.Set(index, 1);
                         break;
                     case IndirectPalette dp:
                         var newPalette = dp.AddState(state, false, out var newBitsPerEntry);
-                        Logger.Info($"Converting {nameof(IndirectPalette)} (bps={this.Data.BitsPerEntry}) to {newPalette.GetType().Name} (bps={newBitsPerEntry})");
                         this.Data.ChangeBitsPerEntry(newBitsPerEntry);
 
                         if (newPalette is DirectPalette)

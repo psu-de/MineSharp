@@ -39,43 +39,46 @@ namespace MineSharp.Pathfinding.Moves
             return false;
         }
 
-        protected override Task Prepare(MinecraftBot bot)
+        protected override Task Prepare(MinecraftBot bot, int count, Vector3 startPosition)
         {
-            this._target = bot.Player!.Entity.Position
+            this._target = startPosition
                 .Floored()
                 .Plus(this.MoveVector)
                 .Plus(new Vector3(0.5, 0, 0.5));
 
-            Logger.Debug($"JumpUpMove: Target={this._target}");
+            Logger.Debug($"JumpMove: From={startPosition} Target={this._target!}");
             return Task.CompletedTask;
         }
 
 
-        protected override void OnTick(MinecraftBot sender)
+        protected override MinecraftBot.BotEmptyEvent OnTickWrapper()
         {
-            var delta = sender.BotEntity!.Position.Minus(this._target);
-            var deltaY = Math.Abs(delta.Y);
-            delta.Y = 0;
-
-            if (this.Movements.AllowSprinting)
+            return (sender) =>
             {
-                _ = sender.PlayerControls.StartSprinting();
-            }
+                var delta = sender.BotEntity!.Position.Minus(this._target);
+                var deltaY = Math.Abs(delta.Y);
+                delta.Y = 0;
 
-            var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
-            sender.ForceSetRotation((float)yaw, 0);
+                if (this.Movements.AllowSprinting)
+                {
+                    _ = sender.PlayerControls.StartSprinting();
+                }
 
-            sender.PlayerControls.Walk(WalkDirection.Forward);
+                var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
+                sender.ForceSetRotation((float)yaw, 0);
 
-            if (deltaY > 0.6)
-            {
-                sender.PlayerControls.Jump();
-            }
+                sender.PlayerControls.Walk(WalkDirection.Forward);
 
-            if (deltaY < 0.2 && delta.Length() <= THRESHOLD)
-            {
-                this.TSC.SetResult();
-            }
+                if (deltaY > 0.6)
+                {
+                    sender.PlayerControls.Jump();
+                }
+
+                if (deltaY < 0.2 && delta.Length() <= THRESHOLD)
+                {
+                    this.TSC.SetResult();
+                }  
+            };
         }
     }
 }

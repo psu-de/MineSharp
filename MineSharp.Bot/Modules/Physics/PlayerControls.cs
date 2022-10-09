@@ -1,4 +1,5 @@
 ﻿using MineSharp.Bot.Enums;
+using MineSharp.Core.Types;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.Physics;
 

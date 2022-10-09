@@ -21,42 +21,50 @@ namespace MineSharp.Pathfinding.Moves
 
         public override Vector3 MoveVector { get; }
 
+        internal override bool CanBeSimplified => true;
+
         public override bool IsMovePossible(Vector3 startPosition, World.World world)
         {
             var target = startPosition.Plus(this.MoveVector);
-            return this.HasBlockSpaceForStanding(target, world);
+            var possible = this.HasBlockSpaceForStanding(target, world);
+            return possible;
         }
 
-        protected override Task Prepare(MinecraftBot bot)
+        protected override Task Prepare(MinecraftBot bot, int count, Vector3 startPosition)
         {
-            this._target = bot.BotEntity!.Position.Floored()
-                .Plus(this.MoveVector)
+            this._target = startPosition.Floored()
+                .Plus(this.MoveVector * count)
                 .Plus(new Vector3(0.5d, 0, 0.5d));
-            Logger.Debug($"DirectMove: Target={this._target!}");
+            Logger.Debug($"DirectMove: From={startPosition} Target={this._target!} Count={count}");
             return Task.CompletedTask;
         }
 
         protected override Task Finish(MinecraftBot bot) => bot.PlayerControls.Reset();
 
-        protected override void OnTick(MinecraftBot sender)
+        protected override MinecraftBot.BotEmptyEvent OnTickWrapper()
         {
-            var delta = sender.BotEntity!.Position.Minus(this._target!);
-            var length = delta.Length();
-
-            if (length <= THRESHOLD)
+            return (sender) =>
             {
-                this.TSC.SetResult();
-                return;
-            }
+                var delta = sender.BotEntity!.Position.Minus(this._target!);
+                var length = delta.Length();
+                
+                if (length <= THRESHOLD)
+                {
+                    Logger.Debug("Reached target");
+                    this.TSC.SetResult();
+                    return;
+                }
 
-            var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
-            sender.ForceSetRotation((float)yaw, 0);
+                var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
+                sender.ForceSetRotation((float)yaw, 0);
 
-            sender.PlayerControls.Walk(WalkDirection.Forward);
-            if (this.Movements.AllowSprinting)
-            {
-                _ = sender.PlayerControls.StartSprinting();
-            }
+                sender.PlayerControls.Walk(WalkDirection.Forward);
+
+                if (this.Movements.AllowSprinting)
+                {
+                    _ = sender.PlayerControls.StartSprinting();
+                }
+            };
         }
     }
 }

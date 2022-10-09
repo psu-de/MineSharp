@@ -25,7 +25,7 @@ namespace MineSharp.Pathfinding.Algorithm
         public World.World World { get; set; }
         public Movements Movements { get; set; }
 
-        public Node[] ComputePath(Goal goal, double? timeout = null, int maxNodes = DEFAULT_MAX_NODES)
+        public Path ComputePath(Goal goal, double? timeout = null, int maxNodes = DEFAULT_MAX_NODES)
         {
             var startTime = DateTime.Now;
 
@@ -60,18 +60,7 @@ namespace MineSharp.Pathfinding.Algorithm
                     if (node.Position == goal.Target.Floored())
                     {
                         Logger.Debug($"Checked {nodes.Count} nodes in {Math.Round((DateTime.Now - startTime).TotalMilliseconds * 10) / 10}ms");
-                        var path = new List<Node>();
-                        var currentNode = node;
-
-                        while (currentNode != startNode)
-                        {
-                            path.Add(currentNode!);
-                            currentNode = currentNode!.Parent!;
-                        }
-                        path.Add(startNode);
-                        path.Reverse();
-                        Logger.Debug($"Found Path with {path.Count} nodes");
-                        return path.ToArray();
+                        return RetracePath(node, startNode);
                     }
 
                     var neighbors = this.GetNeighbors(node, ref nodes).ToArray();
@@ -112,16 +101,17 @@ namespace MineSharp.Pathfinding.Algorithm
 
             foreach (var move in this.Movements.PossibleMoves)
             {
-                if (move.IsMovePossible(node.Position, this.World))
+                if (!move.IsMovePossible(node.Position, this.World))
                 {
-                    var pos = node.Position.Plus(move.MoveVector);
-                    if (!this.World.IsBlockLoaded(pos))
-                    {
-                        continue;
-                    }
-                    var neighborNode = this.GetNodeForBlock(pos, ref nodes);
-                    neighbors.Add((neighborNode, move));
+                    continue;
                 }
+                var pos = node.Position.Plus(move.MoveVector);
+                if (!this.World.IsBlockLoaded(pos))
+                {
+                    continue;
+                }
+                var neighborNode = this.GetNodeForBlock(pos, ref nodes);
+                neighbors.Add((neighborNode, move));
             }
 
             return neighbors;
@@ -141,6 +131,24 @@ namespace MineSharp.Pathfinding.Algorithm
             var newNode = new Node(pos, walkable, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);
             return newNode;
+        }
+        
+        private static Path RetracePath(Node node, Node startNode)
+        {
+            var path = new List<Node>();
+            var currentNode = node;
+
+            while (currentNode != startNode)
+            {
+                path.Add(currentNode!);
+                currentNode = currentNode!.Parent!;
+            }
+            path.Add(startNode);
+            path.Reverse();
+            Logger.Debug($"Found Path with {path.Count} nodes");
+
+            var nodes = path.ToArray();
+            return new Path(nodes);
         }
     }
 }

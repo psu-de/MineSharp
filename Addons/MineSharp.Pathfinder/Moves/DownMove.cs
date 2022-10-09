@@ -39,43 +39,46 @@ namespace MineSharp.Pathfinding.Moves
             return false;
         }
 
-        protected override Task Prepare(MinecraftBot bot)
+        protected override Task Prepare(MinecraftBot bot, int count, Vector3 startPosition)
         {
-            this._target = bot.Player!.Entity.Position
+            this._target = startPosition
                 .Floored()
                 .Plus(this.MoveVector)
                 .Plus(new Vector3(0.5, 0, 0.5));
 
-            Logger.Debug($"DownMove: Target={this._target}");
+            Logger.Debug($"DownMove: From={startPosition} Target={this._target!}");
             return Task.CompletedTask;
         }
 
 
-        protected override void OnTick(MinecraftBot sender)
+        protected override MinecraftBot.BotEmptyEvent OnTickWrapper()
         {
-            var delta = sender.BotEntity!.Position.Minus(this._target!);
-            var deltaY = Math.Abs(delta.Y);
-            delta.Y = 0;
-
-            var length = delta.Length();
-
-            if (length <= THRESHOLD)
+            return (sender) =>
             {
-                if (deltaY <= 0.2d)
+                var delta = sender.BotEntity!.Position.Minus(this._target!);
+                var deltaY = Math.Abs(delta.Y);
+                delta.Y = 0;
+
+                var length = delta.Length();
+
+                if (length <= THRESHOLD)
                 {
-                    this.TSC.SetResult();
-                    return;
+                    if (deltaY <= 0.2d)
+                    {
+                        this.TSC.SetResult();
+                        return;
+                    }
                 }
-            }
 
-            var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
-            sender.ForceSetRotation((float)yaw, 0);
+                var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
+                sender.ForceSetRotation((float)yaw, 0);
 
-            sender.PlayerControls.Walk(WalkDirection.Forward);
-            if (this.Movements.AllowSprinting)
-            {
-                _ = sender.PlayerControls.StartSprinting();
-            }
+                sender.PlayerControls.Walk(WalkDirection.Forward);
+                if (this.Movements.AllowSprinting)
+                {
+                    _ = sender.PlayerControls.StartSprinting();
+                }  
+            };
         }
     }
 }

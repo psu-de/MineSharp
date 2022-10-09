@@ -48,12 +48,20 @@ namespace MineSharp.Physics
                     new List<Modifier>());
             }
 
+            bool hasSprintAttr = movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod);
+            
             if (controls.Sprint)
             {
-                if (!movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod))
+                if (!hasSprintAttr)
                 {
                     spMod = new Modifier(PhysicsConst.SprintingUUID, PhysicsConst.SprintSpeed, ModifierOp.Multiply);
                     movementFactorAttr.Modifiers.Add(PhysicsConst.SprintingUUID, spMod);
+                }
+            } else
+            {
+                if (hasSprintAttr)
+                {
+                    movementFactorAttr.Modifiers.Remove(PhysicsConst.SprintingUUID);
                 }
             }
 
