@@ -11,14 +11,12 @@ namespace MineSharp.Pathfinding.Moves
         private const double THRESHOLD = 0.525d;
         private static readonly Logger Logger = Logger.GetLogger();
 
-        private Vector3 _target;
-
         internal JumpUpMove(Movements movements, Vector3 direction) : base(movements)
         {
             this.MoveVector = direction.Plus(Vector3.Up);
         }
 
-        public override float MoveCost => 5;
+        public override float MoveCost => 20;
 
         public override Vector3 MoveVector { get; }
 
@@ -39,46 +37,31 @@ namespace MineSharp.Pathfinding.Moves
             return false;
         }
 
-        protected override Task Prepare(MinecraftBot bot, int count, Vector3 startPosition)
+        protected override void OnTick(MinecraftBot bot, Vector3 target)
         {
-            this._target = startPosition
-                .Floored()
-                .Plus(this.MoveVector)
-                .Plus(new Vector3(0.5, 0, 0.5));
+            var delta = bot.BotEntity!.Position.Minus(target);
+            var deltaY = Math.Abs(delta.Y);
+            delta.Y = 0;
 
-            Logger.Debug($"JumpMove: From={startPosition} Target={this._target!}");
-            return Task.CompletedTask;
-        }
-
-
-        protected override MinecraftBot.BotEmptyEvent OnTickWrapper()
-        {
-            return (sender) =>
+            if (this.Movements.AllowSprinting)
             {
-                var delta = sender.BotEntity!.Position.Minus(this._target);
-                var deltaY = Math.Abs(delta.Y);
-                delta.Y = 0;
+                _ = bot.PlayerControls.StartSprinting();
+            }
 
-                if (this.Movements.AllowSprinting)
-                {
-                    _ = sender.PlayerControls.StartSprinting();
-                }
+            var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
+            bot.ForceSetRotation((float)yaw, 0);
 
-                var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
-                sender.ForceSetRotation((float)yaw, 0);
+            bot.PlayerControls.Walk(WalkDirection.Forward);
 
-                sender.PlayerControls.Walk(WalkDirection.Forward);
+            if (deltaY > 0.6)
+            {
+                bot.PlayerControls.Jump();
+            }
 
-                if (deltaY > 0.6)
-                {
-                    sender.PlayerControls.Jump();
-                }
-
-                if (deltaY < 0.2 && delta.Length() <= THRESHOLD)
-                {
-                    this.TSC.SetResult();
-                }  
-            };
+            if (deltaY < 0.2 && delta.Length() <= THRESHOLD)
+            {
+                this.TSC.SetResult();
+            }  
         }
     }
 }

@@ -101,17 +101,27 @@ namespace MineSharp.Pathfinding.Algorithm
 
             foreach (var move in this.Movements.PossibleMoves)
             {
-                if (!move.IsMovePossible(node.Position, this.World))
+                try
                 {
-                    continue;
-                }
-                var pos = node.Position.Plus(move.MoveVector);
-                if (!this.World.IsBlockLoaded(pos))
+                    if (!move.IsMovePossible(node.Position, this.World))
+                    {
+                        continue;
+                    }
+                    var pos = node.Position.Plus(move.MoveVector);
+                    if (!this.World.IsBlockLoaded(pos))
+                    {
+                        continue;
+                    }
+                    var neighborNode = this.GetNodeForBlock(pos, ref nodes);
+                    neighbors.Add((neighborNode, move));
+                } catch (Exception e)
                 {
-                    continue;
+                    if (!e.Message.StartsWith("Chunk"))
+                    {
+                        throw new AggregateException(e);
+                    }
                 }
-                var neighborNode = this.GetNodeForBlock(pos, ref nodes);
-                neighbors.Add((neighborNode, move));
+
             }
 
             return neighbors;

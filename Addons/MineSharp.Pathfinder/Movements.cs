@@ -53,6 +53,8 @@ namespace MineSharp.Pathfinding
             if (this.AllowJumping)
             {
                 moves.AddRange(directions.Select(dir => new JumpUpMove(this, dir)));
+                moves.AddRange(directions.Select(dir => new Jump1BlockMove(this, dir)));
+                moves.AddRange(directions.Select(dir => new Jump2BlockMove(this, dir)));
             }
 
             return moves.ToArray();

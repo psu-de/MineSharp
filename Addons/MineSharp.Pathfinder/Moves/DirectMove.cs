@@ -7,11 +7,8 @@ namespace MineSharp.Pathfinding.Moves
 {
     public class DirectMove : Move
     {
-        private const double THRESHOLD = 0.0525d;
         private static readonly Logger Logger = Logger.GetLogger();
-
-        private Vector3? _target;
-
+        
         internal DirectMove(Movements movements, Vector3 direction) : base(movements)
         {
             this.MoveVector = direction;
@@ -30,41 +27,27 @@ namespace MineSharp.Pathfinding.Moves
             return possible;
         }
 
-        protected override Task Prepare(MinecraftBot bot, int count, Vector3 startPosition)
+        protected override void OnTick(MinecraftBot bot, Vector3 target)
         {
-            this._target = startPosition.Floored()
-                .Plus(this.MoveVector * count)
-                .Plus(new Vector3(0.5d, 0, 0.5d));
-            Logger.Debug($"DirectMove: From={startPosition} Target={this._target!} Count={count}");
-            return Task.CompletedTask;
-        }
-
-        protected override Task Finish(MinecraftBot bot) => bot.PlayerControls.Reset();
-
-        protected override MinecraftBot.BotEmptyEvent OnTickWrapper()
-        {
-            return (sender) =>
-            {
-                var delta = sender.BotEntity!.Position.Minus(this._target!);
-                var length = delta.Length();
+            var delta = bot.BotEntity!.Position.Minus(target);
+            var length = delta.Length();
                 
-                if (length <= THRESHOLD)
-                {
-                    Logger.Debug("Reached target");
-                    this.TSC.SetResult();
-                    return;
-                }
+            if (length <= THRESHOLD)
+            {
+                Logger.Debug("Reached target");
+                this.TSC.SetResult();
+                return;
+            }
 
-                var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
-                sender.ForceSetRotation((float)yaw, 0);
+            var yaw = Math.Atan2(delta.X, -delta.Z) * (180 / Math.PI);
+            bot.ForceSetRotation((float)yaw, 0);
 
-                sender.PlayerControls.Walk(WalkDirection.Forward);
+            bot.PlayerControls.Walk(WalkDirection.Forward);
 
-                if (this.Movements.AllowSprinting)
-                {
-                    _ = sender.PlayerControls.StartSprinting();
-                }
-            };
+            if (this.Movements.AllowSprinting)
+            {
+                _ = bot.PlayerControls.StartSprinting();
+            }
         }
     }
 }

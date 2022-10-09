@@ -1,13 +1,16 @@
 ﻿using MineSharp.Bot;
+using MineSharp.Core.Logging;
 using MineSharp.Data.Blocks;
 using MineSharp.Physics;
-using System.Numerics;
-using Vector3 = MineSharp.Core.Types.Vector3;
+using MineSharp.Core.Types;
 
 namespace MineSharp.Pathfinding.Moves
 {
     public abstract class Move
     {
+        private static readonly Logger Logger = Logger.GetLogger();
+        protected const double THRESHOLD = 0.25d * 0.25d;
+        
         internal Move(Movements movements)
         {
             this.Movements = movements;
@@ -44,19 +47,7 @@ namespace MineSharp.Pathfinding.Moves
         /// <param name="world"></param>
         /// <returns></returns>
         public abstract bool IsMovePossible(Vector3 startPosition, World.World world);
-
-        /// <summary>
-        ///     Called just before performing the move
-        /// </summary>
-        /// <param name="bot"></param>
-        protected virtual Task Prepare(MinecraftBot bot, int count, Vector3 startPosition) => Task.CompletedTask;
-
-        /// <summary>
-        ///     Called right after the move has been completed
-        /// </summary>
-        /// <param name="bot"></param>
-        protected virtual Task Finish(MinecraftBot bot) => Task.CompletedTask;
-
+        
         /// <summary>
         ///     Perform the move
         /// </summary>
@@ -74,24 +65,30 @@ namespace MineSharp.Pathfinding.Moves
                 throw new ArgumentException("Move cannot be performed multiple times");
             }
             
-            cancellation = cancellation ?? CancellationToken.None;
+            cancellation ??= CancellationToken.None;
             this.TSC = new TaskCompletionSource();
-            await this.Prepare(bot, count, startPosition);
 
-            var onTick = this.OnTickWrapper();
+            var target = startPosition
+                .Plus(this.MoveVector * count)
+                .Plus(new Vector3(0.5d, 0, 0.5d));
+            
+            Logger.Debug($"{this.GetType().Name}: From={startPosition} Target={target} Count={count}");
+
+            MinecraftBot.BotEmptyEvent onTick = (MinecraftBot sender) =>
+            {
+                OnTick(sender, target);
+            };
             
             bot.PhysicsTick += onTick;
             await this.TSC.Task.WaitAsync(cancellation.Value);
             bot.PhysicsTick -= onTick;
-
-            await this.Finish(bot);
         }
 
-        protected abstract MinecraftBot.BotEmptyEvent OnTickWrapper();
+        protected abstract void OnTick(MinecraftBot bot, Vector3 target);
 
         protected bool HasBlockSpaceForStanding(Vector3 pos, World.World world)
         {
-            var playerBB = PhysicsConst.GetPlayerBoundingBox(pos);
+            var playerBB = PhysicsConst.GetPlayerBoundingBox(pos).Offset(0.5d, 0,0.5d);
 
             var targetBlock = world.GetBlockAt(pos.Floored());
             var targetBBs = targetBlock.GetBoundingBoxes();

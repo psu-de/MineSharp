@@ -43,7 +43,10 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
                 {
                     try
                     {
-                        pathfinder.GoTo(goal, timeout: timeout ?? 10000, cancellation: cancellation).GetAwaiter().GetResult();
+                        DateTime startTime = DateTime.Now;
+                        var path = pathfinder.FindPath(goal, timeout: timeout ?? 10000, cancellation: cancellation).GetAwaiter().GetResult();
+                        AnsiConsole.MarkupLine($"Found path in [olive]{Math.Round((DateTime.Now - startTime).TotalMilliseconds * 10) / 10}ms[/]");
+                        pathfinder.MovePath(path).Wait(cancellation);
                     } catch (Exception e)
                     {
                         AnsiConsole.WriteException(e);
