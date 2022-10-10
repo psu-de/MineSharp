@@ -9,11 +9,13 @@ namespace MineSharp.ConsoleClient.Client
         public static MemoryStream BotLog = new MemoryStream();
         private static StreamWriter? BotLogWriter;
         private static ChatCallback ChatCallback;
-
+        private static Action<string, CancellationToken> ExecutionFunc;
+        
         public static MinecraftBot? Bot;
 
-        public static void Initialize(MinecraftBot.BotOptions options)
+        public static void Initialize(MinecraftBot.BotOptions options, Action<string, CancellationToken> executionFunc)
         {
+            ExecutionFunc = executionFunc;
             BotLogWriter = new StreamWriter(BotLog) {
                 AutoFlush = true
             };
@@ -23,9 +25,9 @@ namespace MineSharp.ConsoleClient.Client
 
             _ = Bot.WaitForBot().ContinueWith(v =>
             {
-                ChatCallback = new ChatCallback(Bot);
+                ChatCallback = new ChatCallback(Bot, ExecutionFunc);
             });
-
+            
         }
     }
 }

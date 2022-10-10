@@ -49,9 +49,9 @@ namespace MineSharp.Bot
         /// <summary>
         ///     Fires when a chat message from another player is received
         /// </summary>
-        public event BotChatSenderEvent ChatReceived {
-            add => this.BaseModule!.ChatReceived += value;
-            remove => this.BaseModule!.ChatReceived -= value;
+        public event BotChatMessageEvent ChatMessageReceived {
+            add => this.BaseModule!.ChatMessageReceived += value;
+            remove => this.BaseModule!.ChatMessageReceived -= value;
         }
 
         public void AssertPlayerLoaded()

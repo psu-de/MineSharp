@@ -221,7 +221,7 @@ namespace MineSharp.Bot
 
         public delegate void BotEmptyEvent(MinecraftBot sender);
         public delegate void BotChatEvent(MinecraftBot sender, Chat chat);
-        public delegate void BotChatSenderEvent(MinecraftBot sender, Chat chat, MinecraftPlayer messageSender);
+        public delegate void BotChatMessageEvent(MinecraftBot sender, string message, MinecraftPlayer messageSender);
         public delegate void BotItemEvent(MinecraftBot sender, Item? item);
 
         public delegate void BotPlayerEvent(MinecraftBot sender, MinecraftPlayer entity);

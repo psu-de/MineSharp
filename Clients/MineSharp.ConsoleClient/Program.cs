@@ -97,7 +97,7 @@ AnsiConsole.Status()
     .Spinner(Spinner.Known.Dots2)
     .Start($"Connecting to [purple]{loginOptions.Host}:{loginOptions.Port}[/] as [aqua]{loginOptions.UsernameOrEmail}[/]", ctx =>
     {
-        BotClient.Initialize(loginOptions);
+        BotClient.Initialize(loginOptions, ExecuteCommand);
         Logger.OnLogMessageReceieved += LogMessage;
 
         var successful = BotClient.Bot!.Connect().GetAwaiter().GetResult();
@@ -122,7 +122,6 @@ var prompt = new Prompt(
         completionItemDescriptionPaneBackground: AnsiColor.Rgb(30, 30, 30),
         selectedCompletionItemBackground: AnsiColor.Rgb(30, 30, 30),
         selectedTextBackground: AnsiColor.Rgb(20, 61, 102)));
-
 
 while (true)
 {

@@ -34,7 +34,7 @@ namespace MineSharp.Bot.Modules
 
         public event BotChatEvent? Died;
 
-        public event BotChatSenderEvent? ChatReceived;
+        public event BotChatMessageEvent? ChatMessageReceived;
 
         protected override async Task Load()
         {
@@ -114,7 +114,9 @@ namespace MineSharp.Bot.Modules
                     this.Logger.Warning($"Unknown player uuid: {packet.Sender}");
                 } else
                 {
-                    this.ChatReceived?.Invoke(this.Bot, new Chat(packet.Message, Language.GetRule), player);
+                    var chat = new Chat(packet.Message, Language.GetRule);
+                    var message = string.Join(">", chat.Message.Split(">").Skip(1)).Substring(1);
+                    this.ChatMessageReceived?.Invoke(this.Bot, message, player);
                 }
             }
 
