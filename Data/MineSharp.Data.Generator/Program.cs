@@ -7,6 +7,7 @@ using MineSharp.Data.Generator.Entities;
 using MineSharp.Data.Generator.Items;
 using MineSharp.Data.Generator.Languages;
 using MineSharp.Data.Generator.Protocol;
+using MineSharp.Data.Generator.Recipes;
 using Spectre.Console;
 using System.Reflection;
 
@@ -47,6 +48,7 @@ var dataGenerators = new Dictionary<string, Generator> {
     { "Items", new ItemGenerator(dataHelper, version) }, 
     { "Protocol", new ProtocolGenerator(dataHelper, version) }, 
     { "Language", new LanguageGenerator(dataHelper, version) },
+    { "Recipes", new RecipeGenerator(dataHelper, version) },
     { "MinecraftData", new MinecraftDataGenerator(dataHelper, version) }
 };
 
