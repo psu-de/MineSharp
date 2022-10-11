@@ -7,7 +7,7 @@ using MineSharp.Data.Protocol.Play.Clientbound;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.World.Chunks;
 
-namespace MineSharp.Bot.Modules
+namespace MineSharp.Bot.Modules.World
 {
     public class WorldModule : Module
     {
@@ -15,12 +15,12 @@ namespace MineSharp.Bot.Modules
         public WorldModule(MinecraftBot bot) : base(bot) {}
 
 
-        public World.World? World { get; private set; }
+        public MineSharp.World.World? World { get; private set; }
 
         protected override Task Load()
         {
 
-            this.World = new World.World();
+            this.World = new MineSharp.World.World();
 
             this.Bot.On<PacketMapChunk>(this.handleChunkDataAndLightUpdate);
             this.Bot.On<PacketUnloadChunk>(this.handleUnloadChunk);

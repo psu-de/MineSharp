@@ -1,17 +1,15 @@
-﻿using MineSharp.Bot.Modules.Physics;
-using MineSharp.Core.Types;
+﻿using MineSharp.Core.Types;
 using MineSharp.Data.Protocol.Play.Serverbound;
 using MineSharp.Physics;
 using static MineSharp.Bot.MinecraftBot;
 
-namespace MineSharp.Bot.Modules
+namespace MineSharp.Bot.Modules.Physics
 {
     public class PhysicsModule : TickedModule
     {
 
         private const double POSITION_THRESHOLD = 0.2d;
 
-        private readonly List<(Vector3, TaskCompletionSource)> AwaitedPositions = new List<(Vector3, TaskCompletionSource)>();
         private PlayerInfoState LastPlayerState;
 
         public PhysicsEngine? Physics;
@@ -21,7 +19,6 @@ namespace MineSharp.Bot.Modules
         public PhysicsModule(MinecraftBot bot) : base(bot)
         {
             this.PlayerControls = new PlayerControls(bot);
-            this.BotMoved += this.handleBotMoved;
         }
 
         /// <summary>
@@ -110,31 +107,6 @@ namespace MineSharp.Bot.Modules
             if (yaw < 0) yaw = 360 + yaw;
             var pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
             this.ForceSetRotation((float)yaw, (float)pitch);
-        }
-        private void handleBotMoved(MinecraftBot sender, MinecraftPlayer entity)
-        {
-            foreach ((var pos, var tsc) in this.AwaitedPositions.ToArray())
-            {
-                if (Math.Truncate(pos.Y) == Math.Truncate(entity.Entity.Position.Y))
-                {
-                    var dx = pos.X - entity.Entity.Position.X;
-                    var dz = pos.Z - entity.Entity.Position.Z;
-                    var length = dx * dx + dz * dz;
-
-                    if (dx * dx + dz * dz < POSITION_THRESHOLD * POSITION_THRESHOLD)
-                    {
-                        tsc.SetResult();
-                        this.AwaitedPositions.Remove((pos, tsc));
-                    }
-                }
-            }
-        }
-
-        public Task WaitUntilReached(Vector3 pos)
-        {
-            var tsc = new TaskCompletionSource();
-            this.AwaitedPositions.Add((pos, tsc));
-            return tsc.Task;
         }
 
         private struct PlayerInfoState

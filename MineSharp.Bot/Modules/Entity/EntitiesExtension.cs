@@ -16,9 +16,6 @@ namespace MineSharp.Bot
         /// </summary>
         public ConcurrentDictionary<int, Entity> Entities => this.EntityModule!.Entities;
 
-        public ConcurrentDictionary<UUID, MinecraftPlayer> PlayerMapping => this.PlayerModule!.PlayerMapping;
-        public List<MinecraftPlayer> PlayerList => this.PlayerMapping.Values.ToList();
-
 
         /// <summary>
         ///     Fires when an entity spawned in the players View Distance or when a player walks into View Distance

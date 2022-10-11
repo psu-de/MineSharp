@@ -1,4 +1,9 @@
 ﻿using MineSharp.Bot.Modules;
+using MineSharp.Bot.Modules.Base;
+using MineSharp.Bot.Modules.Entity;
+using MineSharp.Bot.Modules.Physics;
+using MineSharp.Bot.Modules.Windows;
+using MineSharp.Bot.Modules.World;
 using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
@@ -13,23 +18,27 @@ namespace MineSharp.Bot
 {
     public partial class MinecraftBot
     {
-
         private static readonly Logger Logger = Logger.GetLogger();
+        
+        public MinecraftClient Client { get; }
+        public BotOptions Options { get; }
+        public Session Session { get; }
+        
         private readonly Dictionary<Type, List<Func<IPacketPayload, Task>>> PacketHandlers = new Dictionary<Type, List<Func<IPacketPayload, Task>>>();
 
         private readonly Dictionary<Type, object> packetWaiters = new Dictionary<Type, object>();
+        
+        public List<Module> Modules = new List<Module>();
         private readonly List<TickedModule> TickedModules = new List<TickedModule>();
 
-        public BaseModule? BaseModule;
-
-        public EntityModule? EntityModule;
-
-        public List<Module> Modules = new List<Module>();
-        public PhysicsModule? PhysicsModule;
-        public PlayerModule? PlayerModule;
+        public readonly BaseModule? BaseModule;
+        public readonly EntityModule? EntityModule;
+        public readonly PhysicsModule? PhysicsModule;
+        public readonly PlayerModule? PlayerModule;
+        public readonly WindowsModule? WindowsModule;
+        public readonly WorldModule? WorldModule;
+        
         private Task? TickLoopTask;
-        public WindowsModule? WindowsModule;
-        public WorldModule? WorldModule;
 
         static MinecraftBot()
         {
@@ -59,16 +68,6 @@ namespace MineSharp.Bot
             this.PhysicsModule = new PhysicsModule(this);
             this.WorldModule = new WorldModule(this);
             this.WindowsModule = new WindowsModule(this);
-        }
-
-        public MinecraftClient Client {
-            get;
-        }
-        public BotOptions Options {
-            get;
-        }
-        public Session Session {
-            get;
         }
 
         public async Task LoadModule(Module module)

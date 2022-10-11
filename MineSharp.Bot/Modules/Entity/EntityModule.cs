@@ -7,13 +7,13 @@ using System.Collections.Concurrent;
 using static MineSharp.Bot.MinecraftBot;
 using Attribute = MineSharp.Core.Types.Attribute;
 
-namespace MineSharp.Bot.Modules
+namespace MineSharp.Bot.Modules.Entity
 {
     public class EntityModule : Module
     {
 
 
-        public ConcurrentDictionary<int, Entity> Entities = new ConcurrentDictionary<int, Entity>();
+        public ConcurrentDictionary<int, Core.Types.Entity> Entities = new ConcurrentDictionary<int, Core.Types.Entity>();
         public EntityModule(MinecraftBot bot) : base(bot) {}
 
         public event BotEntityEvent? EntitySpawned;
@@ -194,7 +194,7 @@ namespace MineSharp.Bot.Modules
         }
 
 
-        internal void AddEntity(Entity entity)
+        internal void AddEntity(Core.Types.Entity entity)
         {
             this.Entities.TryAdd(entity.Id, entity);
         }

@@ -10,12 +10,10 @@ using static MineSharp.Bot.MinecraftBot;
 using PacketCloseWindow = MineSharp.Data.Protocol.Play.Clientbound.PacketCloseWindow;
 using PacketHeldItemSlot = MineSharp.Data.Protocol.Play.Clientbound.PacketHeldItemSlot;
 
-namespace MineSharp.Bot.Modules
+namespace MineSharp.Bot.Modules.Windows
 {
     public class WindowsModule : Module
     {
-
-
         private readonly List<int> AllowedBlocksToOpen = new List<int> {
             (int)BlockType.Chest,
             (int)BlockType.TrappedChest,
@@ -132,7 +130,6 @@ namespace MineSharp.Bot.Modules
 
         public async Task SelectHotbarIndex(byte hotbarIndex)
         {
-
             if (hotbarIndex < 0 || hotbarIndex > 8) throw new ArgumentOutOfRangeException(nameof(hotbarIndex) + " must be between 0 and 8");
 
             var packet = new Data.Protocol.Play.Serverbound.PacketHeldItemSlot(hotbarIndex);
@@ -191,8 +188,7 @@ namespace MineSharp.Bot.Modules
         }
 
         #region Handlers
-
-
+        
         private Task handleSetSlot(PacketSetSlot packet)
         {
             if (!this.OpenedWindows.TryGetValue(packet.WindowId!, out var window))
@@ -216,8 +212,7 @@ namespace MineSharp.Bot.Modules
 
             return Task.CompletedTask;
         }
-
-
+        
         private DateTime? cacheTimestamp;
         private PacketWindowItems? cachedWindowItemsPacket;
         private Task handleWindowItems(PacketWindowItems packet)
@@ -255,8 +250,7 @@ namespace MineSharp.Bot.Modules
             this.HeldItemChanged?.Invoke(this.Bot, this.HeldItem);
             return Task.CompletedTask;
         }
-
-
+        
         #endregion
 
     }

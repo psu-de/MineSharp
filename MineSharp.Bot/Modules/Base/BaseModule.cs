@@ -8,7 +8,7 @@ using static MineSharp.Bot.MinecraftBot;
 using PacketChat = MineSharp.Data.Protocol.Play.Clientbound.PacketChat;
 using PacketPosition = MineSharp.Data.Protocol.Play.Clientbound.PacketPosition;
 
-namespace MineSharp.Bot.Modules
+namespace MineSharp.Bot.Modules.Base
 {
     public class BaseModule : Module
     {
@@ -152,7 +152,7 @@ namespace MineSharp.Bot.Modules
         /// <param name="entity"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public Task Attack(Entity entity)
+        public Task Attack(Core.Types.Entity entity)
         {
             // TODO: Cooldown
             this.Bot.AssertPlayerLoaded();
