@@ -27,16 +27,15 @@ namespace MineSharp.Data.Generator.Recipes
         
         private string StringifyRecipe(RecipeJsonInfo recipe)
         {
-            var ingredients = new int?[9];
+            int?[] ingredients;
             var requiresTable = false;
             
             if (recipe.Ingredients != null)
             {
-                requiresTable = recipe.Ingredients.Length > 4;
                 ingredients = recipe.Ingredients
                     .Select(x => (int?)x)    
-                    .Concat(Enumerable.Repeat<int?>(null, ingredients.Length - recipe.Ingredients.Length))
                     .ToArray();
+                requiresTable = recipe.Ingredients.Length > 4;
             } 
             else
             {
@@ -45,7 +44,27 @@ namespace MineSharp.Data.Generator.Recipes
                     throw new Exception("Ingredients and inShape are null");
                 }
                 ingredients = ConvertShape(recipe.InShape!);
+                ingredients = RemoveTrailingNulls(ingredients);
                 requiresTable = recipe.InShape!.Length > 2 || recipe.InShape!.Any(x => x.Length > 2);
+                if (!requiresTable)
+                {
+                    if (ingredients.Length > 3)
+                    {
+                        if (ingredients[2] != null)
+                        {
+                            throw new Exception($"[{string.Join(", ", ingredients)}], [{string.Join(", ", ConvertShape(recipe.InShape!))}], {recipe.InShape.Length}, [{string.Join(", ", recipe.InShape.Select(x => x.Length))}]");
+                        }
+                    
+                        var ing = ingredients.ToList();
+                        ing.RemoveAt(2);
+                        ingredients = ing.ToArray();   
+                    }
+                    
+                    if (ingredients.Length > 4)
+                    {
+                        throw new Exception($"[{string.Join(", ", ingredients)}], [{string.Join(", ", ConvertShape(recipe.InShape!))}], {recipe.InShape.Length}, [{string.Join(", ", recipe.InShape.Select(x => x.Length))}]");
+                    }   
+                }
             }
 
             int?[]? outShape = null;
@@ -85,6 +104,34 @@ namespace MineSharp.Data.Generator.Recipes
                 }
             }
             return @out;
+        }
+        
+        private int?[] RemoveTrailingNulls(int?[] arr)
+        {
+            int nullIndex = -1;
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] != null)
+                {
+                    nullIndex = -1;
+                    continue;
+                }
+
+                if (nullIndex > 0)
+                {
+                    continue;
+                }
+
+                nullIndex = i;
+            }
+
+            if (nullIndex == -1)
+            {
+                return arr;
+            }
+
+            return arr.Take(nullIndex).ToArray();
         }
     }
 }
