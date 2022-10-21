@@ -30,10 +30,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
             var block = BotClient.Bot!.GetBlockAt(new Position(x, y, z));
             var window = BotClient.Bot.OpenContainer(block).GetAwaiter().GetResult();
 
-                var window = task.GetAwaiter().GetResult();
-
-                AnsiConsole.MarkupLine($"[green]Opened window with id={window.Id}[/]");
-            }
+            AnsiConsole.MarkupLine($"[green]Opened window with id={window.Id}[/]");
         }
     }
 }
