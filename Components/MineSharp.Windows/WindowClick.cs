@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Types;
+﻿using MineSharp.Core.Logging;
+using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 
 namespace MineSharp.Windows
@@ -39,6 +40,7 @@ namespace MineSharp.Windows
 
         private void PerformSimpleClick(Window window)
         {
+            Logger.GetLogger().Debug(window.GetSlot(Slot).ToString());
             if (!(this.Button == 0 || this.Button == 1))
                 throw new NotSupportedException();
 
@@ -88,5 +90,7 @@ namespace MineSharp.Windows
                 window.SwapSelectedSlot(this.Slot);
             }
         }
+
+        public override string ToString() => $"Window (Type={ClickMode}, Button={Button}, Slot={Slot})";
     }
 }

@@ -16,12 +16,19 @@
 
         public bool CanStack(Slot otherSlot)
         {
-            if (this.IsEmpty() || otherSlot.IsEmpty()) return true;
+            return this.CanStack(otherSlot.Item?.Id);
+        }
 
+        public bool CanStack(int? itemId)
+        {
+            if (this.IsEmpty() || itemId == null)
+            {
+                return true;
+            }
+            
             var slotType = this.Item!.Id;
-            var otherSlotType = otherSlot.Item!.Id;
 
-            if (slotType == otherSlotType)
+            if (slotType == itemId)
             {
 
                 if (this.Item!.StackSize == 1) return false;

@@ -1,5 +1,6 @@
 ﻿using MineSharp.Bot.Modules;
 using MineSharp.Bot.Modules.Base;
+using MineSharp.Bot.Modules.Crafting;
 using MineSharp.Bot.Modules.Entity;
 using MineSharp.Bot.Modules.Physics;
 using MineSharp.Bot.Modules.Windows;
@@ -8,6 +9,7 @@ using MineSharp.Core;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
+using MineSharp.Data.Blocks;
 using MineSharp.Data.Protocol;
 using MineSharp.MojangAuth;
 using MineSharp.Protocol;
@@ -37,6 +39,7 @@ namespace MineSharp.Bot
         public readonly PlayerModule? PlayerModule;
         public readonly WindowsModule? WindowsModule;
         public readonly WorldModule? WorldModule;
+        public readonly CraftingModule? CraftingModule;
         
         private Task? TickLoopTask;
 
@@ -68,11 +71,11 @@ namespace MineSharp.Bot
             this.PhysicsModule = new PhysicsModule(this);
             this.WorldModule = new WorldModule(this);
             this.WindowsModule = new WindowsModule(this);
+            this.CraftingModule = new CraftingModule(this);
         }
 
         public async Task LoadModule(Module module)
         {
-
             this.Modules.Add(module);
             if (module is TickedModule) this.TickedModules.Add((TickedModule)module);
 
@@ -121,7 +124,7 @@ namespace MineSharp.Bot
 
         private async Task LoadModules()
         {
-            await Task.WhenAll(this.LoadModule(this.BaseModule), this.LoadModule(this.EntityModule), this.LoadModule(this.PlayerModule), this.LoadModule(this.PhysicsModule), this.LoadModule(this.WorldModule), this.LoadModule(this.WindowsModule));
+            await Task.WhenAll(this.LoadModule(this.BaseModule!), this.LoadModule(this.EntityModule!), this.LoadModule(this.PlayerModule!), this.LoadModule(this.PhysicsModule!), this.LoadModule(this.WorldModule!), this.LoadModule(this.WindowsModule!), this.LoadModule(this.CraftingModule!));
         }
 
 

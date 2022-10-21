@@ -4,7 +4,10 @@ using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
 using MineSharp.Core.Types.Enums;
 using MineSharp.Data.Items;
+using MineSharp.Data.Protocol;
 using MineSharp.Data.Windows;
+using System.Runtime.CompilerServices;
+using Slot = MineSharp.Core.Types.Slot;
 
 namespace MineSharp.Windows
 {
@@ -53,6 +56,11 @@ namespace MineSharp.Windows
             get;
         }
 
+        public bool IsSynchronized { get; set; } = false;
+
+        private object _clickLock = new object();
+        private TaskCompletionSource _syncTsc = new TaskCompletionSource();
+
         public int ContainerStart => 0;
         public int ContainerEnd => this.Info.UniqueSlots - 1;
         public int InventoryStart => this.Info.ExcludeInventory ? throw new NotSupportedException() : this.Info.UniqueSlots;
@@ -73,7 +81,7 @@ namespace MineSharp.Windows
 
         public Window? InventoryWindow { get; private set; }
 
-        public Slot? SelectedSlot { get; set; }
+        public Slot SelectedSlot { get; set; }
         public int StateId { get; set; }
 
         public int EmptySlotCount => this.EmptyContainerSlots().Length;
@@ -104,10 +112,30 @@ namespace MineSharp.Windows
 
         public void PerformClick(WindowClick click)
         {
-            click.PerformClick(this);
-            this.WindowClicked?.Invoke(this, click);
+            Logger.Debug($"PerformClick(click={click} window={this}");
+            Logger.Debug($"SelectedItem={SelectedSlot}");
+            Logger.Debug($"{Id} => {click}");
+            if (this.IsSynchronized)
+            {
+                lock (this._clickLock)
+                {
+                    click.PerformClick(this);
+                    this._syncTsc = new TaskCompletionSource();
+                    this.WindowClicked?.Invoke(this, click);
+                    this._syncTsc.Task.Wait();
+                }
+            } else
+            {
+                click.PerformClick(this);
+                this.WindowClicked?.Invoke(this, click);
+            }
         }
 
+        public void SetSync()
+        {
+            this._syncTsc.TrySetResult();
+        }
+        
         public void SetSlot(Slot slot)
         {
 
@@ -153,7 +181,7 @@ namespace MineSharp.Windows
 
         public void UpdateSlots(Slot[] slotData)
         {
-            foreach (var slot in slotData) this.SetSlot(slot);
+            slotData.ToList().ForEach(this.SetSlot);
         }
 
         public Slot[] GetContainerSlots()
@@ -166,21 +194,29 @@ namespace MineSharp.Windows
             return slots.ToArray();
         }
 
+        public Slot[] GetInventorySlots()
+        {
+            if (this.InventoryWindow == null)
+            {
+                throw new Exception();
+            }
+            
+            var slots = new List<Slot>();
+            slots.AddRange(this.InventoryWindow!.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
+            return slots.ToArray();
+        }
+
         public Slot[] GetAllSlots()
         {
             var slots = this.GetContainerSlots().ToList();
 
-            if (this.Info.ExcludeInventory || this.InventoryWindow != null)
+            if (!this.Info.ExcludeInventory && this.InventoryWindow != null)
             {
-                slots.AddRange(this.InventoryWindow!.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber! + this.ContainerSlots.Length))));
+                slots.AddRange(this.GetInventorySlots());
             }
 
             return slots.ToArray();
         }
-
-        public Item?[] ContainerItems() => this.GetContainerSlots().Select(x => x.Item).ToArray();
-
-        public Item?[] AllItems() => this.GetAllSlots().Select(x => x.Item).ToArray();
 
         /// <summary>
         ///     When using MineSharp.Bot, please use Bot.CloseWindow(windowId) instead.
@@ -211,16 +247,16 @@ namespace MineSharp.Windows
         }
 
 
-        private Slot? FindItem(Slot[] slots, Item searched) => slots.FirstOrDefault(x => !x.IsEmpty() && x.Item!.Id == searched.Id);
+        private Slot? FindItem(Slot[] slots, ItemType searched) => slots.FirstOrDefault(x => !x.IsEmpty() && x.Item!.Id == (int)searched);
 
         /// <summary>
         ///     Searches through the container slots for an item
         /// </summary>
-        /// <param name="itemInfo"></param>
+        /// <param name="searched"></param>
         /// <returns></returns>
-        public Slot? FindContainerItem(Item searched) => this.FindItem(this.ContainerSlots, searched);
+        public Slot? FindContainerItem(ItemType searched) => this.FindItem(this.ContainerSlots, searched);
 
-        public Slot? FindInventoryItem(Item searched) => this.FindItem(this.InventoryWindow!.ContainerSlots, searched);
+        public Slot? FindInventoryItem(ItemType searched) => this.FindItem(this.InventoryWindow!.ContainerSlots, searched);
 
         public void SwitchSlots(short slot1, short slot2)
         {
@@ -411,6 +447,130 @@ namespace MineSharp.Windows
 
             for (int i = 0; i < count; i++)
                 yield return new WindowClick(WindowOperationMode.SimpleClick, 1, slot.SlotNumber);
+        }
+        
+        private void PickupItems(Slot[] availableSlots, ItemType itemType, int count = 1)
+        {
+            var slots = availableSlots.ToList();
+            
+            if (!this.SelectedSlot.IsEmpty())
+            {
+                throw new InvalidOperationException("Selected slot must be null");
+            }
+            
+            var itemSlots = slots.Where(x => !x.IsEmpty() && x.Item!.Id == (int)itemType).ToList();
+
+            if (itemSlots.Count == 0 || itemSlots.Sum(x => x.Item!.Count) < count)
+            {
+                throw new Exception("Not enough items in container");
+            }
+            
+            int pickedUp = 0;
+            int left;
+            while ((left = count - pickedUp) != 0)
+            {
+                if (itemSlots.Count == 0)
+                {
+                    throw new Exception("Something went wrong.");
+                }
+                
+                Slot? slot = null;
+                if ((slot = itemSlots.FirstOrDefault(x => x.Item!.Count + pickedUp == left)) != null)
+                {
+                    var click = new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseLeft, slot.SlotNumber);
+                    this.PerformClick(click);
+
+                    if (pickedUp == 0)
+                    {
+                        this.PerformClick(click);
+                    }
+                    
+                    return;
+                } else
+                {
+                    slot = itemSlots.OrderBy(x => (count - pickedUp) - x.Item!.Count).First();
+                    itemSlots.Remove(slot);
+                    
+                    var diff = (count - pickedUp) - slot.Item!.Count;
+                    if (diff >= 0)
+                    {
+                        pickedUp += slot.Item!.Count;
+                        var click = new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseLeft, slot.SlotNumber);
+                        this.PerformClick(click);
+                        this.PerformClick(click);
+
+                        if (pickedUp == count)
+                        {
+                            return;
+                        }
+                    } else
+                    {
+                        this.PerformClick(
+                            new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseLeft, slot.SlotNumber));
+                        
+                        PutDownItems(slots.ToArray(), Math.Abs(diff));
+                        var click = new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseLeft, slot.SlotNumber);
+                        this.PerformClick(click);
+                        this.PerformClick(click);
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void PutDownItems(Slot[] availableSlots, int count)
+        {
+            if (this.SelectedSlot.IsEmpty())
+            {
+                throw new Exception("Selected slot cannot be null");
+            }
+            
+            var itemId = this.SelectedSlot!.Item!.Id;
+            
+            var item = ItemFactory.CreateItem(itemId, 1, null, null);
+            var stackableSlots = availableSlots.Where(x => x.CanStack(itemId))
+                .OrderBy(x => x.IsEmpty() ? item.StackSize : x.Item!.StackSize - x.Item!.Count)
+                .ToArray();
+
+            if (stackableSlots.Sum(x => x.IsEmpty() ? item.StackSize : x.Item!.StackSize - x.Item!.Count) < count)
+            {
+                throw new Exception("Not enough space");
+            }
+
+            var putDown = 0;
+            foreach (var slot in stackableSlots)
+            {
+                var left = count - putDown;
+
+                var toStack = Math.Min(left, slot.IsEmpty() ? item.StackSize - slot.Item!.Count : item.StackSize);
+
+                for (int i = 0; i < toStack; i++)
+                {
+                    var click = new WindowClick(WindowOperationMode.SimpleClick, (byte)WindowMouseButton.MouseRight, slot.SlotNumber);
+                    this.PerformClick(click);
+                }
+
+                putDown += toStack;
+                if (left == toStack)
+                {
+                    return;
+                }
+            }
+        }
+
+        public void PickupInventoryItems(ItemType itemType, int count = 1) => PickupItems(this.GetInventorySlots(), itemType, count);
+
+        public void PickupContainerItems(ItemType itemType, int count = 1) => PickupItems(this.GetContainerSlots(), itemType, count);
+
+        public void PutDownInventoryItems(int count) => PutDownItems(this.GetInventorySlots(), count);
+
+        public void PutDownContainerItems(int count) => PutDownItems(this.GetContainerSlots(), count);
+
+
+        public override string ToString()
+        {
+            return $"Window (id={Id}, Name={Info.Name}, Slots={Info.UniqueSlots}, ExcludeInventory={Info.ExcludeInventory})";
         }
     }
 }
