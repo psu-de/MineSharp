@@ -2,29 +2,35 @@
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Player {
-    internal class SetRotationCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.Player
+{
+    internal class SetRotationCommand : Command
+    {
 
-        FloatArgument PitchArg;
-        FloatArgument YawArg;
+        private readonly FloatArgument PitchArg;
+        private readonly FloatArgument YawArg;
 
-        public SetRotationCommand() {
-            PitchArg = new FloatArgument("pitch");
-            YawArg = new FloatArgument("yaw");
+        public SetRotationCommand()
+        {
+            this.PitchArg = new FloatArgument("pitch");
+            this.YawArg = new FloatArgument("yaw");
 
-            var desc = $"Sets the rotation of the player to [{PitchArg.Color}]Pitch / Yaw[/]";
-            this.Initialize("setRotation", desc, CColor.PlayerCommand, PitchArg, YawArg);
+            var desc = $"Sets the rotation of the player to [{this.PitchArg.Color}]Pitch / Yaw[/]";
+            this.Initialize("setRotation", desc, CColor.PlayerCommand, this.PitchArg, this.YawArg);
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
 
-            float? pitch = PitchArg.GetValue(argv[0]);
-            float? yaw = YawArg.GetValue(argv[1]);
+            var pitch = this.PitchArg.GetValue(argv[0]);
+            var yaw = this.YawArg.GetValue(argv[1]);
 
-            if (pitch == null) {
+            if (pitch == null)
+            {
                 AnsiConsole.MarkupLine($"[{CColor.Error}]Invalid pitch![/]");
             }
-            if (yaw == null) {
+            if (yaw == null)
+            {
                 AnsiConsole.MarkupLine($"[{CColor.Error}]Invalid yaw![/]");
             }
 

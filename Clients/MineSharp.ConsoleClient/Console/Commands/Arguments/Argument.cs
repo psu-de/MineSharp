@@ -1,13 +1,16 @@
 ﻿using PrettyPrompt.Completion;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Arguments {
-    internal abstract class Argument {
+namespace MineSharp.ConsoleClient.Console.Commands.Arguments
+{
+    internal abstract class Argument
+    {
 #pragma warning disable CS0649
         protected Action<string> ArgumentMatched;
 #pragma warning restore CS0649
 
 #pragma warning disable CS8618
-        public Argument(string name, bool isOptional = false) {
+        public Argument(string name, bool isOptional = false)
+        {
             this.Name = name;
             this.IsOptional = isOptional;
         }

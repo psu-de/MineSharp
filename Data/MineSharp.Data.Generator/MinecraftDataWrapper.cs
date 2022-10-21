@@ -1,47 +1,56 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace MineSharp.Data.Generator {
-    internal class MinecraftDataHelper {
+namespace MineSharp.Data.Generator
+{
+    internal class MinecraftDataHelper
+    {
+
+        private readonly DataPathsJson DataPaths;
 
 
         public string DataPath;
 
-        private DataPathsJson DataPaths;
-
-        public MinecraftDataHelper(string dataPath) {
+        public MinecraftDataHelper(string dataPath)
+        {
             this.DataPath = Path.Join(dataPath, "data");
 
-            this.DataPaths = JsonConvert.DeserializeObject<DataPathsJson>(File.ReadAllText(Path.Join(DataPath, "dataPaths.json")));
+            this.DataPaths = JsonConvert.DeserializeObject<DataPathsJson>(File.ReadAllText(Path.Join(this.DataPath, "dataPaths.json")));
         }
 
 
-        public string[] GetAvailableVersions() => DataPaths.PCVersions.Keys.ToArray();
+        public string[] GetAvailableVersions() => this.DataPaths.PCVersions.Keys.ToArray();
 
-        internal string GetJsonPath(string version, string type) {
+        internal string GetJsonPath(string version, string type)
+        {
 
-            var pathInfo = DataPaths.PCVersions[version];
-            var key = Uppercase(type) + "Path";
-            string dataPath = (string)(pathInfo.GetType().GetProperty(key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)?.GetValue(DataPaths.PCVersions[version]) ?? throw new KeyNotFoundException(key));
-            return Path.Join(DataPath, dataPath, type + ".json");
+            var pathInfo = this.DataPaths.PCVersions[version];
+            var key = this.Uppercase(type) + "Path";
+            var dataPath = (string)(pathInfo.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance)?.GetValue(this.DataPaths.PCVersions[version]) ?? throw new KeyNotFoundException(key));
+            return Path.Join(this.DataPath, dataPath, type + ".json");
 
         }
 
-        public T LoadJson<T>(string version, string type) {
-            var data = JsonConvert.DeserializeObject<T>(File.ReadAllText(GetJsonPath(version, type)));
+        public T LoadJson<T>(string version, string type)
+        {
+            var data = JsonConvert.DeserializeObject<T>(File.ReadAllText(this.GetJsonPath(version, type)));
             if (data == null)
                 throw new Exception();
             return data;
         }
 
-        public string GetCSharpName(string name) {
-            System.Globalization.TextInfo ti = new System.Globalization.CultureInfo("en-US", false).TextInfo;
+        public string GetCSharpName(string name)
+        {
+            var ti = new CultureInfo("en-US", false).TextInfo;
             name = name.Replace("_", " ");
             name = ti.ToTitleCase(name);
 
-            Regex rgx = new Regex(@"^\d+");
-            Match match = rgx.Match(name);
-            if (match.Success) {
+            var rgx = new Regex(@"^\d+");
+            var match = rgx.Match(name);
+            if (match.Success)
+            {
                 name = name.Substring(match.Value.Length);
                 name += match.Value;
             }
@@ -49,19 +58,15 @@ namespace MineSharp.Data.Generator {
             rgx = new Regex("[^a-zA-Z0-9 -]");
             name = rgx.Replace(name, "");
             name = name.Replace(" ", "");
-            return Uppercase(name);
+            return this.Uppercase(name);
         }
 
-        public string Uppercase(string str) {
-            return char.ToUpper(str[0]) + str.Substring(1);
-        }
+        public string Uppercase(string str) => char.ToUpper(str[0]) + str.Substring(1);
 
-        public string Lowercase(string str) {
-            return char.ToLower(str[0]) + str.Substring(1);
-        }
-
+        public string Lowercase(string str) => char.ToLower(str[0]) + str.Substring(1);
 #pragma warning disable CS8618
-        private struct GenerateInfoJson {
+        private struct GenerateInfoJson
+        {
             [JsonProperty("attributes")]
             public string AttributesPath { get; set; }
             [JsonProperty("blocks")]
@@ -102,7 +107,8 @@ namespace MineSharp.Data.Generator {
             public string MapIcons { get; set; }
         }
 
-        private struct DataPathsJson {
+        private struct DataPathsJson
+        {
 #pragma warning disable CS0649
             [JsonProperty("pc")]
             public Dictionary<string, GenerateInfoJson> PCVersions;

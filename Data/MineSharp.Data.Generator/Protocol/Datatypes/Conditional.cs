@@ -1,123 +1,135 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace MineSharp.Data.Generator.Protocol.Datatypes {
-    internal class SwitchDatatypeGenerator : DatatypeGenerator<SwitchDatatype> {
+namespace MineSharp.Data.Generator.Protocol.Datatypes
+{
+    internal class SwitchDatatypeGenerator : DatatypeGenerator<SwitchDatatype>
+    {
+
+        public SwitchDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "switch";
-        public override void WriteClassReader(CodeGenerator codeGenerator) { }
-        public override void WriteClassWriter(CodeGenerator codeGenerator) { }
         public override bool IsGeneric => true;
-
-        public SwitchDatatypeGenerator(ProtoCompiler compiler) : base(compiler) { }
+        public override void WriteClassReader(CodeGenerator codeGenerator) {}
+        public override void WriteClassWriter(CodeGenerator codeGenerator) {}
     }
 
-    internal class SwitchDatatype : StructureDatatype {
+    internal class SwitchDatatype : StructureDatatype
+    {
         internal Field? CompareToField;
-        internal Dictionary<string, Datatype>? SwitchMap;
         internal Datatype? DefaultType;
+        internal Dictionary<string, Datatype>? SwitchMap;
+        public SwitchDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {}
 
         public override string TypeName => "switch";
-        public SwitchDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-        }
 
-        public override string CSharpType => Compiler.GetCSharpName(Name) + "Switch";
+        public override string CSharpType => this.Compiler.GetCSharpName(this.Name) + "Switch";
 
-        public override string GetReader() {
-            ParseCompareToDatatype();
-            ParseSwitchMap();
+        public override string GetReader()
+        {
+            this.ParseCompareToDatatype();
+            this.ParseSwitchMap();
 
-            string compareTo = (string)((JObject)Options!).GetValue("compareTo")!;
-            if (compareTo == "$compareTo" && ExtraOptions != null) {
-                compareTo = (string)((JObject)ExtraOptions!).GetValue("compareTo")!;
+            var compareTo = (string)((JObject)this.Options!).GetValue("compareTo")!;
+            if (compareTo == "$compareTo" && this.ExtraOptions != null)
+            {
+                compareTo = (string)((JObject)this.ExtraOptions!).GetValue("compareTo")!;
             }
             var paths = compareTo.Split("/");
 
-            if (paths[0] == "..") {
+            if (paths[0] == "..")
+            {
                 paths = paths.Skip(1).ToArray();
             }
 
 
-            paths[0] = Compiler.Lowercase(Compiler.GetCSharpName(paths[0]));
-            for (int i = 1; i < paths.Length; i++)
-                paths[i] = Compiler.GetCSharpName(paths[i]);
+            paths[0] = this.Compiler.Lowercase(this.Compiler.GetCSharpName(paths[0]));
+            for (var i = 1; i < paths.Length; i++)
+                paths[i] = this.Compiler.GetCSharpName(paths[i]);
 
-            string fieldName = string.Join(".", paths);
+            var fieldName = string.Join(".", paths);
 
-            return $"((Func<PacketBuffer, {CSharpType}>)((buffer) => {CSharpType}.Read(buffer, @{fieldName}{(RequiredParentFields!.Count == 0 ? "" : $", {string.Join(", ", RequiredParentFields.Values.Select(x => $"@{Compiler.Lowercase(Compiler.GetCSharpName(x.Name))}"))}")})))";
+            return $"((Func<PacketBuffer, {this.CSharpType}>)((buffer) => {this.CSharpType}.Read(buffer, @{fieldName}{(this.RequiredParentFields!.Count == 0 ? "" : $", {string.Join(", ", this.RequiredParentFields.Values.Select(x => $"@{this.Compiler.Lowercase(this.Compiler.GetCSharpName(x.Name))}"))}")})))";
         }
 
-        public override string GetWriter() {
-            ParseCompareToDatatype();
-            ParseSwitchMap();
+        public override string GetWriter()
+        {
+            this.ParseCompareToDatatype();
+            this.ParseSwitchMap();
 
-            string compareTo = (string)((JObject)Options!).GetValue("compareTo")!;
-            if (compareTo == "$compareTo" && ExtraOptions != null) {
-                compareTo = (string)((JObject)ExtraOptions!).GetValue("compareTo")!;
+            var compareTo = (string)((JObject)this.Options!).GetValue("compareTo")!;
+            if (compareTo == "$compareTo" && this.ExtraOptions != null)
+            {
+                compareTo = (string)((JObject)this.ExtraOptions!).GetValue("compareTo")!;
             }
             var paths = compareTo.Split("/");
 
-            if (paths[0] == "..") {
+            if (paths[0] == "..")
+            {
                 paths = paths.Skip(1).ToArray();
-                paths[0] = "@" + Compiler.Lowercase(Compiler.GetCSharpName(paths[0]));
-            } else if (OuterStructure != null && OuterStructure is not ContainerDatatype) {
-                paths[0] = "@" + Compiler.Lowercase(Compiler.GetCSharpName(paths[0]));
-            } else {
-                paths[0] = Compiler.GetCSharpName(paths[0]);
+                paths[0] = "@" + this.Compiler.Lowercase(this.Compiler.GetCSharpName(paths[0]));
+            } else if (this.OuterStructure != null && this.OuterStructure is not ContainerDatatype)
+            {
+                paths[0] = "@" + this.Compiler.Lowercase(this.Compiler.GetCSharpName(paths[0]));
+            } else
+            {
+                paths[0] = this.Compiler.GetCSharpName(paths[0]);
             }
 
 
-            for (int i = 1; i < paths.Length; i++)
-                paths[i] = Compiler.GetCSharpName(paths[i]);
+            for (var i = 1; i < paths.Length; i++)
+                paths[i] = this.Compiler.GetCSharpName(paths[i]);
 
-            string fieldName = string.Join(".", paths);
+            var fieldName = string.Join(".", paths);
 
-            return $"((Action<PacketBuffer, {CSharpType}>)((buffer, value) => value.Write(buffer, {fieldName}{(RequiredParentFields!.Count == 0 ? "" : $", {string.Join(", ", RequiredParentFields.Values.Select(x => (Container!.FieldMap!.ContainsKey(x.Name) ? $"{Compiler.GetCSharpName(x.Name)}" : $"@{Compiler.Lowercase(Compiler.GetCSharpName(x.Name))}")))}")})))";
+            return $"((Action<PacketBuffer, {this.CSharpType}>)((buffer, value) => value.Write(buffer, {fieldName}{(this.RequiredParentFields!.Count == 0 ? "" : $", {string.Join(", ", this.RequiredParentFields.Values.Select(x => this.Container!.FieldMap!.ContainsKey(x.Name) ? $"{this.Compiler.GetCSharpName(x.Name)}" : $"@{this.Compiler.Lowercase(this.Compiler.GetCSharpName(x.Name))}"))}")})))";
         }
 
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent)
+        {
 
-            ParseCompareToDatatype();
-            ParseSwitchMap();
+            this.ParseCompareToDatatype();
+            this.ParseSwitchMap();
 
-            codeGenerator.Begin($"public class {CSharpType}");
+            codeGenerator.Begin($"public class {this.CSharpType}");
 
             foreach (var dtype in this.SwitchMap!.Values)
-                dtype.DoWriteStructure(codeGenerator, Container);
+                dtype.DoWriteStructure(codeGenerator, this.Container);
 
             codeGenerator.WriteLine("public object? Value { get; set; }");
 
-            codeGenerator.Begin($"public {CSharpType}(object? value)");
+            codeGenerator.Begin($"public {this.CSharpType}(object? value)");
             codeGenerator.WriteLine("this.Value = value;");
             codeGenerator.Finish();
 
-            codeGenerator.Begin($"public void Write(PacketBuffer buffer, {CompareToField!.Type.CSharpType} state{(RequiredParentFields.Count == 0 ? "" : $", {string.Join(", ", RequiredParentFields.Values.Select(x => $"{x.Type.CSharpType} @{Compiler.Lowercase(Compiler.GetCSharpName(x.Name))}"))}")})");
+            codeGenerator.Begin($"public void Write(PacketBuffer buffer, {this.CompareToField!.Type.CSharpType} state{(this.RequiredParentFields.Count == 0 ? "" : $", {string.Join(", ", this.RequiredParentFields.Values.Select(x => $"{x.Type.CSharpType} @{this.Compiler.Lowercase(this.Compiler.GetCSharpName(x.Name))}"))}")})");
             codeGenerator.Begin("switch (state)");
-            foreach (var type in SwitchMap!) 
-                codeGenerator.WriteLine($"case {(CompareToField!.Type.CSharpType == "string" ? $@"""{type.Key}""" : type.Key)}: {type.Value.GetWriter()}(buffer, ({type.Value.CSharpType})this); break;");
-            if (DefaultType != null)
-                codeGenerator.WriteLine($"default: {DefaultType.GetWriter()}(buffer, ({DefaultType.CSharpType})Value); break;");
+            foreach (var type in this.SwitchMap!)
+                codeGenerator.WriteLine($"case {(this.CompareToField!.Type.CSharpType == "string" ? $@"""{type.Key}""" : type.Key)}: {type.Value.GetWriter()}(buffer, ({type.Value.CSharpType})this); break;");
+            if (this.DefaultType != null)
+                codeGenerator.WriteLine($"default: {this.DefaultType.GetWriter()}(buffer, ({this.DefaultType.CSharpType})Value); break;");
             else
-                codeGenerator.WriteLine($@"default: throw new Exception($""Invalid value: '{{state}}'"");");
+                codeGenerator.WriteLine(@"default: throw new Exception($""Invalid value: '{state}'"");");
             codeGenerator.Finish();
             codeGenerator.Finish();
 
 
-            codeGenerator.Begin($"public static {CSharpType} Read(PacketBuffer buffer, {CompareToField!.Type.CSharpType} state{(RequiredParentFields.Count == 0 ? "" : $", {string.Join(", ", RequiredParentFields.Values.Select(x => $"{x.Type.CSharpType} @{Compiler.Lowercase(Compiler.GetCSharpName(x.Name))}"))}")})");
-            codeGenerator.Begin(@$"object? value = {(CompareToField!.Type.CSharpType == "VarInt" ? "state.Value" : "state")} switch");
-            foreach (var type in SwitchMap!) 
-                codeGenerator.WriteLine($"{(CompareToField!.Type.CSharpType == "string" ? $@"""{type.Key}""" : type.Key)} => {type.Value.GetReader()}(buffer),");
-            if (DefaultType != null) 
-                codeGenerator.WriteLine($"_ => {DefaultType.GetReader()}(buffer)");
-            else if (CompareToField!.Type.CSharpType != "bool")
-                codeGenerator.WriteLine($@" _ => throw new Exception($""Invalid value: '{{state}}'"")");
+            codeGenerator.Begin($"public static {this.CSharpType} Read(PacketBuffer buffer, {this.CompareToField!.Type.CSharpType} state{(this.RequiredParentFields.Count == 0 ? "" : $", {string.Join(", ", this.RequiredParentFields.Values.Select(x => $"{x.Type.CSharpType} @{this.Compiler.Lowercase(this.Compiler.GetCSharpName(x.Name))}"))}")})");
+            codeGenerator.Begin(@$"object? value = {(this.CompareToField!.Type.CSharpType == "VarInt" ? "state.Value" : "state")} switch");
+            foreach (var type in this.SwitchMap!)
+                codeGenerator.WriteLine($"{(this.CompareToField!.Type.CSharpType == "string" ? $@"""{type.Key}""" : type.Key)} => {type.Value.GetReader()}(buffer),");
+            if (this.DefaultType != null)
+                codeGenerator.WriteLine($"_ => {this.DefaultType.GetReader()}(buffer)");
+            else if (this.CompareToField!.Type.CSharpType != "bool")
+                codeGenerator.WriteLine(@" _ => throw new Exception($""Invalid value: '{state}'"")");
 
             codeGenerator.Finish(semicolon: true);
-            codeGenerator.WriteLine($"return new {CSharpType}(value);");
+            codeGenerator.WriteLine($"return new {this.CSharpType}(value);");
             codeGenerator.Finish();
 
-            List<string> conversions = this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")}({CSharpType} value) => ({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")})value.Value;").ToList();
-            conversions.AddRange(this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {CSharpType}?({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")} value) => new {CSharpType}(value);"));
-            foreach (var conv in conversions.Distinct()) {
+            var conversions = this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")}({this.CSharpType} value) => ({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")})value.Value;").ToList();
+            conversions.AddRange(this.SwitchMap!.Values.Where(x => x.CSharpType != "object?").Select(dtype => $"public static implicit operator {this.CSharpType}?({dtype.CSharpType + (dtype.CSharpType.EndsWith("?") ? "" : "?")} value) => new {this.CSharpType}(value);"));
+            foreach (var conv in conversions.Distinct())
+            {
                 codeGenerator.WriteLine(conv);
             }
 
@@ -125,60 +137,71 @@ namespace MineSharp.Data.Generator.Protocol.Datatypes {
             codeGenerator.Finish();
         }
 
-        private void ParseCompareToDatatype() {
+        private void ParseCompareToDatatype()
+        {
 
-            var defaultToken = ((JObject)Options!).GetValue("default");
-            if (defaultToken != null) {
-                DefaultType = Datatype.Parse(Compiler, defaultToken, Name + "Default", Container, this);
+            var defaultToken = ((JObject)this.Options!).GetValue("default");
+            if (defaultToken != null)
+            {
+                this.DefaultType = Parse(this.Compiler, defaultToken, this.Name + "Default", this.Container, this);
             }
 
-            string compareTo = (string)((JObject)Options!).GetValue("compareTo")!;
+            var compareTo = (string)((JObject)this.Options!).GetValue("compareTo")!;
 
-            if (compareTo == "$compareTo") {
-                if (Name == "particleData") {
-                    this.CompareToField = new Field("particleId", new Datatypes.I32Datatype(Compiler, null, "particleDataCompareTo", null, null));
-                } else if (Name == "entityMetadataItem") {
-                    this.CompareToField = new Field("type", new Datatypes.VarIntDatatype(Compiler, null, "entityMetadataItemCompareTo", null, null));
+            if (compareTo == "$compareTo")
+            {
+                if (this.Name == "particleData")
+                {
+                    this.CompareToField = new Field("particleId", new I32Datatype(this.Compiler, null, "particleDataCompareTo", null, null));
+                } else if (this.Name == "entityMetadataItem")
+                {
+                    this.CompareToField = new Field("type", new VarIntDatatype(this.Compiler, null, "entityMetadataItemCompareTo", null, null));
                 } else throw new Exception();
                 return;
             }
 
-            var field = Container!.GetField(compareTo);
-            if (compareTo.StartsWith("..")) {
-                this.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], (field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype) ? field.Type.OuterStructure : field.Type));
-                this.Container!.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], (field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype) ? field.Type.OuterStructure : field.Type));
-                this.OuterStructure!.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], (field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype) ? field.Type.OuterStructure : field.Type));
+            var field = this.Container!.GetField(compareTo);
+            if (compareTo.StartsWith(".."))
+            {
+                this.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype ? field.Type.OuterStructure : field.Type));
+                this.Container!.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype ? field.Type.OuterStructure : field.Type));
+                this.OuterStructure!.RequiredParentFields.TryAdd(compareTo.Split("/")[1], new Field(compareTo.Split("/")[1], field.Type.OuterStructure != null && field.Type.OuterStructure is not ContainerDatatype ? field.Type.OuterStructure : field.Type));
             }
 
             this.CompareToField = field;
         }
 
-        private void ParseSwitchMap() {
-            if (SwitchMap != null) return;
+        private void ParseSwitchMap()
+        {
+            if (this.SwitchMap != null) return;
             this.SwitchMap = new Dictionary<string, Datatype>();
-            JObject mapToken = (JObject)((JObject)Options!).GetValue("fields")!;
-            foreach (var prop in mapToken.Properties()) {
-                this.SwitchMap!.Add(prop.Name, Datatype.Parse(Compiler, prop.Value, this.CSharpType + "State" + prop.Name, Container, this));
+            var mapToken = (JObject)((JObject)this.Options!).GetValue("fields")!;
+            foreach (var prop in mapToken.Properties())
+            {
+                this.SwitchMap!.Add(prop.Name, Parse(this.Compiler, prop.Value, this.CSharpType + "State" + prop.Name, this.Container, this));
             }
         }
     }
 
-    internal class OptionDatatypeGenerator : DatatypeGenerator<OptionDatatype> {
-        public OptionDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {
-        }
+    internal class OptionDatatypeGenerator : DatatypeGenerator<OptionDatatype>
+    {
+        public OptionDatatypeGenerator(ProtoCompiler compiler) : base(compiler) {}
 
         public override string TypeName => "option";
-        public override void WriteClassReader(CodeGenerator codeGenerator) {
+        public override bool IsGeneric => true;
+        public override void WriteClassReader(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@"public T? ReadOption<T>(Func<PacketBuffer, T> reader) { 
+                @"public T? ReadOption<T>(Func<PacketBuffer, T> reader) { 
     bool present = this.ReadBool();
     if (!present) return default(T);
     return reader(this);
 }");
         }
-        public override void WriteClassWriter(CodeGenerator codeGenerator) {
+        public override void WriteClassWriter(CodeGenerator codeGenerator)
+        {
             codeGenerator.WriteBlock(
-@"public void WriteOption<T>(T value, Action<PacketBuffer, T> encoder) where T : class {
+                @"public void WriteOption<T>(T value, Action<PacketBuffer, T> encoder) where T : class {
     if (value == null) {
         WriteBool(false);
         return;
@@ -195,28 +218,26 @@ public void WriteOption<T>(Nullable<T> value, Action<PacketBuffer, T> encoder) w
 	encoder(this, value.Value);
 }");
         }
-        public override bool IsGeneric => true;
     }
 
-    internal class OptionDatatype : Datatype {
+    internal class OptionDatatype : Datatype
+    {
 
-        Datatype InnerType;
+        private readonly Datatype InnerType;
+
+        public OptionDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure)
+        {
+            this.InnerType = Parse(compiler, options!, name, container, outerStructure);
+        }
         public override string TypeName => "options";
 
-        public OptionDatatype(ProtoCompiler compiler, JToken? options, string name, ContainerDatatype? container, StructureDatatype? outerStructure) : base(compiler, options, name, container, outerStructure) {
-            this.InnerType = Datatype.Parse(compiler, options!, name, container, outerStructure);
-        }
+        public override string CSharpType => this.InnerType.CSharpType + "?";
 
-        public override string CSharpType => InnerType.CSharpType + "?";
-
-        public override string GetReader() {
-            return $"((Func<PacketBuffer, {CSharpType}>)((buffer) => buffer.ReadOption({InnerType.GetReader()})))";
-        }
-        public override string GetWriter() {
-            return $"((Action<PacketBuffer, {CSharpType}>)((buffer, value) => buffer.WriteOption(value, {InnerType.GetWriter()})))";
-        }
-        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent) {
-            InnerType.DoWriteStructure(codeGenerator, parent);
+        public override string GetReader() => $"((Func<PacketBuffer, {this.CSharpType}>)((buffer) => buffer.ReadOption({this.InnerType.GetReader()})))";
+        public override string GetWriter() => $"((Action<PacketBuffer, {this.CSharpType}>)((buffer, value) => buffer.WriteOption(value, {this.InnerType.GetWriter()})))";
+        protected override void WriteStructure(CodeGenerator codeGenerator, Datatype? parent)
+        {
+            this.InnerType.DoWriteStructure(codeGenerator, parent);
         }
     }
 }

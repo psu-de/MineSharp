@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Types.Enums {
-    public enum BlockFace {
+﻿namespace MineSharp.Core.Types.Enums
+{
+    public enum BlockFace
+    {
         Bottom = 0,
         Top = 1,
         North = 2,

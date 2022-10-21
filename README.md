@@ -1,4 +1,7 @@
-# Minesharp
+[![Gitter](https://img.shields.io/gitter/room/MineSharp-net/community?style=for-the-badge)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
+
+# MineSharp
 
 **This Project is not finished and under development!**
 
@@ -7,68 +10,79 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer)
 
 If you're interested in this project, feel free to contribute!
 
-# Projects
-## MineSharp.Core
-Contains core functionality like Logging, Basic Minecraft Types and versioning
+Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to provide support for mutliple versions tho.
 
-ToDo's
- - Versioning
+# Current features
 
-### MineSharp.Data
+- ✨Supported Version: Minecraft Java 1.18.1
+- 📈 Player Stats
+- ⚡ Events
+- 🐖 Entity tracking
+- 🌍 World tracking (query the world for blocks)
+- ⛏️ Mining
+- 👷‍♂️ Building
+- 🪟 Low-Level window api (needs some more work)
+- ⚔️ Attacking entities
+- 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
+- 🔎 Simple Pathfinder
+- 📝 Chat (Reading and Writing)
+
+# Roadmap
+
+- 🪟 Finish the window api
+- 🏊 Support more forms of movement (Swimming, climbing, maybe flying)
+- 🪄 Support more versions
+
+# Projects Overview
+
+## [MineSharp.Core](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Core)
+
+Contains core functionality like Logging, Basic Minecraft Types and (versioning)
+
+### [MineSharp.Data](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data)
+
 Dont reference this project directly, use MineSharp.Data.Wrapper
-Contains mostly (generated) code for
- - Biomes
- - Blocks
- - Effects
- - Enchantments
- - Entities
- - Items
- - Protocol
- - (Windows)
+Contains generated sourcecode from [minecraft-data](https://github.com/PrismarineJS/minecraft-data)
 
-ToDo's:
- - Block Loot
- - ~~Enchantments~~
- - Entity Loot
- - Materials
- - Recipies
- - Foods
- - Attributes?
- - Tints?
+### [MineSharp.Data.Generator](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data.Generator)
 
-### MineSharp.Data.Generator
 Transforms the json data from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) into C# source code
 
-### MineSharp.Data.Wrapper
-This is really the MineSharp.Data module. It helps with the (sometimes weird) generated data from MineSharp.Data
+### [MineSharp.Data.Wrapper](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data.Wrapper)
 
-### MineSharp.Bot
- Functions and logic to directly interact with a minecraft server\
- See [MineSharp.Bot README](https://github.com/psu-de/MineSharp/blob/main/MineSharp.Bot/README.md)
+Provides helper functions and extension methods to help with the generated types and the MineSharp.Core types.
+
+### [MineSharp.Bot](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Bot)
+
+API to directly interact with a minecraft server. \
+See [MineSharp.Bot README](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Bot)
 
 ## Components
 
-### MineSharp.MojangAuth
+### [MineSharp.MojangAuth](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.MojangAuth)
+
 Used to connect to Mojang Auth servers and create a Minecraft Session
 
-### MineSharp.Physics
-Logic to simulation player physics from minecraft\
-By now mostly copied from Mineflayer 😇
+### [MineSharp.Physics](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.Physics)
 
-ToDo's:
- - Water Movement doesnt work
- - Jumping doesnt work
+Logic to simulate entity physics from minecraft\
+Thanks to [ConcreteMC/Alex](https://github.com/ConcreteMC/Alex)
 
-### MineSharp.Protocol
+### [MineSharp.Protocol](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.Protocol)
+
 Implements the Minecraft Protocol. Contains logic to connect to a Minecraft server and read/write packets from/to it.
 
-### Minesharp.World
+### [MineSharp.World](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.World)
+
 Basic functionality to represent a Minecraft World
 
 ## Clients
-### MineSharp.ConsoleClient
+
+### [MineSharp.ConsoleClient](https://github.com/psu-de/MineSharp/tree/main/Clients/MineSharp.ConsoleClient)
+
 Console Prompt for MineSharp.Bot\
 Used for testing\
-See [MineSharp.ConsoleClient README](https://github.com/psu-de/MineSharp/blob/main/Clients/MineSharp.ConsoleClient/README.md) for a list of commands
+See [MineSharp.ConsoleClient README](https://github.com/psu-de/MineSharp/blob/main/Clients/MineSharp.ConsoleClient/README.md)
+for a list of commands
 
- ![MineSharp.ConsoleClient](https://i.ibb.co/HgYtkN0/Bild-2022-07-20-141355981.png)
+![MineSharp.ConsoleClient](https://i.ibb.co/HgYtkN0/Bild-2022-07-20-141355981.png)

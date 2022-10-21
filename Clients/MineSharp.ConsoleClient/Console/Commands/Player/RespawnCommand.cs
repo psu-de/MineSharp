@@ -1,21 +1,27 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using Spectre.Console;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Player {
-    internal class RespawnCommand : Command {
+namespace MineSharp.ConsoleClient.Console.Commands.Player
+{
+    internal class RespawnCommand : Command
+    {
 
-        public RespawnCommand() {
+        public RespawnCommand()
+        {
 
-            var desc = $"Respawns the Bot if it's dead";
+            var desc = "Respawns the Bot if it's dead";
 
-            this.Initialize("respawn", desc, CColor.PlayerCommand, new Commands.Arguments.Argument[] {});
+            this.Initialize("respawn", desc, CColor.PlayerCommand);
         }
 
-        public override void DoAction(string[] argv, CancellationToken cancellation) {
-            try {
+        public override void DoAction(string[] argv, CancellationToken cancellation)
+        {
+            try
+            {
 
                 BotClient.Bot!.Respawn();
-            } catch (Exception) {
+            } catch (Exception)
+            {
                 AnsiConsole.MarkupLine("[red]Player is not dead![/]");
             }
         }

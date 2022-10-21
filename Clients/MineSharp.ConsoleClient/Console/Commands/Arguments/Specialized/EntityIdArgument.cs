@@ -1,23 +1,26 @@
 ﻿using MineSharp.ConsoleClient.Client;
 using PrettyPrompt.Completion;
 
-namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized {
-    internal class EntityIdArgument : IntegerArgument {
-        public EntityIdArgument(string name, bool isOptional = false) : base(name, isOptional) {
-        }
+namespace MineSharp.ConsoleClient.Console.Commands.Arguments.Specialized
+{
+    internal class EntityIdArgument : IntegerArgument
+    {
+        public EntityIdArgument(string name, bool isOptional = false) : base(name, isOptional) {}
 
-        public override List<CompletionItem> GetCompletionItems(string str) {
-           
-            List<CompletionItem> items = new List<CompletionItem>();
+        public override List<CompletionItem> GetCompletionItems(string str)
+        {
 
-            foreach (var e in BotClient.Bot!.Entities.Values) {
+            var items = new List<CompletionItem>();
 
-                string displayText = $"[{Color}]{e.Id} ({e.Name})[/]";
+            foreach (var e in BotClient.Bot!.Entities.Values)
+            {
+
+                var displayText = $"[{this.Color}]{e.ServerId} ({e.Name})[/]";
 
                 items.Add(
                     new CompletionItem(
-                        replacementText: e.Id.ToString(),
-                        displayText: CColor.FromMarkup(displayText)));
+                        e.ServerId.ToString(),
+                        CColor.FromMarkup(displayText)));
             }
             return items;
         }

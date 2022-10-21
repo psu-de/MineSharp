@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-namespace MineSharp.Data.Generator.Enchantments {
+namespace MineSharp.Data.Generator.Enchantments
+{
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-    internal class MaxCost {
+    internal class MaxCost
+    {
         [JsonProperty("a")]
         public int A { get; set; }
 
@@ -10,7 +12,8 @@ namespace MineSharp.Data.Generator.Enchantments {
         public int B { get; set; }
     }
 
-    internal class MinCost {
+    internal class MinCost
+    {
         [JsonProperty("a")]
         public int A { get; set; }
 
@@ -18,7 +21,8 @@ namespace MineSharp.Data.Generator.Enchantments {
         public int B { get; set; }
     }
 
-    internal class EnchantmentJsonInfo {
+    internal class EnchantmentJsonInfo
+    {
         [JsonProperty("id")]
         public int Id { get; set; }
 

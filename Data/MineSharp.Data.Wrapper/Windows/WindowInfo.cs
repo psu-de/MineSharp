@@ -1,15 +1,12 @@
 ﻿using MineSharp.Core.Types;
 
-namespace MineSharp.Data.Windows {
-    public class WindowInfo {
+namespace MineSharp.Data.Windows
+{
+    public class WindowInfo
+    {
 
-        public Identifier Name { get; set; }
-        public string Title { get; set; }
-        public int UniqueSlots { get; private set; }
-        public bool ExcludeInventory { get; private set; }
-        public bool HasOffHandSlot { get; private set; }
-
-        public WindowInfo(Identifier name, string title, int uniqueSlots, bool excludeInventory = false, bool hasOffHandSlot = false) {
+        public WindowInfo(Identifier name, string title, int uniqueSlots, bool excludeInventory = false, bool hasOffHandSlot = false)
+        {
             this.Name = name;
             this.Title = title;
             this.UniqueSlots = uniqueSlots;
@@ -17,9 +14,21 @@ namespace MineSharp.Data.Windows {
             this.HasOffHandSlot = hasOffHandSlot;
         }
 
+        public Identifier Name { get; set; }
+        public string Title { get; set; }
+        public int UniqueSlots {
+            get;
+        }
+        public bool ExcludeInventory {
+            get;
+        }
+        public bool HasOffHandSlot {
+            get;
+        }
     }
 
-    public enum PlayerWindowSlots {
+    public enum PlayerWindowSlots
+    {
         CraftingOutput = 0,
         CraftingInputStart = 1,
         CraftingInputEnd = 4,
@@ -32,7 +41,8 @@ namespace MineSharp.Data.Windows {
         OffhandSlot = 45
     }
 
-    public enum ChestWindowSlots {
+    public enum ChestWindowSlots
+    {
         ChestStart = 0,
         ChestEnd = 26,
         InventoryStart = 27,
@@ -41,7 +51,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 62
     }
 
-    public enum LargeChestWindowSlots {
+    public enum LargeChestWindowSlots
+    {
         ChestStart = 0,
         ChestEnd = 53,
         InventoryStart = 54,
@@ -50,7 +61,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 89
     }
 
-    public enum CraftingTableWindowSlots {
+    public enum CraftingTableWindowSlots
+    {
         CraftingOutput = 0,
         CraftingInputStart = 1,
         CraftingInputEnd = 9,
@@ -60,7 +72,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 45
     }
 
-    public enum FurnaceWindowSlots {
+    public enum FurnaceWindowSlots
+    {
         Ingredient = 0,
         Fuel = 1,
         Output = 2,
@@ -70,7 +83,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum BlastFurnaceWindowSlots {
+    public enum BlastFurnaceWindowSlots
+    {
         Ingredient = 0,
         Fuel = 1,
         Output = 2,
@@ -80,7 +94,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum SmokerWindowSlots {
+    public enum SmokerWindowSlots
+    {
         Ingredient = 0,
         Fuel = 1,
         Output = 2,
@@ -90,7 +105,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum DispenserWindowSlots {
+    public enum DispenserWindowSlots
+    {
         ContentStart = 0,
         ContentEnd = 8,
         InventoryStart = 9,
@@ -99,7 +115,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 44
     }
 
-    public enum EnchantmentTableWindowSlots {
+    public enum EnchantmentTableWindowSlots
+    {
         ItemToEnchant = 0,
         LapisLazuli = 1,
         InventoryStart = 2,
@@ -108,7 +125,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 37
     }
 
-    public enum BrewingTableWindowSlots {
+    public enum BrewingTableWindowSlots
+    {
         BottlesStart = 0,
         BottlesEnd = 2,
         PotionIngredient = 3,
@@ -119,7 +137,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 40
     }
 
-    public enum VillagerTradingWindowSlots {
+    public enum VillagerTradingWindowSlots
+    {
         InputStart = 0,
         InputEnd = 1,
         Result = 2,
@@ -129,7 +148,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum BeaconWindowSlots {
+    public enum BeaconWindowSlots
+    {
         PaymentItem = 0,
         InventoryStart = 1,
         InventoryEnd = 27,
@@ -137,7 +157,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 36
     }
 
-    public enum AnvilWindowSlots {
+    public enum AnvilWindowSlots
+    {
         FirstItem = 0,
         SecondItem = 1,
         Result = 2,
@@ -147,7 +168,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum HopperWindowSlots {
+    public enum HopperWindowSlots
+    {
         HopperSlotsStart = 0,
         HopperSlotsEnd = 4,
         InventoryStart = 5,
@@ -156,7 +178,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 40
     }
 
-    public enum ShulkerBoxWindowSlots {
+    public enum ShulkerBoxWindowSlots
+    {
         BoxStart = 0,
         BoxEnd = 26,
         InventoryStart = 27,
@@ -165,14 +188,16 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 62
     }
 
-    public enum LlamaWindowSlots {
+    public enum LlamaWindowSlots
+    {
         Saddle = 0,
         Carpet = 1,
         LlamaInventoryStart = 2,
-        LlamaInventorySlotsPerStrength = 3,
+        LlamaInventorySlotsPerStrength = 3
     }
 
-    public enum HorseWindowSlots {
+    public enum HorseWindowSlots
+    {
         Saddle = 0,
         Armor = 1,
         InventoryStart = 2,
@@ -181,7 +206,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 37
     }
 
-    public enum UnchestedDonkeyWindowSlots {
+    public enum UnchestedDonkeyWindowSlots
+    {
         Saddle = 0,
         Armor = 1,
         InventoryStart = 2,
@@ -190,7 +216,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 37
     }
 
-    public enum ChestedDonkeyWindowSlots {
+    public enum ChestedDonkeyWindowSlots
+    {
         Saddle = 0,
         Armor = 1,
         DonkeyInventoryStart = 2,
@@ -201,7 +228,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 52
     }
 
-    public enum CartographyTableWindowSlots {
+    public enum CartographyTableWindowSlots
+    {
         Map = 0,
         Paper = 1,
         Output = 2,
@@ -211,7 +239,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum GrindstoneWindowSlots {
+    public enum GrindstoneWindowSlots
+    {
         FirstItem = 0,
         SecondItem = 1,
         Result = 2,
@@ -221,11 +250,13 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 38
     }
 
-    public enum LecternWindowSlots {
+    public enum LecternWindowSlots
+    {
         Book = 0
     }
 
-    public enum LoomWindowSlots {
+    public enum LoomWindowSlots
+    {
         Banner = 0,
         Dye = 1,
         Pattern = 2,
@@ -236,7 +267,8 @@ namespace MineSharp.Data.Windows {
         HotbarEnd = 39
     }
 
-    public enum StonecutterWindowSlots {
+    public enum StonecutterWindowSlots
+    {
         Input = 0,
         Result = 1,
         InventoryStart = 2,

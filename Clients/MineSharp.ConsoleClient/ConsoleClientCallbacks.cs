@@ -5,57 +5,62 @@ using PrettyPrompt.Consoles;
 using PrettyPrompt.Documents;
 using PrettyPrompt.Highlighting;
 
-namespace MineSharp.ConsoleClient {
-    internal class ConsoleClientCallbacks : PromptCallbacks {
+namespace MineSharp.ConsoleClient
+{
+    internal class ConsoleClientCallbacks : PromptCallbacks
+    {
 
-        protected override Task<bool> ShouldOpenCompletionWindowAsync(string text, int caret, KeyPress keyPress, CancellationToken cancellationToken) {
-            return Task.FromResult(true);
-        }
+        protected override Task<bool> ShouldOpenCompletionWindowAsync(string text, int caret, KeyPress keyPress, CancellationToken cancellationToken) => Task.FromResult(true);
 
-        protected override Task<IReadOnlyList<CompletionItem>> GetCompletionItemsAsync(string text, int caret, TextSpan spanToBeReplaced, CancellationToken cancellationToken) {
+        protected override Task<IReadOnlyList<CompletionItem>> GetCompletionItemsAsync(string text, int caret, TextSpan spanToBeReplaced, CancellationToken cancellationToken)
+        {
 
-            if (!text.TrimStart().Contains(' ')) {
+            if (!text.TrimStart().Contains(' '))
+            {
                 // Command selection
                 return Task.FromResult<IReadOnlyList<CompletionItem>>(CommandManager.Commands.Values.OrderBy(x => x.Color)
-                    .Select(x => {
+                    .Select(x =>
+                    {
 
-                    return new CompletionItem(
-                        replacementText: x.Name,
-                        displayText: new FormattedString(x.Name, new FormatSpan(0, x.Name.Length, CColor.GetAnsiColor(x.Color))),
-                        getExtendedDescription: _ => Task.FromResult(CColor.FromMarkup(x.Description))
-                        );
-                }).ToArray());
-            } else {
-
-                string cmdName = text.TrimStart().Split(' ')[0];
-                if (!CommandManager.TryGetCommand(cmdName, out var command)) {
-                    return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
-                }
-
-                string args = text.Substring(cmdName.Length + (text.Length - text.TrimStart().Length)).TrimStart();
-                (var currentArg, var remaining) = command.GetCurrentArgument(args);
-                if (currentArg == null) {
-                    return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
-                }
-
-                return Task.FromResult<IReadOnlyList<CompletionItem>>(currentArg.GetCompletionItems(remaining));
+                        return new CompletionItem(
+                            x.Name,
+                            new FormattedString(x.Name, new FormatSpan(0, x.Name.Length, CColor.GetAnsiColor(x.Color))),
+                            getExtendedDescription: _ => Task.FromResult(CColor.FromMarkup(x.Description))
+                            );
+                    }).ToArray());
             }
+            var cmdName = text.TrimStart().Split(' ')[0];
+            if (!CommandManager.TryGetCommand(cmdName, out var command))
+            {
+                return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
+            }
+
+            var args = text.Substring(cmdName.Length + (text.Length - text.TrimStart().Length)).TrimStart();
+            (var currentArg, var remaining) = command.GetCurrentArgument(args);
+            if (currentArg == null)
+            {
+                return Task.FromResult<IReadOnlyList<CompletionItem>>(new List<CompletionItem>());
+            }
+
+            return Task.FromResult<IReadOnlyList<CompletionItem>>(currentArg.GetCompletionItems(remaining));
 
         }
 
-        protected override Task<IReadOnlyCollection<FormatSpan>> HighlightCallbackAsync(string text, CancellationToken cancellationToken) {
+        protected override Task<IReadOnlyCollection<FormatSpan>> HighlightCallbackAsync(string text, CancellationToken cancellationToken)
+        {
 
-            string trimmed = text.TrimStart();
-            string commandName = trimmed.Split(' ')[0];
+            var trimmed = text.TrimStart();
+            var commandName = trimmed.Split(' ')[0];
 
-            bool isInvalidCommandName = !CommandManager.TryGetCommand(commandName, out var command);
+            var isInvalidCommandName = !CommandManager.TryGetCommand(commandName, out var command);
 
-            List<FormatSpan> highlighting = new List<FormatSpan>();
+            var highlighting = new List<FormatSpan>();
             highlighting.Add(new FormatSpan(0, commandName.Length + (text.Length - trimmed.Length), isInvalidCommandName ? AnsiColor.Red : AnsiColor.Cyan));
 
-            if (command != null) {
-                string args = trimmed.Substring(commandName.Length);
-                int offset = commandName.Length + (text.Length - trimmed.Length);
+            if (command != null)
+            {
+                var args = trimmed.Substring(commandName.Length);
+                var offset = commandName.Length + (text.Length - trimmed.Length);
                 offset += args.Length - args.TrimStart().Length;
                 args = args.TrimStart();
 
@@ -65,7 +70,5 @@ namespace MineSharp.ConsoleClient {
 
             return Task.FromResult<IReadOnlyCollection<FormatSpan>>(highlighting);
         }
-
-
     }
 }

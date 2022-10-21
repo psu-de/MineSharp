@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Types.Enums {
-    public enum GameStateReason : byte {
+﻿namespace MineSharp.Core.Types.Enums
+{
+    public enum GameStateReason : byte
+    {
         NoRespawnBlock = 0,
         EndRaining = 1,
         BeginRaining = 2,

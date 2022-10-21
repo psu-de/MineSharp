@@ -1,26 +1,31 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace MineSharp.Data.Generator.Blocks {
-    internal class BlockGenerator : Generator {
-        public BlockGenerator(MinecraftDataHelper wrapper, string version) : base(wrapper, version) {
+namespace MineSharp.Data.Generator.Blocks
+{
+    internal class BlockGenerator : Generator
+    {
+        public BlockGenerator(MinecraftDataHelper wrapper, string version) : base(wrapper, version) {}
+
+        public string[] GetUsings()
+        {
+            return new[] {
+                "MineSharp.Core.Types", "System.Collections.Generic"
+            };
         }
 
-        public string[] GetUsings() {
-            return new[] { "MineSharp.Core.Types", "System.Collections.Generic" };
-        }
+        public override void WriteCode(CodeGenerator codeGenerator)
+        {
 
-        public override void WriteCode(CodeGenerator codeGenerator) {
+            var blockData = this.Wrapper.LoadJson<BlockJsonInfo[]>(this.Version, "blocks");
+            var blockCollisionData = this.Wrapper.LoadJson<BlockCollisionShapeJson>(this.Version, "blockCollisionShapes");
 
-            var blockData = Wrapper.LoadJson<BlockJsonInfo[]>(Version, "blocks");
-            var blockCollisionData = Wrapper.LoadJson<BlockCollisionShapeJson>(Version, "blockCollisionShapes");
-
-            NumberFormatInfo nfi = new NumberFormatInfo();
+            var nfi = new NumberFormatInfo();
             nfi.NumberDecimalSeparator = ".";
 
-            codeGenerator.CommentBlock($"Generated Block Data for Minecraft Version {Version}");
+            codeGenerator.CommentBlock($"Generated Block Data for Minecraft Version {this.Version}");
 
-            foreach (var ns in GetUsings())
+            foreach (var ns in this.GetUsings())
                 codeGenerator.WriteLine($"using {ns};");
 
             codeGenerator.Begin("namespace MineSharp.Data.Blocks");
@@ -37,19 +42,20 @@ namespace MineSharp.Data.Generator.Blocks {
             codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
             foreach (var block in blockData)
                 codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Block with state {{state}} not found!\")");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
             codeGenerator.Finish(semicolon: true);
 
             codeGenerator.Begin("public static Type GetBlockTypeById(int id) => id switch");
             foreach (var block in blockData)
-                codeGenerator.WriteLine($"{block.Id} => typeof({Wrapper.GetCSharpName(block.Name)}),");
-            codeGenerator.WriteLine($"_ => throw new ArgumentException($\"Block with id {{id}} not found!\")");
+                codeGenerator.WriteLine($"{block.Id} => typeof({this.Wrapper.GetCSharpName(block.Name)}),");
+            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with id {id} not found!\")");
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
-            foreach (var block in blockData) {
+            foreach (var block in blockData)
+            {
 
-                codeGenerator.Begin($"public class {Wrapper.GetCSharpName(block.Name)} : Block");
+                codeGenerator.Begin($"public class {this.Wrapper.GetCSharpName(block.Name)} : Block");
                 codeGenerator.WriteBlock($@"
 public const int BlockId = {block.Id};
 public const string BlockName = ""{block.Name}"";
@@ -68,31 +74,32 @@ public const int BlockDefaultState = {block.DefaultState};
 public const int BlockMinStateId = {block.MinStateId};
 public const int BlockMaxStateId = {block.MaxStateId};
 public static readonly int[]? BlockHarvestTools = {(block.HarvestTools == null ? "null" : $"new int[] {{ {string.Join(", ", block.HarvestTools.Keys)} }}")};
-internal static readonly int[] BlockShapeIndices = new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[block.Name])) } }};
-public static readonly BlockProperties BlockProperties = new BlockProperties(new BlockStateProperty[] {{ {string.Join("", block.States!.Select(x => GetProperty(x)))} }}, {block.DefaultState - block.MinStateId});
+internal static readonly int[] BlockShapeIndices = new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[block.Name]))} }};
+public static readonly BlockProperties BlockProperties = new BlockProperties(new BlockStateProperty[] {{ {string.Join("", block.States!.Select(x => this.GetProperty(x)))} }}, {block.DefaultState - block.MinStateId});
 
-public {Wrapper.GetCSharpName(block.Name)}() : base(BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}} 
+public {this.Wrapper.GetCSharpName(block.Name)}() : base(BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}} 
 
-public {Wrapper.GetCSharpName(block.Name)}(int state, Position pos) : base(state, pos, BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}}");
+public {this.Wrapper.GetCSharpName(block.Name)}(int state, Position pos) : base(state, pos, BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}}");
                 codeGenerator.Finish();
 
             }
 
             codeGenerator.Begin("public enum BlockType");
             foreach (var block in blockData)
-                codeGenerator.WriteLine($"{Wrapper.GetCSharpName(block.Name)} = {block.Id},");
+                codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(block.Name)} = {block.Id},");
             codeGenerator.Finish();
             codeGenerator.Finish();
         }
 
-        private string GetProperty(BlockStateJsonInfo info) {
-            StringBuilder sb = new StringBuilder();
+        private string GetProperty(BlockStateJsonInfo info)
+        {
+            var sb = new StringBuilder();
 
-            sb.Append($"new BlockStateProperty(\"{info.Name}\", BlockStateProperty.BlockStatePropertyType.{info.Type[0].ToString().ToUpper() + info.Type.Substring(1)}, { info.NumValues }, ");
+            sb.Append($"new BlockStateProperty(\"{info.Name}\", BlockStateProperty.BlockStatePropertyType.{info.Type[0].ToString().ToUpper() + info.Type.Substring(1)}, {info.NumValues}, ");
             if (info.Values == null)
                 sb.Append("null");
             else
-                sb.Append($"new string[] {{ { string.Join(", ", info.Values.Select(x => '"' + x + '"'))} }}");
+                sb.Append($"new string[] {{ {string.Join(", ", info.Values.Select(x => '"' + x + '"'))} }}");
             sb.Append("),");
             return sb.ToString();
         }

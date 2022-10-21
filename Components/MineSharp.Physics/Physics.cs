@@ -1,237 +1,504 @@
-﻿using MineSharp.Core.Types;
-using MineSharp.Data.Entities;
+﻿using MineSharp.Core.Logging;
+using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
+using MineSharp.Data.Entities;
+using Attribute = MineSharp.Core.Types.Attribute;
 
-namespace MineSharp.Physics {
-    public class Physics {
+/*
+ Thanks to https://github.com/ConcreteMC/Alex
+ Especially these files:
+  - https://github.com/ConcreteMC/Alex/blob/master/src/Alex/Entities/Components/PhysicsComponent.cs
+  - https://github.com/ConcreteMC/Alex/blob/master/src/Alex/Entities/Components/MovementComponent.cs
+*/
+
+namespace MineSharp.Physics
+{
+    public class PhysicsEngine
+    {
+        private static Logger Logger = Logger.GetLogger();
 
         public Player Player;
         public PlayerState PlayerState;
         public World.World World;
-        public Physics(Player player, World.World world) {
+
+        public PhysicsEngine(Player player, World.World world)
+        {
             this.World = world;
             this.Player = player;
             this.PlayerState = new PlayerState(player);
         }
 
-        public List<AABB> GetSurroundingBoundingBoxes(AABB queryBB) {
-            List<AABB> surroundingBBs = new List<AABB>();
-            var cursor = new Vector3(0, 0, 0);
-            for (cursor.Y = Math.Floor(queryBB.MinY) - 1; cursor.Y <= Math.Floor(queryBB.MaxY); cursor.Y++) {
-                for (cursor.Z = Math.Floor(queryBB.MinZ); cursor.Z <= Math.Floor(queryBB.MaxZ); cursor.Z++) {
-                    for (cursor.X = Math.Floor(queryBB.MinX); cursor.X <= Math.Floor(queryBB.MaxX); cursor.X++) {
-                        var block = this.World.GetBlockAt(cursor);
-                        if (block.IsSolid()) {
-                            var blockPos = block.Position;
-                            foreach (var shape in block.GetBlockShape()) { //TODO: Block Shapes!
-                                var blockBB = shape.ToBoundingBox();
-                                blockBB.Offset(blockPos!.X, blockPos.Y, blockPos.Z);
-                                surroundingBBs.Add(blockBB);
-                            }
+        public void SimulatePlayer(MovementControls controls)
+        {
+            var playerBB = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
+
+            var waterBB = playerBB.Clone().Contract(0.001d, 0.4d, 0.001d);
+            var lavaBB = playerBB.Clone().Contract(0.1d, 0.4d, 0.1d);
+
+            this.PlayerState.IsInWater = this.CheckInWaterAndAppyCurrent(waterBB, this.Player.Velocity);
+
+            var onGround = this.Player.IsOnGround;
+            if (!this.Player.Attributes.TryGetValue(
+                    PhysicsConst.MovementSpeedAttribute, out var movementFactorAttr))
+            {
+                movementFactorAttr = new Attribute(
+                    PhysicsConst.MovementSpeedAttribute,
+                    PhysicsConst.PlayerSpeed,
+                    new List<Modifier>());
+            }
+
+            bool hasSprintAttr = movementFactorAttr.Modifiers.TryGetValue(PhysicsConst.SprintingUUID, out var spMod);
+            
+            if (controls.Sprint)
+            {
+                if (!hasSprintAttr)
+                {
+                    spMod = new Modifier(PhysicsConst.SprintingUUID, PhysicsConst.SprintSpeed, ModifierOp.Multiply);
+                    movementFactorAttr.Modifiers.Add(PhysicsConst.SprintingUUID, spMod);
+                }
+            } else
+            {
+                if (hasSprintAttr)
+                {
+                    movementFactorAttr.Modifiers.Remove(PhysicsConst.SprintingUUID);
+                }
+            }
+
+            var movementFactor = movementFactorAttr.Value;
+            var slipperiness = 0.91d;
+
+            if (this.PlayerState.IsInWater)
+            {
+                movementFactor = 0.2d;
+                slipperiness = 0.8d;
+            } else
+            {
+                if (onGround)
+                {
+                    var blockUnder =
+                        playerBB.MinY % 1 < 0.05f ? this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down)) : this.World.GetBlockAt(this.Player.Position);
+                    slipperiness *= PhysicsConst.GetBlockSlipperiness(blockUnder.Id);
+
+                    var acceleration = 0.1627714d / Math.Pow(slipperiness, 3);
+                    movementFactor *= acceleration;
+                } else
+                {
+                    movementFactor = 0.02d;
+                }
+            }
+
+
+            if (controls.Jump)
+            {
+                if (onGround)
+                {
+                    var blockUnder = this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down));
+                    this.Player.Velocity.Y += 0.42d * (blockUnder.Id == HoneyBlock.BlockId ? PhysicsConst.HoneyblockJumpSpeed : 1);
+
+                    var effectLevel = this.Player.GetEffectLevel(JumpboostEffect.EffectId);
+                    if (effectLevel.HasValue)
+                    {
+                        this.Player.Velocity.Y += 0.1d * effectLevel.Value;
+                    }
+                }
+            }
+
+            var heading = this.CalculateHeading(controls);
+            // TODO: When swimming rotate heading vector
+            //       by Pitch radians 
+
+            var strafing = heading.Z * 0.98d;
+            var forward = heading.X * 0.98d;
+
+            if (controls.Sneak)
+            {
+                strafing *= 0.3d;
+                forward *= 0.3d;
+            }
+
+            heading = this.ApplyHeading(strafing, forward, movementFactor);
+
+            this.Player.Velocity.Add(heading);
+
+            if (this.IsOnLadder(this.Player.Position))
+            {
+                this.Player.Velocity.X = Math.Clamp(this.Player.Velocity.X, -PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.Z = Math.Clamp(this.Player.Velocity.Z, -PhysicsConst.LadderMaxSpeed, PhysicsConst.LadderMaxSpeed);
+                this.Player.Velocity.Y = Math.Max(this.Player.Velocity.Y, controls.Sneak ? 0 : -PhysicsConst.LadderMaxSpeed);
+            }
+
+            this.Move(controls, this.TruncateVector(this.Player.Velocity));
+
+            if (this.IsOnLadder(this.Player.Position) && (this.PlayerState.IsCollidedHorizontally || controls.Jump))
+            {
+                this.Player.Velocity.Y = PhysicsConst.LadderClimbSpeed;
+            }
+
+            if (!this.Player.IsOnGround)
+            {
+                var gravity = PhysicsConst.Gravity;
+
+                if (this.PlayerState.IsInWater)
+                {
+                    gravity /= 4.0d;
+                }
+                this.Player.Velocity.Subtract(new Vector3(0f, gravity, 0f));
+            }
+
+            if (this.PlayerState.IsInWater)
+            {
+                this.Player.Velocity.Mul(new Vector3(slipperiness, slipperiness, slipperiness));
+            } else
+            {
+                this.Player.Velocity.Mul(new Vector3(slipperiness, 0.98d, slipperiness));
+            }
+
+            this.Player.Velocity = this.TruncateVector(this.Player.Velocity);
+        }
+
+        private Vector3 TruncateVector(Vector3 vector)
+        {
+            var clone = vector.Clone();
+            if (Math.Abs(clone.X) < PhysicsConst.NegligeableVelocity)
+                clone.X = 0;
+            if (Math.Abs(clone.Y) < PhysicsConst.NegligeableVelocity)
+                clone.Y = 0;
+            if (Math.Abs(clone.Z) < PhysicsConst.NegligeableVelocity)
+                clone.Z = 0;
+            return clone;
+        }
+
+        private Vector3 CalculateHeading(MovementControls controls)
+        {
+            var moveVector = Vector3.Zero;
+
+            if (controls.Forward)
+                moveVector.X += 1;
+
+            if (controls.Back)
+                moveVector.X -= 1;
+
+            if (controls.Left)
+                moveVector.Z += 1;
+
+            if (controls.Right)
+                moveVector.Z -= 1;
+
+            return moveVector;
+        }
+
+        private void Move(MovementControls controls, Vector3 amount)
+        {
+            var wasOnGround = this.Player.IsOnGround;
+
+            var collideY = this.CheckY(ref amount, false);
+            var collideX = this.CheckX(ref amount, false);
+            var collideZ = this.CheckZ(ref amount, false);
+
+            if (!collideX && this.CheckX(ref amount, true))
+            {
+                collideX = true;
+            }
+
+            if (collideZ && this.CheckZ(ref amount, true))
+            {
+                collideZ = true;
+            }
+
+            if (controls.Sneak && wasOnGround)
+            {
+                this.FixSneaking(ref amount);
+            }
+
+            this.PlayerState.IsCollidedHorizontally = collideX || collideZ;
+            this.PlayerState.IsCollidedVertically = collideY;
+
+            this.Player.Position.Add(amount);
+            this.Player.IsOnGround = this.DetectOnGround();
+        }
+
+        private bool DetectOnGround()
+        {
+            var entityBoundingBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position).Offset(0, -PhysicsConst.Gravity, 0);
+
+            var offset = 0f;
+
+            if (entityBoundingBox.MinY % 1 < 0.05f)
+            {
+                offset = -1f;
+            }
+
+            var minX = entityBoundingBox.MinX;
+
+            var minZ = entityBoundingBox.MinZ;
+
+            var maxX = entityBoundingBox.MaxX;
+            var maxZ = entityBoundingBox.MaxZ;
+
+            var y = (int)Math.Floor(entityBoundingBox.MinY + offset);
+
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
+            {
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
+                {
+                    var block = this.World.GetBlockAt(new Position(x, y, z));
+
+                    if (!block.IsSolid())
+                        continue;
+
+                    var coords = new Vector3(x, y, z);
+
+                    foreach (var box in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                    {
+                        if (box.Intersects(entityBoundingBox))
+                        {
+                            return true;
                         }
                     }
                 }
             }
 
-            return surroundingBBs;
+            return false;
         }
 
-        public void AdjustPositionHeight(ref Vector3 position) {
-            var playerBB = PhysicsConst.GetPlayerBoundingBox(position);
-            var queryBB = playerBB.Clone().Extend(0, -1, 0);
-            var surroundingBBs = GetSurroundingBoundingBoxes(queryBB);
+        private void FixSneaking(ref Vector3 amount)
+        {
+            var dX = amount.X;
+            var dZ = amount.Z;
+            var correctedX = amount.X;
+            var correctedZ = amount.Z;
+            var increment = 0.05d;
 
-            double dy = -1;
-            foreach (var blockBB in surroundingBBs) {
-                dy = blockBB.ComputeOffsetY(playerBB, dy);
+            var boundingBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
+
+            while (dX != 0.0f && !this.GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, 0d)).Any())
+            {
+                if (dX < increment && dX >= -increment)
+                    dX = 0.0f;
+                else if (dX > 0.0D)
+                    dX -= increment;
+                else
+                    dX += increment;
+
+                correctedX = dX;
             }
-            position.Y += dy;
+
+            while (dZ != 0.0f && !this.GetIntersecting(boundingBox.Offset(0d, -PhysicsConst.MaxFallDistance, dZ)).Any())
+            {
+                if (dZ < increment && dZ >= -increment)
+                    dZ = 0.0f;
+                else if (dZ > 0.0f)
+                    dZ -= increment;
+                else
+                    dZ += increment;
+
+                correctedZ = dZ;
+            }
+
+            while (dX != 0.0f && dZ != 0.0f && !this.GetIntersecting(boundingBox.Offset(dX, -PhysicsConst.MaxFallDistance, dZ)).Any())
+            {
+                if (dX < increment && dX >= -increment)
+                    dX = 0.0f;
+                else if (dX > 0.0f)
+                    dX -= increment;
+                else
+                    dX += increment;
+
+                correctedX = dX;
+
+
+                if (dZ < increment && dZ >= -increment)
+                    dZ = 0.0f;
+                else if (dZ > 0.0f)
+                    dZ -= increment;
+                else
+                    dZ += increment;
+
+                correctedZ = dZ;
+            }
+
+            amount.X = correctedX;
+            amount.Z = correctedZ;
         }
 
-        public void SetPositionToBoundingBox(AABB bb, Vector3 position) {
-            position.X = bb.MinX + PhysicsConst.PlayerHalfWidth;
-            position.Y = bb.MinY;
-            position.Z = bb.MinZ + PhysicsConst.PlayerHalfWidth;
+        private IEnumerable<AABB> GetIntersecting(AABB box)
+        {
+            var minX = (int)Math.Floor(box.MinX);
+            var maxX = (int)Math.Ceiling(box.MaxX);
+
+            var minZ = (int)Math.Floor(box.MinZ);
+            var maxZ = (int)Math.Ceiling(box.MaxZ);
+
+            var minY = (int)Math.Floor(box.MinY);
+            var maxY = (int)Math.Ceiling(box.MaxY);
+
+            for (var x = minX; x < maxX; x++)
+            {
+                for (var y = minY; y < maxY; y++)
+                {
+                    for (var z = minZ; z < maxZ; z++)
+                    {
+                        var coords = new Vector3(x, y, z);
+
+                        var block = this.World.GetBlockAt(new Position(x, y, z));
+
+
+                        if (block == null)
+                            continue;
+
+                        if (!block.IsSolid())
+                            continue;
+
+                        foreach (var blockBox in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                        {
+                            if (box.Intersects(blockBox))
+                            {
+                                yield return blockBox;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        private void MoveEntity(double dx, double dy, double dz, PlayerControls controls) {
-            var vel = this.Player.Velocity;
-            var pos = this.Player.Position;
+        private float CollidedWithWorld(Vector3 direction, Vector3 position, double impactVelocity)
+        {
+            if (direction == Vector3.Down)
+            {
+                this.Player.IsOnGround = true;
+            }
+            return 0;
+        }
 
-            if (this.PlayerState.IsInWeb) {
-                dx *= 0.25f;
-                dy *= 0.25f;
-                dz *= 0.25f;
-                vel.X = 0;
-                vel.Y = 0;
-                vel.Z = 0;
-                this.PlayerState.IsInWeb = false;
+        private bool CheckY(ref Vector3 amount, bool checkOther)
+        {
+            var beforeAdjustment = amount.Y;
+
+            if (!this.TestTerrainCollisionY(ref amount, out var yCollisionPoint, out var collisionY))
+                return false;
+
+            var yVelocity = this.CollidedWithWorld(beforeAdjustment < 0 ? Vector3.Down : Vector3.Up, yCollisionPoint, beforeAdjustment);
+
+            if (MathF.Abs(yVelocity) < 0.005f)
+                yVelocity = 0;
+
+            amount.Y = collisionY;
+
+            this.Player.Velocity = new Vector3(this.Player.Velocity.X, yVelocity, this.Player.Velocity.Z);
+
+            return true;
+        }
+
+        private bool CheckX(ref Vector3 amount, bool checkOther)
+        {
+            if (!this.TestTerrainCollisionX(amount, out _, out var collisionX, checkOther))
+                return false;
+            var climbingResult = this.CheckClimbing(amount, out var yValue);
+            if (climbingResult == CollisionResult.ClimbHalfBlock)
+            {
+                amount.Y = yValue;
+            } else
+            {
+                if (collisionX < 0f)
+                    collisionX -= 0.005f;
+
+                amount.X += collisionX;
+                this.Player.Velocity = new Vector3(0, this.Player.Velocity.Y, this.Player.Velocity.Z);
             }
 
-            var oldVelX = dx;
-            var oldVelY = dy;
-            var oldVelZ = dz;
-            
-            if (controls.Sneak && Player.IsOnGround) {
-                var step = 0.05;
+            return true;
+        }
 
-                // In the 3 loops bellow, y offset should be -1, but that doesnt reproduce vanilla behavior.
-                for (; dx != 0 && GetSurroundingBoundingBoxes(PhysicsConst.GetPlayerBoundingBox(pos).Offset(dx, 0, 0)).Count == 0; oldVelX = dx) {
-                    if (dx < step && dx >= -step) dx = 0;
-                    else if (dx > 0) dx -= step;
-                    else dx += step;
-                }
+        private bool CheckZ(ref Vector3 amount, bool checkOther)
+        {
+            if (!this.TestTerrainCollisionZ(amount, out _, out var collisionZ, checkOther))
+                return false;
 
-                for (; dz != 0 && GetSurroundingBoundingBoxes(PhysicsConst.GetPlayerBoundingBox(pos).Offset(0, 0, dz)).Count == 0; oldVelZ = dz) {
-                    if (dz < step && dz >= -step) dz = 0;
-                    else if (dz > 0) dz -= step;
-                    else dz += step;
-                }
+            var climbingResult = this.CheckClimbing(amount, out var yValue);
 
-                while (dx != 0 && dz != 0 && GetSurroundingBoundingBoxes(PhysicsConst.GetPlayerBoundingBox(pos).Offset(dx, 0, dz)).Count == 0) {
-                    if (dx < step && dx >= -step) dx = 0;
-                    else if (dx > 0) dx -= step;
-                    else dx += step;
+            if (climbingResult == CollisionResult.ClimbHalfBlock)
+            {
+                amount.Y = yValue;
+            } else
+            {
+                if (collisionZ < 0f)
+                    collisionZ -= 0.005f;
 
-
-                    if (dz < step && dz >= -step) dz = 0;
-                    else if (dz > 0) dz -= step;
-                    else dz += step;
-
-                    oldVelX = dx;
-                    oldVelZ = dz;
-                }
+                amount.Z += collisionZ;
+                this.Player.Velocity = new Vector3(this.Player.Velocity.X, this.Player.Velocity.Y, 0f);
             }
 
-            var playerBB = PhysicsConst.GetPlayerBoundingBox(pos);
-            var queryBB = playerBB.Clone().Extend(dx, dy, dz);
-            var surroudingBBs = GetSurroundingBoundingBoxes(queryBB);
-            var oldBB = playerBB.Clone();
+            return true;
+        }
 
-            foreach (var bb in surroudingBBs) {
-                dy = bb.ComputeOffsetY(playerBB, dy);
-            }
-            playerBB.Offset(0, dy, 0);
+        private bool TestTerrainCollisionY(ref Vector3 velocity, out Vector3 collisionPoint, out double result)
+        {
+            collisionPoint = Vector3.Zero;
+            result = velocity.Y;
 
-            foreach (var bb in surroudingBBs) {
-                dx = bb.ComputeOffsetX(playerBB, dx);
-            }
-            playerBB.Offset(dx, 0, 0);
+            bool negative;
 
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(this.Player.Position);
+            AABB testBox;
 
-            foreach (var bb in surroudingBBs) {
-                dz = bb.ComputeOffsetZ(playerBB, dz);
-            }
-            playerBB.Offset(0, 0, dz);
+            if (velocity.Y < 0)
+            {
+                testBox = entityBox.Clone();
+                testBox.MinY += velocity.Y;
 
+                negative = true;
+            } else
+            {
+                testBox = entityBox.Clone();
+                testBox.MaxY += velocity.Y;
 
-            if (PhysicsConst.StepHeight > 0 &&
-                (this.Player.IsOnGround || (dy != oldVelY && oldVelY < 0)) &&
-                (dx != oldVelX || dz != oldVelZ)) {
-                var oldVelXCol = dx;
-                var oldVelYCol = dy;
-                var oldVelZCol = dz;
-                var oldBBCol = playerBB.Clone();
-
-                dy = PhysicsConst.StepHeight;
-                queryBB = oldBB.Clone().Extend(oldVelX, dy, oldVelZ);
-                var surroundingBBs = GetSurroundingBoundingBoxes(queryBB);
-
-                var BB1 = oldBB.Clone();
-                var BB2 = oldBB.Clone();
-                var BB_XZ = BB1.Clone().Extend(dx, 0, dz);
-
-                var dy1 = dy;
-                var dy2 = dy;
-                foreach (var blockBB in surroudingBBs) {
-                    dy1 = blockBB.ComputeOffsetY(BB_XZ, dy1);
-                    dy2 = blockBB.ComputeOffsetY(BB2, dy2);
-                }
-                BB1.Offset(0, dy1, 0);
-                BB2.Offset(0, dy2, 0);
-
-                var dx1 = oldVelX;
-                var dx2 = oldVelX;
-                foreach (var blockBB in surroundingBBs) {
-                    dx1 = blockBB.ComputeOffsetX(BB1, dx1);
-                    dx2 = blockBB.ComputeOffsetX(BB2, dx2);
-                }
-                BB1.Offset(dx1, 0, 0);
-                BB2.Offset(dx2, 0, 0);
-
-                var dz1 = oldVelZ;
-                var dz2 = oldVelZ;
-                foreach (var blockBB in surroundingBBs) {
-                    dz1 = blockBB.ComputeOffsetZ(BB1, dz1);
-                    dz2 = blockBB.ComputeOffsetZ(BB2, dz2);
-                }
-                BB1.Offset(0, 0, dz1);
-                BB2.Offset(0, 0, dz2);
-
-                var norm1 = dx1 * dx1 + dz1 * dz1;
-                var norm2 = dx2 * dx2 + dz2 * dz2;
-
-                if (norm1 > norm2) {
-                    dx = dx1;
-                    dy = -dy1;
-                    dz = dz1;
-                    playerBB = BB1;
-                } else {
-                    dx = dx2;
-                    dy = -dy2;
-                    dz = dz2;
-                    playerBB = BB2;
-                }
-
-                foreach (var blockBB in surroundingBBs) {
-                    dy = blockBB.ComputeOffsetY(playerBB, dy);
-                }
-                playerBB.Offset(0, dy, 0);
-
-                if (oldVelXCol * oldVelXCol + oldVelZCol * oldVelZCol >= dx * dx + dz * dz) {
-                    dx = oldVelXCol;
-                    dy = oldVelYCol;
-                    dz = oldVelZCol;
-                    playerBB = oldBBCol;
-                }
+                negative = false;
             }
 
-            SetPositionToBoundingBox(playerBB, pos);
-            this.PlayerState.IsCollidedHorizontally = dx != oldVelX || dz != oldVelZ;
-            this.PlayerState.IsCollidedVertically = dy != oldVelY;
-            this.Player.IsOnGround = this.PlayerState.IsCollidedVertically && oldVelY < 0;
+            double? collisionExtent = null;
 
-            var blockAtFeet = this.World.GetBlockAt(pos.Floored().Plus(Vector3.Down));
+            for (var x = (int)Math.Floor(testBox.MinX); x <= (int)Math.Ceiling(testBox.MaxX); x++)
+            {
+                for (var z = (int)Math.Floor(testBox.MinZ); z <= (int)Math.Ceiling(testBox.MaxZ); z++)
+                {
+                    for (var y = (int)Math.Floor(testBox.MinY); y <= (int)Math.Ceiling(testBox.MaxY); y++)
+                    {
+                        var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
-            if (dx != oldVelX) vel.X = 0;
-            if (dz != oldVelZ) vel.Y = 0;
-            if (dy != oldVelY) {
-                if (blockAtFeet.IsSolid() && blockAtFeet.Id == SlimeBlock.BlockId && !controls.Sneak) {
-                    vel.Y = -vel.Y;
-                } else {
-                    vel.Y = 0;
-                }
-            }
+                        if (!blockState.IsSolid())
+                            continue;
 
-            playerBB.Contract(0.001, 0.001, 0.001);
-            var cursor = new Vector3(0, 0, 0);
-            for (cursor.Y = Math.Floor(playerBB.MinY); cursor.Y <= Math.Floor(playerBB.MaxY); cursor.Y++) {
-                for (cursor.Z = Math.Floor(playerBB.MinZ); cursor.Z <= Math.Floor(playerBB.MaxZ); cursor.Z++) {
-                    for (cursor.X = Math.Floor(playerBB.MinX); cursor.X <= Math.Floor(playerBB.MaxX); cursor.X++) {
-                        var block = this.World.GetBlockAt(cursor);
-                        if (block.IsSolid()) {
+                        var coords = new Vector3(x, y, z);
 
-                            if (block.Id == Cobweb.BlockId) {
-                                this.PlayerState.IsInWeb = true;
-                            } else if (block.Id == BubbleColumn.BlockId) {
-                                var down = block.Metadata == 0;
-                                var aboveBlock = this.World.GetBlockAt(cursor.Plus(Vector3.Up));
-                                var bubbleDrag = (!aboveBlock.IsSolid()) ? PhysicsConst.BubbleColumnSurfaceDrag : PhysicsConst.BubbleColumnDrag;
-                                if (down) {
-                                    vel.Y = Math.Max(bubbleDrag.MaxDown, vel.Y - bubbleDrag.Down);
-                                } else {
-                                    vel.Y = Math.Min(bubbleDrag.MaxUp, vel.Y + bubbleDrag.Up);
+                        foreach (var box in blockState.GetBlockShape().Select(c => c.ToBoundingBox().Offset(x, y, z)))
+                        {
+                            if (negative)
+                            {
+                                if (entityBox.MinY - box.MaxY < 0)
+                                    continue;
+                            } else
+                            {
+                                if (box.MinY - entityBox.MaxY < 0)
+                                    continue;
+                            }
+
+                            if (testBox.Intersects(box))
+                            {
+                                if (negative)
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxY)
+                                    {
+                                        collisionExtent = box.MaxY;
+                                        collisionPoint = coords;
+                                    }
+                                } else
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinY)
+                                    {
+                                        collisionExtent = box.MinY;
+                                        collisionPoint = coords;
+                                    }
                                 }
                             }
                         }
@@ -239,279 +506,476 @@ namespace MineSharp.Physics {
                 }
             }
 
-            var blockBelow = this.World.GetBlockAt(this.Player.Position.Floored().Plus(Vector3.Down));
-            if (blockBelow.IsSolid()) {
-                if (blockBelow.Id == SoulSand.BlockId) {
-                    vel.X *= PhysicsConst.SoulsandSpeed;
-                    vel.Z *= PhysicsConst.SoulsandSpeed;
-                } else if (blockBelow.Id == HoneyBlock.BlockId) {
-                    vel.X *= PhysicsConst.HoneyblockSpeed;
-                    vel.Z *= PhysicsConst.HoneyblockSpeed;
+            if (collisionExtent != null)
+            {
+                var extent = collisionExtent.Value;
+
+                double diff;
+
+                if (negative)
+                    diff = extent - entityBox.MinY;
+                else
+                    diff = extent - entityBox.MaxY;
+
+                result = (float)diff;
+
+                return true;
+            }
+            return false;
+        }
+
+        private bool TestTerrainCollisionX(Vector3 velocity, out Vector3 collisionPoint, out double result, bool includeOther)
+        {
+            result = velocity.X;
+            collisionPoint = Vector3.Zero;
+
+            bool negative;
+
+            var p = this.Player.Position;
+            if (includeOther) p = p.Plus(velocity);
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
+            AABB testBox;
+
+            var min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
+            var max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
+
+            if (velocity.X < 0)
+            {
+                min.X += velocity.X;
+                negative = true;
+            } else
+            {
+                max.X += velocity.X;
+                negative = false;
+            }
+
+            if (includeOther)
+            {
+                if (velocity.Z < 0)
+                {
+                    min.Z += velocity.Z;
+                } else
+                {
+                    max.Z += velocity.Z;
+                }
+
+                if (velocity.Y < 0)
+                {
+                    min.Y += velocity.Y;
+                } else
+                {
+                    max.Y += velocity.Y;
                 }
             }
 
-            this.Player.Velocity = vel;
+            testBox = new AABB(min.X, min.Y, min.Z, max.X, max.Y, max.Z);
+
+            var minX = testBox.MinX;
+            var minZ = testBox.MinZ;
+
+            var maxX = testBox.MaxX;
+            var maxZ = testBox.MaxZ;
+
+            var minY = testBox.MinY;
+            var maxY = testBox.MaxY;
+
+            double? collisionExtent = null;
+
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
+            {
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
+                {
+                    for (var y = (int)Math.Floor(minY); y <= (int)Math.Ceiling(maxY); y++)
+                    {
+                        var blockState = this.World.GetBlockAt(new Position(x, y, z));
+
+                        if (!blockState.IsSolid())
+                            continue;
+
+                        var coords = new Vector3(x, y, z);
+
+                        foreach (var box in blockState.GetBlockShape().Select(x => x.ToBoundingBox().Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                        {
+                            if (box.MaxY <= minY) continue;
+
+                            if (negative)
+                            {
+                                if (box.MaxX <= minX)
+                                    continue;
+
+                                if (entityBox.MinX - box.MaxX < 0)
+                                    continue;
+                            } else
+                            {
+                                if (box.MinX >= maxX)
+                                    continue;
+
+                                if (box.MinX - entityBox.MaxX < 0)
+                                    continue;
+                            }
+
+                            if (testBox.Intersects(box))
+                            {
+                                if (negative)
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxX)
+                                    {
+                                        collisionExtent = box.MaxX;
+                                        collisionPoint = coords;
+                                    }
+                                } else
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinX)
+                                    {
+                                        collisionExtent = box.MinX;
+                                        collisionPoint = coords;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (collisionExtent != null)
+            {
+                double diff;
+
+                if (negative)
+                {
+                    diff = collisionExtent.Value - minX + 0.01f;
+                } else
+                {
+                    diff = collisionExtent.Value - maxX;
+                }
+
+                result = (float)diff;
+                return true;
+            }
+
+            return false;
         }
 
-        public void ApplyHeading(double strafe, double forward, double multiplier) {
-            var speed = Math.Sqrt(strafe * strafe + forward * forward);
-            if (speed < 0.01) return;
+        private bool TestTerrainCollisionZ(Vector3 velocity, out Vector3 collisionPoint, out double result, bool includeOther)
+        {
+            result = velocity.Z;
+            collisionPoint = Vector3.Zero;
 
-            speed = multiplier / Math.Max(speed, 1);
+            bool negative;
+
+            var p = this.Player.Position;
+            if (includeOther) p = p.Plus(velocity);
+            var entityBox = PhysicsConst.GetPlayerBoundingBox(p);
+            AABB testBox;
+
+            var min = new Vector3(entityBox.MinX, entityBox.MinY, entityBox.MinZ);
+            var max = new Vector3(entityBox.MaxX, entityBox.MaxY, entityBox.MaxZ);
+
+            if (velocity.Z < 0)
+            {
+                min.Z += velocity.Z;
+                negative = true;
+            } else
+            {
+                max.Z += velocity.Z;
+                negative = false;
+            }
+
+            if (includeOther)
+            {
+                if (velocity.X < 0)
+                {
+                    min.X += velocity.X;
+                } else
+                {
+                    max.X += velocity.X;
+                }
+
+                if (velocity.Y < 0)
+                {
+                    min.Y += velocity.Y;
+                } else
+                {
+                    max.Y += velocity.Y;
+                }
+            }
+
+            testBox = new AABB(min.X, min.Y, min.Z, max.X, max.Y, max.Z);
+
+            var minX = testBox.MinX;
+            var minZ = testBox.MinZ;
+
+            var maxX = testBox.MaxX;
+            var maxZ = testBox.MaxZ;
+
+            var minY = testBox.MinY;
+            var maxY = testBox.MaxY;
+
+            double? collisionExtent = null;
+
+            for (var x = (int)Math.Floor(minX); x <= (int)Math.Ceiling(maxX); x++)
+            {
+                for (var z = (int)Math.Floor(minZ); z <= (int)Math.Ceiling(maxZ); z++)
+                {
+                    for (var y = (int)Math.Floor(minY); y <= (int)Math.Ceiling(maxY); y++)
+                    {
+                        var blockState = this.World.GetBlockAt(new Position(x, y, z));
+
+                        if (!blockState.IsSolid())
+                            continue;
+
+                        var coords = new Vector3(x, y, z);
+
+                        foreach (var box in blockState.GetBlockShape().Select(x => x.ToBoundingBox().Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                        {
+                            if (box.MaxY <= minY) continue;
+
+                            if (negative)
+                            {
+                                if (box.MaxZ <= minZ)
+                                    continue;
+
+                                if (entityBox.MinZ - box.MaxZ < 0)
+                                    continue;
+                            } else
+                            {
+                                if (box.MinZ >= maxZ)
+                                    continue;
+
+                                if (box.MinZ - entityBox.MaxZ < 0)
+                                    continue;
+                            }
+
+                            if (testBox.Intersects(box))
+                            {
+                                if (negative)
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value < box.MaxZ)
+                                    {
+                                        collisionExtent = box.MaxZ;
+                                        collisionPoint = coords;
+                                    }
+                                } else
+                                {
+                                    if (collisionExtent == null || collisionExtent.Value > box.MinZ)
+                                    {
+                                        collisionExtent = box.MinZ;
+                                        collisionPoint = coords;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (collisionExtent != null) // Collision detected, adjust accordingly
+            {
+                var cp = collisionExtent.Value;
+
+                double diff;
+
+                if (negative)
+                    diff = cp - minZ + 0.01f;
+                else
+                    diff = cp - maxZ;
+
+                //velocity.Z = (float)diff;	
+                result = (float)diff;
+
+                //	if (Entity is Player p)
+                //		Log.Debug($"ColZ, Distance={diff}, MinZ={(minZ)} MaxZ={maxZ} PointOfCollision={cp} (negative: {negative})");
+
+                return true;
+            }
+
+            return false;
+        }
+
+
+        private CollisionResult CheckClimbing(Vector3 amount, out double yValue)
+        {
+            yValue = amount.Y;
+            var canJump = false;
+            var canClimb = false;
+
+            if (this.Player.IsOnGround && Math.Abs(this.Player.Velocity.Y) < 0.001f)
+            {
+                canJump = true;
+                var adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(amount));
+                var intersecting = this.GetIntersecting(adjusted);
+
+                var targetY = 0d;
+
+                foreach (var box in intersecting)
+                {
+                    var yDifference = box.MaxY - adjusted.MinY;
+                    if (yDifference > PhysicsConst.StepHeight)
+                    {
+                        canJump = false;
+                        break;
+                    }
+
+                    if (yDifference > targetY)
+                        targetY = yDifference;
+                }
+
+                if (canJump && targetY > 0f)
+                {
+                    adjusted = PhysicsConst.GetPlayerBoundingBox(this.Player.Position.Plus(new Vector3(amount.X, targetY, amount.Z)));
+
+                    if (this.GetIntersecting(adjusted).Any(
+                            bb => bb.MaxY > adjusted.MinY && bb.MinY <= adjusted.MaxY))
+                    {
+                        canJump = false;
+                    }
+                } else
+                {
+                    canJump = false;
+                }
+
+                if (canJump)
+                {
+                    yValue = targetY;
+                }
+            }
+
+            if (canClimb)
+                return CollisionResult.VerticalClimb;
+
+            if (canJump)
+                return CollisionResult.ClimbHalfBlock;
+
+            return CollisionResult.DoNothing;
+        }
+
+        private Vector3 ApplyHeading(double strafe, double forward, double multiplier)
+        {
+            var speed = Math.Sqrt(strafe * strafe + forward * forward);
+
+            if (speed < 0.01f)
+                return Vector3.Zero;
+
+            speed = multiplier / Math.Max(speed, 1f);
 
             strafe *= speed;
             forward *= speed;
 
-            var yaw = Math.PI - this.Player.YawRadians;
-            var sin = Math.Sin(yaw);
-            var cos = Math.Cos(yaw);
+            var rotationYaw = this.Player.Yaw;
+            var sinYaw = MathF.Sin(rotationYaw * MathF.PI / 180.0F);
+            var cosYaw = MathF.Cos(rotationYaw * MathF.PI / 180.0F);
 
-            this.Player.Velocity.X += strafe * cos - forward * sin;
-            this.Player.Velocity.Z += forward * cos + strafe * sin;
+            return new Vector3(strafe * cosYaw - forward * sinYaw, 0, forward * cosYaw + strafe * sinYaw);
         }
 
-        public bool IsOnLadder(Vector3 pos) {
-            var block = this.World.GetBlockAt(pos.Floored());
-            return (block.IsSolid() && (block.Id == Ladder.BlockId || block.Id == Vine.BlockId)); // TODO: Other vines?
-        }
-
-        public bool DoesNotCollide(Vector3 pos) {
-            var pBB = PhysicsConst.GetPlayerBoundingBox(pos);
-            return !GetSurroundingBoundingBoxes(pBB).Any(x => pBB.Intersects(x)) && GetWaterInBB(pBB).Count == 0;
-        }
-
-        public int GetRenderedDepth(Block block) {
-            if (!block.IsSolid()) return -1;
+        private float GetRenderedDepth(Block block)
+        {
             if (PhysicsConst.WaterLikeBlocks.Contains(block.Id)) return 0;
-            if (block.Properties.Get("waterlogged")?.GetValue<bool>() == true) return 0;
+            if (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false) return 0;
             if (block.Id != Water.BlockId) return -1;
-
-            return block.Metadata >= 8 ? 0 : block.Metadata;
+            var meta = block.Metadata;
+            return meta >= 8 ? 0 : meta;
         }
 
-
-        public int GetLiquidHeightPercent(Block block) {
-            return (GetRenderedDepth(block) + 1) / 9;
-        }
-
-        public List<Block> GetWaterInBB(AABB bb) {
+        private bool CheckInWaterAndAppyCurrent(AABB bb, Vector3 vel)
+        {
+            var acc = new Vector3(0, 0, 0);
             var waterBlocks = new List<Block>();
             var cursor = new Vector3(0, 0, 0);
-            for (cursor.Y = Math.Floor(bb.MinY); cursor.Y <= Math.Floor(bb.MaxY); cursor.Y++) {
-                for (cursor.Z = Math.Floor(bb.MinZ); cursor.Z <= Math.Floor(bb.MaxZ); cursor.Z++) {
-                    for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++) {
+
+            for (cursor.Y = Math.Floor(bb.MinY); cursor.Y <= Math.Floor(bb.MaxY); cursor.Y++)
+            {
+                for (cursor.Z = Math.Floor(bb.MinZ); cursor.Z <= Math.Floor(bb.MaxZ); cursor.Z++)
+                {
+                    for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++)
+                    {
                         var block = this.World.GetBlockAt(cursor);
-                        if (block.IsSolid() && (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || block.Properties.Get("waterlogged")?.GetValue<bool>() == true)) {
-                            var waterLevel = cursor.Y + 1 - GetLiquidHeightPercent(block);
+                        if (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false))
+                        {
+                            var waterLevel = cursor.Y + 1 - (this.GetRenderedDepth(block) + 1) / 9;
                             if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
                         }
                     }
                 }
             }
-            return waterBlocks;
-        }
 
-        public void MoveEntityWithHeading(double strafe, double forward, PlayerControls controls) {
-            var vel = this.Player.Velocity;
-            var pos = this.Player.Position;
+            var isInWater = waterBlocks.Count > 0;
+            foreach (var block in waterBlocks)
+            {
+                var curLevel = this.GetRenderedDepth(block);
+                var flow = new Vector3(0, 0, 0);
+                var offsets = new[] {
+                    new Vector3(0, 0, 1),
+                    new Vector3(-1, 0, 0),
+                    new Vector3(0, 0, -1),
+                    new Vector3(1, 0, 0)
+                };
+                var p = (Vector3)block.Position!;
 
-            var gravityMultiplier = (vel.Y <= 0 && this.PlayerState.SlowFalling > 0) ? PhysicsConst.SlowFalling : 1;
-
-            if (!this.PlayerState.IsInWater && !this.PlayerState.IsInLava) {
-                // Normal movement
-                var acceleration = PhysicsConst.AirborneAcceleration;
-                var inertia = PhysicsConst.AirborneInertia;
-                var blockUnder = this.World.GetBlockAt(pos.Floored().Plus(Vector3.Down));
-
-                if (this.Player.IsOnGround && blockUnder.IsSolid()) {
-                    inertia = PhysicsConst.GetBlockSlipperiness(blockUnder.Id) * 0.91;
-                    acceleration = 0.1 * (0.1627714 / (inertia * inertia * inertia));
-                }
-
-                if (controls.Sprint) acceleration *= PhysicsConst.SprintSpeed;
-
-                var speedLevel = Player.GetEffectLevel(SpeedEffect.EffectId);
-                var slownessLevel = Player.GetEffectLevel(SlownessEffect.EffectId);
-                if (speedLevel != null && speedLevel > 0) acceleration *= PhysicsConst.SpeedEffect * (int)speedLevel;
-                if (slownessLevel != null && slownessLevel > 0) acceleration *= PhysicsConst.SlowEffect * (int)slownessLevel;
-
-                ApplyHeading(strafe, forward, acceleration);
-
-                if (IsOnLadder(pos)) {
-                    vel.X = Math.Clamp(-PhysicsConst.LadderMaxSpeed, vel.X, PhysicsConst.LadderMaxSpeed);
-                    vel.Z = Math.Clamp(-PhysicsConst.LadderMaxSpeed, vel.Z, PhysicsConst.LadderMaxSpeed);
-                    vel.Y = Math.Max(vel.Y, (controls.Sneak ? 1 : 0) -PhysicsConst.LadderMaxSpeed);
-                }
-
-                MoveEntity(vel.X, vel.Y, vel.Z, controls);
-
-                if (IsOnLadder(pos) && (this.PlayerState.IsCollidedHorizontally || controls.Jump)) {
-                    vel.Y = PhysicsConst.LadderClimbSpeed; // climb ladder
-                }
-
-                // Apply friction and gravity
-                if (this.PlayerState.Levitation > 0) {
-                    vel.Y += (0.05 * this.PlayerState.Levitation - vel.Y) * 0.2;
-                } else {
-                    vel.Y -= PhysicsConst.Gravity * gravityMultiplier;
-                }
-                vel.Y *= PhysicsConst.Airdrag;
-                vel.X *= inertia;
-                vel.Z *= inertia;
-            } else {
-                // Water / Lava movement
-                var lastY = pos.Y;
-                var acceleration = PhysicsConst.LiquidAcceleration;
-                var inertia = this.PlayerState.IsInWater ? PhysicsConst.WaterInertia : PhysicsConst.LavaInertia;
-                var horizontalInertia = inertia;
-
-                if (this.PlayerState.IsInWater) {
-                    float strider = Math.Min(this.PlayerState.DepthStrider, 3);
-                    if (!this.Player.IsOnGround) {
-                        strider *= 0.5f;
+                foreach (var offset in offsets)
+                {
+                    var adjBlock = this.World.GetBlockAt(p.Plus(offset));
+                    var adjLevel = this.GetRenderedDepth(adjBlock);
+                    if (adjLevel < 0)
+                    {
+                        if (adjBlock.BoundingBox != "empty")
+                        {
+                            var adjLevel2 = this.GetRenderedDepth(this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Down)));
+                            if (adjLevel2 >= 0)
+                            {
+                                var f = adjLevel2 - (curLevel - 8);
+                                flow.X += offset.X * f;
+                                flow.Z += offset.Z * f;
+                            }
+                        }
+                    } else
+                    {
+                        var f = adjLevel - curLevel;
+                        flow.X += offset.X * f;
+                        flow.Z += offset.Z * f;
                     }
-                    if (strider > 0) {
-                        horizontalInertia += (0.546 - horizontalInertia) * strider / 3;
-                        acceleration += (0.7 - acceleration) * strider / 3;
-                    }
-
-                    if (this.PlayerState.DolphinsGrace > 0) horizontalInertia = 0.96;
                 }
 
-                ApplyHeading(strafe, forward, acceleration);
-                MoveEntity(vel.X, vel.Y, vel.Z, controls);
-                vel.Y *= inertia;
-                vel.Y -= (this.PlayerState.IsInWater ? PhysicsConst.WaterGravity : PhysicsConst.LavaGravity) * gravityMultiplier;
-                vel.X *= horizontalInertia;
-                vel.Z *= horizontalInertia;
-
-                if (this.PlayerState.IsCollidedHorizontally && DoesNotCollide(pos.Plus(new(vel.X, vel.Y + 0.6 - pos.Y + lastY, vel.Z)))) {
-                    vel.Y = PhysicsConst.OutOfLiquidImpulse; // jump out of liquid
-                }
-            }
-
-            this.Player.Velocity = vel;
-        }
-
-        public Vector3 GetFlow(Block block) {
-            var curlevel = GetRenderedDepth(block);
-            var flow = new Vector3(0, 0, 0);
-            foreach ((int dx, int dz) in new[] { (0, 1), (-1, 0), (0, -1), (1, 0) }) {
-                var adjBlock = this.World.GetBlockAt(((Vector3)block.Position!).Plus(new Vector3(dx, 0, dz)));
-                var adjLevel = GetRenderedDepth(adjBlock);
-                if (adjLevel < 0) {
-                    if (adjBlock.IsSolid() && adjBlock.BoundingBox != "empty") {
-                        adjLevel = GetRenderedDepth(this.World.GetBlockAt(((Vector3)block.Position).Plus(new Vector3(dx, -1, dz))));
-                        if (adjLevel >= 0) {
-                            var f = adjLevel - (curlevel - 8);
-                            flow.X += dx * f;
-                            flow.Z += dz * f;
+                if (block.Metadata >= 8)
+                {
+                    foreach (var offset in offsets)
+                    {
+                        var adjBlock = this.World.GetBlockAt(p.Plus(offset));
+                        var adjUpBlock = this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Up));
+                        if (adjBlock.BoundingBox != "empty" || adjUpBlock.BoundingBox != "empty")
+                        {
+                            flow = flow.Normalized().Plus(new Vector3(0, -6, 0));
                         }
                     }
-                } else {
-                    var f = adjLevel - curlevel;
-                    flow.X += dx * f;
-                    flow.Z += dz * f;
                 }
+
+                flow = flow.Normalized();
+                acc.Add(flow);
             }
 
-            if (block.Metadata >= 8) {
-                foreach ((int dx, int dz) in new [] { (0, 1), (-1, 0), (0, -1), (1, 0) }) {
+            var len = acc.Length();
 
-                    var bPos1 = new Position(block.Position!.X + dx, block.Position.Y, block.Position.Z + dz);
-                    var bPos2 = new Position(block.Position.X + dx, block.Position.Y + 1, block.Position.Z + dz);
-
-                    var adjBlock = this.World.GetBlockAt(bPos1);
-                    var adjUpBlock = this.World.GetBlockAt(bPos2);
-
-                 if ((adjBlock.IsSolid() && adjBlock.BoundingBox != "empty") || (adjUpBlock.IsSolid() && adjUpBlock.BoundingBox != "empty")) {
-                        flow.Normalized().Plus(Vector3.Down * 6);
-        }
-                }
+            if (len > 0)
+            {
+                vel.X += acc.X / len * 0.014;
+                vel.Y += acc.Y / len * 0.014;
+                vel.Z += acc.Z / len * 0.014;
             }
 
-
-            return flow.Normalized();
-        }
-
-        public bool IsInWaterApplyCurrent(AABB bb, Vector3 vel) {
-            var acceleration = new Vector3(0, 0, 0);
-            var waterBlocks = GetWaterInBB(bb);
-            var isInWater = waterBlocks.Count > 0;
-            foreach (var block in waterBlocks) {
-                var flow = GetFlow(block);
-                acceleration.Add(flow);
-            }
-
-            var len = acceleration.Length();
-            if (len > 0) {
-                vel.X += acceleration.X / len * 0.014;
-                vel.Y += acceleration.Y / len * 0.014;
-                vel.Z += acceleration.Z / len * 0.014;
-            }
             return isInWater;
         }
 
-        public bool IsMaterialInBB(AABB queryBB, int type) {
-            var cursor = new Vector3(0, 0, 0);
-            for (cursor.Y = Math.Floor(queryBB.MinY); cursor.Y <= Math.Floor(queryBB.MaxY); cursor.Y++) {
-                for (cursor.Z = Math.Floor(queryBB.MinZ); cursor.Z <= Math.Floor(queryBB.MaxZ); cursor.Z++) {
-                    for (cursor.X = Math.Floor(queryBB.MinX); cursor.X <= Math.Floor(queryBB.MaxX); cursor.X++) {
-                        var block = this.World.GetBlockAt(cursor);
-                        if (block.IsSolid() && block.Id == type) return true;
-                    }
-                }
-            }
-            return false;
+        private bool IsOnLadder(Vector3 pos)
+        {
+            var block = this.World.GetBlockAt(pos);
+            return block.Id == Ladder.BlockId || block.Id == Vine.BlockId;
         }
 
-        public void SimulatePlayer(PlayerControls controls) {
-            var vel = this.Player.Velocity;
-            var pos = this.Player.Position;
-
-            var waterBB = PhysicsConst.GetPlayerBoundingBox(pos).Contract(0.001, 0.401, 0.001);
-            var lavaBB = PhysicsConst.GetPlayerBoundingBox(pos).Contract(0.1, 0.4, 0.1);
-
-            this.PlayerState.IsInWater = IsInWaterApplyCurrent(waterBB, vel);
-            this.PlayerState.IsInLava = IsMaterialInBB(lavaBB, Lava.BlockId);
-
-            // Reset velocity component if it falls under the threshold
-            if (Math.Abs(vel.X) < PhysicsConst.NegligeableVelocity) vel.X = 0;
-            if (Math.Abs(vel.Y) < PhysicsConst.NegligeableVelocity) vel.Y = 0;
-            if (Math.Abs(vel.Z) < PhysicsConst.NegligeableVelocity) vel.Z = 0;
-
-            if (controls.Jump || PlayerState.JumpQueued) {
-                if (PlayerState.JumpTicks > 0) PlayerState.JumpTicks--;
-                if (PlayerState.IsInWater || PlayerState.IsInLava) {
-                    vel.Y += 0.04;
-                } else if (Player.IsOnGround && PlayerState.JumpTicks == 0) {
-                    var blockBelow = this.World.GetBlockAt(Player.Position.Floored().Plus(Vector3.Down));
-                    vel.Y = MathF.Round(0.42f) * ((blockBelow.Id == HoneyBlock.BlockId) ? PhysicsConst.HoneyblockJumpSpeed : 1);
-                          if (PlayerState.JumpBoost > 0) {
-                        vel.Y += 0.1 * PlayerState.JumpBoost;
-                    }
-                    if (controls.Sprint) {
-                        var yaw = Math.PI - Player.YawRadians;
-                        vel.X -= Math.Sin(yaw) * 0.2;
-                        vel.Z += Math.Cos(yaw) * 0.2;
-                    }
-                    PlayerState.JumpTicks = PhysicsConst.AutoJumpCooldown;
-                }
-            } else {
-                PlayerState.JumpTicks = 0; // reset autojump cooldown
-            }
-            this.PlayerState.JumpQueued = false;
-
-            var strafe = ((controls.Right ? 1f : 0f) - (controls.Left ? 1f : 0f)) * 0.98;
-            var forward = ((controls.Forward ? 1f : 0f) - (controls.Back ? 1f : 0f)) * 0.98;
-
-            if (controls.Sneak) {
-                strafe *= PhysicsConst.SneakSpeed;
-                forward *= PhysicsConst.SneakSpeed;
-            }
-
-
-            MoveEntityWithHeading(strafe, forward, controls);
+        internal enum CollisionResult
+        {
+            DoNothing,
+            ClimbHalfBlock,
+            VerticalClimb
         }
     }
 }

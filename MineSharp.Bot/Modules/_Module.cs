@@ -1,18 +1,23 @@
 ﻿using MineSharp.Core.Logging;
 
-namespace MineSharp.Bot.Modules {
-    public abstract class Module {
-        protected Logger Logger = Logger.GetLogger();
-        public bool IsLoaded { get; private set; } = false;
-        public bool IsEnabled => _enabled;
-
-        private bool _enabled = false;
+namespace MineSharp.Bot.Modules
+{
+    public abstract class Module
+    {
 
         public readonly MinecraftBot Bot;
 
+        protected Logger Logger = Logger.GetLogger();
 
-        public Module(MinecraftBot bot) {
+
+        public Module(MinecraftBot bot)
+        {
             this.Bot = bot;
+        }
+        public bool IsLoaded { get; private set; }
+        public bool IsEnabled {
+            get;
+            private set;
         }
 
 
@@ -20,22 +25,24 @@ namespace MineSharp.Bot.Modules {
         protected virtual Task EnablePlugin() => Task.CompletedTask;
         protected virtual Task DisablePlugin() => Task.CompletedTask;
 
-        public async Task Initialize() {
+        public async Task Initialize()
+        {
             if (this.IsLoaded)
                 return;
 
-            await Load();
+            await this.Load();
 
             this.IsLoaded = true;
         }
 
-        public async Task SetEnabled (bool enabled) {
-            if (IsEnabled == enabled) return;
+        public async Task SetEnabled(bool enabled)
+        {
+            if (this.IsEnabled == enabled) return;
 
-            if (enabled) await EnablePlugin();
-            else await DisablePlugin();
+            if (enabled) await this.EnablePlugin();
+            else await this.DisablePlugin();
 
-            this._enabled = enabled;
+            this.IsEnabled = enabled;
         }
     }
 }

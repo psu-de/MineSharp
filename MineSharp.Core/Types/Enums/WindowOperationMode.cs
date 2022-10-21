@@ -1,5 +1,7 @@
-﻿namespace MineSharp.Core.Types.Enums {
-    public enum WindowOperationMode {
+﻿namespace MineSharp.Core.Types.Enums
+{
+    public enum WindowOperationMode
+    {
         SimpleClick = 0,
         ShiftClick = 1,
         Hotkey = 2,

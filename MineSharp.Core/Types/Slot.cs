@@ -1,35 +1,39 @@
-﻿namespace MineSharp.Core.Types {
-    public partial class Slot {
+﻿namespace MineSharp.Core.Types
+{
+    public class Slot
+    {
 
-        public Item? Item { get; set; } = null;
-        public short SlotNumber { get; set; }
-
-        public Slot() { }
-
-        public Slot(Item? item, short slotNumber) {
+        public Slot(Item? item, short slotNumber)
+        {
             this.Item = item;
             this.SlotNumber = slotNumber;
         }
 
-        public bool IsEmpty() => Item == null;
+        public Item? Item { get; set; }
+        public short SlotNumber { get; set; }
 
-        public bool CanStack(Slot otherSlot) {
+        public bool IsEmpty() => this.Item == null;
+
+        public bool CanStack(Slot otherSlot)
+        {
             if (this.IsEmpty() || otherSlot.IsEmpty()) return true;
 
             var slotType = this.Item!.Id;
             var otherSlotType = otherSlot.Item!.Id;
 
-            if (slotType == otherSlotType) {
+            if (slotType == otherSlotType)
+            {
 
                 if (this.Item!.StackSize == 1) return false;
 
-                return (this.Item!.StackSize - this.Item.Count) > 0;
+                return this.Item!.StackSize - this.Item.Count > 0;
 
-            } else return false;
+            }
+            return false;
         }
 
-        public Slot Clone() {
-            return new Slot(this.Item, this.SlotNumber);
-        }
+        public Slot Clone() => new Slot(this.Item, this.SlotNumber);
+
+        public override string ToString() => $"Slot (Index={this.SlotNumber} Item={this.Item?.ToString() ?? "None"})";
     }
 }

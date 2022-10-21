@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MineSharp.Data.Generator.Blocks {
+namespace MineSharp.Data.Generator.Blocks
+{
 #pragma warning disable CS8618
-    internal class BlockJsonInfo {
+    internal class BlockJsonInfo
+    {
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -59,7 +61,8 @@ namespace MineSharp.Data.Generator.Blocks {
         public int? DefaultState { get; set; }
     }
 
-    internal class BlockStateJsonInfo {
+    internal class BlockStateJsonInfo
+    {
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -71,19 +74,23 @@ namespace MineSharp.Data.Generator.Blocks {
         public string[]? Values { get; set; }
     }
 
-    internal class BlockCollisionShapeJson {
+    internal class BlockCollisionShapeJson
+    {
         [JsonProperty("blocks")]
         public Dictionary<string, object> Blocks;
         [JsonProperty("shapes")]
         public Dictionary<string, float[][]> Shapes;
 
 
-        public static int[] GetShapeIndices(object obj) {
-            if (obj is JArray) {
+        public static int[] GetShapeIndices(object obj)
+        {
+            if (obj is JArray)
+            {
                 return ((JArray)obj).Select(x => (int)x).ToArray();
-            } else {
-                return new int[] { (int)((long)obj) };
             }
+            return new[] {
+                (int)(long)obj
+            };
         }
     }
 #pragma warning restore CS8618

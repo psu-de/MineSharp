@@ -1,34 +1,38 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Components\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
-    <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj" />
-    <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
-    <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
-    <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
-    <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Components\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
+        <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj" />
+        <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
+        <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
+        <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
+        <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Readme.md">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Readme.tt</DependentUpon>
-    </None>
-    <None Update="Readme.tt">
-      <Generator>TextTemplatingFileGeneratorCore</Generator>
-      <LastGenOutput>Readme.md</LastGenOutput>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="Readme.md">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Readme.tt</DependentUpon>
+        </None>
+        <None Update="Readme.tt">
+            <Generator>TextTemplatingFileGeneratorCore</Generator>
+            <LastGenOutput>Readme.md</LastGenOutput>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+    <ItemGroup>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions" />
+    </ItemGroup>
 
 </Project>
