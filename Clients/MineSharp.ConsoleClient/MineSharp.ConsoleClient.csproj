@@ -8,14 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="PrettyPrompt" Version="3.0.5"/>
-        <PackageReference Include="Spectre.Console" Version="0.44.0"/>
+        <PackageReference Include="PrettyPrompt" Version="3.0.5" />
+        <PackageReference Include="Spectre.Console" Version="0.44.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Addons\MineSharp.Pathfinder\MineSharp.Pathfinding.csproj"/>
-        <ProjectReference Include="..\..\Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj"/>
-        <ProjectReference Include="..\..\MineSharp.Bot\MineSharp.Bot.csproj"/>
+        <ProjectReference Include="..\..\Addons\MineSharp.Pathfinder\MineSharp.Pathfinding.csproj" />
+        <ProjectReference Include="..\..\Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj" />
+        <ProjectReference Include="..\..\MineSharp.Bot\MineSharp.Bot.csproj" />
     </ItemGroup>
 
 </Project>

@@ -87,7 +87,7 @@ namespace MineSharp.Protocol
             {
                 var packet = this.ClientboundPacketFactories[this.client.GameState].ReadPacket(packetBuffer);
                 if (packetBuffer.ReadableBytes > 0)
-                    Logger.Debug3($"PacketBuffer should be empty after reading ({packet.GetType().Name})"); //throw new Exception("PacketBuffer must be empty after reading");
+                    Logger.Debug3($"PacketBuffer should be empty after reading ({packet.Name})"); //throw new Exception("PacketBuffer must be empty after reading");
 
                 return packet switch {
                     Packet chPacket => (IPacketPayload)chPacket.Params.Value!,
