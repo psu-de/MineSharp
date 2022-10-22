@@ -86,10 +86,8 @@ namespace MineSharp.Bot.Modules.World
                         var b = this.World!.GetBlockAt(lc.Floored());
                         if (b.IsSolid())
                         {
-                            var boundingBoxes = new List<AABB>();
-                            foreach (var shape in b.GetBlockShape())
+                            foreach (var bb in b.GetBoundingBoxes())
                             {
-                                var bb = shape.ToBoundingBox();
                                 bb.Offset(b.Position!.X, b.Position.Y, b.Position.Z);
                                 if (bb.Contains(lc.X, lc.Y, lc.Z))
                                     return b;

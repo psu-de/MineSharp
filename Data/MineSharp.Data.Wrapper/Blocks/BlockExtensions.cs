@@ -54,10 +54,8 @@ namespace MineSharp.Data.Blocks
             return block.HarvestTools.Contains(item!.Id);
         }
 
-
-        public static BlockShape[] GetBlockShape(this Block block)
+        public static AABB[] GetBoundingBoxes(this Block block)
         {
-
             var blockType = block.GetType();
             var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
             var idx = 0;
@@ -67,16 +65,7 @@ namespace MineSharp.Data.Blocks
             }
             var shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[idx]];
 
-            return shapeData.Select(x => new BlockShape(x)).ToArray();
-        }
-
-        public static AABB[] GetBoundingBoxes(this Block block)
-        {
-            var blockType = block.GetType();
-            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
-            var idx = shapeIndices.Length > 1 ? block.Metadata : 0;
-            var shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[idx]];
-            return shapeData.Select(x => new BlockShape(x).ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)).ToArray();
+            return shapeData.Select(x => new AABB(x[0], x[1], x[2], x[3], x[4], x[5])).ToArray();
         }
     }
 }
