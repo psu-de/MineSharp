@@ -249,7 +249,7 @@ namespace MineSharp.Physics
 
                     var coords = new Vector3(x, y, z);
 
-                    foreach (var box in block.GetBoundingBoxes().Select(x => x.Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                    foreach (var box in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                     {
                         if (box.Intersects(entityBoundingBox))
                         {
@@ -350,7 +350,7 @@ namespace MineSharp.Physics
                         if (!block.IsSolid())
                             continue;
 
-                        foreach (var blockBox in block.GetBoundingBoxes().Select(x => x.Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                        foreach (var blockBox in block.GetBlockShape().Select(x => x.ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                         {
                             if (box.Intersects(blockBox))
                             {
@@ -471,7 +471,7 @@ namespace MineSharp.Physics
 
                         var coords = new Vector3(x, y, z);
 
-                        foreach (var box in blockState.GetBoundingBoxes().Select(c => c.Offset(x, y, z)))
+                        foreach (var box in blockState.GetBlockShape().Select(c => c.ToBoundingBox().Offset(x, y, z)))
                         {
                             if (negative)
                             {
@@ -594,7 +594,7 @@ namespace MineSharp.Physics
 
                         var coords = new Vector3(x, y, z);
 
-                        foreach (var box in blockState.GetBoundingBoxes().Select(x => x.Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                        foreach (var box in blockState.GetBlockShape().Select(x => x.ToBoundingBox().Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
                         {
                             if (box.MaxY <= minY) continue;
 
@@ -726,7 +726,7 @@ namespace MineSharp.Physics
 
                         var coords = new Vector3(x, y, z);
 
-                        foreach (var box in blockState.GetBoundingBoxes().Select(x => x.Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                        foreach (var box in blockState.GetBlockShape().Select(x => x.ToBoundingBox().Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
                         {
                             if (box.MaxY <= minY) continue;
 
