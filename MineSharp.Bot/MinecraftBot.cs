@@ -57,8 +57,7 @@ namespace MineSharp.Bot
                 this.Session = Session.OfflineSession(this.Options.UsernameOrEmail);
             } else
             {
-                if (this.Options.Password == null) throw new Exception("Password cannot be null when Offline=false");
-                this.Session = Session.Login(this.Options.UsernameOrEmail, this.Options.Password).GetAwaiter().GetResult();
+                this.Session = Session.Login().GetAwaiter().GetResult();
                 Logger.Info("UUID: " + this.Session.UUID);
             }
 
@@ -211,7 +210,6 @@ namespace MineSharp.Bot
         {
             public string Version;
             public string UsernameOrEmail;
-            public string? Password;
             public bool? Offline;
             public string Host;
             public ushort? Port;

@@ -7,6 +7,7 @@ using PrettyPrompt;
 using PrettyPrompt.Highlighting;
 using Spectre.Console;
 using System.Net;
+using MineSharp.MojangAuth;
 
 const string DEBUG_LOG_FILE = "log_debug.txt";
 const string LOG_FILE = "log.txt";
@@ -23,61 +24,14 @@ Logger.AddScope(LogLevel.DEBUG3, s => debugFileWriter.WriteLine(s));
 
 //Credentials
 var loginOptions = new MinecraftBot.BotOptions();
+bool offline = AnsiConsole.Confirm("Use offline mode", true);
+loginOptions.Offline = offline;
+loginOptions.Host = "127.0.0.1";
+loginOptions.Port = 25565;
 
-if (true /*args.Length == 1*/)
+if (offline)
 {
-    loginOptions = new MinecraftBot.BotOptions {
-        Host = "127.0.0.1",
-        Port = 25565,
-        Offline = true,
-        UsernameOrEmail = "MineSharpBot",
-        Version = "1.18.1"
-    };
-    // Parse credential file
-} else
-{
-    AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
-    AnsiConsole.MarkupLine("Please login:");
-    var username = AnsiConsole.Ask<string>("Username [red]or[/] Email: ");
-    var isOffline = AnsiConsole.Confirm("Offline Mode: ");
-    string? password = null;
-
-    if (!isOffline)
-    {
-        password = AnsiConsole.Prompt(new TextPrompt<string>("Password: ").PromptStyle("red").Secret());
-    }
-
-    var host = AnsiConsole.Prompt(new TextPrompt<string>("Hostname: ")
-        .ValidationErrorMessage("[red] Invalid Hostname [/]")
-        .Validate(i =>
-        {
-            if (IPAddress.TryParse(i, out _)) return ValidationResult.Success();
-            try
-            {
-                Dns.GetHostEntry(i);
-                return ValidationResult.Success();
-            } catch (Exception)
-            {
-
-                return ValidationResult.Error();
-            }
-        }));
-
-    var port = AnsiConsole.Prompt(
-        new TextPrompt<ushort>("Port: ")
-            .ValidationErrorMessage("[red] Invalid port number [/]"));
-
-    var version = AnsiConsole.Ask<string>("Minecraft version: ");
-
-    loginOptions = new MinecraftBot.BotOptions {
-        Host = host,
-        Offline = isOffline,
-        Password = password,
-        Port = port,
-        UsernameOrEmail = username,
-        Version = version
-    };
-    AnsiConsole.Clear();
+    loginOptions.UsernameOrEmail = "MineSharpBot";
 }
 
 AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));

@@ -56,15 +56,13 @@ namespace MineSharp.Pathfinding.Moves
         {
             var diff = bot.BotEntity!.Position.Minus(target);
             var length = diff.Length();
-            Logger.Debug($"Pos: {bot.BotEntity!.Position}, Len: {length}");
-                
+               
             var yaw = Math.Atan2(diff.X, -diff.Z) * (180 / Math.PI);
                 
             bot.ForceSetRotation((float)yaw, 0);
 
             if (length is > 2d and < 2.4d)
             {
-                Logger.Debug("Jump");
                 bot.PlayerControls.Jump();
             }
             

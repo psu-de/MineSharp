@@ -1,23 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <OutputType>Library</OutputType>
+        <LangVersion>11</LangVersion>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Spectre.Console" Version="0.44.0"/>
+        <PackageReference Include="Spectre.Console" Version="0.44.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
-        <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj"/>
+        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+        <ProjectReference Include="..\MineSharp.Data\MineSharp.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}"/>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
 
 </Project>

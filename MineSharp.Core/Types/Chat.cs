@@ -31,6 +31,7 @@ namespace MineSharp.Core.Types
                 JTokenType.Array => ParseArray((JArray)token, styleCode),
                 JTokenType.Object => ParseObject((JObject)token, styleCode),
                 JTokenType.String => (string)token!,
+                JTokenType.Integer => (string)token!,
                 _ => throw new Exception($"Type {token.Type} is not supported")
             };
         }
