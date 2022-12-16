@@ -1,6 +1,5 @@
 ﻿using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
-using MojangSharpCore.Endpoints;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 
@@ -8,14 +7,11 @@ namespace MineSharp.MojangAuth
 {
     public class Session
     {
-
-
         private static readonly Logger Logger = Logger.GetLogger();
 
-        public Session(string username, string password, UUID uuid, string clientToken, string sessionToken, bool isOnline)
+        public Session(string username, UUID uuid, string clientToken, string sessionToken, bool isOnline)
         {
             this.Username = username;
-            this.Password = password;
             this.UUID = uuid;
             this.ClientToken = clientToken;
             this.SessionToken = sessionToken;
@@ -24,9 +20,6 @@ namespace MineSharp.MojangAuth
 
 
         public string Username {
-            get;
-        }
-        public string Password {
             get;
         }
         public UUID UUID {
@@ -42,20 +35,13 @@ namespace MineSharp.MojangAuth
             get;
         }
 
-        public static async Task<Session> Login(string usernameOrEmail, string password)
+        /// <summary>
+        /// Use MicrosoftAuth.MicrosoftLogin for more options
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<Session> Login()
         {
-            var auth = await new Authenticate(new Credentials {
-                Username = usernameOrEmail,
-                Password = password
-            }).PerformRequestAsync();
-
-            if (auth.IsSuccess)
-            {
-                Logger.Debug("Successfully logged in as " + auth.SelectedProfile.PlayerName);
-                return new Session(auth.SelectedProfile.PlayerName, password, UUID.Parse(auth.SelectedProfile.Value), auth.ClientToken, auth.AccessToken, true);
-            }
-            Logger.Warning("Could not Login, Invalid Credentials?");
-            throw new Exception("AuthException");
+            return await MicrosoftAuth.MicrosoftLogin(null);
         }
 
         public static async Task<Session> Load(string filepath)
@@ -66,23 +52,22 @@ namespace MineSharp.MojangAuth
                 {
 
                     var username = await reader.ReadLineAsync();
-                    var password = await reader.ReadLineAsync();
                     var uuid = UUID.Parse(await reader.ReadLineAsync() ?? throw new ArgumentException("Invalid file"));
                     var cToken = await reader.ReadLineAsync();
                     var sToken = await reader.ReadLineAsync();
                     var isOnline = await reader.ReadLineAsync();
 
-                    if (username == null || password == null || cToken == null || sToken == null || isOnline == null)
+                    if (username == null || cToken == null || sToken == null || isOnline == null)
                     {
                         throw new Exception("Invalid file");
                     }
 
-                    return new Session(username, password, uuid, cToken, sToken, bool.Parse(isOnline));
+                    return new Session(username, uuid, cToken, sToken, bool.Parse(isOnline));
                 }
             }
         }
 
-        public static Session OfflineSession(string username) => new Session(username, "", Guid.NewGuid(), "", "", false);
+        public static Session OfflineSession(string username) => new Session(username, Guid.NewGuid(), "", "", false);
 
         // This is insecure af
         // TODO: Encryption?
@@ -93,7 +78,6 @@ namespace MineSharp.MojangAuth
                 using (TextWriter writer = new StreamWriter(fs))
                 {
                     await writer.WriteLineAsync(this.Username);
-                    await writer.WriteLineAsync(this.Password);
                     await writer.WriteLineAsync(this.UUID.ToString());
                     await writer.WriteLineAsync(this.ClientToken);
                     await writer.WriteLineAsync(this.SessionToken);
@@ -119,7 +103,7 @@ namespace MineSharp.MojangAuth
 
             if (!response.IsSuccessStatusCode)
             {
-                Logger.Error("Sessionserver returned error code: " + response.StatusCode + "  " + await response.Content.ReadAsStringAsync());
+                Logger.Error("Session server returned error code: " + response.StatusCode + "  " + await response.Content.ReadAsStringAsync());
                 return false;
                 //throw new Exception("Could not authenticate");
             }

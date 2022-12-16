@@ -8,7 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ChangFeng.MojangSharpCore" Version="0.0.1" />
+        <PackageReference Include="CmlLib.Core.Auth.Microsoft" Version="2.2.0" />
+        <PackageReference Include="CmlLib.Core.Auth.Microsoft.MsalClient" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>
