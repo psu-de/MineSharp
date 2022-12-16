@@ -29,6 +29,11 @@ loginOptions.Offline = offline;
 loginOptions.Host = "127.0.0.1";
 loginOptions.Port = 25565;
 
+if (offline)
+{
+    loginOptions.UsernameOrEmail = "MineSharpBot";
+}
+
 AnsiConsole.Write(new Rule("[yellow] MineSharp Console Client [/]").RuleStyle(Style.Parse("yellow")));
 AnsiConsole.Write(new FigletText("MineSharp Alpha").Centered());
 
