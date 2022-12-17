@@ -22,7 +22,7 @@ Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to prov
 - 🌍 World tracking (query the world for blocks)
 - ⛏️ Mining
 - 👷‍♂️ Building
-- 🪟 Low-Level window api (needs some more work)
+- 🪟 High-Level window api (needs some more work)
 - ⚔️ Attacking entities
 - 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
 - 🔎 Simple Pathfinder
