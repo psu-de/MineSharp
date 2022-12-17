@@ -1,8 +1,10 @@
+![banner](banner.png)
+
+# MineSharp
+
 [![Gitter](https://img.shields.io/gitter/room/MineSharp-net/community?style=for-the-badge)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Discord](https://img.shields.io/badge/Discord-Join-green?style=for-the-badge)](https://discord.gg/Pt6JT5nXMr)
 [![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
-
-# MineSharp
 
 **This Project is not finished and under development!**
 
@@ -22,7 +24,7 @@ Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to prov
 - 🌍 World tracking (query the world for blocks)
 - ⛏️ Mining
 - 👷‍♂️ Building
-- 🪟 Low-Level window api (needs some more work)
+- 🪟 High-Level window api (needs some more work)
 - ⚔️ Attacking entities
 - 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
 - 🔎 Simple Pathfinder
