@@ -156,7 +156,7 @@ namespace MineSharp.Windows
             {
                 throw new NotSupportedException("Inventory is null");
             }
-            return this.Inventory.GetContainerSlots();
+            return this.Inventory.GetContainerSlots().Select(x => new Slot(x.Item, (short)(x.SlotNumber + this.Slots.Length))).ToArray();
         }
 
         /// <summary>
@@ -495,6 +495,14 @@ namespace MineSharp.Windows
             }
         }
         
+        /// <summary>
+        /// Moves <paramref name="count"/> items from slot <paramref name="slotFromIndex"/> to <paramref name="slotToIndex"/>
+        /// </summary>
+        /// <param name="slotFromIndex"></param>
+        /// <param name="slotToIndex"></param>
+        /// <param name="count"></param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public void MoveItemsFromSlot(short slotFromIndex, short slotToIndex, int count)
         {
             var slotFrom = this.GetSlot(slotFromIndex);

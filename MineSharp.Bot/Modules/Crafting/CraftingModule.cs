@@ -107,16 +107,51 @@ namespace MineSharp.Bot.Modules.Crafting
             for (int i = 0; i < recipe.Ingredients.Length; i++)
             {
                 var ingredient = recipe.Ingredients[i];
-                if (ingredient == null)
+                if (!ingredient.HasValue)
                 {
                     continue;
                 }
 
-                var ingredientCount = ingredient * count;
-                var slotIndex = i + 1;
-                
-                
+                var ingredientCount = ingredient!.Value * count;
+                var slotIndex = (short)(i + 1);
+
+                foreach (var slot in craftingWindow.FindInventoryItems((ItemType)ingredient))
+                {
+                    int toTake = Math.Min(ingredientCount, slot.Item!.Count);
+                    ingredientCount -= slot.Item!.Count;
+                    craftingWindow.MoveItemsFromSlot(slot.SlotNumber, slotIndex, toTake);
+
+                    if (ingredientCount <= 0)
+                    {
+                        break;
+                    }
+                }
             }
+
+            var resultSlot = craftingWindow.GetSlot(0);
+            for (int i = 0; i < 10; i++)
+            {
+                await Task.Delay(10);
+                resultSlot = craftingWindow.GetSlot(0);
+                if (!resultSlot.IsEmpty() && resultSlot.Item!.Id == recipe.Result)
+                {
+                    break;
+                }
+            }
+            
+            if (resultSlot.IsEmpty())
+            {
+                throw new Exception("result slot is empty");
+            }
+
+            if (resultSlot.Item!.Id != recipe.Result)
+            {
+                throw new Exception($"unexpected result item! got: {resultSlot.Item!.Id}, expected: {recipe.Result}");
+            }
+            
+            craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
+            this.Logger.Debug(craftingWindow.GetSelectedSlot().ToString());
+            craftingWindow.StackSelectedSlotInInventory(craftingWindow.GetSelectedSlot().Item!.Count);
         }
     }
 }
