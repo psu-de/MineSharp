@@ -25,7 +25,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
             {
                 return new CompletionItem(
                     x.Key.ToString(),
-                    CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Info.Name})[/]"));
+                    CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Title})[/]"));
             }).ToList();
         }
 

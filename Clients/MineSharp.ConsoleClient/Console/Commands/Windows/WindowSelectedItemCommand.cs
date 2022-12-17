@@ -33,14 +33,14 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows {
                 throw new Exception("Window with id " + windowId + " not found!");
             }
 
-            AnsiConsole.MarkupLine($"Selected window item: " + window.SelectedSlot?.Item ?? "null");
+            AnsiConsole.MarkupLine($"Selected window item: " + window.GetSelectedSlot().Item ?? "null");
         }
 
         private List<CompletionItem> GetWindowIdItems(string arg) {
             return BotClient.Bot!.OpenedWindows.Select(x => {
                 return new CompletionItem(
                     replacementText: x.Key.ToString(),
-                    displayText: CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Info.Name})[/]"));
+                    displayText: CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Title})[/]"));
             }).ToList();
         }
     }

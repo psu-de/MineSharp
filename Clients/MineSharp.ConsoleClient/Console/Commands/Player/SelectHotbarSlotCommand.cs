@@ -20,7 +20,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Player
         {
 
             var slot = this.SlotId.GetValue(argv[0]);
-            if (slot == null || slot < 1 || slot > 9)
+            if (slot == null || slot < 0 || slot > 8)
             {
                 AnsiConsole.MarkupLine("[red]Invalid Slot number, must be between 1 and 9[/]");
                 return;
