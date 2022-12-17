@@ -209,7 +209,7 @@ namespace MineSharp.Windows
         /// Sets the slot at the given index
         /// </summary>
         /// <param name="slot"></param>
-        internal void SetSlot(Slot slot)
+        public void SetSlot(Slot slot)
         {
             ThrowIfSlotOufOfRange(slot.SlotNumber);
 

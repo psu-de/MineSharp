@@ -61,7 +61,7 @@ namespace MineSharp.Bot.Modules.Windows
         public WindowsModule(MinecraftBot bot) : base(bot)
         {
             this.inventoryLoadedTsc = new TaskCompletionSource();
-            this.MainInventory = new Window(0, "MainInventory", 4 * 9, null, this.SynchronizeWindowClick);
+            this.MainInventory = new Window(255, "MainInventory", 4 * 9, null, this.SynchronizeWindowClick);
             this.MainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
         }
 
