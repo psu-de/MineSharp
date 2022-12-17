@@ -84,6 +84,9 @@ namespace MineSharp.ConsoleClient.Console
                 RegisterCommand(new ClickWindowCommand());
                 RegisterCommand(new OpenContainerCommand());
                 RegisterCommand(new WindowItemsCommand());
+                RegisterCommand(new WindowSelectedItemCommand());
+                RegisterCommand(new CraftCommand());
+                RegisterCommand(new MoveItemsCommand());
             }
         }
     }

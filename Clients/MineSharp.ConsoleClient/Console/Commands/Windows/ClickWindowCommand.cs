@@ -46,7 +46,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
             {
                 return new CompletionItem(
                     x.Key.ToString(),
-                    CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Info.Name})[/]"));
+                    CColor.FromMarkup($"[darkorange3_1]{x.Key} ({x.Value.Title})[/]"));
             }).ToList();
         }
 
@@ -62,12 +62,18 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
             if (button == null || button >= byte.MaxValue) throw new ArgumentException("button");
             if (slot == null || button >= short.MaxValue) throw new ArgumentException("slot");
 
-            var click = new WindowClick(clickMode, (byte)button, (short)slot);
             BotClient.Bot!.OpenedWindows.TryGetValue((int)windowId, out var window);
 
             if (window == null) throw new ArgumentException($"Window with id={windowId} not opened");
 
-            window.PerformClick(click);
+            switch (clickMode)
+            {
+                case WindowOperationMode.SimpleClick:
+                    window.DoSimpleClick((WindowMouseButton)button, (short)slot);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

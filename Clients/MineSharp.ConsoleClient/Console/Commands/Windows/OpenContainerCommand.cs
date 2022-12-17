@@ -21,16 +21,17 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
         public override void DoAction(string[] argv, CancellationToken cancellation)
         {
 
-            var x = (int)this.X.GetValue(argv[0])!;
-            var y = (int)this.Y.GetValue(argv[1])!;
-            var z = (int)this.Z.GetValue(argv[2])!;
-
-            AnsiConsole.MarkupLine($"[green] Opening container at ({x} / {y} / {z}) [/]");
-
-            var block = BotClient.Bot!.GetBlockAt(new Position(x, y, z));
-            var window = BotClient.Bot.OpenContainer(block).GetAwaiter().GetResult();
-
-            AnsiConsole.MarkupLine($"[green]Opened window with id={window.Id}[/]");
+            throw new NotImplementedException();
+            // var x = (int)this.X.GetValue(argv[0])!;
+            // var y = (int)this.Y.GetValue(argv[1])!;
+            // var z = (int)this.Z.GetValue(argv[2])!;
+            //
+            // AnsiConsole.MarkupLine($"[green] Opening container at ({x} / {y} / {z}) [/]");
+            //
+            // var block = BotClient.Bot!.GetBlockAt(new Position(x, y, z));
+            // var window = BotClient.Bot.OpenContainer(block).GetAwaiter().GetResult();
+            //
+            // AnsiConsole.MarkupLine($"[green]Opened window with id={window.Id}[/]");
         }
     }
 }

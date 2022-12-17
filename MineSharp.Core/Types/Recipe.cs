@@ -27,6 +27,25 @@ namespace MineSharp.Core.Types
         /// </summary>
         public int ResultCount { get; private set; }
 
+        public Dictionary<int, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<int, int>(), (x, y) =>
+        {
+            if (y == null)
+            {
+                return x;
+            }
+
+            if (!x.TryGetValue(y.Value, out var count))
+            {
+                x.Add(y.Value, 1);
+                return x;
+            }
+
+            count += 1;
+            x[y.Value] = count;
+            return x;
+
+        });
+
         public Recipe(int?[] ingredients, int?[]? outShape, bool requiresCraftingTable,  int result, int count)
         {
             this.Ingredients = ingredients;

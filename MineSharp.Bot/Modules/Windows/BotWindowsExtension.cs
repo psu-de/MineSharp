@@ -72,7 +72,7 @@ namespace MineSharp.Bot
         /// <param name="window"></param>
         /// <returns></returns>
         [BotFunction("Window", "Closes a window")]
-        public Task CloseWindow(Window window) => this.WindowsModule!.CloseWindow(window.Id);
+        public Task CloseWindow(Window window) => this.WindowsModule!.CloseWindow(window.WindowId);
 
         /// <summary>
         ///     Changes the selected hotbar slot (see <see cref="HeldItem" />)
