@@ -13,14 +13,26 @@
         public short SlotNumber { get; set; }
 
         public bool IsEmpty() => this.Item == null;
+        public bool IsFull() => this.Item != null && this.Item.Count == this.Item.StackSize;
+        
+        /// <summary>
+        /// How many items can be stacked on this slot
+        /// </summary>
+        public int LeftToStack => (this.Item?.StackSize - this.Item?.Count) ?? throw new NotSupportedException();
 
+        public bool CanStack(Slot otherSlot, int count)
+        {
+            return this.CanStack(otherSlot.Item?.Id, count);
+        }
+        
         public bool CanStack(Slot otherSlot)
         {
-            return this.CanStack(otherSlot.Item?.Id);
+            return this.CanStack(otherSlot.Item?.Id, otherSlot.Item?.Count);
         }
 
-        public bool CanStack(int? itemId)
+        public bool CanStack(int? itemId, int? count = null)
         {
+            count ??= 1;
             if (this.IsEmpty() || itemId == null)
             {
                 return true;
@@ -33,7 +45,7 @@
 
                 if (this.Item!.StackSize == 1) return false;
 
-                return this.Item!.StackSize - this.Item.Count > 0;
+                return this.LeftToStack >= count;
 
             }
             return false;

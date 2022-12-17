@@ -6,7 +6,6 @@ namespace MineSharp.Bot
 {
     public partial class MinecraftBot
     {
-
         public Recipe[]? GetRecipes(ItemType itemType) => this.CraftingModule!.GetRecipes(itemType);
         public IEnumerable<Recipe> FindRecipes(ItemType itemType) => this.CraftingModule!.FindRecipes(itemType);
         

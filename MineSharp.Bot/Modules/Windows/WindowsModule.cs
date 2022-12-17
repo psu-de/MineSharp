@@ -61,7 +61,7 @@ namespace MineSharp.Bot.Modules.Windows
         public WindowsModule(MinecraftBot bot) : base(bot)
         {
             this.inventoryLoadedTsc = new TaskCompletionSource();
-            this.MainInventory = new Window(0, 0, "MainInventory", 4 * 9, null, this.SynchronizeWindowClick);
+            this.MainInventory = new Window(0, "MainInventory", 4 * 9, null, this.SynchronizeWindowClick);
             this.MainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
         }
 
@@ -131,7 +131,7 @@ namespace MineSharp.Bot.Modules.Windows
 
         public async Task SelectHotbarIndex(byte hotbarIndex)
         {
-            if (hotbarIndex < 0 || hotbarIndex > 8) throw new ArgumentOutOfRangeException(nameof(hotbarIndex) + " must be between 0 and 8");
+            if (hotbarIndex > 8) throw new ArgumentOutOfRangeException(nameof(hotbarIndex) + " must be between 0 and 8");
 
             var packet = new Data.Protocol.Play.Serverbound.PacketHeldItemSlot(hotbarIndex);
             await this.Bot.Client.SendPacket(packet);
@@ -151,7 +151,6 @@ namespace MineSharp.Bot.Modules.Windows
 
             var window = new Window(
                 (byte)id, 
-                -1, 
                 windowInfo.Title, 
                 windowInfo.UniqueSlots, 
                 windowInfo.ExcludeInventory ? null : this.MainInventory, 
