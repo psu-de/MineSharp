@@ -40,6 +40,13 @@ namespace MineSharp.Core.Types
 
         public Slot ToSlot(short slotNumber) => new Slot(this, slotNumber);
 
+        public Item Clone()
+        {
+            return new Item(
+                this.Count, this.Damage, (NbtCompound?)this.Metadata?.Clone(), this.Id, this.DisplayName, this.Name, this.StackSize,
+                this.MaxDurability, this.EnchantCategories, this.RepairWith);
+        }
+        
         private int GetMaterialMultiplier()
         {
             var name = this.Name;

@@ -61,6 +61,11 @@ namespace MineSharp.Windows
             
             this.Synchronizer = windowSynchronizer;
             this._syncLock = new object();
+
+            for (short i = 0; i < uniqueSlotCount; i++)
+            {
+                this.Slots[i] = new Slot(null, i);
+            }
         }
 
         #region Get / Set slots
@@ -198,7 +203,9 @@ namespace MineSharp.Windows
                 return this.OffhandSlot;
             } else if (index >= this.Slots.Length)
             {
-                return this.Inventory!.GetSlot((short)(index - this.Slots.Length));
+                var slot = this.Inventory!.GetSlot((short)(index - this.Slots.Length));
+                slot.SlotNumber = index;
+                return slot;
             } else
             {
                 return this.Slots[index].Clone();
@@ -408,59 +415,59 @@ namespace MineSharp.Windows
                 throw new InvalidOperationException($"cannot pickup {count} items from slot {pickupSlot}");
             }
             
-            if (!selectedSlot.CanStack(pickupSlot, count))
+            if (!selectedSlot.IsEmpty())
             {
                 throw new Exception("Cannot pickup items from slot, because GetSelectedSlot() cannot stack this item");
             }
 
-            if (!selectedSlot.IsEmpty())
-            {
-                Logger.Warning($"PickupItems() called although selected slot is not empty!");
-                beforeSelectedCount = selectedSlot.Item!.Count;
-
-                if (count == pickupSlot.Item!.Count)
-                {
-                    // Put down all item in the selected slot, and pickup all items together
-                    this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-                    this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-                    return;
-                }
-
-                // put down selected items, until pickupSlot.Item.Count + selectedSlot.Item.Count = count
-                var toPutDown = pickupSlot.Item!.Count + selectedSlot.Item!.Count - count;
-
-                if (toPutDown <= selectedSlot.Item!.Count)
-                {
-                    if (this.IsContainerSlotIndex(slot))
-                    {
-                        this.StackSelectedSlotInContainer(toPutDown);
-                    } else
-                    {
-                        this.StackSelectedSlotInInventory(toPutDown);
-                    }
-                    
-                    // now slot items + selected slot items are equal to selected slot items + count,
-                    // and we can pick up all items at once
-                    this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-                    this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-                } else
-                {
-                    //put down all selected items, can continue with the normal method
-                    if (this.IsContainerSlotIndex(slot))
-                    {
-                        this.StackSelectedSlotInContainer(selectedSlot.Item!.Count);
-                    } else
-                    {
-                        this.StackSelectedSlotInInventory(selectedSlot.Item!.Count);
-                    }
-                    selectedSlot = this.GetSelectedSlot();
-
-                    if (!selectedSlot.IsEmpty())
-                    {
-                        throw new Exception("Expected selected slot to be empty");
-                    }
-                }
-            }
+            /* if (!selectedSlot.IsEmpty())
+            // {
+            //     Logger.Warning($"PickupItems() called although selected slot is not empty!");
+            //     beforeSelectedCount = selectedSlot.Item!.Count;
+            //
+            //     if (count == pickupSlot.Item!.Count)
+            //     {
+            //         // Put down all item in the selected slot, and pickup all items together
+            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
+            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
+            //         return;
+            //     }
+            //
+            //     // put down selected items, until pickupSlot.Item.Count + selectedSlot.Item.Count = count
+            //     var toPutDown = pickupSlot.Item!.Count + selectedSlot.Item!.Count - count;
+            //
+            //     if (toPutDown <= selectedSlot.Item!.Count)
+            //     {
+            //         if (this.IsContainerSlotIndex(slot))
+            //         {
+            //             this.StackSelectedSlotInContainer(toPutDown);
+            //         } else
+            //         {
+            //             this.StackSelectedSlotInInventory(toPutDown);
+            //         }
+            //         
+            //         // now slot items + selected slot items are equal to selected slot items + count,
+            //         // and we can pick up all items at once
+            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
+            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
+            //     } else
+            //     {
+            //         //put down all selected items, can continue with the normal method
+            //         if (this.IsContainerSlotIndex(slot))
+            //         {
+            //             this.StackSelectedSlotInContainer(selectedSlot.Item!.Count);
+            //         } else
+            //         {
+            //             this.StackSelectedSlotInInventory(selectedSlot.Item!.Count);
+            //         }
+            //         selectedSlot = this.GetSelectedSlot();
+            //
+            //         if (!selectedSlot.IsEmpty())
+            //         {
+            //             throw new Exception("Expected selected slot to be empty");
+            //         }
+            //     }
+             }*/
 
             if (pickupSlot.Item!.Count >= 2 * count)
             {
@@ -540,7 +547,7 @@ namespace MineSharp.Windows
         /// <exception cref="ArgumentException"></exception>
         public void DoSimpleClick(WindowMouseButton button, short clickedSlot)
         {
-            ThrowIfSlotOufOfRange(clickedSlot);
+            //ThrowIfSlotOufOfRange(clickedSlot);
             if (button != WindowMouseButton.MouseLeft && button != WindowMouseButton.MouseRight)
             {
                 throw new ArgumentException($"{nameof(SimpleWindowClick)} does not support mouse button {Enum.GetName(button)}");

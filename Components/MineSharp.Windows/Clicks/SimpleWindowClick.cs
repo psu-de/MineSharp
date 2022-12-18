@@ -36,14 +36,35 @@ namespace MineSharp.Windows.Clicks
         private void PerformLeftClick()
         {
             // Swap selected slot and clicked slot
-            var temp = this.Window.GetSelectedSlot().Clone();
+            var selectedSlot = this.Window.GetSelectedSlot().Clone();
             var clickedSlot = this.Window.GetSlot(this.Slot);
 
+            if (selectedSlot.IsEmpty() && clickedSlot.IsEmpty())
+            {
+                return;
+            }
+
+            if (selectedSlot.Item?.Id == clickedSlot.Item?.Id)
+            {
+                // stack items, both items cannot be null
+                int left = selectedSlot.Item!.Count - clickedSlot.LeftToStack;
+                if (left < 0)
+                {
+                    left = 0;
+                }
+                clickedSlot.Item!.Count += (byte)(selectedSlot.Item!.Count - left);
+                selectedSlot.Item!.Count = (byte)left;
+                this.Window.SetSlot(clickedSlot);
+                this.Window.SetSlot(selectedSlot);
+                return;
+            }
+            
+            //swap items
             clickedSlot.SlotNumber = -1;
             this.Window.SetSlot(clickedSlot); // set selected slot
 
-            temp.SlotNumber = this.Slot;
-            this.Window.SetSlot(temp);
+            selectedSlot.SlotNumber = this.Slot;
+            this.Window.SetSlot(selectedSlot);
         }
 
         private void PerformRightClick()
@@ -57,22 +78,34 @@ namespace MineSharp.Windows.Clicks
             { // Pickup half stack
                 var oldSlot = this.Window.GetSlot(this.Slot);
                 var count = (byte)Math.Ceiling(oldSlot.Item!.Count / 2.0F);
-                var newSelected = new Slot(oldSlot.Item, -1); // Clone Item?
-                this.Window.SetSlot(newSelected);
-                
+                var selectedSlot = this.Window.GetSelectedSlot();
+                selectedSlot.Item = oldSlot.Item.Clone();
+                selectedSlot.Item.Count = count;
+
                 oldSlot.Item.Count -= count;
+                
                 this.Window.SetSlot(oldSlot);
                 return;
             }
 
             if (this.Window.GetSlot(this.Slot).IsEmpty() || this.Window.GetSlot(this.Slot).CanStack(this.Window.GetSelectedSlot()))
             { // Transfer one item from selectedSlot to slots[Slot]
-                var oldSlot = this.Window.GetSelectedSlot().Clone();
-                this.Window.SetSlot(new Slot(oldSlot.Item, this.Slot)); // Clone Item?
-                oldSlot.Item!.Count--;
-                if (oldSlot.Item!.Count == 0) oldSlot.Item = null;
-                oldSlot.SlotNumber = -1;
-                this.Window.SetSlot(oldSlot);
+                var selectedSlot = this.Window.GetSelectedSlot();
+                selectedSlot.Item!.Count -= 1;
+
+                var clickedSlot = this.Window.GetSlot(this.Slot);
+
+                if (clickedSlot.IsEmpty())
+                {
+                    clickedSlot.Item = selectedSlot.Item!.Clone();
+                    clickedSlot.Item!.Count = 1;
+                } else
+                {
+                    clickedSlot.Item!.Count += 1;
+                }
+                    
+                this.Window.SetSelectedSlot(selectedSlot);
+                this.Window.SetSlot(clickedSlot); // Clone Item?
             } else
             {
                 // just swap selected slot and clicked swap, like a left click
