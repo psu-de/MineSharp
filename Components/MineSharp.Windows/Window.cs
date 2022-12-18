@@ -349,7 +349,7 @@ namespace MineSharp.Windows
 
                     if ((this.GetSelectedSlot().Item?.Count ?? 0) != expectedEndCount)
                     {
-                        throw new Exception();
+                        throw new Exception($"Expected selected slot to be {expectedEndCount}, but it was {this.GetSelectedSlot().Item?.Count.ToString() ?? "null"}");
                     }
                     return;
                 } else
@@ -419,55 +419,6 @@ namespace MineSharp.Windows
             {
                 throw new Exception("Cannot pickup items from slot, because GetSelectedSlot() cannot stack this item");
             }
-
-            /* if (!selectedSlot.IsEmpty())
-            // {
-            //     Logger.Warning($"PickupItems() called although selected slot is not empty!");
-            //     beforeSelectedCount = selectedSlot.Item!.Count;
-            //
-            //     if (count == pickupSlot.Item!.Count)
-            //     {
-            //         // Put down all item in the selected slot, and pickup all items together
-            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-            //         return;
-            //     }
-            //
-            //     // put down selected items, until pickupSlot.Item.Count + selectedSlot.Item.Count = count
-            //     var toPutDown = pickupSlot.Item!.Count + selectedSlot.Item!.Count - count;
-            //
-            //     if (toPutDown <= selectedSlot.Item!.Count)
-            //     {
-            //         if (this.IsContainerSlotIndex(slot))
-            //         {
-            //             this.StackSelectedSlotInContainer(toPutDown);
-            //         } else
-            //         {
-            //             this.StackSelectedSlotInInventory(toPutDown);
-            //         }
-            //         
-            //         // now slot items + selected slot items are equal to selected slot items + count,
-            //         // and we can pick up all items at once
-            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-            //         this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
-            //     } else
-            //     {
-            //         //put down all selected items, can continue with the normal method
-            //         if (this.IsContainerSlotIndex(slot))
-            //         {
-            //             this.StackSelectedSlotInContainer(selectedSlot.Item!.Count);
-            //         } else
-            //         {
-            //             this.StackSelectedSlotInInventory(selectedSlot.Item!.Count);
-            //         }
-            //         selectedSlot = this.GetSelectedSlot();
-            //
-            //         if (!selectedSlot.IsEmpty())
-            //         {
-            //             throw new Exception("Expected selected slot to be empty");
-            //         }
-            //     }
-             }*/
 
             if (pickupSlot.Item!.Count >= 2 * count)
             {

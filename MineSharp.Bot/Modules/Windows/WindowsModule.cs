@@ -124,9 +124,11 @@ namespace MineSharp.Bot.Modules.Windows
             {
                 this.CurrentlyOpenedWindow = null;
             }
+
+            this.OpenedWindows.Remove(id);
             
             // TODO: window.Close();
-            return this.Bot.Client.SendPacket(new PacketCloseWindow((byte)id));
+            return this.Bot.Client.SendPacket(new MineSharp.Data.Protocol.Play.Serverbound.PacketCloseWindow((byte)id));
         }
 
         public async Task SelectHotbarIndex(byte hotbarIndex)

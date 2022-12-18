@@ -101,6 +101,9 @@ namespace MineSharp.Bot.Modules.Crafting
                 craftingWindow = this.Bot.Inventory!;
             }
             
+            this.Logger.Debug(craftingWindow!.ToString());
+            this.Logger.Debug(string.Join(", ", recipe.Ingredients.Select(x => x.HasValue ? x.ToString() : "null").ToArray()));
+            
             // Crafting result slot is always 1
             // crafting slots are indexed from 1 (top left) to 4 or 9 (bottom right)
 
@@ -112,15 +115,16 @@ namespace MineSharp.Bot.Modules.Crafting
                     continue;
                 }
 
-                var ingredientCount = ingredient!.Value * count;
+                var ingredientCount = count;
                 var slotIndex = (short)(i + 1);
 
                 foreach (var slot in craftingWindow.FindInventoryItems((ItemType)ingredient))
                 {
                     int toTake = Math.Min(ingredientCount, slot.Item!.Count);
-                    ingredientCount -= slot.Item!.Count;
+                    ingredientCount -= toTake;
                     craftingWindow.MoveItemsFromSlot(slot.SlotNumber, slotIndex, toTake);
-
+                    await Task.Delay(10);
+                    
                     if (ingredientCount <= 0)
                     {
                         break;
@@ -128,6 +132,8 @@ namespace MineSharp.Bot.Modules.Crafting
                 }
             }
 
+            // It can take a couple of milliseconds until the server has set the
+            // crafting result slot 
             var resultSlot = craftingWindow.GetSlot(0);
             for (int i = 0; i < 10; i++)
             {
@@ -150,8 +156,8 @@ namespace MineSharp.Bot.Modules.Crafting
             }
             
             craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
-            this.Logger.Debug(craftingWindow.GetSelectedSlot().ToString());
             craftingWindow.StackSelectedSlotInInventory(craftingWindow.GetSelectedSlot().Item!.Count);
+            await this.Bot.CloseWindow(craftingWindow);
         }
     }
 }
