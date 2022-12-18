@@ -141,7 +141,7 @@ namespace MineSharp.Data.Generator.Protocol
                     codeGenerator.WriteLine(@$"case {type.Value.CSharpType} p_0x{i.ToString("X2")}: new {this.Namespace}.Packet(""{type.Key}"", p_0x{i.ToString("X2")}!).Write(buffer); break;");
                     i++;
                 }
-                codeGenerator.WriteLine(@$"default: throw new Exception(""{this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])} cannot write packet of type {{typeof(packet).FullName}}"");");
+                codeGenerator.WriteLine(@$"default: throw new Exception($""{this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])} cannot write packet of type {{packet.GetType().FullName}}"");");
                 codeGenerator.Finish();
                 codeGenerator.Finish();
                 codeGenerator.Finish();
