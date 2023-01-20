@@ -58,8 +58,8 @@ namespace MineSharp.Data.Protocol {
     }
 
     public interface IPacketFactory {
-        public IPacket ReadPacket(PacketBuffer buffer);
-        public void WritePacket(PacketBuffer buffer, IPacketPayload packet);
+        public static abstract IPacket ReadPacket(PacketBuffer buffer);
+        public static abstract void WritePacket(PacketBuffer buffer, IPacketPayload packet);
     }
 
     public class VarInt {
@@ -1040,31 +1040,7 @@ namespace MineSharp.Data.Protocol {
 		}
 	}
 }
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
-}
 namespace MineSharp.Data.Protocol.Play {
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
 }
 namespace MineSharp.Data.Protocol.Play.Serverbound {
 	public class PacketTeleportConfirm : IPacketPayload {
@@ -2407,76 +2383,71 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class PlayPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Play.Serverbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketTeleportConfirm p_0x00: new MineSharp.Data.Protocol.Play.Serverbound.Packet("teleport_confirm", p_0x00!).Write(buffer); break;
-				case PacketQueryBlockNbt p_0x01: new MineSharp.Data.Protocol.Play.Serverbound.Packet("query_block_nbt", p_0x01!).Write(buffer); break;
-				case PacketSetDifficulty p_0x02: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_difficulty", p_0x02!).Write(buffer); break;
-				case PacketEditBook p_0x03: new MineSharp.Data.Protocol.Play.Serverbound.Packet("edit_book", p_0x03!).Write(buffer); break;
-				case PacketQueryEntityNbt p_0x04: new MineSharp.Data.Protocol.Play.Serverbound.Packet("query_entity_nbt", p_0x04!).Write(buffer); break;
-				case PacketPickItem p_0x05: new MineSharp.Data.Protocol.Play.Serverbound.Packet("pick_item", p_0x05!).Write(buffer); break;
-				case PacketNameItem p_0x06: new MineSharp.Data.Protocol.Play.Serverbound.Packet("name_item", p_0x06!).Write(buffer); break;
-				case PacketSelectTrade p_0x07: new MineSharp.Data.Protocol.Play.Serverbound.Packet("select_trade", p_0x07!).Write(buffer); break;
-				case PacketSetBeaconEffect p_0x08: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_beacon_effect", p_0x08!).Write(buffer); break;
-				case PacketUpdateCommandBlock p_0x09: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_command_block", p_0x09!).Write(buffer); break;
-				case PacketUpdateCommandBlockMinecart p_0x0A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_command_block_minecart", p_0x0A!).Write(buffer); break;
-				case PacketUpdateStructureBlock p_0x0B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_structure_block", p_0x0B!).Write(buffer); break;
-				case PacketTabComplete p_0x0C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("tab_complete", p_0x0C!).Write(buffer); break;
-				case PacketChat p_0x0D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("chat", p_0x0D!).Write(buffer); break;
-				case PacketClientCommand p_0x0E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("client_command", p_0x0E!).Write(buffer); break;
-				case PacketSettings p_0x0F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("settings", p_0x0F!).Write(buffer); break;
-				case PacketEnchantItem p_0x10: new MineSharp.Data.Protocol.Play.Serverbound.Packet("enchant_item", p_0x10!).Write(buffer); break;
-				case PacketWindowClick p_0x11: new MineSharp.Data.Protocol.Play.Serverbound.Packet("window_click", p_0x11!).Write(buffer); break;
-				case PacketCloseWindow p_0x12: new MineSharp.Data.Protocol.Play.Serverbound.Packet("close_window", p_0x12!).Write(buffer); break;
-				case PacketCustomPayload p_0x13: new MineSharp.Data.Protocol.Play.Serverbound.Packet("custom_payload", p_0x13!).Write(buffer); break;
-				case PacketUseEntity p_0x14: new MineSharp.Data.Protocol.Play.Serverbound.Packet("use_entity", p_0x14!).Write(buffer); break;
-				case PacketGenerateStructure p_0x15: new MineSharp.Data.Protocol.Play.Serverbound.Packet("generate_structure", p_0x15!).Write(buffer); break;
-				case PacketKeepAlive p_0x16: new MineSharp.Data.Protocol.Play.Serverbound.Packet("keep_alive", p_0x16!).Write(buffer); break;
-				case PacketLockDifficulty p_0x17: new MineSharp.Data.Protocol.Play.Serverbound.Packet("lock_difficulty", p_0x17!).Write(buffer); break;
-				case PacketPosition p_0x18: new MineSharp.Data.Protocol.Play.Serverbound.Packet("position", p_0x18!).Write(buffer); break;
-				case PacketPositionLook p_0x19: new MineSharp.Data.Protocol.Play.Serverbound.Packet("position_look", p_0x19!).Write(buffer); break;
-				case PacketLook p_0x1A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("look", p_0x1A!).Write(buffer); break;
-				case PacketFlying p_0x1B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("flying", p_0x1B!).Write(buffer); break;
-				case PacketVehicleMove p_0x1C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("vehicle_move", p_0x1C!).Write(buffer); break;
-				case PacketSteerBoat p_0x1D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("steer_boat", p_0x1D!).Write(buffer); break;
-				case PacketCraftRecipeRequest p_0x1E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("craft_recipe_request", p_0x1E!).Write(buffer); break;
-				case PacketAbilities p_0x1F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("abilities", p_0x1F!).Write(buffer); break;
-				case PacketBlockDig p_0x20: new MineSharp.Data.Protocol.Play.Serverbound.Packet("block_dig", p_0x20!).Write(buffer); break;
-				case PacketEntityAction p_0x21: new MineSharp.Data.Protocol.Play.Serverbound.Packet("entity_action", p_0x21!).Write(buffer); break;
-				case PacketSteerVehicle p_0x22: new MineSharp.Data.Protocol.Play.Serverbound.Packet("steer_vehicle", p_0x22!).Write(buffer); break;
-				case PacketDisplayedRecipe p_0x23: new MineSharp.Data.Protocol.Play.Serverbound.Packet("displayed_recipe", p_0x23!).Write(buffer); break;
-				case PacketRecipeBook p_0x24: new MineSharp.Data.Protocol.Play.Serverbound.Packet("recipe_book", p_0x24!).Write(buffer); break;
-				case PacketResourcePackReceive p_0x25: new MineSharp.Data.Protocol.Play.Serverbound.Packet("resource_pack_receive", p_0x25!).Write(buffer); break;
-				case PacketHeldItemSlot p_0x26: new MineSharp.Data.Protocol.Play.Serverbound.Packet("held_item_slot", p_0x26!).Write(buffer); break;
-				case PacketSetCreativeSlot p_0x27: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_creative_slot", p_0x27!).Write(buffer); break;
-				case PacketUpdateJigsawBlock p_0x28: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_jigsaw_block", p_0x28!).Write(buffer); break;
-				case PacketUpdateSign p_0x29: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_sign", p_0x29!).Write(buffer); break;
-				case PacketArmAnimation p_0x2A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("arm_animation", p_0x2A!).Write(buffer); break;
-				case PacketSpectate p_0x2B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("spectate", p_0x2B!).Write(buffer); break;
-				case PacketBlockPlace p_0x2C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("block_place", p_0x2C!).Write(buffer); break;
-				case PacketUseItem p_0x2D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("use_item", p_0x2D!).Write(buffer); break;
-				case PacketAdvancementTab p_0x2E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("advancement_tab", p_0x2E!).Write(buffer); break;
-				case PacketPong p_0x2F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("pong", p_0x2F!).Write(buffer); break;
-				default: throw new Exception($"Play cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class PlayPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Play.Serverbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketTeleportConfirm p_0x00: new MineSharp.Data.Protocol.Play.Serverbound.Packet("teleport_confirm", p_0x00!).Write(buffer); break;
+	                case PacketQueryBlockNbt p_0x01: new MineSharp.Data.Protocol.Play.Serverbound.Packet("query_block_nbt", p_0x01!).Write(buffer); break;
+	                case PacketSetDifficulty p_0x02: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_difficulty", p_0x02!).Write(buffer); break;
+	                case PacketEditBook p_0x03: new MineSharp.Data.Protocol.Play.Serverbound.Packet("edit_book", p_0x03!).Write(buffer); break;
+	                case PacketQueryEntityNbt p_0x04: new MineSharp.Data.Protocol.Play.Serverbound.Packet("query_entity_nbt", p_0x04!).Write(buffer); break;
+	                case PacketPickItem p_0x05: new MineSharp.Data.Protocol.Play.Serverbound.Packet("pick_item", p_0x05!).Write(buffer); break;
+	                case PacketNameItem p_0x06: new MineSharp.Data.Protocol.Play.Serverbound.Packet("name_item", p_0x06!).Write(buffer); break;
+	                case PacketSelectTrade p_0x07: new MineSharp.Data.Protocol.Play.Serverbound.Packet("select_trade", p_0x07!).Write(buffer); break;
+	                case PacketSetBeaconEffect p_0x08: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_beacon_effect", p_0x08!).Write(buffer); break;
+	                case PacketUpdateCommandBlock p_0x09: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_command_block", p_0x09!).Write(buffer); break;
+	                case PacketUpdateCommandBlockMinecart p_0x0A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_command_block_minecart", p_0x0A!).Write(buffer); break;
+	                case PacketUpdateStructureBlock p_0x0B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_structure_block", p_0x0B!).Write(buffer); break;
+	                case PacketTabComplete p_0x0C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("tab_complete", p_0x0C!).Write(buffer); break;
+	                case PacketChat p_0x0D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("chat", p_0x0D!).Write(buffer); break;
+	                case PacketClientCommand p_0x0E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("client_command", p_0x0E!).Write(buffer); break;
+	                case PacketSettings p_0x0F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("settings", p_0x0F!).Write(buffer); break;
+	                case PacketEnchantItem p_0x10: new MineSharp.Data.Protocol.Play.Serverbound.Packet("enchant_item", p_0x10!).Write(buffer); break;
+	                case PacketWindowClick p_0x11: new MineSharp.Data.Protocol.Play.Serverbound.Packet("window_click", p_0x11!).Write(buffer); break;
+	                case PacketCloseWindow p_0x12: new MineSharp.Data.Protocol.Play.Serverbound.Packet("close_window", p_0x12!).Write(buffer); break;
+	                case PacketCustomPayload p_0x13: new MineSharp.Data.Protocol.Play.Serverbound.Packet("custom_payload", p_0x13!).Write(buffer); break;
+	                case PacketUseEntity p_0x14: new MineSharp.Data.Protocol.Play.Serverbound.Packet("use_entity", p_0x14!).Write(buffer); break;
+	                case PacketGenerateStructure p_0x15: new MineSharp.Data.Protocol.Play.Serverbound.Packet("generate_structure", p_0x15!).Write(buffer); break;
+	                case PacketKeepAlive p_0x16: new MineSharp.Data.Protocol.Play.Serverbound.Packet("keep_alive", p_0x16!).Write(buffer); break;
+	                case PacketLockDifficulty p_0x17: new MineSharp.Data.Protocol.Play.Serverbound.Packet("lock_difficulty", p_0x17!).Write(buffer); break;
+	                case PacketPosition p_0x18: new MineSharp.Data.Protocol.Play.Serverbound.Packet("position", p_0x18!).Write(buffer); break;
+	                case PacketPositionLook p_0x19: new MineSharp.Data.Protocol.Play.Serverbound.Packet("position_look", p_0x19!).Write(buffer); break;
+	                case PacketLook p_0x1A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("look", p_0x1A!).Write(buffer); break;
+	                case PacketFlying p_0x1B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("flying", p_0x1B!).Write(buffer); break;
+	                case PacketVehicleMove p_0x1C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("vehicle_move", p_0x1C!).Write(buffer); break;
+	                case PacketSteerBoat p_0x1D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("steer_boat", p_0x1D!).Write(buffer); break;
+	                case PacketCraftRecipeRequest p_0x1E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("craft_recipe_request", p_0x1E!).Write(buffer); break;
+	                case PacketAbilities p_0x1F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("abilities", p_0x1F!).Write(buffer); break;
+	                case PacketBlockDig p_0x20: new MineSharp.Data.Protocol.Play.Serverbound.Packet("block_dig", p_0x20!).Write(buffer); break;
+	                case PacketEntityAction p_0x21: new MineSharp.Data.Protocol.Play.Serverbound.Packet("entity_action", p_0x21!).Write(buffer); break;
+	                case PacketSteerVehicle p_0x22: new MineSharp.Data.Protocol.Play.Serverbound.Packet("steer_vehicle", p_0x22!).Write(buffer); break;
+	                case PacketDisplayedRecipe p_0x23: new MineSharp.Data.Protocol.Play.Serverbound.Packet("displayed_recipe", p_0x23!).Write(buffer); break;
+	                case PacketRecipeBook p_0x24: new MineSharp.Data.Protocol.Play.Serverbound.Packet("recipe_book", p_0x24!).Write(buffer); break;
+	                case PacketResourcePackReceive p_0x25: new MineSharp.Data.Protocol.Play.Serverbound.Packet("resource_pack_receive", p_0x25!).Write(buffer); break;
+	                case PacketHeldItemSlot p_0x26: new MineSharp.Data.Protocol.Play.Serverbound.Packet("held_item_slot", p_0x26!).Write(buffer); break;
+	                case PacketSetCreativeSlot p_0x27: new MineSharp.Data.Protocol.Play.Serverbound.Packet("set_creative_slot", p_0x27!).Write(buffer); break;
+	                case PacketUpdateJigsawBlock p_0x28: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_jigsaw_block", p_0x28!).Write(buffer); break;
+	                case PacketUpdateSign p_0x29: new MineSharp.Data.Protocol.Play.Serverbound.Packet("update_sign", p_0x29!).Write(buffer); break;
+	                case PacketArmAnimation p_0x2A: new MineSharp.Data.Protocol.Play.Serverbound.Packet("arm_animation", p_0x2A!).Write(buffer); break;
+	                case PacketSpectate p_0x2B: new MineSharp.Data.Protocol.Play.Serverbound.Packet("spectate", p_0x2B!).Write(buffer); break;
+	                case PacketBlockPlace p_0x2C: new MineSharp.Data.Protocol.Play.Serverbound.Packet("block_place", p_0x2C!).Write(buffer); break;
+	                case PacketUseItem p_0x2D: new MineSharp.Data.Protocol.Play.Serverbound.Packet("use_item", p_0x2D!).Write(buffer); break;
+	                case PacketAdvancementTab p_0x2E: new MineSharp.Data.Protocol.Play.Serverbound.Packet("advancement_tab", p_0x2E!).Write(buffer); break;
+	                case PacketPong p_0x2F: new MineSharp.Data.Protocol.Play.Serverbound.Packet("pong", p_0x2F!).Write(buffer); break;
+	            default: throw new Exception($"Play cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Play.Clientbound {
 	public class PacketSpawnEntity : IPacketPayload {
@@ -7418,146 +7389,129 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class PlayPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Play.Clientbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketSpawnEntity p_0x00: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity", p_0x00!).Write(buffer); break;
-				case PacketSpawnEntityExperienceOrb p_0x01: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_experience_orb", p_0x01!).Write(buffer); break;
-				case PacketSpawnEntityLiving p_0x02: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_living", p_0x02!).Write(buffer); break;
-				case PacketSpawnEntityPainting p_0x03: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_painting", p_0x03!).Write(buffer); break;
-				case PacketNamedEntitySpawn p_0x04: new MineSharp.Data.Protocol.Play.Clientbound.Packet("named_entity_spawn", p_0x04!).Write(buffer); break;
-				case PacketAnimation p_0x05: new MineSharp.Data.Protocol.Play.Clientbound.Packet("animation", p_0x05!).Write(buffer); break;
-				case PacketStatistics p_0x06: new MineSharp.Data.Protocol.Play.Clientbound.Packet("statistics", p_0x06!).Write(buffer); break;
-				case PacketAdvancements p_0x07: new MineSharp.Data.Protocol.Play.Clientbound.Packet("advancements", p_0x07!).Write(buffer); break;
-				case PacketBlockBreakAnimation p_0x08: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_break_animation", p_0x08!).Write(buffer); break;
-				case PacketTileEntityData p_0x09: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tile_entity_data", p_0x09!).Write(buffer); break;
-				case PacketBlockAction p_0x0A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_action", p_0x0A!).Write(buffer); break;
-				case PacketBlockChange p_0x0B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_change", p_0x0B!).Write(buffer); break;
-				case PacketBossBar p_0x0C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("boss_bar", p_0x0C!).Write(buffer); break;
-				case PacketDifficulty p_0x0D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("difficulty", p_0x0D!).Write(buffer); break;
-				case PacketTabComplete p_0x0E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tab_complete", p_0x0E!).Write(buffer); break;
-				case PacketDeclareCommands p_0x0F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("declare_commands", p_0x0F!).Write(buffer); break;
-				case PacketFacePlayer p_0x10: new MineSharp.Data.Protocol.Play.Clientbound.Packet("face_player", p_0x10!).Write(buffer); break;
-				case PacketNbtQueryResponse p_0x11: new MineSharp.Data.Protocol.Play.Clientbound.Packet("nbt_query_response", p_0x11!).Write(buffer); break;
-				case PacketChat p_0x12: new MineSharp.Data.Protocol.Play.Clientbound.Packet("chat", p_0x12!).Write(buffer); break;
-				case PacketMultiBlockChange p_0x13: new MineSharp.Data.Protocol.Play.Clientbound.Packet("multi_block_change", p_0x13!).Write(buffer); break;
-				case PacketCloseWindow p_0x14: new MineSharp.Data.Protocol.Play.Clientbound.Packet("close_window", p_0x14!).Write(buffer); break;
-				case PacketOpenWindow p_0x15: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_window", p_0x15!).Write(buffer); break;
-				case PacketWindowItems p_0x16: new MineSharp.Data.Protocol.Play.Clientbound.Packet("window_items", p_0x16!).Write(buffer); break;
-				case PacketCraftProgressBar p_0x17: new MineSharp.Data.Protocol.Play.Clientbound.Packet("craft_progress_bar", p_0x17!).Write(buffer); break;
-				case PacketSetSlot p_0x18: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_slot", p_0x18!).Write(buffer); break;
-				case PacketSetCooldown p_0x19: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_cooldown", p_0x19!).Write(buffer); break;
-				case PacketCustomPayload p_0x1A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("custom_payload", p_0x1A!).Write(buffer); break;
-				case PacketNamedSoundEffect p_0x1B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("named_sound_effect", p_0x1B!).Write(buffer); break;
-				case PacketKickDisconnect p_0x1C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("kick_disconnect", p_0x1C!).Write(buffer); break;
-				case PacketEntityStatus p_0x1D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_status", p_0x1D!).Write(buffer); break;
-				case PacketExplosion p_0x1E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("explosion", p_0x1E!).Write(buffer); break;
-				case PacketUnloadChunk p_0x1F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("unload_chunk", p_0x1F!).Write(buffer); break;
-				case PacketGameStateChange p_0x20: new MineSharp.Data.Protocol.Play.Clientbound.Packet("game_state_change", p_0x20!).Write(buffer); break;
-				case PacketOpenHorseWindow p_0x21: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_horse_window", p_0x21!).Write(buffer); break;
-				case PacketKeepAlive p_0x22: new MineSharp.Data.Protocol.Play.Clientbound.Packet("keep_alive", p_0x22!).Write(buffer); break;
-				case PacketMapChunk p_0x23: new MineSharp.Data.Protocol.Play.Clientbound.Packet("map_chunk", p_0x23!).Write(buffer); break;
-				case PacketWorldEvent p_0x24: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_event", p_0x24!).Write(buffer); break;
-				case PacketWorldParticles p_0x25: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_particles", p_0x25!).Write(buffer); break;
-				case PacketUpdateLight p_0x26: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_light", p_0x26!).Write(buffer); break;
-				case PacketLogin p_0x27: new MineSharp.Data.Protocol.Play.Clientbound.Packet("login", p_0x27!).Write(buffer); break;
-				case PacketMap p_0x28: new MineSharp.Data.Protocol.Play.Clientbound.Packet("map", p_0x28!).Write(buffer); break;
-				case PacketTradeList p_0x29: new MineSharp.Data.Protocol.Play.Clientbound.Packet("trade_list", p_0x29!).Write(buffer); break;
-				case PacketRelEntityMove p_0x2A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("rel_entity_move", p_0x2A!).Write(buffer); break;
-				case PacketEntityMoveLook p_0x2B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_move_look", p_0x2B!).Write(buffer); break;
-				case PacketEntityLook p_0x2C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_look", p_0x2C!).Write(buffer); break;
-				case PacketVehicleMove p_0x2D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("vehicle_move", p_0x2D!).Write(buffer); break;
-				case PacketOpenBook p_0x2E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_book", p_0x2E!).Write(buffer); break;
-				case PacketOpenSignEntity p_0x2F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_sign_entity", p_0x2F!).Write(buffer); break;
-				case PacketCraftRecipeResponse p_0x30: new MineSharp.Data.Protocol.Play.Clientbound.Packet("craft_recipe_response", p_0x30!).Write(buffer); break;
-				case PacketAbilities p_0x31: new MineSharp.Data.Protocol.Play.Clientbound.Packet("abilities", p_0x31!).Write(buffer); break;
-				case PacketEndCombatEvent p_0x32: new MineSharp.Data.Protocol.Play.Clientbound.Packet("end_combat_event", p_0x32!).Write(buffer); break;
-				case PacketEnterCombatEvent p_0x33: new MineSharp.Data.Protocol.Play.Clientbound.Packet("enter_combat_event", p_0x33!).Write(buffer); break;
-				case PacketDeathCombatEvent p_0x34: new MineSharp.Data.Protocol.Play.Clientbound.Packet("death_combat_event", p_0x34!).Write(buffer); break;
-				case PacketPlayerInfo p_0x35: new MineSharp.Data.Protocol.Play.Clientbound.Packet("player_info", p_0x35!).Write(buffer); break;
-				case PacketPosition p_0x36: new MineSharp.Data.Protocol.Play.Clientbound.Packet("position", p_0x36!).Write(buffer); break;
-				case PacketUnlockRecipes p_0x37: new MineSharp.Data.Protocol.Play.Clientbound.Packet("unlock_recipes", p_0x37!).Write(buffer); break;
-				case PacketEntityDestroy p_0x38: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_destroy", p_0x38!).Write(buffer); break;
-				case PacketRemoveEntityEffect p_0x39: new MineSharp.Data.Protocol.Play.Clientbound.Packet("remove_entity_effect", p_0x39!).Write(buffer); break;
-				case PacketResourcePackSend p_0x3A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("resource_pack_send", p_0x3A!).Write(buffer); break;
-				case PacketRespawn p_0x3B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("respawn", p_0x3B!).Write(buffer); break;
-				case PacketEntityUpdateAttributes p_0x3C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_update_attributes", p_0x3C!).Write(buffer); break;
-				case PacketCamera p_0x3D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("camera", p_0x3D!).Write(buffer); break;
-				case PacketHeldItemSlot p_0x3E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("held_item_slot", p_0x3E!).Write(buffer); break;
-				case PacketUpdateViewPosition p_0x3F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_view_position", p_0x3F!).Write(buffer); break;
-				case PacketUpdateViewDistance p_0x40: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_view_distance", p_0x40!).Write(buffer); break;
-				case PacketScoreboardDisplayObjective p_0x41: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_display_objective", p_0x41!).Write(buffer); break;
-				case PacketEntityMetadata p_0x42: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_metadata", p_0x42!).Write(buffer); break;
-				case PacketAttachEntity p_0x43: new MineSharp.Data.Protocol.Play.Clientbound.Packet("attach_entity", p_0x43!).Write(buffer); break;
-				case PacketEntityVelocity p_0x44: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_velocity", p_0x44!).Write(buffer); break;
-				case PacketEntityEquipment p_0x45: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_equipment", p_0x45!).Write(buffer); break;
-				case PacketExperience p_0x46: new MineSharp.Data.Protocol.Play.Clientbound.Packet("experience", p_0x46!).Write(buffer); break;
-				case PacketUpdateHealth p_0x47: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_health", p_0x47!).Write(buffer); break;
-				case PacketScoreboardObjective p_0x48: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_objective", p_0x48!).Write(buffer); break;
-				case PacketSetPassengers p_0x49: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_passengers", p_0x49!).Write(buffer); break;
-				case PacketTeams p_0x4A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("teams", p_0x4A!).Write(buffer); break;
-				case PacketScoreboardScore p_0x4B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_score", p_0x4B!).Write(buffer); break;
-				case PacketSimulationDistance p_0x4C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("simulation_distance", p_0x4C!).Write(buffer); break;
-				case PacketSpawnPosition p_0x4D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_position", p_0x4D!).Write(buffer); break;
-				case PacketUpdateTime p_0x4E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_time", p_0x4E!).Write(buffer); break;
-				case PacketEntitySoundEffect p_0x4F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_sound_effect", p_0x4F!).Write(buffer); break;
-				case PacketStopSound p_0x50: new MineSharp.Data.Protocol.Play.Clientbound.Packet("stop_sound", p_0x50!).Write(buffer); break;
-				case PacketSoundEffect p_0x51: new MineSharp.Data.Protocol.Play.Clientbound.Packet("sound_effect", p_0x51!).Write(buffer); break;
-				case PacketPlayerlistHeader p_0x52: new MineSharp.Data.Protocol.Play.Clientbound.Packet("playerlist_header", p_0x52!).Write(buffer); break;
-				case PacketCollect p_0x53: new MineSharp.Data.Protocol.Play.Clientbound.Packet("collect", p_0x53!).Write(buffer); break;
-				case PacketEntityTeleport p_0x54: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_teleport", p_0x54!).Write(buffer); break;
-				case PacketEntityHeadRotation p_0x55: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_head_rotation", p_0x55!).Write(buffer); break;
-				case PacketEntityEffect p_0x56: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_effect", p_0x56!).Write(buffer); break;
-				case PacketSelectAdvancementTab p_0x57: new MineSharp.Data.Protocol.Play.Clientbound.Packet("select_advancement_tab", p_0x57!).Write(buffer); break;
-				case PacketDeclareRecipes p_0x58: new MineSharp.Data.Protocol.Play.Clientbound.Packet("declare_recipes", p_0x58!).Write(buffer); break;
-				case PacketTags p_0x59: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tags", p_0x59!).Write(buffer); break;
-				case PacketAcknowledgePlayerDigging p_0x5A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("acknowledge_player_digging", p_0x5A!).Write(buffer); break;
-				case PacketSculkVibrationSignal p_0x5B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("sculk_vibration_signal", p_0x5B!).Write(buffer); break;
-				case PacketClearTitles p_0x5C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("clear_titles", p_0x5C!).Write(buffer); break;
-				case PacketInitializeWorldBorder p_0x5D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("initialize_world_border", p_0x5D!).Write(buffer); break;
-				case PacketActionBar p_0x5E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("action_bar", p_0x5E!).Write(buffer); break;
-				case PacketWorldBorderCenter p_0x5F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_center", p_0x5F!).Write(buffer); break;
-				case PacketWorldBorderLerpSize p_0x60: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_lerp_size", p_0x60!).Write(buffer); break;
-				case PacketWorldBorderSize p_0x61: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_size", p_0x61!).Write(buffer); break;
-				case PacketWorldBorderWarningDelay p_0x62: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_warning_delay", p_0x62!).Write(buffer); break;
-				case PacketWorldBorderWarningReach p_0x63: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_warning_reach", p_0x63!).Write(buffer); break;
-				case PacketPing p_0x64: new MineSharp.Data.Protocol.Play.Clientbound.Packet("ping", p_0x64!).Write(buffer); break;
-				case PacketSetTitleSubtitle p_0x65: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_subtitle", p_0x65!).Write(buffer); break;
-				case PacketSetTitleText p_0x66: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_text", p_0x66!).Write(buffer); break;
-				case PacketSetTitleTime p_0x67: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_time", p_0x67!).Write(buffer); break;
-				default: throw new Exception($"Play cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class PlayPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Play.Clientbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketSpawnEntity p_0x00: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity", p_0x00!).Write(buffer); break;
+	                case PacketSpawnEntityExperienceOrb p_0x01: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_experience_orb", p_0x01!).Write(buffer); break;
+	                case PacketSpawnEntityLiving p_0x02: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_living", p_0x02!).Write(buffer); break;
+	                case PacketSpawnEntityPainting p_0x03: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_entity_painting", p_0x03!).Write(buffer); break;
+	                case PacketNamedEntitySpawn p_0x04: new MineSharp.Data.Protocol.Play.Clientbound.Packet("named_entity_spawn", p_0x04!).Write(buffer); break;
+	                case PacketAnimation p_0x05: new MineSharp.Data.Protocol.Play.Clientbound.Packet("animation", p_0x05!).Write(buffer); break;
+	                case PacketStatistics p_0x06: new MineSharp.Data.Protocol.Play.Clientbound.Packet("statistics", p_0x06!).Write(buffer); break;
+	                case PacketAdvancements p_0x07: new MineSharp.Data.Protocol.Play.Clientbound.Packet("advancements", p_0x07!).Write(buffer); break;
+	                case PacketBlockBreakAnimation p_0x08: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_break_animation", p_0x08!).Write(buffer); break;
+	                case PacketTileEntityData p_0x09: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tile_entity_data", p_0x09!).Write(buffer); break;
+	                case PacketBlockAction p_0x0A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_action", p_0x0A!).Write(buffer); break;
+	                case PacketBlockChange p_0x0B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("block_change", p_0x0B!).Write(buffer); break;
+	                case PacketBossBar p_0x0C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("boss_bar", p_0x0C!).Write(buffer); break;
+	                case PacketDifficulty p_0x0D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("difficulty", p_0x0D!).Write(buffer); break;
+	                case PacketTabComplete p_0x0E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tab_complete", p_0x0E!).Write(buffer); break;
+	                case PacketDeclareCommands p_0x0F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("declare_commands", p_0x0F!).Write(buffer); break;
+	                case PacketFacePlayer p_0x10: new MineSharp.Data.Protocol.Play.Clientbound.Packet("face_player", p_0x10!).Write(buffer); break;
+	                case PacketNbtQueryResponse p_0x11: new MineSharp.Data.Protocol.Play.Clientbound.Packet("nbt_query_response", p_0x11!).Write(buffer); break;
+	                case PacketChat p_0x12: new MineSharp.Data.Protocol.Play.Clientbound.Packet("chat", p_0x12!).Write(buffer); break;
+	                case PacketMultiBlockChange p_0x13: new MineSharp.Data.Protocol.Play.Clientbound.Packet("multi_block_change", p_0x13!).Write(buffer); break;
+	                case PacketCloseWindow p_0x14: new MineSharp.Data.Protocol.Play.Clientbound.Packet("close_window", p_0x14!).Write(buffer); break;
+	                case PacketOpenWindow p_0x15: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_window", p_0x15!).Write(buffer); break;
+	                case PacketWindowItems p_0x16: new MineSharp.Data.Protocol.Play.Clientbound.Packet("window_items", p_0x16!).Write(buffer); break;
+	                case PacketCraftProgressBar p_0x17: new MineSharp.Data.Protocol.Play.Clientbound.Packet("craft_progress_bar", p_0x17!).Write(buffer); break;
+	                case PacketSetSlot p_0x18: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_slot", p_0x18!).Write(buffer); break;
+	                case PacketSetCooldown p_0x19: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_cooldown", p_0x19!).Write(buffer); break;
+	                case PacketCustomPayload p_0x1A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("custom_payload", p_0x1A!).Write(buffer); break;
+	                case PacketNamedSoundEffect p_0x1B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("named_sound_effect", p_0x1B!).Write(buffer); break;
+	                case PacketKickDisconnect p_0x1C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("kick_disconnect", p_0x1C!).Write(buffer); break;
+	                case PacketEntityStatus p_0x1D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_status", p_0x1D!).Write(buffer); break;
+	                case PacketExplosion p_0x1E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("explosion", p_0x1E!).Write(buffer); break;
+	                case PacketUnloadChunk p_0x1F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("unload_chunk", p_0x1F!).Write(buffer); break;
+	                case PacketGameStateChange p_0x20: new MineSharp.Data.Protocol.Play.Clientbound.Packet("game_state_change", p_0x20!).Write(buffer); break;
+	                case PacketOpenHorseWindow p_0x21: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_horse_window", p_0x21!).Write(buffer); break;
+	                case PacketKeepAlive p_0x22: new MineSharp.Data.Protocol.Play.Clientbound.Packet("keep_alive", p_0x22!).Write(buffer); break;
+	                case PacketMapChunk p_0x23: new MineSharp.Data.Protocol.Play.Clientbound.Packet("map_chunk", p_0x23!).Write(buffer); break;
+	                case PacketWorldEvent p_0x24: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_event", p_0x24!).Write(buffer); break;
+	                case PacketWorldParticles p_0x25: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_particles", p_0x25!).Write(buffer); break;
+	                case PacketUpdateLight p_0x26: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_light", p_0x26!).Write(buffer); break;
+	                case PacketLogin p_0x27: new MineSharp.Data.Protocol.Play.Clientbound.Packet("login", p_0x27!).Write(buffer); break;
+	                case PacketMap p_0x28: new MineSharp.Data.Protocol.Play.Clientbound.Packet("map", p_0x28!).Write(buffer); break;
+	                case PacketTradeList p_0x29: new MineSharp.Data.Protocol.Play.Clientbound.Packet("trade_list", p_0x29!).Write(buffer); break;
+	                case PacketRelEntityMove p_0x2A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("rel_entity_move", p_0x2A!).Write(buffer); break;
+	                case PacketEntityMoveLook p_0x2B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_move_look", p_0x2B!).Write(buffer); break;
+	                case PacketEntityLook p_0x2C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_look", p_0x2C!).Write(buffer); break;
+	                case PacketVehicleMove p_0x2D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("vehicle_move", p_0x2D!).Write(buffer); break;
+	                case PacketOpenBook p_0x2E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_book", p_0x2E!).Write(buffer); break;
+	                case PacketOpenSignEntity p_0x2F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("open_sign_entity", p_0x2F!).Write(buffer); break;
+	                case PacketCraftRecipeResponse p_0x30: new MineSharp.Data.Protocol.Play.Clientbound.Packet("craft_recipe_response", p_0x30!).Write(buffer); break;
+	                case PacketAbilities p_0x31: new MineSharp.Data.Protocol.Play.Clientbound.Packet("abilities", p_0x31!).Write(buffer); break;
+	                case PacketEndCombatEvent p_0x32: new MineSharp.Data.Protocol.Play.Clientbound.Packet("end_combat_event", p_0x32!).Write(buffer); break;
+	                case PacketEnterCombatEvent p_0x33: new MineSharp.Data.Protocol.Play.Clientbound.Packet("enter_combat_event", p_0x33!).Write(buffer); break;
+	                case PacketDeathCombatEvent p_0x34: new MineSharp.Data.Protocol.Play.Clientbound.Packet("death_combat_event", p_0x34!).Write(buffer); break;
+	                case PacketPlayerInfo p_0x35: new MineSharp.Data.Protocol.Play.Clientbound.Packet("player_info", p_0x35!).Write(buffer); break;
+	                case PacketPosition p_0x36: new MineSharp.Data.Protocol.Play.Clientbound.Packet("position", p_0x36!).Write(buffer); break;
+	                case PacketUnlockRecipes p_0x37: new MineSharp.Data.Protocol.Play.Clientbound.Packet("unlock_recipes", p_0x37!).Write(buffer); break;
+	                case PacketEntityDestroy p_0x38: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_destroy", p_0x38!).Write(buffer); break;
+	                case PacketRemoveEntityEffect p_0x39: new MineSharp.Data.Protocol.Play.Clientbound.Packet("remove_entity_effect", p_0x39!).Write(buffer); break;
+	                case PacketResourcePackSend p_0x3A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("resource_pack_send", p_0x3A!).Write(buffer); break;
+	                case PacketRespawn p_0x3B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("respawn", p_0x3B!).Write(buffer); break;
+	                case PacketEntityUpdateAttributes p_0x3C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_update_attributes", p_0x3C!).Write(buffer); break;
+	                case PacketCamera p_0x3D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("camera", p_0x3D!).Write(buffer); break;
+	                case PacketHeldItemSlot p_0x3E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("held_item_slot", p_0x3E!).Write(buffer); break;
+	                case PacketUpdateViewPosition p_0x3F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_view_position", p_0x3F!).Write(buffer); break;
+	                case PacketUpdateViewDistance p_0x40: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_view_distance", p_0x40!).Write(buffer); break;
+	                case PacketScoreboardDisplayObjective p_0x41: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_display_objective", p_0x41!).Write(buffer); break;
+	                case PacketEntityMetadata p_0x42: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_metadata", p_0x42!).Write(buffer); break;
+	                case PacketAttachEntity p_0x43: new MineSharp.Data.Protocol.Play.Clientbound.Packet("attach_entity", p_0x43!).Write(buffer); break;
+	                case PacketEntityVelocity p_0x44: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_velocity", p_0x44!).Write(buffer); break;
+	                case PacketEntityEquipment p_0x45: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_equipment", p_0x45!).Write(buffer); break;
+	                case PacketExperience p_0x46: new MineSharp.Data.Protocol.Play.Clientbound.Packet("experience", p_0x46!).Write(buffer); break;
+	                case PacketUpdateHealth p_0x47: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_health", p_0x47!).Write(buffer); break;
+	                case PacketScoreboardObjective p_0x48: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_objective", p_0x48!).Write(buffer); break;
+	                case PacketSetPassengers p_0x49: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_passengers", p_0x49!).Write(buffer); break;
+	                case PacketTeams p_0x4A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("teams", p_0x4A!).Write(buffer); break;
+	                case PacketScoreboardScore p_0x4B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("scoreboard_score", p_0x4B!).Write(buffer); break;
+	                case PacketSimulationDistance p_0x4C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("simulation_distance", p_0x4C!).Write(buffer); break;
+	                case PacketSpawnPosition p_0x4D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("spawn_position", p_0x4D!).Write(buffer); break;
+	                case PacketUpdateTime p_0x4E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("update_time", p_0x4E!).Write(buffer); break;
+	                case PacketEntitySoundEffect p_0x4F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_sound_effect", p_0x4F!).Write(buffer); break;
+	                case PacketStopSound p_0x50: new MineSharp.Data.Protocol.Play.Clientbound.Packet("stop_sound", p_0x50!).Write(buffer); break;
+	                case PacketSoundEffect p_0x51: new MineSharp.Data.Protocol.Play.Clientbound.Packet("sound_effect", p_0x51!).Write(buffer); break;
+	                case PacketPlayerlistHeader p_0x52: new MineSharp.Data.Protocol.Play.Clientbound.Packet("playerlist_header", p_0x52!).Write(buffer); break;
+	                case PacketCollect p_0x53: new MineSharp.Data.Protocol.Play.Clientbound.Packet("collect", p_0x53!).Write(buffer); break;
+	                case PacketEntityTeleport p_0x54: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_teleport", p_0x54!).Write(buffer); break;
+	                case PacketEntityHeadRotation p_0x55: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_head_rotation", p_0x55!).Write(buffer); break;
+	                case PacketEntityEffect p_0x56: new MineSharp.Data.Protocol.Play.Clientbound.Packet("entity_effect", p_0x56!).Write(buffer); break;
+	                case PacketSelectAdvancementTab p_0x57: new MineSharp.Data.Protocol.Play.Clientbound.Packet("select_advancement_tab", p_0x57!).Write(buffer); break;
+	                case PacketDeclareRecipes p_0x58: new MineSharp.Data.Protocol.Play.Clientbound.Packet("declare_recipes", p_0x58!).Write(buffer); break;
+	                case PacketTags p_0x59: new MineSharp.Data.Protocol.Play.Clientbound.Packet("tags", p_0x59!).Write(buffer); break;
+	                case PacketAcknowledgePlayerDigging p_0x5A: new MineSharp.Data.Protocol.Play.Clientbound.Packet("acknowledge_player_digging", p_0x5A!).Write(buffer); break;
+	                case PacketSculkVibrationSignal p_0x5B: new MineSharp.Data.Protocol.Play.Clientbound.Packet("sculk_vibration_signal", p_0x5B!).Write(buffer); break;
+	                case PacketClearTitles p_0x5C: new MineSharp.Data.Protocol.Play.Clientbound.Packet("clear_titles", p_0x5C!).Write(buffer); break;
+	                case PacketInitializeWorldBorder p_0x5D: new MineSharp.Data.Protocol.Play.Clientbound.Packet("initialize_world_border", p_0x5D!).Write(buffer); break;
+	                case PacketActionBar p_0x5E: new MineSharp.Data.Protocol.Play.Clientbound.Packet("action_bar", p_0x5E!).Write(buffer); break;
+	                case PacketWorldBorderCenter p_0x5F: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_center", p_0x5F!).Write(buffer); break;
+	                case PacketWorldBorderLerpSize p_0x60: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_lerp_size", p_0x60!).Write(buffer); break;
+	                case PacketWorldBorderSize p_0x61: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_size", p_0x61!).Write(buffer); break;
+	                case PacketWorldBorderWarningDelay p_0x62: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_warning_delay", p_0x62!).Write(buffer); break;
+	                case PacketWorldBorderWarningReach p_0x63: new MineSharp.Data.Protocol.Play.Clientbound.Packet("world_border_warning_reach", p_0x63!).Write(buffer); break;
+	                case PacketPing p_0x64: new MineSharp.Data.Protocol.Play.Clientbound.Packet("ping", p_0x64!).Write(buffer); break;
+	                case PacketSetTitleSubtitle p_0x65: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_subtitle", p_0x65!).Write(buffer); break;
+	                case PacketSetTitleText p_0x66: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_text", p_0x66!).Write(buffer); break;
+	                case PacketSetTitleTime p_0x67: new MineSharp.Data.Protocol.Play.Clientbound.Packet("set_title_time", p_0x67!).Write(buffer); break;
+	            default: throw new Exception($"Play cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Login {
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
 }
 namespace MineSharp.Data.Protocol.Login.Serverbound {
 	public class PacketLoginStart : IPacketPayload {
@@ -7653,31 +7607,26 @@ namespace MineSharp.Data.Protocol.Login.Serverbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class LoginPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Login.Serverbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketLoginStart p_0x00: new MineSharp.Data.Protocol.Login.Serverbound.Packet("login_start", p_0x00!).Write(buffer); break;
-				case PacketEncryptionBegin p_0x01: new MineSharp.Data.Protocol.Login.Serverbound.Packet("encryption_begin", p_0x01!).Write(buffer); break;
-				case PacketLoginPluginResponse p_0x02: new MineSharp.Data.Protocol.Login.Serverbound.Packet("login_plugin_response", p_0x02!).Write(buffer); break;
-				default: throw new Exception($"Login cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class LoginPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Login.Serverbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketLoginStart p_0x00: new MineSharp.Data.Protocol.Login.Serverbound.Packet("login_start", p_0x00!).Write(buffer); break;
+	                case PacketEncryptionBegin p_0x01: new MineSharp.Data.Protocol.Login.Serverbound.Packet("encryption_begin", p_0x01!).Write(buffer); break;
+	                case PacketLoginPluginResponse p_0x02: new MineSharp.Data.Protocol.Login.Serverbound.Packet("login_plugin_response", p_0x02!).Write(buffer); break;
+	            default: throw new Exception($"Login cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Login.Clientbound {
 	public class PacketDisconnect : IPacketPayload {
@@ -7819,47 +7768,30 @@ namespace MineSharp.Data.Protocol.Login.Clientbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class LoginPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Login.Clientbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketDisconnect p_0x00: new MineSharp.Data.Protocol.Login.Clientbound.Packet("disconnect", p_0x00!).Write(buffer); break;
-				case PacketEncryptionBegin p_0x01: new MineSharp.Data.Protocol.Login.Clientbound.Packet("encryption_begin", p_0x01!).Write(buffer); break;
-				case PacketSuccess p_0x02: new MineSharp.Data.Protocol.Login.Clientbound.Packet("success", p_0x02!).Write(buffer); break;
-				case PacketCompress p_0x03: new MineSharp.Data.Protocol.Login.Clientbound.Packet("compress", p_0x03!).Write(buffer); break;
-				case PacketLoginPluginRequest p_0x04: new MineSharp.Data.Protocol.Login.Clientbound.Packet("login_plugin_request", p_0x04!).Write(buffer); break;
-				default: throw new Exception($"Login cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class LoginPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Login.Clientbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketDisconnect p_0x00: new MineSharp.Data.Protocol.Login.Clientbound.Packet("disconnect", p_0x00!).Write(buffer); break;
+	                case PacketEncryptionBegin p_0x01: new MineSharp.Data.Protocol.Login.Clientbound.Packet("encryption_begin", p_0x01!).Write(buffer); break;
+	                case PacketSuccess p_0x02: new MineSharp.Data.Protocol.Login.Clientbound.Packet("success", p_0x02!).Write(buffer); break;
+	                case PacketCompress p_0x03: new MineSharp.Data.Protocol.Login.Clientbound.Packet("compress", p_0x03!).Write(buffer); break;
+	                case PacketLoginPluginRequest p_0x04: new MineSharp.Data.Protocol.Login.Clientbound.Packet("login_plugin_request", p_0x04!).Write(buffer); break;
+	            default: throw new Exception($"Login cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Status {
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
 }
 namespace MineSharp.Data.Protocol.Status.Serverbound {
 	public class PacketPingStart : IPacketPayload {
@@ -7926,30 +7858,25 @@ namespace MineSharp.Data.Protocol.Status.Serverbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class StatusPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Status.Serverbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketPingStart p_0x00: new MineSharp.Data.Protocol.Status.Serverbound.Packet("ping_start", p_0x00!).Write(buffer); break;
-				case PacketPing p_0x01: new MineSharp.Data.Protocol.Status.Serverbound.Packet("ping", p_0x01!).Write(buffer); break;
-				default: throw new Exception($"Status cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class StatusPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Status.Serverbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketPingStart p_0x00: new MineSharp.Data.Protocol.Status.Serverbound.Packet("ping_start", p_0x00!).Write(buffer); break;
+	                case PacketPing p_0x01: new MineSharp.Data.Protocol.Status.Serverbound.Packet("ping", p_0x01!).Write(buffer); break;
+	            default: throw new Exception($"Status cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Status.Clientbound {
 	public class PacketServerInfo : IPacketPayload {
@@ -8020,44 +7947,27 @@ namespace MineSharp.Data.Protocol.Status.Clientbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class StatusPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Status.Clientbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketServerInfo p_0x00: new MineSharp.Data.Protocol.Status.Clientbound.Packet("server_info", p_0x00!).Write(buffer); break;
-				case PacketPing p_0x01: new MineSharp.Data.Protocol.Status.Clientbound.Packet("ping", p_0x01!).Write(buffer); break;
-				default: throw new Exception($"Status cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class StatusPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Status.Clientbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketServerInfo p_0x00: new MineSharp.Data.Protocol.Status.Clientbound.Packet("server_info", p_0x00!).Write(buffer); break;
+	                case PacketPing p_0x01: new MineSharp.Data.Protocol.Status.Clientbound.Packet("ping", p_0x01!).Write(buffer); break;
+	            default: throw new Exception($"Status cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Handshaking {
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
 }
 namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 	public class PacketSetProtocol : IPacketPayload {
@@ -8140,30 +8050,25 @@ namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class HandshakingPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Handshaking.Serverbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				case PacketSetProtocol p_0x00: new MineSharp.Data.Protocol.Handshaking.Serverbound.Packet("set_protocol", p_0x00!).Write(buffer); break;
-				case PacketLegacyServerListPing p_0x01: new MineSharp.Data.Protocol.Handshaking.Serverbound.Packet("legacy_server_list_ping", p_0x01!).Write(buffer); break;
-				default: throw new Exception($"Handshaking cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class HandshakingPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Handshaking.Serverbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	                            case PacketSetProtocol p_0x00: new MineSharp.Data.Protocol.Handshaking.Serverbound.Packet("set_protocol", p_0x00!).Write(buffer); break;
+	                case PacketLegacyServerListPing p_0x01: new MineSharp.Data.Protocol.Handshaking.Serverbound.Packet("legacy_server_list_ping", p_0x01!).Write(buffer); break;
+	            default: throw new Exception($"Handshaking cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
-}
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
-		#region Reading
-
-
-		#endregion
-		#region Writing
-
-
-		#endregion
-	}
+	
 }
 namespace MineSharp.Data.Protocol.Handshaking.Clientbound {
 	public class Packet : IPacket {
@@ -8200,14 +8105,22 @@ namespace MineSharp.Data.Protocol.Handshaking.Clientbound {
 			return new Packet(@name, @params);
 		}
 	}
-	public class HandshakingPacketFactory : IPacketFactory {
-		public IPacket ReadPacket(PacketBuffer buffer) {
-			return MineSharp.Data.Protocol.Handshaking.Clientbound.Packet.Read(buffer);
-		}
-		public void WritePacket(PacketBuffer buffer, IPacketPayload packet) {
-			switch (packet) {
-				default: throw new Exception($"Handshaking cannot write packet of type {packet.GetType().FullName}");
-			}
-		}
+	
+	public class HandshakingPacketFactory : IPacketFactory 
+	{
+	    public static IPacket ReadPacket(PacketBuffer buffer) 
+	    {
+	        return MineSharp.Data.Protocol.Handshaking.Clientbound.Packet.Read(buffer);
+	    }
+	
+	    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+	    {
+	        switch (packet)
+	        {
+	            
+	            default: throw new Exception($"Handshaking cannot write packet of type {packet.GetType().FullName}");
+	        }
+	    }
 	}
+	
 }

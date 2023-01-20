@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Handlers
 
         private static readonly Logger Logger = Logger.GetLogger();
 
-        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client)
+        public Task HandleIncoming(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
                 PacketDisconnect disconnect => this.HandleDisconnectPacket(disconnect, client),

@@ -5,7 +5,7 @@ namespace MineSharp.Protocol.Handlers
 {
     public class PlayPacketHandler : IPacketHandler
     {
-        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client)
+        public Task HandleIncoming(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
                 PacketKeepAlive keepAlive => this.HandleKeepAlive(keepAlive, client),

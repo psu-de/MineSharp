@@ -154,8 +154,6 @@ namespace MineSharp.Data.Generator.Protocol
 
             while (stack.TryPop(out var ns))
             {
-
-
                 var namespaces = new List<string>();
                 var paths = (ns.Token.Path + (ns.Token.Path == "" ? "types" : ".types")).Split('.');
                 for (var i = 0; i < paths.Length; i++)
@@ -267,8 +265,8 @@ namespace MineSharp.Data.Generator.Protocol
     }}
 
     public interface IPacketFactory {{
-        public IPacket ReadPacket(PacketBuffer buffer);
-        public void WritePacket(PacketBuffer buffer, IPacketPayload packet);
+        public static abstract IPacket ReadPacket(PacketBuffer buffer);
+        public static abstract void WritePacket(PacketBuffer buffer, IPacketPayload packet);
     }}
 
     public class VarInt {{

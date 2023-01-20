@@ -6,7 +6,7 @@ namespace MineSharp.Protocol.Handlers
 {
     internal class HandshakePacketHandler : IPacketHandler
     {
-        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client)
+        public Task HandleIncoming(IPacketPayload packet, MinecraftClient client)
         {
 
             return packet switch {

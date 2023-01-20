@@ -2,9 +2,9 @@
 
 namespace MineSharp.Protocol.Handlers
 {
-    public interface IPacketHandler
+    internal interface IPacketHandler
     {
-        public Task HandleIncomming(IPacketPayload packet, MinecraftClient client);
+        public Task HandleIncoming(IPacketPayload packet, MinecraftClient client);
         public Task HandleOutgoing(IPacketPayload packet, MinecraftClient client);
     }
 }

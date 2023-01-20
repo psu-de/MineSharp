@@ -39,7 +39,7 @@ namespace MineSharp.Data.Generator
 
         public void WriteBlock(string str)
         {
-            var lines = str.Split("\r\n");
+            var lines = str.Split(Environment.NewLine);
             foreach (var line in lines)
             {
                 this.WriteLine(line);

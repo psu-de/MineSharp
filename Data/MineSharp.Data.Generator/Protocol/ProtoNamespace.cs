@@ -87,31 +87,32 @@ namespace MineSharp.Data.Generator.Protocol
 
         private void WritePacketBuffer(CodeGenerator codeGenerator, string baseNamespace)
         {
-            codeGenerator.Begin($"namespace {baseNamespace}");
-            codeGenerator.Begin("public partial class PacketBuffer");
+            if (this.UsedNativeTypes.Count > 0)
+            {
+                codeGenerator.Begin($"namespace {baseNamespace}");
+                codeGenerator.Begin("public partial class PacketBuffer");
+                
+                codeGenerator.WriteLine("#region Reading");
+                codeGenerator.WriteLine();
+                foreach (var generator in this.UsedNativeTypes.Select(x => x.Value).DistinctBy(x => x.TypeName))
+                    generator.WriteClassReader(codeGenerator);
+                codeGenerator.WriteLine();
+                codeGenerator.WriteLine("#endregion");
 
-            codeGenerator.WriteLine("#region Reading");
-            codeGenerator.WriteLine();
-            foreach (var generator in this.UsedNativeTypes.Select(x => x.Value).DistinctBy(x => x.TypeName))
-                generator.WriteClassReader(codeGenerator);
-            codeGenerator.WriteLine();
-            codeGenerator.WriteLine("#endregion");
+                codeGenerator.WriteLine("#region Writing");
+                codeGenerator.WriteLine();
+                foreach (var generator in this.UsedNativeTypes.Select(x => x.Value).DistinctBy(x => x.TypeName))
+                    generator.WriteClassWriter(codeGenerator);
+                codeGenerator.WriteLine();
+                codeGenerator.WriteLine("#endregion");
 
-            codeGenerator.WriteLine("#region Writing");
-            codeGenerator.WriteLine();
-            foreach (var generator in this.UsedNativeTypes.Select(x => x.Value).DistinctBy(x => x.TypeName))
-                generator.WriteClassWriter(codeGenerator);
-            codeGenerator.WriteLine();
-            codeGenerator.WriteLine("#endregion");
-
-            codeGenerator.Finish();
-            codeGenerator.Finish();
+                codeGenerator.Finish();
+                codeGenerator.Finish();   
+            }
         }
 
         public void WriteCode(CodeGenerator codeGenerator, string baseNamespace)
         {
-
-
             this.WritePacketBuffer(codeGenerator, baseNamespace);
 
             codeGenerator.Begin($"namespace {this.Namespace}");
@@ -124,27 +125,44 @@ namespace MineSharp.Data.Generator.Protocol
             if (this.Types.ContainsKey("packet"))
             {
                 var namespaces = this.Namespace.Split(".");
-                codeGenerator.Begin($"public class {this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])}PacketFactory : IPacketFactory");
-
-                codeGenerator.Begin(@"public IPacket ReadPacket(PacketBuffer buffer)");
-                codeGenerator.WriteLine($"return {this.Namespace}.Packet.Read(buffer);");
-                codeGenerator.Finish();
-
+                
                 var packetType = (ContainerDatatype)this.Types["packet"];
                 var @params = (SwitchDatatype)packetType.FieldMap!["params"].Type;
+                
+                
+                // codeGenerator.Begin($"public class {this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])}PacketFactory : IPacketFactory");
+                //
+                // codeGenerator.Begin(@"public static IPacket ReadPacket(PacketBuffer buffer)");
+                // codeGenerator.WriteLine($"return {this.Namespace}.Packet.Read(buffer);");
+                // codeGenerator.Finish();
 
-                codeGenerator.Begin(@"public void WritePacket(PacketBuffer buffer, IPacketPayload packet)");
-                codeGenerator.Begin("switch (packet)");
-                var i = 0;
-                foreach (var type in @params.SwitchMap!)
-                {
-                    codeGenerator.WriteLine(@$"case {type.Value.CSharpType} p_0x{i.ToString("X2")}: new {this.Namespace}.Packet(""{type.Key}"", p_0x{i.ToString("X2")}!).Write(buffer); break;");
-                    i++;
-                }
-                codeGenerator.WriteLine(@$"default: throw new Exception($""{this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])} cannot write packet of type {{packet.GetType().FullName}}"");");
-                codeGenerator.Finish();
-                codeGenerator.Finish();
-                codeGenerator.Finish();
+                // var packetType = (ContainerDatatype)this.Types["packet"];
+                // var @params = (SwitchDatatype)packetType.FieldMap!["params"].Type;
+                
+                codeGenerator.WriteBlock(
+$@"
+public class {this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])}PacketFactory : IPacketFactory 
+{{
+    public static IPacket ReadPacket(PacketBuffer buffer) 
+    {{
+        return {this.Namespace}.Packet.Read(buffer);
+    }}
+
+    public static void WritePacket(PacketBuffer buffer, IPacketPayload packet) 
+    {{
+        switch (packet)
+        {{
+            { string.Join(
+                    Environment.NewLine,
+                    @params.SwitchMap!
+                    .Select((type, i) 
+                        => @$"                case {type.Value.CSharpType} p_0x{i.ToString("X2")}: new {this.Namespace}.Packet(""{type.Key}"", p_0x{i.ToString("X2")}!).Write(buffer); break;")
+                    ) }
+            default: throw new Exception($""{this.Compiler.GetCSharpName(namespaces[namespaces.Length - 2])} cannot write packet of type {{packet.GetType().FullName}}"");
+        }}
+    }}
+}}
+");
             }
 
             codeGenerator.Finish();
