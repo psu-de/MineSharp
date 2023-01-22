@@ -6,15 +6,22 @@ using MineSharp.Protocol.Crypto;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+using LoginPacketFactory = MineSharp.Data.Protocol.Login.Serverbound.LoginPacketFactory;
 using PacketEncryptionBegin = MineSharp.Data.Protocol.Login.Serverbound.PacketEncryptionBegin;
 
 namespace MineSharp.Protocol.Handlers
 {
     internal class LoginPacketHandler : IPacketHandler
     {
-
         private static readonly Logger Logger = Logger.GetLogger();
-
+        private TaskCompletionSource _enableEncryptionTSC;
+        
+        
+        public LoginPacketHandler()
+        {
+            this._enableEncryptionTSC = new TaskCompletionSource();
+        }
+        
         public Task HandleIncoming(IPacketPayload packet, MinecraftClient client)
         {
             return packet switch {
@@ -40,7 +47,7 @@ namespace MineSharp.Protocol.Handlers
 
         private Task HandleOutgoingEncryptionBeginPacket(PacketEncryptionBegin packet, MinecraftClient client)
         {
-            client.EnableEncryption();
+            this._enableEncryptionTSC.SetResult();
             return Task.CompletedTask;
         }
 
@@ -70,7 +77,7 @@ namespace MineSharp.Protocol.Handlers
             var aes = Aes.Create();
             aes.KeySize = 128;
             aes.GenerateKey();
-            client.SetEncryptionKey(aes.Key);
+            client.SetEncryptionKey(aes.Key, this._enableEncryptionTSC.Task);
 
             var hash = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(packet.ServerId).Concat(aes.Key).Concat(packet.PublicKey!).ToArray());
             Array.Reverse(hash);

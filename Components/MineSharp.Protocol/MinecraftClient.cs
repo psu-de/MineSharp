@@ -22,18 +22,15 @@ namespace MineSharp.Protocol
         private static readonly Logger Logger = Logger.GetLogger();
 
         private readonly TcpClient _client;
-        private readonly CancellationToken CancellationToken;
+        private readonly CancellationToken _cancellationToken;
 
-        private readonly CancellationTokenSource CancellationTokenSource;
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
         private readonly Queue<PacketSendTask> PacketQueue;
         private MinecraftStream? _stream;
         private Task? _streamLoopTask;
 
         private IPacketHandler _packetHandler;
-
-        //TODO: this should probably be somewhere else
-        private byte[]? sharedSecret;
 
         public MinecraftClient(string version, Session session, string host, int port)
         {
@@ -42,8 +39,8 @@ namespace MineSharp.Protocol
             this.GameState = GameState.HANDSHAKING;
             this.IPAddress = this.GetIpAddress(host);
             this.Port = port;
-            this.CancellationTokenSource = new CancellationTokenSource();
-            this.CancellationToken = this.CancellationTokenSource.Token;
+            this._cancellationTokenSource = new CancellationTokenSource();
+            this._cancellationToken = this._cancellationTokenSource.Token;
             this.PacketQueue = new Queue<PacketSendTask>();
 
             this._client = new TcpClient();
@@ -111,11 +108,11 @@ namespace MineSharp.Protocol
             Logger.Debug("Connecting...");
             try
             {
-                await this._client.ConnectAsync(this.IPAddress, this.Port, this.CancellationToken);
+                await this._client.ConnectAsync(this.IPAddress, this.Port, this._cancellationToken);
 
                 // Start Reading / Writing Loops
                 this._stream = new MinecraftStream(this._client.GetStream());
-                this._streamLoopTask = Task.Run(async () => await this.StreamLoop(), this.CancellationToken);
+                this._streamLoopTask = Task.Run(async () => await this.StreamLoop(), this._cancellationToken);
 
                 Logger.Info("Connected, starting handshake");
                 await this.MakeHandshake(nextState);
@@ -135,7 +132,7 @@ namespace MineSharp.Protocol
         public void ForceDisconnect(string reason)
         {
             Logger.Debug("Forcing Disconnect: " + reason);
-            this.CancellationTokenSource.Cancel();
+            this._cancellationTokenSource.Cancel();
             this._streamLoopTask?.Wait();
             this._client.Close();
             this.Disconnected?.Invoke(this, reason);
@@ -156,22 +153,23 @@ namespace MineSharp.Protocol
                 _ => throw new InvalidOperationException($"Next state '{nextState}' is not supported")
             });
         }
-        public void SetEncryptionKey(byte[] key)
+        internal void SetEncryptionKey(byte[] key, Task enableEncryption)
         {
-            this.sharedSecret = key;
+            Task.Run(async () =>
+            {
+                await enableEncryption;
+                this._stream!.EnableEncryption(key);
+            }, this._cancellationToken);
         }
 
-        public void EnableEncryption() => this._stream!.EnableEncryption(this.sharedSecret!);
-
-        public void SetCompressionThreshold(int compressionThreshold) => this._stream!.SetCompressionThreshold(compressionThreshold);
+        internal void SetCompressionThreshold(int compressionThreshold) => this._stream!.SetCompressionThreshold(compressionThreshold);
         
-        public void SetGameState(GameState newState)
+        internal void SetGameState(GameState newState)
         {
             this.GameState = newState;
             this._packetHandler = this.GetPacketHandler(newState);
         }
-
-
+        
         /// <summary>
         ///     Sends a <see cref="Data.Protocol.Handshaking.Serverbound.Packet" /> to the Minecraft Server
         /// </summary>
@@ -201,7 +199,7 @@ namespace MineSharp.Protocol
 
         private async Task StreamLoop()
         {
-            while (!this.CancellationToken.IsCancellationRequested)
+            while (!this._cancellationToken.IsCancellationRequested)
             {
                 try
                 {
@@ -210,18 +208,18 @@ namespace MineSharp.Protocol
                         var packet = PacketFactory.BuildPacket(this._stream!.ReadPacket(), this.GameState);
                         if (packet != null)
                         {
-                            await this._packetHandler.HandleIncoming(packet, this).WaitAsync(this.CancellationToken);
+                            await this._packetHandler.HandleIncoming(packet, this).WaitAsync(this._cancellationToken);
                             
                             // don't await the custom handling of the packet
-                            Task.Run(() => this.HandleIncomingPacket(packet), this.CancellationToken);
+                            Task.Run(() => this.HandleIncomingPacket(packet), this._cancellationToken);
                         }
                         
                         if (this.GameState != GameState.PLAY)
                         {
-                            await Task.Delay(1, this.CancellationToken);
+                            await Task.Delay(1, this._cancellationToken);
                         }
                     }
-                    await Task.Delay(1, this.CancellationToken);
+                    await Task.Delay(1, this._cancellationToken);
 
                     // writing
                     if (this.PacketQueue.Count == 0)
@@ -248,7 +246,7 @@ namespace MineSharp.Protocol
                     this._stream!.WritePacket(packetBuffer);
 
                     packetTask.SendingTsc.TrySetResult();
-                    await this._packetHandler.HandleOutgoing(packetTask.Packet, this).WaitAsync(this.CancellationToken);
+                    await this._packetHandler.HandleOutgoing(packetTask.Packet, this).WaitAsync(this._cancellationToken);
                     // don't await
                     Task.Run(() =>
                     {
