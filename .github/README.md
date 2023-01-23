@@ -38,22 +38,16 @@ Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to prov
 
 # Projects Overview
 
-## [MineSharp.Core](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Core)
+### [MineSharp.Core](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Core)
 
 Contains core functionality like Logging, Basic Minecraft Types and (versioning)
 
 ### [MineSharp.Data](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data)
-
-Dont reference this project directly, use MineSharp.Data.Wrapper
-Contains generated sourcecode from [minecraft-data](https://github.com/PrismarineJS/minecraft-data)
+Contains generated sourcecode from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) as well as some extension methods.
 
 ### [MineSharp.Data.Generator](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data.Generator)
 
 Transforms the json data from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) into C# source code
-
-### [MineSharp.Data.Wrapper](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data.Wrapper)
-
-Provides helper functions and extension methods to help with the generated types and the MineSharp.Core types.
 
 ### [MineSharp.Bot](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Bot)
 
