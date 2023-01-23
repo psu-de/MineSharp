@@ -2,6 +2,7 @@
 using MineSharp.ConsoleClient.Client;
 using MineSharp.ConsoleClient.Console.Commands.Arguments;
 using MineSharp.Core.Types;
+using MineSharp.Data;
 using MineSharp.Data.Blocks;
 using Spectre.Console;
 

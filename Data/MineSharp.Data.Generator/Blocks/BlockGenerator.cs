@@ -78,49 +78,6 @@ namespace MineSharp.Data.Generator.Blocks
             };
             var infoGenerator = new InfoGenerator<BlockJsonInfo>(infoGeneratorTemplate);
             infoGenerator.GenerateInfos(codeGenerator);
-
-            //codeGenerator.Begin("public static class BlockPalette");
-            //codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
-            //foreach (var block in blockData)
-            //    codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
-            //codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
-            //codeGenerator.Finish(semicolon: true);
-
-            //codeGenerator.Begin("public static BlockInfo GetBlockInfoById(int id) => id switch");
-            //foreach (var block in blockData)
-            //    codeGenerator.WriteLine($"{block.Id} => {this.Wrapper.GetCSharpName(block.Name)}Info,");
-            //codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with id {id} not found!\")");
-            //codeGenerator.Finish(semicolon: true);
-
-            //foreach (var block in blockData)
-            //    codeGenerator.WriteLine(new StringBuilder($@"public static readonly BlockInfo {this.Wrapper.GetCSharpName(block.Name)}Info = new BlockInfo(")
-            //                                                                    .Append($"{block.Id}, ")
-            //                                                                    .Append(@$"""{block.Name}"", ")
-            //                                                                    .Append(@$"""{block.DisplayName}"", ")
-            //                                                                    .Append($"{(block.Hardness ?? float.MaxValue).ToString(nfi)}F, ")
-            //                                                                    .Append($"{block.Resistance!.Value.ToString(nfi)}F, ")
-            //                                                                    .Append(block.Diggable.ToString().ToLower() + ", ")
-            //                                                                    .Append(block.Transparent.ToString().ToLower() + ", ")
-            //                                                                    .Append(block.FilterLight + ", ")
-            //                                                                    .Append(block.EmitLight + ", ")
-            //                                                                    .Append($@"""{block.BoundingBox}"", ")
-            //                                                                    .Append(block.StackSize + ", ")
-            //                                                                    .Append($@"""{block.Material}"", ")
-            //                                                                    .Append(block.DefaultState + ", ")
-            //                                                                    .Append(block.MinStateId + ", ")
-            //                                                                    .Append(block.MaxStateId + ", ")
-            //                                                                    .Append(block.HarvestTools == null ? "null, " : $"new int[] {{ {string.Join(", ", block.HarvestTools.Keys)} }}, ")
-            //                                                                    .Append($@"new BlockProperties(new BlockStateProperty[] {{ {string.Join("", block.States!.Select(x => this.GetProperty(x)))} }}), ")
-            //                                                                    .Append($@"new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[block.Name]))} }});")
-            //                                                                    .ToString());
-
-            //codeGenerator.Finish();
-
-            //codeGenerator.Begin("public enum BlockType");
-            //foreach (var block in blockData)
-            //    codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(block.Name)} = {block.Id},");
-            //codeGenerator.Finish();
-            //codeGenerator.Finish();
         }
 
         private string GetProperty(BlockStateJsonInfo info)

@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
         <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
         <ProjectReference Include="..\MineSharp.Protocol\MineSharp.Protocol.csproj" />
     </ItemGroup>

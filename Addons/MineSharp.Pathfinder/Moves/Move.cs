@@ -3,6 +3,7 @@ using MineSharp.Core.Logging;
 using MineSharp.Data.Blocks;
 using MineSharp.Physics;
 using MineSharp.Core.Types;
+using MineSharp.Data;
 
 namespace MineSharp.Pathfinding.Moves
 {

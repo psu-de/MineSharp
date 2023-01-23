@@ -32,8 +32,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{B2ED554B-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data.Generator", "Data\MineSharp.Data.Generator\MineSharp.Data.Generator.csproj", "{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data.Wrapper", "Data\MineSharp.Data.Wrapper\MineSharp.Data.Wrapper.csproj", "{9A77DBB2-843E-4140-AD8D-417623C5D41E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data", "Data\MineSharp.Data\MineSharp.Data.csproj", "{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Addons", "Addons", "{2570B4A5-3645-4A1F-93DF-F94079010964}"
@@ -45,11 +43,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{55
 		Examples\README.md = Examples\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Examples.EchoBot", "Examples\MineSharp.Examples.EchoBot\MineSharp.Examples.EchoBot.csproj", "{BAD24E3F-D4B1-414C-A454-8436C13C94A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Examples.EchoBot", "Examples\MineSharp.Examples.EchoBot\MineSharp.Examples.EchoBot.csproj", "{BAD24E3F-D4B1-414C-A454-8436C13C94A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Examples.Finder", "Examples\MineSharp.Examples.Finder\MineSharp.Examples.Finder.csproj", "{7E71C114-0942-4568-8CA4-AF37E870E317}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Examples.Finder", "Examples\MineSharp.Examples.Finder\MineSharp.Examples.Finder.csproj", "{7E71C114-0942-4568-8CA4-AF37E870E317}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Examples.Pathfinder", "Examples\MineSharp.Examples.Pathfinder\MineSharp.Examples.Pathfinder.csproj", "{3072619A-7A0D-4FF7-8582-95CDCD8887E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Examples.Pathfinder", "Examples\MineSharp.Examples.Pathfinder\MineSharp.Examples.Pathfinder.csproj", "{3072619A-7A0D-4FF7-8582-95CDCD8887E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,10 +91,6 @@ Global
 		{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A77DBB2-843E-4140-AD8D-417623C5D41E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A77DBB2-843E-4140-AD8D-417623C5D41E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A77DBB2-843E-4140-AD8D-417623C5D41E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A77DBB2-843E-4140-AD8D-417623C5D41E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -129,7 +123,6 @@ Global
 		{3ABD42E2-9AD0-44E7-A20C-47B55462586A} = {4A9970C9-AE02-4C9E-B25B-9145327982C1}
 		{9E259831-5376-4A6E-8F78-BB4FC348C5EB} = {08FBDED7-F952-4266-BB96-93C475D53102}
 		{4BB5C24B-705E-47FD-86F6-32F71A6C2BD9} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
-		{9A77DBB2-843E-4140-AD8D-417623C5D41E} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
 		{0C8D9B20-59E9-4DF9-A144-EBB475B0AA0D} = {B2ED554B-4F6E-4B92-9CE6-2D5847B29FAE}
 		{4B25348C-394C-47F7-BEBF-A416EC876AA9} = {2570B4A5-3645-4A1F-93DF-F94079010964}
 		{BAD24E3F-D4B1-414C-A454-8436C13C94A7} = {55452583-3B05-4348-9F32-5EF862A8670E}

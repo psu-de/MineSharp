@@ -2,7 +2,7 @@
 using MineSharp.Core.Types;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
-using MineSharp.Data.Entities;
+using MineSharp.Data;
 using Attribute = MineSharp.Core.Types.Attribute;
 
 /*

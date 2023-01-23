@@ -2,6 +2,7 @@
 using MineSharp.Bot.Enums;
 using MineSharp.Core.Logging;
 using MineSharp.Core.Types;
+using MineSharp.Data;
 using MineSharp.Data.Blocks;
 
 namespace MineSharp.Pathfinding.Moves
