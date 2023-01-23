@@ -1,17 +1,31 @@
-﻿namespace MineSharp.Core.Types
-{
-    public class Entity
-    {
+﻿using System.Xml.Linq;
 
-        public Entity(int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects,
-            int id, string name, string displayName, float width, float height, int category)
-        {
+namespace MineSharp.Core.Types
+{
+    public class EntityInfo
+    {
+        public EntityInfo(int id, string name, string displayName, float width, float height, int category) {
             this.Id = id;
             this.Name = name;
             this.DisplayName = displayName;
             this.Width = width;
             this.Height = height;
             this.Category = category;
+        }
+
+        public int Id { get; }
+        public string Name { get; }
+        public string DisplayName { get; }
+        public float Width { get; }
+        public float Height { get; }
+        public int Category { get; }
+    }
+
+    public class Entity
+    {
+        public Entity(EntityInfo info, int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects)
+        {
+            this.Info = info;
             this.ServerId = serverId;
             this.Position = position;
             this.Pitch = pitch;
@@ -22,12 +36,7 @@
             this.Attributes = new Dictionary<string, Attribute>();
         }
 
-        public int Id { get; }
-        public string Name { get; }
-        public string DisplayName { get; }
-        public float Width { get; }
-        public float Height { get; }
-        public int Category { get; }
+        public EntityInfo Info { get; }
 
 
         public int ServerId { get; set; }
@@ -61,6 +70,6 @@
                 len * Math.Cos(this.YawRadians));
         }
 
-        public override string ToString() => $"Entity (Name={this.Name} Id={this.Id} Position={this.Position})";
+        public override string ToString() => $"Entity (Name={this.Info.Name} Id={this.Info.Id} Position={this.Position})";
     }
 }

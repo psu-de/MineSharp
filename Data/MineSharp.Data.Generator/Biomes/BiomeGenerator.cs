@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text;
 
 namespace MineSharp.Data.Generator.Biomes
 {
@@ -25,50 +26,86 @@ namespace MineSharp.Data.Generator.Biomes
 
             codeGenerator.CommentBlock($"Generated Biome Data for Minecraft Version {this.Version}");
 
+            var categoryEnum = new EnumGenerator<BiomeJsonInfo>()
+            {
+                GetName = (b) => this.Wrapper.GetCSharpName(b.Category),
+                Name = "BiomeCategory",
+            };
+
             foreach (var ns in this.GetUsings())
                 codeGenerator.WriteLine($"using {ns};");
 
-            codeGenerator.Begin("namespace MineSharp.Data.Biomes");
+                var infoGeneratorTemplate = new InfoGeneratorTemplate<BiomeJsonInfo>() {
+                Name = "Biome",
+                Namespace = "MineSharp.Data.Biomes",
+                Stringifiers = new Dictionary<string, Func<object, string>>() {
+                    { "Id", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Name", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Category", (x) => $"(int)BiomeCategoryType.{this.Wrapper.GetCSharpName(x as string)}" },
+                    { "Temperature", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Precipitation", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Depth", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Dimension", (x) => $"MineSharp.Core.Types.Enums.Dimension.{this.Wrapper.Uppercase(x as string)}" },
+                    { "DisplayName", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Color", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Rainfall", (x) => InfoGenerator<int>.StringifyDefaults(x) },
+                },
+                Data = biomeData,
+                NameGenerator = (d) => this.Wrapper.GetCSharpName(d.Name),
+                Indexer = (x) => x.Id,
+                Indexers = new EnumGenerator<BiomeJsonInfo>[]
+                {
+                    categoryEnum
+                }
+            };
+            var infoGenerator = new InfoGenerator<BiomeJsonInfo>(infoGeneratorTemplate);
+            infoGenerator.GenerateInfos(codeGenerator);
 
-            codeGenerator.Begin("public static class BiomePalette");
-            codeGenerator.Begin("public static Type GetBiomeTypeById(int id) => id switch");
-            foreach (var biome in biomeData)
-                codeGenerator.WriteLine($"{biome.Id} => typeof({this.GetName(biome.Name)}),");
-            codeGenerator.WriteLine(@"_ => throw new ArgumentException($""Biome with id {id} not found!"")");
-            codeGenerator.Finish(semicolon: true);
-            codeGenerator.Finish();
+//            foreach (var ns in this.GetUsings())
+//                codeGenerator.WriteLine($"using {ns};");
 
-            codeGenerator.Begin("public enum BiomeCategory");
-            var categories = biomeData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
-            foreach (var biomeCategory in categories)
-                codeGenerator.WriteLine($"{biomeCategory} = {categories.IndexOf(biomeCategory)},");
-            codeGenerator.Finish();
+//            codeGenerator.Begin("namespace MineSharp.Data.Biomes");
 
-            foreach (var biome in biomeData)
-            {
-                codeGenerator.Begin($"public class {this.GetName(biome.Name)} : Biome");
-                codeGenerator.WriteBlock($@"
-public const int BiomeId = {biome.Id};
-public const string BiomeName = ""{biome.Name}"";
-public const string BiomeDisplayName = ""{biome.DisplayName}"";
-public const int BiomeCategory = {categories.IndexOf(this.Wrapper.GetCSharpName(biome.Category))};
-public const float BiomeTemperature = {biome.Temperature.ToString(nfi)}F;
-public const string BiomePrecipitation = ""{biome.Precipitation}"";
-public const float BiomeDepth = {biome.Depth.ToString(nfi)}F;
-public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.{this.Wrapper.Uppercase(biome.Dimension)};
-public const int BiomeColor = {biome.Color};
-public const float BiomeRainfall = {biome.Rainfall.ToString(nfi)}F;
+//            codeGenerator.Begin("public static class BiomePalette");
+//            codeGenerator.Begin("public static Type GetBiomeTypeById(int id) => id switch");
+//            foreach (var biome in biomeData)
+//                codeGenerator.WriteLine($"{biome.Id} => typeof({this.GetName(biome.Name)}),");
+//            codeGenerator.WriteLine(@"_ => throw new ArgumentException($""Biome with id {id} not found!"")");
+//            codeGenerator.Finish(semicolon: true);
+//            codeGenerator.Finish();
 
-public {this.GetName(biome.Name)}() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) {{ }}");
-                codeGenerator.Finish();
-            }
+//            codeGenerator.Begin("public enum BiomeCategory");
+//            var categories = biomeData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
+//            foreach (var biomeCategory in categories)
+//                codeGenerator.WriteLine($"{biomeCategory} = {categories.IndexOf(biomeCategory)},");
+//            codeGenerator.Finish();
 
-            codeGenerator.Begin("public enum BiomeType");
-            foreach (var biome in biomeData)
-                codeGenerator.WriteLine($"{this.GetName(biome.Name)} = {biome.Id},");
-            codeGenerator.Finish();
+//            foreach (var biome in biomeData)
+//            {
+//                codeGenerator.WriteLine(new StringBuilder($@"public static readonly BiomeInfo").ToString());
+//                codeGenerator.Begin($"public class {this.GetName(biome.Name)} : Biome");
+//                codeGenerator.WriteBlock($@"
+//public const int BiomeId = {biome.Id};
+//public const string BiomeName = ""{biome.Name}"";
+//public const string BiomeDisplayName = ""{biome.DisplayName}"";
+//public const int BiomeCategory = {categories.IndexOf(this.Wrapper.GetCSharpName(biome.Category))};
+//public const float BiomeTemperature = {biome.Temperature.ToString(nfi)}F;
+//public const string BiomePrecipitation = ""{biome.Precipitation}"";
+//public const float BiomeDepth = {biome.Depth.ToString(nfi)}F;
+//public const MineSharp.Core.Types.Enums.Dimension BiomeDimension = MineSharp.Core.Types.Enums.Dimension.{this.Wrapper.Uppercase(biome.Dimension)};
+//public const int BiomeColor = {biome.Color};
+//public const float BiomeRainfall = {biome.Rainfall.ToString(nfi)}F;
 
-            codeGenerator.Finish();
+//public {this.GetName(biome.Name)}() : base(BiomeId, BiomeName, BiomeDisplayName, BiomeCategory, BiomeTemperature, BiomePrecipitation, BiomeDepth, BiomeDimension, BiomeColor, BiomeRainfall) {{ }}");
+//                codeGenerator.Finish();
+//            }
+
+//            codeGenerator.Begin("public enum BiomeType");
+//            foreach (var biome in biomeData)
+//                codeGenerator.WriteLine($"{this.GetName(biome.Name)} = {biome.Id},");
+//            codeGenerator.Finish();
+
+//            codeGenerator.Finish();
         }
 
         private string GetName(string name) => this.Wrapper.GetCSharpName(name);

@@ -136,7 +136,7 @@ namespace MineSharp.Pathfinding.Algorithm
             }
 
             var block = this.World.GetBlockAt(pos);
-            var walkable = !(block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id));
+            var walkable = !(block.Info.Id == (int)BlockType.Water || PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id));
 
             var newNode = new Node(pos, walkable, 0, 0);
             nodes.Add(((Position)pos).ToULong(), newNode);

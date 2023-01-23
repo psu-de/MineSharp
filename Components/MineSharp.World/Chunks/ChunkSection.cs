@@ -42,7 +42,7 @@ namespace MineSharp.World.Chunks
                 var y = (int)(blocks[i] >> 0 & 0xF);
 
                 var blockId = BlockPalette.GetBlockIdByState(stateId);
-                var block = BlockFactory.CreateBlock(blockId, stateId, new Position(x, y, z));
+                var block = new Block(BlockPalette.GetBlockInfoById(blockId), stateId, new Position(x, y, z));
                 this.SetBlock(block);
             }
         }
@@ -53,7 +53,7 @@ namespace MineSharp.World.Chunks
         {
             var state = this.BlockStorage.GetAt(this.GetBlockIndex(blockPos.X, blockPos.Y, blockPos.Z));
             var blockId = BlockPalette.GetBlockIdByState(state);
-            var block = BlockFactory.CreateBlock(blockId, state, blockPos);
+            var block = new Block(BlockPalette.GetBlockInfoById(blockId), state, blockPos);
             return block;
         }
 
@@ -77,7 +77,8 @@ namespace MineSharp.World.Chunks
         private Biome GetBiomeAt(int index)
         {
             var state = this.BiomeStorage.GetAt(index);
-            return BiomeFactory.CreateBiome(state);
+            var info = BiomePalette.GetBiomeInfoById(state);
+            return new Biome(info);
         }
 
         public Task<Block?> FindBlockAsync(BlockType type, CancellationToken? cancellation = null)
@@ -85,10 +86,9 @@ namespace MineSharp.World.Chunks
 
             return Task.Factory.StartNew(() =>
             {
-                var blockType = BlockPalette.GetBlockTypeById((int)type);
-                var searchedBlock = (Block)Activator.CreateInstance(blockType)!;
+                var blockInfo = type.GetInfo();
 
-                if (!this.BlockStorage.Palette.HasState(searchedBlock.MinStateId, searchedBlock.MaxStateId)) return null;
+                if (!this.BlockStorage.Palette.HasState(blockInfo.MinStateId, blockInfo.MaxStateId)) return null;
 
                 for (var y = 0; y < Chunk.ChunkSectionLength; y++)
                 {
@@ -98,7 +98,7 @@ namespace MineSharp.World.Chunks
                         {
                             if (cancellation?.IsCancellationRequested ?? false) return null;
                             var value = this.BlockStorage.GetAt(this.GetBlockIndex(x, y, z));
-                            if (searchedBlock.MinStateId <= value && value <= searchedBlock.MaxStateId)
+                            if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId)
                                 return this.GetBlockAt(new Position(x, y, z));
                         }
                     }
@@ -115,10 +115,9 @@ namespace MineSharp.World.Chunks
             {
 
                 var blocks = new List<Block>();
-                var blockType = BlockPalette.GetBlockTypeById((int)type);
-                var searchedBlock = (Block)Activator.CreateInstance(blockType)!;
+                var blockInfo = type.GetInfo();
 
-                if (!this.BlockStorage.Palette.HasState(searchedBlock.MinStateId, searchedBlock.MaxStateId)) return null;
+                if (!this.BlockStorage.Palette.HasState(blockInfo.MinStateId, blockInfo.MaxStateId)) return null;
 
                 for (var y = 0; y < Chunk.ChunkSectionLength; y++)
                 {
@@ -128,7 +127,7 @@ namespace MineSharp.World.Chunks
                         {
                             if (cancellation?.IsCancellationRequested ?? false) return null;
                             var value = this.BlockStorage.GetAt(this.GetBlockIndex(x, y, z));
-                            if (searchedBlock.MinStateId <= value && value <= searchedBlock.MaxStateId)
+                            if (blockInfo.MinStateId <= value && value <= blockInfo.MaxStateId)
                             {
                                 blocks.Add(this.GetBlockAt(new Position(x, y, z)));
                                 if (count > 0 && blocks.Count >= count)

@@ -18,11 +18,11 @@ namespace MineSharp.Physics
     {
         private static Logger Logger = Logger.GetLogger();
 
-        public Player Player;
+        public Entity Player;
         public PlayerState PlayerState;
         public World.World World;
 
-        public PhysicsEngine(Player player, World.World world)
+        public PhysicsEngine(Entity player, World.World world)
         {
             this.World = world;
             this.Player = player;
@@ -78,7 +78,7 @@ namespace MineSharp.Physics
                 {
                     var blockUnder =
                         playerBB.MinY % 1 < 0.05f ? this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down)) : this.World.GetBlockAt(this.Player.Position);
-                    slipperiness *= PhysicsConst.GetBlockSlipperiness(blockUnder.Id);
+                    slipperiness *= PhysicsConst.GetBlockSlipperiness(blockUnder.Info.Id);
 
                     var acceleration = 0.1627714d / Math.Pow(slipperiness, 3);
                     movementFactor *= acceleration;
@@ -94,9 +94,9 @@ namespace MineSharp.Physics
                 if (onGround)
                 {
                     var blockUnder = this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down));
-                    this.Player.Velocity.Y += 0.42d * (blockUnder.Id == HoneyBlock.BlockId ? PhysicsConst.HoneyblockJumpSpeed : 1);
+                    this.Player.Velocity.Y += 0.42d * (blockUnder.Info.Id == (int)BlockType.HoneyBlock ? PhysicsConst.HoneyblockJumpSpeed : 1);
 
-                    var effectLevel = this.Player.GetEffectLevel(JumpboostEffect.EffectId);
+                    var effectLevel = this.Player.GetEffectLevel((int)EffectType.JumpboostEffect);
                     if (effectLevel.HasValue)
                     {
                         this.Player.Velocity.Y += 0.1d * effectLevel.Value;
@@ -870,9 +870,9 @@ namespace MineSharp.Physics
 
         private float GetRenderedDepth(Block block)
         {
-            if (PhysicsConst.WaterLikeBlocks.Contains(block.Id)) return 0;
-            if (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false) return 0;
-            if (block.Id != Water.BlockId) return -1;
+            if (PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id)) return 0;
+            if (block.GetProperty<bool>("waterlogged")) return 0;
+            if (block.Info.Id != (int)BlockType.Water) return -1;
             var meta = block.Metadata;
             return meta >= 8 ? 0 : meta;
         }
@@ -890,7 +890,7 @@ namespace MineSharp.Physics
                     for (cursor.X = Math.Floor(bb.MinX); cursor.X <= Math.Floor(bb.MaxX); cursor.X++)
                     {
                         var block = this.World.GetBlockAt(cursor);
-                        if (block.Id == Water.BlockId || PhysicsConst.WaterLikeBlocks.Contains(block.Id) || (block.Properties.Get("waterlogged")?.GetValue<bool>() ?? false))
+                        if (block.Info.Id == (int)BlockType.Water || PhysicsConst.WaterLikeBlocks.Contains(block.Info.Id) || (block.GetProperty<bool>("waterlogged")))
                         {
                             var waterLevel = cursor.Y + 1 - (this.GetRenderedDepth(block) + 1) / 9;
                             if (Math.Ceiling(bb.MaxY) >= waterLevel) waterBlocks.Add(block);
@@ -918,7 +918,7 @@ namespace MineSharp.Physics
                     var adjLevel = this.GetRenderedDepth(adjBlock);
                     if (adjLevel < 0)
                     {
-                        if (adjBlock.BoundingBox != "empty")
+                        if (adjBlock.Info.BoundingBox != "empty")
                         {
                             var adjLevel2 = this.GetRenderedDepth(this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Down)));
                             if (adjLevel2 >= 0)
@@ -942,7 +942,7 @@ namespace MineSharp.Physics
                     {
                         var adjBlock = this.World.GetBlockAt(p.Plus(offset));
                         var adjUpBlock = this.World.GetBlockAt(p.Plus(offset).Plus(Vector3.Up));
-                        if (adjBlock.BoundingBox != "empty" || adjUpBlock.BoundingBox != "empty")
+                        if (adjBlock.Info.BoundingBox != "empty" || adjUpBlock.Info.BoundingBox != "empty")
                         {
                             flow = flow.Normalized().Plus(new Vector3(0, -6, 0));
                         }
@@ -968,7 +968,7 @@ namespace MineSharp.Physics
         private bool IsOnLadder(Vector3 pos)
         {
             var block = this.World.GetBlockAt(pos);
-            return block.Id == Ladder.BlockId || block.Id == Vine.BlockId;
+            return block.Info.Id == (int)BlockType.Ladder || block.Info.Id == (int)BlockType.Vine;
         }
 
         internal enum CollisionResult

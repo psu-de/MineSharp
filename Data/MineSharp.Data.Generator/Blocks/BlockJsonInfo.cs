@@ -7,58 +7,78 @@ namespace MineSharp.Data.Generator.Blocks
     internal class BlockJsonInfo
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [Index(0)]
+        public int Id;
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        [Index(1)]
+        public string Name;
+
+        [JsonProperty("displayName")]
+        [Index(2)]
+        public string DisplayName;
+
 
         [JsonProperty("hardness")]
-        public float? Hardness { get; set; }
+        [Index(3)]
+        public float? Hardness;
 
         [JsonProperty("resistance")]
-        public float? Resistance { get; set; }
-
-        [JsonProperty("minStateId")]
-        public int? MinStateId { get; set; }
-
-        [JsonProperty("maxStateId")]
-        public int? MaxStateId { get; set; }
-
-        [JsonProperty("states")]
-        public BlockStateJsonInfo[]? States { get; set; }
-
-        [JsonProperty("drops")]
-        public object[] Drops { get; set; }
+        [Index(4)]
+        public float? Resistance;
 
         [JsonProperty("diggable")]
-        public bool Diggable { get; set; }
+        [Index(5)]
+        public bool Diggable;
 
         [JsonProperty("transparent")]
-        public bool Transparent { get; set; }
+        [Index(6)]
+        public bool Transparent;
 
         [JsonProperty("filterLight")]
-        public int FilterLight { get; set; }
+        [Index(7)]
+        public int FilterLight;
 
         [JsonProperty("emitLight")]
-        public int EmitLight { get; set; }
+        [Index(8)]
+        public int EmitLight;
 
         [JsonProperty("boundingBox")]
-        public string BoundingBox { get; set; }
+        [Index(9)]
+        public string BoundingBox;
 
         [JsonProperty("stackSize")]
-        public int StackSize { get; set; }
+        [Index(10)]
+        public int StackSize;
 
         [JsonProperty("material")]
-        public string? Material { get; set; }
-
-        [JsonProperty("harvestTools")]
-        public Dictionary<string, bool>? HarvestTools { get; set; }
+        [Index(11)]
+        public string? Material;
 
         [JsonProperty("defaultState")]
-        public int? DefaultState { get; set; }
+        [Index(12)]
+        public int? DefaultState;
+
+        [JsonProperty("minStateId")]
+        [Index(13)]
+        public int? MinStateId;
+
+        [JsonProperty("maxStateId")]
+        [Index(14)]
+        public int? MaxStateId;
+
+        [JsonProperty("harvestTools")]
+        [Index(15)]
+        public Dictionary<string, bool>? HarvestTools;
+
+        [JsonProperty("states")]
+        [Index(16)]
+        public BlockStateJsonInfo[]? States;
+
+        [JsonProperty("drops")]
+        public object[] Drops;
+
+
     }
 
     internal class BlockStateJsonInfo

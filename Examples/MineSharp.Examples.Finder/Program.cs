@@ -101,7 +101,7 @@ void FindEntity(string arg)
     bot.Chat("Searching...");
 
     var entities = bot.Entities.Values
-        .Where(x => x.Id == (int)entityType)
+        .Where(x => x.Info.Id == (int)entityType)
         .ToArray();                                 // Find the entities with id 
 
     if (entities.Length == 0)

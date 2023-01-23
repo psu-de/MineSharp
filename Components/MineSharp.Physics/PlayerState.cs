@@ -1,4 +1,5 @@
-﻿using MineSharp.Data.Effects;
+﻿using MineSharp.Core.Types;
+using MineSharp.Data.Effects;
 using MineSharp.Data.Entities;
 
 namespace MineSharp.Physics
@@ -6,9 +7,9 @@ namespace MineSharp.Physics
     public class PlayerState
     {
 
-        private readonly Player Player;
+        private readonly Entity Player;
 
-        public PlayerState(Player player)
+        public PlayerState(Entity player)
         {
             this.Player = player;
         }
@@ -21,10 +22,10 @@ namespace MineSharp.Physics
         public int JumpTicks { get; set; } = 0;
         public bool JumpQueued { get; set; } = false;
 
-        public int SlowFalling => this.Player.GetEffectLevel(SlowfallingEffect.EffectId) ?? 0;
-        public int Levitation => this.Player.GetEffectLevel(LevitationEffect.EffectId) ?? 0;
-        public int DolphinsGrace => this.Player.GetEffectLevel(DolphinsgraceEffect.EffectId) ?? 0;
-        public int JumpBoost => this.Player.GetEffectLevel(JumpboostEffect.EffectId) ?? 0;
+        public int SlowFalling => this.Player.GetEffectLevel((int)EffectType.SlowfallingEffect) ?? 0;
+        public int Levitation => this.Player.GetEffectLevel((int)EffectType.LevitationEffect) ?? 0;
+        public int DolphinsGrace => this.Player.GetEffectLevel((int)EffectType.DolphinsgraceEffect) ?? 0;
+        public int JumpBoost => this.Player.GetEffectLevel((int)EffectType.JumpboostEffect) ?? 0;
 
         //TODO: Depth Strider
         public int DepthStrider => 0;

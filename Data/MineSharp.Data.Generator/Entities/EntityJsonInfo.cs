@@ -6,28 +6,34 @@ namespace MineSharp.Data.Generator.Entities
     internal class EntityJsonInfo
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        [Index(0)]
+        public int Id;
 
         [JsonProperty("internalId")]
-        public int InternalId { get; set; }
+        public int InternalId;
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        [Index(1)]
+        public string Name;
 
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [Index(2)]
+        public string DisplayName;
 
         [JsonProperty("width")]
-        public double Width { get; set; }
+        [Index(3)]
+        public float Width;
 
         [JsonProperty("height")]
-        public double Height { get; set; }
+        [Index(4)]
+        public float Height;
 
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type;
 
         [JsonProperty("category")]
-        public string Category { get; set; }
+        [Index(5)]
+        public string Category;
     }
 #pragma warning restore CS8618
 }

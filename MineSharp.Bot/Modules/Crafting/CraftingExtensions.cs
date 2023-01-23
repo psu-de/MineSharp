@@ -13,6 +13,6 @@ namespace MineSharp.Bot
         
         public int CraftableAmount(Recipe recipe) => this.CraftingModule!.CraftableAmount(recipe);
         
-        public Task Craft(Recipe recipe, CraftingTable? craftingTable = null, int count = 1) => this.CraftingModule!.Craft(recipe, craftingTable, count);
+        public Task Craft(Recipe recipe, Block? craftingTable = null, int count = 1) => this.CraftingModule!.Craft(recipe, craftingTable, count);
     }
 }

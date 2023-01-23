@@ -37,24 +37,24 @@ namespace MineSharp.ConsoleClient.Console.Commands.World
             var biome = BotClient.Bot!.GetBiomeAt(new Position((int)x, (int)y, (int)z));
             var table = new Table().AddColumns("Name", "Position", "Metadata", "Properties", "Biome");
 
-            string propGetValue(BlockStateProperty prop)
+            string propGetValue(Block block, BlockStateProperty prop)
             {
                 switch (prop.Type)
                 {
                     case BlockStateProperty.BlockStatePropertyType.Bool:
-                        return prop.GetValue<bool>().ToString();
+                        return block.GetProperty<bool>(prop.Name).ToString();
                     case BlockStateProperty.BlockStatePropertyType.Int:
-                        return prop.GetValue<int>().ToString();
+                        return block.GetProperty<int>(prop.Name).ToString();
                     case BlockStateProperty.BlockStatePropertyType.Enum:
-                        return prop.GetValue<string>();
+                        return block.GetProperty<string>(prop.Name).ToString();
                     default:
                         throw new NotSupportedException();
                 }
             }
 
-            var properties = string.Join("\n", block.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(x)}"));
+            var properties = string.Join("\n", block.Info.Properties.Properties.Select(x => $"{x.Name}: {propGetValue(block, x)}"));
 
-            table.AddRow(block.Name, block.Position!.ToString(), block.Metadata.ToString(), properties, biome.Name);
+            table.AddRow(block.Info.Name, block.Position!.ToString(), block.Metadata.ToString(), properties, biome.Info.Name);
             AnsiConsole.Write(table);
             AnsiConsole.WriteLine();
         }

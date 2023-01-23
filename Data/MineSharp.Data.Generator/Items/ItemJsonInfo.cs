@@ -6,25 +6,32 @@ namespace MineSharp.Data.Generator.Items
     internal class ItemJsonInfo
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        [Index(0)]
+        public int Id;
 
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [Index(1)]
+        public string DisplayName;
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        [Index(2)]
+        public string Name;
 
         [JsonProperty("stackSize")]
-        public int StackSize { get; set; }
+        [Index(3)]
+        public int StackSize;
 
         [JsonProperty("maxDurability")]
-        public int MaxDurability { get; set; }
+        [Index(4)]
+        public int MaxDurability;
 
         [JsonProperty("enchantCategories")]
-        public string[] EnchantCategories { get; set; }
+        [Index(5)]
+        public string[] EnchantCategories;
 
         [JsonProperty("repairWith")]
-        public string[] RepairWith { get; set; }
+        [Index(6)]
+        public string[] RepairWith;
     }
 #pragma warning restore CS8618
 }

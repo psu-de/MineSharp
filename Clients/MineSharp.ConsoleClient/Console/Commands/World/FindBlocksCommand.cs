@@ -67,7 +67,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.World
 
                         foreach (var b in block)
                         {
-                            table.AddRow(b.Name, b.Position!.ToString());
+                            table.AddRow(b.Info.Name, b.Position!.ToString());
                         }
                         block = null;
                     } else

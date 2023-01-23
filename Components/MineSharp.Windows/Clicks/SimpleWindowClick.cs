@@ -44,7 +44,7 @@ namespace MineSharp.Windows.Clicks
                 return;
             }
 
-            if (selectedSlot.Item?.Id == clickedSlot.Item?.Id)
+            if (selectedSlot.Item?.Info.Id == clickedSlot.Item?.Info.Id)
             {
                 // stack items, both items cannot be null
                 int left = selectedSlot.Item!.Count - clickedSlot.LeftToStack;

@@ -252,7 +252,7 @@ namespace MineSharp.Windows
         {
             for (int i = 0; i < slots.Length; i++)
             {
-                if (slots[i].Item != null && slots[i].Item!.Id == (int)type)
+                if (slots[i].Item != null && slots[i].Item!.Info.Id == (int)type)
                 {
                     yield return slots[i];
                 }
@@ -375,7 +375,7 @@ namespace MineSharp.Windows
                 return;
             }
             
-            this.StackSelectedSlot(stackCount, this.FindInventorySlotsToStack((ItemType)selectedSlot.Item!.Id, selectedSlot.Item!.Count));
+            this.StackSelectedSlot(stackCount, this.FindInventorySlotsToStack((ItemType)selectedSlot.Item!.Info.Id, selectedSlot.Item!.Count));
         }
         
         /// <summary>
@@ -391,7 +391,7 @@ namespace MineSharp.Windows
                 return;
             }
             
-            this.StackSelectedSlot(stackCount, this.FindContainerSlotsToStack((ItemType)selectedSlot.Item!.Id, selectedSlot.Item!.Count));
+            this.StackSelectedSlot(stackCount, this.FindContainerSlotsToStack((ItemType)selectedSlot.Item!.Info.Id, selectedSlot.Item!.Count));
         }
         
         /// <summary>

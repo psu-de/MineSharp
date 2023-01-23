@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using MineSharp.Core.Types;
+using System.Globalization;
 using System.Text;
 
 namespace MineSharp.Data.Generator.Blocks
@@ -16,7 +17,6 @@ namespace MineSharp.Data.Generator.Blocks
 
         public override void WriteCode(CodeGenerator codeGenerator)
         {
-
             var blockData = this.Wrapper.LoadJson<BlockJsonInfo[]>(this.Version, "blocks");
             var blockCollisionData = this.Wrapper.LoadJson<BlockCollisionShapeJson>(this.Version, "blockCollisionShapes");
 
@@ -37,58 +37,90 @@ namespace MineSharp.Data.Generator.Blocks
 
             codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
-
-            codeGenerator.Begin("public static class BlockPalette");
-            codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
-            foreach (var block in blockData)
-                codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
-            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
-            codeGenerator.Finish(semicolon: true);
-
-            codeGenerator.Begin("public static Type GetBlockTypeById(int id) => id switch");
-            foreach (var block in blockData)
-                codeGenerator.WriteLine($"{block.Id} => typeof({this.Wrapper.GetCSharpName(block.Name)}),");
-            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with id {id} not found!\")");
-            codeGenerator.Finish(semicolon: true);
             codeGenerator.Finish();
 
-            foreach (var block in blockData)
-            {
 
-                codeGenerator.Begin($"public class {this.Wrapper.GetCSharpName(block.Name)} : Block");
-                codeGenerator.WriteBlock($@"
-public const int BlockId = {block.Id};
-public const string BlockName = ""{block.Name}"";
-public const string BlockDisplayName = ""{block.DisplayName}"";
+            var infoGeneratorTemplate = new InfoGeneratorTemplate<BlockJsonInfo>() {
+                Data = blockData,
+                Name = "Block",
+                Namespace = "MineSharp.Data.Blocks",
+                NameGenerator = (t) => this.Wrapper.GetCSharpName(t.Name),
+                Indexer = (t) => t.Id,
+                Stringifiers = new Dictionary<string, Func<object, string>>() {
+                    { "Id", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Name", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "DisplayName", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Hardness", x => InfoGenerator<int>.StringifyDefaults(x ?? float.MaxValue) },
+                    { "Resistance", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Diggable", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Transparent", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "FilterLight", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "EmitLight", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "BoundingBox", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "StackSize", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "Material", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "DefaultState", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "MinStateId", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "MaxStateId", x => InfoGenerator<int>.StringifyDefaults(x) },
+                    { "HarvestTools", x => x == null ? "null" : $"new int[] {{ {string.Join(", ", (x as Dictionary<string, bool>)!.Keys)} }}" },
+                    { "States",  x => $@"new BlockProperties(new BlockStateProperty[] {{ {string.Join("", (x as BlockStateJsonInfo[])!.Select(x => this.GetProperty(x)))} }})"}
+                },
+                AdditionalInfoArgs = new Func<BlockJsonInfo, string>[] {
+                    (t) => $@"new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[t.Name]))} }}",
+                },
+                GenerateCodeBlock = (data, codeGenerator) => {
+                    codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
+                    foreach (var block in data)
+                        codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
+                    codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
+                    codeGenerator.Finish(semicolon: true);
+                }
+            };
+            var infoGenerator = new InfoGenerator<BlockJsonInfo>(infoGeneratorTemplate);
+            infoGenerator.GenerateInfos(codeGenerator);
 
-public const float BlockHardness = {(block.Hardness ?? float.MaxValue).ToString(nfi)}F;
-public const float BlockResistance = {block.Resistance!.Value.ToString(nfi)}F;
-public const bool BlockDiggable = {block.Diggable.ToString().ToLower()};
-public const bool BlockTransparent = {block.Transparent.ToString().ToLower()};
-public const int BlockFilterLight = {block.FilterLight};
-public const int BlockEmitLight = {block.EmitLight};
-public const string BlockBoundingBox = ""{block.BoundingBox}"";
-public const int BlockStackSize = {block.StackSize};
-public const string BlockMaterial = ""{block.Material}"";
-public const int BlockDefaultState = {block.DefaultState};
-public const int BlockMinStateId = {block.MinStateId};
-public const int BlockMaxStateId = {block.MaxStateId};
-public static readonly int[]? BlockHarvestTools = {(block.HarvestTools == null ? "null" : $"new int[] {{ {string.Join(", ", block.HarvestTools.Keys)} }}")};
-internal static readonly int[] BlockShapeIndices = new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[block.Name]))} }};
-public static readonly BlockProperties BlockProperties = new BlockProperties(new BlockStateProperty[] {{ {string.Join("", block.States!.Select(x => this.GetProperty(x)))} }}, {block.DefaultState - block.MinStateId});
+            //codeGenerator.Begin("public static class BlockPalette");
+            //codeGenerator.Begin("public static int GetBlockIdByState(int state) => state switch");
+            //foreach (var block in blockData)
+            //    codeGenerator.WriteLine($"(>= {block.MinStateId}) and (<= {block.MaxStateId}) => {block.Id},");
+            //codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with state {state} not found!\")");
+            //codeGenerator.Finish(semicolon: true);
 
-public {this.Wrapper.GetCSharpName(block.Name)}() : base(BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}} 
+            //codeGenerator.Begin("public static BlockInfo GetBlockInfoById(int id) => id switch");
+            //foreach (var block in blockData)
+            //    codeGenerator.WriteLine($"{block.Id} => {this.Wrapper.GetCSharpName(block.Name)}Info,");
+            //codeGenerator.WriteLine("_ => throw new ArgumentException($\"Block with id {id} not found!\")");
+            //codeGenerator.Finish(semicolon: true);
 
-public {this.Wrapper.GetCSharpName(block.Name)}(int state, Position pos) : base(state, pos, BlockId, BlockName, BlockDisplayName, BlockHardness, BlockResistance, BlockDiggable, BlockTransparent, BlockFilterLight, BlockEmitLight, BlockBoundingBox, BlockStackSize, BlockMaterial, BlockDefaultState, BlockMinStateId, BlockMaxStateId, BlockHarvestTools, BlockProperties) {{}}");
-                codeGenerator.Finish();
+            //foreach (var block in blockData)
+            //    codeGenerator.WriteLine(new StringBuilder($@"public static readonly BlockInfo {this.Wrapper.GetCSharpName(block.Name)}Info = new BlockInfo(")
+            //                                                                    .Append($"{block.Id}, ")
+            //                                                                    .Append(@$"""{block.Name}"", ")
+            //                                                                    .Append(@$"""{block.DisplayName}"", ")
+            //                                                                    .Append($"{(block.Hardness ?? float.MaxValue).ToString(nfi)}F, ")
+            //                                                                    .Append($"{block.Resistance!.Value.ToString(nfi)}F, ")
+            //                                                                    .Append(block.Diggable.ToString().ToLower() + ", ")
+            //                                                                    .Append(block.Transparent.ToString().ToLower() + ", ")
+            //                                                                    .Append(block.FilterLight + ", ")
+            //                                                                    .Append(block.EmitLight + ", ")
+            //                                                                    .Append($@"""{block.BoundingBox}"", ")
+            //                                                                    .Append(block.StackSize + ", ")
+            //                                                                    .Append($@"""{block.Material}"", ")
+            //                                                                    .Append(block.DefaultState + ", ")
+            //                                                                    .Append(block.MinStateId + ", ")
+            //                                                                    .Append(block.MaxStateId + ", ")
+            //                                                                    .Append(block.HarvestTools == null ? "null, " : $"new int[] {{ {string.Join(", ", block.HarvestTools.Keys)} }}, ")
+            //                                                                    .Append($@"new BlockProperties(new BlockStateProperty[] {{ {string.Join("", block.States!.Select(x => this.GetProperty(x)))} }}), ")
+            //                                                                    .Append($@"new int[] {{ {string.Join(", ", BlockCollisionShapeJson.GetShapeIndices(blockCollisionData.Blocks[block.Name]))} }});")
+            //                                                                    .ToString());
 
-            }
+            //codeGenerator.Finish();
 
-            codeGenerator.Begin("public enum BlockType");
-            foreach (var block in blockData)
-                codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(block.Name)} = {block.Id},");
-            codeGenerator.Finish();
-            codeGenerator.Finish();
+            //codeGenerator.Begin("public enum BlockType");
+            //foreach (var block in blockData)
+            //    codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(block.Name)} = {block.Id},");
+            //codeGenerator.Finish();
+            //codeGenerator.Finish();
         }
 
         private string GetProperty(BlockStateJsonInfo info)

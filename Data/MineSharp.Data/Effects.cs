@@ -3,428 +3,120 @@
 ////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
 using System.Collections.Generic;
-namespace MineSharp.Data.Effects {
-	public static class EffectPalette {
-		public static Type GetEffectTypeById(int id) => id switch {
-			1 => typeof(SpeedEffect),
-			2 => typeof(SlownessEffect),
-			3 => typeof(HasteEffect),
-			4 => typeof(MiningfatigueEffect),
-			5 => typeof(StrengthEffect),
-			6 => typeof(InstanthealthEffect),
-			7 => typeof(InstantdamageEffect),
-			8 => typeof(JumpboostEffect),
-			9 => typeof(NauseaEffect),
-			10 => typeof(RegenerationEffect),
-			11 => typeof(ResistanceEffect),
-			12 => typeof(FireresistanceEffect),
-			13 => typeof(WaterbreathingEffect),
-			14 => typeof(InvisibilityEffect),
-			15 => typeof(BlindnessEffect),
-			16 => typeof(NightvisionEffect),
-			17 => typeof(HungerEffect),
-			18 => typeof(WeaknessEffect),
-			19 => typeof(PoisonEffect),
-			20 => typeof(WitherEffect),
-			21 => typeof(HealthboostEffect),
-			22 => typeof(AbsorptionEffect),
-			23 => typeof(SaturationEffect),
-			24 => typeof(GlowingEffect),
-			25 => typeof(LevitationEffect),
-			26 => typeof(LuckEffect),
-			27 => typeof(BadluckEffect),
-			28 => typeof(SlowfallingEffect),
-			29 => typeof(ConduitpowerEffect),
-			30 => typeof(DolphinsgraceEffect),
-			31 => typeof(BadomenEffect),
-			32 => typeof(HeroofthevillageEffect),
-			_ => throw new ArgumentException($"Effect with id {id} not found!")
+namespace MineSharp.Data.Effects
+{
+	public static class EffectPalette
+	{
+		public static readonly EffectInfo SpeedEffectInfo = new EffectInfo(1, "Speed", "Speed", true);
+		public static readonly EffectInfo SlownessEffectInfo = new EffectInfo(2, "Slowness", "Slowness", false);
+		public static readonly EffectInfo HasteEffectInfo = new EffectInfo(3, "Haste", "Haste", true);
+		public static readonly EffectInfo MiningfatigueEffectInfo = new EffectInfo(4, "MiningFatigue", "Mining Fatigue", false);
+		public static readonly EffectInfo StrengthEffectInfo = new EffectInfo(5, "Strength", "Strength", true);
+		public static readonly EffectInfo InstanthealthEffectInfo = new EffectInfo(6, "InstantHealth", "Instant Health", true);
+		public static readonly EffectInfo InstantdamageEffectInfo = new EffectInfo(7, "InstantDamage", "Instant Damage", false);
+		public static readonly EffectInfo JumpboostEffectInfo = new EffectInfo(8, "JumpBoost", "Jump Boost", true);
+		public static readonly EffectInfo NauseaEffectInfo = new EffectInfo(9, "Nausea", "Nausea", false);
+		public static readonly EffectInfo RegenerationEffectInfo = new EffectInfo(10, "Regeneration", "Regeneration", true);
+		public static readonly EffectInfo ResistanceEffectInfo = new EffectInfo(11, "Resistance", "Resistance", true);
+		public static readonly EffectInfo FireresistanceEffectInfo = new EffectInfo(12, "FireResistance", "Fire Resistance", true);
+		public static readonly EffectInfo WaterbreathingEffectInfo = new EffectInfo(13, "WaterBreathing", "Water Breathing", true);
+		public static readonly EffectInfo InvisibilityEffectInfo = new EffectInfo(14, "Invisibility", "Invisibility", true);
+		public static readonly EffectInfo BlindnessEffectInfo = new EffectInfo(15, "Blindness", "Blindness", false);
+		public static readonly EffectInfo NightvisionEffectInfo = new EffectInfo(16, "NightVision", "Night Vision", true);
+		public static readonly EffectInfo HungerEffectInfo = new EffectInfo(17, "Hunger", "Hunger", false);
+		public static readonly EffectInfo WeaknessEffectInfo = new EffectInfo(18, "Weakness", "Weakness", false);
+		public static readonly EffectInfo PoisonEffectInfo = new EffectInfo(19, "Poison", "Poison", false);
+		public static readonly EffectInfo WitherEffectInfo = new EffectInfo(20, "Wither", "Wither", false);
+		public static readonly EffectInfo HealthboostEffectInfo = new EffectInfo(21, "HealthBoost", "Health Boost", true);
+		public static readonly EffectInfo AbsorptionEffectInfo = new EffectInfo(22, "Absorption", "Absorption", true);
+		public static readonly EffectInfo SaturationEffectInfo = new EffectInfo(23, "Saturation", "Saturation", true);
+		public static readonly EffectInfo GlowingEffectInfo = new EffectInfo(24, "Glowing", "Glowing", false);
+		public static readonly EffectInfo LevitationEffectInfo = new EffectInfo(25, "Levitation", "Levitation", false);
+		public static readonly EffectInfo LuckEffectInfo = new EffectInfo(26, "Luck", "Luck", true);
+		public static readonly EffectInfo BadluckEffectInfo = new EffectInfo(27, "BadLuck", "Bad Luck", false);
+		public static readonly EffectInfo SlowfallingEffectInfo = new EffectInfo(28, "SlowFalling", "Slow Falling", true);
+		public static readonly EffectInfo ConduitpowerEffectInfo = new EffectInfo(29, "ConduitPower", "Conduit Power", true);
+		public static readonly EffectInfo DolphinsgraceEffectInfo = new EffectInfo(30, "DolphinsGrace", "Dolphin's Grace", true);
+		public static readonly EffectInfo BadomenEffectInfo = new EffectInfo(31, "BadOmen", "Bad Omen", false);
+		public static readonly EffectInfo HeroofthevillageEffectInfo = new EffectInfo(32, "HeroOfTheVillage", "Hero of the Village", true);
+		public static EffectInfo GetEffectInfoById(int id) => id switch
+		{
+			1 => SpeedEffectInfo,
+			2 => SlownessEffectInfo,
+			3 => HasteEffectInfo,
+			4 => MiningfatigueEffectInfo,
+			5 => StrengthEffectInfo,
+			6 => InstanthealthEffectInfo,
+			7 => InstantdamageEffectInfo,
+			8 => JumpboostEffectInfo,
+			9 => NauseaEffectInfo,
+			10 => RegenerationEffectInfo,
+			11 => ResistanceEffectInfo,
+			12 => FireresistanceEffectInfo,
+			13 => WaterbreathingEffectInfo,
+			14 => InvisibilityEffectInfo,
+			15 => BlindnessEffectInfo,
+			16 => NightvisionEffectInfo,
+			17 => HungerEffectInfo,
+			18 => WeaknessEffectInfo,
+			19 => PoisonEffectInfo,
+			20 => WitherEffectInfo,
+			21 => HealthboostEffectInfo,
+			22 => AbsorptionEffectInfo,
+			23 => SaturationEffectInfo,
+			24 => GlowingEffectInfo,
+			25 => LevitationEffectInfo,
+			26 => LuckEffectInfo,
+			27 => BadluckEffectInfo,
+			28 => SlowfallingEffectInfo,
+			29 => ConduitpowerEffectInfo,
+			30 => DolphinsgraceEffectInfo,
+			31 => BadomenEffectInfo,
+			32 => HeroofthevillageEffectInfo,
+			_ => throw new ArgumentException($"Biome with id {id} not found!")
 		};
 	}
-	public class SpeedEffect : Effect {
-		
-		public const int EffectId = 1;
-				public const string EffectName = "Speed";
-				public const string EffectDisplayName = "Speed";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public SpeedEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public SpeedEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
+	public enum EffectType
+	{
+		SpeedEffect = 0,
+		SlownessEffect = 1,
+		HasteEffect = 2,
+		MiningfatigueEffect = 3,
+		StrengthEffect = 4,
+		InstanthealthEffect = 5,
+		InstantdamageEffect = 6,
+		JumpboostEffect = 7,
+		NauseaEffect = 8,
+		RegenerationEffect = 9,
+		ResistanceEffect = 10,
+		FireresistanceEffect = 11,
+		WaterbreathingEffect = 12,
+		InvisibilityEffect = 13,
+		BlindnessEffect = 14,
+		NightvisionEffect = 15,
+		HungerEffect = 16,
+		WeaknessEffect = 17,
+		PoisonEffect = 18,
+		WitherEffect = 19,
+		HealthboostEffect = 20,
+		AbsorptionEffect = 21,
+		SaturationEffect = 22,
+		GlowingEffect = 23,
+		LevitationEffect = 24,
+		LuckEffect = 25,
+		BadluckEffect = 26,
+		SlowfallingEffect = 27,
+		ConduitpowerEffect = 28,
+		DolphinsgraceEffect = 29,
+		BadomenEffect = 30,
+		HeroofthevillageEffect = 31,
 	}
-	public class SlownessEffect : Effect {
-		
-		public const int EffectId = 2;
-				public const string EffectName = "Slowness";
-				public const string EffectDisplayName = "Slowness";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public SlownessEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public SlownessEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class HasteEffect : Effect {
-		
-		public const int EffectId = 3;
-				public const string EffectName = "Haste";
-				public const string EffectDisplayName = "Haste";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public HasteEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public HasteEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class MiningfatigueEffect : Effect {
-		
-		public const int EffectId = 4;
-				public const string EffectName = "MiningFatigue";
-				public const string EffectDisplayName = "Mining Fatigue";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public MiningfatigueEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public MiningfatigueEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class StrengthEffect : Effect {
-		
-		public const int EffectId = 5;
-				public const string EffectName = "Strength";
-				public const string EffectDisplayName = "Strength";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public StrengthEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public StrengthEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class InstanthealthEffect : Effect {
-		
-		public const int EffectId = 6;
-				public const string EffectName = "InstantHealth";
-				public const string EffectDisplayName = "Instant Health";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public InstanthealthEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public InstanthealthEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class InstantdamageEffect : Effect {
-		
-		public const int EffectId = 7;
-				public const string EffectName = "InstantDamage";
-				public const string EffectDisplayName = "Instant Damage";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public InstantdamageEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public InstantdamageEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class JumpboostEffect : Effect {
-		
-		public const int EffectId = 8;
-				public const string EffectName = "JumpBoost";
-				public const string EffectDisplayName = "Jump Boost";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public JumpboostEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public JumpboostEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class NauseaEffect : Effect {
-		
-		public const int EffectId = 9;
-				public const string EffectName = "Nausea";
-				public const string EffectDisplayName = "Nausea";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public NauseaEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public NauseaEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class RegenerationEffect : Effect {
-		
-		public const int EffectId = 10;
-				public const string EffectName = "Regeneration";
-				public const string EffectDisplayName = "Regeneration";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public RegenerationEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public RegenerationEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class ResistanceEffect : Effect {
-		
-		public const int EffectId = 11;
-				public const string EffectName = "Resistance";
-				public const string EffectDisplayName = "Resistance";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public ResistanceEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public ResistanceEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class FireresistanceEffect : Effect {
-		
-		public const int EffectId = 12;
-				public const string EffectName = "FireResistance";
-				public const string EffectDisplayName = "Fire Resistance";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public FireresistanceEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public FireresistanceEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class WaterbreathingEffect : Effect {
-		
-		public const int EffectId = 13;
-				public const string EffectName = "WaterBreathing";
-				public const string EffectDisplayName = "Water Breathing";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public WaterbreathingEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public WaterbreathingEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class InvisibilityEffect : Effect {
-		
-		public const int EffectId = 14;
-				public const string EffectName = "Invisibility";
-				public const string EffectDisplayName = "Invisibility";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public InvisibilityEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public InvisibilityEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class BlindnessEffect : Effect {
-		
-		public const int EffectId = 15;
-				public const string EffectName = "Blindness";
-				public const string EffectDisplayName = "Blindness";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public BlindnessEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public BlindnessEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class NightvisionEffect : Effect {
-		
-		public const int EffectId = 16;
-				public const string EffectName = "NightVision";
-				public const string EffectDisplayName = "Night Vision";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public NightvisionEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public NightvisionEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class HungerEffect : Effect {
-		
-		public const int EffectId = 17;
-				public const string EffectName = "Hunger";
-				public const string EffectDisplayName = "Hunger";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public HungerEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public HungerEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class WeaknessEffect : Effect {
-		
-		public const int EffectId = 18;
-				public const string EffectName = "Weakness";
-				public const string EffectDisplayName = "Weakness";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public WeaknessEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public WeaknessEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class PoisonEffect : Effect {
-		
-		public const int EffectId = 19;
-				public const string EffectName = "Poison";
-				public const string EffectDisplayName = "Poison";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public PoisonEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public PoisonEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class WitherEffect : Effect {
-		
-		public const int EffectId = 20;
-				public const string EffectName = "Wither";
-				public const string EffectDisplayName = "Wither";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public WitherEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public WitherEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class HealthboostEffect : Effect {
-		
-		public const int EffectId = 21;
-				public const string EffectName = "HealthBoost";
-				public const string EffectDisplayName = "Health Boost";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public HealthboostEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public HealthboostEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class AbsorptionEffect : Effect {
-		
-		public const int EffectId = 22;
-				public const string EffectName = "Absorption";
-				public const string EffectDisplayName = "Absorption";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public AbsorptionEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public AbsorptionEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class SaturationEffect : Effect {
-		
-		public const int EffectId = 23;
-				public const string EffectName = "Saturation";
-				public const string EffectDisplayName = "Saturation";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public SaturationEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public SaturationEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class GlowingEffect : Effect {
-		
-		public const int EffectId = 24;
-				public const string EffectName = "Glowing";
-				public const string EffectDisplayName = "Glowing";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public GlowingEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public GlowingEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class LevitationEffect : Effect {
-		
-		public const int EffectId = 25;
-				public const string EffectName = "Levitation";
-				public const string EffectDisplayName = "Levitation";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public LevitationEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public LevitationEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class LuckEffect : Effect {
-		
-		public const int EffectId = 26;
-				public const string EffectName = "Luck";
-				public const string EffectDisplayName = "Luck";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public LuckEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public LuckEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class BadluckEffect : Effect {
-		
-		public const int EffectId = 27;
-				public const string EffectName = "BadLuck";
-				public const string EffectDisplayName = "Bad Luck";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public BadluckEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public BadluckEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class SlowfallingEffect : Effect {
-		
-		public const int EffectId = 28;
-				public const string EffectName = "SlowFalling";
-				public const string EffectDisplayName = "Slow Falling";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public SlowfallingEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public SlowfallingEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class ConduitpowerEffect : Effect {
-		
-		public const int EffectId = 29;
-				public const string EffectName = "ConduitPower";
-				public const string EffectDisplayName = "Conduit Power";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public ConduitpowerEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public ConduitpowerEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class DolphinsgraceEffect : Effect {
-		
-		public const int EffectId = 30;
-				public const string EffectName = "DolphinsGrace";
-				public const string EffectDisplayName = "Dolphin's Grace";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public DolphinsgraceEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public DolphinsgraceEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class BadomenEffect : Effect {
-		
-		public const int EffectId = 31;
-				public const string EffectName = "BadOmen";
-				public const string EffectDisplayName = "Bad Omen";
-		        public const bool EffectIsGood = false;
-		
-		
-		        public BadomenEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public BadomenEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public class HeroofthevillageEffect : Effect {
-		
-		public const int EffectId = 32;
-				public const string EffectName = "HeroOfTheVillage";
-				public const string EffectDisplayName = "Hero of the Village";
-		        public const bool EffectIsGood = true;
-		
-		
-		        public HeroofthevillageEffect() : base(EffectId, EffectName, EffectDisplayName, EffectIsGood) {} 
-				public HeroofthevillageEffect(int amplifier, DateTime startTime, int duration) : base(amplifier, startTime, duration, EffectId, EffectName, EffectDisplayName, EffectIsGood) {}
-	}
-	public enum EffectType {
-		Speed = 1,
-		Slowness = 2,
-		Haste = 3,
-		Miningfatigue = 4,
-		Strength = 5,
-		Instanthealth = 6,
-		Instantdamage = 7,
-		Jumpboost = 8,
-		Nausea = 9,
-		Regeneration = 10,
-		Resistance = 11,
-		Fireresistance = 12,
-		Waterbreathing = 13,
-		Invisibility = 14,
-		Blindness = 15,
-		Nightvision = 16,
-		Hunger = 17,
-		Weakness = 18,
-		Poison = 19,
-		Wither = 20,
-		Healthboost = 21,
-		Absorption = 22,
-		Saturation = 23,
-		Glowing = 24,
-		Levitation = 25,
-		Luck = 26,
-		Badluck = 27,
-		Slowfalling = 28,
-		Conduitpower = 29,
-		Dolphinsgrace = 30,
-		Badomen = 31,
-		Heroofthevillage = 32,
+	
+	public static class EffectExtensions 
+	{
+	    public static EffectInfo GetInfo(this EffectType type)
+	    {
+	        return EffectPalette.GetEffectInfoById((int)type);
+	    }
 	}
 }

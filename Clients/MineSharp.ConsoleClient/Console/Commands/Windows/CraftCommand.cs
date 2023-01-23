@@ -25,21 +25,20 @@ namespace MineSharp.ConsoleClient.Console.Commands.Windows
         {
             var itemType = this.itemArg.GetValue(argv[0]);
 
-            CraftingTable? table = null;
+            Block? table = null;
             
             if (argv.Length == 4)
             {
                 var x = this.X.GetValue(argv[1]);
                 var y = this.X.GetValue(argv[2]);
                 var z = this.X.GetValue(argv[3]);
-                var block = Client.BotClient.Bot!.GetBlockAt(new Position(x!.Value, y!.Value, z!.Value));
+                table = Client.BotClient.Bot!.GetBlockAt(new Position(x!.Value, y!.Value, z!.Value));
 
-                if (block.Id != CraftingTable.BlockId)
+                if (table.Info.Id != (int)BlockType.CraftingTable)
                 {
                     AnsiConsole.MarkupLine($"[{CColor.Error}]Block is not a crafting table[/]");
                     return;
                 }
-                table = (CraftingTable)block;   
             }
 
             var recipe = BotClient.Bot!.FindRecipe(itemType);

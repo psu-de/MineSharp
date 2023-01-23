@@ -2,9 +2,12 @@
 //   Generated Recipe Data for Minecraft Version 1.18.1   //
 ////////////////////////////////////////////////////////////
 using MineSharp.Core.Types;
-namespace MineSharp.Data.Recipes {
-	public static class RecipePalette {
-		public static readonly Dictionary<int, Recipe[]> Recipes = new Dictionary<int, Recipe[]>() {
+namespace MineSharp.Data.Recipes
+{
+	public static class RecipePalette
+	{
+		public static readonly Dictionary<int, Recipe[]> Recipes = new Dictionary<int, Recipe[]>()
+		{
 			{ 2, new [] { 
 				new Recipe(new int?[] { 4, 689 }, null, false, 2, 1) } },
 			{ 3, new [] { 

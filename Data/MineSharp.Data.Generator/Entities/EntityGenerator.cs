@@ -26,47 +26,76 @@ namespace MineSharp.Data.Generator.Entities
             foreach (var ns in this.GetUsings())
                 codeGenerator.WriteLine($"using {ns};");
 
-            codeGenerator.Begin("namespace MineSharp.Data.Entities");
-
-            codeGenerator.Begin("public static class EntityPalette");
-
-            codeGenerator.Begin("public static Type GetEntityTypeById(int id) => id switch");
-            foreach (var entity in entityData)
-                codeGenerator.WriteLine($"{entity.Id} => typeof({this.Wrapper.GetCSharpName(entity.Name)}),");
-            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Entity with id {id} not found!\")");
-            codeGenerator.Finish(semicolon: true);
-            codeGenerator.Finish();
-
-            codeGenerator.Begin("public enum EntityCategory");
-            var categories = entityData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
-            foreach (var category in categories)
-                codeGenerator.WriteLine($"{category} = {categories.IndexOf(category)},");
-            codeGenerator.Finish();
-
-            foreach (var entity in entityData)
+            var infoTemplateGenerator = new InfoGeneratorTemplate<EntityJsonInfo>()
             {
+                Name = "Entity",
+                Namespace = "MineSharp.Data.Entities",
+                Data = entityData,
+                Indexer = (t) => t.Id,
+                NameGenerator = (t) => this.Wrapper.GetCSharpName(t.Name),
+                Stringifiers = new Dictionary<string, Func<object, string>>()
+                {
+                    { "Id", (e) => InfoGenerator<int>.StringifyDefaults(e) },
+                    { "Name", (e) => InfoGenerator<int>.StringifyDefaults(e) },
+                    { "DisplayName", (e) => InfoGenerator<int>.StringifyDefaults(e) },
+                    { "Width", (e) => InfoGenerator<int>.StringifyDefaults(e) },
+                    { "Height", (e) => InfoGenerator<int>.StringifyDefaults(e) },
+                    { "Category", (x) => $"(int)EntityCategoryType.{this.Wrapper.GetCSharpName(x as string)}" },
+                },
+                Indexers = new EnumGenerator<EntityJsonInfo>[] 
+                {
+                    new EnumGenerator<EntityJsonInfo>()
+                    {
+                        GetName= (x) => this.Wrapper.GetCSharpName(x.Category),
+                        Name = "EntityCategory",
+                    }
+                }
+            };
 
-                codeGenerator.Begin($"public class {this.Wrapper.GetCSharpName(entity.Name)} : Entity");
-                codeGenerator.WriteBlock(
-                    $@"public const int EntityId = {entity.Id};
-public const string EntityName = "" {entity.Name}"";
-public const string EntityDisplayName = ""{entity.DisplayName}"";
+            var infoGenerator = new InfoGenerator<EntityJsonInfo>(infoTemplateGenerator);
+            infoGenerator.GenerateInfos(codeGenerator);
 
-public const float EntityWidth = {entity.Width.ToString(nfi)}F;
-public const float EntityHeight = {entity.Height.ToString(nfi)}F;
-public const int EntityCategory = {categories.IndexOf(this.Wrapper.GetCSharpName(entity.Category))};
+//            codeGenerator.Begin("namespace MineSharp.Data.Entities");
+
+//            codeGenerator.Begin("public static class EntityPalette");
+
+//            codeGenerator.Begin("public static Type GetEntityTypeById(int id) => id switch");
+//            foreach (var entity in entityData)
+//                codeGenerator.WriteLine($"{entity.Id} => typeof({this.Wrapper.GetCSharpName(entity.Name)}),");
+//            codeGenerator.WriteLine("_ => throw new ArgumentException($\"Entity with id {id} not found!\")");
+//            codeGenerator.Finish(semicolon: true);
+//            codeGenerator.Finish();
+
+//            codeGenerator.Begin("public enum EntityCategory");
+//            var categories = entityData.Select(x => $"{this.Wrapper.GetCSharpName(x.Category)}").Distinct().ToList();
+//            foreach (var category in categories)
+//                codeGenerator.WriteLine($"{category} = {categories.IndexOf(category)},");
+//            codeGenerator.Finish();
+
+//            foreach (var entity in entityData)
+//            {
+
+//                codeGenerator.Begin($"public class {this.Wrapper.GetCSharpName(entity.Name)} : Entity");
+//                codeGenerator.WriteBlock(
+//                    $@"public const int EntityId = {entity.Id};
+//public const string EntityName = "" {entity.Name}"";
+//public const string EntityDisplayName = ""{entity.DisplayName}"";
+
+//public const float EntityWidth = {entity.Width.ToString(nfi)}F;
+//public const float EntityHeight = {entity.Height.ToString(nfi)}F;
+//public const int EntityCategory = {categories.IndexOf(this.Wrapper.GetCSharpName(entity.Category))};
 
 
-public {this.Wrapper.GetCSharpName(entity.Name)} (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {{}}");
-                codeGenerator.Finish();
+//public {this.Wrapper.GetCSharpName(entity.Name)} (int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects) : base(serverId, position, pitch, yaw, velocity, isOnGround, effects, EntityId, EntityName, EntityDisplayName, EntityWidth, EntityHeight, EntityCategory) {{}}");
+//                codeGenerator.Finish();
 
-            }
+//            }
 
-            codeGenerator.Begin("public enum EntityType");
-            foreach (var entity in entityData)
-                codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(entity.Name)} = {entity.Id},");
-            codeGenerator.Finish();
-            codeGenerator.Finish();
+//            codeGenerator.Begin("public enum EntityType");
+//            foreach (var entity in entityData)
+//                codeGenerator.WriteLine($"{this.Wrapper.GetCSharpName(entity.Name)} = {entity.Id},");
+//            codeGenerator.Finish();
+//            codeGenerator.Finish();
         }
     }
 }

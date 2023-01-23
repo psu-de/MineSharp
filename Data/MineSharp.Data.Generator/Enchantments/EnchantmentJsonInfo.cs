@@ -24,43 +24,56 @@ namespace MineSharp.Data.Generator.Enchantments
     internal class EnchantmentJsonInfo
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        [Index(0)]
+        public int Id ;
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        [Index(1)]
+        public string Name;
 
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [Index(2)]
+        public string DisplayName;
 
         [JsonProperty("maxLevel")]
-        public int MaxLevel { get; set; }
+        [Index(3)]
+        public int MaxLevel;
 
         [JsonProperty("minCost")]
-        public MinCost MinCost { get; set; }
+        [Index(4)]
+        public MinCost MinCost;
 
         [JsonProperty("maxCost")]
-        public MaxCost MaxCost { get; set; }
+        [Index(5)]
+        public MaxCost MaxCost;
 
         [JsonProperty("treasureOnly")]
-        public bool TreasureOnly { get; set; }
+        [Index(6)]
+        public bool TreasureOnly;
 
         [JsonProperty("curse")]
-        public bool Curse { get; set; }
+        [Index(7)]
+        public bool Curse;
 
         [JsonProperty("exclude")]
-        public List<string> Exclude { get; set; }
+        [Index(8)]
+        public List<string> Exclude;
 
         [JsonProperty("category")]
-        public string Category { get; set; }
+        [Index(9)]
+        public string Category;
 
         [JsonProperty("weight")]
-        public int Weight { get; set; }
+        [Index(10)]
+        public int Weight;
 
         [JsonProperty("tradeable")]
-        public bool Tradeable { get; set; }
+        [Index(11)]
+        public bool Tradeable;
 
         [JsonProperty("discoverable")]
-        public bool Discoverable { get; set; }
+        [Index(12)]
+        public bool Discoverable;
     }
 #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 }

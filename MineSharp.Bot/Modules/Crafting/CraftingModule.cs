@@ -70,7 +70,7 @@ namespace MineSharp.Bot.Modules.Crafting
             
                 int count = this.Bot.Inventory!.GetContainerSlots()
                     .Select(x => x.Item)
-                    .Where(x => x != null && x.Id == ingredient.Value)
+                    .Where(x => x != null && x.Info.Id == ingredient.Value)
                     .Select(x => x!.Count)
                     .Sum(x => x);
             
@@ -80,12 +80,12 @@ namespace MineSharp.Bot.Modules.Crafting
             return totalCraftableAmount;
         }
 
-        public async Task Craft(Recipe recipe, CraftingTable? craftingTable = null, int count = 1)
+        public async Task Craft(Recipe recipe, Block? craftingTable = null, int count = 1)
         {
             Window craftingWindow;
             if (recipe.RequiresCraftingTable)
             {
-                if (craftingTable == null)
+                if (craftingTable == null || craftingTable.Info.Id != (int)BlockType.CraftingTable)
                 {
                     throw new ArgumentNullException(nameof(craftingTable));
                 }
@@ -139,7 +139,7 @@ namespace MineSharp.Bot.Modules.Crafting
             {
                 await Task.Delay(10);
                 resultSlot = craftingWindow.GetSlot(0);
-                if (!resultSlot.IsEmpty() && resultSlot.Item!.Id == recipe.Result)
+                if (!resultSlot.IsEmpty() && resultSlot.Item!.Info.Id == recipe.Result)
                 {
                     break;
                 }
@@ -150,9 +150,9 @@ namespace MineSharp.Bot.Modules.Crafting
                 throw new Exception("result slot is empty");
             }
 
-            if (resultSlot.Item!.Id != recipe.Result)
+            if (resultSlot.Item!.Info.Id != recipe.Result)
             {
-                throw new Exception($"unexpected result item! got: {resultSlot.Item!.Id}, expected: {recipe.Result}");
+                throw new Exception($"unexpected result item! got: {resultSlot.Item!.Info.Id}, expected: {recipe.Result}");
             }
             
             craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);

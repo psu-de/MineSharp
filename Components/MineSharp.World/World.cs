@@ -60,8 +60,8 @@ namespace MineSharp.World
                 var stateId = (int)(l >> 12);
 
                 var blockId = BlockPalette.GetBlockIdByState(stateId);
-                var blockType = BlockPalette.GetBlockTypeById(blockId);
-                var block = (Block)Activator.CreateInstance(blockType, stateId, new Position(blockX, blockY, blockZ))!;
+                var blockInfo = BlockPalette.GetBlockInfoById(blockId);
+                var block = new Block(blockInfo, stateId, new Position(blockX, blockY, blockZ))!;
 
                 chunk.ChunkSections[cY].SetBlock(block);
 

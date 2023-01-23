@@ -42,25 +42,25 @@ namespace MineSharp.Physics
         public static readonly UUID SprintingUUID = UUID.Parse("662a6b8d-da3e-4c1c-8813-96ea6097278d");
 
         public static List<int> WaterLikeBlocks = new List<int> {
-            Seagrass.BlockId,
-            TallSeagrass.BlockId,
-            Kelp.BlockId,
-            BubbleColumn.BlockId
+            (int)BlockType.Seagrass,
+            (int)BlockType.TallSeagrass,
+            (int)BlockType.Kelp,
+            (int)BlockType.BubbleColumn
         };
 
         public static double GetBlockSlipperiness(int blockId)
         {
             switch (blockId)
             {
-                case SlimeBlock.BlockId:
+                case (int)BlockType.SlimeBlock:
                     return 0.8f;
-                case Ice.BlockId:
+                case (int)BlockType.Ice:
                     return 0.98f;
-                case PackedIce.BlockId:
+                case (int)BlockType.PackedIce:
                     return 0.98f;
-                case FrostedIce.BlockId:
+                case (int)BlockType.FrostedIce:
                     return 0.98f;
-                case BlueIce.BlockId:
+                case (int)BlockType.BlueIce:
                     return 0.989f;
                 default:
                     return DefaultSlipperiness;

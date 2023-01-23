@@ -107,7 +107,7 @@ namespace MineSharp.Bot.Modules
                             continue;
                         }
 
-                        var newPlayer = new MinecraftPlayer(name, data.UUID!, ping, gm, new Player(-1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN, Vector3.Zero, true, new Dictionary<int, Effect?>()));
+                        var newPlayer = new MinecraftPlayer(name, data.UUID!, ping, gm, new Core.Types.Entity(EntityType.Player.GetInfo(), -1, new Vector3(double.NaN, double.NaN, double.NaN), float.NaN, float.NaN, Vector3.Zero, true, new Dictionary<int, Effect?>()));
                         if (!this.PlayerMapping.TryAdd(data.UUID!, newPlayer))
                         {
                             this.Logger.Debug("Could not add player");

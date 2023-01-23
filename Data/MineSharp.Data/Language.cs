@@ -1,9 +1,12 @@
 //////////////////////////////////////////////////////////////
 //   Generated Language Data for Minecraft Version 1.18.1   //
 //////////////////////////////////////////////////////////////
-namespace MineSharp.Data.Languages {
-	public static class Language {
-		public static Dictionary<string, string> Rules = new () {
+namespace MineSharp.Data.Languages
+{
+	public static class Language
+	{
+		public static Dictionary<string, string> Rules = new ()
+		{
 			{ "language.name", "English" },
 			{ "language.region", "United States" },
 			{ "language.code", "en_us" },

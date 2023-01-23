@@ -18,7 +18,7 @@ namespace MineSharp.Bot.Modules.Base
         public BaseModule(MinecraftBot bot) : base(bot) {}
 
 
-        public Player? BotEntity { get; private set; }
+        public Core.Types.Entity? BotEntity { get; private set; }
         public MinecraftPlayer? Player { get; private set; }
         public float Health { get; private set; }
         public bool IsAlive => this.Health > 0;
@@ -47,7 +47,8 @@ namespace MineSharp.Bot.Modules.Base
             var packet1 = await task1;
             var packet2 = await task2;
 
-            this.BotEntity = new Player(
+            this.BotEntity = new Core.Types.Entity(
+                EntityType.Player.GetInfo(),
                 packet1.EntityId!,
                 new Vector3(packet2.X!, packet2.Y!, packet2.Z!),
                 packet2.Pitch!,

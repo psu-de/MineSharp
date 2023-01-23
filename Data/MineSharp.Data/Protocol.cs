@@ -105,8 +105,10 @@ namespace MineSharp.Data.Protocol {
         }
     }
 }
-namespace MineSharp.Data.Protocol {
-	public partial class PacketBuffer {
+namespace MineSharp.Data.Protocol
+{
+	public partial class PacketBuffer
+	{
 		#region Reading
 
 		public VarInt ReadVarInt() {
@@ -456,24 +458,31 @@ namespace MineSharp.Data.Protocol {
 		#endregion
 	}
 }
-namespace MineSharp.Data.Protocol {
-	public class Slot {
-		public class AnonSwitch {
-			public class AnonSwitchStatetrueContainer {
+namespace MineSharp.Data.Protocol
+{
+	public class Slot
+	{
+		public class AnonSwitch
+		{
+			public class AnonSwitchStatetrueContainer
+			{
 				public VarInt ItemId { get; set; }
 				public sbyte ItemCount { get; set; }
 				public NbtCompound? NbtData { get; set; }
-				public AnonSwitchStatetrueContainer(VarInt @itemId, sbyte @itemCount, NbtCompound? @nbtData) {
+				public AnonSwitchStatetrueContainer(VarInt @itemId, sbyte @itemCount, NbtCompound? @nbtData)
+				{
 					this.ItemId = @itemId;
 					this.ItemCount = @itemCount;
 					this.NbtData = @nbtData;
 				}
-				public void Write(PacketBuffer buffer ) {
+				public void Write(PacketBuffer buffer )
+				{
 					((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ItemId);
 					((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.ItemCount);
 					((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))(buffer, this.NbtData);
 				}
-				public static AnonSwitchStatetrueContainer Read(PacketBuffer buffer ) {
+				public static AnonSwitchStatetrueContainer Read(PacketBuffer buffer )
+				{
 					VarInt @itemId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 					sbyte @itemCount = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 					NbtCompound? @nbtData = ((Func<PacketBuffer, NbtCompound?>)((buffer) => buffer.ReadOptionalNbt()))(buffer);
@@ -481,18 +490,23 @@ namespace MineSharp.Data.Protocol {
 				}
 			}
 			public object? Value { get; set; }
-			public AnonSwitch(object? value) {
+			public AnonSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, bool state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, bool state)
+			{
+				switch (state)
+				{
 					case false: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					case true: ((Action<PacketBuffer, AnonSwitchStatetrueContainer>)((buffer, value) => value.Write(buffer )))(buffer, (AnonSwitchStatetrueContainer)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static AnonSwitch Read(PacketBuffer buffer, bool state) {
-				object? value = state switch {
+			public static AnonSwitch Read(PacketBuffer buffer, bool state)
+			{
+				object? value = state switch
+				{
 					false => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					true => ((Func<PacketBuffer, AnonSwitchStatetrueContainer>)((buffer) => MineSharp.Data.Protocol.Slot.AnonSwitch.AnonSwitchStatetrueContainer.Read(buffer )))(buffer),
 				};
@@ -503,82 +517,102 @@ namespace MineSharp.Data.Protocol {
 		}
 		public bool Present { get; set; }
 		public AnonSwitch Anon { get; set; }
-		public Slot(bool @present, AnonSwitch @anon) {
+		public Slot(bool @present, AnonSwitch @anon)
+		{
 			this.Present = @present;
 			this.Anon = @anon;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Present);
 			((Action<PacketBuffer, AnonSwitch>)((buffer, value) => value.Write(buffer, Present)))(buffer, this.Anon);
 		}
-		public static Slot Read(PacketBuffer buffer ) {
+		public static Slot Read(PacketBuffer buffer )
+		{
 			bool @present = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			AnonSwitch @anon = ((Func<PacketBuffer, AnonSwitch>)((buffer) => AnonSwitch.Read(buffer, @present)))(buffer);
 			return new Slot(@present, @anon);
 		}
 	}
-	public class Particle {
+	public class Particle
+	{
 		public VarInt ParticleId { get; set; }
 		public ParticleDataSwitch Data { get; set; }
-		public Particle(VarInt @particleId, ParticleDataSwitch @data) {
+		public Particle(VarInt @particleId, ParticleDataSwitch @data)
+		{
 			this.ParticleId = @particleId;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ParticleId);
 			((Action<PacketBuffer, ParticleDataSwitch>)((buffer, value) => value.Write(buffer, ParticleId)))(buffer, this.Data);
 		}
-		public static Particle Read(PacketBuffer buffer ) {
+		public static Particle Read(PacketBuffer buffer )
+		{
 			VarInt @particleId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			ParticleDataSwitch @data = ((Func<PacketBuffer, ParticleDataSwitch>)((buffer) => ParticleDataSwitch.Read(buffer, @particleId)))(buffer);
 			return new Particle(@particleId, @data);
 		}
 	}
-	public class ParticleDataSwitch {
-		public class ParticleDataSwitchState2 {
+	public class ParticleDataSwitch
+	{
+		public class ParticleDataSwitchState2
+		{
 			public VarInt BlockState { get; set; }
-			public ParticleDataSwitchState2(VarInt @blockState) {
+			public ParticleDataSwitchState2(VarInt @blockState)
+			{
 				this.BlockState = @blockState;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.BlockState);
 			}
-			public static ParticleDataSwitchState2 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState2 Read(PacketBuffer buffer )
+			{
 				VarInt @blockState = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				return new ParticleDataSwitchState2(@blockState);
 			}
 		}
-		public class ParticleDataSwitchState3 {
+		public class ParticleDataSwitchState3
+		{
 			public VarInt BlockState { get; set; }
-			public ParticleDataSwitchState3(VarInt @blockState) {
+			public ParticleDataSwitchState3(VarInt @blockState)
+			{
 				this.BlockState = @blockState;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.BlockState);
 			}
-			public static ParticleDataSwitchState3 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState3 Read(PacketBuffer buffer )
+			{
 				VarInt @blockState = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				return new ParticleDataSwitchState3(@blockState);
 			}
 		}
-		public class ParticleDataSwitchState14 {
+		public class ParticleDataSwitchState14
+		{
 			public float Red { get; set; }
 			public float Green { get; set; }
 			public float Blue { get; set; }
 			public float Scale { get; set; }
-			public ParticleDataSwitchState14(float @red, float @green, float @blue, float @scale) {
+			public ParticleDataSwitchState14(float @red, float @green, float @blue, float @scale)
+			{
 				this.Red = @red;
 				this.Green = @green;
 				this.Blue = @blue;
 				this.Scale = @scale;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Red);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Green);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Blue);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Scale);
 			}
-			public static ParticleDataSwitchState14 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState14 Read(PacketBuffer buffer )
+			{
 				float @red = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @green = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @blue = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
@@ -586,7 +620,8 @@ namespace MineSharp.Data.Protocol {
 				return new ParticleDataSwitchState14(@red, @green, @blue, @scale);
 			}
 		}
-		public class ParticleDataSwitchState15 {
+		public class ParticleDataSwitchState15
+		{
 			public float FromRed { get; set; }
 			public float FromGreen { get; set; }
 			public float FromBlue { get; set; }
@@ -594,7 +629,8 @@ namespace MineSharp.Data.Protocol {
 			public float ToRed { get; set; }
 			public float ToGreen { get; set; }
 			public float ToBlue { get; set; }
-			public ParticleDataSwitchState15(float @fromRed, float @fromGreen, float @fromBlue, float @scale, float @toRed, float @toGreen, float @toBlue) {
+			public ParticleDataSwitchState15(float @fromRed, float @fromGreen, float @fromBlue, float @scale, float @toRed, float @toGreen, float @toBlue)
+			{
 				this.FromRed = @fromRed;
 				this.FromGreen = @fromGreen;
 				this.FromBlue = @fromBlue;
@@ -603,7 +639,8 @@ namespace MineSharp.Data.Protocol {
 				this.ToGreen = @toGreen;
 				this.ToBlue = @toBlue;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.FromRed);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.FromGreen);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.FromBlue);
@@ -612,7 +649,8 @@ namespace MineSharp.Data.Protocol {
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.ToGreen);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.ToBlue);
 			}
-			public static ParticleDataSwitchState15 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState15 Read(PacketBuffer buffer )
+			{
 				float @fromRed = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @fromGreen = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @fromBlue = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
@@ -623,47 +661,62 @@ namespace MineSharp.Data.Protocol {
 				return new ParticleDataSwitchState15(@fromRed, @fromGreen, @fromBlue, @scale, @toRed, @toGreen, @toBlue);
 			}
 		}
-		public class ParticleDataSwitchState24 {
+		public class ParticleDataSwitchState24
+		{
 			public VarInt BlockState { get; set; }
-			public ParticleDataSwitchState24(VarInt @blockState) {
+			public ParticleDataSwitchState24(VarInt @blockState)
+			{
 				this.BlockState = @blockState;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.BlockState);
 			}
-			public static ParticleDataSwitchState24 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState24 Read(PacketBuffer buffer )
+			{
 				VarInt @blockState = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				return new ParticleDataSwitchState24(@blockState);
 			}
 		}
-		public class ParticleDataSwitchState35 {
+		public class ParticleDataSwitchState35
+		{
 			public Slot Item { get; set; }
-			public ParticleDataSwitchState35(Slot @item) {
+			public ParticleDataSwitchState35(Slot @item)
+			{
 				this.Item = @item;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Item);
 			}
-			public static ParticleDataSwitchState35 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState35 Read(PacketBuffer buffer )
+			{
 				Slot @item = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 				return new ParticleDataSwitchState35(@item);
 			}
 		}
-		public class ParticleDataSwitchState36 {
-			public class DestinationSwitch {
+		public class ParticleDataSwitchState36
+		{
+			public class DestinationSwitch
+			{
 				public object? Value { get; set; }
-				public DestinationSwitch(object? value) {
+				public DestinationSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, string state) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, string state)
+				{
+					switch (state)
+					{
 						case "minecraft:block": ((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, (PositionBitfield)this); break;
 						case "minecraft:entity": ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
-				public static DestinationSwitch Read(PacketBuffer buffer, string state) {
-					object? value = state switch {
+				public static DestinationSwitch Read(PacketBuffer buffer, string state)
+				{
+					object? value = state switch
+					{
 						"minecraft:block" => ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer),
 						"minecraft:entity" => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						 _ => throw new Exception($"Invalid value: '{state}'")
@@ -679,19 +732,22 @@ namespace MineSharp.Data.Protocol {
 			public string PositionType { get; set; }
 			public DestinationSwitch Destination { get; set; }
 			public VarInt Ticks { get; set; }
-			public ParticleDataSwitchState36(PositionBitfield @origin, string @positionType, DestinationSwitch @destination, VarInt @ticks) {
+			public ParticleDataSwitchState36(PositionBitfield @origin, string @positionType, DestinationSwitch @destination, VarInt @ticks)
+			{
 				this.Origin = @origin;
 				this.PositionType = @positionType;
 				this.Destination = @destination;
 				this.Ticks = @ticks;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Origin);
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.PositionType);
 				((Action<PacketBuffer, DestinationSwitch>)((buffer, value) => value.Write(buffer, PositionType)))(buffer, this.Destination);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Ticks);
 			}
-			public static ParticleDataSwitchState36 Read(PacketBuffer buffer ) {
+			public static ParticleDataSwitchState36 Read(PacketBuffer buffer )
+			{
 				PositionBitfield @origin = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 				string @positionType = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				DestinationSwitch @destination = ((Func<PacketBuffer, DestinationSwitch>)((buffer) => DestinationSwitch.Read(buffer, @positionType)))(buffer);
@@ -700,11 +756,14 @@ namespace MineSharp.Data.Protocol {
 			}
 		}
 		public object? Value { get; set; }
-		public ParticleDataSwitch(object? value) {
+		public ParticleDataSwitch(object? value)
+		{
 			this.Value = value;
 		}
-		public void Write(PacketBuffer buffer, int state) {
-			switch (state) {
+		public void Write(PacketBuffer buffer, int state)
+		{
+			switch (state)
+			{
 				case 2: ((Action<PacketBuffer, ParticleDataSwitchState2>)((buffer, value) => value.Write(buffer )))(buffer, (ParticleDataSwitchState2)this); break;
 				case 3: ((Action<PacketBuffer, ParticleDataSwitchState3>)((buffer, value) => value.Write(buffer )))(buffer, (ParticleDataSwitchState3)this); break;
 				case 14: ((Action<PacketBuffer, ParticleDataSwitchState14>)((buffer, value) => value.Write(buffer )))(buffer, (ParticleDataSwitchState14)this); break;
@@ -715,8 +774,10 @@ namespace MineSharp.Data.Protocol {
 				default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 			}
 		}
-		public static ParticleDataSwitch Read(PacketBuffer buffer, int state) {
-			object? value = state switch {
+		public static ParticleDataSwitch Read(PacketBuffer buffer, int state)
+		{
+			object? value = state switch
+			{
 				2 => ((Func<PacketBuffer, ParticleDataSwitchState2>)((buffer) => MineSharp.Data.Protocol.ParticleDataSwitch.ParticleDataSwitchState2.Read(buffer )))(buffer),
 				3 => ((Func<PacketBuffer, ParticleDataSwitchState3>)((buffer) => MineSharp.Data.Protocol.ParticleDataSwitch.ParticleDataSwitchState3.Read(buffer )))(buffer),
 				14 => ((Func<PacketBuffer, ParticleDataSwitchState14>)((buffer) => MineSharp.Data.Protocol.ParticleDataSwitch.ParticleDataSwitchState14.Read(buffer )))(buffer),
@@ -743,9 +804,11 @@ namespace MineSharp.Data.Protocol {
 		public static implicit operator ParticleDataSwitch?(ParticleDataSwitchState35? value) => new ParticleDataSwitch(value);
 		public static implicit operator ParticleDataSwitch?(ParticleDataSwitchState36? value) => new ParticleDataSwitch(value);
 	}
-	public class PositionBitfield {
+	public class PositionBitfield
+	{
 		public ulong Value { get; set; }
-		public PositionBitfield(ulong value) {
+		public PositionBitfield(ulong value)
+		{
 			this.Value = value;
 		}
 		public int X { 
@@ -779,43 +842,52 @@ namespace MineSharp.Data.Protocol {
 		    }
 		}
 	}
-	public class EntityMetadataItemSwitch {
-		public class EntityMetadataItemSwitchState8 {
+	public class EntityMetadataItemSwitch
+	{
+		public class EntityMetadataItemSwitchState8
+		{
 			public float Pitch { get; set; }
 			public float Yaw { get; set; }
 			public float Roll { get; set; }
-			public EntityMetadataItemSwitchState8(float @pitch, float @yaw, float @roll) {
+			public EntityMetadataItemSwitchState8(float @pitch, float @yaw, float @roll)
+			{
 				this.Pitch = @pitch;
 				this.Yaw = @yaw;
 				this.Roll = @roll;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Yaw);
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Roll);
 			}
-			public static EntityMetadataItemSwitchState8 Read(PacketBuffer buffer ) {
+			public static EntityMetadataItemSwitchState8 Read(PacketBuffer buffer )
+			{
 				float @pitch = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @yaw = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				float @roll = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 				return new EntityMetadataItemSwitchState8(@pitch, @yaw, @roll);
 			}
 		}
-		public class EntityMetadataItemSwitchState16 {
+		public class EntityMetadataItemSwitchState16
+		{
 			public VarInt VillagerType { get; set; }
 			public VarInt VillagerProfession { get; set; }
 			public VarInt Level { get; set; }
-			public EntityMetadataItemSwitchState16(VarInt @villagerType, VarInt @villagerProfession, VarInt @level) {
+			public EntityMetadataItemSwitchState16(VarInt @villagerType, VarInt @villagerProfession, VarInt @level)
+			{
 				this.VillagerType = @villagerType;
 				this.VillagerProfession = @villagerProfession;
 				this.Level = @level;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.VillagerType);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.VillagerProfession);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Level);
 			}
-			public static EntityMetadataItemSwitchState16 Read(PacketBuffer buffer ) {
+			public static EntityMetadataItemSwitchState16 Read(PacketBuffer buffer )
+			{
 				VarInt @villagerType = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				VarInt @villagerProfession = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				VarInt @level = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -823,11 +895,14 @@ namespace MineSharp.Data.Protocol {
 			}
 		}
 		public object? Value { get; set; }
-		public EntityMetadataItemSwitch(object? value) {
+		public EntityMetadataItemSwitch(object? value)
+		{
 			this.Value = value;
 		}
-		public void Write(PacketBuffer buffer, VarInt state) {
-			switch (state) {
+		public void Write(PacketBuffer buffer, VarInt state)
+		{
+			switch (state)
+			{
 				case 0: ((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, (sbyte)this); break;
 				case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 				case 2: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
@@ -850,8 +925,10 @@ namespace MineSharp.Data.Protocol {
 				default: throw new Exception($"Invalid value: '{state}'");
 			}
 		}
-		public static EntityMetadataItemSwitch Read(PacketBuffer buffer, VarInt state) {
-			object? value = state.Value switch {
+		public static EntityMetadataItemSwitch Read(PacketBuffer buffer, VarInt state)
+		{
+			object? value = state.Value switch
+			{
 				0 => ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer),
 				1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 				2 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
@@ -900,19 +977,24 @@ namespace MineSharp.Data.Protocol {
 		public static implicit operator EntityMetadataItemSwitch?(Particle? value) => new EntityMetadataItemSwitch(value);
 		public static implicit operator EntityMetadataItemSwitch?(EntityMetadataItemSwitchState16? value) => new EntityMetadataItemSwitch(value);
 	}
-	public class EntityMetadataLoopElement {
-		public class AnonContainer {
+	public class EntityMetadataLoopElement
+	{
+		public class AnonContainer
+		{
 			public byte Key { get; set; }
 			public VarInt Type { get; set; }
-			public AnonContainer(byte @key, VarInt @type) {
+			public AnonContainer(byte @key, VarInt @type)
+			{
 				this.Key = @key;
 				this.Type = @type;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Key);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
 			}
-			public static AnonContainer Read(PacketBuffer buffer ) {
+			public static AnonContainer Read(PacketBuffer buffer )
+			{
 				byte @key = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 				VarInt @type = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				return new AnonContainer(@key, @type);
@@ -922,15 +1004,18 @@ namespace MineSharp.Data.Protocol {
 		public EntityMetadataItemSwitch Value { get; set; }
 		public byte Key { get { return Anon.Key; } set { Anon.Key = value; } }
 		public VarInt Type { get { return Anon.Type; } set { Anon.Type = value; } }
-		public EntityMetadataLoopElement(AnonContainer @anon, EntityMetadataItemSwitch @value) {
+		public EntityMetadataLoopElement(AnonContainer @anon, EntityMetadataItemSwitch @value)
+		{
 			this.Anon = @anon;
 			this.Value = @value;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, AnonContainer>)((buffer, value) => value.Write(buffer )))(buffer, this.Anon);
 			((Action<PacketBuffer, EntityMetadataItemSwitch>)((buffer, value) => value.Write(buffer, Type)))(buffer, this.Value);
 		}
-		public static EntityMetadataLoopElement Read(PacketBuffer buffer ) {
+		public static EntityMetadataLoopElement Read(PacketBuffer buffer )
+		{
 			AnonContainer @anon = ((Func<PacketBuffer, AnonContainer>)((buffer) => MineSharp.Data.Protocol.EntityMetadataLoopElement.AnonContainer.Read(buffer )))(buffer);
 			byte @key = @anon.Key;
 			VarInt @type = @anon.Type;
@@ -938,27 +1023,31 @@ namespace MineSharp.Data.Protocol {
 			return new EntityMetadataLoopElement(@anon, @value);
 		}
 	}
-	public class MinecraftSmeltingFormat {
+	public class MinecraftSmeltingFormat
+	{
 		public string Group { get; set; }
 		public Slot[] Ingredient { get; set; }
 		public Slot Result { get; set; }
 		public float Experience { get; set; }
 		public VarInt CookTime { get; set; }
-		public MinecraftSmeltingFormat(string @group, Slot[] @ingredient, Slot @result, float @experience, VarInt @cookTime) {
+		public MinecraftSmeltingFormat(string @group, Slot[] @ingredient, Slot @result, float @experience, VarInt @cookTime)
+		{
 			this.Group = @group;
 			this.Ingredient = @ingredient;
 			this.Result = @result;
 			this.Experience = @experience;
 			this.CookTime = @cookTime;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Group);
 			((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Ingredient);
 			((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Result);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Experience);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CookTime);
 		}
-		public static MinecraftSmeltingFormat Read(PacketBuffer buffer ) {
+		public static MinecraftSmeltingFormat Read(PacketBuffer buffer )
+		{
 			string @group = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			Slot[] @ingredient = ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
 			Slot @result = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
@@ -967,27 +1056,34 @@ namespace MineSharp.Data.Protocol {
 			return new MinecraftSmeltingFormat(@group, @ingredient, @result, @experience, @cookTime);
 		}
 	}
-	public class TagsElement {
+	public class TagsElement
+	{
 		public string TagName { get; set; }
 		public VarInt[] Entries { get; set; }
-		public TagsElement(string @tagName, VarInt[] @entries) {
+		public TagsElement(string @tagName, VarInt[] @entries)
+		{
 			this.TagName = @tagName;
 			this.Entries = @entries;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.TagName);
 			((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Entries);
 		}
-		public static TagsElement Read(PacketBuffer buffer ) {
+		public static TagsElement Read(PacketBuffer buffer )
+		{
 			string @tagName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			VarInt[] @entries = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new TagsElement(@tagName, @entries);
 		}
 	}
-	public class ChunkBlockEntity {
-		public class AnonBitfield {
+	public class ChunkBlockEntity
+	{
+		public class AnonBitfield
+		{
 			public byte Value { get; set; }
-			public AnonBitfield(byte value) {
+			public AnonBitfield(byte value)
+			{
 				this.Value = value;
 			}
 			public byte X { 
@@ -1017,19 +1113,22 @@ namespace MineSharp.Data.Protocol {
 		public NbtCompound? NbtData { get; set; }
 		public byte X { get { return Anon.X; } set { Anon.X = value; } }
 		public byte Z { get { return Anon.Z; } set { Anon.Z = value; } }
-		public ChunkBlockEntity(AnonBitfield @anon, short @y, VarInt @type, NbtCompound? @nbtData) {
+		public ChunkBlockEntity(AnonBitfield @anon, short @y, VarInt @type, NbtCompound? @nbtData)
+		{
 			this.Anon = @anon;
 			this.Y = @y;
 			this.Type = @type;
 			this.NbtData = @nbtData;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, AnonBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Anon);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Y);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
 			((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))(buffer, this.NbtData);
 		}
-		public static ChunkBlockEntity Read(PacketBuffer buffer ) {
+		public static ChunkBlockEntity Read(PacketBuffer buffer )
+		{
 			AnonBitfield @anon = ((Func<PacketBuffer, AnonBitfield>)((buffer) => new AnonBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 			byte @x = @anon.X;
 			byte @z = @anon.Z;
@@ -1040,164 +1139,206 @@ namespace MineSharp.Data.Protocol {
 		}
 	}
 }
-namespace MineSharp.Data.Protocol.Play {
+namespace MineSharp.Data.Protocol.Play
+{
 }
-namespace MineSharp.Data.Protocol.Play.Serverbound {
-	public class PacketTeleportConfirm : IPacketPayload {
+namespace MineSharp.Data.Protocol.Play.Serverbound
+{
+	public class PacketTeleportConfirm : IPacketPayload
+	{
 		public VarInt TeleportId { get; set; }
-		public PacketTeleportConfirm(VarInt @teleportId) {
+		public PacketTeleportConfirm(VarInt @teleportId)
+		{
 			this.TeleportId = @teleportId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TeleportId);
 		}
-		public static PacketTeleportConfirm Read(PacketBuffer buffer ) {
+		public static PacketTeleportConfirm Read(PacketBuffer buffer )
+		{
 			VarInt @teleportId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketTeleportConfirm(@teleportId);
 		}
 	}
-	public class PacketQueryBlockNbt : IPacketPayload {
+	public class PacketQueryBlockNbt : IPacketPayload
+	{
 		public VarInt TransactionId { get; set; }
 		public PositionBitfield Location { get; set; }
-		public PacketQueryBlockNbt(VarInt @transactionId, PositionBitfield @location) {
+		public PacketQueryBlockNbt(VarInt @transactionId, PositionBitfield @location)
+		{
 			this.TransactionId = @transactionId;
 			this.Location = @location;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TransactionId);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 		}
-		public static PacketQueryBlockNbt Read(PacketBuffer buffer ) {
+		public static PacketQueryBlockNbt Read(PacketBuffer buffer )
+		{
 			VarInt @transactionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			return new PacketQueryBlockNbt(@transactionId, @location);
 		}
 	}
-	public class PacketSetDifficulty : IPacketPayload {
+	public class PacketSetDifficulty : IPacketPayload
+	{
 		public byte NewDifficulty { get; set; }
-		public PacketSetDifficulty(byte @newDifficulty) {
+		public PacketSetDifficulty(byte @newDifficulty)
+		{
 			this.NewDifficulty = @newDifficulty;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.NewDifficulty);
 		}
-		public static PacketSetDifficulty Read(PacketBuffer buffer ) {
+		public static PacketSetDifficulty Read(PacketBuffer buffer )
+		{
 			byte @newDifficulty = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketSetDifficulty(@newDifficulty);
 		}
 	}
-	public class PacketEditBook : IPacketPayload {
+	public class PacketEditBook : IPacketPayload
+	{
 		public VarInt Hand { get; set; }
 		public string[] Pages { get; set; }
 		public string? Title { get; set; }
-		public PacketEditBook(VarInt @hand, string[] @pages, string? @title) {
+		public PacketEditBook(VarInt @hand, string[] @pages, string? @title)
+		{
 			this.Hand = @hand;
 			this.Pages = @pages;
 			this.Title = @title;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Hand);
 			((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Pages);
 			((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.Title);
 		}
-		public static PacketEditBook Read(PacketBuffer buffer ) {
+		public static PacketEditBook Read(PacketBuffer buffer )
+		{
 			VarInt @hand = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string[] @pages = ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
 			string? @title = ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
 			return new PacketEditBook(@hand, @pages, @title);
 		}
 	}
-	public class PacketQueryEntityNbt : IPacketPayload {
+	public class PacketQueryEntityNbt : IPacketPayload
+	{
 		public VarInt TransactionId { get; set; }
 		public VarInt EntityId { get; set; }
-		public PacketQueryEntityNbt(VarInt @transactionId, VarInt @entityId) {
+		public PacketQueryEntityNbt(VarInt @transactionId, VarInt @entityId)
+		{
 			this.TransactionId = @transactionId;
 			this.EntityId = @entityId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TransactionId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 		}
-		public static PacketQueryEntityNbt Read(PacketBuffer buffer ) {
+		public static PacketQueryEntityNbt Read(PacketBuffer buffer )
+		{
 			VarInt @transactionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketQueryEntityNbt(@transactionId, @entityId);
 		}
 	}
-	public class PacketPickItem : IPacketPayload {
+	public class PacketPickItem : IPacketPayload
+	{
 		public VarInt Slot { get; set; }
-		public PacketPickItem(VarInt @slot) {
+		public PacketPickItem(VarInt @slot)
+		{
 			this.Slot = @slot;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Slot);
 		}
-		public static PacketPickItem Read(PacketBuffer buffer ) {
+		public static PacketPickItem Read(PacketBuffer buffer )
+		{
 			VarInt @slot = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketPickItem(@slot);
 		}
 	}
-	public class PacketNameItem : IPacketPayload {
+	public class PacketNameItem : IPacketPayload
+	{
 		public string Name { get; set; }
-		public PacketNameItem(string @name) {
+		public PacketNameItem(string @name)
+		{
 			this.Name = @name;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 		}
-		public static PacketNameItem Read(PacketBuffer buffer ) {
+		public static PacketNameItem Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketNameItem(@name);
 		}
 	}
-	public class PacketSelectTrade : IPacketPayload {
+	public class PacketSelectTrade : IPacketPayload
+	{
 		public VarInt Slot { get; set; }
-		public PacketSelectTrade(VarInt @slot) {
+		public PacketSelectTrade(VarInt @slot)
+		{
 			this.Slot = @slot;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Slot);
 		}
-		public static PacketSelectTrade Read(PacketBuffer buffer ) {
+		public static PacketSelectTrade Read(PacketBuffer buffer )
+		{
 			VarInt @slot = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketSelectTrade(@slot);
 		}
 	}
-	public class PacketSetBeaconEffect : IPacketPayload {
+	public class PacketSetBeaconEffect : IPacketPayload
+	{
 		public VarInt PrimaryEffect { get; set; }
 		public VarInt SecondaryEffect { get; set; }
-		public PacketSetBeaconEffect(VarInt @primaryEffect, VarInt @secondaryEffect) {
+		public PacketSetBeaconEffect(VarInt @primaryEffect, VarInt @secondaryEffect)
+		{
 			this.PrimaryEffect = @primaryEffect;
 			this.SecondaryEffect = @secondaryEffect;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.PrimaryEffect);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SecondaryEffect);
 		}
-		public static PacketSetBeaconEffect Read(PacketBuffer buffer ) {
+		public static PacketSetBeaconEffect Read(PacketBuffer buffer )
+		{
 			VarInt @primaryEffect = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @secondaryEffect = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketSetBeaconEffect(@primaryEffect, @secondaryEffect);
 		}
 	}
-	public class PacketUpdateCommandBlock : IPacketPayload {
+	public class PacketUpdateCommandBlock : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public string Command { get; set; }
 		public VarInt Mode { get; set; }
 		public byte Flags { get; set; }
-		public PacketUpdateCommandBlock(PositionBitfield @location, string @command, VarInt @mode, byte @flags) {
+		public PacketUpdateCommandBlock(PositionBitfield @location, string @command, VarInt @mode, byte @flags)
+		{
 			this.Location = @location;
 			this.Command = @command;
 			this.Mode = @mode;
 			this.Flags = @flags;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Command);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Mode);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Flags);
 		}
-		public static PacketUpdateCommandBlock Read(PacketBuffer buffer ) {
+		public static PacketUpdateCommandBlock Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			string @command = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			VarInt @mode = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -1205,28 +1346,33 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketUpdateCommandBlock(@location, @command, @mode, @flags);
 		}
 	}
-	public class PacketUpdateCommandBlockMinecart : IPacketPayload {
+	public class PacketUpdateCommandBlockMinecart : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public string Command { get; set; }
 		public bool TrackOutput { get; set; }
-		public PacketUpdateCommandBlockMinecart(VarInt @entityId, string @command, bool @trackOutput) {
+		public PacketUpdateCommandBlockMinecart(VarInt @entityId, string @command, bool @trackOutput)
+		{
 			this.EntityId = @entityId;
 			this.Command = @command;
 			this.TrackOutput = @trackOutput;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Command);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.TrackOutput);
 		}
-		public static PacketUpdateCommandBlockMinecart Read(PacketBuffer buffer ) {
+		public static PacketUpdateCommandBlockMinecart Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @command = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			bool @trackOutput = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketUpdateCommandBlockMinecart(@entityId, @command, @trackOutput);
 		}
 	}
-	public class PacketUpdateStructureBlock : IPacketPayload {
+	public class PacketUpdateStructureBlock : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public VarInt Action { get; set; }
 		public VarInt Mode { get; set; }
@@ -1243,7 +1389,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public float Integrity { get; set; }
 		public VarInt Seed { get; set; }
 		public byte Flags { get; set; }
-		public PacketUpdateStructureBlock(PositionBitfield @location, VarInt @action, VarInt @mode, string @name, byte @offsetX, byte @offsetY, byte @offsetZ, byte @sizeX, byte @sizeY, byte @sizeZ, VarInt @mirror, VarInt @rotation, string @metadata, float @integrity, VarInt @seed, byte @flags) {
+		public PacketUpdateStructureBlock(PositionBitfield @location, VarInt @action, VarInt @mode, string @name, byte @offsetX, byte @offsetY, byte @offsetZ, byte @sizeX, byte @sizeY, byte @sizeZ, VarInt @mirror, VarInt @rotation, string @metadata, float @integrity, VarInt @seed, byte @flags)
+		{
 			this.Location = @location;
 			this.Action = @action;
 			this.Mode = @mode;
@@ -1261,7 +1408,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.Seed = @seed;
 			this.Flags = @flags;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Mode);
@@ -1279,7 +1427,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Seed);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Flags);
 		}
-		public static PacketUpdateStructureBlock Read(PacketBuffer buffer ) {
+		public static PacketUpdateStructureBlock Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @mode = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -1299,50 +1448,63 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketUpdateStructureBlock(@location, @action, @mode, @name, @offsetX, @offsetY, @offsetZ, @sizeX, @sizeY, @sizeZ, @mirror, @rotation, @metadata, @integrity, @seed, @flags);
 		}
 	}
-	public class PacketTabComplete : IPacketPayload {
+	public class PacketTabComplete : IPacketPayload
+	{
 		public VarInt TransactionId { get; set; }
 		public string Text { get; set; }
-		public PacketTabComplete(VarInt @transactionId, string @text) {
+		public PacketTabComplete(VarInt @transactionId, string @text)
+		{
 			this.TransactionId = @transactionId;
 			this.Text = @text;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TransactionId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text);
 		}
-		public static PacketTabComplete Read(PacketBuffer buffer ) {
+		public static PacketTabComplete Read(PacketBuffer buffer )
+		{
 			VarInt @transactionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @text = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketTabComplete(@transactionId, @text);
 		}
 	}
-	public class PacketChat : IPacketPayload {
+	public class PacketChat : IPacketPayload
+	{
 		public string Message { get; set; }
-		public PacketChat(string @message) {
+		public PacketChat(string @message)
+		{
 			this.Message = @message;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Message);
 		}
-		public static PacketChat Read(PacketBuffer buffer ) {
+		public static PacketChat Read(PacketBuffer buffer )
+		{
 			string @message = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketChat(@message);
 		}
 	}
-	public class PacketClientCommand : IPacketPayload {
+	public class PacketClientCommand : IPacketPayload
+	{
 		public VarInt ActionId { get; set; }
-		public PacketClientCommand(VarInt @actionId) {
+		public PacketClientCommand(VarInt @actionId)
+		{
 			this.ActionId = @actionId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ActionId);
 		}
-		public static PacketClientCommand Read(PacketBuffer buffer ) {
+		public static PacketClientCommand Read(PacketBuffer buffer )
+		{
 			VarInt @actionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketClientCommand(@actionId);
 		}
 	}
-	public class PacketSettings : IPacketPayload {
+	public class PacketSettings : IPacketPayload
+	{
 		public string Locale { get; set; }
 		public sbyte ViewDistance { get; set; }
 		public VarInt ChatFlags { get; set; }
@@ -1351,7 +1513,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public VarInt MainHand { get; set; }
 		public bool EnableTextFiltering { get; set; }
 		public bool EnableServerListing { get; set; }
-		public PacketSettings(string @locale, sbyte @viewDistance, VarInt @chatFlags, bool @chatColors, byte @skinParts, VarInt @mainHand, bool @enableTextFiltering, bool @enableServerListing) {
+		public PacketSettings(string @locale, sbyte @viewDistance, VarInt @chatFlags, bool @chatColors, byte @skinParts, VarInt @mainHand, bool @enableTextFiltering, bool @enableServerListing)
+		{
 			this.Locale = @locale;
 			this.ViewDistance = @viewDistance;
 			this.ChatFlags = @chatFlags;
@@ -1361,7 +1524,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.EnableTextFiltering = @enableTextFiltering;
 			this.EnableServerListing = @enableServerListing;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Locale);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.ViewDistance);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ChatFlags);
@@ -1371,7 +1535,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.EnableTextFiltering);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.EnableServerListing);
 		}
-		public static PacketSettings Read(PacketBuffer buffer ) {
+		public static PacketSettings Read(PacketBuffer buffer )
+		{
 			string @locale = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			sbyte @viewDistance = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			VarInt @chatFlags = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -1383,36 +1548,45 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketSettings(@locale, @viewDistance, @chatFlags, @chatColors, @skinParts, @mainHand, @enableTextFiltering, @enableServerListing);
 		}
 	}
-	public class PacketEnchantItem : IPacketPayload {
+	public class PacketEnchantItem : IPacketPayload
+	{
 		public sbyte WindowId { get; set; }
 		public sbyte Enchantment { get; set; }
-		public PacketEnchantItem(sbyte @windowId, sbyte @enchantment) {
+		public PacketEnchantItem(sbyte @windowId, sbyte @enchantment)
+		{
 			this.WindowId = @windowId;
 			this.Enchantment = @enchantment;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Enchantment);
 		}
-		public static PacketEnchantItem Read(PacketBuffer buffer ) {
+		public static PacketEnchantItem Read(PacketBuffer buffer )
+		{
 			sbyte @windowId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			sbyte @enchantment = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketEnchantItem(@windowId, @enchantment);
 		}
 	}
-	public class PacketWindowClick : IPacketPayload {
-		public class ChangedSlotsElementContainer {
+	public class PacketWindowClick : IPacketPayload
+	{
+		public class ChangedSlotsElementContainer
+		{
 			public short Location { get; set; }
 			public Slot Item { get; set; }
-			public ChangedSlotsElementContainer(short @location, Slot @item) {
+			public ChangedSlotsElementContainer(short @location, Slot @item)
+			{
 				this.Location = @location;
 				this.Item = @item;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Location);
 				((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Item);
 			}
-			public static ChangedSlotsElementContainer Read(PacketBuffer buffer ) {
+			public static ChangedSlotsElementContainer Read(PacketBuffer buffer )
+			{
 				short @location = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 				Slot @item = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 				return new ChangedSlotsElementContainer(@location, @item);
@@ -1425,7 +1599,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public VarInt Mode { get; set; }
 		public ChangedSlotsElementContainer[] ChangedSlots { get; set; }
 		public Slot CursorItem { get; set; }
-		public PacketWindowClick(byte @windowId, VarInt @stateId, short @slot, sbyte @mouseButton, VarInt @mode, ChangedSlotsElementContainer[] @changedSlots, Slot @cursorItem) {
+		public PacketWindowClick(byte @windowId, VarInt @stateId, short @slot, sbyte @mouseButton, VarInt @mode, ChangedSlotsElementContainer[] @changedSlots, Slot @cursorItem)
+		{
 			this.WindowId = @windowId;
 			this.StateId = @stateId;
 			this.Slot = @slot;
@@ -1434,7 +1609,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.ChangedSlots = @changedSlots;
 			this.CursorItem = @cursorItem;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.StateId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Slot);
@@ -1443,7 +1619,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, ChangedSlotsElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, ChangedSlotsElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ChangedSlots);
 			((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.CursorItem);
 		}
-		public static PacketWindowClick Read(PacketBuffer buffer ) {
+		public static PacketWindowClick Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			VarInt @stateId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			short @slot = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
@@ -1454,50 +1631,65 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketWindowClick(@windowId, @stateId, @slot, @mouseButton, @mode, @changedSlots, @cursorItem);
 		}
 	}
-	public class PacketCloseWindow : IPacketPayload {
+	public class PacketCloseWindow : IPacketPayload
+	{
 		public byte WindowId { get; set; }
-		public PacketCloseWindow(byte @windowId) {
+		public PacketCloseWindow(byte @windowId)
+		{
 			this.WindowId = @windowId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 		}
-		public static PacketCloseWindow Read(PacketBuffer buffer ) {
+		public static PacketCloseWindow Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketCloseWindow(@windowId);
 		}
 	}
-	public class PacketCustomPayload : IPacketPayload {
+	public class PacketCustomPayload : IPacketPayload
+	{
 		public string Channel { get; set; }
 		public byte[] Data { get; set; }
-		public PacketCustomPayload(string @channel, byte[] @data) {
+		public PacketCustomPayload(string @channel, byte[] @data)
+		{
 			this.Channel = @channel;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Channel);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value)))(buffer, this.Data);
 		}
-		public static PacketCustomPayload Read(PacketBuffer buffer ) {
+		public static PacketCustomPayload Read(PacketBuffer buffer )
+		{
 			string @channel = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			byte[] @data = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer()))(buffer);
 			return new PacketCustomPayload(@channel, @data);
 		}
 	}
-	public class PacketUseEntity : IPacketPayload {
-		public class XSwitch {
+	public class PacketUseEntity : IPacketPayload
+	{
+		public class XSwitch
+		{
 			public object? Value { get; set; }
-			public XSwitch(object? value) {
+			public XSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 2: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static XSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static XSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					2 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -1506,19 +1698,25 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			public static implicit operator float?(XSwitch value) => (float?)value.Value;
 			public static implicit operator XSwitch?(float? value) => new XSwitch(value);
 		}
-		public class YSwitch {
+		public class YSwitch
+		{
 			public object? Value { get; set; }
-			public YSwitch(object? value) {
+			public YSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 2: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static YSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static YSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					2 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -1527,19 +1725,25 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			public static implicit operator float?(YSwitch value) => (float?)value.Value;
 			public static implicit operator YSwitch?(float? value) => new YSwitch(value);
 		}
-		public class ZSwitch {
+		public class ZSwitch
+		{
 			public object? Value { get; set; }
-			public ZSwitch(object? value) {
+			public ZSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 2: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static ZSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static ZSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					2 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -1548,20 +1752,26 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			public static implicit operator float?(ZSwitch value) => (float?)value.Value;
 			public static implicit operator ZSwitch?(float? value) => new ZSwitch(value);
 		}
-		public class HandSwitch {
+		public class HandSwitch
+		{
 			public object? Value { get; set; }
-			public HandSwitch(object? value) {
+			public HandSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 2: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static HandSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static HandSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					2 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -1578,7 +1788,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public ZSwitch Z { get; set; }
 		public HandSwitch Hand { get; set; }
 		public bool Sneaking { get; set; }
-		public PacketUseEntity(VarInt @target, VarInt @mouse, XSwitch @x, YSwitch @y, ZSwitch @z, HandSwitch @hand, bool @sneaking) {
+		public PacketUseEntity(VarInt @target, VarInt @mouse, XSwitch @x, YSwitch @y, ZSwitch @z, HandSwitch @hand, bool @sneaking)
+		{
 			this.Target = @target;
 			this.Mouse = @mouse;
 			this.X = @x;
@@ -1587,7 +1798,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.Hand = @hand;
 			this.Sneaking = @sneaking;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Target);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Mouse);
 			((Action<PacketBuffer, XSwitch>)((buffer, value) => value.Write(buffer, Mouse)))(buffer, this.X);
@@ -1596,7 +1808,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, HandSwitch>)((buffer, value) => value.Write(buffer, Mouse)))(buffer, this.Hand);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Sneaking);
 		}
-		public static PacketUseEntity Read(PacketBuffer buffer ) {
+		public static PacketUseEntity Read(PacketBuffer buffer )
+		{
 			VarInt @target = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @mouse = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			XSwitch @x = ((Func<PacketBuffer, XSwitch>)((buffer) => XSwitch.Read(buffer, @mouse)))(buffer);
@@ -1607,71 +1820,87 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketUseEntity(@target, @mouse, @x, @y, @z, @hand, @sneaking);
 		}
 	}
-	public class PacketGenerateStructure : IPacketPayload {
+	public class PacketGenerateStructure : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public VarInt Levels { get; set; }
 		public bool KeepJigsaws { get; set; }
-		public PacketGenerateStructure(PositionBitfield @location, VarInt @levels, bool @keepJigsaws) {
+		public PacketGenerateStructure(PositionBitfield @location, VarInt @levels, bool @keepJigsaws)
+		{
 			this.Location = @location;
 			this.Levels = @levels;
 			this.KeepJigsaws = @keepJigsaws;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Levels);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.KeepJigsaws);
 		}
-		public static PacketGenerateStructure Read(PacketBuffer buffer ) {
+		public static PacketGenerateStructure Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @levels = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			bool @keepJigsaws = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketGenerateStructure(@location, @levels, @keepJigsaws);
 		}
 	}
-	public class PacketKeepAlive : IPacketPayload {
+	public class PacketKeepAlive : IPacketPayload
+	{
 		public long KeepAliveId { get; set; }
-		public PacketKeepAlive(long @keepAliveId) {
+		public PacketKeepAlive(long @keepAliveId)
+		{
 			this.KeepAliveId = @keepAliveId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.KeepAliveId);
 		}
-		public static PacketKeepAlive Read(PacketBuffer buffer ) {
+		public static PacketKeepAlive Read(PacketBuffer buffer )
+		{
 			long @keepAliveId = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			return new PacketKeepAlive(@keepAliveId);
 		}
 	}
-	public class PacketLockDifficulty : IPacketPayload {
+	public class PacketLockDifficulty : IPacketPayload
+	{
 		public bool Locked { get; set; }
-		public PacketLockDifficulty(bool @locked) {
+		public PacketLockDifficulty(bool @locked)
+		{
 			this.Locked = @locked;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Locked);
 		}
-		public static PacketLockDifficulty Read(PacketBuffer buffer ) {
+		public static PacketLockDifficulty Read(PacketBuffer buffer )
+		{
 			bool @locked = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketLockDifficulty(@locked);
 		}
 	}
-	public class PacketPosition : IPacketPayload {
+	public class PacketPosition : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 		public bool OnGround { get; set; }
-		public PacketPosition(double @x, double @y, double @z, bool @onGround) {
+		public PacketPosition(double @x, double @y, double @z, bool @onGround)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketPosition Read(PacketBuffer buffer ) {
+		public static PacketPosition Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -1679,14 +1908,16 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketPosition(@x, @y, @z, @onGround);
 		}
 	}
-	public class PacketPositionLook : IPacketPayload {
+	public class PacketPositionLook : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 		public float Yaw { get; set; }
 		public float Pitch { get; set; }
 		public bool OnGround { get; set; }
-		public PacketPositionLook(double @x, double @y, double @z, float @yaw, float @pitch, bool @onGround) {
+		public PacketPositionLook(double @x, double @y, double @z, float @yaw, float @pitch, bool @onGround)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
@@ -1694,7 +1925,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.Pitch = @pitch;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
@@ -1702,7 +1934,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketPositionLook Read(PacketBuffer buffer ) {
+		public static PacketPositionLook Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -1712,61 +1945,73 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketPositionLook(@x, @y, @z, @yaw, @pitch, @onGround);
 		}
 	}
-	public class PacketLook : IPacketPayload {
+	public class PacketLook : IPacketPayload
+	{
 		public float Yaw { get; set; }
 		public float Pitch { get; set; }
 		public bool OnGround { get; set; }
-		public PacketLook(float @yaw, float @pitch, bool @onGround) {
+		public PacketLook(float @yaw, float @pitch, bool @onGround)
+		{
 			this.Yaw = @yaw;
 			this.Pitch = @pitch;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Yaw);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketLook Read(PacketBuffer buffer ) {
+		public static PacketLook Read(PacketBuffer buffer )
+		{
 			float @yaw = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			float @pitch = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			bool @onGround = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketLook(@yaw, @pitch, @onGround);
 		}
 	}
-	public class PacketFlying : IPacketPayload {
+	public class PacketFlying : IPacketPayload
+	{
 		public bool OnGround { get; set; }
-		public PacketFlying(bool @onGround) {
+		public PacketFlying(bool @onGround)
+		{
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketFlying Read(PacketBuffer buffer ) {
+		public static PacketFlying Read(PacketBuffer buffer )
+		{
 			bool @onGround = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketFlying(@onGround);
 		}
 	}
-	public class PacketVehicleMove : IPacketPayload {
+	public class PacketVehicleMove : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 		public float Yaw { get; set; }
 		public float Pitch { get; set; }
-		public PacketVehicleMove(double @x, double @y, double @z, float @yaw, float @pitch) {
+		public PacketVehicleMove(double @x, double @y, double @z, float @yaw, float @pitch)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
 			this.Yaw = @yaw;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Yaw);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 		}
-		public static PacketVehicleMove Read(PacketBuffer buffer ) {
+		public static PacketVehicleMove Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -1775,205 +2020,251 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketVehicleMove(@x, @y, @z, @yaw, @pitch);
 		}
 	}
-	public class PacketSteerBoat : IPacketPayload {
+	public class PacketSteerBoat : IPacketPayload
+	{
 		public bool LeftPaddle { get; set; }
 		public bool RightPaddle { get; set; }
-		public PacketSteerBoat(bool @leftPaddle, bool @rightPaddle) {
+		public PacketSteerBoat(bool @leftPaddle, bool @rightPaddle)
+		{
 			this.LeftPaddle = @leftPaddle;
 			this.RightPaddle = @rightPaddle;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.LeftPaddle);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.RightPaddle);
 		}
-		public static PacketSteerBoat Read(PacketBuffer buffer ) {
+		public static PacketSteerBoat Read(PacketBuffer buffer )
+		{
 			bool @leftPaddle = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			bool @rightPaddle = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketSteerBoat(@leftPaddle, @rightPaddle);
 		}
 	}
-	public class PacketCraftRecipeRequest : IPacketPayload {
+	public class PacketCraftRecipeRequest : IPacketPayload
+	{
 		public sbyte WindowId { get; set; }
 		public string Recipe { get; set; }
 		public bool MakeAll { get; set; }
-		public PacketCraftRecipeRequest(sbyte @windowId, string @recipe, bool @makeAll) {
+		public PacketCraftRecipeRequest(sbyte @windowId, string @recipe, bool @makeAll)
+		{
 			this.WindowId = @windowId;
 			this.Recipe = @recipe;
 			this.MakeAll = @makeAll;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Recipe);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.MakeAll);
 		}
-		public static PacketCraftRecipeRequest Read(PacketBuffer buffer ) {
+		public static PacketCraftRecipeRequest Read(PacketBuffer buffer )
+		{
 			sbyte @windowId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			string @recipe = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			bool @makeAll = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketCraftRecipeRequest(@windowId, @recipe, @makeAll);
 		}
 	}
-	public class PacketAbilities : IPacketPayload {
+	public class PacketAbilities : IPacketPayload
+	{
 		public sbyte Flags { get; set; }
-		public PacketAbilities(sbyte @flags) {
+		public PacketAbilities(sbyte @flags)
+		{
 			this.Flags = @flags;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Flags);
 		}
-		public static PacketAbilities Read(PacketBuffer buffer ) {
+		public static PacketAbilities Read(PacketBuffer buffer )
+		{
 			sbyte @flags = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketAbilities(@flags);
 		}
 	}
-	public class PacketBlockDig : IPacketPayload {
+	public class PacketBlockDig : IPacketPayload
+	{
 		public sbyte Status { get; set; }
 		public PositionBitfield Location { get; set; }
 		public sbyte Face { get; set; }
-		public PacketBlockDig(sbyte @status, PositionBitfield @location, sbyte @face) {
+		public PacketBlockDig(sbyte @status, PositionBitfield @location, sbyte @face)
+		{
 			this.Status = @status;
 			this.Location = @location;
 			this.Face = @face;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Status);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Face);
 		}
-		public static PacketBlockDig Read(PacketBuffer buffer ) {
+		public static PacketBlockDig Read(PacketBuffer buffer )
+		{
 			sbyte @status = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			sbyte @face = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketBlockDig(@status, @location, @face);
 		}
 	}
-	public class PacketEntityAction : IPacketPayload {
+	public class PacketEntityAction : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public VarInt ActionId { get; set; }
 		public VarInt JumpBoost { get; set; }
-		public PacketEntityAction(VarInt @entityId, VarInt @actionId, VarInt @jumpBoost) {
+		public PacketEntityAction(VarInt @entityId, VarInt @actionId, VarInt @jumpBoost)
+		{
 			this.EntityId = @entityId;
 			this.ActionId = @actionId;
 			this.JumpBoost = @jumpBoost;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ActionId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.JumpBoost);
 		}
-		public static PacketEntityAction Read(PacketBuffer buffer ) {
+		public static PacketEntityAction Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @actionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @jumpBoost = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketEntityAction(@entityId, @actionId, @jumpBoost);
 		}
 	}
-	public class PacketSteerVehicle : IPacketPayload {
+	public class PacketSteerVehicle : IPacketPayload
+	{
 		public float Sideways { get; set; }
 		public float Forward { get; set; }
 		public byte Jump { get; set; }
-		public PacketSteerVehicle(float @sideways, float @forward, byte @jump) {
+		public PacketSteerVehicle(float @sideways, float @forward, byte @jump)
+		{
 			this.Sideways = @sideways;
 			this.Forward = @forward;
 			this.Jump = @jump;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Sideways);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Forward);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Jump);
 		}
-		public static PacketSteerVehicle Read(PacketBuffer buffer ) {
+		public static PacketSteerVehicle Read(PacketBuffer buffer )
+		{
 			float @sideways = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			float @forward = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			byte @jump = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketSteerVehicle(@sideways, @forward, @jump);
 		}
 	}
-	public class PacketDisplayedRecipe : IPacketPayload {
+	public class PacketDisplayedRecipe : IPacketPayload
+	{
 		public string RecipeId { get; set; }
-		public PacketDisplayedRecipe(string @recipeId) {
+		public PacketDisplayedRecipe(string @recipeId)
+		{
 			this.RecipeId = @recipeId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.RecipeId);
 		}
-		public static PacketDisplayedRecipe Read(PacketBuffer buffer ) {
+		public static PacketDisplayedRecipe Read(PacketBuffer buffer )
+		{
 			string @recipeId = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketDisplayedRecipe(@recipeId);
 		}
 	}
-	public class PacketRecipeBook : IPacketPayload {
+	public class PacketRecipeBook : IPacketPayload
+	{
 		public VarInt BookId { get; set; }
 		public bool BookOpen { get; set; }
 		public bool FilterActive { get; set; }
-		public PacketRecipeBook(VarInt @bookId, bool @bookOpen, bool @filterActive) {
+		public PacketRecipeBook(VarInt @bookId, bool @bookOpen, bool @filterActive)
+		{
 			this.BookId = @bookId;
 			this.BookOpen = @bookOpen;
 			this.FilterActive = @filterActive;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.BookId);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.BookOpen);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.FilterActive);
 		}
-		public static PacketRecipeBook Read(PacketBuffer buffer ) {
+		public static PacketRecipeBook Read(PacketBuffer buffer )
+		{
 			VarInt @bookId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			bool @bookOpen = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			bool @filterActive = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketRecipeBook(@bookId, @bookOpen, @filterActive);
 		}
 	}
-	public class PacketResourcePackReceive : IPacketPayload {
+	public class PacketResourcePackReceive : IPacketPayload
+	{
 		public VarInt Result { get; set; }
-		public PacketResourcePackReceive(VarInt @result) {
+		public PacketResourcePackReceive(VarInt @result)
+		{
 			this.Result = @result;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Result);
 		}
-		public static PacketResourcePackReceive Read(PacketBuffer buffer ) {
+		public static PacketResourcePackReceive Read(PacketBuffer buffer )
+		{
 			VarInt @result = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketResourcePackReceive(@result);
 		}
 	}
-	public class PacketHeldItemSlot : IPacketPayload {
+	public class PacketHeldItemSlot : IPacketPayload
+	{
 		public short SlotId { get; set; }
-		public PacketHeldItemSlot(short @slotId) {
+		public PacketHeldItemSlot(short @slotId)
+		{
 			this.SlotId = @slotId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.SlotId);
 		}
-		public static PacketHeldItemSlot Read(PacketBuffer buffer ) {
+		public static PacketHeldItemSlot Read(PacketBuffer buffer )
+		{
 			short @slotId = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			return new PacketHeldItemSlot(@slotId);
 		}
 	}
-	public class PacketSetCreativeSlot : IPacketPayload {
+	public class PacketSetCreativeSlot : IPacketPayload
+	{
 		public short Slot { get; set; }
 		public Slot Item { get; set; }
-		public PacketSetCreativeSlot(short @slot, Slot @item) {
+		public PacketSetCreativeSlot(short @slot, Slot @item)
+		{
 			this.Slot = @slot;
 			this.Item = @item;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Slot);
 			((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Item);
 		}
-		public static PacketSetCreativeSlot Read(PacketBuffer buffer ) {
+		public static PacketSetCreativeSlot Read(PacketBuffer buffer )
+		{
 			short @slot = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			Slot @item = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 			return new PacketSetCreativeSlot(@slot, @item);
 		}
 	}
-	public class PacketUpdateJigsawBlock : IPacketPayload {
+	public class PacketUpdateJigsawBlock : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public string Name { get; set; }
 		public string Target { get; set; }
 		public string Pool { get; set; }
 		public string FinalState { get; set; }
 		public string JointType { get; set; }
-		public PacketUpdateJigsawBlock(PositionBitfield @location, string @name, string @target, string @pool, string @finalState, string @jointType) {
+		public PacketUpdateJigsawBlock(PositionBitfield @location, string @name, string @target, string @pool, string @finalState, string @jointType)
+		{
 			this.Location = @location;
 			this.Name = @name;
 			this.Target = @target;
@@ -1981,7 +2272,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.FinalState = @finalState;
 			this.JointType = @jointType;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Target);
@@ -1989,7 +2281,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.FinalState);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.JointType);
 		}
-		public static PacketUpdateJigsawBlock Read(PacketBuffer buffer ) {
+		public static PacketUpdateJigsawBlock Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			string @target = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
@@ -1999,27 +2292,31 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketUpdateJigsawBlock(@location, @name, @target, @pool, @finalState, @jointType);
 		}
 	}
-	public class PacketUpdateSign : IPacketPayload {
+	public class PacketUpdateSign : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public string Text1 { get; set; }
 		public string Text2 { get; set; }
 		public string Text3 { get; set; }
 		public string Text4 { get; set; }
-		public PacketUpdateSign(PositionBitfield @location, string @text1, string @text2, string @text3, string @text4) {
+		public PacketUpdateSign(PositionBitfield @location, string @text1, string @text2, string @text3, string @text4)
+		{
 			this.Location = @location;
 			this.Text1 = @text1;
 			this.Text2 = @text2;
 			this.Text3 = @text3;
 			this.Text4 = @text4;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text1);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text2);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text3);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text4);
 		}
-		public static PacketUpdateSign Read(PacketBuffer buffer ) {
+		public static PacketUpdateSign Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			string @text1 = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			string @text2 = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
@@ -2028,33 +2325,42 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketUpdateSign(@location, @text1, @text2, @text3, @text4);
 		}
 	}
-	public class PacketArmAnimation : IPacketPayload {
+	public class PacketArmAnimation : IPacketPayload
+	{
 		public VarInt Hand { get; set; }
-		public PacketArmAnimation(VarInt @hand) {
+		public PacketArmAnimation(VarInt @hand)
+		{
 			this.Hand = @hand;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Hand);
 		}
-		public static PacketArmAnimation Read(PacketBuffer buffer ) {
+		public static PacketArmAnimation Read(PacketBuffer buffer )
+		{
 			VarInt @hand = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketArmAnimation(@hand);
 		}
 	}
-	public class PacketSpectate : IPacketPayload {
+	public class PacketSpectate : IPacketPayload
+	{
 		public UUID Target { get; set; }
-		public PacketSpectate(UUID @target) {
+		public PacketSpectate(UUID @target)
+		{
 			this.Target = @target;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.Target);
 		}
-		public static PacketSpectate Read(PacketBuffer buffer ) {
+		public static PacketSpectate Read(PacketBuffer buffer )
+		{
 			UUID @target = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			return new PacketSpectate(@target);
 		}
 	}
-	public class PacketBlockPlace : IPacketPayload {
+	public class PacketBlockPlace : IPacketPayload
+	{
 		public VarInt Hand { get; set; }
 		public PositionBitfield Location { get; set; }
 		public VarInt Direction { get; set; }
@@ -2062,7 +2368,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		public float CursorY { get; set; }
 		public float CursorZ { get; set; }
 		public bool InsideBlock { get; set; }
-		public PacketBlockPlace(VarInt @hand, PositionBitfield @location, VarInt @direction, float @cursorX, float @cursorY, float @cursorZ, bool @insideBlock) {
+		public PacketBlockPlace(VarInt @hand, PositionBitfield @location, VarInt @direction, float @cursorX, float @cursorY, float @cursorZ, bool @insideBlock)
+		{
 			this.Hand = @hand;
 			this.Location = @location;
 			this.Direction = @direction;
@@ -2071,7 +2378,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			this.CursorZ = @cursorZ;
 			this.InsideBlock = @insideBlock;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Hand);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Direction);
@@ -2080,7 +2388,8 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.CursorZ);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.InsideBlock);
 		}
-		public static PacketBlockPlace Read(PacketBuffer buffer ) {
+		public static PacketBlockPlace Read(PacketBuffer buffer )
+		{
 			VarInt @hand = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @direction = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -2091,34 +2400,45 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 			return new PacketBlockPlace(@hand, @location, @direction, @cursorX, @cursorY, @cursorZ, @insideBlock);
 		}
 	}
-	public class PacketUseItem : IPacketPayload {
+	public class PacketUseItem : IPacketPayload
+	{
 		public VarInt Hand { get; set; }
-		public PacketUseItem(VarInt @hand) {
+		public PacketUseItem(VarInt @hand)
+		{
 			this.Hand = @hand;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Hand);
 		}
-		public static PacketUseItem Read(PacketBuffer buffer ) {
+		public static PacketUseItem Read(PacketBuffer buffer )
+		{
 			VarInt @hand = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketUseItem(@hand);
 		}
 	}
-	public class PacketAdvancementTab : IPacketPayload {
-		public class TabIdSwitch {
+	public class PacketAdvancementTab : IPacketPayload
+	{
+		public class TabIdSwitch
+		{
 			public object? Value { get; set; }
-			public TabIdSwitch(object? value) {
+			public TabIdSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 1: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static TabIdSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static TabIdSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					1 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					 _ => throw new Exception($"Invalid value: '{state}'")
@@ -2130,41 +2450,53 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		}
 		public VarInt Action { get; set; }
 		public TabIdSwitch TabId { get; set; }
-		public PacketAdvancementTab(VarInt @action, TabIdSwitch @tabId) {
+		public PacketAdvancementTab(VarInt @action, TabIdSwitch @tabId)
+		{
 			this.Action = @action;
 			this.TabId = @tabId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, TabIdSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.TabId);
 		}
-		public static PacketAdvancementTab Read(PacketBuffer buffer ) {
+		public static PacketAdvancementTab Read(PacketBuffer buffer )
+		{
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			TabIdSwitch @tabId = ((Func<PacketBuffer, TabIdSwitch>)((buffer) => TabIdSwitch.Read(buffer, @action)))(buffer);
 			return new PacketAdvancementTab(@action, @tabId);
 		}
 	}
-	public class PacketPong : IPacketPayload {
+	public class PacketPong : IPacketPayload
+	{
 		public int Id { get; set; }
-		public PacketPong(int @id) {
+		public PacketPong(int @id)
+		{
 			this.Id = @id;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Id);
 		}
-		public static PacketPong Read(PacketBuffer buffer ) {
+		public static PacketPong Read(PacketBuffer buffer )
+		{
 			int @id = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketPong(@id);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "teleport_confirm": ((Action<PacketBuffer, PacketTeleportConfirm>)((buffer, value) => value.Write(buffer )))(buffer, (PacketTeleportConfirm)this); break;
 					case "query_block_nbt": ((Action<PacketBuffer, PacketQueryBlockNbt>)((buffer, value) => value.Write(buffer )))(buffer, (PacketQueryBlockNbt)this); break;
 					case "set_difficulty": ((Action<PacketBuffer, PacketSetDifficulty>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetDifficulty)this); break;
@@ -2216,8 +2548,10 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"teleport_confirm" => ((Func<PacketBuffer, PacketTeleportConfirm>)((buffer) => MineSharp.Data.Protocol.Play.Serverbound.PacketTeleportConfirm.Read(buffer )))(buffer),
 					"query_block_nbt" => ((Func<PacketBuffer, PacketQueryBlockNbt>)((buffer) => MineSharp.Data.Protocol.Play.Serverbound.PacketQueryBlockNbt.Read(buffer )))(buffer),
 					"set_difficulty" => ((Func<PacketBuffer, PacketSetDifficulty>)((buffer) => MineSharp.Data.Protocol.Play.Serverbound.PacketSetDifficulty.Read(buffer )))(buffer),
@@ -2369,15 +2703,18 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "teleport_confirm" => 0x00, "query_block_nbt" => 0x01, "set_difficulty" => 0x02, "chat" => 0x03, "client_command" => 0x04, "settings" => 0x05, "tab_complete" => 0x06, "enchant_item" => 0x07, "window_click" => 0x08, "close_window" => 0x09, "custom_payload" => 0x0a, "edit_book" => 0x0b, "query_entity_nbt" => 0x0c, "use_entity" => 0x0d, "generate_structure" => 0x0e, "keep_alive" => 0x0f, "lock_difficulty" => 0x10, "position" => 0x11, "position_look" => 0x12, "look" => 0x13, "flying" => 0x14, "vehicle_move" => 0x15, "steer_boat" => 0x16, "pick_item" => 0x17, "craft_recipe_request" => 0x18, "abilities" => 0x19, "block_dig" => 0x1a, "entity_action" => 0x1b, "steer_vehicle" => 0x1c, "pong" => 0x1d, "recipe_book" => 0x1e, "displayed_recipe" => 0x1f, "name_item" => 0x20, "resource_pack_receive" => 0x21, "advancement_tab" => 0x22, "select_trade" => 0x23, "set_beacon_effect" => 0x24, "held_item_slot" => 0x25, "update_command_block" => 0x26, "update_command_block_minecart" => 0x27, "set_creative_slot" => 0x28, "update_jigsaw_block" => 0x29, "update_structure_block" => 0x2a, "update_sign" => 0x2b, "arm_animation" => 0x2c, "spectate" => 0x2d, "block_place" => 0x2e, "use_item" => 0x2f, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "teleport_confirm", 0x01 => "query_block_nbt", 0x02 => "set_difficulty", 0x03 => "chat", 0x04 => "client_command", 0x05 => "settings", 0x06 => "tab_complete", 0x07 => "enchant_item", 0x08 => "window_click", 0x09 => "close_window", 0x0a => "custom_payload", 0x0b => "edit_book", 0x0c => "query_entity_nbt", 0x0d => "use_entity", 0x0e => "generate_structure", 0x0f => "keep_alive", 0x10 => "lock_difficulty", 0x11 => "position", 0x12 => "position_look", 0x13 => "look", 0x14 => "flying", 0x15 => "vehicle_move", 0x16 => "steer_boat", 0x17 => "pick_item", 0x18 => "craft_recipe_request", 0x19 => "abilities", 0x1a => "block_dig", 0x1b => "entity_action", 0x1c => "steer_vehicle", 0x1d => "pong", 0x1e => "recipe_book", 0x1f => "displayed_recipe", 0x20 => "name_item", 0x21 => "resource_pack_receive", 0x22 => "advancement_tab", 0x23 => "select_trade", 0x24 => "set_beacon_effect", 0x25 => "held_item_slot", 0x26 => "update_command_block", 0x27 => "update_command_block_minecart", 0x28 => "set_creative_slot", 0x29 => "update_jigsaw_block", 0x2a => "update_structure_block", 0x2b => "update_sign", 0x2c => "arm_animation", 0x2d => "spectate", 0x2e => "block_place", 0x2f => "use_item", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -2449,8 +2786,10 @@ namespace MineSharp.Data.Protocol.Play.Serverbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Play.Clientbound {
-	public class PacketSpawnEntity : IPacketPayload {
+namespace MineSharp.Data.Protocol.Play.Clientbound
+{
+	public class PacketSpawnEntity : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public UUID ObjectUUID { get; set; }
 		public VarInt Type { get; set; }
@@ -2463,7 +2802,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public short VelocityX { get; set; }
 		public short VelocityY { get; set; }
 		public short VelocityZ { get; set; }
-		public PacketSpawnEntity(VarInt @entityId, UUID @objectUUID, VarInt @type, double @x, double @y, double @z, sbyte @pitch, sbyte @yaw, int @objectData, short @velocityX, short @velocityY, short @velocityZ) {
+		public PacketSpawnEntity(VarInt @entityId, UUID @objectUUID, VarInt @type, double @x, double @y, double @z, sbyte @pitch, sbyte @yaw, int @objectData, short @velocityX, short @velocityY, short @velocityZ)
+		{
 			this.EntityId = @entityId;
 			this.ObjectUUID = @objectUUID;
 			this.Type = @type;
@@ -2477,7 +2817,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.VelocityY = @velocityY;
 			this.VelocityZ = @velocityZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.ObjectUUID);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
@@ -2491,7 +2832,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityY);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityZ);
 		}
-		public static PacketSpawnEntity Read(PacketBuffer buffer ) {
+		public static PacketSpawnEntity Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			UUID @objectUUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			VarInt @type = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -2507,27 +2849,31 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSpawnEntity(@entityId, @objectUUID, @type, @x, @y, @z, @pitch, @yaw, @objectData, @velocityX, @velocityY, @velocityZ);
 		}
 	}
-	public class PacketSpawnEntityExperienceOrb : IPacketPayload {
+	public class PacketSpawnEntityExperienceOrb : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 		public short Count { get; set; }
-		public PacketSpawnEntityExperienceOrb(VarInt @entityId, double @x, double @y, double @z, short @count) {
+		public PacketSpawnEntityExperienceOrb(VarInt @entityId, double @x, double @y, double @z, short @count)
+		{
 			this.EntityId = @entityId;
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
 			this.Count = @count;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Count);
 		}
-		public static PacketSpawnEntityExperienceOrb Read(PacketBuffer buffer ) {
+		public static PacketSpawnEntityExperienceOrb Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -2536,7 +2882,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSpawnEntityExperienceOrb(@entityId, @x, @y, @z, @count);
 		}
 	}
-	public class PacketSpawnEntityLiving : IPacketPayload {
+	public class PacketSpawnEntityLiving : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public UUID EntityUUID { get; set; }
 		public VarInt Type { get; set; }
@@ -2549,7 +2896,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public short VelocityX { get; set; }
 		public short VelocityY { get; set; }
 		public short VelocityZ { get; set; }
-		public PacketSpawnEntityLiving(VarInt @entityId, UUID @entityUUID, VarInt @type, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch, sbyte @headPitch, short @velocityX, short @velocityY, short @velocityZ) {
+		public PacketSpawnEntityLiving(VarInt @entityId, UUID @entityUUID, VarInt @type, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch, sbyte @headPitch, short @velocityX, short @velocityY, short @velocityZ)
+		{
 			this.EntityId = @entityId;
 			this.EntityUUID = @entityUUID;
 			this.Type = @type;
@@ -2563,7 +2911,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.VelocityY = @velocityY;
 			this.VelocityZ = @velocityZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.EntityUUID);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
@@ -2577,7 +2926,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityY);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityZ);
 		}
-		public static PacketSpawnEntityLiving Read(PacketBuffer buffer ) {
+		public static PacketSpawnEntityLiving Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			UUID @entityUUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			VarInt @type = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -2593,27 +2943,31 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSpawnEntityLiving(@entityId, @entityUUID, @type, @x, @y, @z, @yaw, @pitch, @headPitch, @velocityX, @velocityY, @velocityZ);
 		}
 	}
-	public class PacketSpawnEntityPainting : IPacketPayload {
+	public class PacketSpawnEntityPainting : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public UUID EntityUUID { get; set; }
 		public VarInt Title { get; set; }
 		public PositionBitfield Location { get; set; }
 		public byte Direction { get; set; }
-		public PacketSpawnEntityPainting(VarInt @entityId, UUID @entityUUID, VarInt @title, PositionBitfield @location, byte @direction) {
+		public PacketSpawnEntityPainting(VarInt @entityId, UUID @entityUUID, VarInt @title, PositionBitfield @location, byte @direction)
+		{
 			this.EntityId = @entityId;
 			this.EntityUUID = @entityUUID;
 			this.Title = @title;
 			this.Location = @location;
 			this.Direction = @direction;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.EntityUUID);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Title);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Direction);
 		}
-		public static PacketSpawnEntityPainting Read(PacketBuffer buffer ) {
+		public static PacketSpawnEntityPainting Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			UUID @entityUUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			VarInt @title = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -2622,7 +2976,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSpawnEntityPainting(@entityId, @entityUUID, @title, @location, @direction);
 		}
 	}
-	public class PacketNamedEntitySpawn : IPacketPayload {
+	public class PacketNamedEntitySpawn : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public UUID PlayerUUID { get; set; }
 		public double X { get; set; }
@@ -2630,7 +2985,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public double Z { get; set; }
 		public sbyte Yaw { get; set; }
 		public sbyte Pitch { get; set; }
-		public PacketNamedEntitySpawn(VarInt @entityId, UUID @playerUUID, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch) {
+		public PacketNamedEntitySpawn(VarInt @entityId, UUID @playerUUID, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch)
+		{
 			this.EntityId = @entityId;
 			this.PlayerUUID = @playerUUID;
 			this.X = @x;
@@ -2639,7 +2995,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Yaw = @yaw;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.PlayerUUID);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
@@ -2648,7 +3005,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Yaw);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Pitch);
 		}
-		public static PacketNamedEntitySpawn Read(PacketBuffer buffer ) {
+		public static PacketNamedEntitySpawn Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			UUID @playerUUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -2659,39 +3017,48 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketNamedEntitySpawn(@entityId, @playerUUID, @x, @y, @z, @yaw, @pitch);
 		}
 	}
-	public class PacketAnimation : IPacketPayload {
+	public class PacketAnimation : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public byte Animation { get; set; }
-		public PacketAnimation(VarInt @entityId, byte @animation) {
+		public PacketAnimation(VarInt @entityId, byte @animation)
+		{
 			this.EntityId = @entityId;
 			this.Animation = @animation;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Animation);
 		}
-		public static PacketAnimation Read(PacketBuffer buffer ) {
+		public static PacketAnimation Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			byte @animation = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketAnimation(@entityId, @animation);
 		}
 	}
-	public class PacketStatistics : IPacketPayload {
-		public class EntriesElementContainer {
+	public class PacketStatistics : IPacketPayload
+	{
+		public class EntriesElementContainer
+		{
 			public VarInt CategoryId { get; set; }
 			public VarInt StatisticId { get; set; }
 			public VarInt Value { get; set; }
-			public EntriesElementContainer(VarInt @categoryId, VarInt @statisticId, VarInt @value) {
+			public EntriesElementContainer(VarInt @categoryId, VarInt @statisticId, VarInt @value)
+			{
 				this.CategoryId = @categoryId;
 				this.StatisticId = @statisticId;
 				this.Value = @value;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CategoryId);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.StatisticId);
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Value);
 			}
-			public static EntriesElementContainer Read(PacketBuffer buffer ) {
+			public static EntriesElementContainer Read(PacketBuffer buffer )
+			{
 				VarInt @categoryId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				VarInt @statisticId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				VarInt @value = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -2699,24 +3066,33 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 		}
 		public EntriesElementContainer[] Entries { get; set; }
-		public PacketStatistics(EntriesElementContainer[] @entries) {
+		public PacketStatistics(EntriesElementContainer[] @entries)
+		{
 			this.Entries = @entries;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, EntriesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, EntriesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Entries);
 		}
-		public static PacketStatistics Read(PacketBuffer buffer ) {
+		public static PacketStatistics Read(PacketBuffer buffer )
+		{
 			EntriesElementContainer[] @entries = ((Func<PacketBuffer, EntriesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, EntriesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketStatistics.EntriesElementContainer.Read(buffer ))))))(buffer);
 			return new PacketStatistics(@entries);
 		}
 	}
-	public class PacketAdvancements : IPacketPayload {
-		public class AdvancementMappingElementContainer {
-			public class ValueContainer {
-				public class DisplayDataContainer {
-					public class FlagsBitfield {
+	public class PacketAdvancements : IPacketPayload
+	{
+		public class AdvancementMappingElementContainer
+		{
+			public class ValueContainer
+			{
+				public class DisplayDataContainer
+				{
+					public class FlagsBitfield
+					{
 						public uint Value { get; set; }
-						public FlagsBitfield(uint value) {
+						public FlagsBitfield(uint value)
+						{
 							this.Value = value;
 						}
 						public uint Unused { 
@@ -2760,19 +3136,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						    }
 						}
 					}
-					public class BackgroundTextureSwitch {
+					public class BackgroundTextureSwitch
+					{
 						public object? Value { get; set; }
-						public BackgroundTextureSwitch(object? value) {
+						public BackgroundTextureSwitch(object? value)
+						{
 							this.Value = value;
 						}
-						public void Write(PacketBuffer buffer, byte state) {
-							switch (state) {
+						public void Write(PacketBuffer buffer, byte state)
+						{
+							switch (state)
+							{
 								case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 								default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 							}
 						}
-						public static BackgroundTextureSwitch Read(PacketBuffer buffer, byte state) {
-							object? value = state switch {
+						public static BackgroundTextureSwitch Read(PacketBuffer buffer, byte state)
+						{
+							object? value = state switch
+							{
 								1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 								_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 							};
@@ -2789,7 +3171,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					public BackgroundTextureSwitch BackgroundTexture { get; set; }
 					public float XCord { get; set; }
 					public float YCord { get; set; }
-					public DisplayDataContainer(string @title, string @description, Slot @icon, VarInt @frameType, FlagsBitfield @flags, BackgroundTextureSwitch @backgroundTexture, float @xCord, float @yCord) {
+					public DisplayDataContainer(string @title, string @description, Slot @icon, VarInt @frameType, FlagsBitfield @flags, BackgroundTextureSwitch @backgroundTexture, float @xCord, float @yCord)
+					{
 						this.Title = @title;
 						this.Description = @description;
 						this.Icon = @icon;
@@ -2799,7 +3182,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						this.XCord = @xCord;
 						this.YCord = @yCord;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Title);
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Description);
 						((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Icon);
@@ -2809,7 +3193,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.XCord);
 						((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.YCord);
 					}
-					public static DisplayDataContainer Read(PacketBuffer buffer ) {
+					public static DisplayDataContainer Read(PacketBuffer buffer )
+					{
 						string @title = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						string @description = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						Slot @icon = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
@@ -2821,18 +3206,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						return new DisplayDataContainer(@title, @description, @icon, @frameType, @flags, @backgroundTexture, @xCord, @yCord);
 					}
 				}
-				public class CriteriaElementContainer {
+				public class CriteriaElementContainer
+				{
 					public string Key { get; set; }
 					public object? Value { get; set; }
-					public CriteriaElementContainer(string @key, object? @value) {
+					public CriteriaElementContainer(string @key, object? @value)
+					{
 						this.Key = @key;
 						this.Value = @value;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Key);
 						((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, this.Value);
 					}
-					public static CriteriaElementContainer Read(PacketBuffer buffer ) {
+					public static CriteriaElementContainer Read(PacketBuffer buffer )
+					{
 						string @key = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						object? @value = ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer);
 						return new CriteriaElementContainer(@key, @value);
@@ -2842,19 +3231,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public DisplayDataContainer? DisplayData { get; set; }
 				public CriteriaElementContainer[] Criteria { get; set; }
 				public string[][] Requirements { get; set; }
-				public ValueContainer(string? @parentId, DisplayDataContainer? @displayData, CriteriaElementContainer[] @criteria, string[][] @requirements) {
+				public ValueContainer(string? @parentId, DisplayDataContainer? @displayData, CriteriaElementContainer[] @criteria, string[][] @requirements)
+				{
 					this.ParentId = @parentId;
 					this.DisplayData = @displayData;
 					this.Criteria = @criteria;
 					this.Requirements = @requirements;
 				}
-				public void Write(PacketBuffer buffer ) {
+				public void Write(PacketBuffer buffer )
+				{
 					((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.ParentId);
 					((Action<PacketBuffer, DisplayDataContainer?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, DisplayDataContainer>)((buffer, value) => value.Write(buffer ))))))(buffer, this.DisplayData);
 					((Action<PacketBuffer, CriteriaElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, CriteriaElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Criteria);
 					((Action<PacketBuffer, string[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Requirements);
 				}
-				public static ValueContainer Read(PacketBuffer buffer ) {
+				public static ValueContainer Read(PacketBuffer buffer )
+				{
 					string? @parentId = ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
 					DisplayDataContainer? @displayData = ((Func<PacketBuffer, DisplayDataContainer?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, DisplayDataContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketAdvancements.AdvancementMappingElementContainer.ValueContainer.DisplayDataContainer.Read(buffer ))))))(buffer);
 					CriteriaElementContainer[] @criteria = ((Func<PacketBuffer, CriteriaElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, CriteriaElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketAdvancements.AdvancementMappingElementContainer.ValueContainer.CriteriaElementContainer.Read(buffer ))))))(buffer);
@@ -2864,33 +3256,41 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 			public string Key { get; set; }
 			public ValueContainer Value { get; set; }
-			public AdvancementMappingElementContainer(string @key, ValueContainer @value) {
+			public AdvancementMappingElementContainer(string @key, ValueContainer @value)
+			{
 				this.Key = @key;
 				this.Value = @value;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Key);
 				((Action<PacketBuffer, ValueContainer>)((buffer, value) => value.Write(buffer )))(buffer, this.Value);
 			}
-			public static AdvancementMappingElementContainer Read(PacketBuffer buffer ) {
+			public static AdvancementMappingElementContainer Read(PacketBuffer buffer )
+			{
 				string @key = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				ValueContainer @value = ((Func<PacketBuffer, ValueContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketAdvancements.AdvancementMappingElementContainer.ValueContainer.Read(buffer )))(buffer);
 				return new AdvancementMappingElementContainer(@key, @value);
 			}
 		}
-		public class ProgressMappingElementContainer {
-			public class ValueElementContainer {
+		public class ProgressMappingElementContainer
+		{
+			public class ValueElementContainer
+			{
 				public string CriterionIdentifier { get; set; }
 				public long? CriterionProgress { get; set; }
-				public ValueElementContainer(string @criterionIdentifier, long? @criterionProgress) {
+				public ValueElementContainer(string @criterionIdentifier, long? @criterionProgress)
+				{
 					this.CriterionIdentifier = @criterionIdentifier;
 					this.CriterionProgress = @criterionProgress;
 				}
-				public void Write(PacketBuffer buffer ) {
+				public void Write(PacketBuffer buffer )
+				{
 					((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.CriterionIdentifier);
 					((Action<PacketBuffer, long?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value))))))(buffer, this.CriterionProgress);
 				}
-				public static ValueElementContainer Read(PacketBuffer buffer ) {
+				public static ValueElementContainer Read(PacketBuffer buffer )
+				{
 					string @criterionIdentifier = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 					long? @criterionProgress = ((Func<PacketBuffer, long?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64())))))(buffer);
 					return new ValueElementContainer(@criterionIdentifier, @criterionProgress);
@@ -2898,15 +3298,18 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 			public string Key { get; set; }
 			public ValueElementContainer[] Value { get; set; }
-			public ProgressMappingElementContainer(string @key, ValueElementContainer[] @value) {
+			public ProgressMappingElementContainer(string @key, ValueElementContainer[] @value)
+			{
 				this.Key = @key;
 				this.Value = @value;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Key);
 				((Action<PacketBuffer, ValueElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, ValueElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Value);
 			}
-			public static ProgressMappingElementContainer Read(PacketBuffer buffer ) {
+			public static ProgressMappingElementContainer Read(PacketBuffer buffer )
+			{
 				string @key = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				ValueElementContainer[] @value = ((Func<PacketBuffer, ValueElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, ValueElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketAdvancements.ProgressMappingElementContainer.ValueElementContainer.Read(buffer ))))))(buffer);
 				return new ProgressMappingElementContainer(@key, @value);
@@ -2916,19 +3319,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public AdvancementMappingElementContainer[] AdvancementMapping { get; set; }
 		public string[] Identifiers { get; set; }
 		public ProgressMappingElementContainer[] ProgressMapping { get; set; }
-		public PacketAdvancements(bool @reset, AdvancementMappingElementContainer[] @advancementMapping, string[] @identifiers, ProgressMappingElementContainer[] @progressMapping) {
+		public PacketAdvancements(bool @reset, AdvancementMappingElementContainer[] @advancementMapping, string[] @identifiers, ProgressMappingElementContainer[] @progressMapping)
+		{
 			this.Reset = @reset;
 			this.AdvancementMapping = @advancementMapping;
 			this.Identifiers = @identifiers;
 			this.ProgressMapping = @progressMapping;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Reset);
 			((Action<PacketBuffer, AdvancementMappingElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, AdvancementMappingElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.AdvancementMapping);
 			((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Identifiers);
 			((Action<PacketBuffer, ProgressMappingElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, ProgressMappingElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ProgressMapping);
 		}
-		public static PacketAdvancements Read(PacketBuffer buffer ) {
+		public static PacketAdvancements Read(PacketBuffer buffer )
+		{
 			bool @reset = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			AdvancementMappingElementContainer[] @advancementMapping = ((Func<PacketBuffer, AdvancementMappingElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, AdvancementMappingElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketAdvancements.AdvancementMappingElementContainer.Read(buffer ))))))(buffer);
 			string[] @identifiers = ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
@@ -2936,66 +3342,78 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketAdvancements(@reset, @advancementMapping, @identifiers, @progressMapping);
 		}
 	}
-	public class PacketBlockBreakAnimation : IPacketPayload {
+	public class PacketBlockBreakAnimation : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public PositionBitfield Location { get; set; }
 		public sbyte DestroyStage { get; set; }
-		public PacketBlockBreakAnimation(VarInt @entityId, PositionBitfield @location, sbyte @destroyStage) {
+		public PacketBlockBreakAnimation(VarInt @entityId, PositionBitfield @location, sbyte @destroyStage)
+		{
 			this.EntityId = @entityId;
 			this.Location = @location;
 			this.DestroyStage = @destroyStage;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.DestroyStage);
 		}
-		public static PacketBlockBreakAnimation Read(PacketBuffer buffer ) {
+		public static PacketBlockBreakAnimation Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			sbyte @destroyStage = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketBlockBreakAnimation(@entityId, @location, @destroyStage);
 		}
 	}
-	public class PacketTileEntityData : IPacketPayload {
+	public class PacketTileEntityData : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public VarInt Action { get; set; }
 		public NbtCompound? NbtData { get; set; }
-		public PacketTileEntityData(PositionBitfield @location, VarInt @action, NbtCompound? @nbtData) {
+		public PacketTileEntityData(PositionBitfield @location, VarInt @action, NbtCompound? @nbtData)
+		{
 			this.Location = @location;
 			this.Action = @action;
 			this.NbtData = @nbtData;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))(buffer, this.NbtData);
 		}
-		public static PacketTileEntityData Read(PacketBuffer buffer ) {
+		public static PacketTileEntityData Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			NbtCompound? @nbtData = ((Func<PacketBuffer, NbtCompound?>)((buffer) => buffer.ReadOptionalNbt()))(buffer);
 			return new PacketTileEntityData(@location, @action, @nbtData);
 		}
 	}
-	public class PacketBlockAction : IPacketPayload {
+	public class PacketBlockAction : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public byte Byte1 { get; set; }
 		public byte Byte2 { get; set; }
 		public VarInt BlockId { get; set; }
-		public PacketBlockAction(PositionBitfield @location, byte @byte1, byte @byte2, VarInt @blockId) {
+		public PacketBlockAction(PositionBitfield @location, byte @byte1, byte @byte2, VarInt @blockId)
+		{
 			this.Location = @location;
 			this.Byte1 = @byte1;
 			this.Byte2 = @byte2;
 			this.BlockId = @blockId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Byte1);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Byte2);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.BlockId);
 		}
-		public static PacketBlockAction Read(PacketBuffer buffer ) {
+		public static PacketBlockAction Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			byte @byte1 = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			byte @byte2 = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
@@ -3003,38 +3421,49 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketBlockAction(@location, @byte1, @byte2, @blockId);
 		}
 	}
-	public class PacketBlockChange : IPacketPayload {
+	public class PacketBlockChange : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public VarInt Type { get; set; }
-		public PacketBlockChange(PositionBitfield @location, VarInt @type) {
+		public PacketBlockChange(PositionBitfield @location, VarInt @type)
+		{
 			this.Location = @location;
 			this.Type = @type;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
 		}
-		public static PacketBlockChange Read(PacketBuffer buffer ) {
+		public static PacketBlockChange Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @type = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketBlockChange(@location, @type);
 		}
 	}
-	public class PacketBossBar : IPacketPayload {
-		public class TitleSwitch {
+	public class PacketBossBar : IPacketPayload
+	{
+		public class TitleSwitch
+		{
 			public object? Value { get; set; }
-			public TitleSwitch(object? value) {
+			public TitleSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 3: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static TitleSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static TitleSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					3 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -3044,20 +3473,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(TitleSwitch value) => (string?)value.Value;
 			public static implicit operator TitleSwitch?(string? value) => new TitleSwitch(value);
 		}
-		public class HealthSwitch {
+		public class HealthSwitch
+		{
 			public object? Value { get; set; }
-			public HealthSwitch(object? value) {
+			public HealthSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 					case 2: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static HealthSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static HealthSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 					2 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -3067,20 +3502,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator float?(HealthSwitch value) => (float?)value.Value;
 			public static implicit operator HealthSwitch?(float? value) => new HealthSwitch(value);
 		}
-		public class ColorSwitch {
+		public class ColorSwitch
+		{
 			public object? Value { get; set; }
-			public ColorSwitch(object? value) {
+			public ColorSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 4: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static ColorSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static ColorSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					4 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -3090,20 +3531,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator VarInt?(ColorSwitch value) => (VarInt?)value.Value;
 			public static implicit operator ColorSwitch?(VarInt? value) => new ColorSwitch(value);
 		}
-		public class DividersSwitch {
+		public class DividersSwitch
+		{
 			public object? Value { get; set; }
-			public DividersSwitch(object? value) {
+			public DividersSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 4: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static DividersSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static DividersSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					4 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -3113,20 +3560,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator VarInt?(DividersSwitch value) => (VarInt?)value.Value;
 			public static implicit operator DividersSwitch?(VarInt? value) => new DividersSwitch(value);
 		}
-		public class FlagsSwitch {
+		public class FlagsSwitch
+		{
 			public object? Value { get; set; }
-			public FlagsSwitch(object? value) {
+			public FlagsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, (byte)this); break;
 					case 5: ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, (byte)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static FlagsSwitch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static FlagsSwitch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer),
 					5 => ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -3143,7 +3596,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public ColorSwitch Color { get; set; }
 		public DividersSwitch Dividers { get; set; }
 		public FlagsSwitch Flags { get; set; }
-		public PacketBossBar(UUID @entityUUID, VarInt @action, TitleSwitch @title, HealthSwitch @health, ColorSwitch @color, DividersSwitch @dividers, FlagsSwitch @flags) {
+		public PacketBossBar(UUID @entityUUID, VarInt @action, TitleSwitch @title, HealthSwitch @health, ColorSwitch @color, DividersSwitch @dividers, FlagsSwitch @flags)
+		{
 			this.EntityUUID = @entityUUID;
 			this.Action = @action;
 			this.Title = @title;
@@ -3152,7 +3606,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Dividers = @dividers;
 			this.Flags = @flags;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.EntityUUID);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, TitleSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Title);
@@ -3161,7 +3616,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, DividersSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Dividers);
 			((Action<PacketBuffer, FlagsSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Flags);
 		}
-		public static PacketBossBar Read(PacketBuffer buffer ) {
+		public static PacketBossBar Read(PacketBuffer buffer )
+		{
 			UUID @entityUUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			TitleSwitch @title = ((Func<PacketBuffer, TitleSwitch>)((buffer) => TitleSwitch.Read(buffer, @action)))(buffer);
@@ -3172,36 +3628,45 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketBossBar(@entityUUID, @action, @title, @health, @color, @dividers, @flags);
 		}
 	}
-	public class PacketDifficulty : IPacketPayload {
+	public class PacketDifficulty : IPacketPayload
+	{
 		public byte Difficulty { get; set; }
 		public bool DifficultyLocked { get; set; }
-		public PacketDifficulty(byte @difficulty, bool @difficultyLocked) {
+		public PacketDifficulty(byte @difficulty, bool @difficultyLocked)
+		{
 			this.Difficulty = @difficulty;
 			this.DifficultyLocked = @difficultyLocked;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Difficulty);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.DifficultyLocked);
 		}
-		public static PacketDifficulty Read(PacketBuffer buffer ) {
+		public static PacketDifficulty Read(PacketBuffer buffer )
+		{
 			byte @difficulty = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			bool @difficultyLocked = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketDifficulty(@difficulty, @difficultyLocked);
 		}
 	}
-	public class PacketTabComplete : IPacketPayload {
-		public class MatchesElementContainer {
+	public class PacketTabComplete : IPacketPayload
+	{
+		public class MatchesElementContainer
+		{
 			public string Match { get; set; }
 			public string? Tooltip { get; set; }
-			public MatchesElementContainer(string @match, string? @tooltip) {
+			public MatchesElementContainer(string @match, string? @tooltip)
+			{
 				this.Match = @match;
 				this.Tooltip = @tooltip;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Match);
 				((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.Tooltip);
 			}
-			public static MatchesElementContainer Read(PacketBuffer buffer ) {
+			public static MatchesElementContainer Read(PacketBuffer buffer )
+			{
 				string @match = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				string? @tooltip = ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
 				return new MatchesElementContainer(@match, @tooltip);
@@ -3211,19 +3676,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public VarInt Start { get; set; }
 		public VarInt Length { get; set; }
 		public MatchesElementContainer[] Matches { get; set; }
-		public PacketTabComplete(VarInt @transactionId, VarInt @start, VarInt @length, MatchesElementContainer[] @matches) {
+		public PacketTabComplete(VarInt @transactionId, VarInt @start, VarInt @length, MatchesElementContainer[] @matches)
+		{
 			this.TransactionId = @transactionId;
 			this.Start = @start;
 			this.Length = @length;
 			this.Matches = @matches;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TransactionId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Start);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Length);
 			((Action<PacketBuffer, MatchesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, MatchesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Matches);
 		}
-		public static PacketTabComplete Read(PacketBuffer buffer ) {
+		public static PacketTabComplete Read(PacketBuffer buffer )
+		{
 			VarInt @transactionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @start = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @length = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -3231,11 +3699,15 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketTabComplete(@transactionId, @start, @length, @matches);
 		}
 	}
-	public class PacketDeclareCommands : IPacketPayload {
-		public class NodesElementContainer {
-			public class FlagsBitfield {
+	public class PacketDeclareCommands : IPacketPayload
+	{
+		public class NodesElementContainer
+		{
+			public class FlagsBitfield
+			{
 				public byte Value { get; set; }
-				public FlagsBitfield(byte value) {
+				public FlagsBitfield(byte value)
+				{
 					this.Value = value;
 				}
 				public byte Unused { 
@@ -3289,19 +3761,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				    }
 				}
 			}
-			public class RedirectNodeSwitch {
+			public class RedirectNodeSwitch
+			{
 				public object? Value { get; set; }
-				public RedirectNodeSwitch(object? value) {
+				public RedirectNodeSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, byte state) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, byte state)
+				{
+					switch (state)
+					{
 						case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static RedirectNodeSwitch Read(PacketBuffer buffer, byte state) {
-					object? value = state switch {
+				public static RedirectNodeSwitch Read(PacketBuffer buffer, byte state)
+				{
+					object? value = state switch
+					{
 						1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 					};
@@ -3310,13 +3788,19 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public static implicit operator VarInt?(RedirectNodeSwitch value) => (VarInt?)value.Value;
 				public static implicit operator RedirectNodeSwitch?(VarInt? value) => new RedirectNodeSwitch(value);
 			}
-			public class ExtraNodeDataSwitch {
-				public class ExtraNodeDataSwitchState2Container {
-					public class PropertiesSwitch {
-						public class PropertiesSwitchStatebrigadierDoubleContainer {
-							public class FlagsBitfield {
+			public class ExtraNodeDataSwitch
+			{
+				public class ExtraNodeDataSwitchState2Container
+				{
+					public class PropertiesSwitch
+					{
+						public class PropertiesSwitchStatebrigadierDoubleContainer
+						{
+							public class FlagsBitfield
+							{
 								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
+								public FlagsBitfield(byte value)
+								{
 									this.Value = value;
 								}
 								public byte Unused { 
@@ -3350,19 +3834,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								    }
 								}
 							}
-							public class MinSwitch {
+							public class MinSwitch
+							{
 								public object? Value { get; set; }
-								public MinSwitch(object? value) {
+								public MinSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MinSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3371,19 +3861,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								public static implicit operator double?(MinSwitch value) => (double?)value.Value;
 								public static implicit operator MinSwitch?(double? value) => new MinSwitch(value);
 							}
-							public class MaxSwitch {
+							public class MaxSwitch
+							{
 								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
+								public MaxSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, (double)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MaxSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3395,27 +3891,33 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 							public FlagsBitfield Flags { get; set; }
 							public MinSwitch Min { get; set; }
 							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierDoubleContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							public PropertiesSwitchStatebrigadierDoubleContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max)
+							{
 								this.Flags = @flags;
 								this.Min = @min;
 								this.Max = @max;
 							}
-							public void Write(PacketBuffer buffer ) {
+							public void Write(PacketBuffer buffer )
+							{
 								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
 								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
 								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
 							}
-							public static PropertiesSwitchStatebrigadierDoubleContainer Read(PacketBuffer buffer ) {
+							public static PropertiesSwitchStatebrigadierDoubleContainer Read(PacketBuffer buffer )
+							{
 								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
 								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
 								return new PropertiesSwitchStatebrigadierDoubleContainer(@flags, @min, @max);
 							}
 						}
-						public class PropertiesSwitchStatebrigadierFloatContainer {
-							public class FlagsBitfield {
+						public class PropertiesSwitchStatebrigadierFloatContainer
+						{
+							public class FlagsBitfield
+							{
 								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
+								public FlagsBitfield(byte value)
+								{
 									this.Value = value;
 								}
 								public byte Unused { 
@@ -3449,19 +3951,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								    }
 								}
 							}
-							public class MinSwitch {
+							public class MinSwitch
+							{
 								public object? Value { get; set; }
-								public MinSwitch(object? value) {
+								public MinSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MinSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3470,19 +3978,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								public static implicit operator float?(MinSwitch value) => (float?)value.Value;
 								public static implicit operator MinSwitch?(float? value) => new MinSwitch(value);
 							}
-							public class MaxSwitch {
+							public class MaxSwitch
+							{
 								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
+								public MaxSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, (float)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MaxSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3494,27 +4008,33 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 							public FlagsBitfield Flags { get; set; }
 							public MinSwitch Min { get; set; }
 							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierFloatContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							public PropertiesSwitchStatebrigadierFloatContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max)
+							{
 								this.Flags = @flags;
 								this.Min = @min;
 								this.Max = @max;
 							}
-							public void Write(PacketBuffer buffer ) {
+							public void Write(PacketBuffer buffer )
+							{
 								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
 								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
 								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
 							}
-							public static PropertiesSwitchStatebrigadierFloatContainer Read(PacketBuffer buffer ) {
+							public static PropertiesSwitchStatebrigadierFloatContainer Read(PacketBuffer buffer )
+							{
 								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
 								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
 								return new PropertiesSwitchStatebrigadierFloatContainer(@flags, @min, @max);
 							}
 						}
-						public class PropertiesSwitchStatebrigadierIntegerContainer {
-							public class FlagsBitfield {
+						public class PropertiesSwitchStatebrigadierIntegerContainer
+						{
+							public class FlagsBitfield
+							{
 								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
+								public FlagsBitfield(byte value)
+								{
 									this.Value = value;
 								}
 								public byte Unused { 
@@ -3548,19 +4068,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								    }
 								}
 							}
-							public class MinSwitch {
+							public class MinSwitch
+							{
 								public object? Value { get; set; }
-								public MinSwitch(object? value) {
+								public MinSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MinSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3569,19 +4095,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								public static implicit operator int?(MinSwitch value) => (int?)value.Value;
 								public static implicit operator MinSwitch?(int? value) => new MinSwitch(value);
 							}
-							public class MaxSwitch {
+							public class MaxSwitch
+							{
 								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
+								public MaxSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, (int)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MaxSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3593,27 +4125,33 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 							public FlagsBitfield Flags { get; set; }
 							public MinSwitch Min { get; set; }
 							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierIntegerContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							public PropertiesSwitchStatebrigadierIntegerContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max)
+							{
 								this.Flags = @flags;
 								this.Min = @min;
 								this.Max = @max;
 							}
-							public void Write(PacketBuffer buffer ) {
+							public void Write(PacketBuffer buffer )
+							{
 								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
 								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
 								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
 							}
-							public static PropertiesSwitchStatebrigadierIntegerContainer Read(PacketBuffer buffer ) {
+							public static PropertiesSwitchStatebrigadierIntegerContainer Read(PacketBuffer buffer )
+							{
 								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
 								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
 								return new PropertiesSwitchStatebrigadierIntegerContainer(@flags, @min, @max);
 							}
 						}
-						public class PropertiesSwitchStatebrigadierLongContainer {
-							public class FlagsBitfield {
+						public class PropertiesSwitchStatebrigadierLongContainer
+						{
+							public class FlagsBitfield
+							{
 								public byte Value { get; set; }
-								public FlagsBitfield(byte value) {
+								public FlagsBitfield(byte value)
+								{
 									this.Value = value;
 								}
 								public byte Unused { 
@@ -3647,19 +4185,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								    }
 								}
 							}
-							public class MinSwitch {
+							public class MinSwitch
+							{
 								public object? Value { get; set; }
-								public MinSwitch(object? value) {
+								public MinSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MinSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MinSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3668,19 +4212,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								public static implicit operator long?(MinSwitch value) => (long?)value.Value;
 								public static implicit operator MinSwitch?(long? value) => new MinSwitch(value);
 							}
-							public class MaxSwitch {
+							public class MaxSwitch
+							{
 								public object? Value { get; set; }
-								public MaxSwitch(object? value) {
+								public MaxSwitch(object? value)
+								{
 									this.Value = value;
 								}
-								public void Write(PacketBuffer buffer, byte state) {
-									switch (state) {
+								public void Write(PacketBuffer buffer, byte state)
+								{
+									switch (state)
+									{
 										case 1: ((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, (long)this); break;
 										default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 									}
 								}
-								public static MaxSwitch Read(PacketBuffer buffer, byte state) {
-									object? value = state switch {
+								public static MaxSwitch Read(PacketBuffer buffer, byte state)
+								{
+									object? value = state switch
+									{
 										1 => ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer),
 										_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 									};
@@ -3692,17 +4242,20 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 							public FlagsBitfield Flags { get; set; }
 							public MinSwitch Min { get; set; }
 							public MaxSwitch Max { get; set; }
-							public PropertiesSwitchStatebrigadierLongContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max) {
+							public PropertiesSwitchStatebrigadierLongContainer(FlagsBitfield @flags, MinSwitch @min, MaxSwitch @max)
+							{
 								this.Flags = @flags;
 								this.Min = @min;
 								this.Max = @max;
 							}
-							public void Write(PacketBuffer buffer ) {
+							public void Write(PacketBuffer buffer )
+							{
 								((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
 								((Action<PacketBuffer, MinSwitch>)((buffer, value) => value.Write(buffer, Flags.MinPresent)))(buffer, this.Min);
 								((Action<PacketBuffer, MaxSwitch>)((buffer, value) => value.Write(buffer, Flags.MaxPresent)))(buffer, this.Max);
 							}
-							public static PropertiesSwitchStatebrigadierLongContainer Read(PacketBuffer buffer ) {
+							public static PropertiesSwitchStatebrigadierLongContainer Read(PacketBuffer buffer )
+							{
 								FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 								MinSwitch @min = ((Func<PacketBuffer, MinSwitch>)((buffer) => MinSwitch.Read(buffer, @flags.MinPresent)))(buffer);
 								MaxSwitch @max = ((Func<PacketBuffer, MaxSwitch>)((buffer) => MaxSwitch.Read(buffer, @flags.MaxPresent)))(buffer);
@@ -3710,11 +4263,14 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 							}
 						}
 						public object? Value { get; set; }
-						public PropertiesSwitch(object? value) {
+						public PropertiesSwitch(object? value)
+						{
 							this.Value = value;
 						}
-						public void Write(PacketBuffer buffer, string state) {
-							switch (state) {
+						public void Write(PacketBuffer buffer, string state)
+						{
+							switch (state)
+							{
 								case "brigadier:double": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierDoubleContainer)this); break;
 								case "brigadier:float": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierFloatContainer)this); break;
 								case "brigadier:integer": ((Action<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer, value) => value.Write(buffer )))(buffer, (PropertiesSwitchStatebrigadierIntegerContainer)this); break;
@@ -3726,8 +4282,10 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 								default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 							}
 						}
-						public static PropertiesSwitch Read(PacketBuffer buffer, string state) {
-							object? value = state switch {
+						public static PropertiesSwitch Read(PacketBuffer buffer, string state)
+						{
+							object? value = state switch
+							{
 								"brigadier:double" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierDoubleContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierDoubleContainer.Read(buffer )))(buffer),
 								"brigadier:float" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierFloatContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierFloatContainer.Read(buffer )))(buffer),
 								"brigadier:integer" => ((Func<PacketBuffer, PropertiesSwitchStatebrigadierIntegerContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.PropertiesSwitch.PropertiesSwitchStatebrigadierIntegerContainer.Read(buffer )))(buffer),
@@ -3755,19 +4313,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						public static implicit operator PropertiesSwitch?(sbyte? value) => new PropertiesSwitch(value);
 						public static implicit operator PropertiesSwitch?(bool? value) => new PropertiesSwitch(value);
 					}
-					public class SuggestsSwitch {
+					public class SuggestsSwitch
+					{
 						public object? Value { get; set; }
-						public SuggestsSwitch(object? value) {
+						public SuggestsSwitch(object? value)
+						{
 							this.Value = value;
 						}
-						public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-							switch (state) {
+						public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags)
+						{
+							switch (state)
+							{
 								case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 								default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 							}
 						}
-						public static SuggestsSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-							object? value = state switch {
+						public static SuggestsSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags)
+						{
+							object? value = state switch
+							{
 								1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 								_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 							};
@@ -3780,19 +4344,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					public string Parser { get; set; }
 					public PropertiesSwitch Properties { get; set; }
 					public SuggestsSwitch Suggests { get; set; }
-					public ExtraNodeDataSwitchState2Container(string @name, string @parser, PropertiesSwitch @properties, SuggestsSwitch @suggests) {
+					public ExtraNodeDataSwitchState2Container(string @name, string @parser, PropertiesSwitch @properties, SuggestsSwitch @suggests)
+					{
 						this.Name = @name;
 						this.Parser = @parser;
 						this.Properties = @properties;
 						this.Suggests = @suggests;
 					}
-					public void Write(PacketBuffer buffer , FlagsBitfield @flags) {
+					public void Write(PacketBuffer buffer , FlagsBitfield @flags)
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Parser);
 						((Action<PacketBuffer, PropertiesSwitch>)((buffer, value) => value.Write(buffer, Parser)))(buffer, this.Properties);
 						((Action<PacketBuffer, SuggestsSwitch>)((buffer, value) => value.Write(buffer, @flags.HasCustomSuggestions, @flags)))(buffer, this.Suggests);
 					}
-					public static ExtraNodeDataSwitchState2Container Read(PacketBuffer buffer , FlagsBitfield @flags) {
+					public static ExtraNodeDataSwitchState2Container Read(PacketBuffer buffer , FlagsBitfield @flags)
+					{
 						string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						string @parser = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						PropertiesSwitch @properties = ((Func<PacketBuffer, PropertiesSwitch>)((buffer) => PropertiesSwitch.Read(buffer, @parser)))(buffer);
@@ -3801,19 +4368,24 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					}
 				}
 				public object? Value { get; set; }
-				public ExtraNodeDataSwitch(object? value) {
+				public ExtraNodeDataSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, byte state, FlagsBitfield @flags)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 						case 1: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 						case 2: ((Action<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer, value) => value.Write(buffer , @flags)))(buffer, (ExtraNodeDataSwitchState2Container)this); break;
 						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
-				public static ExtraNodeDataSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags) {
-					object? value = state switch {
+				public static ExtraNodeDataSwitch Read(PacketBuffer buffer, byte state, FlagsBitfield @flags)
+				{
+					object? value = state switch
+					{
 						0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 						1 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 						2 => ((Func<PacketBuffer, ExtraNodeDataSwitchState2Container>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.ExtraNodeDataSwitch.ExtraNodeDataSwitchState2Container.Read(buffer , @flags)))(buffer),
@@ -3830,19 +4402,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public VarInt[] Children { get; set; }
 			public RedirectNodeSwitch RedirectNode { get; set; }
 			public ExtraNodeDataSwitch ExtraNodeData { get; set; }
-			public NodesElementContainer(FlagsBitfield @flags, VarInt[] @children, RedirectNodeSwitch @redirectNode, ExtraNodeDataSwitch @extraNodeData) {
+			public NodesElementContainer(FlagsBitfield @flags, VarInt[] @children, RedirectNodeSwitch @redirectNode, ExtraNodeDataSwitch @extraNodeData)
+			{
 				this.Flags = @flags;
 				this.Children = @children;
 				this.RedirectNode = @redirectNode;
 				this.ExtraNodeData = @extraNodeData;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, FlagsBitfield>)((buffer, value) => ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, value.Value)))(buffer, this.Flags);
 				((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Children);
 				((Action<PacketBuffer, RedirectNodeSwitch>)((buffer, value) => value.Write(buffer, Flags.HasRedirectNode)))(buffer, this.RedirectNode);
 				((Action<PacketBuffer, ExtraNodeDataSwitch>)((buffer, value) => value.Write(buffer, Flags.CommandNodeType, Flags)))(buffer, this.ExtraNodeData);
 			}
-			public static NodesElementContainer Read(PacketBuffer buffer ) {
+			public static NodesElementContainer Read(PacketBuffer buffer )
+			{
 				FlagsBitfield @flags = ((Func<PacketBuffer, FlagsBitfield>)((buffer) => new FlagsBitfield(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer))))(buffer);
 				VarInt[] @children = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				RedirectNodeSwitch @redirectNode = ((Func<PacketBuffer, RedirectNodeSwitch>)((buffer) => RedirectNodeSwitch.Read(buffer, @flags.HasRedirectNode)))(buffer);
@@ -3852,34 +4427,44 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public NodesElementContainer[] Nodes { get; set; }
 		public VarInt RootIndex { get; set; }
-		public PacketDeclareCommands(NodesElementContainer[] @nodes, VarInt @rootIndex) {
+		public PacketDeclareCommands(NodesElementContainer[] @nodes, VarInt @rootIndex)
+		{
 			this.Nodes = @nodes;
 			this.RootIndex = @rootIndex;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, NodesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, NodesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Nodes);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.RootIndex);
 		}
-		public static PacketDeclareCommands Read(PacketBuffer buffer ) {
+		public static PacketDeclareCommands Read(PacketBuffer buffer )
+		{
 			NodesElementContainer[] @nodes = ((Func<PacketBuffer, NodesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, NodesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareCommands.NodesElementContainer.Read(buffer ))))))(buffer);
 			VarInt @rootIndex = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketDeclareCommands(@nodes, @rootIndex);
 		}
 	}
-	public class PacketFacePlayer : IPacketPayload {
-		public class EntityIdSwitch {
+	public class PacketFacePlayer : IPacketPayload
+	{
+		public class EntityIdSwitch
+		{
 			public object? Value { get; set; }
-			public EntityIdSwitch(object? value) {
+			public EntityIdSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, bool state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, bool state)
+			{
+				switch (state)
+				{
 					case true: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static EntityIdSwitch Read(PacketBuffer buffer, bool state) {
-				object? value = state switch {
+			public static EntityIdSwitch Read(PacketBuffer buffer, bool state)
+			{
+				object? value = state switch
+				{
 					true => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -3888,19 +4473,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator VarInt?(EntityIdSwitch value) => (VarInt?)value.Value;
 			public static implicit operator EntityIdSwitch?(VarInt? value) => new EntityIdSwitch(value);
 		}
-		public class EntityFeetEyesSwitch {
+		public class EntityFeetEyesSwitch
+		{
 			public object? Value { get; set; }
-			public EntityFeetEyesSwitch(object? value) {
+			public EntityFeetEyesSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, bool state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, bool state)
+			{
+				switch (state)
+				{
 					case true: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static EntityFeetEyesSwitch Read(PacketBuffer buffer, bool state) {
-				object? value = state switch {
+			public static EntityFeetEyesSwitch Read(PacketBuffer buffer, bool state)
+			{
+				object? value = state switch
+				{
 					true => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -3916,7 +4507,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public bool IsEntity { get; set; }
 		public EntityIdSwitch EntityId { get; set; }
 		public EntityFeetEyesSwitch EntityFeetEyes { get; set; }
-		public PacketFacePlayer(VarInt @feetEyes, double @x, double @y, double @z, bool @isEntity, EntityIdSwitch @entityId, EntityFeetEyesSwitch @entityFeetEyes) {
+		public PacketFacePlayer(VarInt @feetEyes, double @x, double @y, double @z, bool @isEntity, EntityIdSwitch @entityId, EntityFeetEyesSwitch @entityFeetEyes)
+		{
 			this.FeetEyes = @feetEyes;
 			this.X = @x;
 			this.Y = @y;
@@ -3925,7 +4517,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.EntityId = @entityId;
 			this.EntityFeetEyes = @entityFeetEyes;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.FeetEyes);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
@@ -3934,7 +4527,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, EntityIdSwitch>)((buffer, value) => value.Write(buffer, IsEntity)))(buffer, this.EntityId);
 			((Action<PacketBuffer, EntityFeetEyesSwitch>)((buffer, value) => value.Write(buffer, IsEntity)))(buffer, this.EntityFeetEyes);
 		}
-		public static PacketFacePlayer Read(PacketBuffer buffer ) {
+		public static PacketFacePlayer Read(PacketBuffer buffer )
+		{
 			VarInt @feetEyes = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -3945,48 +4539,59 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketFacePlayer(@feetEyes, @x, @y, @z, @isEntity, @entityId, @entityFeetEyes);
 		}
 	}
-	public class PacketNbtQueryResponse : IPacketPayload {
+	public class PacketNbtQueryResponse : IPacketPayload
+	{
 		public VarInt TransactionId { get; set; }
 		public NbtCompound? Nbt { get; set; }
-		public PacketNbtQueryResponse(VarInt @transactionId, NbtCompound? @nbt) {
+		public PacketNbtQueryResponse(VarInt @transactionId, NbtCompound? @nbt)
+		{
 			this.TransactionId = @transactionId;
 			this.Nbt = @nbt;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TransactionId);
 			((Action<PacketBuffer, NbtCompound?>)((buffer, value) => buffer.WriteOptionalNbt(value)))(buffer, this.Nbt);
 		}
-		public static PacketNbtQueryResponse Read(PacketBuffer buffer ) {
+		public static PacketNbtQueryResponse Read(PacketBuffer buffer )
+		{
 			VarInt @transactionId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			NbtCompound? @nbt = ((Func<PacketBuffer, NbtCompound?>)((buffer) => buffer.ReadOptionalNbt()))(buffer);
 			return new PacketNbtQueryResponse(@transactionId, @nbt);
 		}
 	}
-	public class PacketChat : IPacketPayload {
+	public class PacketChat : IPacketPayload
+	{
 		public string Message { get; set; }
 		public sbyte Position { get; set; }
 		public UUID Sender { get; set; }
-		public PacketChat(string @message, sbyte @position, UUID @sender) {
+		public PacketChat(string @message, sbyte @position, UUID @sender)
+		{
 			this.Message = @message;
 			this.Position = @position;
 			this.Sender = @sender;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Message);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Position);
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.Sender);
 		}
-		public static PacketChat Read(PacketBuffer buffer ) {
+		public static PacketChat Read(PacketBuffer buffer )
+		{
 			string @message = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			sbyte @position = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			UUID @sender = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			return new PacketChat(@message, @position, @sender);
 		}
 	}
-	public class PacketMultiBlockChange : IPacketPayload {
-		public class ChunkCoordinatesBitfield {
+	public class PacketMultiBlockChange : IPacketPayload
+	{
+		public class ChunkCoordinatesBitfield
+		{
 			public ulong Value { get; set; }
-			public ChunkCoordinatesBitfield(ulong value) {
+			public ChunkCoordinatesBitfield(ulong value)
+			{
 				this.Value = value;
 			}
 			public int X { 
@@ -4023,75 +4628,90 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public ChunkCoordinatesBitfield ChunkCoordinates { get; set; }
 		public bool NotTrustEdges { get; set; }
 		public VarInt[] Records { get; set; }
-		public PacketMultiBlockChange(ChunkCoordinatesBitfield @chunkCoordinates, bool @notTrustEdges, VarInt[] @records) {
+		public PacketMultiBlockChange(ChunkCoordinatesBitfield @chunkCoordinates, bool @notTrustEdges, VarInt[] @records)
+		{
 			this.ChunkCoordinates = @chunkCoordinates;
 			this.NotTrustEdges = @notTrustEdges;
 			this.Records = @records;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, ChunkCoordinatesBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.ChunkCoordinates);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.NotTrustEdges);
 			((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Records);
 		}
-		public static PacketMultiBlockChange Read(PacketBuffer buffer ) {
+		public static PacketMultiBlockChange Read(PacketBuffer buffer )
+		{
 			ChunkCoordinatesBitfield @chunkCoordinates = ((Func<PacketBuffer, ChunkCoordinatesBitfield>)((buffer) => new ChunkCoordinatesBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			bool @notTrustEdges = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			VarInt[] @records = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketMultiBlockChange(@chunkCoordinates, @notTrustEdges, @records);
 		}
 	}
-	public class PacketCloseWindow : IPacketPayload {
+	public class PacketCloseWindow : IPacketPayload
+	{
 		public byte WindowId { get; set; }
-		public PacketCloseWindow(byte @windowId) {
+		public PacketCloseWindow(byte @windowId)
+		{
 			this.WindowId = @windowId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 		}
-		public static PacketCloseWindow Read(PacketBuffer buffer ) {
+		public static PacketCloseWindow Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketCloseWindow(@windowId);
 		}
 	}
-	public class PacketOpenWindow : IPacketPayload {
+	public class PacketOpenWindow : IPacketPayload
+	{
 		public VarInt WindowId { get; set; }
 		public VarInt InventoryType { get; set; }
 		public string WindowTitle { get; set; }
-		public PacketOpenWindow(VarInt @windowId, VarInt @inventoryType, string @windowTitle) {
+		public PacketOpenWindow(VarInt @windowId, VarInt @inventoryType, string @windowTitle)
+		{
 			this.WindowId = @windowId;
 			this.InventoryType = @inventoryType;
 			this.WindowTitle = @windowTitle;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.InventoryType);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.WindowTitle);
 		}
-		public static PacketOpenWindow Read(PacketBuffer buffer ) {
+		public static PacketOpenWindow Read(PacketBuffer buffer )
+		{
 			VarInt @windowId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @inventoryType = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @windowTitle = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketOpenWindow(@windowId, @inventoryType, @windowTitle);
 		}
 	}
-	public class PacketWindowItems : IPacketPayload {
+	public class PacketWindowItems : IPacketPayload
+	{
 		public byte WindowId { get; set; }
 		public VarInt StateId { get; set; }
 		public Slot[] Items { get; set; }
 		public Slot CarriedItem { get; set; }
-		public PacketWindowItems(byte @windowId, VarInt @stateId, Slot[] @items, Slot @carriedItem) {
+		public PacketWindowItems(byte @windowId, VarInt @stateId, Slot[] @items, Slot @carriedItem)
+		{
 			this.WindowId = @windowId;
 			this.StateId = @stateId;
 			this.Items = @items;
 			this.CarriedItem = @carriedItem;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.StateId);
 			((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Items);
 			((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.CarriedItem);
 		}
-		public static PacketWindowItems Read(PacketBuffer buffer ) {
+		public static PacketWindowItems Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			VarInt @stateId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			Slot[] @items = ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
@@ -4099,45 +4719,53 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketWindowItems(@windowId, @stateId, @items, @carriedItem);
 		}
 	}
-	public class PacketCraftProgressBar : IPacketPayload {
+	public class PacketCraftProgressBar : IPacketPayload
+	{
 		public byte WindowId { get; set; }
 		public short Property { get; set; }
 		public short Value { get; set; }
-		public PacketCraftProgressBar(byte @windowId, short @property, short @value) {
+		public PacketCraftProgressBar(byte @windowId, short @property, short @value)
+		{
 			this.WindowId = @windowId;
 			this.Property = @property;
 			this.Value = @value;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Property);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Value);
 		}
-		public static PacketCraftProgressBar Read(PacketBuffer buffer ) {
+		public static PacketCraftProgressBar Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			short @property = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			short @value = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			return new PacketCraftProgressBar(@windowId, @property, @value);
 		}
 	}
-	public class PacketSetSlot : IPacketPayload {
+	public class PacketSetSlot : IPacketPayload
+	{
 		public sbyte WindowId { get; set; }
 		public VarInt StateId { get; set; }
 		public short Slot { get; set; }
 		public Slot Item { get; set; }
-		public PacketSetSlot(sbyte @windowId, VarInt @stateId, short @slot, Slot @item) {
+		public PacketSetSlot(sbyte @windowId, VarInt @stateId, short @slot, Slot @item)
+		{
 			this.WindowId = @windowId;
 			this.StateId = @stateId;
 			this.Slot = @slot;
 			this.Item = @item;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.StateId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.Slot);
 			((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Item);
 		}
-		public static PacketSetSlot Read(PacketBuffer buffer ) {
+		public static PacketSetSlot Read(PacketBuffer buffer )
+		{
 			sbyte @windowId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			VarInt @stateId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			short @slot = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
@@ -4145,41 +4773,50 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSetSlot(@windowId, @stateId, @slot, @item);
 		}
 	}
-	public class PacketSetCooldown : IPacketPayload {
+	public class PacketSetCooldown : IPacketPayload
+	{
 		public VarInt ItemID { get; set; }
 		public VarInt CooldownTicks { get; set; }
-		public PacketSetCooldown(VarInt @itemID, VarInt @cooldownTicks) {
+		public PacketSetCooldown(VarInt @itemID, VarInt @cooldownTicks)
+		{
 			this.ItemID = @itemID;
 			this.CooldownTicks = @cooldownTicks;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ItemID);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CooldownTicks);
 		}
-		public static PacketSetCooldown Read(PacketBuffer buffer ) {
+		public static PacketSetCooldown Read(PacketBuffer buffer )
+		{
 			VarInt @itemID = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @cooldownTicks = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketSetCooldown(@itemID, @cooldownTicks);
 		}
 	}
-	public class PacketCustomPayload : IPacketPayload {
+	public class PacketCustomPayload : IPacketPayload
+	{
 		public string Channel { get; set; }
 		public byte[] Data { get; set; }
-		public PacketCustomPayload(string @channel, byte[] @data) {
+		public PacketCustomPayload(string @channel, byte[] @data)
+		{
 			this.Channel = @channel;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Channel);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value)))(buffer, this.Data);
 		}
-		public static PacketCustomPayload Read(PacketBuffer buffer ) {
+		public static PacketCustomPayload Read(PacketBuffer buffer )
+		{
 			string @channel = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			byte[] @data = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer()))(buffer);
 			return new PacketCustomPayload(@channel, @data);
 		}
 	}
-	public class PacketNamedSoundEffect : IPacketPayload {
+	public class PacketNamedSoundEffect : IPacketPayload
+	{
 		public string SoundName { get; set; }
 		public VarInt SoundCategory { get; set; }
 		public int X { get; set; }
@@ -4187,7 +4824,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public int Z { get; set; }
 		public float Volume { get; set; }
 		public float Pitch { get; set; }
-		public PacketNamedSoundEffect(string @soundName, VarInt @soundCategory, int @x, int @y, int @z, float @volume, float @pitch) {
+		public PacketNamedSoundEffect(string @soundName, VarInt @soundCategory, int @x, int @y, int @z, float @volume, float @pitch)
+		{
 			this.SoundName = @soundName;
 			this.SoundCategory = @soundCategory;
 			this.X = @x;
@@ -4196,7 +4834,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Volume = @volume;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.SoundName);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SoundCategory);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.X);
@@ -4205,7 +4844,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Volume);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 		}
-		public static PacketNamedSoundEffect Read(PacketBuffer buffer ) {
+		public static PacketNamedSoundEffect Read(PacketBuffer buffer )
+		{
 			string @soundName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			VarInt @soundCategory = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			int @x = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
@@ -4216,52 +4856,65 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketNamedSoundEffect(@soundName, @soundCategory, @x, @y, @z, @volume, @pitch);
 		}
 	}
-	public class PacketKickDisconnect : IPacketPayload {
+	public class PacketKickDisconnect : IPacketPayload
+	{
 		public string Reason { get; set; }
-		public PacketKickDisconnect(string @reason) {
+		public PacketKickDisconnect(string @reason)
+		{
 			this.Reason = @reason;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Reason);
 		}
-		public static PacketKickDisconnect Read(PacketBuffer buffer ) {
+		public static PacketKickDisconnect Read(PacketBuffer buffer )
+		{
 			string @reason = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketKickDisconnect(@reason);
 		}
 	}
-	public class PacketEntityStatus : IPacketPayload {
+	public class PacketEntityStatus : IPacketPayload
+	{
 		public int EntityId { get; set; }
 		public sbyte EntityStatus { get; set; }
-		public PacketEntityStatus(int @entityId, sbyte @entityStatus) {
+		public PacketEntityStatus(int @entityId, sbyte @entityStatus)
+		{
 			this.EntityId = @entityId;
 			this.EntityStatus = @entityStatus;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.EntityStatus);
 		}
-		public static PacketEntityStatus Read(PacketBuffer buffer ) {
+		public static PacketEntityStatus Read(PacketBuffer buffer )
+		{
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			sbyte @entityStatus = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketEntityStatus(@entityId, @entityStatus);
 		}
 	}
-	public class PacketExplosion : IPacketPayload {
-		public class AffectedBlockOffsetsElementContainer {
+	public class PacketExplosion : IPacketPayload
+	{
+		public class AffectedBlockOffsetsElementContainer
+		{
 			public sbyte X { get; set; }
 			public sbyte Y { get; set; }
 			public sbyte Z { get; set; }
-			public AffectedBlockOffsetsElementContainer(sbyte @x, sbyte @y, sbyte @z) {
+			public AffectedBlockOffsetsElementContainer(sbyte @x, sbyte @y, sbyte @z)
+			{
 				this.X = @x;
 				this.Y = @y;
 				this.Z = @z;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.X);
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Y);
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Z);
 			}
-			public static AffectedBlockOffsetsElementContainer Read(PacketBuffer buffer ) {
+			public static AffectedBlockOffsetsElementContainer Read(PacketBuffer buffer )
+			{
 				sbyte @x = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 				sbyte @y = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 				sbyte @z = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
@@ -4276,7 +4929,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public float PlayerMotionX { get; set; }
 		public float PlayerMotionY { get; set; }
 		public float PlayerMotionZ { get; set; }
-		public PacketExplosion(float @x, float @y, float @z, float @radius, AffectedBlockOffsetsElementContainer[] @affectedBlockOffsets, float @playerMotionX, float @playerMotionY, float @playerMotionZ) {
+		public PacketExplosion(float @x, float @y, float @z, float @radius, AffectedBlockOffsetsElementContainer[] @affectedBlockOffsets, float @playerMotionX, float @playerMotionY, float @playerMotionZ)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
@@ -4286,7 +4940,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.PlayerMotionY = @playerMotionY;
 			this.PlayerMotionZ = @playerMotionZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.X);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Y);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Z);
@@ -4296,7 +4951,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.PlayerMotionY);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.PlayerMotionZ);
 		}
-		public static PacketExplosion Read(PacketBuffer buffer ) {
+		public static PacketExplosion Read(PacketBuffer buffer )
+		{
 			float @x = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			float @y = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			float @z = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
@@ -4308,75 +4964,92 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketExplosion(@x, @y, @z, @radius, @affectedBlockOffsets, @playerMotionX, @playerMotionY, @playerMotionZ);
 		}
 	}
-	public class PacketUnloadChunk : IPacketPayload {
+	public class PacketUnloadChunk : IPacketPayload
+	{
 		public int ChunkX { get; set; }
 		public int ChunkZ { get; set; }
-		public PacketUnloadChunk(int @chunkX, int @chunkZ) {
+		public PacketUnloadChunk(int @chunkX, int @chunkZ)
+		{
 			this.ChunkX = @chunkX;
 			this.ChunkZ = @chunkZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.ChunkX);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.ChunkZ);
 		}
-		public static PacketUnloadChunk Read(PacketBuffer buffer ) {
+		public static PacketUnloadChunk Read(PacketBuffer buffer )
+		{
 			int @chunkX = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			int @chunkZ = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketUnloadChunk(@chunkX, @chunkZ);
 		}
 	}
-	public class PacketGameStateChange : IPacketPayload {
+	public class PacketGameStateChange : IPacketPayload
+	{
 		public byte Reason { get; set; }
 		public float GameMode { get; set; }
-		public PacketGameStateChange(byte @reason, float @gameMode) {
+		public PacketGameStateChange(byte @reason, float @gameMode)
+		{
 			this.Reason = @reason;
 			this.GameMode = @gameMode;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Reason);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.GameMode);
 		}
-		public static PacketGameStateChange Read(PacketBuffer buffer ) {
+		public static PacketGameStateChange Read(PacketBuffer buffer )
+		{
 			byte @reason = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			float @gameMode = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			return new PacketGameStateChange(@reason, @gameMode);
 		}
 	}
-	public class PacketOpenHorseWindow : IPacketPayload {
+	public class PacketOpenHorseWindow : IPacketPayload
+	{
 		public byte WindowId { get; set; }
 		public VarInt NbSlots { get; set; }
 		public int EntityId { get; set; }
-		public PacketOpenHorseWindow(byte @windowId, VarInt @nbSlots, int @entityId) {
+		public PacketOpenHorseWindow(byte @windowId, VarInt @nbSlots, int @entityId)
+		{
 			this.WindowId = @windowId;
 			this.NbSlots = @nbSlots;
 			this.EntityId = @entityId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.NbSlots);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 		}
-		public static PacketOpenHorseWindow Read(PacketBuffer buffer ) {
+		public static PacketOpenHorseWindow Read(PacketBuffer buffer )
+		{
 			byte @windowId = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			VarInt @nbSlots = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketOpenHorseWindow(@windowId, @nbSlots, @entityId);
 		}
 	}
-	public class PacketKeepAlive : IPacketPayload {
+	public class PacketKeepAlive : IPacketPayload
+	{
 		public long KeepAliveId { get; set; }
-		public PacketKeepAlive(long @keepAliveId) {
+		public PacketKeepAlive(long @keepAliveId)
+		{
 			this.KeepAliveId = @keepAliveId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.KeepAliveId);
 		}
-		public static PacketKeepAlive Read(PacketBuffer buffer ) {
+		public static PacketKeepAlive Read(PacketBuffer buffer )
+		{
 			long @keepAliveId = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			return new PacketKeepAlive(@keepAliveId);
 		}
 	}
-	public class PacketMapChunk : IPacketPayload {
+	public class PacketMapChunk : IPacketPayload
+	{
 		public int X { get; set; }
 		public int Z { get; set; }
 		public NbtCompound Heightmaps { get; set; }
@@ -4389,7 +5062,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public long[] EmptyBlockLightMask { get; set; }
 		public byte[][] SkyLight { get; set; }
 		public byte[][] BlockLight { get; set; }
-		public PacketMapChunk(int @x, int @z, NbtCompound @heightmaps, byte[] @chunkData, ChunkBlockEntity[] @blockEntities, bool @trustEdges, long[] @skyLightMask, long[] @blockLightMask, long[] @emptySkyLightMask, long[] @emptyBlockLightMask, byte[][] @skyLight, byte[][] @blockLight) {
+		public PacketMapChunk(int @x, int @z, NbtCompound @heightmaps, byte[] @chunkData, ChunkBlockEntity[] @blockEntities, bool @trustEdges, long[] @skyLightMask, long[] @blockLightMask, long[] @emptySkyLightMask, long[] @emptyBlockLightMask, byte[][] @skyLight, byte[][] @blockLight)
+		{
 			this.X = @x;
 			this.Z = @z;
 			this.Heightmaps = @heightmaps;
@@ -4403,7 +5077,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.SkyLight = @skyLight;
 			this.BlockLight = @blockLight;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.X);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Z);
 			((Action<PacketBuffer, NbtCompound>)((buffer, value) => buffer.WriteNbt(value)))(buffer, this.Heightmaps);
@@ -4417,7 +5092,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, byte[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.SkyLight);
 			((Action<PacketBuffer, byte[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.BlockLight);
 		}
-		public static PacketMapChunk Read(PacketBuffer buffer ) {
+		public static PacketMapChunk Read(PacketBuffer buffer )
+		{
 			int @x = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			int @z = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			NbtCompound @heightmaps = ((Func<PacketBuffer, NbtCompound>)((buffer) => buffer.ReadNbt()))(buffer);
@@ -4433,24 +5109,28 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketMapChunk(@x, @z, @heightmaps, @chunkData, @blockEntities, @trustEdges, @skyLightMask, @blockLightMask, @emptySkyLightMask, @emptyBlockLightMask, @skyLight, @blockLight);
 		}
 	}
-	public class PacketWorldEvent : IPacketPayload {
+	public class PacketWorldEvent : IPacketPayload
+	{
 		public int EffectId { get; set; }
 		public PositionBitfield Location { get; set; }
 		public int Data { get; set; }
 		public bool Global { get; set; }
-		public PacketWorldEvent(int @effectId, PositionBitfield @location, int @data, bool @global) {
+		public PacketWorldEvent(int @effectId, PositionBitfield @location, int @data, bool @global)
+		{
 			this.EffectId = @effectId;
 			this.Location = @location;
 			this.Data = @data;
 			this.Global = @global;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EffectId);
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Data);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Global);
 		}
-		public static PacketWorldEvent Read(PacketBuffer buffer ) {
+		public static PacketWorldEvent Read(PacketBuffer buffer )
+		{
 			int @effectId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			int @data = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
@@ -4458,7 +5138,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketWorldEvent(@effectId, @location, @data, @global);
 		}
 	}
-	public class PacketWorldParticles : IPacketPayload {
+	public class PacketWorldParticles : IPacketPayload
+	{
 		public int ParticleId { get; set; }
 		public bool LongDistance { get; set; }
 		public double X { get; set; }
@@ -4470,7 +5151,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public float ParticleData { get; set; }
 		public int Particles { get; set; }
 		public ParticleDataSwitch Data { get; set; }
-		public PacketWorldParticles(int @particleId, bool @longDistance, double @x, double @y, double @z, float @offsetX, float @offsetY, float @offsetZ, float @particleData, int @particles, ParticleDataSwitch @data) {
+		public PacketWorldParticles(int @particleId, bool @longDistance, double @x, double @y, double @z, float @offsetX, float @offsetY, float @offsetZ, float @particleData, int @particles, ParticleDataSwitch @data)
+		{
 			this.ParticleId = @particleId;
 			this.LongDistance = @longDistance;
 			this.X = @x;
@@ -4483,7 +5165,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Particles = @particles;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.ParticleId);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.LongDistance);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
@@ -4496,7 +5179,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Particles);
 			((Action<PacketBuffer, ParticleDataSwitch>)((buffer, value) => value.Write(buffer, ParticleId)))(buffer, this.Data);
 		}
-		public static PacketWorldParticles Read(PacketBuffer buffer ) {
+		public static PacketWorldParticles Read(PacketBuffer buffer )
+		{
 			int @particleId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			bool @longDistance = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -4511,7 +5195,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketWorldParticles(@particleId, @longDistance, @x, @y, @z, @offsetX, @offsetY, @offsetZ, @particleData, @particles, @data);
 		}
 	}
-	public class PacketUpdateLight : IPacketPayload {
+	public class PacketUpdateLight : IPacketPayload
+	{
 		public VarInt ChunkX { get; set; }
 		public VarInt ChunkZ { get; set; }
 		public bool TrustEdges { get; set; }
@@ -4521,7 +5206,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public long[] EmptyBlockLightMask { get; set; }
 		public byte[][] SkyLight { get; set; }
 		public byte[][] BlockLight { get; set; }
-		public PacketUpdateLight(VarInt @chunkX, VarInt @chunkZ, bool @trustEdges, long[] @skyLightMask, long[] @blockLightMask, long[] @emptySkyLightMask, long[] @emptyBlockLightMask, byte[][] @skyLight, byte[][] @blockLight) {
+		public PacketUpdateLight(VarInt @chunkX, VarInt @chunkZ, bool @trustEdges, long[] @skyLightMask, long[] @blockLightMask, long[] @emptySkyLightMask, long[] @emptyBlockLightMask, byte[][] @skyLight, byte[][] @blockLight)
+		{
 			this.ChunkX = @chunkX;
 			this.ChunkZ = @chunkZ;
 			this.TrustEdges = @trustEdges;
@@ -4532,7 +5218,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.SkyLight = @skyLight;
 			this.BlockLight = @blockLight;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ChunkX);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ChunkZ);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.TrustEdges);
@@ -4543,7 +5230,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, byte[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.SkyLight);
 			((Action<PacketBuffer, byte[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.BlockLight);
 		}
-		public static PacketUpdateLight Read(PacketBuffer buffer ) {
+		public static PacketUpdateLight Read(PacketBuffer buffer )
+		{
 			VarInt @chunkX = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @chunkZ = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			bool @trustEdges = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
@@ -4556,7 +5244,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketUpdateLight(@chunkX, @chunkZ, @trustEdges, @skyLightMask, @blockLightMask, @emptySkyLightMask, @emptyBlockLightMask, @skyLight, @blockLight);
 		}
 	}
-	public class PacketLogin : IPacketPayload {
+	public class PacketLogin : IPacketPayload
+	{
 		public int EntityId { get; set; }
 		public bool IsHardcore { get; set; }
 		public byte GameMode { get; set; }
@@ -4573,7 +5262,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public bool EnableRespawnScreen { get; set; }
 		public bool IsDebug { get; set; }
 		public bool IsFlat { get; set; }
-		public PacketLogin(int @entityId, bool @isHardcore, byte @gameMode, sbyte @previousGameMode, string[] @worldNames, NbtCompound @dimensionCodec, NbtCompound @dimension, string @worldName, long @hashedSeed, VarInt @maxPlayers, VarInt @viewDistance, VarInt @simulationDistance, bool @reducedDebugInfo, bool @enableRespawnScreen, bool @isDebug, bool @isFlat) {
+		public PacketLogin(int @entityId, bool @isHardcore, byte @gameMode, sbyte @previousGameMode, string[] @worldNames, NbtCompound @dimensionCodec, NbtCompound @dimension, string @worldName, long @hashedSeed, VarInt @maxPlayers, VarInt @viewDistance, VarInt @simulationDistance, bool @reducedDebugInfo, bool @enableRespawnScreen, bool @isDebug, bool @isFlat)
+		{
 			this.EntityId = @entityId;
 			this.IsHardcore = @isHardcore;
 			this.GameMode = @gameMode;
@@ -4591,7 +5281,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.IsDebug = @isDebug;
 			this.IsFlat = @isFlat;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.IsHardcore);
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.GameMode);
@@ -4609,7 +5300,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.IsDebug);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.IsFlat);
 		}
-		public static PacketLogin Read(PacketBuffer buffer ) {
+		public static PacketLogin Read(PacketBuffer buffer )
+		{
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			bool @isHardcore = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			byte @gameMode = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
@@ -4629,28 +5321,33 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketLogin(@entityId, @isHardcore, @gameMode, @previousGameMode, @worldNames, @dimensionCodec, @dimension, @worldName, @hashedSeed, @maxPlayers, @viewDistance, @simulationDistance, @reducedDebugInfo, @enableRespawnScreen, @isDebug, @isFlat);
 		}
 	}
-	public class PacketMap : IPacketPayload {
-		public class IconsElementContainer {
+	public class PacketMap : IPacketPayload
+	{
+		public class IconsElementContainer
+		{
 			public VarInt Type { get; set; }
 			public sbyte X { get; set; }
 			public sbyte Z { get; set; }
 			public byte Direction { get; set; }
 			public string? DisplayName { get; set; }
-			public IconsElementContainer(VarInt @type, sbyte @x, sbyte @z, byte @direction, string? @displayName) {
+			public IconsElementContainer(VarInt @type, sbyte @x, sbyte @z, byte @direction, string? @displayName)
+			{
 				this.Type = @type;
 				this.X = @x;
 				this.Z = @z;
 				this.Direction = @direction;
 				this.DisplayName = @displayName;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Type);
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.X);
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Z);
 				((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Direction);
 				((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.DisplayName);
 			}
-			public static IconsElementContainer Read(PacketBuffer buffer ) {
+			public static IconsElementContainer Read(PacketBuffer buffer )
+			{
 				VarInt @type = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 				sbyte @x = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 				sbyte @z = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
@@ -4659,76 +5356,100 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				return new IconsElementContainer(@type, @x, @z, @direction, @displayName);
 			}
 		}
-		public class RowsSwitch {
+		public class RowsSwitch
+		{
 			public object? Value { get; set; }
-			public RowsSwitch(object? value) {
+			public RowsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, byte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, byte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, (byte)Value); break;
 				}
 			}
-			public static RowsSwitch Read(PacketBuffer buffer, byte state) {
-				object? value = state switch {
+			public static RowsSwitch Read(PacketBuffer buffer, byte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer)
 				};
 				return new RowsSwitch(value);
 			}
 		}
-		public class XSwitch {
+		public class XSwitch
+		{
 			public object? Value { get; set; }
-			public XSwitch(object? value) {
+			public XSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, byte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, byte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, (byte)Value); break;
 				}
 			}
-			public static XSwitch Read(PacketBuffer buffer, byte state) {
-				object? value = state switch {
+			public static XSwitch Read(PacketBuffer buffer, byte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer)
 				};
 				return new XSwitch(value);
 			}
 		}
-		public class YSwitch {
+		public class YSwitch
+		{
 			public object? Value { get; set; }
-			public YSwitch(object? value) {
+			public YSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, byte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, byte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, (byte)Value); break;
 				}
 			}
-			public static YSwitch Read(PacketBuffer buffer, byte state) {
-				object? value = state switch {
+			public static YSwitch Read(PacketBuffer buffer, byte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer)
 				};
 				return new YSwitch(value);
 			}
 		}
-		public class DataSwitch {
+		public class DataSwitch
+		{
 			public object? Value { get; set; }
-			public DataSwitch(object? value) {
+			public DataSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, byte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, byte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteBuffer(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (byte[])Value); break;
 				}
 			}
-			public static DataSwitch Read(PacketBuffer buffer, byte state) {
-				object? value = state switch {
+			public static DataSwitch Read(PacketBuffer buffer, byte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadBuffer(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer))))(buffer)
 				};
@@ -4744,7 +5465,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public XSwitch X { get; set; }
 		public YSwitch Y { get; set; }
 		public DataSwitch Data { get; set; }
-		public PacketMap(VarInt @itemDamage, sbyte @scale, bool @locked, IconsElementContainer[]? @icons, byte @columns, RowsSwitch @rows, XSwitch @x, YSwitch @y, DataSwitch @data) {
+		public PacketMap(VarInt @itemDamage, sbyte @scale, bool @locked, IconsElementContainer[]? @icons, byte @columns, RowsSwitch @rows, XSwitch @x, YSwitch @y, DataSwitch @data)
+		{
 			this.ItemDamage = @itemDamage;
 			this.Scale = @scale;
 			this.Locked = @locked;
@@ -4755,7 +5477,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Y = @y;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ItemDamage);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Scale);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Locked);
@@ -4766,7 +5489,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, YSwitch>)((buffer, value) => value.Write(buffer, Columns)))(buffer, this.Y);
 			((Action<PacketBuffer, DataSwitch>)((buffer, value) => value.Write(buffer, Columns)))(buffer, this.Data);
 		}
-		public static PacketMap Read(PacketBuffer buffer ) {
+		public static PacketMap Read(PacketBuffer buffer )
+		{
 			VarInt @itemDamage = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @scale = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			bool @locked = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
@@ -4779,8 +5503,10 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketMap(@itemDamage, @scale, @locked, @icons, @columns, @rows, @x, @y, @data);
 		}
 	}
-	public class PacketTradeList : IPacketPayload {
-		public class TradesElementContainer {
+	public class PacketTradeList : IPacketPayload
+	{
+		public class TradesElementContainer
+		{
 			public Slot InputItem1 { get; set; }
 			public Slot OutputItem { get; set; }
 			public Slot? InputItem2 { get; set; }
@@ -4791,7 +5517,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public int SpecialPrice { get; set; }
 			public float PriceMultiplier { get; set; }
 			public int Demand { get; set; }
-			public TradesElementContainer(Slot @inputItem1, Slot @outputItem, Slot? @inputItem2, bool @tradeDisabled, int @nbTradeUses, int @maximumNbTradeUses, int @xp, int @specialPrice, float @priceMultiplier, int @demand) {
+			public TradesElementContainer(Slot @inputItem1, Slot @outputItem, Slot? @inputItem2, bool @tradeDisabled, int @nbTradeUses, int @maximumNbTradeUses, int @xp, int @specialPrice, float @priceMultiplier, int @demand)
+			{
 				this.InputItem1 = @inputItem1;
 				this.OutputItem = @outputItem;
 				this.InputItem2 = @inputItem2;
@@ -4803,7 +5530,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				this.PriceMultiplier = @priceMultiplier;
 				this.Demand = @demand;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.InputItem1);
 				((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.OutputItem);
 				((Action<PacketBuffer, Slot?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))))))(buffer, this.InputItem2);
@@ -4815,7 +5543,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.PriceMultiplier);
 				((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Demand);
 			}
-			public static TradesElementContainer Read(PacketBuffer buffer ) {
+			public static TradesElementContainer Read(PacketBuffer buffer )
+			{
 				Slot @inputItem1 = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 				Slot @outputItem = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 				Slot? @inputItem2 = ((Func<PacketBuffer, Slot?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
@@ -4835,7 +5564,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public VarInt Experience { get; set; }
 		public bool IsRegularVillager { get; set; }
 		public bool CanRestock { get; set; }
-		public PacketTradeList(VarInt @windowId, TradesElementContainer[] @trades, VarInt @villagerLevel, VarInt @experience, bool @isRegularVillager, bool @canRestock) {
+		public PacketTradeList(VarInt @windowId, TradesElementContainer[] @trades, VarInt @villagerLevel, VarInt @experience, bool @isRegularVillager, bool @canRestock)
+		{
 			this.WindowId = @windowId;
 			this.Trades = @trades;
 			this.VillagerLevel = @villagerLevel;
@@ -4843,7 +5573,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.IsRegularVillager = @isRegularVillager;
 			this.CanRestock = @canRestock;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, TradesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, TradesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value))))))(buffer, this.Trades);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.VillagerLevel);
@@ -4851,7 +5582,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.IsRegularVillager);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.CanRestock);
 		}
-		public static PacketTradeList Read(PacketBuffer buffer ) {
+		public static PacketTradeList Read(PacketBuffer buffer )
+		{
 			VarInt @windowId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			TradesElementContainer[] @trades = ((Func<PacketBuffer, TradesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer), ((Func<PacketBuffer, TradesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketTradeList.TradesElementContainer.Read(buffer ))))))(buffer);
 			VarInt @villagerLevel = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -4861,27 +5593,31 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketTradeList(@windowId, @trades, @villagerLevel, @experience, @isRegularVillager, @canRestock);
 		}
 	}
-	public class PacketRelEntityMove : IPacketPayload {
+	public class PacketRelEntityMove : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public short DX { get; set; }
 		public short DY { get; set; }
 		public short DZ { get; set; }
 		public bool OnGround { get; set; }
-		public PacketRelEntityMove(VarInt @entityId, short @dX, short @dY, short @dZ, bool @onGround) {
+		public PacketRelEntityMove(VarInt @entityId, short @dX, short @dY, short @dZ, bool @onGround)
+		{
 			this.EntityId = @entityId;
 			this.DX = @dX;
 			this.DY = @dY;
 			this.DZ = @dZ;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.DX);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.DY);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.DZ);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketRelEntityMove Read(PacketBuffer buffer ) {
+		public static PacketRelEntityMove Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			short @dX = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			short @dY = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
@@ -4890,7 +5626,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketRelEntityMove(@entityId, @dX, @dY, @dZ, @onGround);
 		}
 	}
-	public class PacketEntityMoveLook : IPacketPayload {
+	public class PacketEntityMoveLook : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public short DX { get; set; }
 		public short DY { get; set; }
@@ -4898,7 +5635,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Yaw { get; set; }
 		public sbyte Pitch { get; set; }
 		public bool OnGround { get; set; }
-		public PacketEntityMoveLook(VarInt @entityId, short @dX, short @dY, short @dZ, sbyte @yaw, sbyte @pitch, bool @onGround) {
+		public PacketEntityMoveLook(VarInt @entityId, short @dX, short @dY, short @dZ, sbyte @yaw, sbyte @pitch, bool @onGround)
+		{
 			this.EntityId = @entityId;
 			this.DX = @dX;
 			this.DY = @dY;
@@ -4907,7 +5645,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Pitch = @pitch;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.DX);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.DY);
@@ -4916,7 +5655,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Pitch);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketEntityMoveLook Read(PacketBuffer buffer ) {
+		public static PacketEntityMoveLook Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			short @dX = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			short @dY = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
@@ -4927,24 +5667,28 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntityMoveLook(@entityId, @dX, @dY, @dZ, @yaw, @pitch, @onGround);
 		}
 	}
-	public class PacketEntityLook : IPacketPayload {
+	public class PacketEntityLook : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public sbyte Yaw { get; set; }
 		public sbyte Pitch { get; set; }
 		public bool OnGround { get; set; }
-		public PacketEntityLook(VarInt @entityId, sbyte @yaw, sbyte @pitch, bool @onGround) {
+		public PacketEntityLook(VarInt @entityId, sbyte @yaw, sbyte @pitch, bool @onGround)
+		{
 			this.EntityId = @entityId;
 			this.Yaw = @yaw;
 			this.Pitch = @pitch;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Yaw);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Pitch);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketEntityLook Read(PacketBuffer buffer ) {
+		public static PacketEntityLook Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @yaw = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			sbyte @pitch = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
@@ -4952,27 +5696,31 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntityLook(@entityId, @yaw, @pitch, @onGround);
 		}
 	}
-	public class PacketVehicleMove : IPacketPayload {
+	public class PacketVehicleMove : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 		public float Yaw { get; set; }
 		public float Pitch { get; set; }
-		public PacketVehicleMove(double @x, double @y, double @z, float @yaw, float @pitch) {
+		public PacketVehicleMove(double @x, double @y, double @z, float @yaw, float @pitch)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
 			this.Yaw = @yaw;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Yaw);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 		}
-		public static PacketVehicleMove Read(PacketBuffer buffer ) {
+		public static PacketVehicleMove Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -4981,132 +5729,168 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketVehicleMove(@x, @y, @z, @yaw, @pitch);
 		}
 	}
-	public class PacketOpenBook : IPacketPayload {
+	public class PacketOpenBook : IPacketPayload
+	{
 		public VarInt Hand { get; set; }
-		public PacketOpenBook(VarInt @hand) {
+		public PacketOpenBook(VarInt @hand)
+		{
 			this.Hand = @hand;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Hand);
 		}
-		public static PacketOpenBook Read(PacketBuffer buffer ) {
+		public static PacketOpenBook Read(PacketBuffer buffer )
+		{
 			VarInt @hand = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketOpenBook(@hand);
 		}
 	}
-	public class PacketOpenSignEntity : IPacketPayload {
+	public class PacketOpenSignEntity : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
-		public PacketOpenSignEntity(PositionBitfield @location) {
+		public PacketOpenSignEntity(PositionBitfield @location)
+		{
 			this.Location = @location;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 		}
-		public static PacketOpenSignEntity Read(PacketBuffer buffer ) {
+		public static PacketOpenSignEntity Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			return new PacketOpenSignEntity(@location);
 		}
 	}
-	public class PacketCraftRecipeResponse : IPacketPayload {
+	public class PacketCraftRecipeResponse : IPacketPayload
+	{
 		public sbyte WindowId { get; set; }
 		public string Recipe { get; set; }
-		public PacketCraftRecipeResponse(sbyte @windowId, string @recipe) {
+		public PacketCraftRecipeResponse(sbyte @windowId, string @recipe)
+		{
 			this.WindowId = @windowId;
 			this.Recipe = @recipe;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.WindowId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Recipe);
 		}
-		public static PacketCraftRecipeResponse Read(PacketBuffer buffer ) {
+		public static PacketCraftRecipeResponse Read(PacketBuffer buffer )
+		{
 			sbyte @windowId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			string @recipe = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketCraftRecipeResponse(@windowId, @recipe);
 		}
 	}
-	public class PacketAbilities : IPacketPayload {
+	public class PacketAbilities : IPacketPayload
+	{
 		public sbyte Flags { get; set; }
 		public float FlyingSpeed { get; set; }
 		public float WalkingSpeed { get; set; }
-		public PacketAbilities(sbyte @flags, float @flyingSpeed, float @walkingSpeed) {
+		public PacketAbilities(sbyte @flags, float @flyingSpeed, float @walkingSpeed)
+		{
 			this.Flags = @flags;
 			this.FlyingSpeed = @flyingSpeed;
 			this.WalkingSpeed = @walkingSpeed;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Flags);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.FlyingSpeed);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.WalkingSpeed);
 		}
-		public static PacketAbilities Read(PacketBuffer buffer ) {
+		public static PacketAbilities Read(PacketBuffer buffer )
+		{
 			sbyte @flags = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			float @flyingSpeed = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			float @walkingSpeed = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			return new PacketAbilities(@flags, @flyingSpeed, @walkingSpeed);
 		}
 	}
-	public class PacketEndCombatEvent : IPacketPayload {
+	public class PacketEndCombatEvent : IPacketPayload
+	{
 		public VarInt Duration { get; set; }
 		public int EntityId { get; set; }
-		public PacketEndCombatEvent(VarInt @duration, int @entityId) {
+		public PacketEndCombatEvent(VarInt @duration, int @entityId)
+		{
 			this.Duration = @duration;
 			this.EntityId = @entityId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Duration);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 		}
-		public static PacketEndCombatEvent Read(PacketBuffer buffer ) {
+		public static PacketEndCombatEvent Read(PacketBuffer buffer )
+		{
 			VarInt @duration = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketEndCombatEvent(@duration, @entityId);
 		}
 	}
-	public class PacketEnterCombatEvent : IPacketPayload {
-		public PacketEnterCombatEvent() {
+	public class PacketEnterCombatEvent : IPacketPayload
+	{
+		public PacketEnterCombatEvent()
+		{
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 		}
-		public static PacketEnterCombatEvent Read(PacketBuffer buffer ) {
+		public static PacketEnterCombatEvent Read(PacketBuffer buffer )
+		{
 			return new PacketEnterCombatEvent();
 		}
 	}
-	public class PacketDeathCombatEvent : IPacketPayload {
+	public class PacketDeathCombatEvent : IPacketPayload
+	{
 		public VarInt PlayerId { get; set; }
 		public int EntityId { get; set; }
 		public string Message { get; set; }
-		public PacketDeathCombatEvent(VarInt @playerId, int @entityId, string @message) {
+		public PacketDeathCombatEvent(VarInt @playerId, int @entityId, string @message)
+		{
 			this.PlayerId = @playerId;
 			this.EntityId = @entityId;
 			this.Message = @message;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.PlayerId);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Message);
 		}
-		public static PacketDeathCombatEvent Read(PacketBuffer buffer ) {
+		public static PacketDeathCombatEvent Read(PacketBuffer buffer )
+		{
 			VarInt @playerId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			string @message = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketDeathCombatEvent(@playerId, @entityId, @message);
 		}
 	}
-	public class PacketPlayerInfo : IPacketPayload {
-		public class DataElementContainer {
-			public class NameSwitch {
+	public class PacketPlayerInfo : IPacketPayload
+	{
+		public class DataElementContainer
+		{
+			public class NameSwitch
+			{
 				public object? Value { get; set; }
-				public NameSwitch(object? value) {
+				public NameSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, VarInt state, VarInt @action) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static NameSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action) {
-					object? value = state.Value switch {
+				public static NameSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					object? value = state.Value switch
+					{
 						0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 					};
@@ -5115,22 +5899,27 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public static implicit operator string?(NameSwitch value) => (string?)value.Value;
 				public static implicit operator NameSwitch?(string? value) => new NameSwitch(value);
 			}
-			public class PropertiesSwitch {
-				public class PropertiesSwitchState0ElementContainer {
+			public class PropertiesSwitch
+			{
+				public class PropertiesSwitchState0ElementContainer
+				{
 					public string Name { get; set; }
 					public string Value { get; set; }
 					public string? Signature { get; set; }
-					public PropertiesSwitchState0ElementContainer(string @name, string @value, string? @signature) {
+					public PropertiesSwitchState0ElementContainer(string @name, string @value, string? @signature)
+					{
 						this.Name = @name;
 						this.Value = @value;
 						this.Signature = @signature;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Value);
 						((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.Signature);
 					}
-					public static PropertiesSwitchState0ElementContainer Read(PacketBuffer buffer ) {
+					public static PropertiesSwitchState0ElementContainer Read(PacketBuffer buffer )
+					{
 						string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						string @value = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						string? @signature = ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
@@ -5138,17 +5927,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					}
 				}
 				public object? Value { get; set; }
-				public PropertiesSwitch(object? value) {
+				public PropertiesSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, VarInt state, VarInt @action) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, PropertiesSwitchState0ElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, PropertiesSwitchState0ElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (PropertiesSwitchState0ElementContainer[])this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static PropertiesSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action) {
-					object? value = state.Value switch {
+				public static PropertiesSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					object? value = state.Value switch
+					{
 						0 => ((Func<PacketBuffer, PropertiesSwitchState0ElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, PropertiesSwitchState0ElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketPlayerInfo.DataElementContainer.PropertiesSwitch.PropertiesSwitchState0ElementContainer.Read(buffer ))))))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 					};
@@ -5157,20 +5951,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public static implicit operator PropertiesSwitchState0ElementContainer[]?(PropertiesSwitch value) => (PropertiesSwitchState0ElementContainer[]?)value.Value;
 				public static implicit operator PropertiesSwitch?(PropertiesSwitchState0ElementContainer[]? value) => new PropertiesSwitch(value);
 			}
-			public class GamemodeSwitch {
+			public class GamemodeSwitch
+			{
 				public object? Value { get; set; }
-				public GamemodeSwitch(object? value) {
+				public GamemodeSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, VarInt state, VarInt @action) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static GamemodeSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action) {
-					object? value = state.Value switch {
+				public static GamemodeSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					object? value = state.Value switch
+					{
 						0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5180,20 +5980,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public static implicit operator VarInt?(GamemodeSwitch value) => (VarInt?)value.Value;
 				public static implicit operator GamemodeSwitch?(VarInt? value) => new GamemodeSwitch(value);
 			}
-			public class PingSwitch {
+			public class PingSwitch
+			{
 				public object? Value { get; set; }
-				public PingSwitch(object? value) {
+				public PingSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, VarInt state, VarInt @action) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						case 2: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static PingSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action) {
-					object? value = state.Value switch {
+				public static PingSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					object? value = state.Value switch
+					{
 						0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						2 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5203,20 +6009,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				public static implicit operator VarInt?(PingSwitch value) => (VarInt?)value.Value;
 				public static implicit operator PingSwitch?(VarInt? value) => new PingSwitch(value);
 			}
-			public class DisplayNameSwitch {
+			public class DisplayNameSwitch
+			{
 				public object? Value { get; set; }
-				public DisplayNameSwitch(object? value) {
+				public DisplayNameSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, VarInt state, VarInt @action) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					switch (state)
+					{
 						case 0: ((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, (string?)this); break;
 						case 3: ((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, (string?)this); break;
 						default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 					}
 				}
-				public static DisplayNameSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action) {
-					object? value = state.Value switch {
+				public static DisplayNameSwitch Read(PacketBuffer buffer, VarInt state, VarInt @action)
+				{
+					object? value = state.Value switch
+					{
 						0 => ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
 						3 => ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
 						_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5232,7 +6044,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public GamemodeSwitch Gamemode { get; set; }
 			public PingSwitch Ping { get; set; }
 			public DisplayNameSwitch DisplayName { get; set; }
-			public DataElementContainer(UUID @uUID, NameSwitch @name, PropertiesSwitch @properties, GamemodeSwitch @gamemode, PingSwitch @ping, DisplayNameSwitch @displayName) {
+			public DataElementContainer(UUID @uUID, NameSwitch @name, PropertiesSwitch @properties, GamemodeSwitch @gamemode, PingSwitch @ping, DisplayNameSwitch @displayName)
+			{
 				this.UUID = @uUID;
 				this.Name = @name;
 				this.Properties = @properties;
@@ -5240,7 +6053,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				this.Ping = @ping;
 				this.DisplayName = @displayName;
 			}
-			public void Write(PacketBuffer buffer , VarInt @action) {
+			public void Write(PacketBuffer buffer , VarInt @action)
+			{
 				((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.UUID);
 				((Action<PacketBuffer, NameSwitch>)((buffer, value) => value.Write(buffer, @action, @action)))(buffer, this.Name);
 				((Action<PacketBuffer, PropertiesSwitch>)((buffer, value) => value.Write(buffer, @action, @action)))(buffer, this.Properties);
@@ -5248,7 +6062,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 				((Action<PacketBuffer, PingSwitch>)((buffer, value) => value.Write(buffer, @action, @action)))(buffer, this.Ping);
 				((Action<PacketBuffer, DisplayNameSwitch>)((buffer, value) => value.Write(buffer, @action, @action)))(buffer, this.DisplayName);
 			}
-			public static DataElementContainer Read(PacketBuffer buffer , VarInt @action) {
+			public static DataElementContainer Read(PacketBuffer buffer , VarInt @action)
+			{
 				UUID @uUID = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 				NameSwitch @name = ((Func<PacketBuffer, NameSwitch>)((buffer) => NameSwitch.Read(buffer, @action, @action)))(buffer);
 				PropertiesSwitch @properties = ((Func<PacketBuffer, PropertiesSwitch>)((buffer) => PropertiesSwitch.Read(buffer, @action, @action)))(buffer);
@@ -5260,21 +6075,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public VarInt Action { get; set; }
 		public DataElementContainer[] Data { get; set; }
-		public PacketPlayerInfo(VarInt @action, DataElementContainer[] @data) {
+		public PacketPlayerInfo(VarInt @action, DataElementContainer[] @data)
+		{
 			this.Action = @action;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, DataElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, DataElementContainer>)((buffer, value) => value.Write(buffer , Action))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Data);
 		}
-		public static PacketPlayerInfo Read(PacketBuffer buffer ) {
+		public static PacketPlayerInfo Read(PacketBuffer buffer )
+		{
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			DataElementContainer[] @data = ((Func<PacketBuffer, DataElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, DataElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketPlayerInfo.DataElementContainer.Read(buffer , @action))))))(buffer);
 			return new PacketPlayerInfo(@action, @data);
 		}
 	}
-	public class PacketPosition : IPacketPayload {
+	public class PacketPosition : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
@@ -5283,7 +6102,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Flags { get; set; }
 		public VarInt TeleportId { get; set; }
 		public bool DismountVehicle { get; set; }
-		public PacketPosition(double @x, double @y, double @z, float @yaw, float @pitch, sbyte @flags, VarInt @teleportId, bool @dismountVehicle) {
+		public PacketPosition(double @x, double @y, double @z, float @yaw, float @pitch, sbyte @flags, VarInt @teleportId, bool @dismountVehicle)
+		{
 			this.X = @x;
 			this.Y = @y;
 			this.Z = @z;
@@ -5293,7 +6113,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.TeleportId = @teleportId;
 			this.DismountVehicle = @dismountVehicle;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
@@ -5303,7 +6124,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TeleportId);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.DismountVehicle);
 		}
-		public static PacketPosition Read(PacketBuffer buffer ) {
+		public static PacketPosition Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -5315,20 +6137,27 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketPosition(@x, @y, @z, @yaw, @pitch, @flags, @teleportId, @dismountVehicle);
 		}
 	}
-	public class PacketUnlockRecipes : IPacketPayload {
-		public class Recipes2Switch {
+	public class PacketUnlockRecipes : IPacketPayload
+	{
+		public class Recipes2Switch
+		{
 			public object? Value { get; set; }
-			public Recipes2Switch(object? value) {
+			public Recipes2Switch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, VarInt state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, VarInt state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string[])this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static Recipes2Switch Read(PacketBuffer buffer, VarInt state) {
-				object? value = state.Value switch {
+			public static Recipes2Switch Read(PacketBuffer buffer, VarInt state)
+			{
+				object? value = state.Value switch
+				{
 					0 => ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
 				};
@@ -5348,7 +6177,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public bool FilteringSmoker { get; set; }
 		public string[] Recipes1 { get; set; }
 		public Recipes2Switch Recipes2 { get; set; }
-		public PacketUnlockRecipes(VarInt @action, bool @craftingBookOpen, bool @filteringCraftable, bool @smeltingBookOpen, bool @filteringSmeltable, bool @blastFurnaceOpen, bool @filteringBlastFurnace, bool @smokerBookOpen, bool @filteringSmoker, string[] @recipes1, Recipes2Switch @recipes2) {
+		public PacketUnlockRecipes(VarInt @action, bool @craftingBookOpen, bool @filteringCraftable, bool @smeltingBookOpen, bool @filteringSmeltable, bool @blastFurnaceOpen, bool @filteringBlastFurnace, bool @smokerBookOpen, bool @filteringSmoker, string[] @recipes1, Recipes2Switch @recipes2)
+		{
 			this.Action = @action;
 			this.CraftingBookOpen = @craftingBookOpen;
 			this.FilteringCraftable = @filteringCraftable;
@@ -5361,7 +6191,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Recipes1 = @recipes1;
 			this.Recipes2 = @recipes2;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Action);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.CraftingBookOpen);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.FilteringCraftable);
@@ -5374,7 +6205,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Recipes1);
 			((Action<PacketBuffer, Recipes2Switch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Recipes2);
 		}
-		public static PacketUnlockRecipes Read(PacketBuffer buffer ) {
+		public static PacketUnlockRecipes Read(PacketBuffer buffer )
+		{
 			VarInt @action = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			bool @craftingBookOpen = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			bool @filteringCraftable = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
@@ -5389,54 +6221,66 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketUnlockRecipes(@action, @craftingBookOpen, @filteringCraftable, @smeltingBookOpen, @filteringSmeltable, @blastFurnaceOpen, @filteringBlastFurnace, @smokerBookOpen, @filteringSmoker, @recipes1, @recipes2);
 		}
 	}
-	public class PacketEntityDestroy : IPacketPayload {
+	public class PacketEntityDestroy : IPacketPayload
+	{
 		public VarInt[] EntityIds { get; set; }
-		public PacketEntityDestroy(VarInt[] @entityIds) {
+		public PacketEntityDestroy(VarInt[] @entityIds)
+		{
 			this.EntityIds = @entityIds;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.EntityIds);
 		}
-		public static PacketEntityDestroy Read(PacketBuffer buffer ) {
+		public static PacketEntityDestroy Read(PacketBuffer buffer )
+		{
 			VarInt[] @entityIds = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketEntityDestroy(@entityIds);
 		}
 	}
-	public class PacketRemoveEntityEffect : IPacketPayload {
+	public class PacketRemoveEntityEffect : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public sbyte EffectId { get; set; }
-		public PacketRemoveEntityEffect(VarInt @entityId, sbyte @effectId) {
+		public PacketRemoveEntityEffect(VarInt @entityId, sbyte @effectId)
+		{
 			this.EntityId = @entityId;
 			this.EffectId = @effectId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.EffectId);
 		}
-		public static PacketRemoveEntityEffect Read(PacketBuffer buffer ) {
+		public static PacketRemoveEntityEffect Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @effectId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketRemoveEntityEffect(@entityId, @effectId);
 		}
 	}
-	public class PacketResourcePackSend : IPacketPayload {
+	public class PacketResourcePackSend : IPacketPayload
+	{
 		public string Url { get; set; }
 		public string Hash { get; set; }
 		public bool Forced { get; set; }
 		public string? PromptMessage { get; set; }
-		public PacketResourcePackSend(string @url, string @hash, bool @forced, string? @promptMessage) {
+		public PacketResourcePackSend(string @url, string @hash, bool @forced, string? @promptMessage)
+		{
 			this.Url = @url;
 			this.Hash = @hash;
 			this.Forced = @forced;
 			this.PromptMessage = @promptMessage;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Url);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Hash);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Forced);
 			((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.PromptMessage);
 		}
-		public static PacketResourcePackSend Read(PacketBuffer buffer ) {
+		public static PacketResourcePackSend Read(PacketBuffer buffer )
+		{
 			string @url = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			string @hash = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			bool @forced = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
@@ -5444,7 +6288,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketResourcePackSend(@url, @hash, @forced, @promptMessage);
 		}
 	}
-	public class PacketRespawn : IPacketPayload {
+	public class PacketRespawn : IPacketPayload
+	{
 		public NbtCompound Dimension { get; set; }
 		public string WorldName { get; set; }
 		public long HashedSeed { get; set; }
@@ -5453,7 +6298,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public bool IsDebug { get; set; }
 		public bool IsFlat { get; set; }
 		public bool CopyMetadata { get; set; }
-		public PacketRespawn(NbtCompound @dimension, string @worldName, long @hashedSeed, byte @gamemode, byte @previousGamemode, bool @isDebug, bool @isFlat, bool @copyMetadata) {
+		public PacketRespawn(NbtCompound @dimension, string @worldName, long @hashedSeed, byte @gamemode, byte @previousGamemode, bool @isDebug, bool @isFlat, bool @copyMetadata)
+		{
 			this.Dimension = @dimension;
 			this.WorldName = @worldName;
 			this.HashedSeed = @hashedSeed;
@@ -5463,7 +6309,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.IsFlat = @isFlat;
 			this.CopyMetadata = @copyMetadata;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, NbtCompound>)((buffer, value) => buffer.WriteNbt(value)))(buffer, this.Dimension);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.WorldName);
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.HashedSeed);
@@ -5473,7 +6320,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.IsFlat);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.CopyMetadata);
 		}
-		public static PacketRespawn Read(PacketBuffer buffer ) {
+		public static PacketRespawn Read(PacketBuffer buffer )
+		{
 			NbtCompound @dimension = ((Func<PacketBuffer, NbtCompound>)((buffer) => buffer.ReadNbt()))(buffer);
 			string @worldName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			long @hashedSeed = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
@@ -5485,148 +6333,184 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketRespawn(@dimension, @worldName, @hashedSeed, @gamemode, @previousGamemode, @isDebug, @isFlat, @copyMetadata);
 		}
 	}
-	public class PacketEntityHeadRotation : IPacketPayload {
+	public class PacketEntityHeadRotation : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public sbyte HeadYaw { get; set; }
-		public PacketEntityHeadRotation(VarInt @entityId, sbyte @headYaw) {
+		public PacketEntityHeadRotation(VarInt @entityId, sbyte @headYaw)
+		{
 			this.EntityId = @entityId;
 			this.HeadYaw = @headYaw;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.HeadYaw);
 		}
-		public static PacketEntityHeadRotation Read(PacketBuffer buffer ) {
+		public static PacketEntityHeadRotation Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @headYaw = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketEntityHeadRotation(@entityId, @headYaw);
 		}
 	}
-	public class PacketCamera : IPacketPayload {
+	public class PacketCamera : IPacketPayload
+	{
 		public VarInt CameraId { get; set; }
-		public PacketCamera(VarInt @cameraId) {
+		public PacketCamera(VarInt @cameraId)
+		{
 			this.CameraId = @cameraId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CameraId);
 		}
-		public static PacketCamera Read(PacketBuffer buffer ) {
+		public static PacketCamera Read(PacketBuffer buffer )
+		{
 			VarInt @cameraId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketCamera(@cameraId);
 		}
 	}
-	public class PacketHeldItemSlot : IPacketPayload {
+	public class PacketHeldItemSlot : IPacketPayload
+	{
 		public sbyte Slot { get; set; }
-		public PacketHeldItemSlot(sbyte @slot) {
+		public PacketHeldItemSlot(sbyte @slot)
+		{
 			this.Slot = @slot;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Slot);
 		}
-		public static PacketHeldItemSlot Read(PacketBuffer buffer ) {
+		public static PacketHeldItemSlot Read(PacketBuffer buffer )
+		{
 			sbyte @slot = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			return new PacketHeldItemSlot(@slot);
 		}
 	}
-	public class PacketUpdateViewPosition : IPacketPayload {
+	public class PacketUpdateViewPosition : IPacketPayload
+	{
 		public VarInt ChunkX { get; set; }
 		public VarInt ChunkZ { get; set; }
-		public PacketUpdateViewPosition(VarInt @chunkX, VarInt @chunkZ) {
+		public PacketUpdateViewPosition(VarInt @chunkX, VarInt @chunkZ)
+		{
 			this.ChunkX = @chunkX;
 			this.ChunkZ = @chunkZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ChunkX);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ChunkZ);
 		}
-		public static PacketUpdateViewPosition Read(PacketBuffer buffer ) {
+		public static PacketUpdateViewPosition Read(PacketBuffer buffer )
+		{
 			VarInt @chunkX = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @chunkZ = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketUpdateViewPosition(@chunkX, @chunkZ);
 		}
 	}
-	public class PacketUpdateViewDistance : IPacketPayload {
+	public class PacketUpdateViewDistance : IPacketPayload
+	{
 		public VarInt ViewDistance { get; set; }
-		public PacketUpdateViewDistance(VarInt @viewDistance) {
+		public PacketUpdateViewDistance(VarInt @viewDistance)
+		{
 			this.ViewDistance = @viewDistance;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ViewDistance);
 		}
-		public static PacketUpdateViewDistance Read(PacketBuffer buffer ) {
+		public static PacketUpdateViewDistance Read(PacketBuffer buffer )
+		{
 			VarInt @viewDistance = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketUpdateViewDistance(@viewDistance);
 		}
 	}
-	public class PacketScoreboardDisplayObjective : IPacketPayload {
+	public class PacketScoreboardDisplayObjective : IPacketPayload
+	{
 		public sbyte Position { get; set; }
 		public string Name { get; set; }
-		public PacketScoreboardDisplayObjective(sbyte @position, string @name) {
+		public PacketScoreboardDisplayObjective(sbyte @position, string @name)
+		{
 			this.Position = @position;
 			this.Name = @name;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Position);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 		}
-		public static PacketScoreboardDisplayObjective Read(PacketBuffer buffer ) {
+		public static PacketScoreboardDisplayObjective Read(PacketBuffer buffer )
+		{
 			sbyte @position = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketScoreboardDisplayObjective(@position, @name);
 		}
 	}
-	public class PacketEntityMetadata : IPacketPayload {
+	public class PacketEntityMetadata : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public EntityMetadataLoopElement[] Metadata { get; set; }
-		public PacketEntityMetadata(VarInt @entityId, EntityMetadataLoopElement[] @metadata) {
+		public PacketEntityMetadata(VarInt @entityId, EntityMetadataLoopElement[] @metadata)
+		{
 			this.EntityId = @entityId;
 			this.Metadata = @metadata;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, EntityMetadataLoopElement[]>)((buffer, value) => buffer.WriteEntityMetadataLoop(value, 255, ((Action<PacketBuffer, EntityMetadataLoopElement>)((buffer, value) => value.Write(buffer ))))))(buffer, this.Metadata);
 		}
-		public static PacketEntityMetadata Read(PacketBuffer buffer ) {
+		public static PacketEntityMetadata Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			EntityMetadataLoopElement[] @metadata = ((Func<PacketBuffer, EntityMetadataLoopElement[]>)((buffer) => buffer.ReadEntityMetadataLoop(255, ((Func<PacketBuffer, EntityMetadataLoopElement>)((buffer) => MineSharp.Data.Protocol.EntityMetadataLoopElement.Read(buffer ))))))(buffer);
 			return new PacketEntityMetadata(@entityId, @metadata);
 		}
 	}
-	public class PacketAttachEntity : IPacketPayload {
+	public class PacketAttachEntity : IPacketPayload
+	{
 		public int EntityId { get; set; }
 		public int VehicleId { get; set; }
-		public PacketAttachEntity(int @entityId, int @vehicleId) {
+		public PacketAttachEntity(int @entityId, int @vehicleId)
+		{
 			this.EntityId = @entityId;
 			this.VehicleId = @vehicleId;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.VehicleId);
 		}
-		public static PacketAttachEntity Read(PacketBuffer buffer ) {
+		public static PacketAttachEntity Read(PacketBuffer buffer )
+		{
 			int @entityId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			int @vehicleId = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketAttachEntity(@entityId, @vehicleId);
 		}
 	}
-	public class PacketEntityVelocity : IPacketPayload {
+	public class PacketEntityVelocity : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public short VelocityX { get; set; }
 		public short VelocityY { get; set; }
 		public short VelocityZ { get; set; }
-		public PacketEntityVelocity(VarInt @entityId, short @velocityX, short @velocityY, short @velocityZ) {
+		public PacketEntityVelocity(VarInt @entityId, short @velocityX, short @velocityY, short @velocityZ)
+		{
 			this.EntityId = @entityId;
 			this.VelocityX = @velocityX;
 			this.VelocityY = @velocityY;
 			this.VelocityZ = @velocityZ;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityX);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityY);
 			((Action<PacketBuffer, short>)((buffer, value) => buffer.WriteI16(value)))(buffer, this.VelocityZ);
 		}
-		public static PacketEntityVelocity Read(PacketBuffer buffer ) {
+		public static PacketEntityVelocity Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			short @velocityX = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
 			short @velocityY = ((Func<PacketBuffer, short>)((buffer) => buffer.ReadI16()))(buffer);
@@ -5634,19 +6518,24 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntityVelocity(@entityId, @velocityX, @velocityY, @velocityZ);
 		}
 	}
-	public class PacketEntityEquipment : IPacketPayload {
-		public class EquipmentsLoopElementContainer {
+	public class PacketEntityEquipment : IPacketPayload
+	{
+		public class EquipmentsLoopElementContainer
+		{
 			public sbyte Slot { get; set; }
 			public Slot Item { get; set; }
-			public EquipmentsLoopElementContainer(sbyte @slot, Slot @item) {
+			public EquipmentsLoopElementContainer(sbyte @slot, Slot @item)
+			{
 				this.Slot = @slot;
 				this.Item = @item;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Slot);
 				((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Item);
 			}
-			public static EquipmentsLoopElementContainer Read(PacketBuffer buffer ) {
+			public static EquipmentsLoopElementContainer Read(PacketBuffer buffer )
+			{
 				sbyte @slot = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 				Slot @item = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 				return new EquipmentsLoopElementContainer(@slot, @item);
@@ -5654,77 +6543,95 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public VarInt EntityId { get; set; }
 		public EquipmentsLoopElementContainer[] Equipments { get; set; }
-		public PacketEntityEquipment(VarInt @entityId, EquipmentsLoopElementContainer[] @equipments) {
+		public PacketEntityEquipment(VarInt @entityId, EquipmentsLoopElementContainer[] @equipments)
+		{
 			this.EntityId = @entityId;
 			this.Equipments = @equipments;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, EquipmentsLoopElementContainer[]>)((buffer, value) => buffer.WriteTopBitSetTerminatedArray(value, ((Action<PacketBuffer, EquipmentsLoopElementContainer>)((buffer, value) => value.Write(buffer ))))))(buffer, this.Equipments);
 		}
-		public static PacketEntityEquipment Read(PacketBuffer buffer ) {
+		public static PacketEntityEquipment Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			EquipmentsLoopElementContainer[] @equipments = ((Func<PacketBuffer, EquipmentsLoopElementContainer[]>)((buffer) => buffer.ReadTopBitSetTerminatedArray(((Func<PacketBuffer, EquipmentsLoopElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketEntityEquipment.EquipmentsLoopElementContainer.Read(buffer ))))))(buffer);
 			return new PacketEntityEquipment(@entityId, @equipments);
 		}
 	}
-	public class PacketExperience : IPacketPayload {
+	public class PacketExperience : IPacketPayload
+	{
 		public float ExperienceBar { get; set; }
 		public VarInt Level { get; set; }
 		public VarInt TotalExperience { get; set; }
-		public PacketExperience(float @experienceBar, VarInt @level, VarInt @totalExperience) {
+		public PacketExperience(float @experienceBar, VarInt @level, VarInt @totalExperience)
+		{
 			this.ExperienceBar = @experienceBar;
 			this.Level = @level;
 			this.TotalExperience = @totalExperience;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.ExperienceBar);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Level);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.TotalExperience);
 		}
-		public static PacketExperience Read(PacketBuffer buffer ) {
+		public static PacketExperience Read(PacketBuffer buffer )
+		{
 			float @experienceBar = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			VarInt @level = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @totalExperience = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketExperience(@experienceBar, @level, @totalExperience);
 		}
 	}
-	public class PacketUpdateHealth : IPacketPayload {
+	public class PacketUpdateHealth : IPacketPayload
+	{
 		public float Health { get; set; }
 		public VarInt Food { get; set; }
 		public float FoodSaturation { get; set; }
-		public PacketUpdateHealth(float @health, VarInt @food, float @foodSaturation) {
+		public PacketUpdateHealth(float @health, VarInt @food, float @foodSaturation)
+		{
 			this.Health = @health;
 			this.Food = @food;
 			this.FoodSaturation = @foodSaturation;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Health);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Food);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.FoodSaturation);
 		}
-		public static PacketUpdateHealth Read(PacketBuffer buffer ) {
+		public static PacketUpdateHealth Read(PacketBuffer buffer )
+		{
 			float @health = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			VarInt @food = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			float @foodSaturation = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			return new PacketUpdateHealth(@health, @food, @foodSaturation);
 		}
 	}
-	public class PacketScoreboardObjective : IPacketPayload {
-		public class DisplayTextSwitch {
+	public class PacketScoreboardObjective : IPacketPayload
+	{
+		public class DisplayTextSwitch
+		{
 			public object? Value { get; set; }
-			public DisplayTextSwitch(object? value) {
+			public DisplayTextSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static DisplayTextSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static DisplayTextSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5734,20 +6641,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(DisplayTextSwitch value) => (string?)value.Value;
 			public static implicit operator DisplayTextSwitch?(string? value) => new DisplayTextSwitch(value);
 		}
-		public class TypeSwitch {
+		public class TypeSwitch
+		{
 			public object? Value { get; set; }
-			public TypeSwitch(object? value) {
+			public TypeSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 2: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static TypeSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static TypeSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					2 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5761,19 +6674,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Action { get; set; }
 		public DisplayTextSwitch DisplayText { get; set; }
 		public TypeSwitch Type { get; set; }
-		public PacketScoreboardObjective(string @name, sbyte @action, DisplayTextSwitch @displayText, TypeSwitch @type) {
+		public PacketScoreboardObjective(string @name, sbyte @action, DisplayTextSwitch @displayText, TypeSwitch @type)
+		{
 			this.Name = @name;
 			this.Action = @action;
 			this.DisplayText = @displayText;
 			this.Type = @type;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Name);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Action);
 			((Action<PacketBuffer, DisplayTextSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.DisplayText);
 			((Action<PacketBuffer, TypeSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Type);
 		}
-		public static PacketScoreboardObjective Read(PacketBuffer buffer ) {
+		public static PacketScoreboardObjective Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			sbyte @action = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			DisplayTextSwitch @displayText = ((Func<PacketBuffer, DisplayTextSwitch>)((buffer) => DisplayTextSwitch.Read(buffer, @action)))(buffer);
@@ -5781,38 +6697,49 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketScoreboardObjective(@name, @action, @displayText, @type);
 		}
 	}
-	public class PacketSetPassengers : IPacketPayload {
+	public class PacketSetPassengers : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public VarInt[] Passengers { get; set; }
-		public PacketSetPassengers(VarInt @entityId, VarInt[] @passengers) {
+		public PacketSetPassengers(VarInt @entityId, VarInt[] @passengers)
+		{
 			this.EntityId = @entityId;
 			this.Passengers = @passengers;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, VarInt[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Passengers);
 		}
-		public static PacketSetPassengers Read(PacketBuffer buffer ) {
+		public static PacketSetPassengers Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt[] @passengers = ((Func<PacketBuffer, VarInt[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketSetPassengers(@entityId, @passengers);
 		}
 	}
-	public class PacketTeams : IPacketPayload {
-		public class NameSwitch {
+	public class PacketTeams : IPacketPayload
+	{
+		public class NameSwitch
+		{
 			public object? Value { get; set; }
-			public NameSwitch(object? value) {
+			public NameSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static NameSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static NameSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5822,20 +6749,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(NameSwitch value) => (string?)value.Value;
 			public static implicit operator NameSwitch?(string? value) => new NameSwitch(value);
 		}
-		public class FriendlyFireSwitch {
+		public class FriendlyFireSwitch
+		{
 			public object? Value { get; set; }
-			public FriendlyFireSwitch(object? value) {
+			public FriendlyFireSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, (sbyte)this); break;
 					case 2: ((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, (sbyte)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static FriendlyFireSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static FriendlyFireSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer),
 					2 => ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5845,20 +6778,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator sbyte?(FriendlyFireSwitch value) => (sbyte?)value.Value;
 			public static implicit operator FriendlyFireSwitch?(sbyte? value) => new FriendlyFireSwitch(value);
 		}
-		public class NameTagVisibilitySwitch {
+		public class NameTagVisibilitySwitch
+		{
 			public object? Value { get; set; }
-			public NameTagVisibilitySwitch(object? value) {
+			public NameTagVisibilitySwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static NameTagVisibilitySwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static NameTagVisibilitySwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5868,20 +6807,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(NameTagVisibilitySwitch value) => (string?)value.Value;
 			public static implicit operator NameTagVisibilitySwitch?(string? value) => new NameTagVisibilitySwitch(value);
 		}
-		public class CollisionRuleSwitch {
+		public class CollisionRuleSwitch
+		{
 			public object? Value { get; set; }
-			public CollisionRuleSwitch(object? value) {
+			public CollisionRuleSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static CollisionRuleSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static CollisionRuleSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5891,20 +6836,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(CollisionRuleSwitch value) => (string?)value.Value;
 			public static implicit operator CollisionRuleSwitch?(string? value) => new CollisionRuleSwitch(value);
 		}
-		public class FormattingSwitch {
+		public class FormattingSwitch
+		{
 			public object? Value { get; set; }
-			public FormattingSwitch(object? value) {
+			public FormattingSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 2: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static FormattingSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static FormattingSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					2 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5914,20 +6865,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator VarInt?(FormattingSwitch value) => (VarInt?)value.Value;
 			public static implicit operator FormattingSwitch?(VarInt? value) => new FormattingSwitch(value);
 		}
-		public class PrefixSwitch {
+		public class PrefixSwitch
+		{
 			public object? Value { get; set; }
-			public PrefixSwitch(object? value) {
+			public PrefixSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static PrefixSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static PrefixSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5937,20 +6894,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(PrefixSwitch value) => (string?)value.Value;
 			public static implicit operator PrefixSwitch?(string? value) => new PrefixSwitch(value);
 		}
-		public class SuffixSwitch {
+		public class SuffixSwitch
+		{
 			public object? Value { get; set; }
-			public SuffixSwitch(object? value) {
+			public SuffixSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static SuffixSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static SuffixSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -5960,21 +6923,27 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator string?(SuffixSwitch value) => (string?)value.Value;
 			public static implicit operator SuffixSwitch?(string? value) => new SuffixSwitch(value);
 		}
-		public class PlayersSwitch {
+		public class PlayersSwitch
+		{
 			public object? Value { get; set; }
-			public PlayersSwitch(object? value) {
+			public PlayersSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 0: ((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string[])this); break;
 					case 3: ((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string[])this); break;
 					case 4: ((Action<PacketBuffer, string[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string[])this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static PlayersSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static PlayersSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					0 => ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
 					3 => ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
 					4 => ((Func<PacketBuffer, string[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer),
@@ -5995,7 +6964,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public PrefixSwitch Prefix { get; set; }
 		public SuffixSwitch Suffix { get; set; }
 		public PlayersSwitch Players { get; set; }
-		public PacketTeams(string @team, sbyte @mode, NameSwitch @name, FriendlyFireSwitch @friendlyFire, NameTagVisibilitySwitch @nameTagVisibility, CollisionRuleSwitch @collisionRule, FormattingSwitch @formatting, PrefixSwitch @prefix, SuffixSwitch @suffix, PlayersSwitch @players) {
+		public PacketTeams(string @team, sbyte @mode, NameSwitch @name, FriendlyFireSwitch @friendlyFire, NameTagVisibilitySwitch @nameTagVisibility, CollisionRuleSwitch @collisionRule, FormattingSwitch @formatting, PrefixSwitch @prefix, SuffixSwitch @suffix, PlayersSwitch @players)
+		{
 			this.Team = @team;
 			this.Mode = @mode;
 			this.Name = @name;
@@ -6007,7 +6977,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Suffix = @suffix;
 			this.Players = @players;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Team);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Mode);
 			((Action<PacketBuffer, NameSwitch>)((buffer, value) => value.Write(buffer, Mode)))(buffer, this.Name);
@@ -6019,7 +6990,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, SuffixSwitch>)((buffer, value) => value.Write(buffer, Mode)))(buffer, this.Suffix);
 			((Action<PacketBuffer, PlayersSwitch>)((buffer, value) => value.Write(buffer, Mode)))(buffer, this.Players);
 		}
-		public static PacketTeams Read(PacketBuffer buffer ) {
+		public static PacketTeams Read(PacketBuffer buffer )
+		{
 			string @team = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			sbyte @mode = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			NameSwitch @name = ((Func<PacketBuffer, NameSwitch>)((buffer) => NameSwitch.Read(buffer, @mode)))(buffer);
@@ -6033,20 +7005,27 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketTeams(@team, @mode, @name, @friendlyFire, @nameTagVisibility, @collisionRule, @formatting, @prefix, @suffix, @players);
 		}
 	}
-	public class PacketScoreboardScore : IPacketPayload {
-		public class ValueSwitch {
+	public class PacketScoreboardScore : IPacketPayload
+	{
+		public class ValueSwitch
+		{
 			public object? Value { get; set; }
-			public ValueSwitch(object? value) {
+			public ValueSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 1: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
 					default: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)Value); break;
 				}
 			}
-			public static ValueSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static ValueSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					1 => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
 					_ => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer)
 				};
@@ -6057,19 +7036,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Action { get; set; }
 		public string ScoreName { get; set; }
 		public ValueSwitch Value { get; set; }
-		public PacketScoreboardScore(string @itemName, sbyte @action, string @scoreName, ValueSwitch @value) {
+		public PacketScoreboardScore(string @itemName, sbyte @action, string @scoreName, ValueSwitch @value)
+		{
 			this.ItemName = @itemName;
 			this.Action = @action;
 			this.ScoreName = @scoreName;
 			this.Value = @value;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ItemName);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Action);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ScoreName);
 			((Action<PacketBuffer, ValueSwitch>)((buffer, value) => value.Write(buffer, Action)))(buffer, this.Value);
 		}
-		public static PacketScoreboardScore Read(PacketBuffer buffer ) {
+		public static PacketScoreboardScore Read(PacketBuffer buffer )
+		{
 			string @itemName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			sbyte @action = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			string @scoreName = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
@@ -6077,61 +7059,73 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketScoreboardScore(@itemName, @action, @scoreName, @value);
 		}
 	}
-	public class PacketSpawnPosition : IPacketPayload {
+	public class PacketSpawnPosition : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public float Angle { get; set; }
-		public PacketSpawnPosition(PositionBitfield @location, float @angle) {
+		public PacketSpawnPosition(PositionBitfield @location, float @angle)
+		{
 			this.Location = @location;
 			this.Angle = @angle;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Angle);
 		}
-		public static PacketSpawnPosition Read(PacketBuffer buffer ) {
+		public static PacketSpawnPosition Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			float @angle = ((Func<PacketBuffer, float>)((buffer) => buffer.ReadF32()))(buffer);
 			return new PacketSpawnPosition(@location, @angle);
 		}
 	}
-	public class PacketUpdateTime : IPacketPayload {
+	public class PacketUpdateTime : IPacketPayload
+	{
 		public long Age { get; set; }
 		public long Time { get; set; }
-		public PacketUpdateTime(long @age, long @time) {
+		public PacketUpdateTime(long @age, long @time)
+		{
 			this.Age = @age;
 			this.Time = @time;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.Age);
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.Time);
 		}
-		public static PacketUpdateTime Read(PacketBuffer buffer ) {
+		public static PacketUpdateTime Read(PacketBuffer buffer )
+		{
 			long @age = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			long @time = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			return new PacketUpdateTime(@age, @time);
 		}
 	}
-	public class PacketEntitySoundEffect : IPacketPayload {
+	public class PacketEntitySoundEffect : IPacketPayload
+	{
 		public VarInt SoundId { get; set; }
 		public VarInt SoundCategory { get; set; }
 		public VarInt EntityId { get; set; }
 		public float Volume { get; set; }
 		public float Pitch { get; set; }
-		public PacketEntitySoundEffect(VarInt @soundId, VarInt @soundCategory, VarInt @entityId, float @volume, float @pitch) {
+		public PacketEntitySoundEffect(VarInt @soundId, VarInt @soundCategory, VarInt @entityId, float @volume, float @pitch)
+		{
 			this.SoundId = @soundId;
 			this.SoundCategory = @soundCategory;
 			this.EntityId = @entityId;
 			this.Volume = @volume;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SoundId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SoundCategory);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Volume);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 		}
-		public static PacketEntitySoundEffect Read(PacketBuffer buffer ) {
+		public static PacketEntitySoundEffect Read(PacketBuffer buffer )
+		{
 			VarInt @soundId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @soundCategory = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -6140,21 +7134,28 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntitySoundEffect(@soundId, @soundCategory, @entityId, @volume, @pitch);
 		}
 	}
-	public class PacketStopSound : IPacketPayload {
-		public class SourceSwitch {
+	public class PacketStopSound : IPacketPayload
+	{
+		public class SourceSwitch
+		{
 			public object? Value { get; set; }
-			public SourceSwitch(object? value) {
+			public SourceSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 3: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					case 1: ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static SourceSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static SourceSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					3 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					1 => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -6164,20 +7165,26 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public static implicit operator VarInt?(SourceSwitch value) => (VarInt?)value.Value;
 			public static implicit operator SourceSwitch?(VarInt? value) => new SourceSwitch(value);
 		}
-		public class SoundSwitch {
+		public class SoundSwitch
+		{
 			public object? Value { get; set; }
-			public SoundSwitch(object? value) {
+			public SoundSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, sbyte state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, sbyte state)
+			{
+				switch (state)
+				{
 					case 3: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					case 2: ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, (string)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static SoundSwitch Read(PacketBuffer buffer, sbyte state) {
-				object? value = state switch {
+			public static SoundSwitch Read(PacketBuffer buffer, sbyte state)
+			{
+				object? value = state switch
+				{
 					3 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					2 => ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -6190,24 +7197,28 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Flags { get; set; }
 		public SourceSwitch Source { get; set; }
 		public SoundSwitch Sound { get; set; }
-		public PacketStopSound(sbyte @flags, SourceSwitch @source, SoundSwitch @sound) {
+		public PacketStopSound(sbyte @flags, SourceSwitch @source, SoundSwitch @sound)
+		{
 			this.Flags = @flags;
 			this.Source = @source;
 			this.Sound = @sound;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Flags);
 			((Action<PacketBuffer, SourceSwitch>)((buffer, value) => value.Write(buffer, Flags)))(buffer, this.Source);
 			((Action<PacketBuffer, SoundSwitch>)((buffer, value) => value.Write(buffer, Flags)))(buffer, this.Sound);
 		}
-		public static PacketStopSound Read(PacketBuffer buffer ) {
+		public static PacketStopSound Read(PacketBuffer buffer )
+		{
 			sbyte @flags = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			SourceSwitch @source = ((Func<PacketBuffer, SourceSwitch>)((buffer) => SourceSwitch.Read(buffer, @flags)))(buffer);
 			SoundSwitch @sound = ((Func<PacketBuffer, SoundSwitch>)((buffer) => SoundSwitch.Read(buffer, @flags)))(buffer);
 			return new PacketStopSound(@flags, @source, @sound);
 		}
 	}
-	public class PacketSoundEffect : IPacketPayload {
+	public class PacketSoundEffect : IPacketPayload
+	{
 		public VarInt SoundId { get; set; }
 		public VarInt SoundCategory { get; set; }
 		public int X { get; set; }
@@ -6215,7 +7226,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public int Z { get; set; }
 		public float Volume { get; set; }
 		public float Pitch { get; set; }
-		public PacketSoundEffect(VarInt @soundId, VarInt @soundCategory, int @x, int @y, int @z, float @volume, float @pitch) {
+		public PacketSoundEffect(VarInt @soundId, VarInt @soundCategory, int @x, int @y, int @z, float @volume, float @pitch)
+		{
 			this.SoundId = @soundId;
 			this.SoundCategory = @soundCategory;
 			this.X = @x;
@@ -6224,7 +7236,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Volume = @volume;
 			this.Pitch = @pitch;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SoundId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.SoundCategory);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.X);
@@ -6233,7 +7246,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Volume);
 			((Action<PacketBuffer, float>)((buffer, value) => buffer.WriteF32(value)))(buffer, this.Pitch);
 		}
-		public static PacketSoundEffect Read(PacketBuffer buffer ) {
+		public static PacketSoundEffect Read(PacketBuffer buffer )
+		{
 			VarInt @soundId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @soundCategory = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			int @x = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
@@ -6244,45 +7258,54 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSoundEffect(@soundId, @soundCategory, @x, @y, @z, @volume, @pitch);
 		}
 	}
-	public class PacketPlayerlistHeader : IPacketPayload {
+	public class PacketPlayerlistHeader : IPacketPayload
+	{
 		public string Header { get; set; }
 		public string Footer { get; set; }
-		public PacketPlayerlistHeader(string @header, string @footer) {
+		public PacketPlayerlistHeader(string @header, string @footer)
+		{
 			this.Header = @header;
 			this.Footer = @footer;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Header);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Footer);
 		}
-		public static PacketPlayerlistHeader Read(PacketBuffer buffer ) {
+		public static PacketPlayerlistHeader Read(PacketBuffer buffer )
+		{
 			string @header = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			string @footer = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketPlayerlistHeader(@header, @footer);
 		}
 	}
-	public class PacketCollect : IPacketPayload {
+	public class PacketCollect : IPacketPayload
+	{
 		public VarInt CollectedEntityId { get; set; }
 		public VarInt CollectorEntityId { get; set; }
 		public VarInt PickupItemCount { get; set; }
-		public PacketCollect(VarInt @collectedEntityId, VarInt @collectorEntityId, VarInt @pickupItemCount) {
+		public PacketCollect(VarInt @collectedEntityId, VarInt @collectorEntityId, VarInt @pickupItemCount)
+		{
 			this.CollectedEntityId = @collectedEntityId;
 			this.CollectorEntityId = @collectorEntityId;
 			this.PickupItemCount = @pickupItemCount;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CollectedEntityId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.CollectorEntityId);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.PickupItemCount);
 		}
-		public static PacketCollect Read(PacketBuffer buffer ) {
+		public static PacketCollect Read(PacketBuffer buffer )
+		{
 			VarInt @collectedEntityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @collectorEntityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @pickupItemCount = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketCollect(@collectedEntityId, @collectorEntityId, @pickupItemCount);
 		}
 	}
-	public class PacketEntityTeleport : IPacketPayload {
+	public class PacketEntityTeleport : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public double X { get; set; }
 		public double Y { get; set; }
@@ -6290,7 +7313,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public sbyte Yaw { get; set; }
 		public sbyte Pitch { get; set; }
 		public bool OnGround { get; set; }
-		public PacketEntityTeleport(VarInt @entityId, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch, bool @onGround) {
+		public PacketEntityTeleport(VarInt @entityId, double @x, double @y, double @z, sbyte @yaw, sbyte @pitch, bool @onGround)
+		{
 			this.EntityId = @entityId;
 			this.X = @x;
 			this.Y = @y;
@@ -6299,7 +7323,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.Pitch = @pitch;
 			this.OnGround = @onGround;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Y);
@@ -6308,7 +7333,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Pitch);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.OnGround);
 		}
-		public static PacketEntityTeleport Read(PacketBuffer buffer ) {
+		public static PacketEntityTeleport Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @y = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -6319,23 +7345,29 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntityTeleport(@entityId, @x, @y, @z, @yaw, @pitch, @onGround);
 		}
 	}
-	public class PacketEntityUpdateAttributes : IPacketPayload {
-		public class PropertiesElementContainer {
-			public class ModifiersElementContainer {
+	public class PacketEntityUpdateAttributes : IPacketPayload
+	{
+		public class PropertiesElementContainer
+		{
+			public class ModifiersElementContainer
+			{
 				public UUID Uuid { get; set; }
 				public double Amount { get; set; }
 				public sbyte Operation { get; set; }
-				public ModifiersElementContainer(UUID @uuid, double @amount, sbyte @operation) {
+				public ModifiersElementContainer(UUID @uuid, double @amount, sbyte @operation)
+				{
 					this.Uuid = @uuid;
 					this.Amount = @amount;
 					this.Operation = @operation;
 				}
-				public void Write(PacketBuffer buffer ) {
+				public void Write(PacketBuffer buffer )
+				{
 					((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.Uuid);
 					((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Amount);
 					((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Operation);
 				}
-				public static ModifiersElementContainer Read(PacketBuffer buffer ) {
+				public static ModifiersElementContainer Read(PacketBuffer buffer )
+				{
 					UUID @uuid = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 					double @amount = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 					sbyte @operation = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
@@ -6345,17 +7377,20 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public string Key { get; set; }
 			public double Value { get; set; }
 			public ModifiersElementContainer[] Modifiers { get; set; }
-			public PropertiesElementContainer(string @key, double @value, ModifiersElementContainer[] @modifiers) {
+			public PropertiesElementContainer(string @key, double @value, ModifiersElementContainer[] @modifiers)
+			{
 				this.Key = @key;
 				this.Value = @value;
 				this.Modifiers = @modifiers;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Key);
 				((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Value);
 				((Action<PacketBuffer, ModifiersElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, ModifiersElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Modifiers);
 			}
-			public static PropertiesElementContainer Read(PacketBuffer buffer ) {
+			public static PropertiesElementContainer Read(PacketBuffer buffer )
+			{
 				string @key = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				double @value = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 				ModifiersElementContainer[] @modifiers = ((Func<PacketBuffer, ModifiersElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, ModifiersElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketEntityUpdateAttributes.PropertiesElementContainer.ModifiersElementContainer.Read(buffer ))))))(buffer);
@@ -6364,41 +7399,48 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public VarInt EntityId { get; set; }
 		public PropertiesElementContainer[] Properties { get; set; }
-		public PacketEntityUpdateAttributes(VarInt @entityId, PropertiesElementContainer[] @properties) {
+		public PacketEntityUpdateAttributes(VarInt @entityId, PropertiesElementContainer[] @properties)
+		{
 			this.EntityId = @entityId;
 			this.Properties = @properties;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, PropertiesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, PropertiesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Properties);
 		}
-		public static PacketEntityUpdateAttributes Read(PacketBuffer buffer ) {
+		public static PacketEntityUpdateAttributes Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			PropertiesElementContainer[] @properties = ((Func<PacketBuffer, PropertiesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, PropertiesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketEntityUpdateAttributes.PropertiesElementContainer.Read(buffer ))))))(buffer);
 			return new PacketEntityUpdateAttributes(@entityId, @properties);
 		}
 	}
-	public class PacketEntityEffect : IPacketPayload {
+	public class PacketEntityEffect : IPacketPayload
+	{
 		public VarInt EntityId { get; set; }
 		public sbyte EffectId { get; set; }
 		public sbyte Amplifier { get; set; }
 		public VarInt Duration { get; set; }
 		public sbyte HideParticles { get; set; }
-		public PacketEntityEffect(VarInt @entityId, sbyte @effectId, sbyte @amplifier, VarInt @duration, sbyte @hideParticles) {
+		public PacketEntityEffect(VarInt @entityId, sbyte @effectId, sbyte @amplifier, VarInt @duration, sbyte @hideParticles)
+		{
 			this.EntityId = @entityId;
 			this.EffectId = @effectId;
 			this.Amplifier = @amplifier;
 			this.Duration = @duration;
 			this.HideParticles = @hideParticles;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.EntityId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.EffectId);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.Amplifier);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Duration);
 			((Action<PacketBuffer, sbyte>)((buffer, value) => buffer.WriteI8(value)))(buffer, this.HideParticles);
 		}
-		public static PacketEntityEffect Read(PacketBuffer buffer ) {
+		public static PacketEntityEffect Read(PacketBuffer buffer )
+		{
 			VarInt @entityId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			sbyte @effectId = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
 			sbyte @amplifier = ((Func<PacketBuffer, sbyte>)((buffer) => buffer.ReadI8()))(buffer);
@@ -6407,64 +7449,79 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketEntityEffect(@entityId, @effectId, @amplifier, @duration, @hideParticles);
 		}
 	}
-	public class PacketSelectAdvancementTab : IPacketPayload {
+	public class PacketSelectAdvancementTab : IPacketPayload
+	{
 		public string? Id { get; set; }
-		public PacketSelectAdvancementTab(string? @id) {
+		public PacketSelectAdvancementTab(string? @id)
+		{
 			this.Id = @id;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))))))(buffer, this.Id);
 		}
-		public static PacketSelectAdvancementTab Read(PacketBuffer buffer ) {
+		public static PacketSelectAdvancementTab Read(PacketBuffer buffer )
+		{
 			string? @id = ((Func<PacketBuffer, string?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))))))))(buffer);
 			return new PacketSelectAdvancementTab(@id);
 		}
 	}
-	public class PacketDeclareRecipes : IPacketPayload {
-		public class RecipesElementContainer {
-			public class DataSwitch {
-				public class DataswitchstateminecraftCraftingShapelessContainer {
+	public class PacketDeclareRecipes : IPacketPayload
+	{
+		public class RecipesElementContainer
+		{
+			public class DataSwitch
+			{
+				public class DataswitchstateminecraftCraftingShapelessContainer
+				{
 					public string Group { get; set; }
 					public Slot[][] Ingredients { get; set; }
 					public Slot Result { get; set; }
-					public DataswitchstateminecraftCraftingShapelessContainer(string @group, Slot[][] @ingredients, Slot @result) {
+					public DataswitchstateminecraftCraftingShapelessContainer(string @group, Slot[][] @ingredients, Slot @result)
+					{
 						this.Group = @group;
 						this.Ingredients = @ingredients;
 						this.Result = @result;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Group);
 						((Action<PacketBuffer, Slot[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Ingredients);
 						((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Result);
 					}
-					public static DataswitchstateminecraftCraftingShapelessContainer Read(PacketBuffer buffer ) {
+					public static DataswitchstateminecraftCraftingShapelessContainer Read(PacketBuffer buffer )
+					{
 						string @group = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						Slot[][] @ingredients = ((Func<PacketBuffer, Slot[][]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))))))))(buffer);
 						Slot @result = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 						return new DataswitchstateminecraftCraftingShapelessContainer(@group, @ingredients, @result);
 					}
 				}
-				public class DataswitchstateminecraftCraftingShapedContainer {
+				public class DataswitchstateminecraftCraftingShapedContainer
+				{
 					public VarInt Width { get; set; }
 					public VarInt Height { get; set; }
 					public string Group { get; set; }
 					public Slot[][][] Ingredients { get; set; }
 					public Slot Result { get; set; }
-					public DataswitchstateminecraftCraftingShapedContainer(VarInt @width, VarInt @height, string @group, Slot[][][] @ingredients, Slot @result) {
+					public DataswitchstateminecraftCraftingShapedContainer(VarInt @width, VarInt @height, string @group, Slot[][][] @ingredients, Slot @result)
+					{
 						this.Width = @width;
 						this.Height = @height;
 						this.Group = @group;
 						this.Ingredients = @ingredients;
 						this.Result = @result;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Width);
 						((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Height);
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Group);
 						((Action<PacketBuffer, Slot[][][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot[][]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Ingredients);
 						((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Result);
 					}
-					public static DataswitchstateminecraftCraftingShapedContainer Read(PacketBuffer buffer ) {
+					public static DataswitchstateminecraftCraftingShapedContainer Read(PacketBuffer buffer )
+					{
 						VarInt @width = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 						VarInt @height = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 						string @group = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
@@ -6473,42 +7530,50 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						return new DataswitchstateminecraftCraftingShapedContainer(@width, @height, @group, @ingredients, @result);
 					}
 				}
-				public class DataSwitchStateminecraftStonecuttingContainer {
+				public class DataSwitchStateminecraftStonecuttingContainer
+				{
 					public string Group { get; set; }
 					public Slot[] Ingredient { get; set; }
 					public Slot Result { get; set; }
-					public DataSwitchStateminecraftStonecuttingContainer(string @group, Slot[] @ingredient, Slot @result) {
+					public DataSwitchStateminecraftStonecuttingContainer(string @group, Slot[] @ingredient, Slot @result)
+					{
 						this.Group = @group;
 						this.Ingredient = @ingredient;
 						this.Result = @result;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Group);
 						((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Ingredient);
 						((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Result);
 					}
-					public static DataSwitchStateminecraftStonecuttingContainer Read(PacketBuffer buffer ) {
+					public static DataSwitchStateminecraftStonecuttingContainer Read(PacketBuffer buffer )
+					{
 						string @group = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 						Slot[] @ingredient = ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
 						Slot @result = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
 						return new DataSwitchStateminecraftStonecuttingContainer(@group, @ingredient, @result);
 					}
 				}
-				public class DataSwitchStateminecraftSmithingContainer {
+				public class DataSwitchStateminecraftSmithingContainer
+				{
 					public Slot[] Base { get; set; }
 					public Slot[] Addition { get; set; }
 					public Slot Result { get; set; }
-					public DataSwitchStateminecraftSmithingContainer(Slot[] @base, Slot[] @addition, Slot @result) {
+					public DataSwitchStateminecraftSmithingContainer(Slot[] @base, Slot[] @addition, Slot @result)
+					{
 						this.Base = @base;
 						this.Addition = @addition;
 						this.Result = @result;
 					}
-					public void Write(PacketBuffer buffer ) {
+					public void Write(PacketBuffer buffer )
+					{
 						((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Base);
 						((Action<PacketBuffer, Slot[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Addition);
 						((Action<PacketBuffer, Slot>)((buffer, value) => value.Write(buffer )))(buffer, this.Result);
 					}
-					public static DataSwitchStateminecraftSmithingContainer Read(PacketBuffer buffer ) {
+					public static DataSwitchStateminecraftSmithingContainer Read(PacketBuffer buffer )
+					{
 						Slot[] @base = ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
 						Slot[] @addition = ((Func<PacketBuffer, Slot[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer ))))))(buffer);
 						Slot @result = ((Func<PacketBuffer, Slot>)((buffer) => MineSharp.Data.Protocol.Slot.Read(buffer )))(buffer);
@@ -6516,11 +7581,14 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					}
 				}
 				public object? Value { get; set; }
-				public DataSwitch(object? value) {
+				public DataSwitch(object? value)
+				{
 					this.Value = value;
 				}
-				public void Write(PacketBuffer buffer, string state) {
-					switch (state) {
+				public void Write(PacketBuffer buffer, string state)
+				{
+					switch (state)
+					{
 						case "minecraft:crafting_shapeless": ((Action<PacketBuffer, DataswitchstateminecraftCraftingShapelessContainer>)((buffer, value) => value.Write(buffer )))(buffer, (DataswitchstateminecraftCraftingShapelessContainer)this); break;
 						case "minecraft:crafting_shaped": ((Action<PacketBuffer, DataswitchstateminecraftCraftingShapedContainer>)((buffer, value) => value.Write(buffer )))(buffer, (DataswitchstateminecraftCraftingShapedContainer)this); break;
 						case "minecraft:crafting_special_armordye": ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)this); break;
@@ -6546,8 +7614,10 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 						default: throw new Exception($"Invalid value: '{state}'");
 					}
 				}
-				public static DataSwitch Read(PacketBuffer buffer, string state) {
-					object? value = state switch {
+				public static DataSwitch Read(PacketBuffer buffer, string state)
+				{
+					object? value = state switch
+					{
 						"minecraft:crafting_shapeless" => ((Func<PacketBuffer, DataswitchstateminecraftCraftingShapelessContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareRecipes.RecipesElementContainer.DataSwitch.DataswitchstateminecraftCraftingShapelessContainer.Read(buffer )))(buffer),
 						"minecraft:crafting_shaped" => ((Func<PacketBuffer, DataswitchstateminecraftCraftingShapedContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareRecipes.RecipesElementContainer.DataSwitch.DataswitchstateminecraftCraftingShapedContainer.Read(buffer )))(buffer),
 						"minecraft:crafting_special_armordye" => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer),
@@ -6588,17 +7658,20 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			public string Type { get; set; }
 			public string RecipeId { get; set; }
 			public DataSwitch Data { get; set; }
-			public RecipesElementContainer(string @type, string @recipeId, DataSwitch @data) {
+			public RecipesElementContainer(string @type, string @recipeId, DataSwitch @data)
+			{
 				this.Type = @type;
 				this.RecipeId = @recipeId;
 				this.Data = @data;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Type);
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.RecipeId);
 				((Action<PacketBuffer, DataSwitch>)((buffer, value) => value.Write(buffer, Type)))(buffer, this.Data);
 			}
-			public static RecipesElementContainer Read(PacketBuffer buffer ) {
+			public static RecipesElementContainer Read(PacketBuffer buffer )
+			{
 				string @type = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				string @recipeId = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				DataSwitch @data = ((Func<PacketBuffer, DataSwitch>)((buffer) => DataSwitch.Read(buffer, @type)))(buffer);
@@ -6606,65 +7679,80 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			}
 		}
 		public RecipesElementContainer[] Recipes { get; set; }
-		public PacketDeclareRecipes(RecipesElementContainer[] @recipes) {
+		public PacketDeclareRecipes(RecipesElementContainer[] @recipes)
+		{
 			this.Recipes = @recipes;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, RecipesElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, RecipesElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Recipes);
 		}
-		public static PacketDeclareRecipes Read(PacketBuffer buffer ) {
+		public static PacketDeclareRecipes Read(PacketBuffer buffer )
+		{
 			RecipesElementContainer[] @recipes = ((Func<PacketBuffer, RecipesElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, RecipesElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketDeclareRecipes.RecipesElementContainer.Read(buffer ))))))(buffer);
 			return new PacketDeclareRecipes(@recipes);
 		}
 	}
-	public class PacketTags : IPacketPayload {
-		public class TagsElementContainer {
+	public class PacketTags : IPacketPayload
+	{
+		public class TagsElementContainer
+		{
 			public string TagType { get; set; }
 			public TagsElement[] Tags { get; set; }
-			public TagsElementContainer(string @tagType, TagsElement[] @tags) {
+			public TagsElementContainer(string @tagType, TagsElement[] @tags)
+			{
 				this.TagType = @tagType;
 				this.Tags = @tags;
 			}
-			public void Write(PacketBuffer buffer ) {
+			public void Write(PacketBuffer buffer )
+			{
 				((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.TagType);
 				((Action<PacketBuffer, TagsElement[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, TagsElement>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Tags);
 			}
-			public static TagsElementContainer Read(PacketBuffer buffer ) {
+			public static TagsElementContainer Read(PacketBuffer buffer )
+			{
 				string @tagType = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 				TagsElement[] @tags = ((Func<PacketBuffer, TagsElement[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, TagsElement>)((buffer) => MineSharp.Data.Protocol.TagsElement.Read(buffer ))))))(buffer);
 				return new TagsElementContainer(@tagType, @tags);
 			}
 		}
 		public TagsElementContainer[] Tags { get; set; }
-		public PacketTags(TagsElementContainer[] @tags) {
+		public PacketTags(TagsElementContainer[] @tags)
+		{
 			this.Tags = @tags;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, TagsElementContainer[]>)((buffer, value) => buffer.WriteArray(value, ((Action<PacketBuffer, TagsElementContainer>)((buffer, value) => value.Write(buffer ))), ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Tags);
 		}
-		public static PacketTags Read(PacketBuffer buffer ) {
+		public static PacketTags Read(PacketBuffer buffer )
+		{
 			TagsElementContainer[] @tags = ((Func<PacketBuffer, TagsElementContainer[]>)((buffer) => buffer.ReadArray(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer), ((Func<PacketBuffer, TagsElementContainer>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketTags.TagsElementContainer.Read(buffer ))))))(buffer);
 			return new PacketTags(@tags);
 		}
 	}
-	public class PacketAcknowledgePlayerDigging : IPacketPayload {
+	public class PacketAcknowledgePlayerDigging : IPacketPayload
+	{
 		public PositionBitfield Location { get; set; }
 		public VarInt Block { get; set; }
 		public VarInt Status { get; set; }
 		public bool Successful { get; set; }
-		public PacketAcknowledgePlayerDigging(PositionBitfield @location, VarInt @block, VarInt @status, bool @successful) {
+		public PacketAcknowledgePlayerDigging(PositionBitfield @location, VarInt @block, VarInt @status, bool @successful)
+		{
 			this.Location = @location;
 			this.Block = @block;
 			this.Status = @status;
 			this.Successful = @successful;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.Location);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Block);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Status);
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Successful);
 		}
-		public static PacketAcknowledgePlayerDigging Read(PacketBuffer buffer ) {
+		public static PacketAcknowledgePlayerDigging Read(PacketBuffer buffer )
+		{
 			PositionBitfield @location = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			VarInt @block = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			VarInt @status = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
@@ -6672,21 +7760,28 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketAcknowledgePlayerDigging(@location, @block, @status, @successful);
 		}
 	}
-	public class PacketSculkVibrationSignal : IPacketPayload {
-		public class DestinationSwitch {
+	public class PacketSculkVibrationSignal : IPacketPayload
+	{
+		public class DestinationSwitch
+		{
 			public object? Value { get; set; }
-			public DestinationSwitch(object? value) {
+			public DestinationSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "block": ((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, (PositionBitfield)this); break;
 					case "entityId": ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, (VarInt)this); break;
 					default: ((Action<PacketBuffer, object?>)((buffer, value) => buffer.WriteVoid(value)))(buffer, (object?)Value); break;
 				}
 			}
-			public static DestinationSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static DestinationSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"block" => ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer),
 					"entityId" => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer),
 					_ => ((Func<PacketBuffer, object?>)((buffer) => buffer.ReadVoid()))(buffer)
@@ -6702,19 +7797,22 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public string DestinationIdentifier { get; set; }
 		public DestinationSwitch Destination { get; set; }
 		public VarInt ArrivalTicks { get; set; }
-		public PacketSculkVibrationSignal(PositionBitfield @sourcePosition, string @destinationIdentifier, DestinationSwitch @destination, VarInt @arrivalTicks) {
+		public PacketSculkVibrationSignal(PositionBitfield @sourcePosition, string @destinationIdentifier, DestinationSwitch @destination, VarInt @arrivalTicks)
+		{
 			this.SourcePosition = @sourcePosition;
 			this.DestinationIdentifier = @destinationIdentifier;
 			this.Destination = @destination;
 			this.ArrivalTicks = @arrivalTicks;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, PositionBitfield>)((buffer, value) => ((Action<PacketBuffer, ulong>)((buffer, value) => buffer.WriteU64(value)))(buffer, value.Value)))(buffer, this.SourcePosition);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.DestinationIdentifier);
 			((Action<PacketBuffer, DestinationSwitch>)((buffer, value) => value.Write(buffer, DestinationIdentifier)))(buffer, this.Destination);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ArrivalTicks);
 		}
-		public static PacketSculkVibrationSignal Read(PacketBuffer buffer ) {
+		public static PacketSculkVibrationSignal Read(PacketBuffer buffer )
+		{
 			PositionBitfield @sourcePosition = ((Func<PacketBuffer, PositionBitfield>)((buffer) => new PositionBitfield(((Func<PacketBuffer, ulong>)((buffer) => buffer.ReadU64()))(buffer))))(buffer);
 			string @destinationIdentifier = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			DestinationSwitch @destination = ((Func<PacketBuffer, DestinationSwitch>)((buffer) => DestinationSwitch.Read(buffer, @destinationIdentifier)))(buffer);
@@ -6722,20 +7820,25 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketSculkVibrationSignal(@sourcePosition, @destinationIdentifier, @destination, @arrivalTicks);
 		}
 	}
-	public class PacketClearTitles : IPacketPayload {
+	public class PacketClearTitles : IPacketPayload
+	{
 		public bool Reset { get; set; }
-		public PacketClearTitles(bool @reset) {
+		public PacketClearTitles(bool @reset)
+		{
 			this.Reset = @reset;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, bool>)((buffer, value) => buffer.WriteBool(value)))(buffer, this.Reset);
 		}
-		public static PacketClearTitles Read(PacketBuffer buffer ) {
+		public static PacketClearTitles Read(PacketBuffer buffer )
+		{
 			bool @reset = ((Func<PacketBuffer, bool>)((buffer) => buffer.ReadBool()))(buffer);
 			return new PacketClearTitles(@reset);
 		}
 	}
-	public class PacketInitializeWorldBorder : IPacketPayload {
+	public class PacketInitializeWorldBorder : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Z { get; set; }
 		public double OldDiameter { get; set; }
@@ -6744,7 +7847,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		public VarInt PortalTeleportBoundary { get; set; }
 		public VarInt WarningBlocks { get; set; }
 		public VarInt WarningTime { get; set; }
-		public PacketInitializeWorldBorder(double @x, double @z, double @oldDiameter, double @newDiameter, VarInt @speed, VarInt @portalTeleportBoundary, VarInt @warningBlocks, VarInt @warningTime) {
+		public PacketInitializeWorldBorder(double @x, double @z, double @oldDiameter, double @newDiameter, VarInt @speed, VarInt @portalTeleportBoundary, VarInt @warningBlocks, VarInt @warningTime)
+		{
 			this.X = @x;
 			this.Z = @z;
 			this.OldDiameter = @oldDiameter;
@@ -6754,7 +7858,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			this.WarningBlocks = @warningBlocks;
 			this.WarningTime = @warningTime;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.OldDiameter);
@@ -6764,7 +7869,8 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WarningBlocks);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WarningTime);
 		}
-		public static PacketInitializeWorldBorder Read(PacketBuffer buffer ) {
+		public static PacketInitializeWorldBorder Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @oldDiameter = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
@@ -6776,177 +7882,226 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 			return new PacketInitializeWorldBorder(@x, @z, @oldDiameter, @newDiameter, @speed, @portalTeleportBoundary, @warningBlocks, @warningTime);
 		}
 	}
-	public class PacketActionBar : IPacketPayload {
+	public class PacketActionBar : IPacketPayload
+	{
 		public string Text { get; set; }
-		public PacketActionBar(string @text) {
+		public PacketActionBar(string @text)
+		{
 			this.Text = @text;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text);
 		}
-		public static PacketActionBar Read(PacketBuffer buffer ) {
+		public static PacketActionBar Read(PacketBuffer buffer )
+		{
 			string @text = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketActionBar(@text);
 		}
 	}
-	public class PacketWorldBorderCenter : IPacketPayload {
+	public class PacketWorldBorderCenter : IPacketPayload
+	{
 		public double X { get; set; }
 		public double Z { get; set; }
-		public PacketWorldBorderCenter(double @x, double @z) {
+		public PacketWorldBorderCenter(double @x, double @z)
+		{
 			this.X = @x;
 			this.Z = @z;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.X);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Z);
 		}
-		public static PacketWorldBorderCenter Read(PacketBuffer buffer ) {
+		public static PacketWorldBorderCenter Read(PacketBuffer buffer )
+		{
 			double @x = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @z = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			return new PacketWorldBorderCenter(@x, @z);
 		}
 	}
-	public class PacketWorldBorderLerpSize : IPacketPayload {
+	public class PacketWorldBorderLerpSize : IPacketPayload
+	{
 		public double OldDiameter { get; set; }
 		public double NewDiameter { get; set; }
 		public VarInt Speed { get; set; }
-		public PacketWorldBorderLerpSize(double @oldDiameter, double @newDiameter, VarInt @speed) {
+		public PacketWorldBorderLerpSize(double @oldDiameter, double @newDiameter, VarInt @speed)
+		{
 			this.OldDiameter = @oldDiameter;
 			this.NewDiameter = @newDiameter;
 			this.Speed = @speed;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.OldDiameter);
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.NewDiameter);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Speed);
 		}
-		public static PacketWorldBorderLerpSize Read(PacketBuffer buffer ) {
+		public static PacketWorldBorderLerpSize Read(PacketBuffer buffer )
+		{
 			double @oldDiameter = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			double @newDiameter = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			VarInt @speed = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketWorldBorderLerpSize(@oldDiameter, @newDiameter, @speed);
 		}
 	}
-	public class PacketWorldBorderSize : IPacketPayload {
+	public class PacketWorldBorderSize : IPacketPayload
+	{
 		public double Diameter { get; set; }
-		public PacketWorldBorderSize(double @diameter) {
+		public PacketWorldBorderSize(double @diameter)
+		{
 			this.Diameter = @diameter;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, double>)((buffer, value) => buffer.WriteF64(value)))(buffer, this.Diameter);
 		}
-		public static PacketWorldBorderSize Read(PacketBuffer buffer ) {
+		public static PacketWorldBorderSize Read(PacketBuffer buffer )
+		{
 			double @diameter = ((Func<PacketBuffer, double>)((buffer) => buffer.ReadF64()))(buffer);
 			return new PacketWorldBorderSize(@diameter);
 		}
 	}
-	public class PacketWorldBorderWarningDelay : IPacketPayload {
+	public class PacketWorldBorderWarningDelay : IPacketPayload
+	{
 		public VarInt WarningTime { get; set; }
-		public PacketWorldBorderWarningDelay(VarInt @warningTime) {
+		public PacketWorldBorderWarningDelay(VarInt @warningTime)
+		{
 			this.WarningTime = @warningTime;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WarningTime);
 		}
-		public static PacketWorldBorderWarningDelay Read(PacketBuffer buffer ) {
+		public static PacketWorldBorderWarningDelay Read(PacketBuffer buffer )
+		{
 			VarInt @warningTime = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketWorldBorderWarningDelay(@warningTime);
 		}
 	}
-	public class PacketWorldBorderWarningReach : IPacketPayload {
+	public class PacketWorldBorderWarningReach : IPacketPayload
+	{
 		public VarInt WarningBlocks { get; set; }
-		public PacketWorldBorderWarningReach(VarInt @warningBlocks) {
+		public PacketWorldBorderWarningReach(VarInt @warningBlocks)
+		{
 			this.WarningBlocks = @warningBlocks;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.WarningBlocks);
 		}
-		public static PacketWorldBorderWarningReach Read(PacketBuffer buffer ) {
+		public static PacketWorldBorderWarningReach Read(PacketBuffer buffer )
+		{
 			VarInt @warningBlocks = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketWorldBorderWarningReach(@warningBlocks);
 		}
 	}
-	public class PacketPing : IPacketPayload {
+	public class PacketPing : IPacketPayload
+	{
 		public int Id { get; set; }
-		public PacketPing(int @id) {
+		public PacketPing(int @id)
+		{
 			this.Id = @id;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Id);
 		}
-		public static PacketPing Read(PacketBuffer buffer ) {
+		public static PacketPing Read(PacketBuffer buffer )
+		{
 			int @id = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketPing(@id);
 		}
 	}
-	public class PacketSetTitleSubtitle : IPacketPayload {
+	public class PacketSetTitleSubtitle : IPacketPayload
+	{
 		public string Text { get; set; }
-		public PacketSetTitleSubtitle(string @text) {
+		public PacketSetTitleSubtitle(string @text)
+		{
 			this.Text = @text;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text);
 		}
-		public static PacketSetTitleSubtitle Read(PacketBuffer buffer ) {
+		public static PacketSetTitleSubtitle Read(PacketBuffer buffer )
+		{
 			string @text = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketSetTitleSubtitle(@text);
 		}
 	}
-	public class PacketSetTitleText : IPacketPayload {
+	public class PacketSetTitleText : IPacketPayload
+	{
 		public string Text { get; set; }
-		public PacketSetTitleText(string @text) {
+		public PacketSetTitleText(string @text)
+		{
 			this.Text = @text;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Text);
 		}
-		public static PacketSetTitleText Read(PacketBuffer buffer ) {
+		public static PacketSetTitleText Read(PacketBuffer buffer )
+		{
 			string @text = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketSetTitleText(@text);
 		}
 	}
-	public class PacketSetTitleTime : IPacketPayload {
+	public class PacketSetTitleTime : IPacketPayload
+	{
 		public int FadeIn { get; set; }
 		public int Stay { get; set; }
 		public int FadeOut { get; set; }
-		public PacketSetTitleTime(int @fadeIn, int @stay, int @fadeOut) {
+		public PacketSetTitleTime(int @fadeIn, int @stay, int @fadeOut)
+		{
 			this.FadeIn = @fadeIn;
 			this.Stay = @stay;
 			this.FadeOut = @fadeOut;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.FadeIn);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.Stay);
 			((Action<PacketBuffer, int>)((buffer, value) => buffer.WriteI32(value)))(buffer, this.FadeOut);
 		}
-		public static PacketSetTitleTime Read(PacketBuffer buffer ) {
+		public static PacketSetTitleTime Read(PacketBuffer buffer )
+		{
 			int @fadeIn = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			int @stay = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			int @fadeOut = ((Func<PacketBuffer, int>)((buffer) => buffer.ReadI32()))(buffer);
 			return new PacketSetTitleTime(@fadeIn, @stay, @fadeOut);
 		}
 	}
-	public class PacketSimulationDistance : IPacketPayload {
+	public class PacketSimulationDistance : IPacketPayload
+	{
 		public VarInt Distance { get; set; }
-		public PacketSimulationDistance(VarInt @distance) {
+		public PacketSimulationDistance(VarInt @distance)
+		{
 			this.Distance = @distance;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Distance);
 		}
-		public static PacketSimulationDistance Read(PacketBuffer buffer ) {
+		public static PacketSimulationDistance Read(PacketBuffer buffer )
+		{
 			VarInt @distance = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketSimulationDistance(@distance);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "spawn_entity": ((Action<PacketBuffer, PacketSpawnEntity>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSpawnEntity)this); break;
 					case "spawn_entity_experience_orb": ((Action<PacketBuffer, PacketSpawnEntityExperienceOrb>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSpawnEntityExperienceOrb)this); break;
 					case "spawn_entity_living": ((Action<PacketBuffer, PacketSpawnEntityLiving>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSpawnEntityLiving)this); break;
@@ -7054,8 +8209,10 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"spawn_entity" => ((Func<PacketBuffer, PacketSpawnEntity>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketSpawnEntity.Read(buffer )))(buffer),
 					"spawn_entity_experience_orb" => ((Func<PacketBuffer, PacketSpawnEntityExperienceOrb>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketSpawnEntityExperienceOrb.Read(buffer )))(buffer),
 					"spawn_entity_living" => ((Func<PacketBuffer, PacketSpawnEntityLiving>)((buffer) => MineSharp.Data.Protocol.Play.Clientbound.PacketSpawnEntityLiving.Read(buffer )))(buffer),
@@ -7375,15 +8532,18 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "spawn_entity" => 0x00, "spawn_entity_experience_orb" => 0x01, "spawn_entity_living" => 0x02, "spawn_entity_painting" => 0x03, "named_entity_spawn" => 0x04, "sculk_vibration_signal" => 0x05, "animation" => 0x06, "statistics" => 0x07, "acknowledge_player_digging" => 0x08, "block_break_animation" => 0x09, "tile_entity_data" => 0x0a, "block_action" => 0x0b, "block_change" => 0x0c, "boss_bar" => 0x0d, "difficulty" => 0x0e, "chat" => 0x0f, "clear_titles" => 0x10, "tab_complete" => 0x11, "declare_commands" => 0x12, "close_window" => 0x13, "window_items" => 0x14, "craft_progress_bar" => 0x15, "set_slot" => 0x16, "set_cooldown" => 0x17, "custom_payload" => 0x18, "named_sound_effect" => 0x19, "kick_disconnect" => 0x1a, "entity_status" => 0x1b, "explosion" => 0x1c, "unload_chunk" => 0x1d, "game_state_change" => 0x1e, "open_horse_window" => 0x1f, "initialize_world_border" => 0x20, "keep_alive" => 0x21, "map_chunk" => 0x22, "world_event" => 0x23, "world_particles" => 0x24, "update_light" => 0x25, "login" => 0x26, "map" => 0x27, "trade_list" => 0x28, "rel_entity_move" => 0x29, "entity_move_look" => 0x2a, "entity_look" => 0x2b, "vehicle_move" => 0x2c, "open_book" => 0x2d, "open_window" => 0x2e, "open_sign_entity" => 0x2f, "ping" => 0x30, "craft_recipe_response" => 0x31, "abilities" => 0x32, "end_combat_event" => 0x33, "enter_combat_event" => 0x34, "death_combat_event" => 0x35, "player_info" => 0x36, "face_player" => 0x37, "position" => 0x38, "unlock_recipes" => 0x39, "entity_destroy" => 0x3a, "remove_entity_effect" => 0x3b, "resource_pack_send" => 0x3c, "respawn" => 0x3d, "entity_head_rotation" => 0x3e, "multi_block_change" => 0x3f, "select_advancement_tab" => 0x40, "action_bar" => 0x41, "world_border_center" => 0x42, "world_border_lerp_size" => 0x43, "world_border_size" => 0x44, "world_border_warning_delay" => 0x45, "world_border_warning_reach" => 0x46, "camera" => 0x47, "held_item_slot" => 0x48, "update_view_position" => 0x49, "update_view_distance" => 0x4a, "spawn_position" => 0x4b, "scoreboard_display_objective" => 0x4c, "entity_metadata" => 0x4d, "attach_entity" => 0x4e, "entity_velocity" => 0x4f, "entity_equipment" => 0x50, "experience" => 0x51, "update_health" => 0x52, "scoreboard_objective" => 0x53, "set_passengers" => 0x54, "teams" => 0x55, "scoreboard_score" => 0x56, "simulation_distance" => 0x57, "set_title_subtitle" => 0x58, "update_time" => 0x59, "set_title_text" => 0x5a, "set_title_time" => 0x5b, "entity_sound_effect" => 0x5c, "sound_effect" => 0x5d, "stop_sound" => 0x5e, "playerlist_header" => 0x5f, "nbt_query_response" => 0x60, "collect" => 0x61, "entity_teleport" => 0x62, "advancements" => 0x63, "entity_update_attributes" => 0x64, "entity_effect" => 0x65, "declare_recipes" => 0x66, "tags" => 0x67, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "spawn_entity", 0x01 => "spawn_entity_experience_orb", 0x02 => "spawn_entity_living", 0x03 => "spawn_entity_painting", 0x04 => "named_entity_spawn", 0x05 => "sculk_vibration_signal", 0x06 => "animation", 0x07 => "statistics", 0x08 => "acknowledge_player_digging", 0x09 => "block_break_animation", 0x0a => "tile_entity_data", 0x0b => "block_action", 0x0c => "block_change", 0x0d => "boss_bar", 0x0e => "difficulty", 0x0f => "chat", 0x10 => "clear_titles", 0x11 => "tab_complete", 0x12 => "declare_commands", 0x13 => "close_window", 0x14 => "window_items", 0x15 => "craft_progress_bar", 0x16 => "set_slot", 0x17 => "set_cooldown", 0x18 => "custom_payload", 0x19 => "named_sound_effect", 0x1a => "kick_disconnect", 0x1b => "entity_status", 0x1c => "explosion", 0x1d => "unload_chunk", 0x1e => "game_state_change", 0x1f => "open_horse_window", 0x20 => "initialize_world_border", 0x21 => "keep_alive", 0x22 => "map_chunk", 0x23 => "world_event", 0x24 => "world_particles", 0x25 => "update_light", 0x26 => "login", 0x27 => "map", 0x28 => "trade_list", 0x29 => "rel_entity_move", 0x2a => "entity_move_look", 0x2b => "entity_look", 0x2c => "vehicle_move", 0x2d => "open_book", 0x2e => "open_window", 0x2f => "open_sign_entity", 0x30 => "ping", 0x31 => "craft_recipe_response", 0x32 => "abilities", 0x33 => "end_combat_event", 0x34 => "enter_combat_event", 0x35 => "death_combat_event", 0x36 => "player_info", 0x37 => "face_player", 0x38 => "position", 0x39 => "unlock_recipes", 0x3a => "entity_destroy", 0x3b => "remove_entity_effect", 0x3c => "resource_pack_send", 0x3d => "respawn", 0x3e => "entity_head_rotation", 0x3f => "multi_block_change", 0x40 => "select_advancement_tab", 0x41 => "action_bar", 0x42 => "world_border_center", 0x43 => "world_border_lerp_size", 0x44 => "world_border_size", 0x45 => "world_border_warning_delay", 0x46 => "world_border_warning_reach", 0x47 => "camera", 0x48 => "held_item_slot", 0x49 => "update_view_position", 0x4a => "update_view_distance", 0x4b => "spawn_position", 0x4c => "scoreboard_display_objective", 0x4d => "entity_metadata", 0x4e => "attach_entity", 0x4f => "entity_velocity", 0x50 => "entity_equipment", 0x51 => "experience", 0x52 => "update_health", 0x53 => "scoreboard_objective", 0x54 => "set_passengers", 0x55 => "teams", 0x56 => "scoreboard_score", 0x57 => "simulation_distance", 0x58 => "set_title_subtitle", 0x59 => "update_time", 0x5a => "set_title_text", 0x5b => "set_title_time", 0x5c => "entity_sound_effect", 0x5d => "sound_effect", 0x5e => "stop_sound", 0x5f => "playerlist_header", 0x60 => "nbt_query_response", 0x61 => "collect", 0x62 => "entity_teleport", 0x63 => "advancements", 0x64 => "entity_update_attributes", 0x65 => "entity_effect", 0x66 => "declare_recipes", 0x67 => "tags", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -7511,72 +8671,93 @@ namespace MineSharp.Data.Protocol.Play.Clientbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Login {
+namespace MineSharp.Data.Protocol.Login
+{
 }
-namespace MineSharp.Data.Protocol.Login.Serverbound {
-	public class PacketLoginStart : IPacketPayload {
+namespace MineSharp.Data.Protocol.Login.Serverbound
+{
+	public class PacketLoginStart : IPacketPayload
+	{
 		public string Username { get; set; }
-		public PacketLoginStart(string @username) {
+		public PacketLoginStart(string @username)
+		{
 			this.Username = @username;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Username);
 		}
-		public static PacketLoginStart Read(PacketBuffer buffer ) {
+		public static PacketLoginStart Read(PacketBuffer buffer )
+		{
 			string @username = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketLoginStart(@username);
 		}
 	}
-	public class PacketEncryptionBegin : IPacketPayload {
+	public class PacketEncryptionBegin : IPacketPayload
+	{
 		public byte[] SharedSecret { get; set; }
 		public byte[] VerifyToken { get; set; }
-		public PacketEncryptionBegin(byte[] @sharedSecret, byte[] @verifyToken) {
+		public PacketEncryptionBegin(byte[] @sharedSecret, byte[] @verifyToken)
+		{
 			this.SharedSecret = @sharedSecret;
 			this.VerifyToken = @verifyToken;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteBuffer(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.SharedSecret);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteBuffer(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.VerifyToken);
 		}
-		public static PacketEncryptionBegin Read(PacketBuffer buffer ) {
+		public static PacketEncryptionBegin Read(PacketBuffer buffer )
+		{
 			byte[] @sharedSecret = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadBuffer(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer))))(buffer);
 			byte[] @verifyToken = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadBuffer(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer))))(buffer);
 			return new PacketEncryptionBegin(@sharedSecret, @verifyToken);
 		}
 	}
-	public class PacketLoginPluginResponse : IPacketPayload {
+	public class PacketLoginPluginResponse : IPacketPayload
+	{
 		public VarInt MessageId { get; set; }
 		public byte[]? Data { get; set; }
-		public PacketLoginPluginResponse(VarInt @messageId, byte[]? @data) {
+		public PacketLoginPluginResponse(VarInt @messageId, byte[]? @data)
+		{
 			this.MessageId = @messageId;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.MessageId);
 			((Action<PacketBuffer, byte[]?>)((buffer, value) => buffer.WriteOption(value, ((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value))))))(buffer, this.Data);
 		}
-		public static PacketLoginPluginResponse Read(PacketBuffer buffer ) {
+		public static PacketLoginPluginResponse Read(PacketBuffer buffer )
+		{
 			VarInt @messageId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			byte[]? @data = ((Func<PacketBuffer, byte[]?>)((buffer) => buffer.ReadOption(((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer())))))(buffer);
 			return new PacketLoginPluginResponse(@messageId, @data);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "login_start": ((Action<PacketBuffer, PacketLoginStart>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLoginStart)this); break;
 					case "encryption_begin": ((Action<PacketBuffer, PacketEncryptionBegin>)((buffer, value) => value.Write(buffer )))(buffer, (PacketEncryptionBegin)this); break;
 					case "login_plugin_response": ((Action<PacketBuffer, PacketLoginPluginResponse>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLoginPluginResponse)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"login_start" => ((Func<PacketBuffer, PacketLoginStart>)((buffer) => MineSharp.Data.Protocol.Login.Serverbound.PacketLoginStart.Read(buffer )))(buffer),
 					"encryption_begin" => ((Func<PacketBuffer, PacketEncryptionBegin>)((buffer) => MineSharp.Data.Protocol.Login.Serverbound.PacketEncryptionBegin.Read(buffer )))(buffer),
 					"login_plugin_response" => ((Func<PacketBuffer, PacketLoginPluginResponse>)((buffer) => MineSharp.Data.Protocol.Login.Serverbound.PacketLoginPluginResponse.Read(buffer )))(buffer),
@@ -7593,15 +8774,18 @@ namespace MineSharp.Data.Protocol.Login.Serverbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "login_start" => 0x00, "encryption_begin" => 0x01, "login_plugin_response" => 0x02, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "login_start", 0x01 => "encryption_begin", 0x02 => "login_plugin_response", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -7628,100 +8812,126 @@ namespace MineSharp.Data.Protocol.Login.Serverbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Login.Clientbound {
-	public class PacketDisconnect : IPacketPayload {
+namespace MineSharp.Data.Protocol.Login.Clientbound
+{
+	public class PacketDisconnect : IPacketPayload
+	{
 		public string Reason { get; set; }
-		public PacketDisconnect(string @reason) {
+		public PacketDisconnect(string @reason)
+		{
 			this.Reason = @reason;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Reason);
 		}
-		public static PacketDisconnect Read(PacketBuffer buffer ) {
+		public static PacketDisconnect Read(PacketBuffer buffer )
+		{
 			string @reason = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketDisconnect(@reason);
 		}
 	}
-	public class PacketEncryptionBegin : IPacketPayload {
+	public class PacketEncryptionBegin : IPacketPayload
+	{
 		public string ServerId { get; set; }
 		public byte[] PublicKey { get; set; }
 		public byte[] VerifyToken { get; set; }
-		public PacketEncryptionBegin(string @serverId, byte[] @publicKey, byte[] @verifyToken) {
+		public PacketEncryptionBegin(string @serverId, byte[] @publicKey, byte[] @verifyToken)
+		{
 			this.ServerId = @serverId;
 			this.PublicKey = @publicKey;
 			this.VerifyToken = @verifyToken;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ServerId);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteBuffer(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.PublicKey);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteBuffer(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.VerifyToken);
 		}
-		public static PacketEncryptionBegin Read(PacketBuffer buffer ) {
+		public static PacketEncryptionBegin Read(PacketBuffer buffer )
+		{
 			string @serverId = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			byte[] @publicKey = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadBuffer(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer))))(buffer);
 			byte[] @verifyToken = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadBuffer(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer))))(buffer);
 			return new PacketEncryptionBegin(@serverId, @publicKey, @verifyToken);
 		}
 	}
-	public class PacketSuccess : IPacketPayload {
+	public class PacketSuccess : IPacketPayload
+	{
 		public UUID Uuid { get; set; }
 		public string Username { get; set; }
-		public PacketSuccess(UUID @uuid, string @username) {
+		public PacketSuccess(UUID @uuid, string @username)
+		{
 			this.Uuid = @uuid;
 			this.Username = @username;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, UUID>)((buffer, value) => buffer.WriteUUID(value)))(buffer, this.Uuid);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Username);
 		}
-		public static PacketSuccess Read(PacketBuffer buffer ) {
+		public static PacketSuccess Read(PacketBuffer buffer )
+		{
 			UUID @uuid = ((Func<PacketBuffer, UUID>)((buffer) => buffer.ReadUUID()))(buffer);
 			string @username = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketSuccess(@uuid, @username);
 		}
 	}
-	public class PacketCompress : IPacketPayload {
+	public class PacketCompress : IPacketPayload
+	{
 		public VarInt Threshold { get; set; }
-		public PacketCompress(VarInt @threshold) {
+		public PacketCompress(VarInt @threshold)
+		{
 			this.Threshold = @threshold;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.Threshold);
 		}
-		public static PacketCompress Read(PacketBuffer buffer ) {
+		public static PacketCompress Read(PacketBuffer buffer )
+		{
 			VarInt @threshold = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			return new PacketCompress(@threshold);
 		}
 	}
-	public class PacketLoginPluginRequest : IPacketPayload {
+	public class PacketLoginPluginRequest : IPacketPayload
+	{
 		public VarInt MessageId { get; set; }
 		public string Channel { get; set; }
 		public byte[] Data { get; set; }
-		public PacketLoginPluginRequest(VarInt @messageId, string @channel, byte[] @data) {
+		public PacketLoginPluginRequest(VarInt @messageId, string @channel, byte[] @data)
+		{
 			this.MessageId = @messageId;
 			this.Channel = @channel;
 			this.Data = @data;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.MessageId);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Channel);
 			((Action<PacketBuffer, byte[]>)((buffer, value) => buffer.WriteRestBuffer(value)))(buffer, this.Data);
 		}
-		public static PacketLoginPluginRequest Read(PacketBuffer buffer ) {
+		public static PacketLoginPluginRequest Read(PacketBuffer buffer )
+		{
 			VarInt @messageId = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @channel = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			byte[] @data = ((Func<PacketBuffer, byte[]>)((buffer) => buffer.ReadRestBuffer()))(buffer);
 			return new PacketLoginPluginRequest(@messageId, @channel, @data);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "disconnect": ((Action<PacketBuffer, PacketDisconnect>)((buffer, value) => value.Write(buffer )))(buffer, (PacketDisconnect)this); break;
 					case "encryption_begin": ((Action<PacketBuffer, PacketEncryptionBegin>)((buffer, value) => value.Write(buffer )))(buffer, (PacketEncryptionBegin)this); break;
 					case "success": ((Action<PacketBuffer, PacketSuccess>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSuccess)this); break;
@@ -7730,8 +8940,10 @@ namespace MineSharp.Data.Protocol.Login.Clientbound {
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"disconnect" => ((Func<PacketBuffer, PacketDisconnect>)((buffer) => MineSharp.Data.Protocol.Login.Clientbound.PacketDisconnect.Read(buffer )))(buffer),
 					"encryption_begin" => ((Func<PacketBuffer, PacketEncryptionBegin>)((buffer) => MineSharp.Data.Protocol.Login.Clientbound.PacketEncryptionBegin.Read(buffer )))(buffer),
 					"success" => ((Func<PacketBuffer, PacketSuccess>)((buffer) => MineSharp.Data.Protocol.Login.Clientbound.PacketSuccess.Read(buffer )))(buffer),
@@ -7754,15 +8966,18 @@ namespace MineSharp.Data.Protocol.Login.Clientbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "disconnect" => 0x00, "encryption_begin" => 0x01, "success" => 0x02, "compress" => 0x03, "login_plugin_request" => 0x04, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "disconnect", 0x01 => "encryption_begin", 0x02 => "success", 0x03 => "compress", 0x04 => "login_plugin_request", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -7791,46 +9006,63 @@ namespace MineSharp.Data.Protocol.Login.Clientbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Status {
+namespace MineSharp.Data.Protocol.Status
+{
 }
-namespace MineSharp.Data.Protocol.Status.Serverbound {
-	public class PacketPingStart : IPacketPayload {
-		public PacketPingStart() {
+namespace MineSharp.Data.Protocol.Status.Serverbound
+{
+	public class PacketPingStart : IPacketPayload
+	{
+		public PacketPingStart()
+		{
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 		}
-		public static PacketPingStart Read(PacketBuffer buffer ) {
+		public static PacketPingStart Read(PacketBuffer buffer )
+		{
 			return new PacketPingStart();
 		}
 	}
-	public class PacketPing : IPacketPayload {
+	public class PacketPing : IPacketPayload
+	{
 		public long Time { get; set; }
-		public PacketPing(long @time) {
+		public PacketPing(long @time)
+		{
 			this.Time = @time;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.Time);
 		}
-		public static PacketPing Read(PacketBuffer buffer ) {
+		public static PacketPing Read(PacketBuffer buffer )
+		{
 			long @time = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			return new PacketPing(@time);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "ping_start": ((Action<PacketBuffer, PacketPingStart>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPingStart)this); break;
 					case "ping": ((Action<PacketBuffer, PacketPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPing)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"ping_start" => ((Func<PacketBuffer, PacketPingStart>)((buffer) => MineSharp.Data.Protocol.Status.Serverbound.PacketPingStart.Read(buffer )))(buffer),
 					"ping" => ((Func<PacketBuffer, PacketPing>)((buffer) => MineSharp.Data.Protocol.Status.Serverbound.PacketPing.Read(buffer )))(buffer),
 					 _ => throw new Exception($"Invalid value: '{state}'")
@@ -7844,15 +9076,18 @@ namespace MineSharp.Data.Protocol.Status.Serverbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "ping_start" => 0x00, "ping" => 0x01, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "ping_start", 0x01 => "ping", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -7878,48 +9113,64 @@ namespace MineSharp.Data.Protocol.Status.Serverbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Status.Clientbound {
-	public class PacketServerInfo : IPacketPayload {
+namespace MineSharp.Data.Protocol.Status.Clientbound
+{
+	public class PacketServerInfo : IPacketPayload
+	{
 		public string Response { get; set; }
-		public PacketServerInfo(string @response) {
+		public PacketServerInfo(string @response)
+		{
 			this.Response = @response;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.Response);
 		}
-		public static PacketServerInfo Read(PacketBuffer buffer ) {
+		public static PacketServerInfo Read(PacketBuffer buffer )
+		{
 			string @response = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			return new PacketServerInfo(@response);
 		}
 	}
-	public class PacketPing : IPacketPayload {
+	public class PacketPing : IPacketPayload
+	{
 		public long Time { get; set; }
-		public PacketPing(long @time) {
+		public PacketPing(long @time)
+		{
 			this.Time = @time;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, long>)((buffer, value) => buffer.WriteI64(value)))(buffer, this.Time);
 		}
-		public static PacketPing Read(PacketBuffer buffer ) {
+		public static PacketPing Read(PacketBuffer buffer )
+		{
 			long @time = ((Func<PacketBuffer, long>)((buffer) => buffer.ReadI64()))(buffer);
 			return new PacketPing(@time);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "server_info": ((Action<PacketBuffer, PacketServerInfo>)((buffer, value) => value.Write(buffer )))(buffer, (PacketServerInfo)this); break;
 					case "ping": ((Action<PacketBuffer, PacketPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketPing)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"server_info" => ((Func<PacketBuffer, PacketServerInfo>)((buffer) => MineSharp.Data.Protocol.Status.Clientbound.PacketServerInfo.Read(buffer )))(buffer),
 					"ping" => ((Func<PacketBuffer, PacketPing>)((buffer) => MineSharp.Data.Protocol.Status.Clientbound.PacketPing.Read(buffer )))(buffer),
 					 _ => throw new Exception($"Invalid value: '{state}'")
@@ -7933,15 +9184,18 @@ namespace MineSharp.Data.Protocol.Status.Clientbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "server_info" => 0x00, "ping" => 0x01, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "server_info", 0x01 => "ping", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -7967,27 +9221,33 @@ namespace MineSharp.Data.Protocol.Status.Clientbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Handshaking {
+namespace MineSharp.Data.Protocol.Handshaking
+{
 }
-namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
-	public class PacketSetProtocol : IPacketPayload {
+namespace MineSharp.Data.Protocol.Handshaking.Serverbound
+{
+	public class PacketSetProtocol : IPacketPayload
+	{
 		public VarInt ProtocolVersion { get; set; }
 		public string ServerHost { get; set; }
 		public ushort ServerPort { get; set; }
 		public VarInt NextState { get; set; }
-		public PacketSetProtocol(VarInt @protocolVersion, string @serverHost, ushort @serverPort, VarInt @nextState) {
+		public PacketSetProtocol(VarInt @protocolVersion, string @serverHost, ushort @serverPort, VarInt @nextState)
+		{
 			this.ProtocolVersion = @protocolVersion;
 			this.ServerHost = @serverHost;
 			this.ServerPort = @serverPort;
 			this.NextState = @nextState;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.ProtocolVersion);
 			((Action<PacketBuffer, string>)((buffer, value) => buffer.WritePString(value, ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value))))))(buffer, this.ServerHost);
 			((Action<PacketBuffer, ushort>)((buffer, value) => buffer.WriteU16(value)))(buffer, this.ServerPort);
 			((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, this.NextState);
 		}
-		public static PacketSetProtocol Read(PacketBuffer buffer ) {
+		public static PacketSetProtocol Read(PacketBuffer buffer )
+		{
 			VarInt @protocolVersion = ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer);
 			string @serverHost = ((Func<PacketBuffer, string>)((buffer) => buffer.ReadPString(((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt())))))(buffer);
 			ushort @serverPort = ((Func<PacketBuffer, ushort>)((buffer) => buffer.ReadU16()))(buffer);
@@ -7995,34 +9255,45 @@ namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 			return new PacketSetProtocol(@protocolVersion, @serverHost, @serverPort, @nextState);
 		}
 	}
-	public class PacketLegacyServerListPing : IPacketPayload {
+	public class PacketLegacyServerListPing : IPacketPayload
+	{
 		public byte Payload { get; set; }
-		public PacketLegacyServerListPing(byte @payload) {
+		public PacketLegacyServerListPing(byte @payload)
+		{
 			this.Payload = @payload;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, byte>)((buffer, value) => buffer.WriteU8(value)))(buffer, this.Payload);
 		}
-		public static PacketLegacyServerListPing Read(PacketBuffer buffer ) {
+		public static PacketLegacyServerListPing Read(PacketBuffer buffer )
+		{
 			byte @payload = ((Func<PacketBuffer, byte>)((buffer) => buffer.ReadU8()))(buffer);
 			return new PacketLegacyServerListPing(@payload);
 		}
 	}
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					case "set_protocol": ((Action<PacketBuffer, PacketSetProtocol>)((buffer, value) => value.Write(buffer )))(buffer, (PacketSetProtocol)this); break;
 					case "legacy_server_list_ping": ((Action<PacketBuffer, PacketLegacyServerListPing>)((buffer, value) => value.Write(buffer )))(buffer, (PacketLegacyServerListPing)this); break;
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					"set_protocol" => ((Func<PacketBuffer, PacketSetProtocol>)((buffer) => MineSharp.Data.Protocol.Handshaking.Serverbound.PacketSetProtocol.Read(buffer )))(buffer),
 					"legacy_server_list_ping" => ((Func<PacketBuffer, PacketLegacyServerListPing>)((buffer) => MineSharp.Data.Protocol.Handshaking.Serverbound.PacketLegacyServerListPing.Read(buffer )))(buffer),
 					 _ => throw new Exception($"Invalid value: '{state}'")
@@ -8036,15 +9307,18 @@ namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch { "set_protocol" => 0x00, "legacy_server_list_ping" => 0xfe, _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch { 0x00 => "set_protocol", 0xfe => "legacy_server_list_ping", _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);
@@ -8070,20 +9344,28 @@ namespace MineSharp.Data.Protocol.Handshaking.Serverbound {
 	}
 	
 }
-namespace MineSharp.Data.Protocol.Handshaking.Clientbound {
-	public class Packet : IPacket {
-		public class ParamsSwitch {
+namespace MineSharp.Data.Protocol.Handshaking.Clientbound
+{
+	public class Packet : IPacket
+	{
+		public class ParamsSwitch
+		{
 			public object? Value { get; set; }
-			public ParamsSwitch(object? value) {
+			public ParamsSwitch(object? value)
+			{
 				this.Value = value;
 			}
-			public void Write(PacketBuffer buffer, string state) {
-				switch (state) {
+			public void Write(PacketBuffer buffer, string state)
+			{
+				switch (state)
+				{
 					default: throw new Exception($"Invalid value: '{state}'");
 				}
 			}
-			public static ParamsSwitch Read(PacketBuffer buffer, string state) {
-				object? value = state switch {
+			public static ParamsSwitch Read(PacketBuffer buffer, string state)
+			{
+				object? value = state switch
+				{
 					 _ => throw new Exception($"Invalid value: '{state}'")
 				};
 				return new ParamsSwitch(value);
@@ -8091,15 +9373,18 @@ namespace MineSharp.Data.Protocol.Handshaking.Clientbound {
 		}
 		public string Name { get; set; }
 		public ParamsSwitch Params { get; set; }
-		public Packet(string @name, ParamsSwitch @params) {
+		public Packet(string @name, ParamsSwitch @params)
+		{
 			this.Name = @name;
 			this.Params = @params;
 		}
-		public void Write(PacketBuffer buffer ) {
+		public void Write(PacketBuffer buffer )
+		{
 			((Action<PacketBuffer, string>)((buffer, value) => ((Action<PacketBuffer, VarInt>)((buffer, value) => buffer.WriteVarInt(value)))(buffer, value switch {  _ => throw new Exception($"Value '{value}' not supported.") })))(buffer, this.Name);
 			((Action<PacketBuffer, ParamsSwitch>)((buffer, value) => value.Write(buffer, Name)))(buffer, this.Params);
 		}
-		public static Packet Read(PacketBuffer buffer ) {
+		public static Packet Read(PacketBuffer buffer )
+		{
 			string @name = ((Func<PacketBuffer, string>)((buffer) => ((Func<PacketBuffer, VarInt>)((buffer) => buffer.ReadVarInt()))(buffer).Value switch {  _ => throw new Exception() }))(buffer);
 			ParamsSwitch @params = ((Func<PacketBuffer, ParamsSwitch>)((buffer) => ParamsSwitch.Read(buffer, @name)))(buffer);
 			return new Packet(@name, @params);

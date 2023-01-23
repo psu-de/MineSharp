@@ -5,15 +5,14 @@ using System.Reflection;
 namespace MineSharp.Data.Blocks
 {
     public static class BlockExtensions
-    {
-
+    {        
         public static bool IsSolid(this Block block)
         {
-            var id = block.Id;
-            return !(id == Air.BlockId || id == CaveAir.BlockId || id == VoidAir.BlockId);
+            var id = block.Info.Id;
+            return !(id == BlockPalette.AirInfo.Id || id == BlockPalette.CaveAirInfo.Id || id == BlockPalette.VoidAirInfo.Id);
         }
 
-        public static int CalculateBreakingTime(this Block block, Item? heldItem, Entity miner)
+        public static int CalculateBreakingTime(this BlockInfo block, Item? heldItem, Entity miner)
         {
 
             //TODO: Gamemode creative
@@ -21,8 +20,8 @@ namespace MineSharp.Data.Blocks
 
             float toolMultiplier = heldItem?.GetToolMultiplier(block) ?? 1;
             float efficiencyLevel = 0; // TODO: Efficiency level
-            float hasteLevel = miner.GetEffectLevel(HasteEffect.EffectId) ?? 0;
-            float miningFatiqueLevel = miner.GetEffectLevel(MiningfatigueEffect.EffectId) ?? 0;
+            float hasteLevel = miner.GetEffectLevel(EffectPalette.HasteEffectInfo.Id) ?? 0;
+            float miningFatiqueLevel = miner.GetEffectLevel(EffectPalette.MiningfatigueEffectInfo.Id) ?? 0;
 
             toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
             toolMultiplier /= MathF.Pow(1.2f, hasteLevel);
@@ -45,21 +44,19 @@ namespace MineSharp.Data.Blocks
             return (int)(ticks / 20 * 1000);
         }
 
-        public static bool CanBeHarvested(this Block block, Item? item)
+        public static bool CanBeHarvested(this BlockInfo block, Item? item)
         {
             if (block.HarvestTools == null) return true;
 
             if (item == null) return false;
 
-            return block.HarvestTools.Contains(item!.Id);
+            return block.HarvestTools.Contains(item!.Info.Id);
         }
 
 
         public static BlockShape[] GetBlockShape(this Block block)
         {
-
-            var blockType = block.GetType();
-            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+            var shapeIndices = block.Info.BlockShapeIndices;
             var idx = 0;
             if (shapeIndices.Length > 1)
             {
@@ -72,8 +69,7 @@ namespace MineSharp.Data.Blocks
 
         public static AABB[] GetBoundingBoxes(this Block block)
         {
-            var blockType = block.GetType();
-            var shapeIndices = (int[])blockType.GetField("BlockShapeIndices", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+            var shapeIndices = block.Info.BlockShapeIndices;
             var idx = shapeIndices.Length > 1 ? block.Metadata : 0;
             var shapeData = BlockShapePalette.AllBlockShapes[shapeIndices[idx]];
             return shapeData.Select(x => new BlockShape(x).ToBoundingBox().Offset(block.Position!.X, block.Position.Y, block.Position.Z)).ToArray();

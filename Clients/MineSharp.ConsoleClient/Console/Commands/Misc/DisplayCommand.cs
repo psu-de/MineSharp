@@ -76,7 +76,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
 
             foreach (var slot in BotClient.Bot.Inventory!.GetAllSlots())
             {
-                inventory.AddRow(slot.SlotNumber!.ToString(), slot.Item?.DisplayName ?? "", slot.Item?.Count.ToString() ?? "");
+                inventory.AddRow(slot.SlotNumber!.ToString(), slot.Item?.Info.DisplayName ?? "", slot.Item?.Count.ToString() ?? "");
             }
             AnsiConsole.Write(inventory);
         }
@@ -109,8 +109,8 @@ namespace MineSharp.ConsoleClient.Console.Commands.Misc
             foreach (var effect in BotClient.Bot.BotEntity.Effects.Values)
             {
                 if (effect == null) continue;
-                var eColor = effect.IsGood ? "springgreen2" : "red1";
-                effectsInfo.AddRow($"[{eColor}]{effect.DisplayName}[/]", (effect.Amplifier + 1).ToString(), effect.Duration * MinecraftConst.TickMs / 1000 + "s");
+                var eColor = effect.Info.IsGood ? "springgreen2" : "red1";
+                effectsInfo.AddRow($"[{eColor}]{effect.Info.DisplayName}[/]", (effect.Amplifier + 1).ToString(), effect.Duration * MinecraftConst.TickMs / 1000 + "s");
             }
 
             masterTable.AddRow(new Markup("\n[green underline]Effects[/]"), effectsInfo);

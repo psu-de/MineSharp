@@ -2,21 +2,20 @@
 
 namespace MineSharp.Core.Types
 {
-    public class Biome
+    public class BiomeInfo
     {
-
-        public Biome(int id, string name, string displayName, int biomeCategory, float temperature, string precipitation, float depth, Dimension dimension, int color, float rainfall)
+        public BiomeInfo(int id, string name, int category, float temperature, string precipitation, float depth, Dimension dimension, string displayName, int color, float rainfall)
         {
-            this.Id = id;
-            this.Name = name;
-            this.Category = biomeCategory;
-            this.Temperature = temperature;
-            this.Precipitation = precipitation;
-            this.Depth = depth;
-            this.Dimension = dimension;
-            this.DisplayName = displayName;
-            this.Color = color;
-            this.Rainfall = rainfall;
+            Id = id;
+            Name = name;
+            Category = category;
+            Temperature = temperature;
+            Precipitation = precipitation;
+            Depth = depth;
+            Dimension = dimension;
+            DisplayName = displayName;
+            Color = color;
+            Rainfall = rainfall;
         }
 
         public int Id { get; }
@@ -30,6 +29,17 @@ namespace MineSharp.Core.Types
         public int Color { get; }
         public float Rainfall { get; }
 
+
         public override string ToString() => $"Biome (Name={this.Name} Id={this.Id})";
+    }
+
+    public class Biome
+    {
+        public BiomeInfo Info { get; }
+
+        public Biome(BiomeInfo info)
+        {
+            this.Info = info;
+        }
     }
 }

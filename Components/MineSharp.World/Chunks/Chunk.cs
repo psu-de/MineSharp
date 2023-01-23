@@ -70,7 +70,7 @@ namespace MineSharp.World.Chunks
 
         public void SetBlock(Block block)
         {
-            var sectionIndex = this.GetSectionIndex(block.Position!.Y);
+            var sectionIndex = this.GetSectionIndex(block.Position.Y);
             block.Position = this.World2ChunkPos(block.Position);
             this.ChunkSections[sectionIndex].SetBlock(block);
         }

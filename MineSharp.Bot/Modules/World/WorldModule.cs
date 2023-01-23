@@ -47,8 +47,7 @@ namespace MineSharp.Bot.Modules.World
         {
 
             var blockId = BlockPalette.GetBlockIdByState(packet.Type!);
-
-            var newBlock = BlockFactory.CreateBlock(blockId, packet.Type!, new Position(packet.Location.Value));
+            var newBlock = new Block(BlockPalette.GetBlockInfoById(blockId), packet.Type!, new Position(packet.Location.Value));
             this.World!.SetBlock(newBlock);
             return Task.CompletedTask;
         }
@@ -137,8 +136,7 @@ namespace MineSharp.Bot.Modules.World
 
             return Task.Run(async () =>
             {
-
-                if (!block.Diggable) return MineBlockStatus.NotDiggable;
+                if (!block.Info.Diggable) return MineBlockStatus.NotDiggable;
                 if (!this.World!.IsBlockLoaded(block.Position!)) return MineBlockStatus.BlockNotLoaded;
 
 
@@ -153,7 +151,7 @@ namespace MineSharp.Bot.Modules.World
 
                 await this.Bot.Client.SendPacket(packet);
 
-                var time = block.CalculateBreakingTime(this.Bot.HeldItem, this.Bot.BotEntity!);
+                var time = block.Info.CalculateBreakingTime(this.Bot.HeldItem, this.Bot.BotEntity!);
 
                 var cancelToken = new CancellationTokenSource();
 

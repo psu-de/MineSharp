@@ -44,8 +44,8 @@ namespace MineSharp.Bot.Modules.Entity
         private Task handleSpawnLivingEntity(PacketSpawnEntityLiving packet)
         {
 
-            var newEntity = EntityFactory.CreateEntity(
-                packet.Type!, packet.EntityId!, new Vector3(packet.X!, packet.Y!, packet.Z!),
+            var newEntity = new Core.Types.Entity(
+                EntityPalette.GetEntityInfoById(packet.Type!), packet.EntityId!, new Vector3(packet.X!, packet.Y!, packet.Z!),
                 packet.Pitch!,
                 packet.Yaw!,
                 new Vector3(packet.VelocityX! / MinecraftConst.VelocityToBlock, packet.VelocityY! / MinecraftConst.VelocityToBlock, packet.VelocityZ! / MinecraftConst.VelocityToBlock),
@@ -139,8 +139,8 @@ namespace MineSharp.Bot.Modules.Entity
         {
             if (!this.Entities.TryGetValue(packet.EntityId!, out var entity))
                 return Task.CompletedTask;
-            var effectType = EffectPalette.GetEffectTypeById(packet.EffectId!);
-            var effect = EffectFactory.CreateEffect(packet.EffectId!, packet.Amplifier!, DateTime.Now, packet.Duration!);
+            var effectType = EffectPalette.GetEffectInfoById(packet.EffectId!);
+            var effect = new Effect(effectType, packet.Amplifier!, DateTime.Now, packet.Duration!);
 
             //TODO: Effect updating is so noch nich ganz richtig
             if (entity.Effects.ContainsKey(packet.EffectId!) && effect.Amplifier >= entity.Effects[packet.EffectId!]!.Amplifier)
@@ -196,7 +196,7 @@ namespace MineSharp.Bot.Modules.Entity
 
         internal void AddEntity(Core.Types.Entity entity)
         {
-            this.Entities.TryAdd(entity.Id, entity);
+            this.Entities.TryAdd(entity.Info.Id, entity);
         }
     }
 }

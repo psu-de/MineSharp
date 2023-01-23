@@ -8,7 +8,7 @@ namespace MineSharp.Bot
     {
 
 
-        public Player? BotEntity => this.BaseModule?.BotEntity;
+        public Entity? BotEntity => this.BaseModule?.BotEntity;
         public MinecraftPlayer? Player => this.BaseModule?.Player;
 
         public float Health => this.BaseModule!.Health;

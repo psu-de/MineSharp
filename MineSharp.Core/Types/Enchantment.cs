@@ -12,12 +12,23 @@
         }
     }
 
-
-    public abstract class Enchantment
+    public class EnchantmentInfo
     {
+        public int Id { get; }
+        public string Name { get; }
+        public string DisplayName { get; }
+        public int MaxLevel { get; }
+        public EnchantCost MinCost { get; }
+        public EnchantCost MaxCost { get; }
+        public bool TreasureOnly { get; }
+        public bool Curse { get; }
+        public int[] Exclude { get; }
+        public int Category { get; }
+        public int Weight { get; }
+        public bool Tradeable { get; }
+        public bool Discoverable { get; }
 
-
-        public Enchantment(int id, string name, string displayName, int maxLevel, EnchantCost minCost, EnchantCost maxCost, bool treasureOnly, bool curse, Type[] exclude, int category, int weight, bool discoverable)
+        public EnchantmentInfo(int id, string name, string displayName, int maxLevel, EnchantCost minCost, EnchantCost maxCost, bool treasureOnly, bool curse, int[] exclude, int category, int weight, bool tradeable, bool discoverable)
         {
             this.Id = id;
             this.Name = name;
@@ -30,30 +41,23 @@
             this.Exclude = exclude;
             this.Category = category;
             this.Weight = weight;
+            this.Tradeable = tradeable;
             this.Discoverable = discoverable;
         }
+    }
 
-        public Enchantment(int level, int id, string name, string displayName, int maxLevel, EnchantCost minCost, EnchantCost maxCost, bool treasureOnly, bool curse, Type[] exclude, int category, int weight, bool discoverable)
-            : this(id, name, displayName, maxLevel, minCost, maxCost, treasureOnly, curse, exclude, category, weight, discoverable)
+
+    public class Enchantment
+    {
+        public Enchantment(EnchantmentInfo info, int level)
         {
-            this.Level = level;
+            Info = info;
+            Level = level;
         }
 
-        public int Id { get; }
-        public string Name { get; }
-        public string DisplayName { get; }
-        public int MaxLevel { get; }
-        public EnchantCost MinCost { get; }
-        public EnchantCost MaxCost { get; }
-        public bool TreasureOnly { get; }
-        public bool Curse { get; }
-        public Type[] Exclude { get; }
-        public int Category { get; }
-        public int Weight { get; }
-        public bool Discoverable { get; }
-
+        public EnchantmentInfo Info { get; }
         public int Level { get; set; }
 
-        public override string ToString() => $"Enchantment (Name={this.Name} Id={this.Id} Level={this.Level})";
+        public override string ToString() => $"Enchantment (Name={this.Info.Name} Id={this.Info.Id} Level={this.Level})";
     }
 }

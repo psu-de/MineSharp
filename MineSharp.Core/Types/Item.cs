@@ -2,10 +2,9 @@
 
 namespace MineSharp.Core.Types
 {
-    public class Item
+    public class ItemInfo
     {
-
-        public Item(int id, string displayName, string name, byte stackSize, int? maxDurability, string[]? enchantCategories, string[]? repairWith)
+        public ItemInfo(int id, string displayName, string name, byte stackSize, int? maxDurability, string[]? enchantCategories, string[]? repairWith)
         {
             this.Id = id;
             this.DisplayName = displayName;
@@ -16,13 +15,6 @@ namespace MineSharp.Core.Types
             this.RepairWith = repairWith;
         }
 
-        public Item(byte count, int? damage, NbtCompound? metadata, int id, string displayName, string name, byte stackSize, int? maxDurability, string[]? enchantCategories, string[]? repairWith) : this(id, displayName, name, stackSize, maxDurability, enchantCategories, repairWith)
-        {
-            this.Count = count;
-            this.Damage = damage;
-            this.Metadata = metadata;
-        }
-
         public int Id { get; }
         public string DisplayName { get; }
         public string Name { get; }
@@ -30,26 +22,37 @@ namespace MineSharp.Core.Types
         public int? MaxDurability { get; }
         public string[]? EnchantCategories { get; }
         public string[]? RepairWith { get; }
+    }
 
+    public class Item
+    {
+        public Item(ItemInfo info, byte count, int? damage, NbtCompound? metadata)
+        {
+            this.Info = info;
+            this.Count = count;
+            this.Damage = damage;
+            this.Metadata = metadata;
+        }
+
+
+        public ItemInfo Info { get; }
         public byte Count { get; set; }
         public int? Damage { get; set; }
         public NbtCompound? Metadata { get; set; } // TODO: Deconstruct metadata
 
-        public override string ToString() => $"Item (Name={this.Name} Id={this.Id} Count={this.Count} Metadata={(this.Metadata == null ? "None" : this.Metadata.ToString())})";
+        public override string ToString() => $"Item (Name={this.Info.Name} Id={this.Info.Id} Count={this.Count} Metadata={(this.Metadata == null ? "None" : this.Metadata.ToString())})";
 
 
         public Slot ToSlot(short slotNumber) => new Slot(this, slotNumber);
 
         public Item Clone()
         {
-            return new Item(
-                this.Count, this.Damage, (NbtCompound?)this.Metadata?.Clone(), this.Id, this.DisplayName, this.Name, this.StackSize,
-                this.MaxDurability, this.EnchantCategories, this.RepairWith);
+            return new Item(this.Info, this.Count, this.Damage, (NbtCompound?)this.Metadata?.Clone());
         }
         
         private int GetMaterialMultiplier()
         {
-            var name = this.Name;
+            var name = this.Info.Name;
             if (name.Contains("_") && (name.EndsWith("axe") || name.EndsWith("pickaxe") || name.EndsWith("hoe") || name.EndsWith("shovel") || name.EndsWith("sword")))
             {
                 var material = name.Split("_")[0];
@@ -66,13 +69,13 @@ namespace MineSharp.Core.Types
             return 1;
         }
 
-        public int GetToolMultiplier(Block block)
+        public int GetToolMultiplier(BlockInfo block)
         {
 
             if (block.Material.Contains("/"))
             {
                 var type = block.Material.Split("/")[1];
-                if (this.Name.EndsWith(type)) return this.GetMaterialMultiplier();
+                if (this.Info.Name.EndsWith(type)) return this.GetMaterialMultiplier();
             }
 
             return 1;

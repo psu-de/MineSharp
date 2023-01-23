@@ -1,8 +1,7 @@
 ﻿namespace MineSharp.Core.Types
 {
-    public class Position
+    public struct Position
     {
-
         public Position(ulong value)
         {
             this.X = (int)(value >> 38);

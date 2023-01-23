@@ -2,39 +2,30 @@
 {
     public class BlockProperties
     {
-
-
         public BlockStateProperty[] Properties;
-        public int State;
 
-        public BlockProperties(BlockStateProperty[] properties, int defaultState)
+        public BlockProperties(BlockStateProperty[] properties)
         {
             this.Properties = properties;
-            this.State = defaultState;
-            this.Set(defaultState);
         }
 
-        public BlockStateProperty? Get(string name)
+        public T GetPropertyValue<T>(string name, int state)
         {
-            return this.Properties.FirstOrDefault(p => p.Name == name);
-        }
-
-        public void Set(int data)
-        {
-            this.State = data;
-            foreach (var property in this.Properties.Reverse())
+            for (int i = this.Properties.Length - 1; i >= 0; i--)
             {
-                property.SetValue(data % property.NumValues);
-                data = data / property.NumValues;
+                var prop = this.Properties[i];
+                if (prop.Name == name)
+                {
+                    return prop.GetValue<T>(state % prop.NumValues);
+                }
+                state /= prop.NumValues;
             }
+            return default(T)!;
         }
-
-        public BlockProperties Clone() => new BlockProperties(this.Properties.Clone() as BlockStateProperty[] ?? throw new Exception(), this.State);
     }
 
     public class BlockStateProperty
     {
-
         public enum BlockStatePropertyType
         {
             Enum,
@@ -52,43 +43,50 @@
 
         public string Name { get; set; }
         public BlockStatePropertyType Type { get; set; }
-        public int State { get; set; }
         public int NumValues { get; set; }
         public string[]? AcceptedValues { get; set; }
 
-
-        public void SetValue(int state)
-        {
-            if (state >= this.NumValues) throw new ArgumentOutOfRangeException();
-
-            this.State = state;
-        }
-
-        public T GetValue<T>()
+        public T GetValue<T>(int state)
         {
             switch (this.Type)
             {
                 case BlockStatePropertyType.Int:
                     if (typeof(T) != typeof(int)) throw new NotSupportedException();
-                    return (T)(object)this.State;
+                    return (T)(object)state;
                 case BlockStatePropertyType.Bool:
                     if (typeof(T) != typeof(bool)) throw new NotSupportedException();
-                    return (T)(object)!Convert.ToBoolean(this.State);
+                    return (T)(object)!Convert.ToBoolean(state);
                 case BlockStatePropertyType.Enum:
                     if (typeof(T) != typeof(string) || this.AcceptedValues == null) throw new NotSupportedException();
-                    return (T)(object)this.AcceptedValues[this.State];
+                    return (T)(object)this.AcceptedValues[state];
                 default:
                     throw new NotImplementedException();
-
             }
         }
     }
 
-
-    public class Block
+    public class BlockInfo
     {
-
-        public Block(int id, string name, string displayName, float hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingBox, int stackSize, string material, int defaultState, int minStateId, int maxStateId, int[]? harvestTools, BlockProperties properties)
+        public int Id { get; }
+        public string Name { get; }
+        public string DisplayName { get; }
+        public float Hardness { get; }
+        public float Resistance { get; }
+        public bool Diggable { get; }
+        public bool Transparent { get; }
+        public int FilterLight { get; }
+        public int EmitLight { get; }
+        public string BoundingBox { get; }
+        public int StackSize { get; }
+        public string Material { get; }
+        public int DefaultState { get; }
+        public int MinStateId { get; }
+        public int MaxStateId { get; }
+        public int[]? HarvestTools { get; }
+        public BlockProperties Properties { get; }
+        public int[] BlockShapeIndices { get; }
+        
+        public BlockInfo(int id, string name, string displayName, float hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingBox, int stackSize, string material, int defaultState, int minStateId, int maxStateId, int[]? harvestTools, BlockProperties properties, int[] blockShapeIndices)
         {
             this.Id = id;
             this.Name = name;
@@ -107,39 +105,29 @@
             this.MaxStateId = maxStateId;
             this.HarvestTools = harvestTools;
             this.Properties = properties;
+            this.BlockShapeIndices = blockShapeIndices;
         }
+    }
 
-        public Block(int state, Position pos, int id, string name, string displayName, float hardness, float resistance, bool diggable, bool transparent, int filterLight, int emitLight, string boundingBox, int stackSize, string material, int defaultState, int minStateId, int maxStateId, int[]? harvestTools, BlockProperties properties)
-            : this(id, name, displayName, hardness, resistance, diggable, transparent, filterLight, emitLight, boundingBox, stackSize, material, defaultState, minStateId, maxStateId, harvestTools, properties)
+    public class Block
+    {
+        public BlockInfo Info { get; }
+        public int State { get; set; }
+        public Position Position { get; set; }
+        public int Metadata => (int)this.State - this.Info.MinStateId;
+
+        public Block(BlockInfo info, int state, Position pos)
         {
+            this.Info = info;
             this.State = state;
             this.Position = pos;
-            this.Properties.Set(this.Metadata);
         }
 
-        public int Id { get; }
-        public string Name { get; }
-        public string DisplayName { get; }
+        public T GetProperty<T>(string name)
+        {
+            return this.Info.Properties.GetPropertyValue<T>(name, this.Metadata);
+        }
 
-        public float Hardness { get; }
-        public float Resistance { get; }
-        public bool Diggable { get; }
-        public bool Transparent { get; }
-        public int FilterLight { get; }
-        public int EmitLight { get; }
-        public string BoundingBox { get; }
-        public int StackSize { get; }
-        public string Material { get; }
-        public int DefaultState { get; }
-        public int MinStateId { get; }
-        public int MaxStateId { get; }
-        public int[]? HarvestTools { get; }
-        public BlockProperties Properties { get; }
-
-        public int? State { get; set; }
-        public Position? Position { get; set; }
-        public int Metadata => (int)this.State! - this.MinStateId;
-
-        public override string ToString() => $"Block (Name={this.Name} Id={this.Id} StateId={this.State} Position={this.Position})";
+        public override string ToString() => $"Block (Name={this.Info.Name} Id={this.Info.Id} StateId={this.State} Position={this.Position})";
     }
 }

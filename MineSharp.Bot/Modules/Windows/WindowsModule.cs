@@ -90,9 +90,9 @@ namespace MineSharp.Bot.Modules.Windows
         public async Task<Window> OpenContainer(Block block)
         {
 
-            if (!this.AllowedBlocksToOpen.Contains(block.Id))
+            if (!this.AllowedBlocksToOpen.Contains(block.Info.Id))
             {
-                throw new ArgumentException("Cannot open block of type " + block.Name);
+                throw new ArgumentException("Cannot open block of type " + block.Info.Name);
             }
 
             var packet = new PacketBlockPlace(

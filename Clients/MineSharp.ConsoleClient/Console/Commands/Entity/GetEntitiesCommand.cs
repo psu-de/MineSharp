@@ -56,7 +56,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity
             }
             if (type != null)
             {
-                entities = entities.Where(x => x.Id == (int)type);
+                entities = entities.Where(x => x.Info.Id == (int)type);
             }
 
             var table = new Table();
@@ -64,7 +64,7 @@ namespace MineSharp.ConsoleClient.Console.Commands.Entity
             table.AddColumns("Entity Id", "Type", "Position");
             foreach (var e in entities)
             {
-                table.AddRow(e.ServerId.ToString(), e.Name, e.Position.ToString());
+                table.AddRow(e.ServerId.ToString(), e.Info.Name, e.Position.ToString());
             }
 
             if (table.Rows.Count > 0)
