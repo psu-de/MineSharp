@@ -26,6 +26,7 @@ namespace MineSharp.Bot.Modules.Entity
 
         protected override async Task Load()
         {
+            await this.Bot.WaitForBot();
 
             this.Bot.On<PacketSpawnEntityLiving>(this.handleSpawnLivingEntity);
             this.Bot.On<PacketEntityDestroy>(this.handleDestroyEntities);
