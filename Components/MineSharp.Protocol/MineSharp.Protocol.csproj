@@ -1,23 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AnalysisLevel>none</AnalysisLevel>
-        <LangVersion>11</LangVersion>
-        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
-        <PackageReference Include="SharpZipLib" Version="1.3.3" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
+      <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+      <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
-        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
-        <ProjectReference Include="..\MineSharp.MojangAuth\MineSharp.MojangAuth.csproj" />
+      <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Packets\Clientbound\Handshaking\" />
     </ItemGroup>
 
 </Project>

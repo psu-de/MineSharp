@@ -1,17 +1,28 @@
-﻿using MineSharp.Core.Types;
-using MineSharp.Data.Effects;
-using MineSharp.Data.Entities;
+﻿using MineSharp.Core.Common.Entities;
+using MineSharp.Data;
 
 namespace MineSharp.Physics
 {
     public class PlayerState
     {
 
-        private readonly Entity Player;
+        private readonly MinecraftData _data;
+        private readonly Entity _player;
 
-        public PlayerState(Entity player)
+        private readonly int _jumpBoostEffect;
+        private readonly int _levitationEffect;
+        private readonly int _dolpinsGraceEffect;
+        private readonly int _slowfallingEffect;
+
+        public PlayerState(MinecraftData data, Entity player)
         {
-            this.Player = player;
+            this._data = data;
+            this._player = player;
+
+            this._jumpBoostEffect = data.Effects.GetByName("JumpBoost").Id;
+            this._levitationEffect = data.Effects.GetByName("Levitation").Id;
+            this._dolpinsGraceEffect = data.Effects.GetByName("DolphinsGrace").Id;
+            this._slowfallingEffect = data.Effects.GetByName("SlowFalling").Id;
         }
 
         public bool IsInWater { get; set; } = false;
@@ -22,10 +33,10 @@ namespace MineSharp.Physics
         public int JumpTicks { get; set; } = 0;
         public bool JumpQueued { get; set; } = false;
 
-        public int SlowFalling => this.Player.GetEffectLevel((int)EffectType.SlowfallingEffect) ?? 0;
-        public int Levitation => this.Player.GetEffectLevel((int)EffectType.LevitationEffect) ?? 0;
-        public int DolphinsGrace => this.Player.GetEffectLevel((int)EffectType.DolphinsgraceEffect) ?? 0;
-        public int JumpBoost => this.Player.GetEffectLevel((int)EffectType.JumpboostEffect) ?? 0;
+        public int SlowFalling => this._player.GetEffectLevel(this._slowfallingEffect) ?? 0;
+        public int Levitation => this._player.GetEffectLevel(this._levitationEffect) ?? 0;
+        public int DolphinsGrace => this._player.GetEffectLevel(this._dolpinsGraceEffect) ?? 0;
+        public int JumpBoost => this._player.GetEffectLevel(this._jumpBoostEffect) ?? 0;
 
         //TODO: Depth Strider
         public int DepthStrider => 0;

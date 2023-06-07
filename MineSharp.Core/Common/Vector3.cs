@@ -1,0 +1,114 @@
+namespace MineSharp.Core.Common;
+
+public class Vector3
+{
+    public static Vector3 One => new Vector3(1, 1, 1);
+    public static Vector3 Zero => new Vector3(0, 0, 0);
+    public static Vector3 Up => new Vector3(0, 1, 0);
+    public static Vector3 Down => new Vector3(0, -1, 0);
+    public static Vector3 North => new Vector3(0, 0, -1);
+    public static Vector3 South => new Vector3(0, 0, 1);
+    public static Vector3 West => new Vector3(-1, 0, 0);
+    public static Vector3 East => new Vector3(1, 0, 0);
+    
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Z { get; set; }
+    
+    public Vector3(double x, double y, double z)
+    {
+        this.X = x;
+        this.Y = y;
+        this.Z = z;
+    }
+
+    /// <summary>
+    /// Component-wise vector addition.
+    /// </summary>
+    /// <param name="other"></param>
+    public void Add(Vector3 other)
+    {
+        this.X += other.X;
+        this.Y += other.Y;
+        this.Z += other.Z;
+    }
+
+    /// <summary>
+    /// Component-wise vector subtraction.
+    /// </summary>
+    /// <param name="other"></param>
+    public void Subtract(Vector3 other)
+    {
+        this.X -= other.X;
+        this.Y -= other.Y;
+        this.Z -= other.Z;
+    }
+
+    /// <summary>
+    /// Component-wise vector multiplication.
+    /// </summary>
+    /// <param name="other"></param>
+    public void Multiply(Vector3 other)
+    {
+        this.X *= other.X;
+        this.Y *= other.Y;
+        this.Z *= other.Z;
+    }
+
+    /// <summary>
+    /// Component-wise vector division.
+    /// </summary>
+    /// <param name="other"></param>
+    public void Divide(Vector3 other)
+    {
+        this.X /= other.X;
+        this.Y /= other.Y;
+        this.Z /= other.Z;
+    }
+
+    public void Scale(double scalar)
+    {
+        this.X *= scalar;
+        this.Y *= scalar;
+        this.Z *= scalar;
+    }
+
+    public double Length()
+    {
+        return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+    }
+
+    public Vector3 Normalized()
+    {
+        var scale = 1 / this.Length();
+        return new Vector3(
+            this.X * scale,
+            this.Y * scale,
+            this.Z * scale);
+    }
+
+    public Vector3 Plus(Vector3 other)
+    {
+        return new Vector3(
+            this.X + other.X,
+            this.Y + other.Y,
+            this.Z + other.Z);
+    }
+
+    public Vector3 Minus(Vector3 other)
+    {
+        return new Vector3(
+            this.X - other.X,
+            this.Y - other.Y,
+            this.Z - other.Z);
+    }
+
+    public Vector3 Clone()
+        => new Vector3(this.X, this.Y, this.Z);
+
+    public override string ToString() 
+        => $"({this.X:0.##} / {this.Y:0.##} / {this.Z:0.##})";
+
+    public static implicit operator Position(Vector3 x) => new Position((int)Math.Floor(x.X), (int)Math.Ceiling(x.Y), (int)Math.Floor(x.Z));
+    public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+}

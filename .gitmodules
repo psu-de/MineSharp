@@ -1,3 +1,0 @@
-[submodule "Data/MineSharp.Data.Generator/minecraft-data"]
-	path = Data/MineSharp.Data.Generator/minecraft-data
-	url = https://github.com/PrismarineJS/minecraft-data.git

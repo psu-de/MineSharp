@@ -1,15 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
-        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
-        <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
+      <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
     </ItemGroup>
 
 </Project>

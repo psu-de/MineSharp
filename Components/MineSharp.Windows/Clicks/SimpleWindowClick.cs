@@ -1,11 +1,8 @@
-using MineSharp.Core.Types;
-using MineSharp.Core.Types.Enums;
+namespace MineSharp.Windows.Clicks;
 
-namespace MineSharp.Windows.Clicks
-{
-    internal class SimpleWindowClick : WindowClick
+internal class SimpleWindowClick : WindowClick
     {
-        public override WindowOperationMode ClickMode => WindowOperationMode.SimpleClick;
+        public override ClickMode ClickMode => ClickMode.SimpleClick;
 
         internal SimpleWindowClick(Window window, short slot, byte button) : base(window, slot, button)
         { }
@@ -40,18 +37,15 @@ namespace MineSharp.Windows.Clicks
             var clickedSlot = this.Window.GetSlot(this.Slot);
 
             if (selectedSlot.IsEmpty() && clickedSlot.IsEmpty())
-            {
                 return;
-            }
 
             if (selectedSlot.Item?.Info.Id == clickedSlot.Item?.Info.Id)
             {
                 // stack items, both items cannot be null
                 int left = selectedSlot.Item!.Count - clickedSlot.LeftToStack;
                 if (left < 0)
-                {
                     left = 0;
-                }
+                
                 clickedSlot.Item!.Count += (byte)(selectedSlot.Item!.Count - left);
                 selectedSlot.Item!.Count = (byte)left;
                 this.Window.SetSlot(clickedSlot);
@@ -60,22 +54,21 @@ namespace MineSharp.Windows.Clicks
             }
             
             //swap items
-            clickedSlot.SlotNumber = -1;
+            clickedSlot.SlotIndex = -1;
             this.Window.SetSlot(clickedSlot); // set selected slot
 
-            selectedSlot.SlotNumber = this.Slot;
+            selectedSlot.SlotIndex = this.Slot;
             this.Window.SetSlot(selectedSlot);
         }
 
         private void PerformRightClick()
         {
             if (this.Window.GetSelectedSlot().IsEmpty() && this.Window.GetSlot(this.Slot).IsEmpty())
-            {
                 return;
-            }
 
             if (this.Window.GetSelectedSlot().IsEmpty())
-            { // Pickup half stack
+            { 
+                // Pickup half stack
                 var oldSlot = this.Window.GetSlot(this.Slot);
                 var count = (byte)Math.Ceiling(oldSlot.Item!.Count / 2.0F);
                 var selectedSlot = this.Window.GetSelectedSlot();
@@ -89,7 +82,8 @@ namespace MineSharp.Windows.Clicks
             }
 
             if (this.Window.GetSlot(this.Slot).IsEmpty() || this.Window.GetSlot(this.Slot).CanStack(this.Window.GetSelectedSlot()))
-            { // Transfer one item from selectedSlot to slots[Slot]
+            { 
+                // Transfer one item from selectedSlot to slots[Slot]
                 var selectedSlot = this.Window.GetSelectedSlot();
                 selectedSlot.Item!.Count -= 1;
 
@@ -125,13 +119,12 @@ namespace MineSharp.Windows.Clicks
             }
 
             if (this.Button == 0)
-            { // Swap selected slot and clicked slot
+            { 
+                // Swap selected slot and clicked slot
                 this.PerformLeftClick();
                 return;
-            } else
-            {
-                this.PerformRightClick();
             }
+            
+            this.PerformRightClick();
         }
     }
-}

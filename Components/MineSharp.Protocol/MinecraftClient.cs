@@ -1,288 +1,374 @@
-﻿using MineSharp.Core.Logging;
-using MineSharp.Core.Types.Enums;
+﻿using MineSharp.Auth;
+using MineSharp.Core.Common;
 using MineSharp.Data;
-using MineSharp.Data.Protocol;
-using MineSharp.Data.Protocol.Handshaking.Serverbound;
-using MineSharp.Data.Protocol.Login.Serverbound;
-using MineSharp.Data.Protocol.Status.Serverbound;
-using MineSharp.MojangAuth;
-using MineSharp.Protocol.Handlers;
+using MineSharp.Protocol.Exceptions;
+using MineSharp.Protocol.Extensions;
+using MineSharp.Protocol.Packets;
+using MineSharp.Protocol.Packets.Clientbound.Status;
+using MineSharp.Protocol.Packets.Handlers;
+using MineSharp.Protocol.Packets.Mappings;
+using MineSharp.Protocol.Packets.Serverbound.Status;
+using Newtonsoft.Json;
+using NLog;
 using System.Diagnostics;
-using System.Net;
 using System.Net.Sockets;
+using System.Net;
 
-namespace MineSharp.Protocol
+namespace MineSharp.Protocol;
+
+public sealed class MinecraftClient : IDisposable
 {
-    public class MinecraftClient
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
+    public delegate Task AsyncPacketHandler(IPacket packet);
+    public delegate Task AsyncPacketHandler<in T>(T packet) where T : IPacket;
+
+    private readonly MinecraftData _data;
+    private readonly CancellationTokenSource _cancellation;
+    private readonly TcpClient _client;
+
+    private readonly PacketMapper _packetMapper;
+    private readonly Queue<PacketSendTask> _packetQueue;
+    private readonly IDictionary<Guid, IList<AsyncPacketHandler>> _packetHandlers;
+    private readonly IDictionary<Guid, TaskCompletionSource<object>> _packetWaiters;
+    private readonly TaskCompletionSource _gameJoinedTsc;
+
+    private IPacketHandler _internalPacketHandler;
+    private MinecraftStream? _stream;
+    private Task? _streamLoop;
+
+    public event Events.ClientPacketEvent? OnPacketReceived;
+    public event Events.ClientPacketEvent? OnPacketSent;
+    public event Events.ClientStringEvent? OnDisconnected;
+    
+    public Session Session { get; }
+    public IPAddress IP { get; }
+    public ushort Port { get; }
+    public GameState GameState { get; private set; }
+
+    public MinecraftClient(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
-        public delegate void ClientPacketEvent(MinecraftClient client, IPacketPayload packet);
+        this._data = data;
+        this._client = new TcpClient();
+        this._packetQueue = new Queue<PacketSendTask>();
+        this._cancellation = new CancellationTokenSource();
+        this._internalPacketHandler = new HandshakePacketHandler(this);
+        this._packetHandlers = new Dictionary<Guid, IList<AsyncPacketHandler>>();
+        this._packetWaiters = new Dictionary<Guid, TaskCompletionSource<object>>();
+        this._packetMapper = new PacketMapper( 
+            PacketPalette.GetPacketMappingFromVersion(this._data.Protocol.Version),
+            PacketFlow.Clientbound,
+            this._data);
+        this._gameJoinedTsc = new TaskCompletionSource();
 
-        public delegate void ClientStringEvent(MinecraftClient client, string message);
+        this.Session = session;
+        this.IP = IPHelper.ResolveHostname(hostnameOrIp);
+        this.Port = port;
+        this.GameState = GameState.HANDSHAKING;
+    }
 
-        private static readonly Logger Logger = Logger.GetLogger();
+    /// <summary>
+    /// Connects to the minecraft sever.
+    /// </summary>
+    /// <param name="nextState">The state to transition to during the handshaking process.</param>
+    /// <returns>A task that resolves once connected. Results in true when connected successfully, false otherwise.</returns>
+    public async Task<bool> Connect(GameState nextState)
+    {
+        Logger.Debug($"Connecting to {this.IP}:{this.Port}.");
 
-        private readonly TcpClient _client;
-        private readonly CancellationToken _cancellationToken;
-
-        private readonly CancellationTokenSource _cancellationTokenSource;
-
-        private readonly Queue<PacketSendTask> PacketQueue;
-        private MinecraftStream? _stream;
-        private Task? _streamLoopTask;
-
-        private IPacketHandler _packetHandler;
-
-        public MinecraftClient(string version, Session session, string host, int port)
+        try
         {
-            this.Version = version;
-            this.Session = session;
-            this.GameState = GameState.HANDSHAKING;
-            this.IPAddress = this.GetIpAddress(host);
-            this.Port = port;
-            this._cancellationTokenSource = new CancellationTokenSource();
-            this._cancellationToken = this._cancellationTokenSource.Token;
-            this.PacketQueue = new Queue<PacketSendTask>();
-
-            this._client = new TcpClient();
-            this._packetHandler = this.GetPacketHandler(this.GameState);
+            await this._client.ConnectAsync(this.IP, this.Port, this._cancellation.Token);
+            this._stream = new MinecraftStream(this._client.GetStream());
+            
+            this.StreamLoop();
+            Logger.Info("Connected, starting handshake...");
+            await HandshakeProtocol.PerformHandshake(this, nextState, this._data);
+            
+        } catch (SocketException ex)
+        {
+            Logger.Error(ex, "Error while connecting");
+            return false;
         }
 
-        public string Version { get; }
-        public GameState GameState { get; private set; }
-        public string IPAddress { get; }
-        public int Port { get; }
+        return true;
+    }
 
-        public Session Session { get; }
+    /// <summary>
+    /// Sends a Packet to the Minecraft Server
+    /// </summary>
+    /// <param name="packet">The packet to send.</param>
+    /// <param name="cancellation">Optional cancellation token.</param>
+    /// <returns>A task that resolves once the packet was actually sent.</returns>
+    public Task SendPacket(IPacket packet, CancellationToken? cancellation = null)
+    {
+        var sendingTask = new PacketSendTask(packet, cancellation, new TaskCompletionSource());
+        this._packetQueue.Enqueue(sendingTask);
 
-        /// <summary>
-        ///     Fires when the client Disconnected
-        /// </summary>
-        public event ClientStringEvent? Disconnected;
+        return sendingTask.Task.Task;
+    }
 
-        /// <summary>
-        ///     Fires when a packet has been received
-        /// </summary>
-        public event ClientPacketEvent? PacketReceived;
-
-        /// <summary>
-        ///     Fires when a packet has been sent
-        /// </summary>
-        public event ClientPacketEvent? PacketSent;
-
-        private string GetIpAddress(string host)
+    /// <summary>
+    ///  Disconnects the client from the server.
+    /// </summary>
+    /// <param name="reason">The reason the client disconnected. Only used for the <see cref="OnDisconnected"/> event.</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task Disconnect(string reason = "disconnect.quitting")
+    {
+        Console.WriteLine(reason);
+        if (!this._client.Connected)
         {
-            var type = Uri.CheckHostName(host);
-            return type switch {
-                UriHostNameType.Dns =>
-                    (Dns.GetHostEntry(host).AddressList.FirstOrDefault()
-                     ?? throw new Exception($"Could not find ip for hostname ('{host}')")).ToString(),
-
-                UriHostNameType.IPv4 => host,
-
-                _ => throw new Exception("Hostname not supported: " + host)
-            };
-
-        }
-
-        private IPacketHandler GetPacketHandler(GameState state)
-        {
-            return state switch {
-                GameState.HANDSHAKING => new HandshakePacketHandler(),
-                GameState.LOGIN => new LoginPacketHandler(),
-                GameState.PLAY => new PlayPacketHandler(),
-                GameState.STATUS => new StatusPacketHandler(),
-                _ => throw new UnreachableException()
-            };
-        }
-
-        /// <summary>
-        ///     Connects to the server and making the handshake
-        /// </summary>
-        /// <param name="nextState">
-        ///     In which <see cref="MineSharp.Protocol.GameState" /> the client and server should switch.
-        ///     Should be either <see cref="Protocol.GameState.LOGIN" /> or <see cref="Protocol.GameState.STATUS" />
-        /// </param>
-        /// <returns>A task that is completed as soon as the Handshake with the server is completed</returns>
-        public async Task<bool> Connect(GameState nextState)
-        {
-            Logger.Debug("Connecting...");
-            try
-            {
-                await this._client.ConnectAsync(this.IPAddress, this.Port, this._cancellationToken);
-
-                // Start Reading / Writing Loops
-                this._stream = new MinecraftStream(this._client.GetStream());
-                this._streamLoopTask = Task.Run(async () => await this.StreamLoop(), this._cancellationToken);
-
-                Logger.Info("Connected, starting handshake");
-                await this.MakeHandshake(nextState);
-
-                return true;
-            } catch (Exception ex)
-            {
-                Logger.Error("Could not connect: " + ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        ///     Closes the connection on the client side without
-        /// </summary>
-        /// <param name="reason"></param>
-        public void ForceDisconnect(string reason)
-        {
-            Logger.Debug("Forcing Disconnect: " + reason);
-            this._cancellationTokenSource.Cancel();
-            this._streamLoopTask?.Wait();
-            this._client.Close();
-            this.Disconnected?.Invoke(this, reason);
-        }
-
-        private async Task MakeHandshake(GameState nextState)
-        {
-            await this.SendPacket(
-                new PacketSetProtocol(
-                    MinecraftData.ProtocolVersion,
-                    this.IPAddress,
-                    (ushort)this.Port,
-                    (int)nextState));
-
-            await (nextState switch {
-                GameState.STATUS => this.SendPacket(new PacketPingStart()),
-                GameState.LOGIN => this.SendPacket(new PacketLoginStart(this.Session.Username)),
-                _ => throw new InvalidOperationException($"Next state '{nextState}' is not supported")
-            });
-        }
-        internal void SetEncryptionKey(byte[] key, Task enableEncryption)
-        {
-            Task.Run(async () =>
-            {
-                await enableEncryption;
-                this._stream!.EnableEncryption(key);
-            }, this._cancellationToken);
-        }
-
-        internal void SetCompressionThreshold(int compressionThreshold) => this._stream!.SetCompressionThreshold(compressionThreshold);
-        
-        internal void SetGameState(GameState newState)
-        {
-            this.GameState = newState;
-            this._packetHandler = this.GetPacketHandler(newState);
+            throw new InvalidOperationException("Client is not connected.");
         }
         
-        /// <summary>
-        ///     Sends a <see cref="Data.Protocol.Handshaking.Serverbound.Packet" /> to the Minecraft Server
-        /// </summary>
-        /// <param name="packet">Packet instance that will be sent</param>
-        /// <returns>A task that will be completed when the packet has been written into the tcp stream</returns>
-        public Task SendPacket(IPacketPayload packet, CancellationToken? cancellation = null)
+        this._cancellation.Cancel();
+        await this._streamLoop!;
+        
+        this._client.Close();
+        this.OnDisconnected?.Invoke(this, reason);
+    }
+
+    public void On<T>(AsyncPacketHandler<T> handler) where T : IPacket
+    {
+        var key = typeof(T).GUID;
+
+        if (!this._packetHandlers.TryGetValue(key, out var handlers))
         {
-            if (packet == null) throw new ArgumentNullException();
-            //Logger.Debug3("Queueing packet: " + packet.GetType().Name);
-
-            var sendTask = new PacketSendTask(cancellation, packet, new TaskCompletionSource());
-            this.PacketQueue.Enqueue(sendTask);
-
-            return sendTask.SendingTsc.Task;
+            handlers = new List<AsyncPacketHandler>();
+            this._packetHandlers.Add(key, handlers);
         }
 
-        private void HandleIncomingPacket(IPacketPayload packet)
+        handlers.Add(p => handler((T)p));
+    }
+
+    public Task<T> WaitForPacket<T>() where T : IPacket
+    {
+        var packetType = typeof(T).GUID;
+        if (!this._packetWaiters.TryGetValue(packetType, out var task))
         {
-            try
-            {
-                this.PacketReceived?.Invoke(this, packet);
-            } catch (Exception e)
-            {
-                Logger.Error("There occurred an error while handling the packet: \n" + e);
-            }
+            var tsc = new TaskCompletionSource<object>();
+            this._packetWaiters.Add(packetType, tsc);
+
+            return tsc.Task.ContinueWith(prev => (T)prev.Result);
         }
 
-        private async Task StreamLoop()
+        return task.Task.ContinueWith(prev => (T)prev.Result);
+    }
+    
+    public Task WaitForGame()
+        => this._gameJoinedTsc.Task;
+
+    internal void UpdateGameState(GameState next)
+    {
+        this.GameState = next;
+
+        this._internalPacketHandler = next switch {
+            GameState.HANDSHAKING => new HandshakePacketHandler(this),
+            GameState.LOGIN => new LoginPacketHandler(this, this._data),
+            GameState.STATUS => new StatusPacketHandler(this),
+            GameState.PLAY => new PlayPacketHandler(this, this._data),
+            _ => throw new UnreachableException()
+        };
+
+        if (next == GameState.PLAY)
+            this._gameJoinedTsc.TrySetResult();
+    }
+
+    internal void EnableEncryption(byte[] key) 
+        => this._stream!.EnableEncryption(key);
+    
+    internal void SetCompression(int threshold) 
+        => this._stream!.SetCompression(threshold);
+    
+    private void StreamLoop()
+    {
+        this._streamLoop = Task.Run(async () =>
         {
-            while (!this._cancellationToken.IsCancellationRequested)
+            while (!this._cancellation.Token.IsCancellationRequested)
             {
                 try
                 {
-                    while (this._client.Available > 0)
-                    {
-                        var packet = PacketFactory.BuildPacket(this._stream!.ReadPacket(), this.GameState);
-                        if (packet != null)
-                        {
-                            await this._packetHandler.HandleIncoming(packet, this).WaitAsync(this._cancellationToken);
-                            
-                            // don't await the custom handling of the packet
-                            Task.Run(() => this.HandleIncomingPacket(packet), this._cancellationToken);
-                        }
-                        
-                        if (this.GameState != GameState.PLAY)
-                        {
-                            await Task.Delay(1, this._cancellationToken);
-                        }
-                    }
-                    await Task.Delay(1, this._cancellationToken);
+                    await this.ReceivePackets();
+                    await this.SendPackets();
 
-                    // writing
-                    if (this.PacketQueue.Count == 0)
-                    {
-                        continue;
-                    }
-                    var packetTask = this.PacketQueue.Dequeue();
-                    if (packetTask.CancellationToken.HasValue && packetTask.CancellationToken.Value.IsCancellationRequested)
-                    {
-                        packetTask.SendingTsc.SetCanceled(packetTask.CancellationToken.Value);
-                        continue;
-                    }
-
-                    if (packetTask.Packet == null) // https://github.com/psu-de/MineSharp/issues/8#issue-1315635361
-                    {
-                        // for now just ignore the packet,
-                        // since i have no idea why this happens
-                        if (packetTask.SendingTsc != null)
-                            packetTask.SendingTsc.TrySetCanceled();
-                        continue;
-                    }
-
-                    var packetBuffer = PacketFactory.WritePacket(packetTask.Packet, this.GameState);
-                    this._stream!.WritePacket(packetBuffer);
-
-                    packetTask.SendingTsc.TrySetResult();
-                    await this._packetHandler.HandleOutgoing(packetTask.Packet, this).WaitAsync(this._cancellationToken);
-                    // don't await
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            this.PacketSent?.Invoke(this, packetTask.Packet);
-                        } catch (Exception e)
-                        {
-                            Logger.Error("Error while handling sent event of packet: \n" + e);
-                        }
-                    });
-                } catch (Exception e)
+                    await Task.Delay(1);
+                } catch (Exception ex)
                 {
-                    Logger.Error("Error in readLoop: " + e);
+                    Logger.Error(ex, "Encountered error in stream loop");
                 }
             }
-        }
-
-        private struct PacketSendTask
+        }, this._cancellation.Token);
+    }
+    
+    private async Task ReceivePackets()
+    {
+        while (this._client.Available > 0 && !this._cancellation.IsCancellationRequested)
         {
-            public CancellationToken? CancellationToken {
-                get;
-            }
-            public IPacketPayload Packet {
-                get;
-            }
-            public TaskCompletionSource SendingTsc {
-                get;
+            var buffer = this._stream!.ReadPacket();
+            var packetId = buffer.ReadVarInt();
+            var oldId = packetId;
+            var packetName = this._packetMapper.ConvertIncomingPacketId(ref packetId, this.GameState);
+            long size = buffer.ReadableBytes;
+
+            var factory = PacketPalette.GetFactory(packetId, this.GameState, PacketFlow.Clientbound);
+            try
+            {
+                var packet = factory?.Invoke(buffer, this._data, packetName);
+                if (packet != null)
+                    await this.HandleIncomingPacket(packet);
+
+                if (this.GameState != GameState.PLAY)
+                {
+                    await Task.Delay(1);
+                }
+            } catch (EndOfStreamException)
+            {
+                Console.WriteLine($"Error reading packet with id {oldId}. Assumed it was {packetName} with new id {packetId}. Packet was {size} bytes.");
             }
 
-            public PacketSendTask(CancellationToken? cancellationToken, IPacketPayload packet, TaskCompletionSource tsc)
-            {
-                this.CancellationToken = cancellationToken;
-                this.Packet = packet;
-                this.SendingTsc = tsc;
-            }
+            
         }
+    }
+
+    private async Task SendPackets()
+    {
+        if (this._packetQueue.Count == 0)
+            return;
+
+        var task = this._packetQueue.Dequeue();
+
+        if (task.Token is { IsCancellationRequested: true })
+            return;
+
+        this.DispatchPacket(task.Packet);
+
+        _ = Task.Run(() => task.Task.TrySetResult());
+        await this.HandleOutgoingPacket(task.Packet);
+    }
+    
+    private void DispatchPacket(IPacket packet)
+    {
+        var packetId = PacketPalette.GetId(packet); 
+        var packetName = this._packetMapper.ConvertOutgoingPacketId(ref packetId, this.GameState);
+        
+        var buffer = new PacketBuffer();
+        buffer.WriteVarInt(packetId);
+        packet.Write(buffer, this._data, packetName);
+
+        this._stream!.WritePacket(buffer);
+    }
+
+    private async Task HandleIncomingPacket(IPacket packet)
+    {
+        await this._internalPacketHandler.HandleIncoming(packet);
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var key = packet.GetType().GUID;
+                
+                if (this._packetWaiters.TryGetValue(key, out var tsc))
+                    tsc.TrySetResult(packet);
+                
+                if (this._packetHandlers.TryGetValue(key, out var handlers))
+                {
+                    foreach (var handler in handlers)
+                        await handler(packet);
+                }
+
+                this.OnPacketReceived?.Invoke(this, packet);
+            } catch (Exception e)
+            {
+                Logger.Warn($"Error in custom packet handling: {e}");
+            }
+        });
+    }
+
+    private async Task HandleOutgoingPacket(IPacket packet)
+    {
+        await this._internalPacketHandler.HandleOutgoing(packet);
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                this.OnPacketSent?.Invoke(this, packet);
+            } catch (Exception e)
+            {
+                Logger.Warn($"Error in custom packet handling: {e}");
+            }
+        });
+    }
+    
+    public void Dispose()
+    {
+        this._cancellation.Cancel();
+        this._streamLoop?.Wait();
+        
+        this._client.Dispose();
+        this._stream?.Close();
+    }
+
+    private record PacketSendTask(IPacket Packet, CancellationToken? Token, TaskCompletionSource Task);
+
+    /// <summary>
+    /// Requests the server status and closes the connection.
+    /// Works only when <see cref="GameState"/> is <see cref="Protocol.GameState.STATUS"/>.
+    /// </summary>
+    /// <returns></returns>
+    public static async Task<ServerStatusResponseBlob> RequestServerStatus(
+        string hostnameOrIp,
+        ushort port,
+        int timeout = 10000)
+    {
+        var latest = MinecraftData.FromVersion("1.19.3");
+        var client = new MinecraftClient(
+            latest,
+            Session.OfflineSession("RequestStatus"),
+            hostnameOrIp,
+            port);
+
+        if (!await client.Connect(GameState.STATUS))
+            throw new MineSharpHostException("Could not connect to server.");
+
+        var timeoutCancellation = new CancellationTokenSource();
+        var taskCompletionSource = new TaskCompletionSource<ServerStatusResponseBlob>();
+
+        client.On<StatusResponsePacket>(async packet =>
+        {
+            var json = packet.Response;
+            var response = JsonConvert.DeserializeObject<ServerStatusResponseBlob>(json)!;
+            taskCompletionSource.TrySetResult(response);
+
+            // the server closes the connection 
+            // after sending the StatusResponsePacket
+            await client.Disconnect();      
+            client.Dispose();
+        });
+
+        await client.SendPacket(new StatusRequestPacket());
+        await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()));
+        
+        timeoutCancellation.Token.Register(
+            () => taskCompletionSource.TrySetCanceled(timeoutCancellation.Token));
+        
+        timeoutCancellation.CancelAfter(timeout);
+
+        return await taskCompletionSource.Task;
+    }
+    
+    /// <summary>
+    /// Requests the server status and returns a <see cref="MinecraftData"/> object based on
+    /// the version the server returned.
+    /// </summary>
+    /// <param name="hostname"></param>
+    /// <param name="port"></param>
+    /// <returns></returns>
+    public static async Task<MinecraftData> AutodetectServerVersion(string hostname, ushort port)
+    {
+        return await RequestServerStatus(hostname, port)
+            .ContinueWith(
+                prev => MinecraftData.FromVersion(prev.Result.Version.Name));
     }
 }

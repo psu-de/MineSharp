@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>MineSharp.Commands</AssemblyName>
+        <RootNamespace>MineSharp.Commands</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
+      <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+    </ItemGroup>
+
+</Project>
