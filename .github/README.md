@@ -8,78 +8,82 @@
 
 **This Project is not finished and under development!**
 
-Create Minecraft bots with C#
-Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer)
+Create Minecraft bots with C#! \
+Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Currently, MineSharp is only supporting Minecraft version 1.18.1, I want to provide support for mutliple versions tho.
+Because of the rework, all versions from 1.18-1.19.4 are supported!
 
 # Current features
 
-- ✨Supported Version: Minecraft Java 1.18.1
+- ✨Supported Versions: 1.18.x - 1.19.x
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
 - 🌍 World tracking (query the world for blocks)
-- ⛏️ Mining
-- 👷‍♂️ Building
-- 🛠️ Crafting
+- ~~⛏️ Mining~~
+- ~~👷‍♂️ Building~~
+- ~~🛠️ Crafting~~
 - 🪟 High-Level window api (needs some more work)
-- ⚔️ Attacking entities
-- 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
-- 🔎 Simple Pathfinder
+- ~~⚔️ Attacking entities~~
+- ~~🏃 Movements (Walking, Sprinting, Jumping, Sneaking)~~
+- ~~🔎 Simple Pathfinder~~
 - 📝 Chat (Reading and Writing)
 
 # Roadmap
 
-- 🏊 Support more forms of movement (Swimming, climbing, maybe flying)
-- 🪄 Support more versions
+- All crossed things will be supported soon!
 
 # Projects Overview
 
-### [MineSharp.Core](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Core)
+### [MineSharp.Core](../MineSharp.Core)
 
-Contains core functionality like Logging, Basic Minecraft Types and (versioning)
+Contains core functionality and common Minecraft types like Entity, Block, etc...
 
-### [MineSharp.Data](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data)
-Contains generated sourcecode from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) as well as some extension methods.
+### [MineSharp.Data](../MineSharp.Data)
+MineSharp.Data is a wrapper for [minecraft-data](https://github.com/PrismarineJS/minecraft-data).
+Currently the following data is supported:
+ - Biomes
+ - Blocks
+ - Collisions
+ - Effects
+ - Enchantments
+ - Entities
+ - Features
+ - Items
+ - Language
+ - Protocol (Packet id's and names)
+ - Recipes
 
-### [MineSharp.Data.Generator](https://github.com/psu-de/MineSharp/tree/main/Data/MineSharp.Data.Generator)
-
-Transforms the json data from [minecraft-data](https://github.com/PrismarineJS/minecraft-data) into C# source code
-
-### [MineSharp.Bot](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Bot)
+### [MineSharp.Bot](../MineSharp.Bot)
 
 API to directly interact with a minecraft server. \
-See [MineSharp.Bot README](https://github.com/psu-de/MineSharp/tree/main/MineSharp.Bot)
+See [MineSharp.Bot README](../MineSharp.Bot)
 
 ## Components
 
-### [MineSharp.MojangAuth](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.MojangAuth)
+### [MineSharp.Auth](../Components/MineSharp.Auth)
 
-Used to connect to Mojang Auth servers and create a Minecraft Session
+Used to login to Microsoft, connect to Mojang Auth servers and create a Minecraft Session.
 
-### [MineSharp.Physics](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.Physics)
+### [MineSharp.Physics](../Components/MineSharp.Physics)
 
 Logic to simulate entity physics from minecraft\
 Thanks to [ConcreteMC/Alex](https://github.com/ConcreteMC/Alex)
 
-### [MineSharp.Protocol](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.Protocol)
+### [MineSharp.Protocol](../Components/MineSharp.Protocol)
 
 Implements the Minecraft Protocol. Contains logic to connect to a Minecraft server and read/write packets from/to it.
 
-### [MineSharp.World](https://github.com/psu-de/MineSharp/tree/main/Components/MineSharp.World)
+### [MineSharp.World](../Components/MineSharp.World)
 
-Basic functionality to represent a Minecraft World
+Basic functionality to represent a Minecraft World and interact with it.
 
-## Clients
+### Links
+Without the following resources this project would not be possible. Thanks to all people involved in those projects!
 
-### [MineSharp.ConsoleClient](https://github.com/psu-de/MineSharp/tree/main/Clients/MineSharp.ConsoleClient)
-
-Console Prompt for MineSharp.Bot\
-Used for testing\
-See [MineSharp.ConsoleClient README](https://github.com/psu-de/MineSharp/blob/main/Clients/MineSharp.ConsoleClient/README.md)
-for a list of commands
-
-![MineSharp.ConsoleClient](https://i.ibb.co/HgYtkN0/Bild-2022-07-20-141355981.png)
+- [wiki.vg](https://wiki.vg)
+- [Minecraft-Console-Client](https://github.com/MCCTeam/Minecraft-Console-Client)
+- [mineflayer](https://github.com/PrismarineJS/mineflayer)
+- [Alex](https://github.com/ConcreteMC/Alex)

@@ -11,7 +11,6 @@
       <ProjectReference Include="..\Components\MineSharp.Auth\MineSharp.Auth.csproj" />
       <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
       <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
-      <ProjectReference Include="..\Data\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj" />
       <ProjectReference Include="..\MineSharp.Core\MineSharp.Core.csproj" />
     </ItemGroup>

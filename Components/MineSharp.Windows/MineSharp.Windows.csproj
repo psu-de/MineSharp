@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
     </ItemGroup>
 
