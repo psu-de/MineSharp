@@ -333,6 +333,7 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
+Test/
 MineSharp.Bot.IntegrationTests/TestServer/*.jar
 MineSharp.Bot.IntegrationTests/TestServer/usercache.json
 MineSharp.Bot.IntegrationTests/TestServer/libraries

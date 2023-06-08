@@ -35,6 +35,40 @@ Because of the rework, all versions from 1.18-1.19.4 are supported!
 
 - All crossed things will be supported soon!
 
+# Example
+```csharp
+using MineSharp.Bot;
+using MineSharp.Bot.Plugins;
+
+MinecraftBot bot = await MinecraftBot.CreateBot(
+    "MineSharpBot",
+    "127.0.0.1",
+    25565,
+    offline: true);
+
+var chat = bot.GetPlugin<ChatPlugin>();
+
+if (!await bot.Connect()) 
+{
+    Console.WriteLine("Could not connect to server!");
+    Environment.Exit(1);
+}
+
+while (true)
+{
+    var input = Console.ReadLine();
+    if (input == "exit") 
+    {
+        await bot.Disconnect();
+        break;
+    }
+    
+    if (input != null)
+        await chat.SendChat(input);
+}
+
+```
+
 # Projects Overview
 
 ### [MineSharp.Core](../MineSharp.Core)
