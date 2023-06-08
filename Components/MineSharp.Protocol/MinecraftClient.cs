@@ -115,7 +115,6 @@ public sealed class MinecraftClient : IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
-        Console.WriteLine(reason);
         if (!this._client.Connected)
         {
             throw new InvalidOperationException("Client is not connected.");

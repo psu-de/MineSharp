@@ -30,13 +30,12 @@ public class ChatPlugin : Plugin
             _ => null
         };
         
-        this.Bot.Client.On<DeclareCommandsPacket>(this.HandleDeclareCommandsPacket);
         this.Bot.Client.On<CBChatMessagePacket>(this.HandleChatMessagePacket);
     }
 
     protected override async Task Init()
     {
-        if (this.Bot.Data.Features.Supports("useChatSessions"))
+        if (this.Bot.Data.Features.Supports("useChatSessions") && this.Bot.Session.OnlineSession)
         {
             await this.Bot.Client.SendPacket(
                 new PlayerSessionPacket(
@@ -46,6 +45,9 @@ public class ChatPlugin : Plugin
                     this.Bot.Client.Session.Certificate.PublicKeySignatureV2
                 ));
         }
+        
+        var packet = await this.Bot.Client.WaitForPacket<DeclareCommandsPacket>();
+        await HandleDeclareCommandsPacket(packet);
     }
 
     public Task SendChat(string message)

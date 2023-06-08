@@ -8,7 +8,7 @@ var bot = await MinecraftBot.CreateBot(
     "MineSharpBot",
     "127.0.0.1",
     25565,
-    offline: false);
+    offline: true);
 
 var worldPl = bot.GetPlugin<WorldPlugin>();
 var player = bot.GetPlugin<PlayerPlugin>();
@@ -22,7 +22,7 @@ player.OnDied += _ => Task.Run(async () =>
     await player.Respawn();
 });
 player.OnRespawned += _ => Console.WriteLine("Respawned!");
-// player.OnHealthChanged += _ => Console.WriteLine($"Health changed: {player.Health}.");
+player.OnHealthChanged += _ => Console.WriteLine($"Health changed: {player.Health}.");
 
 entities.OnEntitySpawned += (sender, entity) =>
 {

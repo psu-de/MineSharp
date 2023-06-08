@@ -112,7 +112,10 @@ public sealed class Chunk_1_18 : IChunk
     
     private int ToChunkSectionY(int y)
     {
-        return y % ChunkSection_1_18.SECTION_SIZE;
+        int v = y % ChunkSection_1_18.SECTION_SIZE;
+        if (v < 0)
+            v += ChunkSection_1_18.SECTION_SIZE;
+        return v;
     }
 
     private int FromChunkSectionY(int y, int sectionIndex)

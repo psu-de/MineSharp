@@ -1,0 +1,20 @@
+[
+  {
+    "uuid": "5cf81f40-ab83-3863-8383-16ffd1b21318",
+    "name": "PepegusMaximus",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "5019098e-7bd4-3659-a297-5eeb4d3bcb43",
+    "name": "MineSharpBot",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "0dc89169-d395-45d8-a8fd-d65fdb41bc1b",
+    "name": "MineSharpBot",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  }
+]

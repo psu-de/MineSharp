@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  mc:
+    container_name: integration_test_server
+    image: itzg/minecraft-server
+    ports:
+      - 25565:25565
+    environment:
+      ONLINE_MODE: "FALSE"
+      ENABLE_COMMAND_BLOCK: "TRUE"
+      VERSION: "1.19.4"
+      EULA: "TRUE"
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    volumes:
+      # attach a directory relative to the directory containing this compose file
+      - ./TestServer:/data

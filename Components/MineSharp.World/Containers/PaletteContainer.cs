@@ -20,7 +20,10 @@ internal abstract class PaletteContainer : IPaletteContainer
 
     public int GetAt(int index)
     {
-        if (index < 0 || index >= this.Capacity)
+        if (index < 0)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        if (index >= this.Capacity)
             throw new ArgumentOutOfRangeException(nameof(index));
 
         if (this.Palette is SingleValuePalette)

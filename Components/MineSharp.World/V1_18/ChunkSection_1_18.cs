@@ -108,10 +108,7 @@ internal class ChunkSection_1_18 : IChunkSection
         => GetBlockIndex(position.X, position.Y, position.Z);
 
     private int GetBlockIndex(int x, int y, int z)
-    {
-        y += -World_1_18.MIN_Y;
-        return y << 8 | z << 4 | x;
-    }
+        => y << 8 | z << 4 | x;
 
     internal static ChunkSection_1_18 FromStream(MinecraftData data, Stream buffer)
     {
