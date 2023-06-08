@@ -102,4 +102,16 @@ public class PlayerTests
         await Task.Delay(500);
         await bot2.Disconnect();
     }
+
+    public static Task TestWeatherRain(MinecraftBot bot, TaskCompletionSource<bool> source)
+    {
+        var player = bot.GetPlugin<PlayerPlugin>();
+
+        player.OnWeatherChanged += sender =>
+        {
+            source.TrySetResult(true);
+        };
+        
+        return Task.CompletedTask;
+    }
 }

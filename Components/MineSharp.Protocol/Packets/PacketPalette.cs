@@ -124,6 +124,7 @@ public static class PacketPalette
         RegisterPacket<SpawnPlayerPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<PlayerInfoUpdatePacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<PlayerInfoRemovePacket>(GameState.PLAY, PacketFlow.Clientbound);
+        RegisterPacket<GameEventPacket>(GameState.PLAY, PacketFlow.Clientbound);
 
         RegisterPacket<SBKeepAlivePacket>(GameState.PLAY, PacketFlow.Serverbound);
         RegisterPacket<SetPlayerPositionPacket>(GameState.PLAY, PacketFlow.Serverbound);
@@ -132,6 +133,7 @@ public static class PacketPalette
         RegisterPacket<SBChatMessagePacket>(GameState.PLAY, PacketFlow.Serverbound);
         RegisterPacket<PlayerSessionPacket>(GameState.PLAY, PacketFlow.Serverbound);
         RegisterPacket<ChatCommandPacket>(GameState.PLAY, PacketFlow.Serverbound);
+        RegisterPacket<ConfirmTeleportPacket>(GameState.PLAY, PacketFlow.Serverbound);
     }
 
     private static void RegisterMapper<TMapper>() where TMapper : IPacketMapping, new()

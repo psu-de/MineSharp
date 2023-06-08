@@ -2,6 +2,7 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Protocol.Packets.Serverbound.Play;
 using System.Collections.Concurrent;
 
 namespace MineSharp.Bot.Plugins;
@@ -22,6 +23,8 @@ public class EntityPlugin : Plugin
     public event Events.EntityEvent? OnEntityDespawned;
     public event Events.EntityEvent? OnEntityMoved;
 
+    private PlayerPlugin? _player;
+
     public EntityPlugin(MinecraftBot bot) : base(bot)
     {
         this.Entities = new ConcurrentDictionary<int, Entity>();
@@ -34,6 +37,13 @@ public class EntityPlugin : Plugin
         this.Bot.Client.On<UpdateEntityRotationPacket>(this.HandleUpdateEntityRotationPacket);
         this.Bot.Client.On<TeleportEntityPacket>(this.HandleTeleportEntityPacket);
         this.Bot.Client.On<UpdateAttributesPacket>(this.HandleUpdateAttributesPacket);
+        this.Bot.Client.On<SynchronizePlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
+    }
+
+    protected override async Task Init()
+    {
+        this._player = this.Bot.GetPlugin<PlayerPlugin>();
+        await this._player.WaitForInitialization();
     }
 
     private Task HandleSpawnEntityPacket(SpawnEntityPacket packet)
@@ -160,6 +170,39 @@ public class EntityPlugin : Plugin
         }
 
         return Task.CompletedTask;
+    }
+
+    private async Task HandleSynchronizePlayerPosition(SynchronizePlayerPositionPacket packet)
+    {
+        await this.WaitForInitialization();
+        if ((packet.Flags & 0x01) == 0x01) 
+            this._player!.Entity!.Position.X += packet.X;
+        else 
+            this._player!.Entity!.Position.X = packet.X;
+
+        if ((packet.Flags & 0x02) == 0x02) 
+            this._player!.Entity!.Position.Y += packet.Y;
+        else 
+            this._player!.Entity!.Position.Y = packet.Y;
+
+        if ((packet.Flags & 0x04) == 0x04) 
+            this._player!.Entity!.Position.Z += packet.Z;
+        else 
+            this._player!.Entity!.Position.Z = packet.Z;
+
+        if ((packet.Flags & 0x08) == 0x08) 
+            this._player!.Entity!.Pitch += packet.Pitch;
+        else 
+            this._player!.Entity!.Pitch = packet.Pitch;
+
+        if ((packet.Flags & 0x10) == 0x10) 
+            this._player!.Entity!.Yaw += packet.Yaw;
+        else 
+            this._player!.Entity!.Yaw = packet.Yaw;
+
+        // TODO: Dismount Vehicle
+
+        await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId!));
     }
 
     internal void AddEntity(Entity entity)

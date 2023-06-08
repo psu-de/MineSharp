@@ -33,12 +33,40 @@ public class PlayerPlugin : Plugin
     /// </summary>
     public IDictionary<UUID, MinecraftPlayer> Players;
 
+    /// <summary>
+    /// The Bots health (between 0.0 - 20.0)
+    /// </summary>
     public float? Health { get; private set; }
+    
+    /// <summary>
+    /// The Bots saturation level
+    /// </summary>
     public float? Saturation { get; private set; }
+    
+    /// <summary>
+    /// The Bots food level
+    /// </summary>
     public float? Food { get; private set; }
     
+    /// <summary>
+    /// The Name of the dimension the bot is currently in.
+    /// </summary>
     public string? Dimension { get; private set; }
+    
+    /// <summary>
+    /// Whether the bot is alive or dead.
+    /// </summary>
     public bool? IsAlive => this.Health > 0; 
+    
+    // TODO: Maybe move weather related stuff to world?
+    
+    /// <summary>
+    /// Whether it is raining
+    /// </summary>
+    public bool IsRaining { get; set; }
+    public float RainLevel { get; set; }
+    public float ThunderLevel { get; set; }
+    
 
     /// <summary>
     /// This event fires when the health, food or saturation has been updated.
@@ -70,6 +98,11 @@ public class PlayerPlugin : Plugin
     /// </summary>
     public event Events.PlayerEvent? OnPlayerLoaded;
 
+    /// <summary>
+    /// This event fires when the weather in the world changes.
+    /// </summary>
+    public event Events.BotEvent? OnWeatherChanged;
+
 
     private EntityPlugin? _entities;
 
@@ -83,8 +116,13 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<SpawnPlayerPacket>(this.HandleSpawnPlayer);
         this.Bot.Client.On<PlayerInfoUpdatePacket>(this.HandlePlayerInfoUpdate);
         this.Bot.Client.On<PlayerInfoRemovePacket>(this.HandlePlayerInfoRemove);
+        this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
     }
 
+    /// <summary>
+    /// Respawns the bot when its dead.
+    /// </summary>
+    /// <returns></returns>
     public Task Respawn()
         => this.Bot.Client.SendPacket(new ClientCommandPacket(0));
 
@@ -131,8 +169,6 @@ public class PlayerPlugin : Plugin
                 positionPacket.Yaw,
                 positionPacket.Pitch,
                 this.Entity.IsOnGround));
-        
-        await this._entities.WaitForInitialization();
     }
 
     private Task HandleSetHealthPacket(SetHealthPacket packet)
@@ -280,6 +316,39 @@ public class PlayerPlugin : Plugin
                 continue;
             
             this.OnPlayerLeft?.Invoke(this.Bot, player);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleGameEvent(GameEventPacket packet)
+    {
+        switch (packet.Event)
+        {
+            case 1: // End Raining
+                this.IsRaining = false;
+                this.OnWeatherChanged?.Invoke(this.Bot);
+                break;
+            
+            case 2: // Begin Raining
+                this.IsRaining = true;
+                this.OnWeatherChanged?.Invoke(this.Bot);
+                break;
+            
+            case 7: // Rain Level Changed
+                this.RainLevel = packet.Value;
+                this.OnWeatherChanged?.Invoke(this.Bot);
+                break;
+            
+            case 8: // Thunder Level Changed
+                this.ThunderLevel = packet.Value;
+                this.OnWeatherChanged?.Invoke(this.Bot);
+                break;
+            
+            case 3: // GameMode Change
+                var gameMode = (GameMode)packet.Value;
+                this.Player!.GameMode = gameMode;
+                break;          
         }
 
         return Task.CompletedTask;
