@@ -28,6 +28,7 @@ Currently, not all packets are implemented yet. Here's a list what packets are i
 | Id   | Packet name                           | Versions      | Write           | Read |
 |------|---------------------------------------|---------------|-----------------|------|
 | 0x01 | SpawnEntityPacket                     | 1.18.x-1.19.x | **No**          | Yes  |
+| 0x04 | SpawnPlayerPacket                     | 1.18.x-1.19.x | Yes             | Yes  |
 | 0x0A | BlockUpdatePacket                     | 1.18.x-1.19.x | Yes             | Yes  |
 | 0x1E | UnloadChunkPacket                     | 1.18.x-1.19.x | Yes             | Yes  |
 | 0x23 | KeepAlivePacket                       | 1.18.x-1.19.x | Yes             | Yes  |

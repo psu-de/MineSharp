@@ -18,6 +18,8 @@ namespace MineSharp.Protocol;
 
 public sealed class MinecraftClient : IDisposable
 {
+    public const string LATEST_SUPPORTED_VERSION = "1.19.4";
+    
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     public delegate Task AsyncPacketHandler(IPacket packet);
@@ -321,7 +323,7 @@ public sealed class MinecraftClient : IDisposable
         ushort port,
         int timeout = 10000)
     {
-        var latest = MinecraftData.FromVersion("1.19.3");
+        var latest = MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
         var client = new MinecraftClient(
             latest,
             Session.OfflineSession("RequestStatus"),

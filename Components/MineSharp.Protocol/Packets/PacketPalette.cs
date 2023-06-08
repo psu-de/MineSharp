@@ -24,7 +24,7 @@ public static class PacketPalette
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
-    public static readonly MinecraftData ImplementedProtocol = MinecraftData.FromVersion("1.19.4");
+    public static readonly MinecraftData ImplementedProtocol = MinecraftData.FromVersion(MinecraftClient.LATEST_SUPPORTED_VERSION);
     
     private static readonly IDictionary<int, PacketFactory> PacketFactories;
     private static readonly IDictionary<Guid, int> PacketToId;
@@ -121,6 +121,8 @@ public static class PacketPalette
         RegisterPacket<UpdateAttributesPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<DeclareCommandsPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<CBChatMessagePacket>(GameState.PLAY, PacketFlow.Clientbound);
+        RegisterPacket<SpawnPlayerPacket>(GameState.PLAY, PacketFlow.Clientbound);
+        RegisterPacket<PlayerInfoUpdatePacket>(GameState.PLAY, PacketFlow.Clientbound);
 
         RegisterPacket<SBKeepAlivePacket>(GameState.PLAY, PacketFlow.Serverbound);
         RegisterPacket<SetPlayerPositionPacket>(GameState.PLAY, PacketFlow.Serverbound);

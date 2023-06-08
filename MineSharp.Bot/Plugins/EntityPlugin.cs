@@ -17,8 +17,7 @@ public class EntityPlugin : Plugin
     /// All Entities loaded by the client.
     /// </summary>
     public readonly IDictionary<int, Entity> Entities;
-    
-    
+
     public event Events.EntityEvent? OnEntitySpawned;
     public event Events.EntityEvent? OnEntityDespawned;
     public event Events.EntityEvent? OnEntityMoved;
@@ -49,7 +48,7 @@ public class EntityPlugin : Plugin
             true,
             new Dictionary<int, Effect?>());
 
-        this.Entities.TryAdd(packet.EntityId!, newEntity);
+        this.Entities.TryAdd(packet.EntityId, newEntity);
         this.OnEntitySpawned?.Invoke(this.Bot, newEntity);
         
         return Task.CompletedTask;
@@ -161,6 +160,11 @@ public class EntityPlugin : Plugin
         }
 
         return Task.CompletedTask;
+    }
+
+    internal void AddEntity(Entity entity)
+    {
+        this.Entities.TryAdd(entity.ServerId, entity);
     }
 
     private double ConvertToVelocity(double value)

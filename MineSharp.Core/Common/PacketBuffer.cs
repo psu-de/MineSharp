@@ -281,6 +281,49 @@ public class PacketBuffer
         return new BlockEntity(x, y, z, type, nbt);
     }
 
+    public T? ReadOptional<T>() where T : class
+    {
+        var available = this.ReadBool();
+        if (!available)
+            return null;
+
+        return Read<T>();
+    }
+    
+    public T? ReadOptional<T>(bool _ = false) where T : struct
+    {
+        var available = this.ReadBool();
+        if (!available)
+            return null;
+
+        return Read<T>();
+    }
+
+
+    public T Read<T>()
+    {
+        var type = Type.GetTypeCode(typeof(T));
+        
+        object value = type switch {
+            TypeCode.Boolean => this.ReadBool(),
+            TypeCode.SByte => this.ReadSByte(),
+            TypeCode.Byte => this.ReadByte(),
+            TypeCode.Int16 => this.ReadShort(),
+            TypeCode.Int32 => this.ReadInt(),
+            TypeCode.Int64 => this.ReadLong(),
+            
+            TypeCode.UInt16 => this.ReadUShort(),
+            TypeCode.UInt32 => this.ReadUInt(),
+            TypeCode.UInt64 => this.ReadULong(),
+            
+            TypeCode.String => this.ReadString(),
+            TypeCode.Single => this.ReadFloat(),
+            TypeCode.Double => this.ReadBool(),
+            _ => throw new NotSupportedException()
+        };
+        return (T)value;
+    }
+    
     #endregion
 
 
