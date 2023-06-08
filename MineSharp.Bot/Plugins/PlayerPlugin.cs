@@ -5,6 +5,7 @@ using MineSharp.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
+using System.Collections.Concurrent;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -74,13 +75,14 @@ public class PlayerPlugin : Plugin
 
     public PlayerPlugin(MinecraftBot bot) : base(bot)
     {
-        this.Players = new Dictionary<UUID, MinecraftPlayer>();
+        this.Players = new ConcurrentDictionary<UUID, MinecraftPlayer>();
 
         this.Bot.Client.On<SetHealthPacket>(this.HandleSetHealthPacket);
         this.Bot.Client.On<CombatDeathPacket>(this.HandleCombatDeathPacket);
         this.Bot.Client.On<RespawnPacket>(this.HandleRespawnPacket);
         this.Bot.Client.On<SpawnPlayerPacket>(this.HandleSpawnPlayer);
         this.Bot.Client.On<PlayerInfoUpdatePacket>(this.HandlePlayerInfoUpdate);
+        this.Bot.Client.On<PlayerInfoRemovePacket>(this.HandlePlayerInfoRemove);
     }
 
     public Task Respawn()
@@ -265,6 +267,19 @@ public class PlayerPlugin : Plugin
                         break;
                 }
             }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePlayerInfoRemove(PlayerInfoRemovePacket packet)
+    {
+        foreach (var uuid in packet.Players)
+        {
+            if (!this.Players.Remove(uuid, out var player))
+                continue;
+            
+            this.OnPlayerLeft?.Invoke(this.Bot, player);
         }
 
         return Task.CompletedTask;

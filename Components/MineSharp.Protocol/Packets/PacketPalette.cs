@@ -123,6 +123,7 @@ public static class PacketPalette
         RegisterPacket<CBChatMessagePacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<SpawnPlayerPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<PlayerInfoUpdatePacket>(GameState.PLAY, PacketFlow.Clientbound);
+        RegisterPacket<PlayerInfoRemovePacket>(GameState.PLAY, PacketFlow.Clientbound);
 
         RegisterPacket<SBKeepAlivePacket>(GameState.PLAY, PacketFlow.Serverbound);
         RegisterPacket<SetPlayerPositionPacket>(GameState.PLAY, PacketFlow.Serverbound);

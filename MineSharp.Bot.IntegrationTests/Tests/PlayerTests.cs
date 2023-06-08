@@ -46,4 +46,60 @@ public class PlayerTests
 
         return Task.CompletedTask;
     }
+
+    public static async Task TestPlayerJoin(MinecraftBot bot, TaskCompletionSource<bool> source)
+    {
+        const string secondBotName = "MineSharpBot2";
+        var player = bot.GetPlugin<PlayerPlugin>();
+
+        player.OnPlayerJoined += (sender, player) =>
+        {
+            if (player.Username == secondBotName)
+            {
+                source.TrySetResult(true);
+            }
+        };
+
+        var bot2 = await MinecraftBot.CreateBot(
+            secondBotName,
+            "localhost",
+            25565,
+            offline: true);
+
+        if (!await bot2.Connect())
+        {
+            source.TrySetResult(false);
+        }
+
+        await Task.Delay(1000);
+        await bot2.Disconnect();
+    }
+    
+    public static async Task TestPlayerLeave(MinecraftBot bot, TaskCompletionSource<bool> source)
+    {
+        const string secondBotName = "MineSharpBot2";
+        var player = bot.GetPlugin<PlayerPlugin>();
+
+        player.OnPlayerLeft += (sender, player) =>
+        {
+            if (player.Username == secondBotName)
+            {
+                source.TrySetResult(true);
+            }
+        };
+
+        var bot2 = await MinecraftBot.CreateBot(
+            secondBotName,
+            "localhost",
+            25565,
+            offline: true);
+
+        if (!await bot2.Connect())
+        {
+            source.TrySetResult(false);
+        }
+
+        await Task.Delay(500);
+        await bot2.Disconnect();
+    }
 }
