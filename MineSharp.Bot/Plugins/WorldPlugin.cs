@@ -28,6 +28,30 @@ public class WorldPlugin : Plugin
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Waits until all chunks in (radius * radius) are loaded around the bot.
+    /// </summary>
+    /// <param name="radius"></param>
+    public async Task WaitForChunks(int radius = 5)
+    {
+        if (radius < 0)
+            throw new ArgumentException($"{nameof(radius)} must be positive.");
+        
+        var player = this.Bot.GetPlugin<PlayerPlugin>();
+        await player.WaitForInitialization();
+
+        var chunkCoords = this.World!.ToChunkCoordinates(player.Entity!.Position);
+        for (int x = chunkCoords.X - radius; x <= chunkCoords.X + radius; x++)
+        {
+            for (int z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
+            {
+                var coords = new ChunkCoordinates(x, z);
+                while (!this.World.IsChunkLoaded(coords))
+                    await Task.Delay(10);
+            }
+        }
+    }
+
     private Task HandleChunkDataAndLightUpdatePacket(ChunkDataAndUpdateLightPacket packet)
     {
         if (!this.IsEnabled)

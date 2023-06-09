@@ -98,7 +98,7 @@ public class World_1_18 : IWorld
             throw new ChunkNotLoadedException($"Block at {position} is not loaded.");
         }
 
-        var relative = WorldToChunkPosition(position);
+        var relative = this.ToChunkPosition(position);
         var block = chunk.GetBlockAt(relative);
         block.Position = position;
         return block;
@@ -111,7 +111,7 @@ public class World_1_18 : IWorld
             throw new ChunkNotLoadedException($"Block at {block.Position} is not loaded.");
         }
         
-        var relative = WorldToChunkPosition(block.Position);
+        var relative = this.ToChunkPosition(block.Position);
         chunk.SetBlock(new Block(block.Info, block.State, relative));
         this.OnBlockUpdated?.Invoke(this, block);
     }
@@ -123,7 +123,7 @@ public class World_1_18 : IWorld
             throw new ChunkNotLoadedException($"Position {position} is not loaded.");
         }
 
-        var relative = WorldToChunkPosition(position);
+        var relative = this.ToChunkPosition(position);
         return chunk.GetBiomeAt(relative);
     }
     
@@ -134,7 +134,7 @@ public class World_1_18 : IWorld
             throw new ChunkNotLoadedException($"Position {position} is not loaded.");
         }
         
-        var relative = WorldToChunkPosition(position);
+        var relative = this.ToChunkPosition(position);
         chunk.SetBiomeAt(relative, biome);
     }
 
@@ -145,7 +145,7 @@ public class World_1_18 : IWorld
         {
             foreach (var block in chunk.FindBlocks(blockId, maxCount - found))
             {
-                block.Position = ChunkToWorldPosition(block.Position, chunk.Coordinates);
+                block.Position = this.ToWorldPosition(chunk.Coordinates, block.Position);
                 yield return block;
 
                 found++;
@@ -157,7 +157,7 @@ public class World_1_18 : IWorld
         }
     }
 
-    private ChunkCoordinates ToChunkCoordinates(Position position)
+    public ChunkCoordinates ToChunkCoordinates(Position position)
     {
         int chunkX = position.X / ChunkSection_1_18.SECTION_SIZE;
         int chunkZ = position.Z / ChunkSection_1_18.SECTION_SIZE;
@@ -165,7 +165,7 @@ public class World_1_18 : IWorld
         return new ChunkCoordinates(chunkX, chunkZ);
     }
 
-    private Position WorldToChunkPosition(Position position)
+    private Position ToChunkPosition(Position position)
     {
         return new Position(
             Mod(position.X, ChunkSection_1_18.SECTION_SIZE),
@@ -173,7 +173,7 @@ public class World_1_18 : IWorld
             Mod(position.Z, ChunkSection_1_18.SECTION_SIZE));
     }
 
-    private Position ChunkToWorldPosition(Position position, ChunkCoordinates coordinates)
+    public Position ToWorldPosition(ChunkCoordinates coordinates, Position position)
     {
         int dx = coordinates.X * ChunkSection_1_18.SECTION_SIZE;
         int dz = coordinates.Z * ChunkSection_1_18.SECTION_SIZE;
