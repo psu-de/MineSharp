@@ -1,8 +1,9 @@
 ﻿using MineSharp.Bot.IntegrationTests;
 using MineSharp.Bot.IntegrationTests.Tests;
 
-// await IntegrationTest.RunTest("testWeatherRain", PlayerTests.TestWeatherRain);
-// Environment.Exit(0);
+await IntegrationTest.RunTest("testWeatherChange", PlayerTests.TestWeatherChange);
+
+Console.ReadKey();
 
 await IntegrationTest.RunTest("testHealth", PlayerTests.TestHealth);
 await IntegrationTest.RunTest("testDeath", PlayerTests.TestDeath);

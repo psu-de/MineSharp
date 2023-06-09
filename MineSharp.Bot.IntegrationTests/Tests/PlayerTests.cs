@@ -103,15 +103,17 @@ public class PlayerTests
         await bot2.Disconnect();
     }
 
-    public static Task TestWeatherRain(MinecraftBot bot, TaskCompletionSource<bool> source)
+    public static async Task TestWeatherChange(MinecraftBot bot, TaskCompletionSource<bool> source)
     {
         var player = bot.GetPlugin<PlayerPlugin>();
-
+        await Task.Delay(10);
+        
         player.OnWeatherChanged += sender =>
         {
-            source.TrySetResult(true);
+            if (Math.Abs(player.RainLevel - 1) < 0.02f)
+            {
+                source.TrySetResult(true);
+            }
         };
-        
-        return Task.CompletedTask;
     }
 }

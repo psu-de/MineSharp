@@ -337,6 +337,7 @@ Test/
 MineSharp.Bot.IntegrationTests/TestServer/*.jar
 MineSharp.Bot.IntegrationTests/TestServer/usercache.json
 MineSharp.Bot.IntegrationTests/TestServer/libraries
+MineSharp.Bot.IntegrationTests/TestServer/logs
 MineSharp.Bot.IntegrationTests/TestServer/world/stats
 MineSharp.Bot.IntegrationTests/TestServer/world/advancements
 MineSharp.Bot.IntegrationTests/TestServer/world/playerdata
@@ -346,3 +347,4 @@ MineSharp.Bot.IntegrationTests/TestServer/eula.txt
 MineSharp.Bot.IntegrationTests/TestServer/banned-ips.json
 MineSharp.Bot.IntegrationTests/TestServer/banned-players.json
 MineSharp.Bot.IntegrationTests/TestServer/whitelist.json
+MineSharp.Bot.IntegrationTests/TestServer/server.properties
