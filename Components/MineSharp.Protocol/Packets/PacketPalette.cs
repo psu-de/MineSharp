@@ -106,6 +106,7 @@ public static class PacketPalette
         RegisterPacket<ChunkDataAndUpdateLightPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<UnloadChunkPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<BlockUpdatePacket>(GameState.PLAY, PacketFlow.Clientbound);
+        RegisterPacket<MultiBlockUpdatePacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<LoginPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<SynchronizePlayerPositionPacket>(GameState.PLAY, PacketFlow.Clientbound);
         RegisterPacket<SetHealthPacket>(GameState.PLAY, PacketFlow.Clientbound);

@@ -110,19 +110,14 @@ public class WorldPlugin : Plugin
         var coords = new ChunkCoordinates((int)sectionX, (int)sectionZ);
         var chunk = this.World!.GetChunkAt(coords);
 
-        sectionY += Math.Abs(this.World!.MinY / chunk.Size);
-        
         foreach (var l in packet.Blocks)
         {
             var blockZ = (int)(l >> 4 & 0x0F);
             var blockX = (int)(l >> 8 & 0x0F);
-            var blockY = (int)(l & 0x0F) + (int)sectionY * chunk.Size;
+            var blockY = (int)(l & 0x0F) + (int)sectionY * IChunk.SIZE;
             var stateId = (int)(l >> 12);
 
-            var blockInfo = this.Bot.Data.Blocks.GetByState(stateId);
-            var block = new Block(blockInfo, stateId, new Position(blockX, blockY, blockZ));
-
-            chunk.SetBlock(block);
+            chunk.SetBlockAt(stateId, new Position(blockX, blockY, blockZ));
         }
 
         return Task.CompletedTask;

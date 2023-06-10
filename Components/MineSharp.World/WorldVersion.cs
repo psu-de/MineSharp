@@ -13,7 +13,7 @@ public static class WorldVersion
     {
         if (version.Version >= Major_1_18)
         {
-            return new World_1_18();
+            return new World_1_18(version);
         }
 
         throw new NotSupportedException($"MineSharp.World does currently not support minecraft version {version.Version}.");

@@ -17,7 +17,6 @@ internal class ChunkSection_1_18 : IChunkSection
     private readonly BlockContainer _blockContainer;
 
     public short SolidBlockCount { get; set; }
-    public int Size => SECTION_SIZE;
 
     public ChunkSection_1_18(MinecraftData data, short blockCount, BlockContainer blocks, BiomeContainer biomes)
     {
@@ -27,22 +26,20 @@ internal class ChunkSection_1_18 : IChunkSection
         this._biomeContainer = biomes;
     }
 
-    public Block GetBlockAt(Position position)
+    public int GetBlockAt(Position position)
     {
-        var state = this._blockContainer.GetAt(this.GetBlockIndex(position));
-        var blockInfo = this._data.Blocks.GetByState(state);
-        var block = new Block(blockInfo, state, position);
-        return block;
+        return this._blockContainer.GetAt(this.GetBlockIndex(position));
     }
     
-    public void SetBlock(Block block)
+    public void SetBlockAt(int state, Position position)
     {
-        var index = GetBlockIndex(block.Position);
+        var index = GetBlockIndex(position);
         var old = this._data.Blocks.GetByState( 
             this._blockContainer.GetAt(index));
 
         bool wasSolid = this._data.Blocks.IsSolid(old.Id);
-        bool isSolid = this._data.Blocks.IsSolid(block.Info.Id);
+        bool isSolid = this._data.Blocks.IsSolid(
+            this._data.Blocks.GetByState(state).Id);
 
         if (wasSolid != isSolid)
         {
@@ -52,7 +49,7 @@ internal class ChunkSection_1_18 : IChunkSection
                 this.SolidBlockCount--;
         }
 
-        this._blockContainer.SetAt(index, block.State);
+        this._blockContainer.SetAt(index, state);
     }
 
     public Biome GetBiomeAt(Position position)

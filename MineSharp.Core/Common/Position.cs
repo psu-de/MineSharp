@@ -24,6 +24,16 @@ public class Position
         this.Z = z;
     }
 
+    public static bool operator ==(Position a, Position b)
+    {
+        return a.GetHashCode() == b.GetHashCode();
+    }
+    
+    public static bool operator !=(Position a, Position b)
+    {
+        return a.GetHashCode() != b.GetHashCode();
+    }
+
     public ulong ToULong() => ((ulong)this.X & 0x3FFFFFF) << 38 | ((ulong)this.Z & 0x3FFFFFF) << 12 | (ulong)this.Y & 0xFFF;
 
     public override string ToString() => $"({this.X} / {this.Y} / {this.Z})";

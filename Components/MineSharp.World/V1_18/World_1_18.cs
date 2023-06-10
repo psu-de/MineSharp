@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Exceptions;
 using NLog;
@@ -24,10 +25,12 @@ public class World_1_18 : IWorld
     public event Events.ChunkEvent? OnChunkUnloaded;
     public event Events.BlockEvent? OnBlockUpdated;
 
+    private readonly MinecraftData _data;
     private readonly IDictionary<ChunkCoordinates, IChunk> _chunks;
 
-    public World_1_18()
+    public World_1_18(MinecraftData data)
     {
+        this._data = data;
         this._chunks = new ConcurrentDictionary<ChunkCoordinates, IChunk>();
     }
 
@@ -35,6 +38,9 @@ public class World_1_18 : IWorld
     {
         if (this.IsChunkLoaded(chunk.Coordinates))
         {
+            var old = this._chunks[chunk.Coordinates];
+            old.OnBlockUpdated -= this.OnChunkBlockUpdate;
+            
             //Logger.Debug($"Updating chunk {chunk.Coordinates}.");
             this._chunks[chunk.Coordinates] = chunk;
         }
@@ -42,7 +48,8 @@ public class World_1_18 : IWorld
         {
             this._chunks.Add(chunk.Coordinates, chunk);
         }
-        
+
+        chunk.OnBlockUpdated += this.OnChunkBlockUpdate;
         OnChunkLoaded?.Invoke(this, chunk);
     }
 
@@ -99,8 +106,11 @@ public class World_1_18 : IWorld
         }
 
         var relative = this.ToChunkPosition(position);
-        var block = chunk.GetBlockAt(relative);
-        block.Position = position;
+        var blockState = chunk.GetBlockAt(relative);
+        var block = new Block(
+            this._data.Blocks.GetByState(blockState),
+            blockState,
+            position);
         return block;
     }
     
@@ -112,8 +122,7 @@ public class World_1_18 : IWorld
         }
         
         var relative = this.ToChunkPosition(block.Position);
-        chunk.SetBlock(new Block(block.Info, block.State, relative));
-        this.OnBlockUpdated?.Invoke(this, block);
+        chunk.SetBlockAt(block.State, relative);
     }
 
     public Biome GetBiomeAt(Position position)
@@ -159,8 +168,8 @@ public class World_1_18 : IWorld
 
     public ChunkCoordinates ToChunkCoordinates(Position position)
     {
-        int chunkX = position.X / ChunkSection_1_18.SECTION_SIZE;
-        int chunkZ = position.Z / ChunkSection_1_18.SECTION_SIZE;
+        int chunkX = (int)Math.Floor((float)position.X / ChunkSection_1_18.SECTION_SIZE);
+        int chunkZ = (int)Math.Floor((float)position.Z / ChunkSection_1_18.SECTION_SIZE);
 
         return new ChunkCoordinates(chunkX, chunkZ);
     }
@@ -188,5 +197,12 @@ public class World_1_18 : IWorld
             v += m;
         
         return v;
+    }
+
+    private void OnChunkBlockUpdate(IChunk chunk, int state, Position position)
+    {
+        var worldPosition = this.ToWorldPosition(chunk.Coordinates, position);
+        this.OnBlockUpdated?.Invoke(this, new Block(
+            this._data.Blocks.GetByState(state), state, worldPosition));
     }
 }

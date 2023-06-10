@@ -14,6 +14,8 @@ public sealed class Chunk_1_18 : IChunk
     
     public ChunkCoordinates Coordinates { get; }
 
+    public event Events.ChunkBlockEvent? OnBlockUpdated;
+
     private readonly MinecraftData _data;
     private readonly IChunkSection[] _sections;
     private readonly Dictionary<Position, BlockEntity> _blockEntities;
@@ -46,20 +48,20 @@ public sealed class Chunk_1_18 : IChunk
         return entity;
     }
 
-    public Block GetBlockAt(Position position)
+    public int GetBlockAt(Position position)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         var block = section.GetBlockAt(new Position(position.X, y, position.Z));
-        block.Position = position;
-        
+
         return block;
     }
     
-    public void SetBlock(Block block)
+    public void SetBlockAt(int state, Position position)
     {
-        (var y, var section) = GetChunkSectionAndNewYFromPosition(block.Position);
-        block.Position = new Position(block.Position.X, y, block.Position.Z);
-        section.SetBlock(block);
+        (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
+        section.SetBlockAt(state, new Position(position.X, y, position.Z));
+        
+        this.OnBlockUpdated?.Invoke(this, state, position);
     }
 
     public Biome GetBiomeAt(Position position)

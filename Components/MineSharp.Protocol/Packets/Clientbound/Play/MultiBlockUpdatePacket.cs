@@ -29,7 +29,7 @@ public class MultiBlockUpdatePacket : IPacket
     {
         var chunkSection = buffer.ReadLong();
         var suppressLightUpdates = buffer.ReadBool();
-        var blocks = buffer.ReadVarIntArray(buf => buf.ReadLong());
+        var blocks = buffer.ReadVarIntArray(buf => buf.ReadVarLong());
         return new MultiBlockUpdatePacket(chunkSection, suppressLightUpdates, blocks);
     }
 }

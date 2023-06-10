@@ -6,15 +6,14 @@ namespace MineSharp.World.Chunks;
 
 public interface IChunk
 {
+    public const int SIZE = 16;
+    
+    public event Events.ChunkBlockEvent OnBlockUpdated;
+    
     /// <summary>
     /// The XZ Coordinates of this chunk.
     /// </summary>
     public ChunkCoordinates Coordinates { get; }
-    
-    /// <summary>
-    /// The size of this chunk.
-    /// </summary>
-    public int Size { get; }
 
     /// <summary>
     /// Loads the chunk data from raw bytes.
@@ -34,23 +33,24 @@ public interface IChunk
     public BlockEntity? GetBlockEntity(Position position);
 
     /// <summary>
-    /// Returns the block at the given position.
+    /// Returns the block state at the given position.
     /// 
     /// Position is considered to be a relative position in the chunk,
     /// not absolute in the world.
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public Block GetBlockAt(Position position);
+    public int GetBlockAt(Position position);
     
+
     /// <summary>
-    /// Sets the block at the given position.
+    /// Sets the block state at the given position.
     ///
-    /// It is expected that block.Position is a relative position in the chunk,
-    /// not absolute in the world.
+    /// Position is expected to be relative to the chunk.
     /// </summary>
-    /// <param name="block"></param>
-    public void SetBlock(Block block);
+    /// <param name="state"></param>
+    /// <param name="position"></param>
+    public void SetBlockAt(int state, Position position);
 
     /// <summary>
     /// Returns the biome of the given position.

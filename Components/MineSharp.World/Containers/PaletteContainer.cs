@@ -38,7 +38,9 @@ internal abstract class PaletteContainer : IPaletteContainer
         if (index < 0 || index >= this.Capacity)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        this.Palette.Set(index, state, this);
+        var newPalette = this.Palette.Set(index, state, this);
+        if (newPalette != null)
+            this.Palette = newPalette;
     }
 
     protected static (IPalette palette, IntBitArray data) FromStream(Stream buffer, byte maxBitsPerEntry)
