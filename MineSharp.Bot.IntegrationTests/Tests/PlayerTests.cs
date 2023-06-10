@@ -2,118 +2,137 @@ using MineSharp.Bot.Plugins;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
-public class PlayerTests
+public static class PlayerTests
 {
-    public static Task TestHealth(MinecraftBot bot, TaskCompletionSource<bool> source)
+    public static Task TestHealth()
     {
-        var player = bot.GetPlugin<PlayerPlugin>();
-        var before = player.Health!.Value;
-
-        player.OnHealthChanged += sender =>
+        return IntegrationTest.RunTest("testHealth", (bot, source) =>
         {
-            // the test should deal 6 damage.
-            source.TrySetResult(Math.Abs(before - player.Health.Value - 6) < 0.2f);
-        };
+            var player = bot.GetPlugin<PlayerPlugin>();
+            var before = player.Health!.Value;
 
-        return Task.CompletedTask;
+            player.OnHealthChanged += sender =>
+            {
+                // the test should deal 6 damage.
+                source.TrySetResult(Math.Abs(before - player.Health.Value - 6) < 0.2f);
+            };
+
+            return Task.CompletedTask;
+        });
     }
 
-    public static Task TestDeath(MinecraftBot bot, TaskCompletionSource<bool> source)
+    public static Task TestDeath()
     {
-        var player = bot.GetPlugin<PlayerPlugin>();
-
-        player.OnDied += sender =>
+        return IntegrationTest.RunTest("testDeath", (bot, source) =>
         {
-            source.TrySetResult(true);
-        };
+            var player = bot.GetPlugin<PlayerPlugin>();
 
-        return Task.CompletedTask;
-    }
-
-    public static Task TestRespawn(MinecraftBot bot, TaskCompletionSource<bool> source)
-    {
-        var player = bot.GetPlugin<PlayerPlugin>();
-
-        player.OnRespawned += sender =>
-        {
-            source.TrySetResult(true);
-        };
-
-        player.OnDied += async sender =>
-        {
-            await player.Respawn();
-        };
-
-        return Task.CompletedTask;
-    }
-
-    public static async Task TestPlayerJoin(MinecraftBot bot, TaskCompletionSource<bool> source)
-    {
-        const string secondBotName = "MineSharpBot2";
-        var player = bot.GetPlugin<PlayerPlugin>();
-
-        player.OnPlayerJoined += (sender, player) =>
-        {
-            if (player.Username == secondBotName)
+            player.OnDied += sender =>
             {
                 source.TrySetResult(true);
-            }
-        };
+            };
 
-        var bot2 = await MinecraftBot.CreateBot(
-            secondBotName,
-            "localhost",
-            25565,
-            offline: true);
+            return Task.CompletedTask;
+        });
+    }
 
-        if (!await bot2.Connect())
+    public static Task TestRespawn()
+    {
+        return IntegrationTest.RunTest("testRespawn", (bot, source) =>
         {
-            source.TrySetResult(false);
-        }
+            var player = bot.GetPlugin<PlayerPlugin>();
 
-        await Task.Delay(1000);
-        await bot2.Disconnect();
+            player.OnRespawned += sender =>
+            {
+                source.TrySetResult(true);
+            };
+
+            player.OnDied += async sender =>
+            {
+                await player.Respawn();
+            };
+
+            return Task.CompletedTask;
+        });
+    }
+
+    public static Task TestPlayerJoin()
+    {
+        return IntegrationTest.RunTest("testPlayerJoin", async (bot, source) =>
+        {
+            const string secondBotName = "MineSharpBot2";
+            var player = bot.GetPlugin<PlayerPlugin>();
+
+            player.OnPlayerJoined += (sender, player) =>
+            {
+                if (player.Username == secondBotName)
+                {
+                    source.TrySetResult(true);
+                }
+            };
+
+            var bot2 = await MinecraftBot.CreateBot(
+                secondBotName,
+                "localhost",
+                25565,
+                offline: true);
+
+            if (!await bot2.Connect())
+            {
+                source.TrySetResult(false);
+            }
+
+            await Task.Delay(1000);
+            await bot2.Disconnect(); 
+        });
     }
     
-    public static async Task TestPlayerLeave(MinecraftBot bot, TaskCompletionSource<bool> source)
+    public static Task TestPlayerLeave()
     {
-        const string secondBotName = "MineSharpBot2";
-        var player = bot.GetPlugin<PlayerPlugin>();
-
-        player.OnPlayerLeft += (sender, player) =>
+        return IntegrationTest.RunTest("testPlayerLeave", async (bot, source) =>
         {
-            if (player.Username == secondBotName)
+            const string secondBotName = "MineSharpBot2";
+            var player = bot.GetPlugin<PlayerPlugin>();
+
+            player.OnPlayerLeft += (sender, player) =>
             {
-                source.TrySetResult(true);
+                if (player.Username == secondBotName)
+                {
+                    source.TrySetResult(true);
+                }
+            };
+
+            var bot2 = await MinecraftBot.CreateBot(
+                secondBotName,
+                "localhost",
+                25565,
+                offline: true);
+
+            if (!await bot2.Connect())
+            {
+                source.TrySetResult(false);
             }
-        };
 
-        var bot2 = await MinecraftBot.CreateBot(
-            secondBotName,
-            "localhost",
-            25565,
-            offline: true);
-
-        if (!await bot2.Connect())
-        {
-            source.TrySetResult(false);
-        }
-
-        await Task.Delay(500);
-        await bot2.Disconnect();
+            await Task.Delay(500);
+            await bot2.Disconnect(); 
+        });
     }
 
-    public static async Task TestWeatherChange(MinecraftBot bot, TaskCompletionSource<bool> source)
+    public static Task TestWeatherChange()
     {
-        var player = bot.GetPlugin<PlayerPlugin>();
-        await Task.Delay(10);
-        
-        player.OnWeatherChanged += sender =>
+        return IntegrationTest.RunTest("testWeatherChange", (bot, source) =>
         {
-            if (Math.Abs(player.RainLevel - 1) < 0.02f)
+            var player = bot.GetPlugin<PlayerPlugin>();
+
+            player.OnWeatherChanged += sender =>
             {
-                source.TrySetResult(true);
-            }
-        };
+                if (Math.Abs(player.RainLevel - 1) < 0.02f)
+                {
+                    source.TrySetResult(true);
+                }
+            };
+
+            return Task.CompletedTask;
+        }, 15 * 1000);
     }
 }

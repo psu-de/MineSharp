@@ -11,7 +11,7 @@ public static class IntegrationTest
 
     public delegate Task TestFunction(MinecraftBot bot, TaskCompletionSource<bool> source);
     
-    public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000)
+    public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
     {
         var bot = await MinecraftBot.CreateBot("MineSharpBot", HOST, PORT, offline: true);
         var chat = bot.GetPlugin<ChatPlugin>();
@@ -33,7 +33,10 @@ public static class IntegrationTest
 
         var tsc = new TaskCompletionSource<bool>();
         _ = callback(bot, tsc);
-    
+
+        if (commandDelay.HasValue)
+            await Task.Delay(commandDelay.Value);
+        
         await chat.SendChat($"/trigger {testName}");
         await Task.WhenAny(tsc.Task, Task.Delay(timeout));
 

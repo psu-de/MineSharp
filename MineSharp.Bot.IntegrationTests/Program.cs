@@ -1,12 +1,12 @@
-﻿using MineSharp.Bot.IntegrationTests;
-using MineSharp.Bot.IntegrationTests.Tests;
+﻿using MineSharp.Bot.IntegrationTests.Tests;
 
-await IntegrationTest.RunTest("testWeatherChange", PlayerTests.TestWeatherChange);
+await WorldTests.TestBlockUpdate();
+Environment.Exit(0);
 
-Console.ReadKey();
+await PlayerTests.TestWeatherChange();
 
-await IntegrationTest.RunTest("testHealth", PlayerTests.TestHealth);
-await IntegrationTest.RunTest("testDeath", PlayerTests.TestDeath);
-await IntegrationTest.RunTest("testRespawn", PlayerTests.TestRespawn);
-await IntegrationTest.RunTest("testPlayerJoin", PlayerTests.TestPlayerJoin);
-await IntegrationTest.RunTest("testPlayerLeave", PlayerTests.TestPlayerLeave);
+await PlayerTests.TestHealth();
+await PlayerTests.TestDeath();
+await PlayerTests.TestRespawn();
+await PlayerTests.TestPlayerJoin();
+await PlayerTests.TestPlayerLeave();
