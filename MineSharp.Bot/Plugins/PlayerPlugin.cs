@@ -181,6 +181,8 @@ public class PlayerPlugin : Plugin
         this.Saturation = packet.Saturation;
         
         this.OnHealthChanged?.Invoke(this.Bot);
+        if (this.Health == 0)
+            this.OnDied?.Invoke(this.Bot);
         
         return Task.CompletedTask;
     }
@@ -191,7 +193,7 @@ public class PlayerPlugin : Plugin
             return Task.CompletedTask;
 
         this.Health = 0;
-        this.OnDied?.Invoke(this.Bot);
+        // this.OnDied?.Invoke(this.Bot);
         return Task.CompletedTask;
     }
 
