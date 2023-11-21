@@ -17,7 +17,7 @@ namespace MineSharp.Protocol;
 
 public sealed class MinecraftClient : IDisposable
 {
-    public const string LATEST_SUPPORTED_VERSION = "1.19.4";
+    public const string LATEST_SUPPORTED_VERSION = "1.20.1";
     
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -161,6 +161,7 @@ public sealed class MinecraftClient : IDisposable
             GameState.Handshaking => new HandshakePacketHandler(this),
             GameState.Login => new LoginPacketHandler(this, this._data),
             GameState.Status => new StatusPacketHandler(this),
+            GameState.Configuration => new ConfigurationPacketHandler(this, this._data),
             GameState.Play => new PlayPacketHandler(this, this._data),
             _ => throw new UnreachableException()
         };

@@ -15,7 +15,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     public NbtCompound Heightmaps { get; set; }
     public byte[] ChunkData { get; set; }
     public BlockEntity[] BlockEntities { get; set; }
-    public bool TrustEdges { get; set; }
+    public bool? TrustEdges { get; set; }
     public long[] SkyLightMask { get; set; }
     public long[] BlockLightMask { get; set; }
     public long[] EmptySkyLightMask { get; set; }
@@ -29,7 +29,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         NbtCompound heightmaps,
         byte[] chunkData,
         BlockEntity[] blockEntities,
-        bool trustEdges,
+        bool? trustEdges,
         long[] skyLightMask,
         long[] blockLightMask,
         long[] emptyBlockLightMask,
@@ -53,6 +53,10 @@ public class ChunkDataAndUpdateLightPacket : IPacket
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
+        
+        if (version.Version.Protocol < ProtocolVersion.V_1_20 && this.TrustEdges == null)
+            throw new ArgumentNullException(nameof(this.TrustEdges));
+        
         buffer.WriteInt(this.X);
         buffer.WriteInt(this.Z);
         buffer.WriteNbt(this.Heightmaps);
@@ -63,7 +67,8 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         foreach (var entity in this.BlockEntities)
             buffer.WriteBlockEntity(entity);
         
-        buffer.WriteBool(this.TrustEdges);
+        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+            buffer.WriteBool(this.TrustEdges!.Value);
         WriteLongArray(this.SkyLightMask, buffer);
         WriteLongArray(this.BlockLightMask, buffer);
         WriteLongArray(this.EmptySkyLightMask, buffer);
@@ -97,7 +102,9 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         for (int i = 0; i < blockEntities.Length; i++)
             blockEntities[i] = buffer.ReadBlockEntity();
 
-        var trustEdges = buffer.ReadBool();
+        bool? trustEdges = null;
+        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+            trustEdges = buffer.ReadBool();
         var skyLightMask = ReadLongArray(buffer);
         var blockLightMask = ReadLongArray(buffer);
         var emptySkyLightMask = ReadLongArray(buffer);

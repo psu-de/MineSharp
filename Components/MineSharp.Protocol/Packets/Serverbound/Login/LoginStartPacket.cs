@@ -13,6 +13,34 @@ public class LoginStartPacket : IPacket
     public SignatureContainer? Signature { get; set; }
     public UUID? PlayerUuid { get; set; }
 
+    
+    /// <summary>
+    /// Constructor for versions before 1.19
+    /// </summary>
+    /// <param name="username"></param>
+    public LoginStartPacket(string username)
+    {
+        this.Username = username;
+    }
+
+    /// <summary>
+    /// Constructor for versions >= 1.19.3
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="playerUuid"></param>
+    public LoginStartPacket(string username, UUID? playerUuid)
+    {
+        this.Username = username;
+        this.PlayerUuid = playerUuid;
+    }
+    
+    
+    /// <summary>
+    /// Constructor for version 1.19-1.19.2
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="signature"></param>
+    /// <param name="playerUuid"></param>
     public LoginStartPacket(string username, SignatureContainer? signature, UUID? playerUuid = null)
     {
         this.Username = username;
@@ -36,11 +64,20 @@ public class LoginStartPacket : IPacket
             return;
         }
 
-        buffer.WriteBool(this.PlayerUuid.HasValue);
-        if (this.PlayerUuid.HasValue)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            buffer.WriteUuid(this.PlayerUuid!.Value);
+            buffer.WriteBool(this.PlayerUuid.HasValue);
+            if (this.PlayerUuid.HasValue)
+            {
+                buffer.WriteUuid(this.PlayerUuid!.Value);
+            }
+            return;
         }
+
+        if (!this.PlayerUuid.HasValue)
+            throw new ArgumentNullException(nameof(this.PlayerUuid));
+        
+        buffer.WriteUuid(this.PlayerUuid.Value);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

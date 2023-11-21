@@ -109,8 +109,14 @@ public class LoginPacketHandler : IPacketHandler
 
     private Task HandleLoginSuccess(LoginSuccessPacket packet)
     {
-        Logger.Debug($"Completed login.");
-        this._client.UpdateGameState(GameState.Play);
+        if (this._data.Version.Protocol < ProtocolVersion.V_1_20_2)
+        {
+            this._client.UpdateGameState(GameState.Play);
+            return Task.CompletedTask;
+        }
+        
+        _ = this._client.SendPacket(new AcknowledgeLoginPacket())
+            .ContinueWith(_ => this._client.UpdateGameState(GameState.Configuration));
         return Task.CompletedTask;
     }
 }

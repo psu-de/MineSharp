@@ -29,6 +29,7 @@ public class LoginPacket : IPacket
     public bool HasDeathLocation { get; set; }
     public string? DeathDimensionName { get; set; }
     public Position? DeathLocation { get; set; }
+    public int? PortalCooldown { get; set; }
 
     public LoginPacket(int entityId, 
         bool isHardcore,
@@ -48,7 +49,8 @@ public class LoginPacket : IPacket
         bool isFlat,
         bool hasDeathLocation,
         string? deathDimensionName,
-        Position? deathLocation)
+        Position? deathLocation,
+        int? portalCooldown)
     {
         this.EntityId = entityId;
         this.IsHardcore = isHardcore;
@@ -69,6 +71,7 @@ public class LoginPacket : IPacket
         this.HasDeathLocation = hasDeathLocation;
         this.DeathDimensionName = deathDimensionName;
         this.DeathLocation = deathLocation;
+        this.PortalCooldown = portalCooldown;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -101,6 +104,13 @@ public class LoginPacket : IPacket
 
         buffer.WriteString(this.DeathDimensionName!);
         buffer.WriteULong(this.DeathLocation!.ToULong());
+
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        {
+            if (this.PortalCooldown == null)
+                throw new ArgumentNullException(nameof(PortalCooldown));
+            buffer.WriteVarInt(this.PortalCooldown.Value);
+        }
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -146,6 +156,12 @@ public class LoginPacket : IPacket
             }
         }
 
+        int? portalCooldown = null;
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        {
+            portalCooldown = buffer.ReadVarInt();
+        }
+
         return new LoginPacket(
             entityId,
             isHardcore,
@@ -165,6 +181,7 @@ public class LoginPacket : IPacket
             isFlat,
             hasDeathLocation ?? false,
             deathDimensionName,
-            deathLocation);
+            deathLocation,
+            portalCooldown);
     }
 }

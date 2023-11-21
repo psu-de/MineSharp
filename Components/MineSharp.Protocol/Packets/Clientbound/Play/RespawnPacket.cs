@@ -21,8 +21,9 @@ public class RespawnPacket : IPacket
     public bool? HasDeathLocation { get; set; }
     public string? DeathDimensionName { get; set; }
     public Position? DeathLocation { get; set; }
+    public int? PortalCooldown { get; set; }
 
-    public RespawnPacket(string dimension, string dimensionName, long hashedSeed, sbyte gameMode, byte previousGameMode, bool isDebug, bool isFlat, bool copyMetadata, bool? hasDeathLocation, string? deathDimensionName, Position? deathLocation)
+    public RespawnPacket(string dimension, string dimensionName, long hashedSeed, sbyte gameMode, byte previousGameMode, bool isDebug, bool isFlat, bool copyMetadata, bool? hasDeathLocation, string? deathDimensionName, Position? deathLocation, int? portalCooldown)
     {
         this.Dimension = dimension;
         this.DimensionName = dimensionName;
@@ -35,6 +36,7 @@ public class RespawnPacket : IPacket
         this.HasDeathLocation = hasDeathLocation;
         this.DeathDimensionName = deathDimensionName;
         this.DeathLocation = deathLocation;
+        this.PortalCooldown = portalCooldown;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -61,6 +63,9 @@ public class RespawnPacket : IPacket
         
         buffer.WriteString(this.DeathDimensionName!);
         buffer.WriteULong(this.DeathLocation!.ToULong());
+        
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+            buffer.WriteVarInt(this.PortalCooldown!.Value);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -96,6 +101,10 @@ public class RespawnPacket : IPacket
             }
         }
 
+        int? portalCooldown = null;
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+            portalCooldown = buffer.ReadVarInt();
+        
         return new RespawnPacket(
             dimension,
             dimensionName,
@@ -107,6 +116,7 @@ public class RespawnPacket : IPacket
             copyMetadata,
             hasDeathLocation,
             deathDimensionName,
-            deathLocation);
+            deathLocation,
+            portalCooldown);
     }
 }

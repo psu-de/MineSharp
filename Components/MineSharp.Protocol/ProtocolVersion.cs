@@ -2,6 +2,9 @@ namespace MineSharp.Protocol;
 
 public static class ProtocolVersion
 {
+    public const int V_1_20_2 = 764;
+    public const int V_1_20 = 763;
+    
     public const int V_1_19_4 = 762;
     public const int V_1_19_3 = 761;
     public const int V_1_19_2 = 760;
