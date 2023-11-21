@@ -1,6 +1,7 @@
 ﻿using MineSharp.Auth;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Plugins;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Protocol;
 using NLog;
@@ -16,6 +17,11 @@ public class MinecraftBot
     public MinecraftData Data { get; }
     public MinecraftClient Client { get; }
     public Session Session { get; }
+    
+    public ChatPlugin? Chat { get; private set; }
+    public EntityPlugin? Entities { get; private set; }
+    public PlayerPlugin? Player { get; private set; }
+    public WorldPlugin? World { get; private set; }
 
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource _cancellation;
@@ -60,7 +66,7 @@ public class MinecraftBot
 
     public async Task<bool> Connect()
     {
-        if (!await this.Client.Connect(GameState.LOGIN))
+        if (!await this.Client.Connect(GameState.Login))
         {
             return false;
         }
@@ -89,10 +95,15 @@ public class MinecraftBot
         void AddPlugin(Plugin plugin) 
             => this._plugins.Add(plugin.GetType().GUID, plugin);
 
-        AddPlugin(new PlayerPlugin(this));
-        AddPlugin(new EntityPlugin(this));
-        AddPlugin(new WorldPlugin(this));
-        AddPlugin(new ChatPlugin(this));
+        this.Player = new PlayerPlugin(this);
+        this.Entities = new EntityPlugin(this);
+        this.World = new WorldPlugin(this);
+        this.Chat = new ChatPlugin(this);
+
+        AddPlugin(this.Player);
+        AddPlugin(this.Entities);
+        AddPlugin(this.World);
+        AddPlugin(this.Chat);
     }
     
     private Task InitializePlugins()

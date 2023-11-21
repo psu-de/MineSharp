@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class TeleportEntityPacket : IPacket
 {
-    public static int Id => 0x68;
+    public PacketType Type => PacketType.CB_Play_EntityTeleport;
     
     public int EntityId { get; set; }
     public double X { get; set; }
@@ -26,18 +27,18 @@ public class TeleportEntityPacket : IPacket
         this.OnGround = onGround;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.EntityId);
-        buffer.WriteDouble(X);
-        buffer.WriteDouble(Y);
-        buffer.WriteDouble(Z);
+        buffer.WriteDouble(this.X);
+        buffer.WriteDouble(this.Y);
+        buffer.WriteDouble(this.Z);
         buffer.WriteSByte(this.Yaw);
         buffer.WriteSByte(this.Pitch);
         buffer.WriteBool(this.OnGround);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
         var x = buffer.ReadDouble();

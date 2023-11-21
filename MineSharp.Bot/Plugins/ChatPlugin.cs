@@ -5,9 +5,10 @@ using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Protocol;
-
+using System.Diagnostics;
+using ChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
+using SBChatMessage = MineSharp.Protocol.Packets.Serverbound.Play.ChatPacket;
 using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMessagePacket;
-using CBChatMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatMessagePacket;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -24,18 +25,19 @@ public class ChatPlugin : Plugin
 
     public ChatPlugin(MinecraftBot bot) : base(bot)
     {
-        this._messageCollector = this.Bot.Data.Protocol.Version switch {
+        this._messageCollector = this.Bot.Data.Version.Protocol switch {
             >= ProtocolVersion.V_1_19_3 => new LastSeenMessageCollector1_19_3(),
             >= ProtocolVersion.V_1_19_2 => new LastSeenMessageCollector1_19_2(),
             _ => null
         };
         
-        this.Bot.Client.On<CBChatMessagePacket>(this.HandleChatMessagePacket);
+        this.Bot.Client.On<PlayerChatPacket>(this.HandleChatMessagePacket);
+        this.Bot.Client.On<ChatPacket>(this.HandleChat);
     }
 
     protected override async Task Init()
     {
-        if (this.Bot.Data.Features.Supports("useChatSessions") && this.Bot.Session.OnlineSession)
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3 && this.Bot.Session.OnlineSession)
         {
             await this.Bot.Client.SendPacket(
                 new PlayerSessionPacket(
@@ -53,29 +55,29 @@ public class ChatPlugin : Plugin
     public Task SendChat(string message)
     {
         if (message.StartsWith('/') 
-            && this.Bot.Data.Protocol.Version >= ProtocolVersion.V_1_19)
+            && this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             return SendCommand(message.Substring(1));
         }
         
         // signed chat messages since 1.19
-        if (this.Bot.Data.Features.Supports("useChatSessions")) // 1.19.3
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3) // 1.19.3
         {
             return SendChat1_19_3(message);
         } 
         
-        if (this.Bot.Data.Features.Supports("chainedChatWithHashing")) // 1.19.2
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_2) // 1.19.2
         {
             return SendChat1_19_2(message);
         }
 
-        if (this.Bot.Data.Features.Supports("signedChat")) // 1.19.1
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19) // 1.19.1
         {
             return SendChat1_19_1(message);
         }
         
         // Literally every version before.
-        return this.Bot.Client.SendPacket(new SBChatMessagePacket(message));
+        return this.Bot.Client.SendPacket(new SBChatMessage(message));
     }
     
     public Task SendCommand(string command)
@@ -86,17 +88,17 @@ public class ChatPlugin : Plugin
             arguments = CollectCommandArgumentsRecursive(this._commandTree!.RootIndex, command);
         }
 
-        if (this.Bot.Data.Features.Supports("useChatSessions")) // 1.19.3
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3) // 1.19.3
         {
             return SendCommand1_19_3(command, arguments);
         } 
         
-        if (this.Bot.Data.Features.Supports("chainedChatWithHashing")) // 1.19.2
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_2) // 1.19.2
         {
             return SendCommand1_19_2(command, arguments);
         }
 
-        if (this.Bot.Data.Features.Supports("signedChat")) // 1.19.1
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19) // 1.19.1
         {
             return SendCommand1_19_1(command, arguments);
         }
@@ -193,11 +195,17 @@ public class ChatPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private Task HandleChatMessagePacket(CBChatMessagePacket packet)
+    /// <summary>
+    /// Method to receive chat messages after 1.19
+    /// </summary>
+    /// <param name="packet"></param>
+    /// <returns></returns>
+    /// <exception cref="UnreachableException"></exception>
+    private Task HandleChatMessagePacket(PlayerChatPacket packet)
     {
         // TODO: Advanced chat stuff like filtering and signature verification.
 
-        if (packet.Body is CBChatMessagePacket.V1_19_2_3Body body && body.Signature != null)
+        if (packet.Body is PlayerChatPacket.V1_19_2_3Body body && body.Signature != null)
         {
             if (this._messageCollector is LastSeenMessageCollector1_19_2 collector1_19_2)
             {
@@ -216,14 +224,30 @@ public class ChatPlugin : Plugin
         }
         
         (UUID sender, string message, ChatMessageType type) = packet.Body switch {
-            CBChatMessagePacket.V1_18Body v18 => (v18.Sender, v18.Message, (ChatMessageType)v18.Position),
-            CBChatMessagePacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
-            CBChatMessagePacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type)
+            PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
+            PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
+            _ => throw new UnreachableException()
         };
 
-        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type);
+        this.HandleChatInternal(sender, message, type);
         
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Method to receive chat messages before 1.19
+    /// </summary>
+    /// <param name="packet"></param>
+    /// <returns></returns>
+    private Task HandleChat(ChatPacket packet)
+    {
+        this.HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
+        return Task.CompletedTask;
+    }
+
+    private void HandleChatInternal(UUID sender, string message, ChatMessageType type)
+    {
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type);
     }
     
 
@@ -250,11 +274,10 @@ public class ChatPlugin : Plugin
         return this.Bot.Client.SendPacket(
             new SBChatMessagePacket(
                 message,
-                new SBChatMessagePacket.V1_19(
-                    timestamp.ToUnixTimeMilliseconds(),
-                    salt,
-                    signature,
-                    false)));
+                timestamp.ToUnixTimeMilliseconds(),
+                salt,
+                signature,
+                false));
     }
     
     private Task SendCommand1_19_1(string command, List<(string, string)> arguments)
@@ -326,14 +349,13 @@ public class ChatPlugin : Plugin
 
         return this.Bot.Client.SendPacket(new SBChatMessagePacket(
             message,
-            new SBChatMessagePacket.V1_19(
-                timestamp.ToUnixTimeMilliseconds(),
-                salt,
-                signature,
-                false,
-                messages.Select(x => x.ToProtocolMessage()).ToArray(),
-                null
-            )));
+            timestamp.ToUnixTimeMilliseconds(),
+            salt,
+            signature,
+            false,
+            messages.Select(x => x.ToProtocolMessage()).ToArray(),
+            null
+            ));
     }
     
     private Task SendCommand1_19_2(string command, List<(string, string)> arguments)
@@ -396,11 +418,10 @@ public class ChatPlugin : Plugin
             return this.Bot.Client.SendPacket(
                 new SBChatMessagePacket(
                     message,
-                    new SBChatMessagePacket.V1_19(
-                        timestamp.ToUnixTimeMilliseconds(),
-                        0,
-                        null,
-                        count, acknowledgedBitfield)));
+                    timestamp.ToUnixTimeMilliseconds(),
+                    0,
+                    null,
+                    count, acknowledgedBitfield));
         }
 
         var salt = ChatSignature.GenerateSalt();
@@ -417,12 +438,11 @@ public class ChatPlugin : Plugin
         return this.Bot.Client.SendPacket(
             new SBChatMessagePacket(
                 message,
-                new SBChatMessagePacket.V1_19(
-                    timestamp.ToUnixTimeMilliseconds(),
-                    salt,
-                    signature,
-                    count,
-                    acknowledgedBitfield)));
+                timestamp.ToUnixTimeMilliseconds(),
+                salt,
+                signature,
+                count,
+                acknowledgedBitfield));
     }
 
     private Task SendCommand1_19_3(string command, List<(string, string)> arguments)

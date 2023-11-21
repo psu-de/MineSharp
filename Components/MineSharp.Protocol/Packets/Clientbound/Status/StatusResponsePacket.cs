@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Status;
 
 public class StatusResponsePacket : IPacket
 {
-    public static int Id => 0x00;
+    public PacketType Type => PacketType.CB_Status_ServerInfo;
 
     public string Response { get; set; }
 
@@ -14,12 +15,12 @@ public class StatusResponsePacket : IPacket
         this.Response = response;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Response);            
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new StatusResponsePacket(buffer.ReadString());
     }

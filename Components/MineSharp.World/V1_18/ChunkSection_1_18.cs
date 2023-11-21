@@ -37,9 +37,8 @@ internal class ChunkSection_1_18 : IChunkSection
         var old = this._data.Blocks.GetByState( 
             this._blockContainer.GetAt(index));
 
-        bool wasSolid = this._data.Blocks.IsSolid(old.Id);
-        bool isSolid = this._data.Blocks.IsSolid(
-            this._data.Blocks.GetByState(state).Id);
+        bool wasSolid = old.IsSolid();
+        bool isSolid = this._data.Blocks.GetByState(state).IsSolid();
 
         if (wasSolid != isSolid)
         {
@@ -68,7 +67,7 @@ internal class ChunkSection_1_18 : IChunkSection
     public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null)
     {
         var info = this._data.Blocks.GetById(blockId);
-        if (!this._blockContainer.Palette.ContainsState(info.MinStateId, info.MaxStateId) || maxCount == 0)
+        if (!this._blockContainer.Palette.ContainsState(info.MinState, info.MaxState) || maxCount == 0)
         {
             yield break;
         }
@@ -82,7 +81,7 @@ internal class ChunkSection_1_18 : IChunkSection
                 {
                     var index = GetBlockIndex(x, y, z);
                     var value = this._blockContainer.GetAt(index);
-                    if (value < info.MinStateId || value > info.MaxStateId)
+                    if (value < info.MinState || value > info.MaxState)
                         continue;
                     
                     yield return new Block(info, value, new Position(x, y, z));

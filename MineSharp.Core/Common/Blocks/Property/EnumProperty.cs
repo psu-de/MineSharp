@@ -1,22 +1,31 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
-public class EnumProperty<TEnum> : StringProperty where TEnum : struct, Enum
+public class EnumProperty : IBlockProperty
 {
-    public EnumProperty(string name) : base(name, Enum.GetNames<TEnum>())
-    { }
-
-    public override T GetValue<T>(int state)
+    private readonly string[] _acceptedValues;
+    
+    public string Name { get; }
+    public int StateCount { get; }
+    
+    public EnumProperty(string name, string[] acceptedValues)
     {
-        if (typeof(T) != typeof(TEnum))
+        this._acceptedValues = acceptedValues;
+        this.Name = name;
+        this.StateCount = this._acceptedValues.Length;
+    }
+    
+    public T GetValue<T>(int state) where T : struct
+    {
+        if (!typeof(T).IsEnum)
         {
-            throw new NotSupportedException($"This property must be of enum type {typeof(TEnum).Name}.");
+            throw new NotSupportedException("This is property can only be an enum.");
         }
         
-        if (state >= this.Size)
+        if (state >= this.StateCount)
         {
-            throw new IndexOutOfRangeException($"State {state} is out of range for property with {this.Size} entries.");
+            throw new IndexOutOfRangeException($"State {state} is out of range for property with {this.StateCount} entries.");
         }
 
-        return (T)(object)Enum.GetValues<TEnum>()[state];
+        return Enum.Parse<T>(this._acceptedValues[state]);
     }
 }

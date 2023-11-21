@@ -1,13 +1,14 @@
 using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class LoginPacket : IPacket
 {
-    public static int Id => 0x28;
+    public PacketType Type => PacketType.CB_Play_Login;
 
     public int EntityId { get; set; }
     public bool IsHardcore { get; set; }
@@ -70,9 +71,9 @@ public class LoginPacket : IPacket
         this.DeathLocation = deathLocation;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Protocol.Version < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
             throw new PacketVersionException($"Cannot write {nameof(LoginPacket)} for versions before 1.19.");
         }
@@ -102,7 +103,7 @@ public class LoginPacket : IPacket
         buffer.WriteULong(this.DeathLocation!.ToULong());
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadInt();
         var isHardcore = buffer.ReadBool();
@@ -112,7 +113,7 @@ public class LoginPacket : IPacket
         var registryCodec = buffer.ReadNbt();
 
         string dimensionType;
-        if (version.Protocol.Version < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
             var dimensionTypeNbt = buffer.ReadNbt();
             dimensionType = dimensionTypeNbt.Get<NbtString>("effects")!.Value;
@@ -135,7 +136,7 @@ public class LoginPacket : IPacket
         string? deathDimensionName = null;
         Position? deathLocation = null;
         
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)

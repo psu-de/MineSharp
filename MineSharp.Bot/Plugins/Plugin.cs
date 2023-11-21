@@ -1,4 +1,3 @@
-using MineSharp.Data;
 using MineSharp.Protocol;
 
 namespace MineSharp.Bot.Plugins;

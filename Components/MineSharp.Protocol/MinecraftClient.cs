@@ -1,12 +1,11 @@
 ﻿using MineSharp.Auth;
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Protocol.Exceptions;
-using MineSharp.Protocol.Extensions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
-using MineSharp.Protocol.Packets.Mappings;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using Newtonsoft.Json;
 using NLog;
@@ -29,7 +28,6 @@ public sealed class MinecraftClient : IDisposable
     private readonly CancellationTokenSource _cancellation;
     private readonly TcpClient _client;
 
-    private readonly PacketMapper _packetMapper;
     private readonly Queue<PacketSendTask> _packetQueue;
     private readonly IDictionary<Guid, IList<AsyncPacketHandler>> _packetHandlers;
     private readonly IDictionary<Guid, TaskCompletionSource<object>> _packetWaiters;
@@ -57,16 +55,12 @@ public sealed class MinecraftClient : IDisposable
         this._internalPacketHandler = new HandshakePacketHandler(this);
         this._packetHandlers = new Dictionary<Guid, IList<AsyncPacketHandler>>();
         this._packetWaiters = new Dictionary<Guid, TaskCompletionSource<object>>();
-        this._packetMapper = new PacketMapper( 
-            PacketPalette.GetPacketMappingFromVersion(this._data.Protocol.Version),
-            PacketFlow.Clientbound,
-            this._data);
         this._gameJoinedTsc = new TaskCompletionSource();
 
         this.Session = session;
         this.IP = IPHelper.ResolveHostname(hostnameOrIp);
         this.Port = port;
-        this.GameState = GameState.HANDSHAKING;
+        this.GameState = GameState.Handshaking;
     }
 
     /// <summary>
@@ -164,14 +158,14 @@ public sealed class MinecraftClient : IDisposable
         this.GameState = next;
 
         this._internalPacketHandler = next switch {
-            GameState.HANDSHAKING => new HandshakePacketHandler(this),
-            GameState.LOGIN => new LoginPacketHandler(this, this._data),
-            GameState.STATUS => new StatusPacketHandler(this),
-            GameState.PLAY => new PlayPacketHandler(this, this._data),
+            GameState.Handshaking => new HandshakePacketHandler(this),
+            GameState.Login => new LoginPacketHandler(this, this._data),
+            GameState.Status => new StatusPacketHandler(this),
+            GameState.Play => new PlayPacketHandler(this, this._data),
             _ => throw new UnreachableException()
         };
 
-        if (next == GameState.PLAY)
+        if (next == GameState.Play)
             this._gameJoinedTsc.TrySetResult();
     }
 
@@ -207,27 +201,25 @@ public sealed class MinecraftClient : IDisposable
         {
             var buffer = this._stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
-            var oldId = packetId;
-            var packetName = this._packetMapper.ConvertIncomingPacketId(ref packetId, this.GameState);
+
+            var packetType = this._data.Protocol.FromPacketId(PacketFlow.Clientbound, this.GameState, packetId);
             long size = buffer.ReadableBytes;
 
-            var factory = PacketPalette.GetFactory(packetId, this.GameState, PacketFlow.Clientbound);
+            var factory = PacketPalette.GetFactory(packetType);
             try
             {
-                var packet = factory?.Invoke(buffer, this._data, packetName);
+                var packet = factory?.Invoke(buffer, this._data);
                 if (packet != null)
                     await this.HandleIncomingPacket(packet);
 
-                if (this.GameState != GameState.PLAY)
+                if (this.GameState != GameState.Play)
                 {
                     await Task.Delay(1);
                 }
             } catch (EndOfStreamException)
             {
-                Console.WriteLine($"Error reading packet with id {oldId}. Assumed it was {packetName} with new id {packetId}. Packet was {size} bytes.");
+                Console.WriteLine($"Error reading packet with id {packetId}, assumed it was {packetType}. Packet was {size} bytes.");
             }
-
-            
         }
     }
 
@@ -249,12 +241,11 @@ public sealed class MinecraftClient : IDisposable
     
     private void DispatchPacket(IPacket packet)
     {
-        var packetId = PacketPalette.GetId(packet); 
-        var packetName = this._packetMapper.ConvertOutgoingPacketId(ref packetId, this.GameState);
+        var packetId = this._data.Protocol.GetPacketId(packet.Type); 
         
         var buffer = new PacketBuffer();
         buffer.WriteVarInt(packetId);
-        packet.Write(buffer, this._data, packetName);
+        packet.Write(buffer, this._data);
 
         this._stream!.WritePacket(buffer);
     }
@@ -315,7 +306,7 @@ public sealed class MinecraftClient : IDisposable
 
     /// <summary>
     /// Requests the server status and closes the connection.
-    /// Works only when <see cref="GameState"/> is <see cref="Protocol.GameState.STATUS"/>.
+    /// Works only when <see cref="GameState"/> is <see cref="Core.Common.Protocol.GameState.Status"/>.
     /// </summary>
     /// <returns></returns>
     public static async Task<ServerStatusResponseBlob> RequestServerStatus(
@@ -330,7 +321,7 @@ public sealed class MinecraftClient : IDisposable
             hostnameOrIp,
             port);
 
-        if (!await client.Connect(GameState.STATUS))
+        if (!await client.Connect(GameState.Status))
             throw new MineSharpHostException("Could not connect to server.");
 
         var timeoutCancellation = new CancellationTokenSource();

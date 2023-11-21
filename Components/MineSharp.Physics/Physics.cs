@@ -269,12 +269,12 @@ public class PhysicsEngine
             {
                 var block = this.World.GetBlockAt(new Position(x, y, z));
 
-                if (!this._data.Blocks.IsSolid(block.Info.Id))
+                if (!block.IsSolid())
                     continue;
 
                 var coords = new Vector3(x, y, z);
                 
-                foreach (var box in this._data.Collisions.GetForBlock(block).Select(x => new AABB(x).Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                foreach (var box in this._data.BlockCollisionShapes.GetForBlock(block).Select(x => x.Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                 {
                     if (box.Intersects(entityBoundingBox))
                     {
@@ -367,10 +367,10 @@ public class PhysicsEngine
                     var coords = new Vector3(x, y, z);
                     var block = this.World.GetBlockAt(coords);
 
-                    if (!this._data.Blocks.IsSolid(block.Info.Id))
+                    if (!block.IsSolid())
                         continue;
 
-                    foreach (var blockBox in this._data.Collisions.GetForBlock(block).Select(x => new AABB(x).Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
+                    foreach (var blockBox in this._data.BlockCollisionShapes.GetForBlock(block).Select(x => x.Offset(block.Position!.X, block.Position.Y, block.Position.Z)))
                     {
                         if (box.Intersects(blockBox))
                         {
@@ -486,12 +486,12 @@ public class PhysicsEngine
                 {
                     var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
-                    if (!this._data.Blocks.IsSolid(blockState.Info.Id))
+                    if (!blockState.IsSolid())
                         continue;
 
                     var coords = new Vector3(x, y, z);
 
-                    foreach (var box in this._data.Collisions.GetForBlock(blockState).Select(c => new AABB(c).Offset(x, y, z)))
+                    foreach (var box in this._data.BlockCollisionShapes.GetForBlock(blockState).Select(c => c.Offset(x, y, z)))
                     {
                         if (negative)
                         {
@@ -609,12 +609,12 @@ public class PhysicsEngine
                 {
                     var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
-                    if (!this._data.Blocks.IsSolid(blockState.Info.Id))
+                    if (!blockState.IsSolid())
                         continue;
 
                     var coords = new Vector3(x, y, z);
 
-                    foreach (var box in this._data.Collisions.GetForBlock(blockState).Select(x => new AABB(x).Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                    foreach (var box in this._data.BlockCollisionShapes.GetForBlock(blockState).Select(x => x.Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
                     {
                         if (box.MaxY <= minY) continue;
 
@@ -741,12 +741,12 @@ public class PhysicsEngine
                 {
                     var blockState = this.World.GetBlockAt(new Position(x, y, z));
 
-                    if (!this._data.Blocks.IsSolid(blockState.Info.Id))
+                    if (!blockState.IsSolid())
                         continue;
 
                     var coords = new Vector3(x, y, z);
 
-                    foreach (var box in this._data.Collisions.GetForBlock(blockState).Select(x => new AABB(x).Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
+                    foreach (var box in this._data.BlockCollisionShapes.GetForBlock(blockState).Select(x => x.Offset(blockState.Position!.X, blockState.Position.Y, blockState.Position.Z)))
                     {
                         if (box.MaxY <= minY) continue;
 

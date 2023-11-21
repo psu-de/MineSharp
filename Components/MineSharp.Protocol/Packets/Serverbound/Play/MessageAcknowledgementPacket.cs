@@ -1,16 +1,17 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class MessageAcknowledgementPacket : IPacket
 {
-    public static int Id => 0x03;
+    public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
     
     public int? Count { get; set; }
-    public ChatMessagePacket.V1_19.MessageItem[]? PreviousMessages { get; set; }
-    public ChatMessagePacket.V1_19.MessageItem? LastRejectedMessage { get; set; }
+    public ChatMessagePacket.MessageItem[]? PreviousMessages { get; set; }
+    public ChatMessagePacket.MessageItem? LastRejectedMessage { get; set; }
 
     /**
      * Constructor for >= 1.19.3
@@ -23,15 +24,15 @@ public class MessageAcknowledgementPacket : IPacket
     /**
      * Constructor for 1.19.2
      */
-    public MessageAcknowledgementPacket(ChatMessagePacket.V1_19.MessageItem[]? previousMessages, ChatMessagePacket.V1_19.MessageItem? lastRejectedMessage)
+    public MessageAcknowledgementPacket(ChatMessagePacket.MessageItem[]? previousMessages, ChatMessagePacket.MessageItem? lastRejectedMessage)
     {
         this.PreviousMessages = previousMessages;
         this.LastRejectedMessage = lastRejectedMessage;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19_3)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             if (Count == null)
             {
@@ -56,5 +57,5 @@ public class MessageAcknowledgementPacket : IPacket
         this.LastRejectedMessage!.Write(buffer);
     }
     
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName) => throw new NotImplementedException();
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version) => throw new NotImplementedException();
 }

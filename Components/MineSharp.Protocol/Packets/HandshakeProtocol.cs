@@ -1,4 +1,5 @@
 using MineSharp.Auth;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 using MineSharp.Protocol.Packets.Serverbound.Login;
@@ -9,15 +10,15 @@ internal static class HandshakeProtocol
 {
     public static async Task PerformHandshake(MinecraftClient client, GameState next, MinecraftData data)
     {
-        if (next is GameState.PLAY or GameState.HANDSHAKING)
+        if (next is GameState.Play or GameState.Handshaking)
         {
-            throw new ArgumentException("Next state must either be LOGIN or STATUS.");
+            throw new ArgumentException("Next state must either be Login or Status.");
         }
         
-        var handshake = new HandshakePacket(data.Protocol.Version, client.IP.ToString(), client.Port, next);
+        var handshake = new HandshakePacket(data.Version.Protocol, client.IP.ToString(), client.Port, next);
         await client.SendPacket(handshake);
 
-        if (next == GameState.STATUS)
+        if (next == GameState.Status)
         {
             return;
         }
@@ -30,13 +31,12 @@ internal static class HandshakeProtocol
     {
         LoginStartPacket.SignatureContainer? signature = null;
         
-        if (data.Protocol.Version >= ProtocolVersion.V_1_19 && !data.Features.Supports("useChatSessions")
-                                                            && session.Certificate != null)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3 && session.Certificate != null)
         {
             signature = new LoginStartPacket.SignatureContainer(
                 new DateTimeOffset(session.Certificate.ExpiresAt).ToUnixTimeMilliseconds(),
                 session.Certificate.Keys.PublicKey,
-                data.Protocol.Version >= ProtocolVersion.V_1_19_2
+                data.Version.Protocol >= ProtocolVersion.V_1_19_2
                     ? session.Certificate.PublicKeySignatureV2
                     : session.Certificate.PublicKeySignature
             );

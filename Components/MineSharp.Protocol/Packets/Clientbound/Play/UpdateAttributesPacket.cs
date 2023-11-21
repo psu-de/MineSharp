@@ -1,14 +1,14 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Core.Common.Entities.Attributes;
-
+using MineSharp.Data.Protocol;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class UpdateAttributesPacket : IPacket
 {
-    public static int Id => 0x6A;
+    public PacketType Type => PacketType.CB_Play_EntityUpdateAttributes;
     
     public int EntityId { get; set; }
     public Attribute[] Attributes { get; set; }
@@ -19,13 +19,13 @@ public class UpdateAttributesPacket : IPacket
         this.Attributes = attributes;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.EntityId);
         buffer.WriteVarIntArray(this.Attributes, this.WriteAttribute);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
         var attributes = buffer.ReadVarIntArray(ReadAttribute);

@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Status;
 
 public class PongResponsePacket : IPacket
 {
-    public static int Id => 0x01;
+    public PacketType Type => PacketType.CB_Status_Ping;
 
     public long Payload { get; set; }
 
@@ -14,12 +15,12 @@ public class PongResponsePacket : IPacket
         this.Payload = payload;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(this.Payload);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new PongResponsePacket(buffer.ReadLong());
     }

@@ -1,12 +1,13 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 
 public class EncryptionResponsePacket : IPacket
 {
-    public static int Id => 0x01;
+    public PacketType Type => PacketType.SB_Login_EncryptionBegin;
     
     public byte[] SharedSecret { get; set; }
     public byte[]? VerifyToken { get; set; }
@@ -19,12 +20,12 @@ public class EncryptionResponsePacket : IPacket
         this.Crypto = crypto;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.SharedSecret.Length);
         buffer.WriteBytes(this.SharedSecret);
 
-        if (ProtocolVersion.IsBetween(version.Protocol.Version, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
             bool hasVerifyToken = this.VerifyToken != null;
             buffer.WriteBool(hasVerifyToken);
@@ -52,14 +53,14 @@ public class EncryptionResponsePacket : IPacket
         buffer.WriteBytes(this.VerifyToken);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var sharedSecretLength = buffer.ReadVarInt();
         var sharedSecret = buffer.ReadBytes(sharedSecretLength);
         CryptoContainer? crypto = null;
         byte[]? verifyToken = null;
         
-        if (ProtocolVersion.IsBetween(version.Protocol.Version, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
             bool hasVerifyToken = buffer.ReadBool();
             buffer.WriteBool(hasVerifyToken);

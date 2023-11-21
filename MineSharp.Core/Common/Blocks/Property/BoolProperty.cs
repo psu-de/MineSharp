@@ -1,11 +1,16 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
-public class BoolProperty : BlockProperty
+public class BoolProperty : IBlockProperty
 {
-    public BoolProperty(string name) : base(name, 2) 
-    { }
+    public string Name { get; }
+    public int StateCount => 2;
 
-    public override T GetValue<T>(int state)
+    public BoolProperty(string name)
+    {
+        this.Name = name;
+    }
+
+    public T GetValue<T>(int state) where T : struct
     {
         if (typeof(T) != typeof(bool))
         {

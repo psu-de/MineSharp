@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;
 using MineSharp.World.Chunks;
 using NLog;
@@ -50,6 +51,17 @@ public class WorldPlugin : Plugin
                     await Task.Delay(10);
             }
         }
+    }
+
+    public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
+    {
+        if (this.Bot.Player?.Self?.GameMode != GameMode.Creative)
+        {
+            throw new Exception("Player must be in creative mode.");
+        }
+        
+        var packet = new UpdateCommandBlock(location, command, mode, flags);
+        return this.Bot.Client.SendPacket(packet);
     }
 
     private Task HandleChunkDataAndLightUpdatePacket(ChunkDataAndUpdateLightPacket packet)

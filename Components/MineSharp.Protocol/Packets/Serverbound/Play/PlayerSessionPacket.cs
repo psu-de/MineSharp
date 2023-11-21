@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class PlayerSessionPacket : IPacket
 {
-    public static int Id => 0x06;
+    public PacketType Type => PacketType.SB_Play_ChatSessionUpdate;
     
     public UUID SessionId { get; set; }
     public long ExpiresAt { get; set; }
@@ -20,7 +21,7 @@ public class PlayerSessionPacket : IPacket
         this.KeySignature = keySignature;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteUuid(this.SessionId);
         buffer.WriteLong(this.ExpiresAt);
@@ -30,7 +31,7 @@ public class PlayerSessionPacket : IPacket
         buffer.WriteBytes(this.KeySignature);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var sessionId = buffer.ReadUuid();
         var expiresAt = buffer.ReadLong();

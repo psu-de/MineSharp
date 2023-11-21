@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class SetEntityVelocityPacket : IPacket
 {
-    public static int Id => 0x54;
+    public PacketType Type => PacketType.CB_Play_EntityVelocity;
 
     public int EntityId { get; set; }
     public short VelocityX { get; set; }
@@ -20,7 +21,7 @@ public class SetEntityVelocityPacket : IPacket
         this.VelocityZ = velocityZ;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.EntityId);
         buffer.WriteShort(this.VelocityX);
@@ -28,7 +29,7 @@ public class SetEntityVelocityPacket : IPacket
         buffer.WriteShort(this.VelocityZ);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
         var velocityX = buffer.ReadShort();

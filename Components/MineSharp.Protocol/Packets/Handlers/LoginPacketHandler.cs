@@ -1,6 +1,7 @@
 using MineSharp.Auth;
 using MineSharp.Auth.Exceptions;
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Protocol.Cryptography;
 using MineSharp.Protocol.Packets.Clientbound.Login;
@@ -72,7 +73,9 @@ public class LoginPacketHandler : IPacketHandler
         var encVerToken = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);
 
         EncryptionResponsePacket response;
-        if (this._data.Features.Supports("signatureEncryption") && this._client.Session.OnlineSession && this._client.Session.Certificate != null)
+        if (ProtocolVersion.IsBetween(this._data.Version.Protocol ,ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2)
+            && this._client.Session.OnlineSession 
+            && this._client.Session.Certificate != null)
         {
             var salt = (long)RandomNumberGenerator.GetInt32(int.MaxValue) << 32 | (uint)RandomNumberGenerator.GetInt32(int.MaxValue);
             
@@ -107,7 +110,7 @@ public class LoginPacketHandler : IPacketHandler
     private Task HandleLoginSuccess(LoginSuccessPacket packet)
     {
         Logger.Debug($"Completed login.");
-        this._client.UpdateGameState(GameState.PLAY);
+        this._client.UpdateGameState(GameState.Play);
         return Task.CompletedTask;
     }
 }

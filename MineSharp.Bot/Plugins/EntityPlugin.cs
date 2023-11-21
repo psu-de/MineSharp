@@ -32,12 +32,12 @@ public class EntityPlugin : Plugin
         this.Bot.Client.On<SpawnEntityPacket>(this.HandleSpawnEntityPacket);
         this.Bot.Client.On<RemoveEntitiesPacket>(this.HandleRemoveEntitiesPacket);
         this.Bot.Client.On<SetEntityVelocityPacket>(this.HandleSetEntityVelocityPacket);
-        this.Bot.Client.On<UpdateEntityPositionPacket>(this.HandleUpdateEntityPositionPacket);
-        this.Bot.Client.On<UpdateEntityPositionAndRotationPacket>(this.HandleUpdateEntityPositionAndRotationPacket);
-        this.Bot.Client.On<UpdateEntityRotationPacket>(this.HandleUpdateEntityRotationPacket);
+        this.Bot.Client.On<EntityPositionPacket>(this.HandleUpdateEntityPositionPacket);
+        this.Bot.Client.On<EntityPositionAndRotationPacket>(this.HandleUpdateEntityPositionAndRotationPacket);
+        this.Bot.Client.On<EntityRotationPacket>(this.HandleUpdateEntityRotationPacket);
         this.Bot.Client.On<TeleportEntityPacket>(this.HandleTeleportEntityPacket);
         this.Bot.Client.On<UpdateAttributesPacket>(this.HandleUpdateAttributesPacket);
-        this.Bot.Client.On<SynchronizePlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
+        this.Bot.Client.On<PlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
     }
 
     protected override async Task Init()
@@ -48,7 +48,7 @@ public class EntityPlugin : Plugin
 
     private Task HandleSpawnEntityPacket(SpawnEntityPacket packet)
     {
-        var entityInfo = this.Bot.Data.Entities.GetById(packet.Type);
+        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
         
         var newEntity = new Entity(
             entityInfo, packet.EntityId!, new Vector3(packet.X, packet.Y, packet.Z),
@@ -92,7 +92,7 @@ public class EntityPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private Task HandleUpdateEntityPositionPacket(UpdateEntityPositionPacket packet)
+    private Task HandleUpdateEntityPositionPacket(EntityPositionPacket packet)
     {
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
@@ -108,7 +108,7 @@ public class EntityPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private Task HandleUpdateEntityPositionAndRotationPacket(UpdateEntityPositionAndRotationPacket packet)
+    private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
     {
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
@@ -126,7 +126,7 @@ public class EntityPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private Task HandleUpdateEntityRotationPacket(UpdateEntityRotationPacket packet)
+    private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
     {
         if (!this.Entities.TryGetValue(packet.EntityId!, out var entity))
             return Task.CompletedTask;
@@ -172,7 +172,7 @@ public class EntityPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private async Task HandleSynchronizePlayerPosition(SynchronizePlayerPositionPacket packet)
+    private async Task HandleSynchronizePlayerPosition(PlayerPositionPacket packet)
     {
         await this.WaitForInitialization();
         if ((packet.Flags & 0x01) == 0x01) 

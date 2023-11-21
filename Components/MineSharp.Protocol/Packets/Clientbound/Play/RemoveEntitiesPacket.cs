@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class RemoveEntitiesPacket : IPacket
 {
-    public static int Id => 0x3E;
+    public PacketType Type => PacketType.CB_Play_EntityDestroy;
     
     public int[] EntityIds { get; set; }
 
@@ -14,11 +15,11 @@ public class RemoveEntitiesPacket : IPacket
         this.EntityIds = entityIds;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarIntArray(this.EntityIds, (buf, i) => buf.WriteVarInt(i));
     }
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityIds = buffer.ReadVarIntArray(buf => buf.ReadVarInt());
         return new RemoveEntitiesPacket(entityIds);

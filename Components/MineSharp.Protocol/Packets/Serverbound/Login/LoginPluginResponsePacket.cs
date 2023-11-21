@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 
 public class LoginPluginResponsePacket : IPacket
 {
-    public static int Id => 0x02;
+    public PacketType Type => PacketType.SB_Login_LoginPluginResponse;
 
     public int MessageId { get; set; }
     public byte[]? Data { get; set; }
@@ -16,7 +17,7 @@ public class LoginPluginResponsePacket : IPacket
         this.Data = data;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.MessageId);
         buffer.WriteBool(this.Data != null);
@@ -27,7 +28,7 @@ public class LoginPluginResponsePacket : IPacket
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
         var hasData = buffer.ReadBool();

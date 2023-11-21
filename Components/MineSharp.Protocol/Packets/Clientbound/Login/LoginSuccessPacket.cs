@@ -1,12 +1,13 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
 
 public class LoginSuccessPacket : IPacket
 {
-    public static int Id => 0x02;
+    public PacketType Type => PacketType.CB_Login_Success;
 
     public UUID Uuid { get; set; }
     public string Username { get; set; }
@@ -19,12 +20,12 @@ public class LoginSuccessPacket : IPacket
         this.Properties = properties;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteUuid(this.Uuid);
         buffer.WriteString(this.Username);
 
-        if (version.Protocol.Version < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
             return;
         }
@@ -37,15 +38,15 @@ public class LoginSuccessPacket : IPacket
         buffer.WriteVarIntArray(this.Properties, ((buffer, property) => property.Write(buffer)));
     }
     
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var uuid = buffer.ReadUuid();
         var username = buffer.ReadString();
         Property[]? properties = null;
         
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
-            properties = buffer.ReadVarIntArray<Property>(Property.Read);
+            properties = buffer.ReadVarIntArray(Property.Read);
         }
 
         return new LoginSuccessPacket(uuid, username, properties);

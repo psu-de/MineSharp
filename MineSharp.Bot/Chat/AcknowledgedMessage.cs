@@ -21,9 +21,9 @@ internal class AcknowledgedMessage
         this.Signature = signature;
     }
 
-    public ChatMessagePacket.V1_19.MessageItem ToProtocolMessage()
+    public ChatMessagePacket.MessageItem ToProtocolMessage()
     {
-        return new ChatMessagePacket.V1_19.MessageItem(
+        return new ChatMessagePacket.MessageItem(
             this.Sender, this.Signature);
     }
 }

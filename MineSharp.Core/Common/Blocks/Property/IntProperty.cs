@@ -1,11 +1,17 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
-public class IntProperty : BlockProperty
+public class IntProperty : IBlockProperty
 {
-    public IntProperty(string name, int size) : base(name, size) 
-    { }
+    public string Name { get; }
+    public int StateCount { get; }
 
-    public override T GetValue<T>(int state)
+    public IntProperty(string name, int stateCount)
+    {
+        this.Name = name;
+        this.StateCount = stateCount;
+    }
+
+    public T GetValue<T>(int state) where T : struct
     {
         if (typeof(T) != typeof(int))
         {

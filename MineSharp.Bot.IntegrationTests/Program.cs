@@ -1,7 +1,7 @@
 ﻿using MineSharp.Bot.IntegrationTests.Tests;
 
-await WorldTests.TestBlockUpdate();
-Environment.Exit(0);
+// await WorldTests.TestBlockUpdate();
+// Environment.Exit(0);
 
 await PlayerTests.TestWeatherChange();
 

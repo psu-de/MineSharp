@@ -1,11 +1,13 @@
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
 public class HandshakePacket : IPacket
 {
-    public static int Id => 0x00;
+    public PacketType Type => PacketType.SB_Handshake_SetProtocol;
 
     public int ProtocolVersion { get; set; }
     public string Host { get; set; }
@@ -20,7 +22,7 @@ public class HandshakePacket : IPacket
         this.NextState = nextState;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.ProtocolVersion);
         buffer.WriteString(this.Host);
@@ -28,7 +30,7 @@ public class HandshakePacket : IPacket
         buffer.WriteVarInt((int)this.NextState);
     }
     
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var protocolVersion = buffer.ReadVarInt();
         var host = buffer.ReadString();

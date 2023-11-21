@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class MultiBlockUpdatePacket : IPacket
 {
-    public static int Id => 0x43;
+    public PacketType Type => PacketType.CB_Play_MultiBlockChange;
 
     public long ChunkSection { get; set; }
     public bool SuppressLightUpdates { get; set; }
@@ -18,14 +19,14 @@ public class MultiBlockUpdatePacket : IPacket
         this.Blocks = blocks;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(this.ChunkSection);
         buffer.WriteBool(this.SuppressLightUpdates);
         buffer.WriteVarIntArray(this.Blocks, (buf, val) => buf.WriteLong(val));
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var chunkSection = buffer.ReadLong();
         var suppressLightUpdates = buffer.ReadBool();

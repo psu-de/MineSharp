@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class SetPlayerPositionPacket : IPacket
 {
-    public static int Id => 0x14;
+    public PacketType Type => PacketType.SB_Play_Position;
 
     public double X { get; set; }
     public double Y { get; set; }
@@ -20,7 +21,7 @@ public class SetPlayerPositionPacket : IPacket
         this.IsOnGround = isOnGround;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteDouble(this.X);
         buffer.WriteDouble(this.Y);
@@ -28,7 +29,7 @@ public class SetPlayerPositionPacket : IPacket
         buffer.WriteBool(this.IsOnGround);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var x = buffer.ReadDouble();
         var y = buffer.ReadDouble();

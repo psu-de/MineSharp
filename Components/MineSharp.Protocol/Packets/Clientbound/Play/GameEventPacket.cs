@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class GameEventPacket : IPacket
 {
-    public static int Id => 0x1F;
+    public PacketType Type => PacketType.CB_Play_GameStateChange;
     
     public byte Event { get; set; }
     public float Value { get; set; }
@@ -16,13 +17,13 @@ public class GameEventPacket : IPacket
         this.Value = value;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteByte(this.Event);
         buffer.WriteFloat(this.Value);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var @event = buffer.ReadByte();
         var value = buffer.ReadFloat();

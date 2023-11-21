@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class PlayerInfoUpdatePacket : IPacket
 {
-    public static int Id => 0x3A;
+    public PacketType Type => PacketType.CB_Play_PlayerInfo;
     
     public int Action { get; set; }
     
@@ -17,9 +18,9 @@ public class PlayerInfoUpdatePacket : IPacket
         this.Data = data;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19_3)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
             buffer.WriteSByte((sbyte)this.Action);
         else 
             buffer.WriteVarInt(this.Action);
@@ -31,10 +32,10 @@ public class PlayerInfoUpdatePacket : IPacket
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         int action;
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19_3)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
             action = buffer.ReadByte();
         else 
             action = buffer.ReadVarInt();
@@ -65,7 +66,7 @@ public class PlayerInfoUpdatePacket : IPacket
         {
             var uuid = buffer.ReadUuid();
             var actions = new List<IPlayerInfoAction>();
-            if (version.Protocol.Version <= ProtocolVersion.V_18_2)
+            if (version.Version.Protocol <= ProtocolVersion.V_18_2)
             {
                 switch (action)
                 {
@@ -75,7 +76,7 @@ public class PlayerInfoUpdatePacket : IPacket
                         actions.Add(UpdateLatencyAction.Read(buffer));
                         actions.Add(UpdateDisplayName.Read(buffer));
 
-                        if (ProtocolVersion.IsBetween(version.Protocol.Version, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+                        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
                             actions.Add(CryptoActionV19.Read(buffer));
                         break;
                     case 1:

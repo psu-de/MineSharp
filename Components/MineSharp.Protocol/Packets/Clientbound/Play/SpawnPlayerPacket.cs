@@ -1,11 +1,16 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
+/// <summary>
+/// SpawnPlayerPacket used for versions <= 1.20.1
+/// Merged with SpawnEntityPacket in 1.20.2
+/// </summary>
 public class SpawnPlayerPacket : IPacket
 {
-    public static int Id => 0x03;
+    public PacketType Type => PacketType.CB_Play_NamedEntitySpawn;
     
     public int EntityId { get; set; }
     public UUID PlayerUuid { get; set; }
@@ -26,7 +31,7 @@ public class SpawnPlayerPacket : IPacket
         this.Pitch = pitch;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.EntityId);
         buffer.WriteUuid(this.PlayerUuid);
@@ -37,7 +42,7 @@ public class SpawnPlayerPacket : IPacket
         buffer.WriteByte(this.Pitch);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
         var playerUuid = buffer.ReadUuid();

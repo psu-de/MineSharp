@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
 
 public class EncryptionRequestPacket : IPacket
 {
-    public static int Id => 0x01;
+    public PacketType Type => PacketType.CB_Login_EncryptionBegin;
 
     public string ServerId { get; set; }
     public byte[] PublicKey { get; set; }
@@ -18,7 +19,7 @@ public class EncryptionRequestPacket : IPacket
         this.VerifyToken = verifyToken;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(ServerId);
         buffer.WriteVarInt(this.PublicKey.Length);
@@ -27,7 +28,7 @@ public class EncryptionRequestPacket : IPacket
         buffer.WriteBytes(this.VerifyToken.AsSpan());
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var serverId = buffer.ReadString();
         Span<byte> publicKey = stackalloc byte[buffer.ReadVarInt()];

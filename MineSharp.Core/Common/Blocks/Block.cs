@@ -5,7 +5,7 @@ public class Block
     public BlockInfo Info { get; }
     public int State { get; set; }
     public Position Position { get; set; }
-    public int Metadata => (int)this.State! - this.Info.MinStateId;
+    public int Metadata => this.State - this.Info.MinState;
     
     public Block(BlockInfo info, int state, Position position)
     {
@@ -14,7 +14,12 @@ public class Block
         this.Position = position;
     }
 
-    public T GetProperty<T>(string name) => this.Info.Properties.GetPropertyValue<T>(name, this.State);
+    public T GetProperty<T>(string name) where T : struct
+        => this.Info.State.GetPropertyValue<T>(name, this.State);
+
+
+    public bool IsSolid()
+        => this.Info.IsSolid();
 
     public override string ToString() => $"Block (Position={Position}, State={State}, Info={Info})";
 }

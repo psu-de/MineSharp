@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class SetHealthPacket : IPacket
 {
-    public static int Id => 0x57;
+    public PacketType Type => PacketType.CB_Play_UpdateHealth;
 
     public float Health { get; set; }
     public int Food { get; set; }
@@ -18,14 +19,14 @@ public class SetHealthPacket : IPacket
         this.Saturation = saturation;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteFloat(this.Health);
         buffer.WriteVarInt(this.Food);
         buffer.WriteFloat(this.Saturation);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var health = buffer.ReadFloat();
         var food = buffer.ReadVarInt();

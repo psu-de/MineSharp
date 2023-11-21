@@ -1,13 +1,14 @@
 using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 public class RespawnPacket : IPacket
 {
-    public static int Id => 0x41;
+    public PacketType Type => PacketType.CB_Play_Respawn;
     
     public string Dimension { get; set; }
     public string DimensionName { get; set; }
@@ -36,9 +37,9 @@ public class RespawnPacket : IPacket
         this.DeathLocation = deathLocation;
     }
 
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Protocol.Version <= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
             throw new PacketVersionException($"Cannot write {nameof(RespawnPacket)} for versions before 1.19.");
         }
@@ -62,11 +63,11 @@ public class RespawnPacket : IPacket
         buffer.WriteULong(this.DeathLocation!.ToULong());
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         string dimension;
 
-        if (version.Protocol.Version <= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
             var dimensionNbt = buffer.ReadNbt();
             dimension = dimensionNbt.Get<NbtString>("effects")!.Value;
@@ -85,7 +86,7 @@ public class RespawnPacket : IPacket
         bool? hasDeathLocation = null;
         string? deathDimensionName = null;
         Position? deathLocation = null;
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation ?? false)

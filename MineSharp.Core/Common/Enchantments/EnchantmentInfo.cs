@@ -9,8 +9,8 @@ public record EnchantmentInfo(
     EnchantCost MaxCost,
     bool TreasureOnly,
     bool Curse,
-    string[] Exclude,
-    string Category,
+    EnchantmentType[] Exclude,
+    EnchantmentCategory Category,
     int Weight,
     bool Tradeable,
     bool Discoverable);

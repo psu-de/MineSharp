@@ -7,7 +7,7 @@ namespace MineSharp.World;
 
 public static class WorldVersion
 {
-    private static readonly MinecraftVersion Major_1_18 = new MinecraftVersion("1.18_major");
+    private static readonly MinecraftVersion Major_1_18 = new MinecraftVersion("1.18", -1);
     
     public static IWorld CreateWorld(MinecraftData version)
     {

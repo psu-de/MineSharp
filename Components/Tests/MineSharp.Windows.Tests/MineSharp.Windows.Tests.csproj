@@ -17,8 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\..\..\MineSharp.Core\MineSharp.Core.csproj" />
-      <ProjectReference Include="..\..\..\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\..\MineSharp.Windows\MineSharp.Windows.csproj" />
     </ItemGroup>
 

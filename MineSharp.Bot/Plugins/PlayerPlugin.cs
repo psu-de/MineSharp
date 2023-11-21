@@ -21,12 +21,12 @@ public class PlayerPlugin : Plugin
     /// <summary>
     /// The Minecraftplayer representing the Minecraft Bot itself.
     /// </summary>
-    public MinecraftPlayer? Player { get; private set; }
+    public MinecraftPlayer? Self { get; private set; }
 
     /// <summary>
     /// The Entity representing the Minecraft Bot itself.
     /// </summary>
-    public Entity? Entity => Player?.Entity;
+    public Entity? Entity => this.Self?.Entity;
 
     /// <summary>
     /// All players on the server.
@@ -130,7 +130,7 @@ public class PlayerPlugin : Plugin
     {
         this._entities = this.Bot.GetPlugin<EntityPlugin>();
         var loginPacketTask = this.Bot.Client.WaitForPacket<LoginPacket>();
-        var positionPacketTask = this.Bot.Client.WaitForPacket<SynchronizePlayerPositionPacket>();
+        var positionPacketTask = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
 
         await Task.WhenAll(loginPacketTask, positionPacketTask);
 
@@ -147,7 +147,7 @@ public class PlayerPlugin : Plugin
             true,
             new Dictionary<int, Effect?>());
 
-        this.Player = new MinecraftPlayer(
+        this.Self = new MinecraftPlayer(
             this.Bot.Session.Username,
             this.Bot.Session.UUID,
             0,
@@ -159,7 +159,7 @@ public class PlayerPlugin : Plugin
         this.Saturation = 20.0f;
         this.Dimension = loginPacket.DimensionName;
         
-        Logger.Info($"Initialized Bot Entity: Position=({this.Entity!.Position}), GameMode={this.Player.GameMode}, Dimension={this.Dimension}.");
+        Logger.Info($"Initialized Bot Entity: Position=({this.Entity!.Position}), GameMode={this.Self.GameMode}, Dimension={this.Dimension}.");
 
         await this.Bot.Client.SendPacket(
             new SetPlayerPositionAndRotationPacket(
@@ -275,7 +275,7 @@ public class PlayerPlugin : Plugin
                             break;
                         }
 
-                        if (!updateListedAction.Listed && this.Bot.Data.Protocol.Version <= ProtocolVersion.V_1_19_2)
+                        if (!updateListedAction.Listed && this.Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_2)
                         {
                             this.OnPlayerLeft?.Invoke(this.Bot, player);
                         }
@@ -349,7 +349,7 @@ public class PlayerPlugin : Plugin
             
             case 3: // GameMode Change
                 var gameMode = (GameMode)packet.Value;
-                this.Player!.GameMode = gameMode;
+                this.Self!.GameMode = gameMode;
                 break;          
         }
 

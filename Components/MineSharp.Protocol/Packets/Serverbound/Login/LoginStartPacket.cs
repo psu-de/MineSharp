@@ -1,12 +1,13 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 
 public class LoginStartPacket : IPacket
 {
-    public static int Id => 0x00;
+    public PacketType Type => PacketType.SB_Login_LoginStart;
 
     public string Username { get; set; }
     public SignatureContainer? Signature { get; set; }
@@ -19,18 +20,18 @@ public class LoginStartPacket : IPacket
         this.PlayerUuid = playerUuid;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Username);
 
-        if (ProtocolVersion.IsBetween(version.Protocol.Version, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
             bool hasSignature = this.Signature != null;
             buffer.WriteBool(hasSignature);
             this.Signature?.Write(buffer);
         }
 
-        if (version.Protocol.Version < ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_2)
         {
             return;
         }
@@ -42,18 +43,18 @@ public class LoginStartPacket : IPacket
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var username = buffer.ReadString();
         SignatureContainer? signature = null;
         UUID? playerUuid = null;
         
-        if (version.Protocol.Version is >= ProtocolVersion.V_1_19 and <= ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol is >= ProtocolVersion.V_1_19 and <= ProtocolVersion.V_1_19_2)
         {
             signature = SignatureContainer.Read(buffer);
         }
 
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
         {
             playerUuid = buffer.ReadUuid();
         }

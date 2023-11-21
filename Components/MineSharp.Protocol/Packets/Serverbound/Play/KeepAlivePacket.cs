@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class KeepAlivePacket : IPacket
 {
-    public static int Id => 0x12;
+    public PacketType Type => PacketType.SB_Play_KeepAlive;
 
     public long KeepAliveId { get; set; }
 
@@ -14,12 +15,12 @@ public class KeepAlivePacket : IPacket
         this.KeepAliveId = id;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(this.KeepAliveId);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var id = buffer.ReadLong();
         return new KeepAlivePacket(id);

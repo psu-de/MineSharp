@@ -1,20 +1,21 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class ChatCommandPacket : IPacket
 {
-    public static int Id => 0x04;
+    public PacketType Type => PacketType.SB_Play_ChatCommand;
     
     public string Command { get; set; }
     public long Timestamp { get; set; }
     public long Salt { get; set; }
     public ArgumentSignature[] Signatures { get; set; }
     public bool? SignedPreview { get; set; }
-    public ChatMessagePacket.V1_19.MessageItem[]? PreviousMessages { get; set; }
-    public ChatMessagePacket.V1_19.MessageItem? LastRejectedMessage { get; set; }
+    public ChatMessagePacket.MessageItem[]? PreviousMessages { get; set; }
+    public ChatMessagePacket.MessageItem? LastRejectedMessage { get; set; }
     public int? MessageCount { get; set; }
     public byte[]? Acknowledged { get; set; }
 
@@ -44,7 +45,7 @@ public class ChatCommandPacket : IPacket
     /// <param name="signedPreview"></param>
     /// <param name="previousMessages"></param>
     /// <param name="lastRejectedMessage"></param>
-    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview, ChatMessagePacket.V1_19.MessageItem[] previousMessages, ChatMessagePacket.V1_19.MessageItem? lastRejectedMessage)
+    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview, ChatMessagePacket.MessageItem[] previousMessages, ChatMessagePacket.MessageItem? lastRejectedMessage)
     {
         this.Command = command;
         this.Timestamp = timestamp;
@@ -74,14 +75,14 @@ public class ChatCommandPacket : IPacket
         this.Acknowledged = acknowledged;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Command);
         buffer.WriteLong(this.Timestamp);
         buffer.WriteLong(this.Salt);
         buffer.WriteVarIntArray(this.Signatures, (buffer, signature) => signature.Write(buffer, version));
 
-        if (ProtocolVersion.IsBetween(version.Protocol.Version, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
             if (!this.SignedPreview.HasValue)
             {
@@ -91,7 +92,7 @@ public class ChatCommandPacket : IPacket
             buffer.WriteBool(this.SignedPreview.Value!);
         }
 
-        if (version.Protocol.Version >= ProtocolVersion.V_1_19_3)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             if (this.Acknowledged == null)
             {
@@ -108,7 +109,7 @@ public class ChatCommandPacket : IPacket
             return;
         }
 
-        if (version.Protocol.Version != ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
             return;
 
         if (this.PreviousMessages == null)
@@ -127,7 +128,7 @@ public class ChatCommandPacket : IPacket
         this.LastRejectedMessage!.Write(buffer);
     }
     
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName) 
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version) 
         => throw new NotImplementedException();
 
     public class ArgumentSignature
@@ -145,7 +146,7 @@ public class ChatCommandPacket : IPacket
         {
             buffer.WriteString(this.ArgumentName);
 
-            if (version.Protocol.Version <= ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
             {
                 buffer.WriteVarInt(this.Signature.Length);
                 buffer.WriteBytes(this.Signature);

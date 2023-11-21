@@ -144,8 +144,8 @@ public static class CommandParserFactory
         { 44, ReadResourceParser },  
     };
 
-    private static readonly MinecraftVersion V1_19_3 = new MinecraftVersion("1.19.3");
-    private static readonly MinecraftVersion V1_19_4 = new MinecraftVersion("1.19.4");
+    private static readonly MinecraftVersion V1_19_3 = new MinecraftVersion("1.19.3", -1);
+    private static readonly MinecraftVersion V1_19_4 = new MinecraftVersion("1.19.4", -1);
     
     public static IParser ReadParser(int parserId, MinecraftData data, PacketBuffer buffer)
     {

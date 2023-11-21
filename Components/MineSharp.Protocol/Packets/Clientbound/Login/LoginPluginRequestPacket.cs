@@ -1,11 +1,12 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
 
 public class LoginPluginRequestPacket : IPacket
 {
-    public static int Id => 0x04;
+    public PacketType Type => PacketType.CB_Login_LoginPluginRequest;
 
     public int MessageId { get; set; }
     public string Channel { get; set; } // TODO: Identifier
@@ -18,14 +19,14 @@ public class LoginPluginRequestPacket : IPacket
         this.Data = data;
     }
     
-    public void Write(PacketBuffer buffer, MinecraftData version, string packetName)
+    public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.MessageId);
         buffer.WriteString(this.Channel);
         buffer.WriteBytes(this.Data.AsSpan());
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version, string packetName)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
         var channel = buffer.ReadString();
