@@ -13,11 +13,11 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Because of the rework, all versions from 1.18-1.19.4 are supported!
+Because of the rework, all versions from 1.18-1.20.1 are supported!
 
 # Current features
 
-- ✨Supported Versions: 1.18.x - 1.19.x
+- ✨Supported Versions: 1.18.x - 1.20.1
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
