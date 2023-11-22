@@ -1,6 +1,7 @@
 using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Items;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -324,6 +325,7 @@ public class PacketBuffer
         return (T)value;
     }
     
+    
     #endregion
 
 
@@ -468,8 +470,14 @@ public class PacketBuffer
         }
     }
 
-    public void WriteNbt(NbtCompound compound)
+    public void WriteNbt(NbtCompound? compound)
     {
+        if (compound == null)
+        {
+            this._buffer.WriteByte((byte)NbtTagType.End);
+            return;
+        }
+        
         NbtFile f = new NbtFile(compound) { BigEndian = true };
         f.SaveToStream(_buffer, NbtCompression.None);
     }
@@ -482,6 +490,7 @@ public class PacketBuffer
         this.WriteVarInt(entity.Type);
         this.WriteNbt(entity.Data);
     }
+    
     
     #endregion
 }

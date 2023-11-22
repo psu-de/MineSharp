@@ -36,10 +36,10 @@ public class Window
     private Slot? OffhandSlot { get; set; }
 
     private WindowSynchronizer? Synchronizer { get; }
-    private object _syncLock { get; }
+    private object SyncLock { get; }
     private bool IsSynchronized => this.Synchronizer != null;
     
-    public event SlotChanged OnSlotChanged;
+    public event SlotChanged? OnSlotChanged;
     
     public Window(byte id, string title, int uniqueSlotCount, Window? inventory = null, WindowSynchronizer? windowSynchronizer = null)
     {
@@ -57,7 +57,7 @@ public class Window
         }
         
         this.Synchronizer = windowSynchronizer;
-        this._syncLock = new object();
+        this.SyncLock = new object();
 
         for (short i = 0; i < uniqueSlotCount; i++)
         {
@@ -183,8 +183,10 @@ public class Window
     {
         ThrowIfSlotOufOfRange(slot.SlotIndex);
 
-        if (slot.Item != null && slot.Item.Count == 0)
+        if (slot.Item?.Count == 0)
             slot.Item = null;
+
+        var index = slot.SlotIndex;
 
         if (slot.SlotIndex == -1)
         {
@@ -199,9 +201,9 @@ public class Window
         {
             slot.SlotIndex -= (short)this.Slots.Length;
             this.Inventory!.SetSlot(slot);
-            return;
         }
-        OnSlotChanged?.Invoke(this, slot.SlotIndex);
+        
+        this.OnSlotChanged?.Invoke(this, index);
     }
 
 
@@ -480,7 +482,7 @@ public class Window
     {
         if (this.IsSynchronized)
         {
-            lock (this._syncLock)
+            lock (this.SyncLock)
             {
                 click.PerformClick();
                 this.Synchronizer!(this, click).Wait();

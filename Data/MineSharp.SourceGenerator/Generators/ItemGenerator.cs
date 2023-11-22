@@ -70,15 +70,7 @@ public class ItemGenerator : IGenerator
     private string KeySelector(JToken token)
     {
         var name = (string)token.SelectToken("name")!;
-        name = name.Pascalize();
-
-        return name switch {
-            "PotteryShardArcher" => "ArcherPotterySherd",
-            "PotteryShardPrize" => "PrizePotterySherd",
-            "PotteryShardArmsUp" => "ArmsUpPotterySherd",
-            "PotteryShardSkull" => "SkullPotterySherd",
-            _ => name
-        };
+        return NameUtils.GetItemName(name);
     }
     
     private string Stringify(JToken token)

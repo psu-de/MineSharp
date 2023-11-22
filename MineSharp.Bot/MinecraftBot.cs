@@ -22,11 +22,14 @@ public class MinecraftBot
     public EntityPlugin? Entities { get; private set; }
     public PlayerPlugin? Player { get; private set; }
     public WorldPlugin? World { get; private set; }
+    public WindowPlugin? Windows { get; private set; }
 
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource _cancellation;
     
     private Task? _tickLoop;
+
+    internal int SequenceId;
 
     private MinecraftBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
@@ -99,11 +102,13 @@ public class MinecraftBot
         this.Entities = new EntityPlugin(this);
         this.World = new WorldPlugin(this);
         this.Chat = new ChatPlugin(this);
+        this.Windows = new WindowPlugin(this);
 
         AddPlugin(this.Player);
         AddPlugin(this.Entities);
         AddPlugin(this.World);
         AddPlugin(this.Chat);
+        AddPlugin(this.Windows);
     }
     
     private Task InitializePlugins()

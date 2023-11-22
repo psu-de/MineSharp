@@ -21,4 +21,7 @@ public class Item
     {
         return new Item(this.Info, Count, Damage, Metadata);
     }
+
+    public override string ToString() 
+        => $"Item(Info={Info}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
 }

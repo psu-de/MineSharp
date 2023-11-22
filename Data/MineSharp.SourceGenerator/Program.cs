@@ -15,6 +15,7 @@ var generators = new IGenerator[] {
     new EntityGenerator(),
     new ItemGenerator(),
     new ProtocolGenerator(),
+    new MaterialGenerator(),
     
     VersionMapGenerator.GetInstance()
 };

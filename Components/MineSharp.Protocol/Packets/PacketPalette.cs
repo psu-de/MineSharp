@@ -123,6 +123,12 @@ public static class PacketPalette
         RegisterPacket<PlayerInfoUpdatePacket>(PacketType.CB_Play_PlayerInfo);
         RegisterPacket<PlayerInfoRemovePacket>(PacketType.CB_Play_PlayerRemove);
         RegisterPacket<GameEventPacket>(PacketType.CB_Play_GameStateChange);
+        RegisterPacket<AcknowledgeBlockChangePacket>(PacketType.CB_Play_AcknowledgePlayerDigging);
+        RegisterPacket<WindowItemsPacket>(PacketType.CB_Play_WindowItems);
+        RegisterPacket<WindowSetSlotPacket>(PacketType.CB_Play_SetSlot);
+        RegisterPacket<OpenWindowPacket>(PacketType.CB_Play_OpenWindow);
+        RegisterPacket<CloseWindowPacket>(PacketType.CB_Play_CloseWindow);
+        RegisterPacket<SetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
@@ -135,6 +141,8 @@ public static class PacketPalette
         RegisterPacket<PlayerSessionPacket>(PacketType.SB_Play_ChatSessionUpdate);
         RegisterPacket<ConfirmTeleportPacket>(PacketType.SB_Play_TeleportConfirm);
         RegisterPacket<UpdateCommandBlock>(PacketType.SB_Play_UpdateCommandBlock);
+        RegisterPacket<WindowClickPacket>(PacketType.SB_Play_WindowClick);
+        RegisterPacket<PlaceBlockPacket>(PacketType.SB_Play_BlockPlace);
         
     }
 

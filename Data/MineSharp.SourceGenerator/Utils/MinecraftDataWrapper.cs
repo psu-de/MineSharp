@@ -50,4 +50,7 @@ public class MinecraftDataWrapper
 
     public Task<JToken> GetVersion(string version)
         => this.Parse(version, "version");
+
+    public Task<JToken> GetMaterials(string version)
+        => this.Parse(version, "materials");
 }

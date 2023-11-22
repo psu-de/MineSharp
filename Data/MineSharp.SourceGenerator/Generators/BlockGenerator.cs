@@ -137,22 +137,12 @@ public class BlockGenerator : IGenerator
         return $"new int[] {{ {string.Join(", ", arr)} }}";
     }
     
-    private string GetMaterial(string x)
-    {
-        if (x == "coweb")
-            return "Cobweb";
-        if (x.StartsWith("mineable/"))
-            return x.Substring("mineable/".Length).Pascalize();
-
-        return x.Pascalize();
-    }
-    
     private string GetMaterials(JToken token)
     {
         var str = (string)token!;
 
         var mats = str.Split(";")
-            .Select(GetMaterial)
+            .Select(NameUtils.GetMaterial)
             .Select(x => $"Material.{x}")
             .ToArray();
         return mats.Length == 0
@@ -173,7 +163,7 @@ public class BlockGenerator : IGenerator
             var mats = (string)block.SelectToken("material")!;
             foreach (var material in mats.Split(";"))
             {
-                materials.Add(GetMaterial(material));
+                materials.Add(NameUtils.GetMaterial(material));
             }
         }
 

@@ -11,7 +11,9 @@ using MineSharp.Data.Effects;
 using MineSharp.Data.Enchantments;
 using MineSharp.Data.Entities;
 using MineSharp.Data.Items;
+using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
+using MineSharp.Data.Windows;
 
 namespace MineSharp.Data;
 
@@ -25,6 +27,8 @@ public class MinecraftData
     public EntityProvider Entities { get; }
     public ItemProvider Items { get; }
     public ProtocolProvider Protocol { get; }
+    public MaterialsProvider Materials { get; }
+    public WindowData Windows { get; } = new WindowData();
     public MinecraftVersion Version { get; }
 
     private MinecraftData(
@@ -36,6 +40,7 @@ public class MinecraftData
         EntityProvider entities,
         ItemProvider items,
         ProtocolProvider protocol,
+        MaterialsProvider materials,
         MinecraftVersion version)
     {
         this.Biomes = biomes;
@@ -46,6 +51,7 @@ public class MinecraftData
         this.Entities = entities;
         this.Items = items;
         this.Protocol = protocol;
+        this.Materials = materials;
         this.Version = version;
     }
 
@@ -59,6 +65,7 @@ public class MinecraftData
         var entityType = GetClassType(VersionMap.Entities[version]);
         var itemType = GetClassType(VersionMap.Items[version]);
         var protocolType = GetClassType(VersionMap.Protocol[version]);
+        var materialType = GetClassType(VersionMap.Materials[version]);
 
         var biomes = new BiomeProvider(
             (DataVersion<BiomeType, BiomeInfo>)Activator.CreateInstance(biomeType)!);
@@ -74,6 +81,8 @@ public class MinecraftData
             (DataVersion<EntityType, EntityInfo>)Activator.CreateInstance(entityType)!);
         var items = new ItemProvider(
             (DataVersion<ItemType, ItemInfo>)Activator.CreateInstance(itemType)!);
+        var materials = new MaterialsProvider(
+            (MaterialVersion)Activator.CreateInstance(materialType)!);
         var protocol = new ProtocolProvider(
             (ProtocolVersion)Activator.CreateInstance(protocolType)!);
 
@@ -86,6 +95,7 @@ public class MinecraftData
             entities,
             items,
             protocol,
+            materials,
             VersionMap.Versions[version]);
     }
 

@@ -117,6 +117,7 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<PlayerInfoUpdatePacket>(this.HandlePlayerInfoUpdate);
         this.Bot.Client.On<PlayerInfoRemovePacket>(this.HandlePlayerInfoRemove);
         this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
+        this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
     }
 
     /// <summary>
@@ -351,6 +352,16 @@ public class PlayerPlugin : Plugin
                 var gameMode = (GameMode)packet.Value;
                 this.Self!.GameMode = gameMode;
                 break;          
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleAcknowledgeBlockChange(AcknowledgeBlockChangePacket packet)
+    {
+        if (packet.Body is AcknowledgeBlockChangePacket.PacketBody_1_19 v1_19)
+        {
+            this.Bot.SequenceId = v1_19.SequenceId;
         }
 
         return Task.CompletedTask;

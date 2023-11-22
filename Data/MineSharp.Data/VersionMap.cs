@@ -106,6 +106,19 @@ internal static class VersionMap
         { "1.20.1", "MineSharp.Data.Protocol.Versions.Protocol_1_20" },
         { "1.20.2", "MineSharp.Data.Protocol.Versions.Protocol_1_20_2" },
     };
+    public static IDictionary<string, string> Materials { get; } = new Dictionary<string, string>()
+    {
+        { "1.18", "MineSharp.Data.Materials.Versions.Materials_1_18" },
+        { "1.18.1", "MineSharp.Data.Materials.Versions.Materials_1_18" },
+        { "1.18.2", "MineSharp.Data.Materials.Versions.Materials_1_18" },
+        { "1.19", "MineSharp.Data.Materials.Versions.Materials_1_19" },
+        { "1.19.2", "MineSharp.Data.Materials.Versions.Materials_1_19_2" },
+        { "1.19.3", "MineSharp.Data.Materials.Versions.Materials_1_19_3" },
+        { "1.19.4", "MineSharp.Data.Materials.Versions.Materials_1_19_4" },
+        { "1.20", "MineSharp.Data.Materials.Versions.Materials_1_20" },
+        { "1.20.1", "MineSharp.Data.Materials.Versions.Materials_1_20" },
+        { "1.20.2", "MineSharp.Data.Materials.Versions.Materials_1_20_2" },
+    };
     public static IDictionary<string, MinecraftVersion> Versions { get; } = new Dictionary<string, MinecraftVersion>()
     {
         { "1.18", new MinecraftVersion("1.18", 757) },
