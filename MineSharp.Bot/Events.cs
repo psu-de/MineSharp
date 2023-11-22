@@ -14,7 +14,7 @@ public static class Events
 
     public delegate void BotChatEvent(MinecraftBot sender, Core.Common.Chat message);
 
-    public delegate void BotChatMessageEvent(MinecraftBot sender, UUID player, string message, ChatMessageType chatPosition);
+    public delegate void BotChatMessageEvent(MinecraftBot sender, UUID? player, string message, ChatMessageType chatPosition, string? senderName);
 
     public delegate void EntityEvent(MinecraftBot sender, Entity entity);
     

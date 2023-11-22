@@ -33,6 +33,8 @@ public class ChatPlugin : Plugin
         
         this.Bot.Client.On<PlayerChatPacket>(this.HandleChatMessagePacket);
         this.Bot.Client.On<ChatPacket>(this.HandleChat);
+        this.Bot.Client.On<SystemChatMessagePacket>(this.HandleSystemChatMessage);
+        this.Bot.Client.On<DisguisedChatMessagePacket>(this.HandleDisguisedChatMessage);
     }
 
     protected override async Task Init()
@@ -157,97 +159,6 @@ public class ChatPlugin : Plugin
             arguments = CollectCommandArgumentsRecursive(childIdx, lastArg, arguments);
 
         return arguments;
-    }
-    
-    /*
-     * Thanks to Minecraft-Console-Client
-     * https://github.com/MCCTeam/Minecraft-Console-Client
-     * 
-     * This Method uses a lot of code from MinecraftClient/Protocol/Handlers/Packet/s2c/DeclareCommands.cs from MCC.
-     */
-    private Task HandleDeclareCommandsPacket(DeclareCommandsPacket packet)
-    {
-        var buffer = packet.RawBuffer;
-        int nodeCount = buffer.ReadVarInt();
-        var nodes = new CommandNode[nodeCount];
-
-        for (int i = 0; i < nodes.Length; i++)
-        {
-            byte flags = buffer.ReadByte();
-            int childCount = buffer.ReadVarInt();
-            int[] children = new int[childCount];
-            for (int j = 0; j < childCount; ++j)
-                children[j] = buffer.ReadVarInt();
-
-            int redirectNode = ((flags & 0x08) == 0x08) ? buffer.ReadVarInt() : -1;
-
-            string? name = ((flags & 0x03) == 1 || (flags & 0x03) == 2) ? buffer.ReadString() : null;
-
-            int parserId = ((flags & 0x03) == 2) ? buffer.ReadVarInt() : -1;
-            IParser? parser = CommandParserFactory.ReadParser(parserId, this.Bot.Data, buffer);
-
-            string? suggestionsType = ((flags & 0x10) == 0x10) ? buffer.ReadString() : null;
-            nodes[i] = new CommandNode(flags, children, redirectNode, name, parser, suggestionsType);
-        }
-        var rootIndex = buffer.ReadVarInt();
-        this._commandTree = new CommandTree(rootIndex, nodes);
-
-        return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Method to receive chat messages after 1.19
-    /// </summary>
-    /// <param name="packet"></param>
-    /// <returns></returns>
-    /// <exception cref="UnreachableException"></exception>
-    private Task HandleChatMessagePacket(PlayerChatPacket packet)
-    {
-        // TODO: Advanced chat stuff like filtering and signature verification.
-
-        if (packet.Body is PlayerChatPacket.V1_19_2_3Body body && body.Signature != null)
-        {
-            if (this._messageCollector is LastSeenMessageCollector1_19_2 collector1_19_2)
-            {
-                collector1_19_2.Push(new AcknowledgedMessage(true, body.Sender, body.Signature));
-                if (collector1_19_2.PendingAcknowledgements++ > 64)
-                {
-                    var messages = collector1_19_2.AcknowledgeMessages().Select(x => x.ToProtocolMessage()).ToArray();
-                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(messages, null));
-                }
-            } else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
-            {
-                int count = collector1_19_3.ResetCount();
-                if (count > 0)
-                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(count));
-            }
-        }
-        
-        (UUID sender, string message, ChatMessageType type) = packet.Body switch {
-            PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
-            PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
-            _ => throw new UnreachableException()
-        };
-
-        this.HandleChatInternal(sender, message, type);
-        
-        return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Method to receive chat messages before 1.19
-    /// </summary>
-    /// <param name="packet"></param>
-    /// <returns></returns>
-    private Task HandleChat(ChatPacket packet)
-    {
-        this.HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
-        return Task.CompletedTask;
-    }
-
-    private void HandleChatInternal(UUID sender, string message, ChatMessageType type)
-    {
-        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type);
     }
     
 
@@ -489,5 +400,124 @@ public class ChatPlugin : Plugin
                 signatures.ToArray(),
                 count,
                 acknowledgedBitfield));
+    }
+    
+    /*
+     * Thanks to Minecraft-Console-Client
+     * https://github.com/MCCTeam/Minecraft-Console-Client
+     * 
+     * This Method uses a lot of code from MinecraftClient/Protocol/Handlers/Packet/s2c/DeclareCommands.cs from MCC.
+     */
+    private Task HandleDeclareCommandsPacket(DeclareCommandsPacket packet)
+    {
+        var buffer = packet.RawBuffer;
+        int nodeCount = buffer.ReadVarInt();
+        var nodes = new CommandNode[nodeCount];
+
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            byte flags = buffer.ReadByte();
+            int childCount = buffer.ReadVarInt();
+            int[] children = new int[childCount];
+            for (int j = 0; j < childCount; ++j)
+                children[j] = buffer.ReadVarInt();
+
+            int redirectNode = ((flags & 0x08) == 0x08) ? buffer.ReadVarInt() : -1;
+
+            string? name = ((flags & 0x03) == 1 || (flags & 0x03) == 2) ? buffer.ReadString() : null;
+
+            int parserId = ((flags & 0x03) == 2) ? buffer.ReadVarInt() : -1;
+            IParser? parser = CommandParserFactory.ReadParser(parserId, this.Bot.Data, buffer);
+
+            string? suggestionsType = ((flags & 0x10) == 0x10) ? buffer.ReadString() : null;
+            nodes[i] = new CommandNode(flags, children, redirectNode, name, parser, suggestionsType);
+        }
+        var rootIndex = buffer.ReadVarInt();
+        this._commandTree = new CommandTree(rootIndex, nodes);
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Method to receive chat messages after 1.19
+    /// </summary>
+    /// <param name="packet"></param>
+    /// <returns></returns>
+    /// <exception cref="UnreachableException"></exception>
+    private Task HandleChatMessagePacket(PlayerChatPacket packet)
+    {
+        // TODO: Advanced chat stuff like filtering and signature verification.
+
+        if (packet.Body is PlayerChatPacket.V1_19_2_3Body body && body.Signature != null)
+        {
+            if (this._messageCollector is LastSeenMessageCollector1_19_2 collector1_19_2)
+            {
+                collector1_19_2.Push(new AcknowledgedMessage(true, body.Sender, body.Signature));
+                if (collector1_19_2.PendingAcknowledgements++ > 64)
+                {
+                    var messages = collector1_19_2.AcknowledgeMessages().Select(x => x.ToProtocolMessage()).ToArray();
+                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(messages, null));
+                }
+            } else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
+            {
+                int count = collector1_19_3.ResetCount();
+                if (count > 0)
+                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(count));
+            }
+        }
+        
+        (UUID sender, string message, ChatMessageType type) = packet.Body switch {
+            PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
+            PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
+            _ => throw new UnreachableException()
+        };
+
+        this.HandleChatInternal(sender, message, type);
+        
+        return Task.CompletedTask;
+    }
+
+    private Task HandleSystemChatMessage(SystemChatMessagePacket packet)
+    {
+        ChatMessageType type;
+        if (packet.ChatType.HasValue)
+        {
+            type = (ChatMessageType)packet.ChatType;
+        }
+        else
+        {
+            type = packet.IsOverlay!.Value 
+                ? ChatMessageType.GameInfo 
+                : ChatMessageType.SystemMessage;
+        }
+        
+        this.HandleChatInternal(null, packet.Content, type);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleDisguisedChatMessage(DisguisedChatMessagePacket packet)
+    {
+        this.HandleChatInternal(
+            null,
+            packet.Message,
+            (ChatMessageType)packet.ChatType,
+            packet.Target ?? packet.Name);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Method to receive chat messages before 1.19
+    /// </summary>
+    /// <param name="packet"></param>
+    /// <returns></returns>
+    private Task HandleChat(ChatPacket packet)
+    {
+        this.HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
+        return Task.CompletedTask;
+    }
+
+    private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
+    {
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type, senderName);
     }
 }

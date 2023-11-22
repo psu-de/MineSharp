@@ -2,24 +2,34 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class ChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatMessage;
-        
+
     public string Message { get; set; }
     public long Timestamp { get; set; }
     public long Salt { get; set; }
     public byte[]? Signature { get; set; }
     public bool? SignedPreview { get; set; }
-    public MessageItem[]? PreviousMessages { get; set; }
-    public MessageItem? LastRejectedMessage { get; set; }
+    public ChatMessageItem[]? PreviousMessages { get; set; }
+    public ChatMessageItem? LastRejectedMessage { get; set; }
     public int? MessageCount { get; set; }
     public byte[]? Acknowledged { get; set; }
-    
-    public ChatMessagePacket(string message, long timestamp, long salt, byte[]? signature, bool? signedPreview, MessageItem[]? previousMessages, MessageItem? lastRejectedMessage, int? messageCount, byte[]? acknowledged)
+
+    public ChatMessagePacket(
+        string message,
+        long timestamp,
+        long salt,
+        byte[]? signature,
+        bool? signedPreview,
+        ChatMessageItem[]? previousMessages,
+        ChatMessageItem? lastRejectedMessage,
+        int? messageCount,
+        byte[]? acknowledged)
     {
         this.Message = message;
         this.Timestamp = timestamp;
@@ -41,14 +51,14 @@ public class ChatMessagePacket : IPacket
         : this(message, timestamp, salt, signature, signedPreview, null, null, null, null)
     { }
 
-    public ChatMessagePacket(string message, long timestamp, long salt, byte[] signature, bool signedPreview, MessageItem[] previousMessages, MessageItem? lastRejectedMessage)
+    public ChatMessagePacket(string message, long timestamp, long salt, byte[] signature, bool signedPreview, ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
         : this(message, timestamp, salt, signature, signedPreview, previousMessages, lastRejectedMessage, null, null)
     { }
 
     public ChatMessagePacket(string message, long timestamp, long salt, byte[]? signature, int messageCount, byte[] acknowledged)
         : this(message, timestamp, salt, signature, null, null, null, messageCount, acknowledged)
     { }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Message);
@@ -66,28 +76,28 @@ public class ChatMessagePacket : IPacket
                 {
                     throw new PacketVersionException("Signature must exactly be 256 bytes long.");
                 }
-                
+
                 buffer.WriteBytes(this.Signature);
             }
 
             if (this.MessageCount == null)
                 throw new PacketVersionException($"Expected {nameof(MessageCount)} to be set for versions >= 1.19.3");
-            
+
             buffer.WriteVarInt(this.MessageCount.Value);
             buffer.WriteBytes(this.Acknowledged);
             return;
         }
-        
+
         // only 1.19-1.19.2
         if (this.Signature == null)
             throw new PacketVersionException($"Expected field {this.Signature} to be set for versions 1.19-1.19.2.");
-        
+
         if (this.SignedPreview == null)
             throw new PacketVersionException($"Expected field {this.SignedPreview} to be set for versions 1.19-1.19.2.");
 
         buffer.WriteVarInt(this.Signature.Length);
         buffer.WriteBytes(this.Signature);
-        
+
         buffer.WriteBool(this.SignedPreview.Value);
 
         if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
@@ -95,16 +105,16 @@ public class ChatMessagePacket : IPacket
 
         if (this.PreviousMessages == null)
             throw new PacketVersionException($"Expected field {this.PreviousMessages} to be set for versions 1.19.2.");
-        
-        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf));
+
+        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 
         var hasLastRejectedMessage = this.LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
 
         if (!hasLastRejectedMessage)
             return;
-        
-        this.LastRejectedMessage!.Write(buffer);
+
+        this.LastRejectedMessage!.Write(buffer, version);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -114,8 +124,8 @@ public class ChatMessagePacket : IPacket
         var salt = buffer.ReadLong();
         byte[]? signature;
         bool? signedPreview;
-        MessageItem[]? previousMessages;
-        MessageItem? lastRejectedMessage;
+        ChatMessageItem[]? previousMessages;
+        ChatMessageItem? lastRejectedMessage;
         int? messageCount;
         byte[]? acknowledged;
 
@@ -133,14 +143,14 @@ public class ChatMessagePacket : IPacket
             messageCount = buffer.ReadVarInt();
             acknowledged = new byte[3];
             buffer.ReadBytes(acknowledged);
-                
+
             return new ChatMessagePacket(message, timestamp, salt, signature, messageCount.Value, acknowledged);
         }
-            
+
         // only 1.19-1.19.2
         signature = new byte[buffer.ReadVarInt()];
         buffer.ReadBytes(signature);
-            
+
         signedPreview = buffer.ReadBool();
 
         if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
@@ -148,44 +158,16 @@ public class ChatMessagePacket : IPacket
             return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value);
         }
 
-            
-        previousMessages = buffer.ReadVarIntArray(MessageItem.Read);
+
+        previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
 
         var hasLastRejectedMessage = buffer.ReadBool();
         if (hasLastRejectedMessage)
         {
-            lastRejectedMessage = MessageItem.Read(buffer);
+            lastRejectedMessage = ChatMessageItem.Read(buffer, version);
         }
         else lastRejectedMessage = null;
 
         return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value, previousMessages, lastRejectedMessage);
-    }
-    
-    public class MessageItem
-    {
-        public UUID Sender { get; set; }
-        public byte[] Signature { get; set; }
-
-        public MessageItem(UUID sender, byte[] signature)
-        {
-            this.Sender = sender;
-            this.Signature = signature;
-        }
-
-        public void Write(PacketBuffer buffer)
-        {
-            buffer.WriteUuid(this.Sender);
-            buffer.WriteVarInt(this.Signature.Length);
-            buffer.WriteBytes(this.Signature.AsSpan());
-        }
-
-        public static MessageItem Read(PacketBuffer buffer)
-        {
-            var sender = buffer.ReadUuid();
-            var signature = new byte[buffer.ReadVarInt()];
-            buffer.ReadBytes(signature);
-
-            return new MessageItem(sender, signature);
-        }
     }
 }

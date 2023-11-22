@@ -256,7 +256,7 @@ public class PlayerPlugin : Plugin
                         }
 
                         var newPlayer = new MinecraftPlayer(addAction.Name, entry.Player, -1, GameMode.Survival, null);
-                        this.Players.Add(entry.Player, newPlayer);
+                        this.Players.TryAdd(entry.Player, newPlayer);
                         this.OnPlayerJoined?.Invoke(this.Bot, newPlayer);
                         break;
                     

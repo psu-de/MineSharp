@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Packets.NetworkTypes;
 using System.Runtime.CompilerServices;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
@@ -34,7 +35,7 @@ public class PlayerChatPacket : IPacket
 
     public interface IChatMessageBody
     {
-        void Write(PacketBuffer buffer, MinecraftData data);
+        void Write(PacketBuffer buffer, MinecraftData version);
     }
 
     public class V1_19Body : IChatMessageBody
@@ -62,7 +63,7 @@ public class PlayerChatPacket : IPacket
             this.Signature = signature;
         }
 
-        public void Write(PacketBuffer buffer, MinecraftData data)
+        public void Write(PacketBuffer buffer, MinecraftData version)
         {
             buffer.WriteString(this.SignedChat);
             
@@ -121,7 +122,7 @@ public class PlayerChatPacket : IPacket
         public string? FormattedMessage { get; set; }
         public long Timestamp { get; set; }
         public long Salt { get; set; }
-        public Serverbound.Play.ChatMessagePacket.MessageItem[] PreviousMessages { get; set; }
+        public ChatMessageItem[] PreviousMessages { get; set; }
         public string? UnsignedContent { get; set; }
         public int FilterType { get; set; }
         public long[]? FilterTypeMask { get; set; }
@@ -129,7 +130,7 @@ public class PlayerChatPacket : IPacket
         public string NetworkName { get; set; }
         public string? NetworkTargetName { get; set; }
 
-        private V1_19_2_3Body(byte[]? previousSignature, UUID sender, int? index, byte[]? signature, string plainMessage, string? formattedMessage, long timestamp, long salt, Serverbound.Play.ChatMessagePacket.MessageItem[] previousMessages, string? unsignedContent, int filterType, long[]? filterTypeMask, int type, string networkName, string? networkTargetName)
+        private V1_19_2_3Body(byte[]? previousSignature, UUID sender, int? index, byte[]? signature, string plainMessage, string? formattedMessage, long timestamp, long salt, ChatMessageItem[] previousMessages, string? unsignedContent, int filterType, long[]? filterTypeMask, int type, string networkName, string? networkTargetName)
         {
             this.PreviousSignature = previousSignature;
             this.Sender = sender;
@@ -165,7 +166,7 @@ public class PlayerChatPacket : IPacket
         /// <param name="type"></param>
         /// <param name="networkName"></param>
         /// <param name="networkTargetName"></param>
-        public V1_19_2_3Body(byte[]? previousSignature, UUID sender, byte[] signature, string plainMessage, string? formattedMessage, long timestamp, long salt, Protocol.Packets.Serverbound.Play.ChatMessagePacket.MessageItem[] previousMessages, string? unsignedContent, int filterType, long[]? filterTypeMask, int type, string networkName, string? networkTargetName)
+        public V1_19_2_3Body(byte[]? previousSignature, UUID sender, byte[] signature, string plainMessage, string? formattedMessage, long timestamp, long salt, ChatMessageItem[] previousMessages, string? unsignedContent, int filterType, long[]? filterTypeMask, int type, string networkName, string? networkTargetName)
         {
             this.PreviousSignature = previousSignature;
             this.Sender = sender;
@@ -206,7 +207,7 @@ public class PlayerChatPacket : IPacket
             string plainMessage,
             long timestamp,
             long salt,
-            Serverbound.Play.ChatMessagePacket.MessageItem[] previousMessages,
+            ChatMessageItem[] previousMessages,
             string? unsignedContent,
             int filterType,
             long[]? filterTypeMask,
@@ -229,9 +230,9 @@ public class PlayerChatPacket : IPacket
             this.NetworkTargetName = networkTargetName;
         }
 
-        public void Write(PacketBuffer buffer, MinecraftData data)
+        public void Write(PacketBuffer buffer, MinecraftData version)
         {
-            if (data.Version.Protocol == ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
                 var hasPreviousSignature = this.PreviousSignature != null;
                 buffer.WriteBool(hasPreviousSignature);
@@ -244,7 +245,7 @@ public class PlayerChatPacket : IPacket
             
             buffer.WriteUuid(this.Sender);
 
-            if (data.Version.Protocol == ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
                 buffer.WriteVarInt(this.Signature!.Length);
                 buffer.WriteBytes(this.Signature);
@@ -258,7 +259,7 @@ public class PlayerChatPacket : IPacket
             }
             buffer.WriteString(this.PlainMessage);
 
-            if (data.Version.Protocol == ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
                 var hasFormattedMessage = this.FormattedMessage != null;
                 buffer.WriteBool(hasFormattedMessage);
@@ -268,7 +269,7 @@ public class PlayerChatPacket : IPacket
 
             buffer.WriteLong(this.Timestamp);
             buffer.WriteLong(this.Salt);
-            buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf));
+            buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 
             var hasUnsignedContent = this.UnsignedContent != null;
             buffer.WriteBool(hasUnsignedContent);
@@ -297,7 +298,7 @@ public class PlayerChatPacket : IPacket
             string? formattedMessage = null;
             long timestamp;
             long salt;
-            Serverbound.Play.ChatMessagePacket.MessageItem[] previousMessages;
+            ChatMessageItem[] previousMessages;
             string? unsignedContent;
             int filterType;
             long[]? filterTypeMask = null;
@@ -345,7 +346,7 @@ public class PlayerChatPacket : IPacket
             
             timestamp = buffer.ReadLong();
             salt = buffer.ReadLong();
-            previousMessages = buffer.ReadVarIntArray(Serverbound.Play.ChatMessagePacket.MessageItem.Read);
+            previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
 
             var hasUnsignedContent = buffer.ReadBool();
             unsignedContent = null;

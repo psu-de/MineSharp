@@ -129,6 +129,8 @@ public static class PacketPalette
         RegisterPacket<OpenWindowPacket>(PacketType.CB_Play_OpenWindow);
         RegisterPacket<CloseWindowPacket>(PacketType.CB_Play_CloseWindow);
         RegisterPacket<SetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
+        RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
+        RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);

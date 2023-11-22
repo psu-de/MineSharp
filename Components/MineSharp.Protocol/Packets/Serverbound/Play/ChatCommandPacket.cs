@@ -2,20 +2,21 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class ChatCommandPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatCommand;
-    
+
     public string Command { get; set; }
     public long Timestamp { get; set; }
     public long Salt { get; set; }
     public ArgumentSignature[] Signatures { get; set; }
     public bool? SignedPreview { get; set; }
-    public ChatMessagePacket.MessageItem[]? PreviousMessages { get; set; }
-    public ChatMessagePacket.MessageItem? LastRejectedMessage { get; set; }
+    public ChatMessageItem[]? PreviousMessages { get; set; }
+    public ChatMessageItem? LastRejectedMessage { get; set; }
     public int? MessageCount { get; set; }
     public byte[]? Acknowledged { get; set; }
 
@@ -34,7 +35,7 @@ public class ChatCommandPacket : IPacket
         this.Signatures = signatures;
         this.SignedPreview = signedPreview;
     }
-    
+
     /// <summary>
     /// Constructor for 1.19.2
     /// </summary>
@@ -45,7 +46,7 @@ public class ChatCommandPacket : IPacket
     /// <param name="signedPreview"></param>
     /// <param name="previousMessages"></param>
     /// <param name="lastRejectedMessage"></param>
-    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview, ChatMessagePacket.MessageItem[] previousMessages, ChatMessagePacket.MessageItem? lastRejectedMessage)
+    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview, ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
     {
         this.Command = command;
         this.Timestamp = timestamp;
@@ -74,7 +75,7 @@ public class ChatCommandPacket : IPacket
         this.MessageCount = messageCount;
         this.Acknowledged = acknowledged;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Command);
@@ -88,7 +89,7 @@ public class ChatCommandPacket : IPacket
             {
                 throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have SignedPreview set for versions 1.19-1.19.2");
             }
-            
+
             buffer.WriteBool(this.SignedPreview.Value!);
         }
 
@@ -103,7 +104,7 @@ public class ChatCommandPacket : IPacket
             {
                 throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have {nameof(this.MessageCount)} set for versions >= 1.19.3");
             }
-            
+
             buffer.WriteVarInt(this.MessageCount.Value);
             buffer.WriteBytes(this.Acknowledged);
             return;
@@ -117,18 +118,18 @@ public class ChatCommandPacket : IPacket
             throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have {nameof(this.PreviousMessages)} set for version 1.19.2");
         }
 
-        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf));
+        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 
         var hasLastRejectedMessage = this.LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
 
         if (!hasLastRejectedMessage)
             return;
-            
-        this.LastRejectedMessage!.Write(buffer);
+
+        this.LastRejectedMessage!.Write(buffer, version);
     }
-    
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version) 
+
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
         => throw new NotImplementedException();
 
     public class ArgumentSignature

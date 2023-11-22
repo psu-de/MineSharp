@@ -1,4 +1,5 @@
 using MineSharp.Core.Common;
+using MineSharp.Protocol.Packets.NetworkTypes;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 
 /*
@@ -21,9 +22,9 @@ internal class AcknowledgedMessage
         this.Signature = signature;
     }
 
-    public ChatMessagePacket.MessageItem ToProtocolMessage()
+    public ChatMessageItem ToProtocolMessage()
     {
-        return new ChatMessagePacket.MessageItem(
+        return new ChatMessageItem(
             this.Sender, this.Signature);
     }
 }

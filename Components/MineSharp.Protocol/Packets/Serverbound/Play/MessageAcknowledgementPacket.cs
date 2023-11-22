@@ -2,6 +2,7 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
@@ -10,8 +11,8 @@ public class MessageAcknowledgementPacket : IPacket
     public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
     
     public int? Count { get; set; }
-    public ChatMessagePacket.MessageItem[]? PreviousMessages { get; set; }
-    public ChatMessagePacket.MessageItem? LastRejectedMessage { get; set; }
+    public ChatMessageItem[]? PreviousMessages { get; set; }
+    public ChatMessageItem? LastRejectedMessage { get; set; }
 
     /**
      * Constructor for >= 1.19.3
@@ -24,7 +25,7 @@ public class MessageAcknowledgementPacket : IPacket
     /**
      * Constructor for 1.19.2
      */
-    public MessageAcknowledgementPacket(ChatMessagePacket.MessageItem[]? previousMessages, ChatMessagePacket.MessageItem? lastRejectedMessage)
+    public MessageAcknowledgementPacket(ChatMessageItem[]? previousMessages, ChatMessageItem? lastRejectedMessage)
     {
         this.PreviousMessages = previousMessages;
         this.LastRejectedMessage = lastRejectedMessage;
@@ -48,13 +49,13 @@ public class MessageAcknowledgementPacket : IPacket
             throw new PacketVersionException($"Expected {nameof(PreviousMessages)} to be set for versions >= 1.19.3");
         }
         
-        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf));
+        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 
         var hasLastRejectedMessage = this.LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
         if (!hasLastRejectedMessage)
             return;
-        this.LastRejectedMessage!.Write(buffer);
+        this.LastRejectedMessage!.Write(buffer, version);
     }
     
     public static IPacket Read(PacketBuffer buffer, MinecraftData version) => throw new NotImplementedException();
