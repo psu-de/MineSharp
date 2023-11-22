@@ -9,7 +9,7 @@ services:
     environment:
       ONLINE_MODE: "FALSE"
       ENABLE_COMMAND_BLOCK: "TRUE"
-      VERSION: "1.20.2"
+      VERSION: "1.20.1"
       EULA: "TRUE"
     tty: true
     stdin_open: true
