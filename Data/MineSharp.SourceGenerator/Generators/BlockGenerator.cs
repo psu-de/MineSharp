@@ -9,12 +9,15 @@ public class BlockGenerator : IGenerator
 {
     public string Name => "Block";
     
+    private JToken? _currentVersionItems;
+    
     public async Task Run(MinecraftDataWrapper wrapper)
     {
         await GenerateEnum(wrapper);
 
         foreach (var version in Config.IncludedVersions)
         {
+            this._currentVersionItems = await wrapper.GetItems(version);
             await GenerateVersion(wrapper, version);
         }
     }
@@ -39,7 +42,7 @@ public class BlockGenerator : IGenerator
             ClassName = $"Blocks_{v}",
             EnumName = "BlockType",
             InfoClass = "BlockInfo",
-            Usings = new[] { "MineSharp.Core.Common.Blocks", "MineSharp.Core.Common.Blocks.Property" },
+            Usings = new[] { "MineSharp.Core.Common.Blocks", "MineSharp.Core.Common.Blocks.Property", "MineSharp.Core.Common.Items" },
             Outfile = Path.Join(outdir, $"Blocks_{v}.cs"),
             Properties = ((JArray)blocks).ToArray(),
             Stringify = Stringify,
@@ -128,10 +131,22 @@ public class BlockGenerator : IGenerator
     {
         if (token == null)
             return "null";
+        
+        string FindNameFromItemId(string id)
+        {
+            foreach (var token in this._currentVersionItems!)
+            {
+                var itemId = (int)token.SelectToken("id")!;
+                if (itemId.ToString() == id)
+                    return NameUtils.GetItemName((string)token.SelectToken("name")!);
+            }
+            throw new Exception($"Item not found: {id}");
+        }
+
 
         var arr = ((JObject)token).Properties()
             .Select(x => x.Name)
-            .Select(NameUtils.GetItemName)
+            .Select(FindNameFromItemId)
             .Select(x => $"ItemType.{x}")
             .ToArray();
 
