@@ -146,7 +146,7 @@ public class PlayerPlugin : Plugin
             positionPacket.Yaw,
             new Vector3(0, 0, 0),
             true,
-            new Dictionary<int, Effect?>());
+            new Dictionary<EffectType, Effect?>());
 
         this.Self = new MinecraftPlayer(
             this.Bot.Session.Username,
@@ -229,7 +229,7 @@ public class PlayerPlugin : Plugin
             packet.Yaw,
             Vector3.Zero,
             true,
-            new Dictionary<int, Effect?>());
+            new Dictionary<EffectType, Effect?>());
         player.Entity = entity;
         
         this._entities!.AddEntity(entity);

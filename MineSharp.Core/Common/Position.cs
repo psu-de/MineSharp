@@ -39,4 +39,6 @@ public class Position
     public override string ToString() => $"({this.X} / {this.Y} / {this.Z})";
 
     public override int GetHashCode() => this.X << 22 | this.Z << 12 & 0x3FF | this.Y & 0xFFF;
+    
+    public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
 }

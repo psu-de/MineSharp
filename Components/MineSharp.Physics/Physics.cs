@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities.Attributes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Data;
 using MineSharp.World;
@@ -121,7 +122,7 @@ public class PhysicsEngine
                 var blockUnder = this.World.GetBlockAt(this.Player.Position.Minus(Vector3.Down));
                 this.Player.Velocity.Y += 0.42d * (blockUnder.Info.Id == this._honeyBlock ? PhysicsConst.HoneyblockJumpSpeed : 1);
 
-                var effectLevel = this.Player.GetEffectLevel(this._jumpBoostEffect);
+                var effectLevel = this.Player.GetEffectLevel(EffectType.JumpBoost);
                 if (effectLevel.HasValue)
                 {
                     this.Player.Velocity.Y += 0.1d * effectLevel.Value;

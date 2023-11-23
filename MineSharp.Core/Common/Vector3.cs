@@ -78,6 +78,11 @@ public class Vector3
         return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
     }
 
+    public double DistanceTo(Vector3 other)
+    {
+        return this.Minus(other).Length();
+    }
+
     public Vector3 Normalized()
     {
         var scale = 1 / this.Length();
@@ -110,5 +115,4 @@ public class Vector3
         => $"({this.X:0.##} / {this.Y:0.##} / {this.Z:0.##})";
 
     public static implicit operator Position(Vector3 x) => new Position((int)Math.Floor(x.X), (int)Math.Ceiling(x.Y), (int)Math.Floor(x.Z));
-    public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
 }

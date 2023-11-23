@@ -56,7 +56,7 @@ public class EntityPlugin : Plugin
             packet.Yaw,
             new Vector3(ConvertToVelocity(packet.VelocityX), ConvertToVelocity(packet.VelocityY), ConvertToVelocity(packet.VelocityZ)),
             true,
-            new Dictionary<int, Effect?>());
+            new Dictionary<EffectType, Effect?>());
 
         this.Entities.TryAdd(packet.EntityId, newEntity);
         this.OnEntitySpawned?.Invoke(this.Bot, newEntity);
