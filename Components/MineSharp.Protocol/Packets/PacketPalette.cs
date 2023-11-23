@@ -145,7 +145,7 @@ public static class PacketPalette
         RegisterPacket<UpdateCommandBlock>(PacketType.SB_Play_UpdateCommandBlock);
         RegisterPacket<WindowClickPacket>(PacketType.SB_Play_WindowClick);
         RegisterPacket<PlaceBlockPacket>(PacketType.SB_Play_BlockPlace);
-        
+        RegisterPacket<PlayerActionPacket>(PacketType.SB_Play_BlockDig);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

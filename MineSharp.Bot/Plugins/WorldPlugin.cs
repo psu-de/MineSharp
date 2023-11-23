@@ -1,5 +1,7 @@
+using MineSharp.Bot.Blocks;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Effects;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;
@@ -62,6 +64,117 @@ public class WorldPlugin : Plugin
         
         var packet = new UpdateCommandBlock(location, command, mode, flags);
         return this.Bot.Client.SendPacket(packet);
+    }
+
+    public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null)
+    {
+        if (this.Bot.Player?.Self == null)
+            await this.Bot.Player?.WaitForInitialization()!;
+        
+        if (this.World == null)
+            await this.WaitForChunks();
+        
+        if (!block.Info.Diggable)
+            return MineBlockStatus.NotDiggable;
+
+        if (6.0 < this.Bot.Player.Entity!.Position.DistanceTo((Vector3)block.Position))
+            return MineBlockStatus.TooFar;
+        
+        if (!this.World!.IsBlockLoaded(block.Position))
+            return MineBlockStatus.BlockNotLoaded;
+
+        cancellation ??= CancellationToken.None;
+        face ??= BlockFace.Top; // TODO: Figure out how to calculate BlockFace
+
+        var time = this.CalculateBreakingTime(block);
+
+        var packet = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
+            (int)DiggingStatus.StartedDigging,
+            block.Position,
+            face.Value,
+            ++this.Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
+
+        try
+        {
+            await this.Bot.Client.SendPacket(packet, cancellation);
+
+            var sendAgain = Task.Run(async () =>
+            {
+                await Task.Delay(time);
+
+                var send = this.Bot.Client.SendPacket(new PlayerActionPacket(
+                    (int)DiggingStatus.FinishedDigging,
+                    block.Position,
+                    face.Value,
+                    ++this.Bot.SequenceId));
+                var receive = this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>();
+
+                await Task.WhenAll(send, receive);
+                return receive.Result;
+            }).WaitAsync(cancellation.Value);
+
+            var ack = await this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>()
+                .WaitAsync(cancellation.Value);
+
+            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p118)
+            {
+                if ((DiggingStatus)p118.Status != DiggingStatus.StartedDigging)
+                    return MineBlockStatus.Failed;
+            } // TODO: MineBlock: What happens in 1.19?
+                
+            ack = await sendAgain;
+
+            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p1182)
+            {
+                if (!p1182.Successful)
+                    return MineBlockStatus.Failed;
+            }
+
+            return MineBlockStatus.Finished;
+        } catch (TaskCanceledException)
+        {
+            await this.Bot.Client.SendPacket(new PlayerActionPacket(
+                (int)DiggingStatus.CancelledDigging,
+                block.Position,
+                face.Value,
+                ++this.Bot.SequenceId));
+
+            return MineBlockStatus.Cancelled;
+        }
+    }
+
+    private int CalculateBreakingTime(Block block)
+    {
+        if (this.Bot.Player!.Self!.GameMode == GameMode.Creative)
+            return 0;
+        
+        var heldItem = this.Bot.Windows?.HeldItem;
+        float toolMultiplier = 1;
+
+        if (heldItem != null)
+        {
+            toolMultiplier = block.Info.Materials
+                .Select(x => this.Bot.Data.Materials.GetToolMultiplier(x, heldItem.Info.Type))
+                .Max();
+        }
+            
+        float efficiencyLevel = 0; // TODO: Efficiency level
+        float hasteLevel = this.Bot.Player.Self.Entity!.GetEffectLevel(EffectType.Haste) ?? 0;
+        float miningFatigueLevel = this.Bot.Player.Self.Entity.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
+
+        toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
+        toolMultiplier /= MathF.Pow(1.2f, hasteLevel);
+        toolMultiplier *= MathF.Pow(0.3f, miningFatigueLevel);
+
+        var damage = toolMultiplier / block.Info.Hardness;
+
+        var canHarvest = block.CanBeHarvestedBy(heldItem?.Info.Type);
+        damage /= canHarvest ? 30.0f : 100.0f;
+
+        if (damage > 1) return 0;
+
+        var ticks = MathF.Ceiling(1 / damage);
+        return (int)(ticks / 20 * 1000);
     }
 
     private Task HandleChunkDataAndLightUpdatePacket(ChunkDataAndUpdateLightPacket packet)
