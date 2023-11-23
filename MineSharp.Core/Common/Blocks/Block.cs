@@ -1,3 +1,5 @@
+using MineSharp.Core.Common.Items;
+
 namespace MineSharp.Core.Common.Blocks;
 
 public class Block
@@ -20,6 +22,10 @@ public class Block
 
     public bool IsSolid()
         => this.Info.IsSolid();
+
+    public bool CanBeHarvestedBy(ItemType? item)
+        => this.Info.HarvestTools == null 
+           || (item != null && this.Info.HarvestTools.Contains(item.Value));
 
     public override string ToString() => $"Block (Position={Position}, State={State}, Info={Info})";
 }

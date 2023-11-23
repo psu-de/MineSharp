@@ -100,6 +100,7 @@ public class BiomeGenerator : IGenerator
         else precipitation = (bool)token.SelectToken("has_precipitation")!;
 
         return $"new BiomeInfo({id}, " +
+               $"BiomeType.{name.Pascalize()}, " +
                $"{Str.String(name)}, " +
                $"{Str.String(displayName)}, " +
                $"BiomeCategory.{category}, " +

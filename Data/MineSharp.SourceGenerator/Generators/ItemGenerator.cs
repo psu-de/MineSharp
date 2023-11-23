@@ -84,6 +84,7 @@ public class ItemGenerator : IGenerator
         var repairWith = GetRepairWith(token.SelectToken("repairWith"));
 
         return $"new ItemInfo({id}, " +
+               $"ItemType.{NameUtils.GetItemName(name)}, " +
                $"{Str.String(name)}, " +
                $"{Str.String(displayName)}, " +
                $"{stackSize}, " +

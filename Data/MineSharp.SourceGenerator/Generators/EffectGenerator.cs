@@ -80,6 +80,7 @@ public class EffectGenerator : IGenerator
         var isGood = (string)token.SelectToken("type")! == "good";
         
         return $"new EffectInfo({id}, " +
+               $"EffectType.{name.Pascalize()}, " +
                $"{Str.String(name)}, " +
                $"{Str.String(displayName)}, " +
                $"{Str.Bool(isGood)})";

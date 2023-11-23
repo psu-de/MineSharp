@@ -131,10 +131,14 @@ public class BlockGenerator : IGenerator
 
         var arr = ((JObject)token).Properties()
             .Select(x => x.Name)
-            .Select(x => Convert.ToInt32(x))
+            .Select(NameUtils.GetItemName)
+            .Select(x => $"ItemType.{x}")
             .ToArray();
 
-        return $"new int[] {{ {string.Join(", ", arr)} }}";
+        if (arr.Length == 0)
+            return "null";
+
+        return $"new [] {{ {string.Join(", ", arr)} }}";
     }
     
     private string GetMaterials(JToken token)

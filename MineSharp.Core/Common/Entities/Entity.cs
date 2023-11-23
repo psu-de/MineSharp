@@ -14,11 +14,11 @@ public class Entity
     public float Yaw { get; set; }
     public Vector3 Velocity { get; set; }
     public bool IsOnGround { get; set; }
-    public IDictionary<int, Effect?> Effects { get; set; }
+    public IDictionary<EffectType, Effect?> Effects { get; set; }
     public IDictionary<string, Attribute> Attributes { get; set; }
 
 
-    public Entity(EntityInfo info, int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<int, Effect?> effects)
+    public Entity(EntityInfo info, int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<EffectType, Effect?> effects)
     {
         this.Info = info;
         this.ServerId = serverId;
@@ -31,10 +31,10 @@ public class Entity
         this.Attributes = new ConcurrentDictionary<string, Attribute>();
     }
     
-    public int? GetEffectLevel(int effectId)
+    public int? GetEffectLevel(EffectType effectType)
     {
 
-        if (!this.Effects.TryGetValue(effectId, out var effect))
+        if (!this.Effects.TryGetValue(effectType, out var effect))
         {
             return null;
         }

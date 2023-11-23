@@ -100,6 +100,7 @@ public class EnchantmentGenerator : IGenerator
         var discoverable = (bool)token.SelectToken("discoverable")!;
 
         return $"new EnchantmentInfo({id}, " +
+               $"EnchantmentType.{name.Pascalize()}, " +
                $"{Str.String(name)}, " +
                $"{Str.String(displayName)}, " +
                $"{maxLevel}, " +

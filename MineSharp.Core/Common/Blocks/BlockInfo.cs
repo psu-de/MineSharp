@@ -1,3 +1,5 @@
+using MineSharp.Core.Common.Items;
+
 namespace MineSharp.Core.Common.Blocks;
 
 public class BlockInfo
@@ -17,7 +19,7 @@ public class BlockInfo
     public readonly string BoundingBox;
     public readonly int StackSize;
     public readonly Material[] Materials;
-    public readonly int[]? HarvestTools;
+    public readonly ItemType[]? HarvestTools;
     public readonly int DefaultState;
     public readonly BlockState State;
 
@@ -37,7 +39,7 @@ public class BlockInfo
         string boundingBox,
         int stackSize,
         Material[] materials,
-        int[]? harvestTools,
+        ItemType[]? harvestTools,
         int defaultState,
         BlockState state)
     {

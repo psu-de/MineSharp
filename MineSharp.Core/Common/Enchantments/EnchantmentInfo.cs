@@ -2,6 +2,7 @@ namespace MineSharp.Core.Common.Enchantments;
 
 public record EnchantmentInfo(
     int Id,
+    EnchantmentType Type,
     string Name,
     string DisplayName,
     int MaxLevel,

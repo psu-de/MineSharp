@@ -43,6 +43,7 @@ public class EntityGenerator : IGenerator
         var category = GetCategory(token.SelectToken("category")!);
 
         return $"new EntityInfo({id}, " +
+               $"EntityType.{name.Pascalize()}, " +
                $"{Str.String(name)}, " +
                $"{Str.String(displayName)}, " +
                $"{Str.Float(width)}, " +
