@@ -1,3 +1,4 @@
+using MineSharp.Bot.Blocks;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using System.Collections.Concurrent;
@@ -47,6 +48,41 @@ public static class WorldTests
                 if (expectedBlocks.Count == 0)
                     source.TrySetResult(true);
             };
+        });
+    }
+
+    public static Task TestMineBlock()
+    {
+        return IntegrationTest.RunTest("testMineBlock", async (bot, source) =>
+        {
+            await bot.World!.WaitForChunks();
+
+            var position = new Position(-8, -59, 20);
+
+            await bot.Chat!.SendChat("/tp @p -5 -60 20");
+            await Task.Delay(1000);
+            
+            var result = await bot.World.MineBlock(
+                bot.World!.World!.GetBlockAt(position));
+            
+            Console.WriteLine(result);
+
+            source.TrySetResult(result == MineBlockStatus.Finished);
+        }, commandDelay: 1000);
+    }
+
+    public static Task TestPlaceBlock()
+    {
+        return IntegrationTest.RunTest("testPlaceBlock", async (bot, source) =>
+        {
+            await bot.World!.WaitForChunks();
+
+            var position = new Position(-8, -59, 19);
+            await bot.Chat!.SendChat("/tp @p -5 -60 20");
+            await bot.Chat!.SendChat("/clear");
+            await bot.Chat!.SendChat("/give @p dirt");
+            await Task.Delay(1000);
+            await bot.World!.PlaceBlock(position);
         });
     }
 }

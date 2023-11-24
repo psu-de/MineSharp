@@ -28,7 +28,7 @@ public class PlaceBlockPacket : IPacket
     /// <param name="cursorZ"></param>
     /// <param name="insideBlock"></param>
     /// <param name="sequenceId"></param>
-    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY, float cursorZ, bool insideBlock, int? sequenceId)
+    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY, float cursorZ, bool insideBlock, int sequenceId)
     {
         this.Hand = hand;
         this.Location = location;

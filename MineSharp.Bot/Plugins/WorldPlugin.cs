@@ -143,6 +143,22 @@ public class WorldPlugin : Plugin
         }
     }
 
+    public async Task PlaceBlock(Position position, PlayerHand hand = PlayerHand.MainHand, BlockFace face = BlockFace.Top)
+    {
+        // TODO: PlaceBlock: Hardcoded values
+        var packet = new PlaceBlockPacket(
+            (int)hand,
+            position,
+            face,
+            0.5f,
+            0.5f,
+            0.5f,
+            false,
+            ++this.Bot.SequenceId);
+
+        await this.Bot.Client.SendPacket(packet);
+    }
+    
     private int CalculateBreakingTime(Block block)
     {
         if (this.Bot.Player!.Self!.GameMode == GameMode.Creative)
