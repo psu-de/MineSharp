@@ -31,8 +31,14 @@ public class PlayerPlugin : Plugin
     /// <summary>
     /// All players on the server.
     /// </summary>
-    public IDictionary<UUID, MinecraftPlayer> Players;
+    public IDictionary<UUID, MinecraftPlayer> Players { get; private set; }
 
+    /// <summary>
+    /// Minecraft players indexed by <see cref="MineSharp.Core.Common.Entities.Entity.ServerId"/>.
+    /// Contains only loaded players (Players in the Bots visible range)
+    /// </summary>
+    public IDictionary<int, MinecraftPlayer> PlayerMap { get; private set; }
+    
     /// <summary>
     /// The Bots health (between 0.0 - 20.0)
     /// </summary>
@@ -109,6 +115,7 @@ public class PlayerPlugin : Plugin
     public PlayerPlugin(MinecraftBot bot) : base(bot)
     {
         this.Players = new ConcurrentDictionary<UUID, MinecraftPlayer>();
+        this.PlayerMap = new ConcurrentDictionary<int, MinecraftPlayer>();
 
         this.Bot.Client.On<SetHealthPacket>(this.HandleSetHealthPacket);
         this.Bot.Client.On<CombatDeathPacket>(this.HandleCombatDeathPacket);
@@ -118,6 +125,7 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<PlayerInfoRemovePacket>(this.HandlePlayerInfoRemove);
         this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
         this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
+        this.Bot.Client.On<EntityStatusPacket>(this.HandleEntityStatus);
     }
 
     /// <summary>
@@ -154,6 +162,8 @@ public class PlayerPlugin : Plugin
             0,
             (GameMode)loginPacket.GameMode,
             entity);
+
+        this.PlayerMap.TryAdd(entity.ServerId, this.Self);
 
         this.Health = 20.0f;
         this.Food = 20.0f;
@@ -233,6 +243,7 @@ public class PlayerPlugin : Plugin
         player.Entity = entity;
         
         this._entities!.AddEntity(entity);
+        this.PlayerMap.TryAdd(player.Entity!.ServerId, player);
         
         this.OnPlayerLoaded?.Invoke(this.Bot, player);
         return Task.CompletedTask;
@@ -365,5 +376,28 @@ public class PlayerPlugin : Plugin
         }
 
         return Task.CompletedTask;
+    }
+
+    private Task HandleEntityStatus(EntityStatusPacket packet)
+    {
+        switch (packet.Status)
+        {
+            case >= 24 and <= 28: 
+                HandlePlayerSetPermission(packet);
+                break;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void HandlePlayerSetPermission(EntityStatusPacket packet)
+    {
+        if (!this.PlayerMap.TryGetValue(packet.EntityId, out var player))
+        {
+            return;
+        }
+        
+        var permissionLevel = (PermissionLevel)(packet.Status - 24);
+        player.PermissionLevel = permissionLevel;
     }
 }
