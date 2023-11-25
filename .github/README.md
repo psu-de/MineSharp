@@ -13,7 +13,7 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Because of the rework, all versions from 1.18-1.20.1 are supported!
+Minecraft Java 1.18 - 1.20.1 supported 
 
 # Current features
 
@@ -22,10 +22,10 @@ Because of the rework, all versions from 1.18-1.20.1 are supported!
 - ⚡ Events
 - 🐖 Entity tracking
 - 🌍 World tracking (query the world for blocks)
-- ~~⛏️ Mining~~
-- ~~👷‍♂️ Building~~
+- ⛏️ Mining (very simple, needs some more work)
+- 👷‍♂️ Building (very simple, needs some more work)
 - ~~🛠️ Crafting~~
-- 🪟 High-Level window api (needs some more work)
+- 🪟 High-Level window Api
 - ~~⚔️ Attacking entities~~
 - ~~🏃 Movements (Walking, Sprinting, Jumping, Sneaking)~~
 - ~~🔎 Simple Pathfinder~~

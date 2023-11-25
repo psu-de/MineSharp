@@ -2,6 +2,7 @@ using MineSharp.Bot.Blocks;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using System.Collections.Concurrent;
+using MineSharp.Bot.Chat;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -58,16 +59,27 @@ public static class WorldTests
             await bot.World!.WaitForChunks();
 
             var position = new Position(-8, -59, 20);
-
             await bot.Chat!.SendChat("/tp @p -5 -60 20");
+            
+            bot.Chat!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            {
+                if (type != ChatMessageType.GameInfo)
+                    return;
+
+                var chat = new MineSharp.Core.Common.Chat(message);
+                if (chat.Message == "testMineBlock success")
+                {
+                    source.TrySetResult(true);
+                }
+            };
+            
             await Task.Delay(1000);
             
             var result = await bot.World.MineBlock(
                 bot.World!.World!.GetBlockAt(position));
-            
-            Console.WriteLine(result);
 
-            source.TrySetResult(result == MineBlockStatus.Finished);
+            if (result != MineBlockStatus.Finished)
+                source.TrySetResult(false);
         }, commandDelay: 1000);
     }
 
@@ -81,6 +93,19 @@ public static class WorldTests
             await bot.Chat!.SendChat("/tp @p -5 -60 20");
             await bot.Chat!.SendChat("/clear");
             await bot.Chat!.SendChat("/give @p dirt");
+
+            bot.Chat!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            {
+                if (type != ChatMessageType.GameInfo)
+                    return;
+
+                var chat = new MineSharp.Core.Common.Chat(message);
+                if (chat.Message == "testPlaceBlock success")
+                {
+                    source.TrySetResult(true);
+                }
+            };
+            
             await Task.Delay(1000);
             await bot.World!.PlaceBlock(position);
         });

@@ -1,8 +1,5 @@
 ﻿using MineSharp.Bot.IntegrationTests.Tests;
 
-await WorldTests.TestPlaceBlock();
-Environment.Exit(0);
-
 await PlayerTests.TestHealth();
 await PlayerTests.TestDeath();
 await PlayerTests.TestRespawn();
@@ -14,3 +11,6 @@ await WorldTests.TestMultiBlockUpdate();
 
 await WindowTests.TestInventoryUpdate();
 await WindowTests.TestOpenContainer();
+
+await WorldTests.TestPlaceBlock();
+await WorldTests.TestMineBlock();
