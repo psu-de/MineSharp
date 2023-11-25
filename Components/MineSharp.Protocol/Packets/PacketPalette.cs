@@ -131,6 +131,7 @@ public static class PacketPalette
         RegisterPacket<SetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
         RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
         RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
+        RegisterPacket<EntityStatusPacket>(PacketType.CB_Play_EntityStatus);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
