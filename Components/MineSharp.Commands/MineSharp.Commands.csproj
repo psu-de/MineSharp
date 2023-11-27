@@ -6,6 +6,7 @@
         <AssemblyName>MineSharp.Commands</AssemblyName>
         <RootNamespace>MineSharp.Commands</RootNamespace>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
