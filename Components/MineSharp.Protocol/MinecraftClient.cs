@@ -219,7 +219,7 @@ public sealed class MinecraftClient : IDisposable
                 }
             } catch (EndOfStreamException)
             {
-                Console.WriteLine($"Error reading packet with id {packetId}, assumed it was {packetType}. Packet was {size} bytes.");
+                Logger.Error("Error reading packet with id {PacketId}, assumed it was {PacketType}. Packet was {Size} bytes.", packetId, packetType, size);
             }
         }
     }
@@ -251,31 +251,40 @@ public sealed class MinecraftClient : IDisposable
         this._stream!.WritePacket(buffer);
     }
 
-    private async Task HandleIncomingPacket(IPacket packet)
+    private Task HandleIncomingPacket(IPacket packet)
     {
-        await this._internalPacketHandler.HandleIncoming(packet);
+        var tasks = new List<Task>();
+        tasks.Add(this._internalPacketHandler.HandleIncoming(packet));
+
+        if (null != this.OnPacketReceived)
+            tasks.Add(Task.Factory.FromAsync(
+                (callback, obj) => this.OnPacketReceived.BeginInvoke(this, packet, callback, obj),
+                this.OnPacketReceived.EndInvoke, 
+                null));
+        
+        var key = packet.GetType().GUID;
+        if (this._packetWaiters.TryGetValue(key, out var tsc))
+            tsc.TrySetResult(packet);
+
+        if (this._packetHandlers.TryGetValue(key, out var handlers))
+            tasks.AddRange(handlers.Select(handler => handler(packet)));
 
         _ = Task.Run(async () =>
         {
             try
             {
-                var key = packet.GetType().GUID;
-                
-                if (this._packetWaiters.TryGetValue(key, out var tsc))
-                    tsc.TrySetResult(packet);
-                
-                if (this._packetHandlers.TryGetValue(key, out var handlers))
-                {
-                    foreach (var handler in handlers)
-                        await handler(packet);
-                }
-
-                this.OnPacketReceived?.Invoke(this, packet);
+                var result = Task.WhenAll(tasks);
+                await result;
             } catch (Exception e)
             {
-                Logger.Warn($"Error in custom packet handling: {e}");
+                foreach (var exception in tasks.Where(x => x.Exception != null))
+                {
+                    Logger.Warn($"Error in custom packet handling: {exception.Exception}");
+                }
             }
         });
+
+        return Task.CompletedTask;
     }
 
     private async Task HandleOutgoingPacket(IPacket packet)
