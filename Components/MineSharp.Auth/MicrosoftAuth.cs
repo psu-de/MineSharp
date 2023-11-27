@@ -1,14 +1,11 @@
 using CmlLib.Core.Auth;
 using CmlLib.Core.Auth.Microsoft;
-using CmlLib.Core.Auth.Microsoft.Cache;
 using CmlLib.Core.Auth.Microsoft.MsalClient;
 using Microsoft.Identity.Client;
+using MineSharp.Auth.Cache;
 using MineSharp.Auth.Exceptions;
-using MineSharp.Auth.Json;
 using MineSharp.Auth.Responses;
-using MineSharp.Core.Cache;
 using MineSharp.Core.Common;
-using Newtonsoft.Json;
 using NLog;
 using System.Diagnostics;
 using System.Runtime.InteropServices;

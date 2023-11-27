@@ -1,4 +1,4 @@
-namespace MineSharp.Core.Cache;
+namespace MineSharp.Auth.Cache;
 
 public static class CacheManager
 {
