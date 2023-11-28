@@ -124,11 +124,8 @@ public class WorldPlugin : Plugin
                 
             ack = await sendAgain;
 
-            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p1182)
-            {
-                if (!p1182.Successful)
-                    return MineBlockStatus.Failed;
-            }
+            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false })
+                return MineBlockStatus.Failed;
 
             return MineBlockStatus.Finished;
         } catch (TaskCanceledException)

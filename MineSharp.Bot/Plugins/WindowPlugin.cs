@@ -29,7 +29,8 @@ public class WindowPlugin : Plugin
     public event Events.ItemEvent? OnHeldItemChanged;
     
     private readonly TaskCompletionSource _inventoryLoadedTsc;
-    private readonly ConcurrentDictionary<int, Window> _openWindows;
+    private readonly IDictionary<int, Window> _openWindows;
+    private readonly object _windowLock;
     private readonly Window _mainInventory;
     
     private DateTime? _cacheTimestamp;
@@ -40,6 +41,7 @@ public class WindowPlugin : Plugin
     {
         this._inventoryLoadedTsc = new TaskCompletionSource();
         this._openWindows = new ConcurrentDictionary<int, Window>();
+        this._windowLock = new object();
         
         this._mainInventory = new Window(
             255,
@@ -72,30 +74,15 @@ public class WindowPlugin : Plugin
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
 
-        PlaceBlockPacket packet;
-        if (this.Bot.Data.Version.Protocol < ProtocolVersion.V_1_19)
-        {
-            packet = new PlaceBlockPacket(
-                (int)PlayerHand.MainHand, 
-                block.Position,
-                BlockFace.Top,
-                0.5f,
-                0.5f,
-                0.5f, 
-                false); // TODO: Hardcoded values
-        }
-        else
-        {
-            packet = new PlaceBlockPacket(
-                (int)PlayerHand.MainHand, 
-                block.Position,
-                BlockFace.Top,
-                0.5f,
-                0.5f,
-                0.5f, 
-                false,
-                ++this.Bot.SequenceId); // TODO: Sequence id++?
-        }
+        PlaceBlockPacket packet = new PlaceBlockPacket(
+            (int)PlayerHand.MainHand, 
+            block.Position,
+            BlockFace.Top,
+            0.5f,
+            0.5f,
+            0.5f, 
+            false,
+            ++this.Bot.SequenceId);
         
         _ = this.Bot.Client.SendPacket(packet);
         var receive = this.Bot.Client.WaitForPacket<OpenWindowPacket>();
@@ -115,7 +102,7 @@ public class WindowPlugin : Plugin
 
     public Task CloseWindow(int id)
     {
-        if (!this._openWindows.TryRemove(id, out var window))
+        if (!this._openWindows.Remove(id, out var window))
         {
             Logger.Warn("Tried to close window which is not open!");
             return Task.CompletedTask;
@@ -157,9 +144,12 @@ public class WindowPlugin : Plugin
             windowInfo.UniqueSlots, 
             windowInfo.ExcludeInventory ? null : this._mainInventory, 
             this._synchronizeWindowClick);
-
-        if (!this._openWindows.TryAdd(id, window))
-            Logger.Warn($"Could not add window with id {id}, it already existed.");
+        
+        lock(this._windowLock) 
+        {
+            if (!this._openWindows.TryAdd(id, window))
+                Logger.Warn($"Could not add window with id {id}, it already existed.");
+        }
 
         if (this._cachedWindowItemsPacket == null)
             return window;
@@ -227,16 +217,20 @@ public class WindowPlugin : Plugin
     
     private Task HandleWindowItems(WindowItemsPacket packet)
     {
-        if (!this._openWindows.TryGetValue(packet.WindowId, out var window))
+        Window? window;
+        lock (this._windowLock)
         {
-            Logger.Warn($"Received {packet.GetType().Name} for windowId={packet.WindowId}, but its not opened");
-            // Cache items in case it gets opened in a bit
-            this._cachedWindowItemsPacket = packet;
-            this._cacheTimestamp = DateTime.Now;
+            if (!this._openWindows.TryGetValue(packet.WindowId, out window))
+            {
+                Logger.Warn($"Received {packet.GetType().Name} for windowId={packet.WindowId}, but its not opened");
+                // Cache items in case it gets opened in a bit
+                this._cachedWindowItemsPacket = packet;
+                this._cacheTimestamp = DateTime.Now;
 
-            return Task.CompletedTask;
+                return Task.CompletedTask;
+            }
+            Logger.Debug($"HandleWindowItems for window {window.Title}");
         }
-        Logger.Debug($"HandleWindowItems for window {window.Title}");
 
         if (window.TotalSlotCount != packet.Items.Length)
         {
