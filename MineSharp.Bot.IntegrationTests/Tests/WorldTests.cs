@@ -33,8 +33,8 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testMultiBlockUpdate", async (bot, source) =>
         {
-            await bot.World!.WaitForInitialization();
-            await bot.Chat!.WaitForInitialization();
+            await bot.WorldPlugin!.WaitForInitialization();
+            await bot.ChatPlugin!.WaitForInitialization();
 
             var relative = new Position(-9, -61, 21);
             var expectedBlocks = new List<ulong>(
@@ -42,7 +42,7 @@ public static class WorldTests
                 .Select(x => new Position(relative.X - x, relative.Y, relative.Z))
                 .Select(x => x.ToULong()));
 
-            bot.World.World!.OnBlockUpdated += (sender, block) =>
+            bot.WorldPlugin.World!.OnBlockUpdated += (sender, block) =>
             {
                 expectedBlocks.Remove(block.Position.ToULong());
                 
@@ -56,12 +56,12 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testMineBlock", async (bot, source) =>
         {
-            await bot.World!.WaitForChunks();
+            await bot.WorldPlugin!.WaitForChunks();
 
             var position = new Position(-8, -59, 20);
-            await bot.Chat!.SendChat("/tp @p -5 -60 20");
+            await bot.ChatPlugin!.SendChat("/tp @p -5 -60 20");
             
-            bot.Chat!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.ChatPlugin!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
@@ -75,8 +75,8 @@ public static class WorldTests
             
             await Task.Delay(1000);
             
-            var result = await bot.World.MineBlock(
-                bot.World!.World!.GetBlockAt(position));
+            var result = await bot.WorldPlugin.MineBlock(
+                bot.WorldPlugin!.World!.GetBlockAt(position));
 
             if (result != MineBlockStatus.Finished)
                 source.TrySetResult(false);
@@ -87,14 +87,14 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testPlaceBlock", async (bot, source) =>
         {
-            await bot.World!.WaitForChunks();
+            await bot.WorldPlugin!.WaitForChunks();
 
             var position = new Position(-8, -59, 19);
-            await bot.Chat!.SendChat("/tp @p -5 -60 20");
-            await bot.Chat!.SendChat("/clear");
-            await bot.Chat!.SendChat("/give @p dirt");
+            await bot.ChatPlugin!.SendChat("/tp @p -5 -60 20");
+            await bot.ChatPlugin!.SendChat("/clear");
+            await bot.ChatPlugin!.SendChat("/give @p dirt");
 
-            bot.Chat!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.ChatPlugin!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
@@ -107,7 +107,7 @@ public static class WorldTests
             };
             
             await Task.Delay(1000);
-            await bot.World!.PlaceBlock(position);
+            await bot.WorldPlugin!.PlaceBlock(position);
         });
     }
 }

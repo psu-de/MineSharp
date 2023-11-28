@@ -8,10 +8,10 @@ public static class WindowTests
     {
         return IntegrationTest.RunTest("testInventoryUpdate", async (bot, source) =>
         {
-            await bot.Windows!.WaitForInventory();
-            await bot.Chat!.SendChat("/clear");
+            await bot.WindowPlugin.WaitForInventory();
+            await bot.ChatPlugin.SendChat("/clear");
 
-            bot.Windows!.Inventory!.OnSlotChanged += (window, index) =>
+            bot.WindowPlugin.Inventory!.OnSlotChanged += (window, index) =>
             {
                 var slot = window.GetSlot(index);
                 if (slot.Item?.Info.Name == "diamond" && slot.Item?.Count == 33)
@@ -26,15 +26,15 @@ public static class WindowTests
     {
         return IntegrationTest.RunTest("testOpenContainer", async (bot, source) =>
         {
-            await bot.Windows!.WaitForInventory();
-            await bot.World!.WaitForChunks();
+            await bot.WindowPlugin.WaitForInventory();
+            await bot.WorldPlugin.WaitForChunks();
 
             await Task.Delay(1000);
 
             var blockPos = new Position(17, -58, 24);
-            var block = bot.World!.World!.GetBlockAt(blockPos);
+            var block = bot.WorldPlugin.World!.GetBlockAt(blockPos);
 
-            var window = await bot.Windows!.OpenContainer(block);
+            var window = await bot.WindowPlugin.OpenContainer(block);
             await Task.Delay(1000);
             var slot = window.GetSlot(0);
 

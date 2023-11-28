@@ -19,8 +19,19 @@ public class EntityPlugin : Plugin
     /// </summary>
     public readonly IDictionary<int, Entity> Entities;
 
+    /// <summary>
+    /// Fires whenever an entity spawns in the bots visible range.
+    /// </summary>
     public event Events.EntityEvent? OnEntitySpawned;
+    
+    /// <summary>
+    /// Fires whenever an entity despawned in the bots visible range.
+    /// </summary>
     public event Events.EntityEvent? OnEntityDespawned;
+    
+    /// <summary>
+    /// Fires whenever an entity moved in the bots visible range.
+    /// </summary>
     public event Events.EntityEvent? OnEntityMoved;
 
     private PlayerPlugin? _player;
@@ -45,27 +56,43 @@ public class EntityPlugin : Plugin
         this._player = this.Bot.GetPlugin<PlayerPlugin>();
         await this._player.WaitForInitialization();
     }
+    
+    internal void AddEntity(Entity entity)
+    {
+        this.Entities.TryAdd(entity.ServerId, entity);
+        this.OnEntitySpawned?.Invoke(this.Bot, entity);
+
+        if (null != this.OnEntitySpawned)
+            _ = Task.Factory.FromAsync(
+                (callback, obj) => this.OnEntitySpawned.BeginInvoke(this.Bot, entity, callback, obj),
+                this.OnEntitySpawned.EndInvoke,
+                null);
+    }
 
     private Task HandleSpawnEntityPacket(SpawnEntityPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
         
         var newEntity = new Entity(
-            entityInfo, packet.EntityId!, new Vector3(packet.X, packet.Y, packet.Z),
+            entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
             new Vector3(ConvertToVelocity(packet.VelocityX), ConvertToVelocity(packet.VelocityY), ConvertToVelocity(packet.VelocityZ)),
             true,
             new Dictionary<EffectType, Effect?>());
 
-        this.Entities.TryAdd(packet.EntityId, newEntity);
-        this.OnEntitySpawned?.Invoke(this.Bot, newEntity);
-        
+        this.AddEntity(newEntity);
         return Task.CompletedTask;
     }
 
     private Task HandleRemoveEntitiesPacket(RemoveEntitiesPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         foreach (var entityId in packet.EntityIds)
         {
             if (!this.Entities.Remove(entityId, out var entity))
@@ -79,6 +106,9 @@ public class EntityPlugin : Plugin
 
     private Task HandleSetEntityVelocityPacket(SetEntityVelocityPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
         {
             return Task.CompletedTask;
@@ -94,6 +124,9 @@ public class EntityPlugin : Plugin
 
     private Task HandleUpdateEntityPositionPacket(EntityPositionPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -110,6 +143,9 @@ public class EntityPlugin : Plugin
 
     private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -128,7 +164,10 @@ public class EntityPlugin : Plugin
 
     private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
     {
-        if (!this.Entities.TryGetValue(packet.EntityId!, out var entity))
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
+        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
         entity.Yaw = packet.Yaw;
@@ -142,7 +181,10 @@ public class EntityPlugin : Plugin
 
     private Task HandleTeleportEntityPacket(TeleportEntityPacket packet)
     {
-        if (!this.Entities.TryGetValue(packet.EntityId!, out var entity))
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+
+        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
         entity.Position.X = packet.X;
@@ -158,6 +200,9 @@ public class EntityPlugin : Plugin
 
     private Task HandleUpdateAttributesPacket(UpdateAttributesPacket packet)
     {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -174,7 +219,9 @@ public class EntityPlugin : Plugin
 
     private async Task HandleSynchronizePlayerPosition(PlayerPositionPacket packet)
     {
-        await this.WaitForInitialization();
+        if (!this.IsEnabled)
+            return;
+        
         if ((packet.Flags & 0x01) == 0x01) 
             this._player!.Entity!.Position.X += packet.X;
         else 
@@ -202,17 +249,12 @@ public class EntityPlugin : Plugin
 
         // TODO: Dismount Vehicle
 
-        await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId!));
+        await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId));
     }
 
-    internal void AddEntity(Entity entity)
-    {
-        this.Entities.TryAdd(entity.ServerId, entity);
-    }
-
-    private double ConvertToVelocity(double value)
+    private static double ConvertToVelocity(double value)
         => value / VELOCITY_CONVERSION;
 
-    private double ConvertDeltaPosition(short delta)
+    private static double ConvertDeltaPosition(short delta)
         => delta / (128 * 32d);
 }

@@ -14,22 +14,24 @@ public class MinecraftBot
 
     public event Events.BotStringEvent? OnBotDisconnected;
 
-    public MinecraftData Data { get; }
-    public MinecraftClient Client { get; }
-    public Session Session { get; }
+    public readonly MinecraftData Data;
+    public readonly MinecraftClient Client;
+    public readonly Session Session;
+
     
-    public ChatPlugin? Chat { get; private set; }
-    public EntityPlugin? Entities { get; private set; }
-    public PlayerPlugin? Player { get; private set; }
-    public WorldPlugin? World { get; private set; }
-    public WindowPlugin? Windows { get; private set; }
+    public readonly ChatPlugin ChatPlugin;
+    public readonly EntityPlugin EntityPlugin;
+    public readonly PlayerPlugin PlayerPlugin;
+    public readonly WorldPlugin WorldPlugin;
+    public readonly WindowPlugin WindowPlugin;
 
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource _cancellation;
     
     private Task? _tickLoop;
 
-    internal int SequenceId;
+    // This field is used for syncing block updates since 1.19.
+    internal int SequenceId = 0;
 
     private MinecraftBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
@@ -39,21 +41,25 @@ public class MinecraftBot
 
         this._cancellation = new CancellationTokenSource();
         this._plugins = new Dictionary<Guid, Plugin>();
-        this.AddDefaultPlugins();
-
+        
         this.Client.OnDisconnected += this.OnClientDisconnected;
+
+        this.PlayerPlugin = new PlayerPlugin(this);
+        this.EntityPlugin = new EntityPlugin(this);
+        this.WorldPlugin = new WorldPlugin(this);
+        this.ChatPlugin = new ChatPlugin(this);
+        this.WindowPlugin = new WindowPlugin(this);
+        this.AddDefaultPlugins();
     }
     
     public async Task LoadPlugin(Plugin plugin)
     {
-        if (this._tickLoop == null)
-        {
-            this._plugins.Add(plugin.GetType().GUID, plugin);
-            return;
-        }
-
-        await plugin.Initialize();
         this._plugins.Add(plugin.GetType().GUID, plugin);
+
+        if (this._tickLoop == null)
+            return;
+        
+        await plugin.Initialize();
     }
 
     public T GetPlugin<T>() where T : Plugin
@@ -75,8 +81,11 @@ public class MinecraftBot
         }
 
         await this.Client.WaitForGame();
+
+        await Task.WhenAll(
+            this._plugins.Values
+                .Select(pl => pl.Initialize()));
         
-        await this.InitializePlugins();
         this._tickLoop = this.TickLoop();
 
         return true;
@@ -84,7 +93,7 @@ public class MinecraftBot
 
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
-        if (this._tickLoop != null && this._tickLoop.Status == TaskStatus.Running)
+        if (this._tickLoop is { Status: TaskStatus.Running })
         {
             this._cancellation.Cancel();
             await this._tickLoop!;   
@@ -95,26 +104,11 @@ public class MinecraftBot
 
     private void AddDefaultPlugins()
     {
-        void AddPlugin(Plugin plugin) 
-            => this._plugins.Add(plugin.GetType().GUID, plugin);
-
-        this.Player = new PlayerPlugin(this);
-        this.Entities = new EntityPlugin(this);
-        this.World = new WorldPlugin(this);
-        this.Chat = new ChatPlugin(this);
-        this.Windows = new WindowPlugin(this);
-
-        AddPlugin(this.Player);
-        AddPlugin(this.Entities);
-        AddPlugin(this.World);
-        AddPlugin(this.Chat);
-        AddPlugin(this.Windows);
-    }
-    
-    private Task InitializePlugins()
-    {
-        return Task.WhenAll(
-            this._plugins.Values.Select(pl => pl.Initialize()));
+        _ = this.LoadPlugin(this.PlayerPlugin);
+        _ = this.LoadPlugin(this.EntityPlugin);
+        _ = this.LoadPlugin(this.WorldPlugin);
+        _ = this.LoadPlugin(this.ChatPlugin);
+        _ = this.LoadPlugin(this.WindowPlugin);
     }
 
     private async Task TickLoop()
@@ -145,8 +139,17 @@ public class MinecraftBot
     private void OnClientDisconnected(MinecraftClient sender, string reason)
         => this.OnBotDisconnected?.Invoke(this, reason);
     
-    
-    public static async Task<MinecraftBot> CreateBot(string username, string hostnameOrIp, ushort port, bool offline = false, string? version = null)
+    /// <summary>
+    /// Creates a new MinecraftBot.
+    /// If you want an online session and login with an Microsoft Account, use your account email as username parameter.
+    /// </summary>
+    /// <param name="username">The Username of the Bot (offline session), or an microsoft account email (online session)</param>
+    /// <param name="hostnameOrIp">The Hostname of the Minecraft server.</param>
+    /// <param name="port">Port of the Minecraft server</param>
+    /// <param name="offline">When true, you won't be logged in to the minecraft services, and will only be able to join servers in offline-mode.</param>
+    /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
+    /// <returns></returns>
+    public static async Task<MinecraftBot> CreateBot(string username, string hostnameOrIp, ushort port = 25565, bool offline = false, string? version = null)
     {
         var session = offline switch {
             true => Session.OfflineSession(username),

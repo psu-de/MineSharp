@@ -2,7 +2,6 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Windows;
-using MineSharp.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Windows;
@@ -25,7 +24,13 @@ public class WindowPlugin : Plugin
 
     public byte SelectedHotbarIndex { get; private set; }
     
+    /// <summary>
+    /// Fires whenever a window is opened (fe: Chest opened)
+    /// </summary>
     public event Events.WindowEvent? OnWindowOpened;
+    /// <summary>
+    /// Fires whenever the bots held item changed.
+    /// </summary>
     public event Events.ItemEvent? OnHeldItemChanged;
     
     private readonly TaskCompletionSource _inventoryLoadedTsc;

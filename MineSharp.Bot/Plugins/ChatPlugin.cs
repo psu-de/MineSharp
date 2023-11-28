@@ -56,30 +56,24 @@ public class ChatPlugin : Plugin
 
     public Task SendChat(string message)
     {
-        if (message.StartsWith('/') 
-            && this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19
+            && message.StartsWith('/'))
         {
             return SendCommand(message.Substring(1));
         }
-        
-        // signed chat messages since 1.19
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3) // 1.19.3
-        {
-            return SendChat1_19_3(message);
-        } 
-        
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_2) // 1.19.2
-        {
-            return SendChat1_19_2(message);
-        }
 
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19) // 1.19.1
-        {
-            return SendChat1_19_1(message);
-        }
-        
-        // Literally every version before.
-        return this.Bot.Client.SendPacket(new SBChatMessage(message));
+        // signed chat messages since 1.19
+        return this.Bot.Data.Version.Protocol switch {
+            // 1.19.3
+            >= ProtocolVersion.V_1_19_3 => this.SendChat1_19_3(message),
+            // 1.19.2
+            >= ProtocolVersion.V_1_19_2 => this.SendChat1_19_2(message),
+            // 1.19.1
+            >= ProtocolVersion.V_1_19 => this.SendChat1_19_1(message),
+            // Literally every version before.
+            _ => this.Bot.Client.SendPacket(new SBChatMessage(message))
+        };
+
     }
     
     public Task SendCommand(string command)
@@ -90,22 +84,17 @@ public class ChatPlugin : Plugin
             arguments = CollectCommandArgumentsRecursive(this._commandTree!.RootIndex, command);
         }
 
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3) // 1.19.3
-        {
-            return SendCommand1_19_3(command, arguments);
-        } 
-        
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_2) // 1.19.2
-        {
-            return SendCommand1_19_2(command, arguments);
-        }
+        return this.Bot.Data.Version.Protocol switch {
+            // 1.19.3
+            >= ProtocolVersion.V_1_19_3 => this.SendCommand1_19_3(command, arguments),
+            // 1.19.2
+            >= ProtocolVersion.V_1_19_2 => this.SendCommand1_19_2(command, arguments),
+            // 1.19.1
+            >= ProtocolVersion.V_1_19 => this.SendCommand1_19_1(command, arguments),
+            // Literally every version before
+            _ => this.SendChat("/" + command)
+        };
 
-        if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19) // 1.19.1
-        {
-            return SendCommand1_19_1(command, arguments);
-        }
-
-        return SendChat("/" + command);
     }
     
     
@@ -124,6 +113,7 @@ public class ChatPlugin : Plugin
         
         var node = this._commandTree.Nodes[nodeIdx];
         var lastArg = command;
+        
         switch (node.Flags & 0x03)
         {
             case 0: // root
@@ -138,14 +128,14 @@ public class ChatPlugin : Plugin
                 break;
             case 2: // argument
             {
-                int argCnt = (node.Parser == null) ? 1 : node.Parser.GetArgumentCount();
+                int argCnt = node.Parser?.GetArgumentCount() ?? 1;
                 string[] arg = command.Split(' ', argCnt + 1);
                 if ((node.Flags & 0x04) > 0)
                 {
                     if (node.Parser != null && node.Parser.GetName() == "minecraft:message")
                         arguments.Add((node.Name!, command));
                 }
-                if (!(arg.Length == argCnt + 1))
+                if (arg.Length != argCnt + 1)
                     return arguments;
                 lastArg = arg[^1];
             }
@@ -155,10 +145,9 @@ public class ChatPlugin : Plugin
         while (this._commandTree.Nodes[nodeIdx].RedirectNode >= 0)
             nodeIdx = this._commandTree.Nodes[nodeIdx].RedirectNode;
 
-        foreach (int childIdx in this._commandTree.Nodes[nodeIdx].Children)
-            arguments = CollectCommandArgumentsRecursive(childIdx, lastArg, arguments);
-
-        return arguments;
+        return this._commandTree.Nodes[nodeIdx]
+            .Children
+            .Aggregate(arguments, (cur, idx) => this.CollectCommandArgumentsRecursive(idx, lastArg, cur));
     }
     
 

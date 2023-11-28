@@ -57,7 +57,7 @@ public class WorldPlugin : Plugin
 
     public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
     {
-        if (this.Bot.Player?.Self?.GameMode != GameMode.Creative)
+        if (this.Bot.PlayerPlugin?.Self?.GameMode != GameMode.Creative)
         {
             throw new Exception("Player must be in creative mode.");
         }
@@ -68,8 +68,8 @@ public class WorldPlugin : Plugin
 
     public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null)
     {
-        if (this.Bot.Player?.Self == null)
-            await this.Bot.Player?.WaitForInitialization()!;
+        if (this.Bot.PlayerPlugin?.Self == null)
+            await this.Bot.PlayerPlugin?.WaitForInitialization()!;
         
         if (this.World == null)
             await this.WaitForChunks();
@@ -77,7 +77,7 @@ public class WorldPlugin : Plugin
         if (!block.Info.Diggable)
             return MineBlockStatus.NotDiggable;
 
-        if (6.0 < this.Bot.Player.Entity!.Position.DistanceTo((Vector3)block.Position))
+        if (6.0 < this.Bot.PlayerPlugin.Entity!.Position.DistanceTo((Vector3)block.Position))
             return MineBlockStatus.TooFar;
         
         if (!this.World!.IsBlockLoaded(block.Position))
@@ -158,10 +158,10 @@ public class WorldPlugin : Plugin
     
     private int CalculateBreakingTime(Block block)
     {
-        if (this.Bot.Player!.Self!.GameMode == GameMode.Creative)
+        if (this.Bot.PlayerPlugin!.Self!.GameMode == GameMode.Creative)
             return 0;
         
-        var heldItem = this.Bot.Windows?.HeldItem;
+        var heldItem = this.Bot.WindowPlugin?.HeldItem;
         float toolMultiplier = 1;
 
         if (heldItem != null)
@@ -172,8 +172,8 @@ public class WorldPlugin : Plugin
         }
             
         float efficiencyLevel = 0; // TODO: Efficiency level
-        float hasteLevel = this.Bot.Player.Self.Entity!.GetEffectLevel(EffectType.Haste) ?? 0;
-        float miningFatigueLevel = this.Bot.Player.Self.Entity.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
+        float hasteLevel = this.Bot.PlayerPlugin.Self.Entity!.GetEffectLevel(EffectType.Haste) ?? 0;
+        float miningFatigueLevel = this.Bot.PlayerPlugin.Self.Entity.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
 
         toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
         toolMultiplier /= MathF.Pow(1.2f, hasteLevel);

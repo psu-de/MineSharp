@@ -31,13 +31,13 @@ public class PlayerPlugin : Plugin
     /// <summary>
     /// All players on the server.
     /// </summary>
-    public IDictionary<UUID, MinecraftPlayer> Players { get; private set; }
+    public IDictionary<UUID, MinecraftPlayer> Players { get; }
 
     /// <summary>
     /// Minecraft players indexed by <see cref="MineSharp.Core.Common.Entities.Entity.ServerId"/>.
     /// Contains only loaded players (Players in the Bots visible range)
     /// </summary>
-    public IDictionary<int, MinecraftPlayer> PlayerMap { get; private set; }
+    public IDictionary<int, MinecraftPlayer> PlayerMap { get; }
     
     /// <summary>
     /// The Bots health (between 0.0 - 20.0)
