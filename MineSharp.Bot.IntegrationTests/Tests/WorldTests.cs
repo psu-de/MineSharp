@@ -87,14 +87,14 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testPlaceBlock", async (bot, source) =>
         {
-            await bot.WorldPlugin!.WaitForChunks();
+            await bot.WorldPlugin.WaitForChunks();
 
             var position = new Position(-8, -59, 19);
-            await bot.ChatPlugin!.SendChat("/tp @p -5 -60 20");
-            await bot.ChatPlugin!.SendChat("/clear");
-            await bot.ChatPlugin!.SendChat("/give @p dirt");
-
-            bot.ChatPlugin!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            await bot.ChatPlugin.SendChat("/tp @p -5 -60 20");
+            await bot.ChatPlugin.SendChat("/clear");
+            await bot.ChatPlugin.SendChat("/give @p dirt");
+            
+            bot.ChatPlugin.OnChatMessageReceived += (sender, player, message, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
@@ -107,7 +107,7 @@ public static class WorldTests
             };
             
             await Task.Delay(1000);
-            await bot.WorldPlugin!.PlaceBlock(position);
+            await bot.WorldPlugin.PlaceBlock(position);
         });
     }
 }

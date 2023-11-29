@@ -6,11 +6,14 @@ services:
     image: itzg/minecraft-server
     ports:
       - 25565:25565
+      - 25575:25575
     environment:
       ONLINE_MODE: "FALSE"
       ENABLE_COMMAND_BLOCK: "TRUE"
       VERSION: "1.20.1"
       EULA: "TRUE"
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: "{\"lakes\":false,\"features\":false,\"layers\":[{\"block\":\"minecraft:air\",\"height\":1}],\"structures\":{\"structures\":{}}}" # Void preset
     tty: true
     stdin_open: true
     restart: unless-stopped
