@@ -88,32 +88,52 @@ public class WorldPlugin : Plugin
 
         var time = this.CalculateBreakingTime(block);
 
-        var packet = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
+        // first packet: Start digging
+        var startPacket = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
             (int)DiggingStatus.StartedDigging,
             block.Position,
             face.Value,
             ++this.Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
 
+        var animationCts = new CancellationTokenSource();
+        animationCts.CancelAfter(time);
+        
+        var diggingAnim = Task.Run(async () =>
+        {
+            while (true)
+            {
+                _ = this.Bot.PlayerPlugin.SwingArm();
+                await Task.Delay(350, animationCts.Token);
+
+                if (animationCts.IsCancellationRequested)
+                    break;
+            }
+        }, animationCts.Token);
+        
         try
         {
-            await this.Bot.Client.SendPacket(packet, cancellation);
+            await this.Bot.Client.SendPacket(startPacket, cancellation);
 
+            // after waiting until the block has broken, another packet must be sent
             var sendAgain = Task.Run(async () =>
             {
                 await Task.Delay(time);
 
-                var send = this.Bot.Client.SendPacket(new PlayerActionPacket(
+                var finishPacket = new PlayerActionPacket(
                     (int)DiggingStatus.FinishedDigging,
                     block.Position,
                     face.Value,
-                    ++this.Bot.SequenceId));
+                    ++this.Bot.SequenceId);
+
+                var send = this.Bot.Client.SendPacket(finishPacket);
                 var receive = this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>();
 
                 await Task.WhenAll(send, receive);
                 return receive.Result;
-            }).WaitAsync(cancellation.Value);
+            }, cancellation.Value);
 
-            var ack = await this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>()
+            var ack = await this.Bot.Client
+                .WaitForPacket<AcknowledgeBlockChangePacket>()
                 .WaitAsync(cancellation.Value);
 
             if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p118)
@@ -124,17 +144,19 @@ public class WorldPlugin : Plugin
                 
             ack = await sendAgain;
 
-            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false })
-                return MineBlockStatus.Failed;
-
-            return MineBlockStatus.Finished;
+            return ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false } 
+                ? MineBlockStatus.Failed 
+                : MineBlockStatus.Finished;
         } catch (TaskCanceledException)
         {
-            await this.Bot.Client.SendPacket(new PlayerActionPacket(
+            var cancelPacket = new PlayerActionPacket(
                 (int)DiggingStatus.CancelledDigging,
                 block.Position,
                 face.Value,
-                ++this.Bot.SequenceId));
+                ++this.Bot.SequenceId);
+            
+            animationCts.Cancel();
+            await this.Bot.Client.SendPacket(cancelPacket);
 
             return MineBlockStatus.Cancelled;
         }
@@ -153,7 +175,9 @@ public class WorldPlugin : Plugin
             false,
             ++this.Bot.SequenceId);
 
-        await this.Bot.Client.SendPacket(packet);
+        await Task.WhenAll(
+            this.Bot.Client.SendPacket(packet),
+            this.Bot.PlayerPlugin.SwingArm());
     }
     
     private int CalculateBreakingTime(Block block)

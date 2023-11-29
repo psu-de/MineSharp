@@ -90,6 +90,7 @@ public class WindowPlugin : Plugin
             ++this.Bot.SequenceId);
         
         _ = this.Bot.Client.SendPacket(packet);
+        _ = this.Bot.PlayerPlugin.SwingArm();
         var receive = this.Bot.Client.WaitForPacket<OpenWindowPacket>();
 
         var cancellation = new CancellationTokenSource();

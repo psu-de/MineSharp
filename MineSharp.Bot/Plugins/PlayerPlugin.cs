@@ -181,6 +181,18 @@ public class PlayerPlugin : Plugin
                 positionPacket.Pitch,
                 this.Entity.IsOnGround));
     }
+    
+    /// <summary>
+    /// Plays a swinging arm animation for other players.
+    /// </summary>
+    /// <param name="hand">The hand to swing</param>
+    /// <param name="token">optional cancellation token</param>
+    /// <returns></returns>
+    public Task SwingArm(PlayerHand hand = PlayerHand.MainHand, CancellationToken? token = null)
+    {
+        var packet = new SwingArmPacket(hand);
+        return this.Bot.Client.SendPacket(packet, token);
+    }
 
     private Task HandleSetHealthPacket(SetHealthPacket packet)
     {
