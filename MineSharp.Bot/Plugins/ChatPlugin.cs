@@ -391,39 +391,9 @@ public class ChatPlugin : Plugin
                 acknowledgedBitfield));
     }
     
-    /*
-     * Thanks to Minecraft-Console-Client
-     * https://github.com/MCCTeam/Minecraft-Console-Client
-     * 
-     * This Method uses a lot of code from MinecraftClient/Protocol/Handlers/Packet/s2c/DeclareCommands.cs from MCC.
-     */
     private Task HandleDeclareCommandsPacket(DeclareCommandsPacket packet)
     {
-        var buffer = packet.RawBuffer;
-        int nodeCount = buffer.ReadVarInt();
-        var nodes = new CommandNode[nodeCount];
-
-        for (int i = 0; i < nodes.Length; i++)
-        {
-            byte flags = buffer.ReadByte();
-            int childCount = buffer.ReadVarInt();
-            int[] children = new int[childCount];
-            for (int j = 0; j < childCount; ++j)
-                children[j] = buffer.ReadVarInt();
-
-            int redirectNode = ((flags & 0x08) == 0x08) ? buffer.ReadVarInt() : -1;
-
-            string? name = ((flags & 0x03) == 1 || (flags & 0x03) == 2) ? buffer.ReadString() : null;
-
-            int parserId = ((flags & 0x03) == 2) ? buffer.ReadVarInt() : -1;
-            IParser? parser = CommandParserFactory.ReadParser(parserId, this.Bot.Data, buffer);
-
-            string? suggestionsType = ((flags & 0x10) == 0x10) ? buffer.ReadString() : null;
-            nodes[i] = new CommandNode(flags, children, redirectNode, name, parser, suggestionsType);
-        }
-        var rootIndex = buffer.ReadVarInt();
-        this._commandTree = new CommandTree(rootIndex, nodes);
-
+        this._commandTree = CommandTree.Parse(packet.RawBuffer, this.Bot.Data);
         return Task.CompletedTask;
     }
 
