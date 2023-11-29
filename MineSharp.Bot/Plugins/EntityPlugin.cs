@@ -221,6 +221,8 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return;
+
+        await this.WaitForInitialization();
         
         if ((packet.Flags & 0x01) == 0x01) 
             this._player!.Entity!.Position.X += packet.X;
