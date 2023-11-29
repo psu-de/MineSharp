@@ -19,7 +19,7 @@ public class PlayerPlugin : Plugin
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
     /// <summary>
-    /// The Minecraftplayer representing the Minecraft Bot itself.
+    /// The MinecraftPlayer representing the Minecraft Bot itself.
     /// </summary>
     public MinecraftPlayer? Self { get; private set; }
 
@@ -193,6 +193,30 @@ public class PlayerPlugin : Plugin
         var packet = new SwingArmPacket(hand);
         return this.Bot.Client.SendPacket(packet, token);
     }
+
+    /// <summary>
+    /// Attacks the given entity with the currently equipped item
+    /// </summary>
+    /// <param name="entity">The entity to attack</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">Thrown when the entity is too far away.</exception>
+    public Task Attack(Entity entity)
+    {
+        if (36 < this.Entity?.Position.DistanceToSquared(entity.Position))
+        {
+            throw new InvalidOperationException("Entity is too far away");
+        }
+
+        var packet = new InteractPacket(
+            entity.ServerId,
+            InteractPacket.InteractionType.Attack,
+            false); // TODO: Sneaking hardcoded (physics required)
+
+        return Task.WhenAll(
+            this.Bot.Client.SendPacket(packet),
+            this.SwingArm());
+    }
+    
 
     private Task HandleSetHealthPacket(SetHealthPacket packet)
     {

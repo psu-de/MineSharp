@@ -156,6 +156,7 @@ internal static class PacketPalette
         RegisterPacket<PlaceBlockPacket>(PacketType.SB_Play_BlockPlace);
         RegisterPacket<PlayerActionPacket>(PacketType.SB_Play_BlockDig);
         RegisterPacket<SwingArmPacket>(PacketType.SB_Play_ArmAnimation);
+        RegisterPacket<InteractPacket>(PacketType.SB_Play_UseItem);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

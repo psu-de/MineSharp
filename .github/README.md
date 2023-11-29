@@ -26,7 +26,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 - 👷‍♂️ Building (very simple, needs some more work)
 - ~~🛠️ Crafting~~
 - 🪟 High-Level window Api
-- ~~⚔️ Attacking entities~~
+- ⚔️ Attacking entities
 - ~~🏃 Movements (Walking, Sprinting, Jumping, Sneaking)~~
 - ~~🔎 Simple Pathfinder~~
 - 📝 Chat (Reading and Writing)

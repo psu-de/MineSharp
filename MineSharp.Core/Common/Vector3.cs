@@ -66,6 +66,10 @@ public class Vector3
         this.Z /= other.Z;
     }
 
+    /// <summary>
+    /// Scale this vector by a scalar
+    /// </summary>
+    /// <param name="scalar"></param>
     public void Scale(double scalar)
     {
         this.X *= scalar;
@@ -73,14 +77,36 @@ public class Vector3
         this.Z *= scalar;
     }
 
+    /// <summary>
+    /// Returns the length of this vector.
+    /// </summary>
+    /// <returns></returns>
     public double Length()
     {
         return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
     }
 
+    /// <summary>
+    /// Returns the distance to the <see cref="other"/> vector.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public double DistanceTo(Vector3 other)
     {
         return this.Minus(other).Length();
+    }
+
+    /// <summary>
+    /// Returns the squared distance to the <see cref="other"/> vector
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns>The distance squared.</returns>
+    public double DistanceToSquared(Vector3 other)
+    {
+        var diff = this.Minus(other);
+        return diff.X * diff.X + 
+               diff.Y * diff.Y +
+               diff.Z * diff.Z;
     }
 
     public Vector3 Normalized()
