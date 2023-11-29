@@ -1,4 +1,5 @@
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 
 namespace MineSharp.Protocol.Packets.Handlers;
@@ -26,6 +27,9 @@ public class PlayPacketHandler : IPacketHandler
     {
         return Task.CompletedTask;
     }
+
+    public bool HandlesIncoming(PacketType type)
+        => type is PacketType.CB_Play_KeepAlive; 
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {

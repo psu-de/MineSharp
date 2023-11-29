@@ -3,6 +3,7 @@ using MineSharp.Auth.Exceptions;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Cryptography;
 using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Serverbound.Login;
@@ -38,10 +39,15 @@ public class LoginPacketHandler : IPacketHandler
     }
 
     public Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
-    }
+        => Task.CompletedTask;
     
+    public bool HandlesIncoming(PacketType type)
+        => type is PacketType.CB_Login_Disconnect
+                or PacketType.CB_Login_EncryptionBegin
+                or PacketType.CB_Login_Compress
+                or PacketType.CB_Login_LoginPluginRequest
+                or PacketType.CB_Login_Success;
+
     private Task HandleDisconnect(DisconnectPacket packet)
     {
         _ = Task.Run(() => this._client.Disconnect(packet.Reason.JSON));

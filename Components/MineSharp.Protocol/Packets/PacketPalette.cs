@@ -29,17 +29,19 @@ using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configurati
 
 namespace MineSharp.Protocol.Packets;
 
-public static class PacketPalette
+internal static class PacketPalette
 {
-    public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData version);
-
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
+    public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData version);
+    
     private static readonly IDictionary<PacketType, PacketFactory> PacketFactories;
+    private static readonly IDictionary<Guid, PacketType> ClassToTypeMap;
 
     static PacketPalette()
     {
         PacketFactories = new Dictionary<PacketType, PacketFactory>();
+        ClassToTypeMap = new Dictionary<Guid, PacketType>();
         
         InitializePackets();
     }
@@ -53,6 +55,12 @@ public static class PacketPalette
         }
 
         return packet;
+    }
+
+    public static PacketType GetPacketType<T>() where T : IPacket
+    {
+        var guid = typeof(T).GUID;
+        return ClassToTypeMap[guid];
     }
     
     private static void InitializePackets()
@@ -152,5 +160,6 @@ public static class PacketPalette
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket
     {
         PacketFactories.Add(type, TPacket.Read);
+        ClassToTypeMap.Add(typeof(TPacket).GUID, type);
     }
 }

@@ -1,3 +1,4 @@
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
@@ -24,6 +25,8 @@ public class HandshakePacketHandler : IPacketHandler
             _ => throw new UnexpectedPacketException($"Unexpected outgoing packet during handshaking: {packet.GetType().FullName}")
         };
     }
+    
+    public bool HandlesIncoming(PacketType type) => false;
 
 
     private Task HandleHandshake(HandshakePacket packet)

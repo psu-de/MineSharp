@@ -2,6 +2,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
@@ -29,16 +30,25 @@ public sealed class MinecraftClient : IDisposable
     private readonly TcpClient _client;
 
     private readonly Queue<PacketSendTask> _packetQueue;
-    private readonly IDictionary<Guid, IList<AsyncPacketHandler>> _packetHandlers;
-    private readonly IDictionary<Guid, TaskCompletionSource<object>> _packetWaiters;
+    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> _packetHandlers;
+    private readonly IDictionary<PacketType, TaskCompletionSource<object>> _packetWaiters;
     private readonly TaskCompletionSource _gameJoinedTsc;
 
     private IPacketHandler _internalPacketHandler;
     private MinecraftStream? _stream;
     private Task? _streamLoop;
 
+    /// <summary>
+    /// Fires whenever the client received a known Packet
+    /// </summary>
     public event Events.ClientPacketEvent? OnPacketReceived;
+    /// <summary>
+    /// Fires whenever the client has sent a packet
+    /// </summary>
     public event Events.ClientPacketEvent? OnPacketSent;
+    /// <summary>
+    /// Fires when the client disconnected from the server
+    /// </summary>
     public event Events.ClientStringEvent? OnDisconnected;
     
     public Session Session { get; }
@@ -53,8 +63,8 @@ public sealed class MinecraftClient : IDisposable
         this._packetQueue = new Queue<PacketSendTask>();
         this._cancellation = new CancellationTokenSource();
         this._internalPacketHandler = new HandshakePacketHandler(this);
-        this._packetHandlers = new Dictionary<Guid, IList<AsyncPacketHandler>>();
-        this._packetWaiters = new Dictionary<Guid, TaskCompletionSource<object>>();
+        this._packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
+        this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc = new TaskCompletionSource();
 
         this.Session = session;
@@ -123,9 +133,14 @@ public sealed class MinecraftClient : IDisposable
         this.OnDisconnected?.Invoke(this, reason);
     }
 
+    /// <summary>
+    /// Registers an <see cref="handler"/> that will be called whenever an packet of type <see cref="T"/> is received
+    /// </summary>
+    /// <param name="handler">A delegate that will be called when a packet of type T is received</param>
+    /// <typeparam name="T">The type of the packet</typeparam>
     public void On<T>(AsyncPacketHandler<T> handler) where T : IPacket
     {
-        var key = typeof(T).GUID;
+        var key = PacketPalette.GetPacketType<T>();
 
         if (!this._packetHandlers.TryGetValue(key, out var handlers))
         {
@@ -136,9 +151,14 @@ public sealed class MinecraftClient : IDisposable
         handlers.Add(p => handler((T)p));
     }
 
+    /// <summary>
+    /// Waits until a packet of the specified type is received.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>A task that completes once the packet is received</returns>
     public Task<T> WaitForPacket<T>() where T : IPacket
     {
-        var packetType = typeof(T).GUID;
+        var packetType = PacketPalette.GetPacketType<T>();
         if (!this._packetWaiters.TryGetValue(packetType, out var task))
         {
             var tsc = new TaskCompletionSource<object>();
@@ -150,6 +170,10 @@ public sealed class MinecraftClient : IDisposable
         return task.Task.ContinueWith(prev => (T)prev.Result);
     }
     
+    /// <summary>
+    /// Waits until the client jumps into the Play <see cref="GameState"/>
+    /// </summary>
+    /// <returns></returns>
     public Task WaitForGame()
         => this._gameJoinedTsc.Task;
 
@@ -202,24 +226,12 @@ public sealed class MinecraftClient : IDisposable
         {
             var buffer = this._stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
-
             var packetType = this._data.Protocol.FromPacketId(PacketFlow.Clientbound, this.GameState, packetId);
-            long size = buffer.ReadableBytes;
-
-            var factory = PacketPalette.GetFactory(packetType);
-            try
+            
+            await this.HandleIncomingPacket(packetType, buffer);
+            if (this.GameState != GameState.Play)
             {
-                var packet = factory?.Invoke(buffer, this._data);
-                if (packet != null)
-                    await this.HandleIncomingPacket(packet);
-
-                if (this.GameState != GameState.Play)
-                {
-                    await Task.Delay(1);
-                }
-            } catch (EndOfStreamException)
-            {
-                Logger.Error("Error reading packet with id {PacketId}, assumed it was {PacketType}. Packet was {Size} bytes.", packetId, packetType, size);
+                await Task.Delay(1);
             }
         }
     }
@@ -251,38 +263,64 @@ public sealed class MinecraftClient : IDisposable
         this._stream!.WritePacket(buffer);
     }
 
-    private Task HandleIncomingPacket(IPacket packet)
+    private Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
     {
-        var tasks = new List<Task>();
-        tasks.Add(this._internalPacketHandler.HandleIncoming(packet));
-
-        if (null != this.OnPacketReceived)
-            tasks.Add(Task.Factory.FromAsync(
-                (callback, obj) => this.OnPacketReceived.BeginInvoke(this, packet, callback, obj),
-                this.OnPacketReceived.EndInvoke, 
-                null));
+        // Only parse packets that are awaited by an handler.
+        // Possible handlers are:
+        //  - MinecraftClient.On<T>()
+        //  - MinecraftClient.WaitForPacket<T>()
+        //  - MinecraftClient.OnPacketReceived     <-- Forces all packets to be parsed
+        //  - The internal IPacketHandler
         
-        var key = packet.GetType().GUID;
-        if (this._packetWaiters.TryGetValue(key, out var tsc))
-            tsc.TrySetResult(packet);
+        var factory = PacketPalette.GetFactory(packetType);
+        if (factory == null)
+            return Task.CompletedTask; // TODO: Maybe add an event for unknown packets
 
-        if (this._packetHandlers.TryGetValue(key, out var handlers))
-            tasks.AddRange(handlers.Select(handler => handler(packet)));
+        var handlers = new List<AsyncPacketHandler>();
+        // Internal packet handler
+        if (this._internalPacketHandler.HandlesIncoming(packetType))
+            handlers.Add(this._internalPacketHandler.HandleIncoming);
+        
+        // Custom packet handlers
+        if (this._packetHandlers.TryGetValue(packetType, out var customHandlers))
+            handlers.AddRange(customHandlers);
+        
+        // Forces all packets to be read
+        if (null != this.OnPacketReceived)
+            handlers.Add(this.InvokeReceivePacketAsync);
+        
+        this._packetWaiters.TryGetValue(packetType, out var tsc);
 
-        _ = Task.Run(async () =>
+        if (handlers.Count == 0 && tsc == null)
+            return Task.CompletedTask;
+        
+        long size = buffer.ReadableBytes;
+        try
         {
-            try
+            var packet = factory(buffer, this._data);
+            
+            _ = Task.Run(async () =>
             {
-                var result = Task.WhenAll(tasks);
-                await result;
-            } catch (Exception e)
-            {
-                foreach (var exception in tasks.Where(x => x.Exception != null))
+                tsc?.TrySetResult(packet);
+                var tasks = handlers
+                    .Select(task => task(packet))
+                    .ToArray();
+                
+                try
                 {
-                    Logger.Warn($"Error in custom packet handling: {exception.Exception}");
+                    await Task.WhenAll(tasks);
+                } catch (Exception)
+                {
+                    foreach (var exception in tasks.Where(x => x.Exception != null))
+                    {
+                        Logger.Warn($"Error in custom packet handling: {exception.Exception}");
+                    }
                 }
-            }
-        });
+            });
+        } catch (EndOfStreamException e)
+        {
+            Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
+        }
 
         return Task.CompletedTask;
     }
@@ -302,6 +340,17 @@ public sealed class MinecraftClient : IDisposable
             }
         });
     }
+
+    private Task InvokeReceivePacketAsync(IPacket packet)
+    {
+        if (null == OnPacketReceived)
+            return Task.CompletedTask;
+
+        return Task.Factory.FromAsync(
+            (callback, obj) => this.OnPacketReceived.BeginInvoke(this, packet, callback, obj),
+            this.OnPacketReceived.EndInvoke,
+            null);
+    }
     
     public void Dispose()
     {
@@ -312,8 +361,11 @@ public sealed class MinecraftClient : IDisposable
         this._stream?.Close();
     }
 
+    
     private record PacketSendTask(IPacket Packet, CancellationToken? Token, TaskCompletionSource Task);
 
+    
+    
     /// <summary>
     /// Requests the server status and closes the connection.
     /// Works only when <see cref="GameState"/> is <see cref="Core.Common.Protocol.GameState.Status"/>.

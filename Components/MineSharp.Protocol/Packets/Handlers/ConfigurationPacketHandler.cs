@@ -1,5 +1,6 @@
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
+using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using NLog;
 
@@ -39,7 +40,13 @@ public class ConfigurationPacketHandler : IPacketHandler
 
         return Task.CompletedTask;
     }
+    public bool HandlesIncoming(PacketType type)
+        => type is PacketType.CB_Configuration_Disconnect 
+                or PacketType.CB_Configuration_FinishConfiguration 
+                or PacketType.CB_Configuration_KeepAlive 
+                or PacketType.CB_Configuration_Ping;
 
+    
     private Task HandleDisconnect(DisconnectPacket packet)
     {
         _ = Task.Run(() => this._client.Disconnect(packet.Reason.JSON));

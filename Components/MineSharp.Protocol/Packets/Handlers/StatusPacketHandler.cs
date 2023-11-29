@@ -1,3 +1,5 @@
+using MineSharp.Data.Protocol;
+
 namespace MineSharp.Protocol.Packets.Handlers;
 
 public class StatusPacketHandler : IPacketHandler
@@ -11,4 +13,5 @@ public class StatusPacketHandler : IPacketHandler
 
     public Task HandleIncoming(IPacket packet) => Task.CompletedTask;
     public Task HandleOutgoing(IPacket packet) => Task.CompletedTask;
+    public bool HandlesIncoming(PacketType type) => false;
 }
