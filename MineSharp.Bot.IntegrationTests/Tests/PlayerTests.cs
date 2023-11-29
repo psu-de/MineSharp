@@ -1,4 +1,5 @@
 using MineSharp.Bot.Plugins;
+using MineSharp.Core.Common.Entities;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -134,5 +135,37 @@ public static class PlayerTests
 
             return Task.CompletedTask;
         }, 15 * 1000);
+    }
+
+    public static Task TestAttack()
+    {
+        return IntegrationTest.RunTest("testAttack", async (bot, source) =>
+        {
+            var player = bot.GetPlugin<PlayerPlugin>();
+            var entities = bot.GetPlugin<EntityPlugin>();
+
+            await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p 16 -60 21");
+
+            Entity? chicken = null;
+            
+            entities.OnEntitySpawned += async (sender, entity) =>
+            {
+                if (entity.Info.Type != EntityType.Chicken)
+                    return;
+
+                chicken = entity;
+                await player.Attack(entity);
+            };
+            
+            entities.OnEntityDespawned += (sender, entity) =>
+            {
+                if (entity.ServerId == chicken?.ServerId)
+                {
+                    source.TrySetResult(true);
+                }
+            };
+            
+            await Task.Delay(1000);
+        }, commandDelay: 1000);
     }
 }
