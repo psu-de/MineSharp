@@ -34,7 +34,7 @@ public class EntityPlugin : Plugin
     /// </summary>
     public event Events.EntityEvent? OnEntityMoved;
 
-    private PlayerPlugin? _player;
+    private PlayerPlugin? _playerPlugin;
 
     public EntityPlugin(MinecraftBot bot) : base(bot)
     {
@@ -53,8 +53,8 @@ public class EntityPlugin : Plugin
 
     protected override async Task Init()
     {
-        this._player = this.Bot.GetPlugin<PlayerPlugin>();
-        await this._player.WaitForInitialization();
+        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
+        await this._playerPlugin.WaitForInitialization();
     }
     
     internal void AddEntity(Entity entity)
@@ -225,29 +225,29 @@ public class EntityPlugin : Plugin
         await this.WaitForInitialization();
         
         if ((packet.Flags & 0x01) == 0x01) 
-            this._player!.Entity!.Position.X += packet.X;
+            this._playerPlugin!.Entity!.Position.X += packet.X;
         else 
-            this._player!.Entity!.Position.X = packet.X;
+            this._playerPlugin!.Entity!.Position.X = packet.X;
 
         if ((packet.Flags & 0x02) == 0x02) 
-            this._player!.Entity!.Position.Y += packet.Y;
+            this._playerPlugin!.Entity!.Position.Y += packet.Y;
         else 
-            this._player!.Entity!.Position.Y = packet.Y;
+            this._playerPlugin!.Entity!.Position.Y = packet.Y;
 
         if ((packet.Flags & 0x04) == 0x04) 
-            this._player!.Entity!.Position.Z += packet.Z;
+            this._playerPlugin!.Entity!.Position.Z += packet.Z;
         else 
-            this._player!.Entity!.Position.Z = packet.Z;
+            this._playerPlugin!.Entity!.Position.Z = packet.Z;
 
         if ((packet.Flags & 0x08) == 0x08) 
-            this._player!.Entity!.Pitch += packet.Pitch;
+            this._playerPlugin!.Entity!.Pitch += packet.Pitch;
         else 
-            this._player!.Entity!.Pitch = packet.Pitch;
+            this._playerPlugin!.Entity!.Pitch = packet.Pitch;
 
         if ((packet.Flags & 0x10) == 0x10) 
-            this._player!.Entity!.Yaw += packet.Yaw;
+            this._playerPlugin!.Entity!.Yaw += packet.Yaw;
         else 
-            this._player!.Entity!.Yaw = packet.Yaw;
+            this._playerPlugin!.Entity!.Yaw = packet.Yaw;
 
         // TODO: Dismount Vehicle
 

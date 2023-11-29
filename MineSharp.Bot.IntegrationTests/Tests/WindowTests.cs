@@ -1,3 +1,4 @@
+using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
@@ -8,10 +9,10 @@ public static class WindowTests
     {
         return IntegrationTest.RunTest("testInventoryUpdate", async (bot, source) =>
         {
-            await bot.WindowPlugin.WaitForInventory();
-            await bot.ChatPlugin.SendChat("/clear");
+            await bot.GetPlugin<WindowPlugin>().WaitForInventory();
+            await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
 
-            bot.WindowPlugin.Inventory!.OnSlotChanged += (window, index) =>
+            bot.GetPlugin<WindowPlugin>().Inventory!.OnSlotChanged += (window, index) =>
             {
                 var slot = window.GetSlot(index);
                 if (slot.Item?.Info.Name == "diamond" && slot.Item?.Count == 33)
@@ -26,15 +27,15 @@ public static class WindowTests
     {
         return IntegrationTest.RunTest("testOpenContainer", async (bot, source) =>
         {
-            await bot.WindowPlugin.WaitForInventory();
-            await bot.WorldPlugin.WaitForChunks();
+            await bot.GetPlugin<WindowPlugin>().WaitForInventory();
+            await bot.GetPlugin<WorldPlugin>().WaitForChunks();
 
             await Task.Delay(1000);
 
             var blockPos = new Position(17, -58, 24);
-            var block = bot.WorldPlugin.World!.GetBlockAt(blockPos);
+            var block = bot.GetPlugin<WorldPlugin>().World.GetBlockAt(blockPos);
 
-            var window = await bot.WindowPlugin.OpenContainer(block);
+            var window = await bot.GetPlugin<WindowPlugin>().OpenContainer(block);
             await Task.Delay(1000);
             var slot = window.GetSlot(0);
 

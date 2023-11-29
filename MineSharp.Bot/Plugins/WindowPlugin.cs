@@ -37,7 +37,8 @@ public class WindowPlugin : Plugin
     private readonly IDictionary<int, Window> _openWindows;
     private readonly object _windowLock;
     private readonly Window _mainInventory;
-    
+
+    private PlayerPlugin? _playerPlugin;
     private DateTime? _cacheTimestamp;
     private WindowItemsPacket? _cachedWindowItemsPacket;
 
@@ -59,6 +60,8 @@ public class WindowPlugin : Plugin
     
     protected override Task Init()
     {
+        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();   
+        
         this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
         this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
         this.Bot.Client.On<SetHeldItemPacket>(this.HandleHeldItemChange);
@@ -90,7 +93,7 @@ public class WindowPlugin : Plugin
             ++this.Bot.SequenceId);
         
         _ = this.Bot.Client.SendPacket(packet);
-        _ = this.Bot.PlayerPlugin.SwingArm();
+        _ = this._playerPlugin?.SwingArm();
         var receive = this.Bot.Client.WaitForPacket<OpenWindowPacket>();
 
         var cancellation = new CancellationTokenSource();

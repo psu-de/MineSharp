@@ -14,20 +14,25 @@ public class WorldPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
-    public IWorld? World { get; private set; }
+    public IWorld World { get; private set; }
     
-    public WorldPlugin(MinecraftBot bot) : base(bot)
-    { }
+    private PlayerPlugin? _playerPlugin;
+    private WindowPlugin? _windowPlugin;
 
-    protected override Task Init()
+    public WorldPlugin(MinecraftBot bot) : base(bot)
     {
         this.World = WorldVersion.CreateWorld(this.Bot.Data);
-
+        
         this.Bot.Client.On<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
         this.Bot.Client.On<UnloadChunkPacket>(this.HandleUnloadChunkPacket);
         this.Bot.Client.On<BlockUpdatePacket>(this.HandleBlockUpdatePacket);
         this.Bot.Client.On<MultiBlockUpdatePacket>(this.HandleMultiBlockUpdatePacket);
+    }
 
+    protected override Task Init()
+    {
+        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
+        this._windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
         return Task.CompletedTask;
     }
 
@@ -57,7 +62,7 @@ public class WorldPlugin : Plugin
 
     public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
     {
-        if (this.Bot.PlayerPlugin?.Self?.GameMode != GameMode.Creative)
+        if (this._playerPlugin?.Self?.GameMode != GameMode.Creative)
         {
             throw new Exception("Player must be in creative mode.");
         }
@@ -68,16 +73,15 @@ public class WorldPlugin : Plugin
 
     public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null)
     {
-        if (this.Bot.PlayerPlugin?.Self == null)
-            await this.Bot.PlayerPlugin?.WaitForInitialization()!;
+        if (this._playerPlugin?.Self == null)
+            await this._playerPlugin?.WaitForInitialization()!;
         
-        if (this.World == null)
-            await this.WaitForChunks();
+        await this.WaitForChunks();
         
         if (!block.Info.Diggable)
             return MineBlockStatus.NotDiggable;
 
-        if (6.0 < this.Bot.PlayerPlugin.Entity!.Position.DistanceTo((Vector3)block.Position))
+        if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo((Vector3)block.Position))
             return MineBlockStatus.TooFar;
         
         if (!this.World!.IsBlockLoaded(block.Position))
@@ -102,7 +106,7 @@ public class WorldPlugin : Plugin
         {
             while (true)
             {
-                _ = this.Bot.PlayerPlugin.SwingArm();
+                _ = this._playerPlugin.SwingArm();
                 await Task.Delay(350, animationCts.Token);
 
                 if (animationCts.IsCancellationRequested)
@@ -177,15 +181,15 @@ public class WorldPlugin : Plugin
 
         await Task.WhenAll(
             this.Bot.Client.SendPacket(packet),
-            this.Bot.PlayerPlugin.SwingArm());
+            this._playerPlugin!.SwingArm());
     }
     
     private int CalculateBreakingTime(Block block)
     {
-        if (this.Bot.PlayerPlugin!.Self!.GameMode == GameMode.Creative)
+        if (this._playerPlugin?.Self?.GameMode == GameMode.Creative)
             return 0;
         
-        var heldItem = this.Bot.WindowPlugin?.HeldItem;
+        var heldItem = this._windowPlugin?.HeldItem;
         float toolMultiplier = 1;
 
         if (heldItem != null)
@@ -196,8 +200,8 @@ public class WorldPlugin : Plugin
         }
             
         float efficiencyLevel = 0; // TODO: Efficiency level
-        float hasteLevel = this.Bot.PlayerPlugin.Self.Entity!.GetEffectLevel(EffectType.Haste) ?? 0;
-        float miningFatigueLevel = this.Bot.PlayerPlugin.Self.Entity.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
+        float hasteLevel = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.Haste) ?? 0;
+        float miningFatigueLevel = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
 
         toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
         toolMultiplier /= MathF.Pow(1.2f, hasteLevel);

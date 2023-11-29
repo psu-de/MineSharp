@@ -3,6 +3,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Chat;
+using MineSharp.Core.Common.Blocks;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -21,7 +22,7 @@ public static class WorldTests
 
             world.World!.OnBlockUpdated += (sender, block) =>
             {
-                if (block.Position == expectedPosition && block.Info.Name == "redstone_block")
+                if (block.Position == expectedPosition && block.Info.Type == BlockType.RedstoneBlock)
                 {
                     source.TrySetResult(true);
                 }
@@ -33,8 +34,8 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testMultiBlockUpdate", async (bot, source) =>
         {
-            await bot.WorldPlugin!.WaitForInitialization();
-            await bot.ChatPlugin!.WaitForInitialization();
+            await bot.GetPlugin<WorldPlugin>().WaitForInitialization();
+            await bot.GetPlugin<ChatPlugin>().WaitForInitialization();
 
             var relative = new Position(-9, -61, 21);
             var expectedBlocks = new List<ulong>(
@@ -42,7 +43,7 @@ public static class WorldTests
                 .Select(x => new Position(relative.X - x, relative.Y, relative.Z))
                 .Select(x => x.ToULong()));
 
-            bot.WorldPlugin.World!.OnBlockUpdated += (sender, block) =>
+            bot.GetPlugin<WorldPlugin>().World.OnBlockUpdated += (sender, block) =>
             {
                 expectedBlocks.Remove(block.Position.ToULong());
                 
@@ -56,12 +57,12 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testMineBlock", async (bot, source) =>
         {
-            await bot.WorldPlugin!.WaitForChunks();
+            await bot.GetPlugin<WorldPlugin>().WaitForChunks();
 
             var position = new Position(-8, -59, 20);
-            await bot.ChatPlugin!.SendChat("/tp @p -5 -60 20");
+            await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
             
-            bot.ChatPlugin!.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, message, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
@@ -75,8 +76,8 @@ public static class WorldTests
             
             await Task.Delay(1000);
             
-            var result = await bot.WorldPlugin.MineBlock(
-                bot.WorldPlugin!.World!.GetBlockAt(position));
+            var result = await bot.GetPlugin<WorldPlugin>().MineBlock(
+                bot.GetPlugin<WorldPlugin>().World!.GetBlockAt(position));
 
             if (result != MineBlockStatus.Finished)
                 source.TrySetResult(false);
@@ -87,14 +88,14 @@ public static class WorldTests
     {
         return IntegrationTest.RunTest("testPlaceBlock", async (bot, source) =>
         {
-            await bot.WorldPlugin.WaitForChunks();
+            await bot.GetPlugin<WorldPlugin>().WaitForChunks();
 
             var position = new Position(-8, -59, 19);
-            await bot.ChatPlugin.SendChat("/tp @p -5 -60 20");
-            await bot.ChatPlugin.SendChat("/clear");
-            await bot.ChatPlugin.SendChat("/give @p dirt");
+            await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
+            await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
+            await bot.GetPlugin<ChatPlugin>().SendChat("/give @p dirt");
             
-            bot.ChatPlugin.OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, message, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
@@ -107,7 +108,7 @@ public static class WorldTests
             };
             
             await Task.Delay(1000);
-            await bot.WorldPlugin.PlaceBlock(position);
+            await bot.GetPlugin<WorldPlugin>().PlaceBlock(position);
         });
     }
 }

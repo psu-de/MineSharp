@@ -18,13 +18,6 @@ public class MinecraftBot
     public readonly MinecraftClient Client;
     public readonly Session Session;
 
-    
-    public readonly ChatPlugin ChatPlugin;
-    public readonly EntityPlugin EntityPlugin;
-    public readonly PlayerPlugin PlayerPlugin;
-    public readonly WorldPlugin WorldPlugin;
-    public readonly WindowPlugin WindowPlugin;
-
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource _cancellation;
     
@@ -43,13 +36,6 @@ public class MinecraftBot
         this._plugins = new Dictionary<Guid, Plugin>();
         
         this.Client.OnDisconnected += this.OnClientDisconnected;
-
-        this.PlayerPlugin = new PlayerPlugin(this);
-        this.EntityPlugin = new EntityPlugin(this);
-        this.WorldPlugin = new WorldPlugin(this);
-        this.ChatPlugin = new ChatPlugin(this);
-        this.WindowPlugin = new WindowPlugin(this);
-        this.AddDefaultPlugins();
     }
     
     public async Task LoadPlugin(Plugin plugin)
@@ -102,15 +88,6 @@ public class MinecraftBot
         await this.Client.Disconnect(reason);
     }
 
-    private void AddDefaultPlugins()
-    {
-        _ = this.LoadPlugin(this.PlayerPlugin);
-        _ = this.LoadPlugin(this.EntityPlugin);
-        _ = this.LoadPlugin(this.WorldPlugin);
-        _ = this.LoadPlugin(this.ChatPlugin);
-        _ = this.LoadPlugin(this.WindowPlugin);
-    }
-
     private async Task TickLoop()
     {
         while (!this._cancellation.Token.IsCancellationRequested)
@@ -138,7 +115,7 @@ public class MinecraftBot
 
     private void OnClientDisconnected(MinecraftClient sender, string reason)
         => this.OnBotDisconnected?.Invoke(this, reason);
-    
+
     /// <summary>
     /// Creates a new MinecraftBot.
     /// If you want an online session and login with an Microsoft Account, use your account email as username parameter.
@@ -148,8 +125,15 @@ public class MinecraftBot
     /// <param name="port">Port of the Minecraft server</param>
     /// <param name="offline">When true, you won't be logged in to the minecraft services, and will only be able to join servers in offline-mode.</param>
     /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
+    /// <param name="excludeDefaultPlugins">When true, the default plugins will not be added to the bot</param>
     /// <returns></returns>
-    public static async Task<MinecraftBot> CreateBot(string username, string hostnameOrIp, ushort port = 25565, bool offline = false, string? version = null)
+    public static async Task<MinecraftBot> CreateBot(
+        string username, 
+        string hostnameOrIp, 
+        ushort port = 25565,
+        bool offline = false, 
+        string? version = null,
+        bool excludeDefaultPlugins = false)
     {
         var session = offline switch {
             true => Session.OfflineSession(username),
@@ -161,6 +145,22 @@ public class MinecraftBot
             _ => MinecraftData.FromVersion(version)
         };
 
-        return new MinecraftBot(data, session, hostnameOrIp, port);
+        var bot = new MinecraftBot(data, session, hostnameOrIp, port);
+
+        if (excludeDefaultPlugins)
+            return bot;
+
+        Plugin[] defaultPlugins = {
+            new ChatPlugin(bot),
+            new EntityPlugin(bot),
+            new PlayerPlugin(bot),
+            new WindowPlugin(bot),
+            new WorldPlugin(bot)
+        };
+
+        foreach (var plugin in defaultPlugins)
+            await bot.LoadPlugin(plugin);
+
+        return bot;
     }
 }

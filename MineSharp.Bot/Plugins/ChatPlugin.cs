@@ -1,6 +1,5 @@
 using MineSharp.Bot.Chat;
 using MineSharp.Commands;
-using MineSharp.Commands.Parser;
 using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
