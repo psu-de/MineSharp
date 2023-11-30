@@ -1,79 +1,28 @@
 using Humanizer;
 using MineSharp.SourceGenerator.Code;
+using MineSharp.SourceGenerator.Generators.Core;
 using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
-public class ItemGenerator : IGenerator
+public class ItemGenerator : CommonGenerator
 {
-    public string Name => "Item";
+    protected override string DataKey => "items";
+    protected override string Namespace => "Items";
+    protected override string Singular => "Item";
+    protected override string[] ExtraUsings { get; } = { "MineSharp.Core.Common.Enchantments" };
 
-    public async Task Run(MinecraftDataWrapper wrapper)
-    {
-        await GenerateEnum(wrapper);
-        
-        foreach (var version in Config.IncludedVersions)
-        {
-            await GenerateVersion(wrapper, version);
-        }
-    }
+    protected override JToken[] GetProperties(JToken data)
+        => ((JArray)data).ToArray();
     
-    private async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
-    {
-        var path = wrapper.GetPath(version, "items");
-        if (VersionMapGenerator.GetInstance().IsRegistered("items", path))
-        {
-            VersionMapGenerator.GetInstance().RegisterVersion("items", version, path);
-            return;
-        }
-        
-        VersionMapGenerator.GetInstance().RegisterVersion("items", version, path);
-        
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Items\\Versions");
-        var v = path.Replace("pc/", "").Replace(".", "_");
-        var items = await wrapper.GetItems(version);
-
-        await new DataVersionGenerator() {
-            Namespace = "MineSharp.Data.Items.Versions",
-            ClassName = $"Items_{v}",
-            EnumName = "ItemType",
-            InfoClass = "ItemInfo",
-            Usings = new[] { "MineSharp.Core.Common.Enchantments", "MineSharp.Core.Common.Items" },
-            Outfile = Path.Join(outdir, $"Items_{v}.cs"),
-            Properties = ((JArray)items).ToArray(),
-            Stringify = Stringify,
-            KeySelector = KeySelector
-        }.Write();
-    }
-
-    private async Task GenerateEnum(MinecraftDataWrapper wrapper)
-    {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Items");
-        var items = await wrapper.GetItems(Config.LatestVersion);
-
-        var itemValues = new Dictionary<string, int>();
-
-        foreach (var item in (JArray)items)
-        {
-            itemValues.Add(((string)item.SelectToken("name")!).Pascalize(), (int)item.SelectToken("id")!);
-        }
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Items",
-            ClassName = "ItemType",
-            Outfile = Path.Join(outdir, "ItemType.cs"),
-            Entries = itemValues
-        }.Write();
-    }
-    
-    private string KeySelector(JToken token)
+    protected override string GetName(JToken token)
     {
         var name = (string)token.SelectToken("name")!;
         return NameUtils.GetItemName(name);
     }
     
-    private string Stringify(JToken token)
+    protected override string Stringify(JToken token)
     {
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;

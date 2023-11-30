@@ -1,44 +1,28 @@
 using Humanizer;
 using MineSharp.SourceGenerator.Code;
+using MineSharp.SourceGenerator.Generators.Core;
 using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
-public class EnchantmentGenerator : IGenerator
+public class EnchantmentGenerator : CommonGenerator
 {
-    public string Name => "Enchantment";
+    protected override string DataKey => "enchantments";
+    protected override string Namespace => "Enchantments";
+    protected override string Singular => "Enchantment";
+    protected override string[] ExtraUsings { get; } = { "MineSharp.Core.Common" };
     
-    public async Task Run(MinecraftDataWrapper wrapper)
-    {
-        await GenerateEnum(wrapper);
-        
-        foreach (var version in Config.IncludedVersions)
-        {
-            await GenerateVersion(wrapper, version);
-        }
-    }
-    
-    private async Task GenerateEnum(MinecraftDataWrapper wrapper)
+    protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
         var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Enchantments");
         var enchantments = await wrapper.GetEnchantments(Config.LatestVersion);
-
-        var enchantmentValues = new Dictionary<string, int>();
         var enchantmentCategories = new HashSet<string>();
 
         foreach (var enchantment in (JArray)enchantments)
         {
-            enchantmentValues.Add(((string)enchantment.SelectToken("name")!).Pascalize(), (int)enchantment.SelectToken("id")!);
             enchantmentCategories.Add(((string)enchantment.SelectToken("category")!).Pascalize());
         }
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Enchantments",
-            ClassName = "EnchantmentType",
-            Outfile = Path.Join(outdir, "EnchantmentType.cs"),
-            Entries = enchantmentValues
-        }.Write();
 
         await new EnumGenerator() {
             Namespace = "MineSharp.Core.Common.Enchantments",
@@ -49,41 +33,14 @@ public class EnchantmentGenerator : IGenerator
                 .ToDictionary(x => x.x, x => x.i)
         }.Write();
     }
-    
-    private async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
-    {
-        var path = wrapper.GetPath(version, "enchantments");
-        if (VersionMapGenerator.GetInstance().IsRegistered("enchantments", path))
-        {
-            VersionMapGenerator.GetInstance().RegisterVersion("enchantments", version, path);
-            return;
-        }
-        
-        VersionMapGenerator.GetInstance().RegisterVersion("enchantments", version, path);
-        
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Enchantments\\Versions");
-        var v = path.Replace("pc/", "").Replace(".", "_");
-        var enchantments = await wrapper.GetEnchantments(version);
 
-        await new DataVersionGenerator() {
-            Namespace = "MineSharp.Data.Enchantments.Versions",
-            ClassName = $"Enchantments_{v}",
-            EnumName = "EnchantmentType",
-            InfoClass = "EnchantmentInfo",
-            Usings = new[] { "MineSharp.Core.Common", "MineSharp.Core.Common.Enchantments" },
-            Outfile = Path.Join(outdir, $"Enchantments_{v}.cs"),
-            Properties = ((JArray)enchantments).ToArray(),
-            Stringify = Stringify,
-            KeySelector = KeySelector
-        }.Write();
-    }
+    protected override JToken[] GetProperties(JToken data) 
+        => ((JArray)data).ToArray();
 
-    private string KeySelector(JToken token)
-    {
-        return ((string)token.SelectToken("name")!).Pascalize();
-    }
+    protected override string GetName(JToken token)
+        => NameUtils.GetEnchantmentName((string)token.SelectToken("name")!);
     
-    private string Stringify(JToken token)
+    protected override string Stringify(JToken token)
     {
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;

@@ -1,61 +1,57 @@
 using Humanizer;
 using MineSharp.SourceGenerator.Code;
+using MineSharp.SourceGenerator.Generators.Core;
 using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
-public class BlockGenerator : IGenerator
+public class BlockGenerator : CommonGenerator
 {
-    public string Name => "Block";
-    
-    private JToken? _currentVersionItems;
-    
-    public async Task Run(MinecraftDataWrapper wrapper)
-    {
-        await GenerateEnum(wrapper);
+    protected override string Singular => "Block";
+    protected override string Namespace => "Blocks";
+    protected override string DataKey => "blocks";
+    protected override string[] ExtraUsings { get; } = 
+        { "MineSharp.Core.Common.Blocks.Property", "MineSharp.Core.Common.Items" };
 
-        foreach (var version in Config.IncludedVersions)
-        {
-            this._currentVersionItems = await wrapper.GetItems(version);
-            await GenerateVersion(wrapper, version);
-        }
+    private JToken? _currentVersionItems;
+
+    protected override string GetName(JToken token)
+        => NameUtils.GetBlockName((string)token.SelectToken("name")!);
+
+    protected override JToken[] GetProperties(JToken data) 
+        => ((JArray)data).ToArray();
+
+    protected override async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
+    {
+        this._currentVersionItems = await wrapper.GetItems(version);
+        await base.GenerateVersion(wrapper, version);
     }
 
-    private async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
+    protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        var path = wrapper.GetPath(version, "blocks");
-        if (VersionMapGenerator.GetInstance().IsRegistered("blocks", path))
-        {
-            VersionMapGenerator.GetInstance().RegisterVersion("blocks", version, path);
-            return;
-        }
-        
-        VersionMapGenerator.GetInstance().RegisterVersion("blocks", version, path);
-        
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Blocks\\Versions");
-        var v = path.Replace("pc/", "").Replace(".", "_");
-        var blocks = await wrapper.GetBlocks(version);
+        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Blocks");
+        var blocks = await wrapper.GetBlocks(Config.LatestVersion);
 
-        await new DataVersionGenerator() {
-            Namespace = "MineSharp.Data.Blocks.Versions",
-            ClassName = $"Blocks_{v}",
-            EnumName = "BlockType",
-            InfoClass = "BlockInfo",
-            Usings = new[] { "MineSharp.Core.Common.Blocks", "MineSharp.Core.Common.Blocks.Property", "MineSharp.Core.Common.Items" },
-            Outfile = Path.Join(outdir, $"Blocks_{v}.cs"),
-            Properties = ((JArray)blocks).ToArray(),
-            Stringify = Stringify,
-            KeySelector = KeySelector
+        var materials = new HashSet<string>();
+        foreach (var block in (JArray)blocks)
+        {
+            var mats = (string)block.SelectToken("material")!;
+            foreach (var material in mats.Split(";"))
+            {
+                materials.Add(NameUtils.GetMaterial(material));
+            }
+        }
+
+        await new EnumGenerator() {
+            Namespace = "MineSharp.Core.Common.Blocks",
+            ClassName = "Material",
+            Outfile = Path.Join(outdir, "Material.cs"),
+            Entries = materials.Select((x, i) => (x, i)).ToDictionary(x => x.x, x => x.i)
         }.Write();
     }
-    
-    private string KeySelector(JToken token)
-    {
-        return ((string)token.SelectToken("name")!).Pascalize();
-    }
-    
-    private string Stringify(JToken token)
+
+    protected override string Stringify(JToken token)
     {
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;
@@ -167,37 +163,5 @@ public class BlockGenerator : IGenerator
         return mats.Length == 0
             ? "Array.Empty<Material>()"
             : $"new [] {{ {string.Join(", ", mats)} }}";
-    }
-    
-    private async Task GenerateEnum(MinecraftDataWrapper wrapper)
-    {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Blocks");
-        var blocks = await wrapper.GetBlocks(Config.LatestVersion);
-
-        var blockValues = new Dictionary<string, int>();
-        var materials = new HashSet<string>();
-        foreach (var block in (JArray)blocks)
-        {
-            blockValues.Add(((string)block.SelectToken("name")!).Pascalize(), (int)block.SelectToken("id")!);
-            var mats = (string)block.SelectToken("material")!;
-            foreach (var material in mats.Split(";"))
-            {
-                materials.Add(NameUtils.GetMaterial(material));
-            }
-        }
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Blocks",
-            ClassName = "BlockType",
-            Outfile = Path.Join(outdir, "BlockType.cs"),
-            Entries = blockValues
-        }.Write();
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Blocks",
-            ClassName = "Material",
-            Outfile = Path.Join(outdir, "Material.cs"),
-            Entries = materials.Select((x, i) => (x, i)).ToDictionary(x => x.x, x => x.i)
-        }.Write();
     }
 }

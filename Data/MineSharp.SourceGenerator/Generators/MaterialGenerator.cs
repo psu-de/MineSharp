@@ -45,35 +45,33 @@ public class MaterialGenerator : IGenerator
         
         var v = version.Replace(".", "_");
         
-        var sb = new StringBuilder();
-        sb.AppendLine("using MineSharp.Core.Common.Blocks;");
-        sb.AppendLine("using MineSharp.Core.Common.Items;");
-        sb.AppendLine();
-        sb.AppendLine("namespace MineSharp.Data.Materials.Versions;");
-        sb.AppendLine();
-        sb.AppendLine($"internal class Materials_{v} : MaterialVersion");
-        sb.AppendLine("{");
-        sb.AppendLine("    public override IDictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new Dictionary<Material, Dictionary<ItemType, float>>()");
-        sb.AppendLine("    {");
+        var writer = new CodeWriter();
+        writer.Disclaimer();
+        writer.WriteLine("using MineSharp.Core.Common.Blocks;");
+        writer.WriteLine("using MineSharp.Core.Common.Items;");
+        writer.WriteLine();
+        writer.WriteLine("namespace MineSharp.Data.Materials.Versions;");
+        writer.WriteLine();
+        writer.Begin($"internal class Materials_{v} : MaterialVersion");
+        writer.Begin("public override IDictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new()");
         foreach (var prop in ((JObject)materials).Properties())
         {
             if (prop.Name.Contains(';'))
                 continue;
             
-            sb.AppendLine("        {");
-            sb.AppendLine($"            Material.{NameUtils.GetMaterial(prop.Name)},");
-            sb.AppendLine($"            new Dictionary<ItemType, float>()");
-            sb.AppendLine($"            {{");
+            writer.Begin("");
+            writer.WriteLine($"Material.{NameUtils.GetMaterial(prop.Name)},");
+            writer.Begin($"new Dictionary<ItemType, float>()");
             foreach (var kvp in ((JObject)prop.Value).Properties())
             {
-                sb.AppendLine($"                {{ ItemType.{FindNameFromItemId(kvp.Name)}, {Str.Float((float)kvp.Value)} }},");
+                writer.WriteLine($"{{ ItemType.{FindNameFromItemId(kvp.Name)}, {Str.Float((float)kvp.Value)} }},");
             }
-            sb.AppendLine($"            }}");
-            sb.AppendLine("        },");
+            writer.Finish();
+            writer.Finish(colon: true);
         }
-        sb.AppendLine("    };");
-        sb.AppendLine("}");
+        writer.Finish(semicolon: true);
+        writer.Finish();
         
-        await File.WriteAllTextAsync(Path.Join(outdir, $"Materials_{v}.cs"), sb.ToString());
+        await File.WriteAllTextAsync(Path.Join(outdir, $"Materials_{v}.cs"), writer.ToString());
     }
 }

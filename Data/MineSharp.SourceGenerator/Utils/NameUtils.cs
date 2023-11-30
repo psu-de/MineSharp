@@ -4,6 +4,9 @@ namespace MineSharp.SourceGenerator.Utils;
 
 public static class NameUtils
 {
+    private static string CommonGetName(string x)
+        => x.Pascalize();
+    
     public static string GetMaterial(string x)
     {
         if (x == "coweb")
@@ -11,12 +14,12 @@ public static class NameUtils
         if (x.StartsWith("mineable/"))
             return x.Substring("mineable/".Length).Pascalize();
 
-        return x.Pascalize();
+        return CommonGetName(x);
     }
 
     public static string GetItemName(string name)
     {
-        name = name.Pascalize();
+        name = CommonGetName(name);
 
         return name switch {
             "PotteryShardArcher" => "ArcherPotterySherd",
@@ -26,4 +29,19 @@ public static class NameUtils
             _ => name
         };
     }
+
+    public static string GetBiomeName(string name)
+        => CommonGetName(name);
+
+    public static string GetBlockName(string name)
+        => CommonGetName(name);
+
+    public static string GetEffectName(string name)
+        => CommonGetName(name);
+
+    public static string GetEnchantmentName(string name)
+        => CommonGetName(name);
+
+    public static string GetEntityName(string name)
+        => CommonGetName(name);
 }

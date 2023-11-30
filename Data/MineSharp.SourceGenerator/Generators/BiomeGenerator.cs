@@ -1,72 +1,29 @@
 using Humanizer;
 using MineSharp.SourceGenerator.Code;
+using MineSharp.SourceGenerator.Generators.Core;
 using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
-public class BiomeGenerator : IGenerator
+public class BiomeGenerator : CommonGenerator
 {
-    public string Name => "Biome";
-    
-    public async Task Run(MinecraftDataWrapper wrapper)
-    {
-        await GenerateEnum(wrapper);
+    protected override string Singular => "Biome";
+    protected override string Namespace => "Biomes";
+    protected override string DataKey => "biomes";
+    protected override string[] ExtraUsings { get; } = { "MineSharp.Core.Common" };
 
-        foreach (var version in Config.IncludedVersions)
-        {
-            await GenerateVersion(wrapper, version);
-        }
-    }
-
-    private async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
-    {
-        var path = wrapper.GetPath(version, "biomes");
-        if (VersionMapGenerator.GetInstance().IsRegistered("biomes", path))
-        {
-            VersionMapGenerator.GetInstance().RegisterVersion("biomes", version, path);
-            return;
-        }
-        
-        VersionMapGenerator.GetInstance().RegisterVersion("biomes", version, path);
-        
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Biomes\\Versions");
-        var v = path.Replace("pc/", "").Replace(".", "_");
-        var biomes = await wrapper.GetBiomes(version);
-
-        await new DataVersionGenerator() {
-            Namespace = "MineSharp.Data.Biomes.Versions",
-            ClassName = $"Biomes_{v}",
-            EnumName = "BiomeType",
-            InfoClass = "BiomeInfo",
-            Usings = new[] { "MineSharp.Core.Common", "MineSharp.Core.Common.Biomes" },
-            Outfile = Path.Join(outdir, $"Biomes_{v}.cs"),
-            Properties = ((JArray)biomes).ToArray(),
-            Stringify = Stringify,
-            KeySelector = KeySelector
-        }.Write();
-    }
 
     private async Task GenerateEnum(MinecraftDataWrapper wrapper)
     {
         var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Biomes");
         var biomes = await wrapper.GetBiomes(Config.LatestVersion);
-
-        var biomeValues = new Dictionary<string, int>();
         var biomeCategories = new HashSet<string>();
 
         foreach (var biome in (JArray)biomes)
         {
-            biomeValues.Add(((string)biome.SelectToken("name")!).Pascalize(), (int)biome.SelectToken("id")!);
-            biomeCategories.Add(((string)biome.SelectToken("category")!).Pascalize());
+            biomeCategories.Add(GetCategory(biome));
         }
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Biomes",
-            ClassName = "BiomeType",
-            Outfile = Path.Join(outdir, "BiomeType.cs"),
-            Entries = biomeValues
-        }.Write();
         
         await new EnumGenerator() {
             Namespace = "MineSharp.Core.Common.Biomes",
@@ -78,12 +35,38 @@ public class BiomeGenerator : IGenerator
         }.Write();
     }
 
-    private string KeySelector(JToken token)
+    protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        return ((string)token.SelectToken("name")!).Pascalize();
+        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Biomes");
+        var biomes = await wrapper.GetBiomes(Config.LatestVersion);
+
+        var biomeCategories = new HashSet<string>();
+
+        foreach (var biome in (JArray)biomes)
+        {
+            biomeCategories.Add(((string)biome.SelectToken("category")!).Pascalize());
+        }
+        
+        await new EnumGenerator() {
+            Namespace = "MineSharp.Core.Common.Biomes",
+            ClassName = "BiomeCategory",
+            Outfile = Path.Join(outdir, "BiomeCategory.cs"),
+            Entries = biomeCategories
+                .Select((x, i) => (x, i))
+                .ToDictionary(x => x.x, x => x.i)
+        }.Write();
     }
 
-    private string Stringify(JToken token)
+    protected override JToken[] GetProperties(JToken data)
+        => ((JArray)data).ToArray();
+    
+    protected override string GetName(JToken token)
+    {
+        var name = (string)token.SelectToken("name")!;
+        return NameUtils.GetBiomeName(name);
+    }
+
+    protected override string Stringify(JToken token)
     {
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;

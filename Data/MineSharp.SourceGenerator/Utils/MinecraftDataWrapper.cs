@@ -17,7 +17,7 @@ public class MinecraftDataWrapper
     public string GetPath(string version, string key) 
         => (string)this._dataPaths.Property(version)!.Value.SelectToken(key)!;
 
-    private async Task<JToken> Parse(string version, string key)
+    public async Task<JToken> Parse(string version, string key)
     {
         var rel = GetPath(version, key);
         var path = Path.Join(this._path, rel, $"{key}.json");

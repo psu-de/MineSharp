@@ -29,39 +29,36 @@ public class VersionMapGenerator : IGenerator
     
     public async Task Run(MinecraftDataWrapper wrapper)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("namespace MineSharp.Data;");
-        sb.AppendLine();
-        sb.AppendLine("internal static class VersionMap");
-        sb.AppendLine("{");
-        
+        var writer = new CodeWriter();
+        writer.Disclaimer();
+        writer.WriteLine("namespace MineSharp.Data;");
+        writer.WriteLine();
+        writer.Begin("internal static class VersionMap");
         
         foreach (var key in this._registered.Keys)
         {
             var versionMap = this._registered[key];
             
-            sb.AppendLine($"    public static IDictionary<string, string> {key.Pascalize()} {{ get; }} = new Dictionary<string, string>()");
-            sb.AppendLine("    {");
+            writer.Begin($"public static Dictionary<string, string> {key.Pascalize()} {{ get; }} = new()");
                 
             foreach (var version in versionMap.Keys)
             {
                 var className = this.GetClassName(key, versionMap[version]);
-                sb.AppendLine($"        {{ {Str.String(version)}, {Str.String(className)} }},");
+                writer.WriteLine($"{{ {Str.String(version)}, {Str.String(className)} }},");
             }
             
-            sb.AppendLine("    };");
+            writer.Finish(semicolon: true);
         }
-        sb.AppendLine("    public static IDictionary<string, MinecraftVersion> Versions { get; } = new Dictionary<string, MinecraftVersion>()");
-        sb.AppendLine("    {");
+        writer.Begin("public static Dictionary<string, MinecraftVersion> Versions { get; } = new()");
         foreach (var version in Config.IncludedVersions)
         {
-            sb.AppendLine($"        {{ {Str.String(version)}, {await StringifyVersion(version, wrapper)} }},");
+            writer.WriteLine($"{{ {Str.String(version)}, {await StringifyVersion(version, wrapper)} }},");
         }
-        sb.AppendLine("    };");
-        sb.AppendLine("}");
+        writer.Finish(semicolon: true);
+        writer.Finish();
 
         await File.WriteAllTextAsync(
-            Path.Join(DirectoryUtils.GetDataSourceDirectory(), "VersionMap.cs"), sb.ToString());
+            Path.Join(DirectoryUtils.GetDataSourceDirectory(), "VersionMap.cs"), writer.ToString());
     }
 
     public void RegisterVersion(string key, string version, string path)

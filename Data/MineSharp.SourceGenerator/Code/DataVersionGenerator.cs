@@ -18,26 +18,28 @@ public class DataVersionGenerator
 
     public Task Write()
     {
-        var sb = new StringBuilder();
+        var writer = new CodeWriter();
+
+        writer.Disclaimer();
+
         foreach (var @using in this.Usings)
         {
-            sb.AppendLine($"using {@using};");
+            writer.WriteLine($"using {@using};");
         }
-        sb.AppendLine();
-        sb.AppendLine($"namespace {this.Namespace};");
-        sb.AppendLine();
-        sb.AppendLine($"internal class {this.ClassName} : DataVersion<{this.EnumName}, {this.InfoClass}>");
-        sb.AppendLine("{");
-        sb.AppendLine($"    private static Dictionary<{this.EnumName}, {this.InfoClass}> Values {{ get; }} = new Dictionary<{this.EnumName}, {this.InfoClass}>()");
-        sb.AppendLine($"    {{");
+        
+        writer.WriteLine();
+        writer.WriteLine($"namespace {this.Namespace};");
+        writer.WriteLine();
+        writer.Begin($"internal class {this.ClassName} : DataVersion<{this.EnumName}, {this.InfoClass}>");
+        writer.Begin($"private static Dictionary<{this.EnumName}, {this.InfoClass}> Values {{ get; }} = new()");
         foreach (var token in this.Properties)
         {
-            sb.AppendLine($"        {{ {this.EnumName}.{this.KeySelector(token)}, {this.Stringify(token)} }},");
+            writer.WriteLine($"{{ {this.EnumName}.{this.KeySelector(token)}, {this.Stringify(token)} }},");
         }
-        sb.AppendLine($"    }};");
-        sb.AppendLine($"    public override Dictionary<{this.EnumName}, {this.InfoClass}> Palette => Values;");
-        sb.AppendLine("}");
+        writer.Finish(semicolon: true);
+        writer.WriteLine($"public override Dictionary<{this.EnumName}, {this.InfoClass}> Palette => Values;");
+        writer.Finish();
 
-        return File.WriteAllTextAsync(this.Outfile, sb.ToString());
+        return File.WriteAllTextAsync(this.Outfile, writer.ToString());
     }
 }

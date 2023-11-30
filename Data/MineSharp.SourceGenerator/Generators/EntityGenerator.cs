@@ -1,38 +1,25 @@
 using Humanizer;
 using MineSharp.SourceGenerator.Code;
+using MineSharp.SourceGenerator.Generators.Core;
 using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
-public class EntityGenerator : IGenerator
+public class EntityGenerator : CommonGenerator
 {
-    public string Name => "Entity";
+    protected override string DataKey => "entities";
+    protected override string Namespace => "Entities";
+    protected override string Singular => "Entity";
+    protected override string[] ExtraUsings { get; } = { "MineSharp.Core.Common" };
 
-    public async Task Run(MinecraftDataWrapper wrapper)
-    {
-        await GenerateEnum(wrapper);
-
-        foreach (var version in Config.IncludedVersions)
-        {
-            await GenerateVersion(wrapper, version);
-        }
-    }
-
-    private string GetCategory(JToken token)
-    {
-        var val = (string)token!;
-        if (val == "UNKNOWN")
-            val = val.ToLower();
-        return val.Pascalize();
-    }
-
-    private string KeySelector(JToken token)
-    {
-        return ((string)token.SelectToken("name")!).Pascalize();
-    }
+    protected override JToken[] GetProperties(JToken data)
+        => ((JArray)data).ToArray();
     
-    private string Stringify(JToken token)
+    protected override string GetName(JToken token)
+        => NameUtils.GetEntityName((string)token.SelectToken("name")!);
+    
+    protected override string Stringify(JToken token)
     {
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;
@@ -51,59 +38,22 @@ public class EntityGenerator : IGenerator
                $"MobType.{type.Pascalize()}, " +
                $"EntityCategory.{category})";
     }
-
-    private async Task GenerateVersion(MinecraftDataWrapper wrapper, string version)
-    {
-        var path = wrapper.GetPath(version, "entities");
-        if (VersionMapGenerator.GetInstance().IsRegistered("entities", path))
-        {
-            VersionMapGenerator.GetInstance().RegisterVersion("entities", version, path);
-            return;
-        }
-        
-        VersionMapGenerator.GetInstance().RegisterVersion("entities", version, path);
-        
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Entities\\Versions");
-        var v = path.Replace("pc/", "").Replace(".", "_");
-        var entities = await wrapper.GetEntities(version);
-
-        await new DataVersionGenerator() {
-            Namespace = "MineSharp.Data.Entities.Versions",
-            ClassName = $"Entities_{v}",
-            EnumName = "EntityType",
-            InfoClass = "EntityInfo",
-            Usings = new[] { "MineSharp.Core.Common", "MineSharp.Core.Common.Entities" },
-            Outfile = Path.Join(outdir, $"Entities_{v}.cs"),
-            Properties = ((JArray)entities).ToArray(),
-            Stringify = Stringify,
-            KeySelector = KeySelector
-        }.Write();
-    }
     
-    private async Task GenerateEnum(MinecraftDataWrapper wrapper)
+    protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
         var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Entities");
         var entities = await wrapper.GetEntities(Config.LatestVersion);
 
-        var entityValues = new Dictionary<string, int>();
         var entityCategories = new HashSet<string>();
         var entityTypes = new HashSet<string>();
 
         foreach (var entity in (JArray)entities)
         {
-            entityValues.Add(((string)entity.SelectToken("name")!).Pascalize(), (int)entity.SelectToken("id")!);
             var category = GetCategory(entity.SelectToken("category")!);
             entityCategories.Add(category);
             entityTypes.Add(((string)entity.SelectToken("type")!).Pascalize());
         }
-
-        await new EnumGenerator() {
-            Namespace = "MineSharp.Core.Common.Entities",
-            ClassName = "EntityType",
-            Outfile = Path.Join(outdir, "EntityType.cs"),
-            Entries = entityValues
-        }.Write();
-
+        
         await new EnumGenerator() {
             Namespace = "MineSharp.Core.Common.Entities",
             ClassName = "EntityCategory",
@@ -121,5 +71,13 @@ public class EntityGenerator : IGenerator
                 .Select((x, i) => (x, i))
                 .ToDictionary(x => x.x, x => x.i)
         }.Write();
+    }
+    
+    private string GetCategory(JToken token)
+    {
+        var val = (string)token!;
+        if (val == "UNKNOWN")
+            val = val.ToLower();
+        return val.Pascalize();
     }
 }

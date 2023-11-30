@@ -11,14 +11,14 @@ public class EnumGenerator
 
     public Task Write()
     {
-        var sb = new StringBuilder();
-        sb.AppendLine($"namespace {this.Namespace};");
-        sb.AppendLine();
-        sb.AppendLine($"public enum {this.ClassName}");
-        sb.AppendLine("{");
+        var writer = new CodeWriter();
+        writer.Disclaimer();
+        writer.WriteLine($"namespace {this.Namespace};");
+        writer.WriteLine();
+        writer.Begin($"public enum {this.ClassName}");
         foreach (var entry in this.Entries)
-            sb.AppendLine($"    {entry.Key} = {entry.Value},");
-        sb.AppendLine("}");
-        return File.WriteAllTextAsync(this.Outfile, sb.ToString());
+            writer.WriteLine($"{entry.Key} = {entry.Value},");
+        writer.Finish();
+        return File.WriteAllTextAsync(this.Outfile, writer.ToString());
     }
 }

@@ -62,13 +62,12 @@ public class ProtocolGenerator : IGenerator
         var outdir = DirectoryUtils.GetDataSourceDirectory("Protocol\\Versions");
         var protocol = await wrapper.GetProtocol(version);
         
-        var sb = new StringBuilder();
-        sb.AppendLine("namespace MineSharp.Data.Protocol.Versions;");
-        sb.AppendLine();
-        sb.AppendLine($"internal class Protocol_{v} : ProtocolVersion");
-        sb.AppendLine("{");
-        sb.AppendLine("    public override Dictionary<PacketType, int> PacketIds { get; } = new Dictionary<PacketType, int>()");
-        sb.AppendLine("    {");
+        var writer = new CodeWriter();
+        writer.Disclaimer();
+        writer.WriteLine("namespace MineSharp.Data.Protocol.Versions;");
+        writer.WriteLine();
+        writer.Begin($"internal class Protocol_{v} : ProtocolVersion");
+        writer.Begin("public override Dictionary<PacketType, int> PacketIds { get; } = new()");
         foreach (var ns in ((JObject)protocol).Properties().Select(x => x.Name))
         {
             if (ns == "types")
@@ -85,19 +84,19 @@ public class ProtocolGenerator : IGenerator
             foreach (var kvp in cbIdMapping)
             {
                 var packetName = kvp.Key;
-                sb.AppendLine($"        {{ PacketType.{packetName}, {kvp.Value} }},");
+                writer.WriteLine($"{{ PacketType.{packetName}, {kvp.Value} }},");
             }
             
             foreach (var kvp in sbIdMapping)
             {
                 var packetName = kvp.Key;
-                sb.AppendLine($"        {{ PacketType.{packetName}, {kvp.Value} }},");
+                writer.WriteLine($"{{ PacketType.{packetName}, {kvp.Value} }},");
             }
         }
-        sb.AppendLine("    };");
-        sb.AppendLine("}");
+        writer.Finish(semicolon: true);
+        writer.Finish();
 
-        await File.WriteAllTextAsync(Path.Join(outdir, $"Protocol_{v}.cs"), sb.ToString());
+        await File.WriteAllTextAsync(Path.Join(outdir, $"Protocol_{v}.cs"), writer.ToString());
     }
 
     private string[] CollectPackets(JToken token, string @namespace, string direction)

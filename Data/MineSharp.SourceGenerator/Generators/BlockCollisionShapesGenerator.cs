@@ -36,32 +36,30 @@ public class BlockCollisionShapesGenerator : IGenerator
         var blocks = (JObject)blockCollisionShapes.SelectToken("blocks")!;
         var shapes = (JObject)blockCollisionShapes.SelectToken("shapes")!;
 
-        var sb = new StringBuilder();
-        sb.AppendLine("using MineSharp.Core.Common;");
-        sb.AppendLine("using MineSharp.Core.Common.Blocks;");
-        sb.AppendLine();
-        sb.AppendLine("namespace MineSharp.Data.BlockCollisionShapes.Versions;");
-        sb.AppendLine();
-        sb.AppendLine($"internal class BlockCollisionShapes_{v} : BlockCollisionShapesVersion");
-        sb.AppendLine("{");
-        sb.AppendLine("    public override Dictionary<BlockType, int[]> BlockToIndicesMap { get; } = new Dictionary<BlockType, int[]>()");
-        sb.AppendLine("    {");
+        var writer = new CodeWriter();
+        writer.Disclaimer();
+        writer.WriteLine("using MineSharp.Core.Common;");
+        writer.WriteLine("using MineSharp.Core.Common.Blocks;");
+        writer.WriteLine();
+        writer.WriteLine("namespace MineSharp.Data.BlockCollisionShapes.Versions;");
+        writer.WriteLine();
+        writer.Begin($"internal class BlockCollisionShapes_{v} : BlockCollisionShapesVersion");
+        writer.Begin("public override Dictionary<BlockType, int[]> BlockToIndicesMap { get; } = new()");
         foreach (var prop in blocks.Properties())
         {
-            sb.AppendLine($"        {{ BlockType.{prop.Name.Pascalize()}, {StringifyIndices(prop.Value)} }},");
+            writer.WriteLine($"{{ BlockType.{prop.Name.Pascalize()}, {StringifyIndices(prop.Value)} }},");
         }
-        sb.AppendLine("    };");
-        sb.AppendLine("    public override Dictionary<int, AABB[]> BlockShapes { get; } = new Dictionary<int, AABB[]>()");
-        sb.AppendLine("    {");
+        writer.Finish(semicolon: true);
+        writer.Begin("public override Dictionary<int, AABB[]> BlockShapes { get; } = new()");
         foreach (var prop in shapes.Properties())
         {
-            sb.AppendLine($"        {{ {prop.Name}, {StringifyShapes(prop.Value)} }},");
+            writer.WriteLine($"{{ {prop.Name}, {StringifyShapes(prop.Value)} }},");
         }
-        sb.AppendLine("    };");
-        sb.AppendLine("}");
+        writer.Finish(semicolon: true);
+        writer.Finish();
 
         await File.WriteAllTextAsync(
-            Path.Join(outdir, $"BlockCollisionShapes_{v}.cs"), sb.ToString());
+            Path.Join(outdir, $"BlockCollisionShapes_{v}.cs"), writer.ToString());
     }
 
     private string StringifyIndices(JToken value)
