@@ -8,7 +8,7 @@ namespace MineSharp.Data.Materials.Versions;
 
 internal class Materials_1_19_4 : MaterialVersion
 {
-    public override IDictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new()
+    public override Dictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new()
     {
         
         {

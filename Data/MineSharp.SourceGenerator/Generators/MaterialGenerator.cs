@@ -53,7 +53,7 @@ public class MaterialGenerator : IGenerator
         writer.WriteLine("namespace MineSharp.Data.Materials.Versions;");
         writer.WriteLine();
         writer.Begin($"internal class Materials_{v} : MaterialVersion");
-        writer.Begin("public override IDictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new()");
+        writer.Begin("public override Dictionary<Material, Dictionary<ItemType, float>> Palette { get; } = new()");
         foreach (var prop in ((JObject)materials).Properties())
         {
             if (prop.Name.Contains(';'))
