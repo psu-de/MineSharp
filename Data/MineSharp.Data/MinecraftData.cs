@@ -13,6 +13,7 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Items;
 using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
+using MineSharp.Data.Recipes;
 using MineSharp.Data.Windows;
 
 namespace MineSharp.Data;
@@ -28,6 +29,7 @@ public class MinecraftData
     public ItemProvider Items { get; }
     public ProtocolProvider Protocol { get; }
     public MaterialsProvider Materials { get; }
+    public RecipeProvider Recipes { get; }
     public WindowData Windows { get; } = new WindowData();
     public MinecraftVersion Version { get; }
 
@@ -41,6 +43,7 @@ public class MinecraftData
         ItemProvider items,
         ProtocolProvider protocol,
         MaterialsProvider materials,
+        RecipeProvider recipes,
         MinecraftVersion version)
     {
         this.Biomes = biomes;
@@ -52,6 +55,7 @@ public class MinecraftData
         this.Items = items;
         this.Protocol = protocol;
         this.Materials = materials;
+        this.Recipes = recipes;
         this.Version = version;
     }
 
@@ -66,6 +70,7 @@ public class MinecraftData
         var itemType = GetClassType(VersionMap.Items[version]);
         var protocolType = GetClassType(VersionMap.Protocol[version]);
         var materialType = GetClassType(VersionMap.Materials[version]);
+        var recipeType = GetClassType(VersionMap.Recipes[version]);
 
         var biomes = new BiomeProvider(
             (DataVersion<BiomeType, BiomeInfo>)Activator.CreateInstance(biomeType)!);
@@ -85,6 +90,8 @@ public class MinecraftData
             (MaterialVersion)Activator.CreateInstance(materialType)!);
         var protocol = new ProtocolProvider(
             (ProtocolVersion)Activator.CreateInstance(protocolType)!);
+        var recipes = new RecipeProvider(
+            (RecipeData)Activator.CreateInstance(recipeType)!);
 
         return new MinecraftData(
             biomes,
@@ -96,6 +103,7 @@ public class MinecraftData
             items,
             protocol,
             materials,
+            recipes,
             VersionMap.Versions[version]);
     }
 

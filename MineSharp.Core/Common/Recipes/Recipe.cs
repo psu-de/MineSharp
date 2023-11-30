@@ -1,3 +1,5 @@
+using MineSharp.Core.Common.Items;
+
 namespace MineSharp.Core.Common.Recipes;
 
 public class Recipe
@@ -5,12 +7,12 @@ public class Recipe
     /// <summary>
     /// Ingredients in shape (null for no item) from top left to bottom right
     /// </summary>
-    public int?[] Ingredients { get; private set; }
+    public ItemType?[] Ingredients { get; private set; }
 
     /// <summary>
     /// Leftover items in crafting slots after crafting
     /// </summary>
-    public int?[]? OutShape { get; private set; }
+    public ItemType?[]? OutShape { get; private set; }
         
     /// <summary>
     /// Whether the recipe requires a crafting table.
@@ -20,14 +22,14 @@ public class Recipe
     /// <summary>
     /// Item id of the result
     /// </summary>
-    public int Result { get; private set; }
+    public ItemType Result { get; private set; }
 
     /// <summary>
     /// Number of result items
     /// </summary>
     public int ResultCount { get; private set; }
 
-    public Dictionary<int, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<int, int>(), (x, y) =>
+    public Dictionary<ItemType, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<ItemType, int>(), (x, y) =>
     {
         if (y == null)
         {
@@ -46,7 +48,7 @@ public class Recipe
 
     });
 
-    public Recipe(int?[] ingredients, int?[]? outShape, bool requiresCraftingTable,  int result, int count)
+    public Recipe(ItemType?[] ingredients, ItemType?[]? outShape, bool requiresCraftingTable, ItemType result, int count)
     {
         this.Ingredients = ingredients;
         this.OutShape = outShape;

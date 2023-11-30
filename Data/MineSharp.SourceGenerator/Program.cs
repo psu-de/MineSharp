@@ -16,6 +16,7 @@ var generators = new IGenerator[] {
     new ItemGenerator(),
     new ProtocolGenerator(),
     new MaterialGenerator(),
+    new RecipeGenerator(),
     
     VersionMapGenerator.GetInstance()
 };

@@ -122,6 +122,19 @@ internal static class VersionMap
         { "1.20.1", "MineSharp.Data.Materials.Versions.Materials_1_20" },
         { "1.20.2", "MineSharp.Data.Materials.Versions.Materials_1_20_2" },
     };
+    public static Dictionary<string, string> Recipes { get; } = new()
+    {
+        { "1.18", "MineSharp.Data.Recipes.Versions.Recipes_1_18" },
+        { "1.18.1", "MineSharp.Data.Recipes.Versions.Recipes_1_18" },
+        { "1.18.2", "MineSharp.Data.Recipes.Versions.Recipes_1_18" },
+        { "1.19", "MineSharp.Data.Recipes.Versions.Recipes_1_19" },
+        { "1.19.2", "MineSharp.Data.Recipes.Versions.Recipes_1_19" },
+        { "1.19.3", "MineSharp.Data.Recipes.Versions.Recipes_1_19_3" },
+        { "1.19.4", "MineSharp.Data.Recipes.Versions.Recipes_1_19_4" },
+        { "1.20", "MineSharp.Data.Recipes.Versions.Recipes_1_20" },
+        { "1.20.1", "MineSharp.Data.Recipes.Versions.Recipes_1_20" },
+        { "1.20.2", "MineSharp.Data.Recipes.Versions.Recipes_1_20_2" },
+    };
     public static Dictionary<string, MinecraftVersion> Versions { get; } = new()
     {
         { "1.18", new MinecraftVersion("1.18", 757) },
