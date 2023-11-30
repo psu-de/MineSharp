@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 
 namespace MineSharp.Auth.Json;
 
+#pragma warning disable CS8618
 internal class JoinServerBlob
 {
     [JsonProperty("accessToken")]
@@ -13,3 +14,4 @@ internal class JoinServerBlob
     [JsonProperty("serverId")]
     public string ServerId;
 }
+#pragma warning restore CS8618

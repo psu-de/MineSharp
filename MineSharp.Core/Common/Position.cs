@@ -26,12 +26,22 @@ public class Position
 
     public static bool operator ==(Position a, Position b)
     {
-        return a.GetHashCode() == b.GetHashCode();
+        return a.ToULong() == b.ToULong();
     }
     
     public static bool operator !=(Position a, Position b)
     {
-        return a.GetHashCode() != b.GetHashCode();
+        return a.ToULong() != b.ToULong();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Position pos)
+        {
+            return pos.ToULong() == this.ToULong();
+        }
+
+        return false;
     }
 
     public ulong ToULong() => ((ulong)this.X & 0x3FFFFFF) << 38 | ((ulong)this.Z & 0x3FFFFFF) << 12 | (ulong)this.Y & 0xFFF;

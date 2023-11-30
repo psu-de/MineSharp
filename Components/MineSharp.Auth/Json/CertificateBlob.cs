@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 
 namespace MineSharp.Auth.Json;
 
+#pragma warning disable CS8618
 internal class CertificateBlob
 {
     [JsonProperty("KeyPair")]
@@ -28,3 +29,4 @@ internal class KeyPairBlob
     [JsonProperty("publicKey")]
     public string PublicKey;
 }
+#pragma warning restore CS8618

@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 
 namespace MineSharp.Protocol.Packets;
 
+#pragma warning disable CS8618
 public class ServerStatusResponseBlob
 {
     [JsonProperty("version")]
@@ -55,3 +56,4 @@ public class ServerStatusResponseBlob
         public int Protocol;
     }
 }
+#pragma warning restore CS8618
