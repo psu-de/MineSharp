@@ -155,7 +155,8 @@ public class MinecraftBot
             new EntityPlugin(bot),
             new PlayerPlugin(bot),
             new WindowPlugin(bot),
-            new WorldPlugin(bot)
+            new WorldPlugin(bot),
+            new CraftingPlugin(bot)
         };
 
         foreach (var plugin in defaultPlugins)

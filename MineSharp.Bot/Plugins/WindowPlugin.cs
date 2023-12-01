@@ -75,6 +75,7 @@ public class WindowPlugin : Plugin
     public Task WaitForInventory() 
         => this._inventoryLoadedTsc.Task;
     
+
     public async Task<Window> OpenContainer(Block block, int timeoutMs = 10 * 1000)
     {
         if (!this.Bot.Data.Windows.AllowedBlocksToOpen.Contains(block.Info.Type))

@@ -32,14 +32,19 @@ public static class IntegrationTest
         await Task.Delay(3 * 1000);
 
         var tsc = new TaskCompletionSource<bool>();
-        _ = callback(bot, tsc);
+        var test = callback(bot, tsc);
 
         if (commandDelay.HasValue)
             await Task.Delay(commandDelay.Value);
         
         await chat.SendChat($"/trigger {testName}");
-        await Task.WhenAny(tsc.Task, Task.Delay(timeout));
+        await Task.WhenAny(tsc.Task, Task.Delay(timeout), test);
 
+        if (test.Exception != null)
+        {
+            throw test.Exception;
+        }
+        
         string team;
         if (tsc.Task.IsCompleted)
         {
