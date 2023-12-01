@@ -146,12 +146,23 @@ public class WindowTests
     {
         this._inventory.SetSlot(new Slot(
             new Item(this._diamond, 16, null, null), 9));
+        this._inventory.SetSlot(new Slot(
+            new Item(this._netherStar, 31, null, null), 10));
+        this._inventory.SetSlot(new Slot(
+            new Item(this._netherStar, 16, null, null), 11));
         
         Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(16));
         
         this._inventory.PickupItems(9, 6);
         Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(6));
         Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(10));
+        
+        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 12);
+        Assert.That(this._inventory.GetSelectedSlot().Item, Is.EqualTo(null));
+        
+        this._inventory.PickupInventoryItems(ItemType.NetherStar, 47);
+        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(47));
+        Assert.That(this._inventory.GetSelectedSlot().Item?.Info.Type, Is.EqualTo(ItemType.NetherStar));
         
         Assert.Catch(() => this._inventory.PickupItems(9, 5));
     }

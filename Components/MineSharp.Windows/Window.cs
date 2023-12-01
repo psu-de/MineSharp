@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Items;
 using MineSharp.Windows.Clicks;
 using NLog;
 
@@ -211,11 +212,11 @@ public class Window
 
     #region Helper API methods
 
-    private IEnumerable<Slot> FindItem(int itemId, Slot[] slots)
+    private IEnumerable<Slot> FindItem(ItemType item, Slot[] slots)
     {
         for (int i = 0; i < slots.Length; i++)
         {
-            if (slots[i].Item != null && slots[i].Item!.Info.Id == itemId)
+            if (slots[i].Item != null && slots[i].Item!.Info.Type == item)
             {
                 yield return slots[i];
             }
@@ -225,16 +226,16 @@ public class Window
     /// <summary>
     /// Returns inventory slots with the given item type in the inventory slots of this window
     /// </summary>
-    /// <param name="itemId"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindInventoryItems(int itemId) => this.FindItem(itemId, this.GetInventorySlots());
+    public IEnumerable<Slot> FindInventoryItems(ItemType item) => this.FindItem(item, this.GetInventorySlots());
 
     /// <summary>
     /// Returns slots with the given item type in the container slots of this window
     /// </summary>
-    /// <param name="itemId"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindContainerItems(int itemId) => this.FindItem(itemId, this.GetContainerSlots());
+    public IEnumerable<Slot> FindContainerItems(ItemType item) => this.FindItem(item, this.GetContainerSlots());
 
 
     private IEnumerable<Slot> FindEmptySlots(Slot[] slots)
@@ -254,12 +255,17 @@ public class Window
     /// <returns></returns>
     public IEnumerable<Slot> FindEmptyContainerSlots() => this.FindEmptySlots(this.GetContainerSlots());
 
+    /// <summary>
+    /// Whether the given slot index is in the container range of this window
+    /// </summary>
+    /// <param name="slotIndex"></param>
+    /// <returns></returns>
     public bool IsContainerSlotIndex(short slotIndex) => slotIndex < this.Slots.Length || (this.OffhandSlot != null && slotIndex == 45);
 
-    private IEnumerable<Slot> FindSlotsToStack(int itemId, int count, Slot[] slots)
+    private IEnumerable<Slot> FindSlotsToStack(ItemType item, int count, Slot[] slots)
     {
         int left = count;
-        foreach (var slot in FindItem(itemId, slots))
+        foreach (var slot in FindItem(item, slots))
         {
             if (slot.IsFull())
             {
@@ -278,11 +284,23 @@ public class Window
         yield return FindEmptySlots(slots).First();
     }
 
-    public IEnumerable<Slot> FindInventorySlotsToStack(int itemId, int count) 
-        => this.FindSlotsToStack(itemId, count, this.GetInventorySlots());
+    /// <summary>
+    /// Yields slots in the Inventory where the given item can be stacked upon.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public IEnumerable<Slot> FindInventorySlotsToStack(ItemType item, int count) 
+        => this.FindSlotsToStack(item, count, this.GetInventorySlots());
     
-    public IEnumerable<Slot> FindContainerSlotsToStack(int itemId, int count) 
-        => this.FindSlotsToStack(itemId, count, this.GetContainerSlots());
+    /// <summary>
+    /// Yields slots in the Container where the given item can be stacked upon
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public IEnumerable<Slot> FindContainerSlotsToStack(ItemType item, int count) 
+        => this.FindSlotsToStack(item, count, this.GetContainerSlots());
 
     
     private void StackSelectedSlot(int stackCount, IEnumerable<Slot> stackableSlots)
@@ -343,7 +361,7 @@ public class Window
         }
         
         this.StackSelectedSlot(stackCount, 
-            this.FindInventorySlotsToStack(selectedSlot.Item!.Info.Id, selectedSlot.Item!.Count));
+            this.FindInventorySlotsToStack(selectedSlot.Item!.Info.Type, selectedSlot.Item!.Count));
     }
     
     /// <summary>
@@ -360,7 +378,42 @@ public class Window
         }
         
         this.StackSelectedSlot(stackCount, 
-            this.FindContainerSlotsToStack(selectedSlot.Item!.Info.Id, selectedSlot.Item!.Count));
+            this.FindContainerSlotsToStack(selectedSlot.Item!.Info.Type, selectedSlot.Item!.Count));
+    }
+
+    /// <summary>
+    /// Put down the <see cref="count"/> items in <see cref="GetSelectedSlot"/> to the slot given
+    /// </summary>
+    /// <param name="count"></param>
+    /// <param name="slot"></param>
+    public void PutDownItems(int count, short slot)
+    {
+        var selectedSlot = this.GetSelectedSlot();
+        var stackSlot = this.GetSlot(slot);
+        
+        if (selectedSlot.IsEmpty())
+        {
+            throw new InvalidOperationException("selected slot is empty");
+        }
+        
+        if (!stackSlot.CanStack(selectedSlot, count))
+        {
+            throw new InvalidOperationException($"cannot stack {count} {selectedSlot.Item!.Info.Type} on the given slot");
+        }
+
+        if (selectedSlot.Item!.Count == count)
+        {
+            // Put down the whole stack at once
+            this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
+            return;
+        }
+        
+        // put down items one by one
+        // TODO: PutDownItems(): this could be done with fewer clicks
+        for (int i = 0; i < count; i++)
+        {
+            this.DoSimpleClick(WindowMouseButton.MouseRight, slot);
+        }
     }
     
     /// <summary>
@@ -400,26 +453,84 @@ public class Window
         
         selectedSlot = this.GetSelectedSlot();
 
-        // if more picked up than needed, put the rest down
+        // if more picked up than needed, put the rest down on the same slot
         if (selectedSlot.Item!.Count > count)
         {
             int toPutDown = selectedSlot.Item!.Count - count;
-            
-            if (this.IsContainerSlotIndex(slot))
-            {
-                this.StackSelectedSlotInContainer(toPutDown);
-            } else
-            {
-                this.StackSelectedSlotInInventory(toPutDown);
-            }
+            this.PutDownItems(toPutDown, pickupSlot.SlotIndex);
         }
-
-        selectedSlot = this.GetSelectedSlot();
+        
         if (selectedSlot.Item!.Count != count)
         {
             throw new InvalidOperationException(
                 $"Result count does not match expected output (got: {selectedSlot.Item!.Count}, expected: {count}");
         }
+    }
+    
+    /// <summary>
+    /// Picks up <paramref name="count"/> items of type <paramref name="type"/> from the container range. The items will be in the <see cref="GetSelectedSlot"/>
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="count"></param>
+    public void PickupContainerItems(ItemType type, int count)
+        => PickupItems(type, count, this.GetContainerSlots());
+
+    /// <summary>
+    /// Picks up <paramref name="count"/> items of type <paramref name="type"/> from the inventory range. The items will be in the <see cref="GetSelectedSlot"/>
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="count"></param>
+    public void PickupInventoryItems(ItemType type, int count)
+        => PickupItems(type, count, this.GetInventorySlots());
+    
+    private void PickupItems(ItemType type, int count, IEnumerable<Slot> enumerable)
+    {
+        if (!this.GetSelectedSlot().IsEmpty())
+        {
+            throw new InvalidOperationException("Selected slot must be empty");
+        }
+        
+        var slots = enumerable as Slot[] ?? enumerable.ToArray();
+        
+        if (count > CountItems(type, slots))
+        {
+            throw new InvalidOperationException($"Not enough items {type} in this window.");
+        }
+        
+        var possibleSlots = slots.Where(x => x.Item?.Info.Type == type).ToArray();
+        if (possibleSlots.Length == 0)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        var slot = possibleSlots.FirstOrDefault(x => x.Item?.Count >= count);
+        if (null != slot)
+        {
+            PickupItems(slot.SlotIndex, count);
+            return;
+        }
+        
+        // move items to the first slot until the desired count is reached
+        slot = possibleSlots.First();
+        var current = (int)slot.Item!.Count;
+        foreach (var pickupSlot in possibleSlots.Skip(1))
+        {
+            var toPickup = Math.Min(pickupSlot.Item!.Count, count - current);
+            this.PickupItems(pickupSlot.SlotIndex, toPickup);
+            this.PutDownItems(toPickup, slot.SlotIndex);
+            
+            current += toPickup;
+            if (current == count)
+                break;
+        }
+
+        if (current != count)
+        {
+            throw new InvalidOperationException($"something went wrong. Picked up {current} items instead of {count}");
+        }
+        
+        // now, exactly <count> items are on <slot>, and they can be picked up
+        this.PickupItems(slot.SlotIndex, count);
     }
     
     /// <summary>
@@ -452,6 +563,24 @@ public class Window
         
         this.PickupItems(slotFromIndex, count);
         this.DoSimpleClick(WindowMouseButton.MouseLeft, slotToIndex);
+    }
+
+    /// <summary>
+    /// Counts how many items of the given type are in this window (Container + Inventory)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public int CountItems(ItemType type)
+    {
+        return CountItems(type, this.GetAllSlots());
+    }
+
+    private int CountItems(ItemType type, IEnumerable<Slot> slots)
+    {
+        return slots
+            .Where(x => x.Item?.Info.Type == type)
+            .Select(x => (int)x.Item!.Count)
+            .Sum();
     }
 
 
