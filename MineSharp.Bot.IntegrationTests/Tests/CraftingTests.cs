@@ -1,6 +1,7 @@
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
+using MineSharp.Windows;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -22,14 +23,21 @@ public static class CraftingTests
             await chat.WaitForInitialization();
             await crafting.WaitForInitialization();
             await world.WaitForChunks();
+
             await chat.SendChat("/tp @p 15 -60.00 21");
+            await chat.SendChat("/clear");
+            await Task.Delay(1000);
             await chat.SendChat("/give @p glass 49");
             await chat.SendChat("/give @p ghast_tear 7");
             await chat.SendChat("/give @p ender_eye 7");
             await Task.Delay(1000);
+
+
+
             var block = world.World.GetBlockAt(new Position(15, -59, 24));
             var recipe = crafting.FindRecipe(ItemType.EndCrystal);
             await crafting.Craft(recipe!, block, 7);
+
             source.TrySetResult(window.Inventory!.CountItems(ItemType.EndCrystal) == 7);
         }, 60 * 1000);
     }

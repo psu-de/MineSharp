@@ -83,12 +83,12 @@ public class CraftingPlugin : Plugin
         var done = 0;
         for (int i = 0; i < iterations; i++)
         {
-            Console.WriteLine($"Crafting {perIteration} times");
             await this._Craft(recipe, craftingWindow, Math.Min(perIteration, amount - done));
             done += Math.Min(perIteration, amount - done);
         }
     }
-    private async Task _Craft(Recipe recipe, Window craftingWindow, int amount)
+
+    private async Task _Craft(Recipe recipe, Window craftingWindow, int count)
     {
         // 0 is always the result slot
         // crafting slots are indexed from top left to bottom right, starting at 1
@@ -101,33 +101,48 @@ public class CraftingPlugin : Plugin
             }
             Console.WriteLine($"Setting ingredient {i} ({item})");
             var craftingSlot = (short)(i + 1);
-            craftingWindow.PickupInventoryItems(item.Value, amount);
+            craftingWindow.PickupInventoryItems(item.Value, count);
             Console.WriteLine($"Picked up items, selected={craftingWindow.GetSelectedSlot()}");
-            craftingWindow.PutDownItems(amount, craftingSlot);
+            craftingWindow.PutDownItems(count, craftingSlot);
             Console.WriteLine($"put down items, selected={craftingWindow.GetSelectedSlot()}");
         }
         
         Console.WriteLine("Trying to get result");
         var resultSlot = craftingWindow.GetSlot(0);
-        for (int i = 0; i < 100; i++)
+        var selected = craftingWindow.GetSelectedSlot();
+
+        var timeout = new CancellationTokenSource();
+        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+
+        try
         {
-            await Task.Delay(10);
-            if (!resultSlot.IsEmpty())
-                break;
-        }
-        if (resultSlot.IsEmpty())
+            await Task.Run(() => {
+                for (int i = 0; i < count; i++) {
+                    while (resultSlot.IsEmpty())
+                        Task.Delay(10);
+
+                    // pickup result slot
+                    // TODO: _Craft(): All items could be picked up at once with shift click
+                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, resultSlot.SlotIndex);
+                }
+            }).WaitAsync(timeout.Token);
+        } catch (TaskCanceledException) 
+        { }
+
+        if (selected.Item?.Count != recipe.ResultCount * count)
         {
-            throw new Exception("Crafting failed!");
-        }
-    
-        if (resultSlot.Item!.Count != recipe.ResultCount * amount)
-        {
-            Logger.Warn("Crafting: Expected {Result} result items, but got {Actual}", recipe.ResultCount * amount, resultSlot.Item!.Count);
+            Logger.Warn("Crafting: Expected {Result} result items, but got {Actual}", recipe.ResultCount * count, selected.Item?.Count);
             // TODO: _Craft(): if the correct amount wasn't crafted, somehow return the actual amount crafted 
         }
-        craftingWindow.PickupItems(resultSlot.SlotIndex, resultSlot.Item!.Count);
+
+        Console.WriteLine(selected); // TODO: Checken ob craftingWindow.GetSelectedSlot() == inventory.GetSelectedSlot()
+        
+        if (null == selected.Item)
+            return;
         
         // put down result items somewhere in the inventory
-        craftingWindow.StackSelectedSlotInInventory(resultSlot.Item!.Count);
+        craftingWindow.StackSelectedSlotInInventory(selected.Item.Count); 
+
+        await windowPlugin!.CloseWindow(craftingWindow.WindowId);
     }
 }

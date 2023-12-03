@@ -8,18 +8,20 @@ namespace MineSharp.Windows;
 public class Window
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     public delegate void SlotChanged(Window window, short index);
     public delegate Task WindowSynchronizer(Window window, WindowClick click);
-    
-    
+
+
     public byte WindowId { get; }
     public int StateId { get; set; }
     public string Title { get; }
     public Slot[] Slots { get; }
     public Window? Inventory { get; }
-    public int TotalSlotCount {
-        get {
+    public int TotalSlotCount
+    {
+        get
+        {
             int count = this.Slots.Length;
             if (this.Inventory != null)
             {
@@ -32,16 +34,16 @@ public class Window
             return count;
         }
     }
-    
+
     private Slot? _selectedSlot { get; set; }
     private Slot? OffhandSlot { get; set; }
 
     private WindowSynchronizer? Synchronizer { get; }
     private object SyncLock { get; }
     private bool IsSynchronized => this.Synchronizer != null;
-    
+
     public event SlotChanged? OnSlotChanged;
-    
+
     public Window(byte id, string title, int uniqueSlotCount, Window? inventory = null, WindowSynchronizer? windowSynchronizer = null)
     {
         this.WindowId = id;
@@ -56,7 +58,7 @@ public class Window
         {
             this.OffhandSlot = new Slot(null, 45);
         }
-        
+
         this.Synchronizer = windowSynchronizer;
         this.SyncLock = new object();
 
@@ -67,7 +69,7 @@ public class Window
     }
 
     #region Get / Set slots
-    
+
 
     /// <summary>
     /// Sets the selected slot
@@ -78,7 +80,8 @@ public class Window
         if (this.Inventory != null)
         {
             this.Inventory.SetSelectedSlot(slot);
-        } else
+        }
+        else
         {
             slot.SlotIndex = -1;
             this._selectedSlot = slot;
@@ -104,12 +107,12 @@ public class Window
     /// <returns></returns>
     public Slot[] GetContainerSlots()
     {
-        var slots = this.Slots.Select(x => x.Clone());
-        if (this.OffhandSlot != null)
-        {
-            slots = slots.Append(this.OffhandSlot);
-        }
-        return slots.ToArray();
+        if (this.OffhandSlot == null)
+            return this.Slots;
+        
+        return this.Slots
+            .Append(this.OffhandSlot)
+            .ToArray();
     }
 
     /// <summary>
@@ -124,7 +127,7 @@ public class Window
             throw new NotSupportedException("Inventory is null");
         }
         return this.Inventory.GetContainerSlots()
-            .Select(x => 
+            .Select(x =>
                 new Slot(x.Item, (short)(x.SlotIndex + this.Slots.Length)))
             .ToArray();
     }
@@ -135,17 +138,16 @@ public class Window
     /// <returns></returns>
     public Slot[] GetAllSlots()
     {
-        List<Slot> slots = new List<Slot>();
-        slots.AddRange(this.Slots);
+        List<Slot> slots = new List<Slot>(this.Slots);
 
         if (this.Inventory != null)
         {
             slots.AddRange(
                 this.Inventory.Slots
-                    .Select(x => 
+                    .Select(x =>
                         new Slot(x.Item, (short)(x.SlotIndex + this.Slots.Length))));
         }
-        
+
         if (this.OffhandSlot != null)
             slots.Add(this.OffhandSlot);
 
@@ -162,49 +164,69 @@ public class Window
         ThrowIfSlotOufOfRange(index);
 
         if (index == -1)
-            return this.GetSelectedSlot().Clone();
-        
+            return this.GetSelectedSlot();
+
         if (index == 45 && this.OffhandSlot != null)
             return this.OffhandSlot;
 
         if (index < this.Slots.Length)
-            return this.Slots[index].Clone();
+            return this.Slots[index];
 
         var slot = this.Inventory!.GetSlot((short)(index - this.Slots.Length));
-        slot.SlotIndex = index;
+        // slot.SlotIndex = index; // TODO: something must be done here
         return slot;
-
     }
-    
+
     /// <summary>
     /// Sets the slot at the given index
     /// </summary>
     /// <param name="slot"></param>
     public void SetSlot(Slot slot)
     {
-        ThrowIfSlotOufOfRange(slot.SlotIndex);
+        lock (this.SyncLock)
+        {
+            ThrowIfSlotOufOfRange(slot.SlotIndex);
 
-        if (slot.Item?.Count == 0)
-            slot.Item = null;
+            if (slot.Item?.Count == 0)
+                slot.Item = null;
 
-        var index = slot.SlotIndex;
+            var index = slot.SlotIndex;
 
-        if (slot.SlotIndex == -1)
-        {
-            this.SetSelectedSlot(slot);
-        } else if (slot.SlotIndex == 45 && this.OffhandSlot != null)
-        {
-            this.OffhandSlot = slot;
-        } else if (slot.SlotIndex < this.Slots.Length)
-        {
-            this.Slots[slot.SlotIndex] = slot;
-        } else
-        {
-            slot.SlotIndex -= (short)this.Slots.Length;
-            this.Inventory!.SetSlot(slot);
+            if (slot.SlotIndex == -1)
+            {
+                this.SetSelectedSlot(slot);
+            }
+            else if (slot.SlotIndex == 45 && this.OffhandSlot != null)
+            {
+                this.OffhandSlot = slot;
+            }
+            else if (slot.SlotIndex < this.Slots.Length)
+            {
+                this.Slots[slot.SlotIndex] = slot;
+            }
+            else
+            {
+                slot.SlotIndex -= (short)this.Slots.Length;
+                this.Inventory!.SetSlot(slot);
+            }
+
+            this.OnSlotChanged?.Invoke(this, index);
         }
-        
-        this.OnSlotChanged?.Invoke(this, index);
+    }
+
+    /// <summary>
+    /// Update all slots in the window
+    /// </summary>
+    /// <param name="slots"></param>
+    public void SetSlots(Slot[] slots)
+    {
+        if (slots.Length != this.TotalSlotCount)
+        {
+            throw new InvalidOperationException("length of slots must be equal to TotalSlotCount");
+        }
+
+        foreach (var slot in slots)
+            this.SetSlot(slot);
     }
 
 
@@ -290,19 +312,19 @@ public class Window
     /// <param name="item"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindInventorySlotsToStack(ItemType item, int count) 
+    public IEnumerable<Slot> FindInventorySlotsToStack(ItemType item, int count)
         => this.FindSlotsToStack(item, count, this.GetInventorySlots());
-    
+
     /// <summary>
     /// Yields slots in the Container where the given item can be stacked upon
     /// </summary>
     /// <param name="item"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindContainerSlotsToStack(ItemType item, int count) 
+    public IEnumerable<Slot> FindContainerSlotsToStack(ItemType item, int count)
         => this.FindSlotsToStack(item, count, this.GetContainerSlots());
 
-    
+
     private void StackSelectedSlot(int stackCount, IEnumerable<Slot> stackableSlots)
     {
         if (this.GetSelectedSlot().IsEmpty())
@@ -311,7 +333,7 @@ public class Window
             return;
         }
 
-        int expectedEndCount = this.GetSelectedSlot().Item!.Count - stackCount; 
+        int expectedEndCount = this.GetSelectedSlot().Item!.Count - stackCount;
 
         int left = stackCount;
         foreach (var slot in stackableSlots)
@@ -324,7 +346,7 @@ public class Window
                     this.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
                     return;
                 }
-                
+
                 // put down <left> items one by one 
                 for (int i = 0; i < left; i++)
                 {
@@ -337,7 +359,8 @@ public class Window
                         $"Expected selected slot to be {expectedEndCount}, but it was {this.GetSelectedSlot().Item?.Count.ToString() ?? "null"}");
                 }
                 return;
-            } else
+            }
+            else
             {
                 left -= slot.LeftToStack;
                 this.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
@@ -359,11 +382,11 @@ public class Window
         {
             return;
         }
-        
-        this.StackSelectedSlot(stackCount, 
+
+        this.StackSelectedSlot(stackCount,
             this.FindInventorySlotsToStack(selectedSlot.Item!.Info.Type, selectedSlot.Item!.Count));
     }
-    
+
     /// <summary>
     /// Stacks <see cref="GetSelectedSlot"/> in the container 
     /// </summary>
@@ -376,8 +399,8 @@ public class Window
         {
             return;
         }
-        
-        this.StackSelectedSlot(stackCount, 
+
+        this.StackSelectedSlot(stackCount,
             this.FindContainerSlotsToStack(selectedSlot.Item!.Info.Type, selectedSlot.Item!.Count));
     }
 
@@ -390,12 +413,12 @@ public class Window
     {
         var selectedSlot = this.GetSelectedSlot();
         var stackSlot = this.GetSlot(slot);
-        
+
         if (selectedSlot.IsEmpty())
         {
             throw new InvalidOperationException("selected slot is empty");
         }
-        
+
         if (!stackSlot.CanStack(selectedSlot, count))
         {
             throw new InvalidOperationException($"cannot stack {count} {selectedSlot.Item!.Info.Type} on the given slot");
@@ -407,7 +430,7 @@ public class Window
             this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
             return;
         }
-        
+
         // put down items one by one
         // TODO: PutDownItems(): this could be done with fewer clicks
         for (int i = 0; i < count; i++)
@@ -415,7 +438,7 @@ public class Window
             this.DoSimpleClick(WindowMouseButton.MouseRight, slot);
         }
     }
-    
+
     /// <summary>
     /// Picks up <paramref name="count"/> items from <paramref name="slot"/>. The items will be in the <see cref="GetSelectedSlot"/>
     /// </summary>
@@ -435,22 +458,23 @@ public class Window
         {
             throw new InvalidOperationException($"cannot pickup {count} items from slot {pickupSlot}");
         }
-        
+
         if (!selectedSlot.IsEmpty())
         {
-            throw new Exception("Cannot pickup items from slot, because GetSelectedSlot() cannot stack this item");
+            throw new Exception("Cannot pickup items from slot, because GetSelectedSlot() must be empty");
         }
 
         if (pickupSlot.Item!.Count >= 2 * count)
         {
             // pickup half stack
             this.DoSimpleClick(WindowMouseButton.MouseRight, slot);
-        } else
+        }
+        else
         {
             // pickup full stack
             this.DoSimpleClick(WindowMouseButton.MouseLeft, slot);
         }
-        
+
         selectedSlot = this.GetSelectedSlot();
 
         // if more picked up than needed, put the rest down on the same slot
@@ -459,14 +483,14 @@ public class Window
             int toPutDown = selectedSlot.Item!.Count - count;
             this.PutDownItems(toPutDown, pickupSlot.SlotIndex);
         }
-        
+
         if (selectedSlot.Item!.Count != count)
         {
             throw new InvalidOperationException(
                 $"Result count does not match expected output (got: {selectedSlot.Item!.Count}, expected: {count}");
         }
     }
-    
+
     /// <summary>
     /// Picks up <paramref name="count"/> items of type <paramref name="type"/> from the container range. The items will be in the <see cref="GetSelectedSlot"/>
     /// </summary>
@@ -482,34 +506,34 @@ public class Window
     /// <param name="count"></param>
     public void PickupInventoryItems(ItemType type, int count)
         => PickupItems(type, count, this.GetInventorySlots());
-    
+
     private void PickupItems(ItemType type, int count, IEnumerable<Slot> enumerable)
     {
         if (!this.GetSelectedSlot().IsEmpty())
         {
             throw new InvalidOperationException("Selected slot must be empty");
         }
-        
+
         var slots = enumerable as Slot[] ?? enumerable.ToArray();
-        
-        if (count > CountItems(type, slots))
+
+        if (count > this.CountItems(type, slots))
         {
             throw new InvalidOperationException($"Not enough items {type} in this window.");
         }
-        
+
         var possibleSlots = slots.Where(x => x.Item?.Info.Type == type).ToArray();
         if (possibleSlots.Length == 0)
         {
             throw new InvalidOperationException();
         }
-        
+
         var slot = possibleSlots.FirstOrDefault(x => x.Item?.Count >= count);
         if (null != slot)
         {
             PickupItems(slot.SlotIndex, count);
             return;
         }
-        
+
         // move items to the first slot until the desired count is reached
         slot = possibleSlots.First();
         var current = (int)slot.Item!.Count;
@@ -518,7 +542,7 @@ public class Window
             var toPickup = Math.Min(pickupSlot.Item!.Count, count - current);
             this.PickupItems(pickupSlot.SlotIndex, toPickup);
             this.PutDownItems(toPickup, slot.SlotIndex);
-            
+
             current += toPickup;
             if (current == count)
                 break;
@@ -528,11 +552,11 @@ public class Window
         {
             throw new InvalidOperationException($"something went wrong. Picked up {current} items instead of {count}");
         }
-        
+
         // now, exactly <count> items are on <slot>, and they can be picked up
         this.PickupItems(slot.SlotIndex, count);
     }
-    
+
     /// <summary>
     /// Moves <paramref name="count"/> items from slot <paramref name="slotFromIndex"/> to <paramref name="slotToIndex"/>
     /// </summary>
@@ -560,7 +584,7 @@ public class Window
         {
             throw new InvalidOperationException("Selected slot must be empty");
         }
-        
+
         this.PickupItems(slotFromIndex, count);
         this.DoSimpleClick(WindowMouseButton.MouseLeft, slotToIndex);
     }
@@ -585,7 +609,7 @@ public class Window
 
 
     #endregion
-    
+
     #region Clicks
 
     /// <summary>
@@ -605,8 +629,8 @@ public class Window
         var click = new SimpleWindowClick(this, clickedSlot, (byte)button);
         this.PerformWindowClick(click);
     }
-    
-    
+
+
     private void PerformWindowClick(WindowClick click)
     {
         if (this.IsSynchronized)
@@ -616,7 +640,8 @@ public class Window
                 click.PerformClick();
                 this.Synchronizer!(this, click).Wait();
             }
-        } else
+        }
+        else
         {
             click.PerformClick();
         }
@@ -633,7 +658,7 @@ public class Window
         }
     }
 
-    
+
     public override string ToString()
     {
         return $"Window (Id={this.WindowId}, State={this.StateId}, Title={this.Title}, Slots={this.Slots.Length}, HasInventory={this.Inventory != null})";
