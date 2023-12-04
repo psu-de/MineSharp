@@ -26,6 +26,8 @@ using CBPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configurati
 using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.FinishConfigurationPacket;
 using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
 using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
+using CBCloseWindowPacket = MineSharp.Protocol.Packets.Clientbound.Play.CloseWindowPacket;
+using SBCloseWindowPacket = MineSharp.Protocol.Packets.Serverbound.Play.CloseWindowPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -135,7 +137,7 @@ internal static class PacketPalette
         RegisterPacket<WindowItemsPacket>(PacketType.CB_Play_WindowItems);
         RegisterPacket<WindowSetSlotPacket>(PacketType.CB_Play_SetSlot);
         RegisterPacket<OpenWindowPacket>(PacketType.CB_Play_OpenWindow);
-        RegisterPacket<CloseWindowPacket>(PacketType.CB_Play_CloseWindow);
+        RegisterPacket<CBCloseWindowPacket>(PacketType.CB_Play_CloseWindow);
         RegisterPacket<SetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
         RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
         RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
@@ -157,6 +159,7 @@ internal static class PacketPalette
         RegisterPacket<PlayerActionPacket>(PacketType.SB_Play_BlockDig);
         RegisterPacket<SwingArmPacket>(PacketType.SB_Play_ArmAnimation);
         RegisterPacket<InteractPacket>(PacketType.SB_Play_UseItem);
+        RegisterPacket<SBCloseWindowPacket>(PacketType.SB_Play_CloseWindow);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

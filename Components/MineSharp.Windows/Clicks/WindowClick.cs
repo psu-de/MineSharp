@@ -1,3 +1,5 @@
+using MineSharp.Core.Common;
+
 namespace MineSharp.Windows.Clicks;
 
 public abstract class WindowClick
@@ -16,6 +18,8 @@ public abstract class WindowClick
         this.Slot = slot;
         this.Button = button;
     }
+
+    public abstract Slot[] GetChangedSlots();
         
     /// <summary>
     /// Performs the click on <see cref="Window"/>

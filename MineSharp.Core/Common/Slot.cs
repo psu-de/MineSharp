@@ -13,7 +13,7 @@ public class Slot
         this.SlotIndex = slotIndex;
     }
     
-    public bool IsEmpty() => this.Item == null;
+    public bool IsEmpty() => this.Item == null || this.Item.Count <= 0;
     public bool IsFull() => this.Item != null && this.Item.Count == this.Item.Info.StackSize;
     
     /// <summary>
@@ -51,8 +51,6 @@ public class Slot
         }
         return false;
     }
-
-    public Slot Clone() => new Slot(this.Item, this.SlotIndex);
 
     public override string ToString() => $"Slot (Index={this.SlotIndex} Item={this.Item?.ToString() ?? "None"})";
 }

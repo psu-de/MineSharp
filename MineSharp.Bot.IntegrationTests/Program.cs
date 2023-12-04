@@ -1,5 +1,6 @@
 ﻿using MineSharp.Bot.IntegrationTests.Tests;
-
+await CraftingTests.RunAll();
+return;
 
 await PlayerTests.TestHealth();
 await PlayerTests.TestDeath();

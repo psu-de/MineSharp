@@ -23,5 +23,5 @@ public class Item
     }
 
     public override string ToString() 
-        => $"Item(Info={Info}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
+        => $"Item(Type={Info.Type}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
 }

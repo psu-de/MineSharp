@@ -75,6 +75,7 @@ public class WindowPlugin : Plugin
     public Task WaitForInventory() 
         => this._inventoryLoadedTsc.Task;
     
+
     public async Task<Window> OpenContainer(Block block, int timeoutMs = 10 * 1000)
     {
         if (!this.Bot.Data.Windows.AllowedBlocksToOpen.Contains(block.Info.Type))
@@ -123,7 +124,7 @@ public class WindowPlugin : Plugin
         }
         
         // TODO: window.Close();
-        return this.Bot.Client.SendPacket(new CloseWindowPacket(id));
+        return this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.CloseWindowPacket((byte)id));
     }
 
     public async Task SelectHotbarIndex(byte hotbarIndex)
@@ -178,7 +179,7 @@ public class WindowPlugin : Plugin
         return window;
     }
 
-    private Task _synchronizeWindowClick(Window window, WindowClick click)
+    private async Task _synchronizeWindowClick(Window window, WindowClick click)
     {
         var windowClickPacket = new WindowClickPacket(
             window.WindowId, 
@@ -186,9 +187,10 @@ public class WindowPlugin : Plugin
             click.Slot,
             (sbyte)click.Button,
             (sbyte)click.ClickMode,
-            window.GetAllSlots(), 
+            click.GetChangedSlots(), 
             window.GetSelectedSlot().Item);
-        return this.Bot.Client.SendPacket(windowClickPacket);
+        await this.Bot.Client.SendPacket(windowClickPacket);
+        await Task.Delay(50);
     }
 
     private void MainInventory_SlotUpdated(Window window, short index)
@@ -218,8 +220,10 @@ public class WindowPlugin : Plugin
             return Task.CompletedTask;
         }
         
-        window.SetSlot(packet.Slot);
+        Logger.Debug("Handle set slot: {Slot}", packet.Slot);
+        
         window.StateId = packet.StateId;
+        window.SetSlot(packet.Slot);
 
         return Task.CompletedTask;
     }
@@ -240,19 +244,12 @@ public class WindowPlugin : Plugin
             }
             Logger.Debug($"HandleWindowItems for window {window.Title}");
         }
-
-        if (window.TotalSlotCount != packet.Items.Length)
-        {
-            Logger.Warn($"Received {packet.Items.Length} window items for window with {window.TotalSlotCount} slots.");
-            return Task.CompletedTask;
-        }
         
+        var slots = packet.Items
+            .Select((x, i) => new Slot(x, (short)i))
+            .ToArray();
         window.StateId = packet.StateId;
-        for (short i = 0; i < packet.Items.Length; i++)
-        {
-            var slot = new Slot(packet.Items[i], i);
-            window.SetSlot(slot);
-        }
+        window.SetSlots(slots);
 
         if (window.WindowId == 0 && !this._inventoryLoadedTsc.Task.IsCompleted)
         {

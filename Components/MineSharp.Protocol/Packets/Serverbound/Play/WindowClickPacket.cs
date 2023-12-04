@@ -36,7 +36,7 @@ public class WindowClickPacket : IPacket
         buffer.WriteVarInt(this.StateId);
         buffer.WriteShort(this.Slot);
         buffer.WriteSByte(this.MouseButton);
-        buffer.WriteVarInt(this.MouseButton);
+        buffer.WriteVarInt(this.Mode);
         buffer.WriteVarIntArray(this.ChangedSlots, (buff, slot) => buff.WriteSlot(slot));
         buffer.WriteOptionalItem(this.SelectedItem);
     }

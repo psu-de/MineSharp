@@ -42,7 +42,7 @@ public static class WindowTests
             await Task.Delay(1000);
             
             source.TrySetResult(
-                window.Slots.Length == 3 * 9
+                window.SlotCount == 3 * 9
                 && slot.Item?.Info.Name == "soul_sand"
                 && slot.Item?.Count == 48);
         });

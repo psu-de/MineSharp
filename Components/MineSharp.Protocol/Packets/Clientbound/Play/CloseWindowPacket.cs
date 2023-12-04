@@ -8,21 +8,21 @@ public class CloseWindowPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_CloseWindow;
     
-    public int WindowId { get; set; }
+    public byte WindowId { get; set; }
     
-    public CloseWindowPacket(int windowId)
+    public CloseWindowPacket(byte windowId)
     {
         this.WindowId = windowId;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.WindowId);
+        buffer.WriteByte(this.WindowId);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new CloseWindowPacket(
-            buffer.ReadVarInt());
+            buffer.ReadByte());
     }
 }

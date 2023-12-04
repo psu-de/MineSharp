@@ -472,7 +472,7 @@ public class PacketBuffer
 
     public void WriteNbt(NbtCompound? compound)
     {
-        if (compound == null)
+        if (compound == null || compound.Count == 0)
         {
             this._buffer.WriteByte((byte)NbtTagType.End);
             return;

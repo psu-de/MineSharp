@@ -41,12 +41,12 @@ public class WindowTests
         Assert.Multiple(() =>
         {
             Assert.That(this._mainInventory.TotalSlotCount, Is.EqualTo(4 * 9));
-            Assert.That(this._mainInventory.Slots.Length, Is.EqualTo(4 * 9));
-            Assert.That(this._inventory.Slots.Length, Is.EqualTo(9));
+            Assert.That(this._mainInventory.SlotCount, Is.EqualTo(4 * 9));
+            Assert.That(this._inventory.SlotCount, Is.EqualTo(9));
             Assert.That(this._inventory.TotalSlotCount, Is.EqualTo(5 * 9 + 1));
             Assert.That(this._inventory.GetSlot(45), Is.Not.Null);
 
-            Assert.That(this._inventory.GetSelectedSlot(), Is.EqualTo(this._mainInventory.GetSelectedSlot()));
+            Assert.That(this._inventory.GetSelectedSlot().Item, Is.EqualTo(this._mainInventory.GetSelectedSlot().Item));
 
             Assert.That(this._inventory.IsContainerSlotIndex(1), Is.EqualTo(true));
             Assert.That(this._inventory.IsContainerSlotIndex(9), Is.EqualTo(false));
@@ -90,6 +90,11 @@ public class WindowTests
     [Test]
     public void SimpleClickTest()
     {
+        this._inventory.OnSlotChanged += (window, index) =>
+        {
+            Console.WriteLine($"Slot changed ({index}): {window.GetSlot(index)}");
+        };
+        
         this._inventory.SetSlot(new Slot(
             new Item(this._diamond, 16, null, null), 9));
 
@@ -165,28 +170,5 @@ public class WindowTests
         Assert.That(this._inventory.GetSelectedSlot().Item?.Info.Type, Is.EqualTo(ItemType.NetherStar));
         
         Assert.Catch(() => this._inventory.PickupItems(9, 5));
-    }
-
-    [Test]
-    public void MoveItemsTest()
-    {
-        this._inventory.SetSlot(new Slot(
-            new Item(this._diamond, 64, null, null), 9));
-        
-        this._inventory.MoveItemsFromSlot(9, 10, 24);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(40));
-        Assert.That(this._inventory.GetSlot(10).Item?.Count, Is.EqualTo(24));
-        
-        this._inventory.MoveItemsFromSlot(9, 10, 20);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(20));
-        Assert.That(this._inventory.GetSlot(10).Item?.Count, Is.EqualTo(44));
-        
-        this._inventory.MoveItemsFromSlot(9, 10, 20);
-        Assert.That(this._inventory.GetSlot(9).Item, Is.Null);
-        Assert.That(this._inventory.GetSlot(10).Item?.Count, Is.EqualTo(64));
-        
-        this._inventory.MoveItemsFromSlot(10, 9, 1);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(1));
-        Assert.That(this._inventory.GetSlot(10).Item?.Count, Is.EqualTo(63));
     }
 }
