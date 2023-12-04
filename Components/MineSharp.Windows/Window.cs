@@ -12,32 +12,28 @@ public class Window
     public delegate void SlotChanged(Window window, short index);
     public delegate Task WindowSynchronizer(Window window, WindowClick click);
 
+    internal const short SELECTED_SLOT = -1;
+    internal const short OFFHAND_SLOT = 45;
+    internal const byte INVENTORY_ID = 0;
 
     public byte WindowId { get; }
     public int StateId { get; set; }
     public string Title { get; }
-    public Slot[] Slots { get; }
+    public short SlotCount { get; }
+    public bool HasOffhandSlot { get; }
     public Window? Inventory { get; }
     public int TotalSlotCount
     {
         get
         {
-            int count = this.Slots.Length;
-            if (this.Inventory != null)
-            {
-                count += this.Inventory.Slots.Length;
-            }
-            if (this.OffhandSlot != null)
-            {
-                count += 1;
-            }
+            int count = this.SlotCount;
+            count += this.Inventory?.SlotCount ?? 0;
+            count += this.HasOffhandSlot ? 1 : 0;
             return count;
         }
     }
 
-    private Slot? _selectedSlot { get; set; }
-    private Slot? OffhandSlot { get; set; }
-
+    private IDictionary<short, Item?> Slots { get; }
     private WindowSynchronizer? Synchronizer { get; }
     private object SyncLock { get; }
     private bool IsSynchronized => this.Synchronizer != null;
@@ -48,24 +44,27 @@ public class Window
     {
         this.WindowId = id;
         this.Title = title;
-        this.Slots = new Slot[uniqueSlotCount];
         this.Inventory = inventory;
-        if (inventory == null)
-        {
-            this._selectedSlot = new Slot(null, -1);
-        }
-        if (id == 0)
-        {
-            this.OffhandSlot = new Slot(null, 45);
-        }
-
+        this.SlotCount = (short)uniqueSlotCount;
+        this.HasOffhandSlot = id == INVENTORY_ID; // Only main inventory has offhand slot
         this.Synchronizer = windowSynchronizer;
         this.SyncLock = new object();
+        
+        this.Slots = this.InitializeSlots(uniqueSlotCount);
+        
+        if (inventory == null)
+            this.Slots.Add(SELECTED_SLOT, null);
+        
+        if (this.HasOffhandSlot) 
+            this.Slots.Add(OFFHAND_SLOT, null);
+    }
 
-        for (short i = 0; i < uniqueSlotCount; i++)
-        {
-            this.Slots[i] = new Slot(null, i);
-        }
+    private IDictionary<short, Item?> InitializeSlots(int count)
+    {
+        var dict = new Dictionary<short, Item?>();
+        for (short i = 0; i < count; i++) 
+            dict.Add(i, null);
+        return dict;
     }
 
     #region Get / Set slots
@@ -74,18 +73,12 @@ public class Window
     /// <summary>
     /// Sets the selected slot
     /// </summary>
-    /// <param name="slot"></param>
-    internal void SetSelectedSlot(Slot slot)
+    /// <param name="item"></param>
+    private void SetSelectedSlot(Item? item)
     {
         if (this.Inventory != null)
-        {
-            this.Inventory.SetSelectedSlot(slot);
-        }
-        else
-        {
-            slot.SlotIndex = -1;
-            this._selectedSlot = slot;
-        }
+            this.Inventory.SetSelectedSlot(item);
+        else this.Slots[SELECTED_SLOT] = item;
     }
 
     /// <summary>
@@ -94,11 +87,9 @@ public class Window
     /// <returns></returns>
     public Slot GetSelectedSlot()
     {
-        if (this.Inventory != null)
-        {
-            return this.Inventory.GetSelectedSlot();
-        }
-        return this._selectedSlot!;
+        return this.Inventory != null 
+            ? this.Inventory.GetSelectedSlot() 
+            : new Slot(this.Slots[SELECTED_SLOT], SELECTED_SLOT);
     }
 
     /// <summary>
@@ -107,11 +98,9 @@ public class Window
     /// <returns></returns>
     public Slot[] GetContainerSlots()
     {
-        if (this.OffhandSlot == null)
-            return this.Slots;
-        
         return this.Slots
-            .Append(this.OffhandSlot)
+            .Where(kvp => kvp.Key is not SELECTED_SLOT)
+            .Select(x => new Slot(x.Value, x.Key))
             .ToArray();
     }
 
@@ -126,9 +115,13 @@ public class Window
         {
             throw new NotSupportedException("Inventory is null");
         }
-        return this.Inventory.GetContainerSlots()
+        return this.Inventory
+            .GetContainerSlots()
             .Select(x =>
-                new Slot(x.Item, (short)(x.SlotIndex + this.Slots.Length)))
+            {
+                x.SlotIndex += this.SlotCount;
+                return x;
+            })
             .ToArray();
     }
 
@@ -138,19 +131,13 @@ public class Window
     /// <returns></returns>
     public Slot[] GetAllSlots()
     {
-        List<Slot> slots = new List<Slot>(this.Slots);
-
+        var slots = new List<Slot>();        
         if (this.Inventory != null)
         {
-            slots.AddRange(
-                this.Inventory.Slots
-                    .Select(x =>
-                        new Slot(x.Item, (short)(x.SlotIndex + this.Slots.Length))));
+            slots.AddRange(this.GetInventorySlots());
         }
-
-        if (this.OffhandSlot != null)
-            slots.Add(this.OffhandSlot);
-
+        slots.AddRange(this.GetContainerSlots());
+        
         return slots.ToArray();
     }
 
@@ -163,17 +150,14 @@ public class Window
     {
         ThrowIfSlotOufOfRange(index);
 
-        if (index == -1)
+        if (index == SELECTED_SLOT)
             return this.GetSelectedSlot();
 
-        if (index == 45 && this.OffhandSlot != null)
-            return this.OffhandSlot;
+        if (index < this.SlotCount || (index == OFFHAND_SLOT && this.HasOffhandSlot))
+            return new Slot(this.Slots[index], index);
 
-        if (index < this.Slots.Length)
-            return this.Slots[index];
-
-        var slot = this.Inventory!.GetSlot((short)(index - this.Slots.Length));
-        // slot.SlotIndex = index; // TODO: something must be done here
+        var slot = this.Inventory!.GetSlot((short)(index - this.SlotCount));
+        slot.SlotIndex = index;
         return slot;
     }
 
@@ -182,36 +166,32 @@ public class Window
     /// </summary>
     /// <param name="slot"></param>
     public void SetSlot(Slot slot)
+        => this.UpdateSlot(slot.Item, slot.SlotIndex);
+
+    internal void UpdateSlot(Item? item, short slotIndex)
     {
         lock (this.SyncLock)
         {
-            ThrowIfSlotOufOfRange(slot.SlotIndex);
+            ThrowIfSlotOufOfRange(slotIndex);
+            
+            if (item?.Count <= 0)
+                item = null;
 
-            if (slot.Item?.Count == 0)
-                slot.Item = null;
-
-            var index = slot.SlotIndex;
-
-            if (slot.SlotIndex == -1)
+            if (slotIndex == SELECTED_SLOT)
             {
-                this.SetSelectedSlot(slot);
+                this.SetSelectedSlot(item);
             }
-            else if (slot.SlotIndex == 45 && this.OffhandSlot != null)
+            else if (slotIndex < this.SlotCount || slotIndex == OFFHAND_SLOT && this.HasOffhandSlot)
             {
-                this.OffhandSlot = slot;
-            }
-            else if (slot.SlotIndex < this.Slots.Length)
-            {
-                this.Slots[slot.SlotIndex] = slot;
+                this.Slots[slotIndex] = item;
             }
             else
             {
-                slot.SlotIndex -= (short)this.Slots.Length;
-                this.Inventory!.SetSlot(slot);
+                this.Inventory!.UpdateSlot(item, (short)(slotIndex - this.SlotCount));
             }
-
-            this.OnSlotChanged?.Invoke(this, index);
         }
+        
+        this.OnSlotChanged?.Invoke(this, slotIndex);
     }
 
     /// <summary>
@@ -225,8 +205,8 @@ public class Window
             throw new InvalidOperationException("length of slots must be equal to TotalSlotCount");
         }
 
-        foreach (var slot in slots)
-            this.SetSlot(slot);
+        for (short i = 0; i < slots.Length; i++)
+            this.SetSlot(slots[i]);
     }
 
 
@@ -234,55 +214,51 @@ public class Window
 
     #region Helper API methods
 
-    private IEnumerable<Slot> FindItem(ItemType item, Slot[] slots)
-    {
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (slots[i].Item != null && slots[i].Item!.Info.Type == item)
-            {
-                yield return slots[i];
-            }
-        }
-    }
+
+    private IEnumerable<Slot> FindItem(ItemType item, IEnumerable<Slot> slots)
+        => slots.Where(x => x.Item?.Info.Type == item);
 
     /// <summary>
     /// Returns inventory slots with the given item type in the inventory slots of this window
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindInventoryItems(ItemType item) => this.FindItem(item, this.GetInventorySlots());
+    public IEnumerable<Slot> FindInventoryItems(ItemType item) 
+        => this.FindItem(item, this.GetInventorySlots());
 
     /// <summary>
     /// Returns slots with the given item type in the container slots of this window
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public IEnumerable<Slot> FindContainerItems(ItemType item) => this.FindItem(item, this.GetContainerSlots());
+    public IEnumerable<Slot> FindContainerItems(ItemType item) 
+        => this.FindItem(item, this.GetContainerSlots());
 
 
     private IEnumerable<Slot> FindEmptySlots(Slot[] slots)
-    {
-        return slots.Where(x => x.Item == null);
-    }
+        => slots.Where(x => x.Item == null);
 
     /// <summary>
     /// Returns empty slots in the inventory section of the window
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Slot> FindEmptyInventorySlots() => this.FindEmptySlots(this.GetInventorySlots());
+    public IEnumerable<Slot> FindEmptyInventorySlots() 
+        => this.FindEmptySlots(this.GetInventorySlots());
 
     /// <summary>
     /// Returns empty slots in the container section of the inventory
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Slot> FindEmptyContainerSlots() => this.FindEmptySlots(this.GetContainerSlots());
+    public IEnumerable<Slot> FindEmptyContainerSlots() 
+        => this.FindEmptySlots(this.GetContainerSlots());
 
     /// <summary>
     /// Whether the given slot index is in the container range of this window
     /// </summary>
     /// <param name="slotIndex"></param>
     /// <returns></returns>
-    public bool IsContainerSlotIndex(short slotIndex) => slotIndex < this.Slots.Length || (this.OffhandSlot != null && slotIndex == 45);
+    public bool IsContainerSlotIndex(short slotIndex) 
+        => slotIndex < this.SlotCount || (this.HasOffhandSlot && slotIndex == OFFHAND_SLOT);
 
     private IEnumerable<Slot> FindSlotsToStack(ItemType item, int count, Slot[] slots)
     {
@@ -558,38 +534,6 @@ public class Window
     }
 
     /// <summary>
-    /// Moves <paramref name="count"/> items from slot <paramref name="slotFromIndex"/> to <paramref name="slotToIndex"/>
-    /// </summary>
-    /// <param name="slotFromIndex"></param>
-    /// <param name="slotToIndex"></param>
-    /// <param name="count"></param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
-    public void MoveItemsFromSlot(short slotFromIndex, short slotToIndex, int count)
-    {
-        var slotFrom = this.GetSlot(slotFromIndex);
-        var slotTo = this.GetSlot(slotToIndex);
-
-        if (slotFrom.Item == null || slotFrom.Item.Count < count)
-        {
-            throw new ArgumentException($"Slot {slotFrom} does not have enough items");
-        }
-
-        if (!slotTo.CanStack(slotFrom, count))
-        {
-            throw new ArgumentException($"Slot {slotTo} cannot stack {count} items of slot {slotFrom}");
-        }
-
-        if (!this.GetSelectedSlot().IsEmpty())
-        {
-            throw new InvalidOperationException("Selected slot must be empty");
-        }
-
-        this.PickupItems(slotFromIndex, count);
-        this.DoSimpleClick(WindowMouseButton.MouseLeft, slotToIndex);
-    }
-
-    /// <summary>
     /// Counts how many items of the given type are in this window (Container + Inventory)
     /// </summary>
     /// <param name="type"></param>
@@ -657,10 +601,9 @@ public class Window
             throw new IndexOutOfRangeException(nameof(index) + $" is out of range ({index} / {count})");
         }
     }
-
-
+    
     public override string ToString()
     {
-        return $"Window (Id={this.WindowId}, State={this.StateId}, Title={this.Title}, Slots={this.Slots.Length}, HasInventory={this.Inventory != null})";
+        return $"Window (Id={this.WindowId}, State={this.StateId}, Title={this.Title}, Slots={this.SlotCount}, HasInventory={this.Inventory != null})";
     }
 }

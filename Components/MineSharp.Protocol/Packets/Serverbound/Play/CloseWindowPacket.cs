@@ -2,11 +2,11 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
-namespace MineSharp.Protocol.Packets.Clientbound.Play;
+namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 public class CloseWindowPacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_CloseWindow;
+    public PacketType Type => PacketType.SB_Play_CloseWindow;
     
     public byte WindowId { get; set; }
     

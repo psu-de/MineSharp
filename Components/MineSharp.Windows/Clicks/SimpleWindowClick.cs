@@ -1,4 +1,5 @@
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Items;
 
 namespace MineSharp.Windows.Clicks;
 
@@ -31,6 +32,8 @@ internal class SimpleWindowClick : WindowClick
                 selectedItem.Item = null;
             }
         }
+        
+        this.Window.UpdateSlot(selectedItem.Item, Window.SELECTED_SLOT);
     }
 
     private void PerformLeftClick()
@@ -57,62 +60,60 @@ internal class SimpleWindowClick : WindowClick
             if (selectedSlot.Item!.Count == 0) 
                 selectedSlot.Item = null;
             
+            this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
+            this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
             return;
         }
         
         //swap items
-        var temp = clickedSlot.Item;
-        clickedSlot.Item = selectedSlot.Item;
-        selectedSlot.Item = temp;
+        (clickedSlot.Item, selectedSlot.Item) = (selectedSlot.Item, clickedSlot.Item);
+        this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
+        this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
     }
 
     private void PerformRightClick()
     {
-        Console.WriteLine("Simple right click");
-        if (this.Window.GetSelectedSlot().IsEmpty() && this.Window.GetSlot(this.Slot).IsEmpty())
-            return;
-
         var clickedSlot = this.Window.GetSlot(this.Slot);
         var selectedSlot = this.Window.GetSelectedSlot();
-
-        if (this.Window.GetSelectedSlot().IsEmpty())
+        if (selectedSlot.IsEmpty() && clickedSlot.IsEmpty())
+            return;
+        
+        if (selectedSlot.IsEmpty())
         { 
-            Console.WriteLine("Simple right click pickup half");
             // Pickup half stack
             var count = (byte)Math.Ceiling(clickedSlot.Item!.Count / 2.0F);
-            selectedSlot.Item = clickedSlot.Item.Clone();
-            selectedSlot.Item.Count = count;
+            var newSelectedItem = clickedSlot.Item.Clone();
+            newSelectedItem.Count = count;
 
             clickedSlot.Item.Count -= count;
             this._changedSlots.Add(clickedSlot);
+            
+            this.Window.UpdateSlot(newSelectedItem, Window.SELECTED_SLOT);
+            this.Window.UpdateSlot(clickedSlot.Item, clickedSlot.SlotIndex);
             return;
         }
 
         if (clickedSlot.IsEmpty() || clickedSlot.CanStack(selectedSlot, 1))
         { 
-            Console.WriteLine("Simple right click transfer one");
             // Transfer one item from selectedSlot to slots[Slot]
             selectedSlot.Item!.Count -= 1;
 
-            Console.WriteLine("Initial: " + clickedSlot);
             if (clickedSlot.IsEmpty())
             {
-                Console.WriteLine("Empty");
-                clickedSlot.Item = new Core.Common.Items.Item(
+                clickedSlot.Item = new Item(
                     selectedSlot.Item.Info, 
                     1, 
                     selectedSlot.Item.Damage, 
                     selectedSlot.Item.Metadata); // TODO: Clone metadata?
-                    
-                Console.WriteLine(clickedSlot.Item);
             } else
             {
                 clickedSlot.Item!.Count += 1;
             }
+            this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
+            this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
             this._changedSlots.Add(clickedSlot);
         } else
         {
-            Console.WriteLine("Simple right click swap");
             // just swap selected slot and clicked swap, like a left click
             this.PerformLeftClick();
         }

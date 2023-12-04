@@ -124,7 +124,7 @@ public class WindowPlugin : Plugin
         }
         
         // TODO: window.Close();
-        return this.Bot.Client.SendPacket(new CloseWindowPacket(id));
+        return this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.CloseWindowPacket((byte)id));
     }
 
     public async Task SelectHotbarIndex(byte hotbarIndex)
@@ -220,9 +220,10 @@ public class WindowPlugin : Plugin
             return Task.CompletedTask;
         }
         
-        Logger.Info(packet.Slot.ToString());
-        window.SetSlot(packet.Slot);
+        Logger.Debug("Handle set slot: {Slot}", packet.Slot);
+        
         window.StateId = packet.StateId;
+        window.SetSlot(packet.Slot);
 
         return Task.CompletedTask;
     }
@@ -244,10 +245,10 @@ public class WindowPlugin : Plugin
             Logger.Debug($"HandleWindowItems for window {window.Title}");
         }
         
-        window.StateId = packet.StateId;
         var slots = packet.Items
             .Select((x, i) => new Slot(x, (short)i))
             .ToArray();
+        window.StateId = packet.StateId;
         window.SetSlots(slots);
 
         if (window.WindowId == 0 && !this._inventoryLoadedTsc.Task.IsCompleted)

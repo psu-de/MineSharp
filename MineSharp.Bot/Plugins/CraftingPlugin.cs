@@ -92,6 +92,8 @@ public class CraftingPlugin : Plugin
     {
         // 0 is always the result slot
         // crafting slots are indexed from top left to bottom right, starting at 1
+        
+        // put in ingredients
         for (short i = 0; i < recipe.Ingredients.Length; i++)
         {
             var item = recipe.Ingredients[i];
@@ -99,50 +101,52 @@ public class CraftingPlugin : Plugin
             {
                 continue;
             }
-            Console.WriteLine($"Setting ingredient {i} ({item})");
+            
             var craftingSlot = (short)(i + 1);
             craftingWindow.PickupInventoryItems(item.Value, count);
-            Console.WriteLine($"Picked up items, selected={craftingWindow.GetSelectedSlot()}");
             craftingWindow.PutDownItems(count, craftingSlot);
-            Console.WriteLine($"put down items, selected={craftingWindow.GetSelectedSlot()}");
         }
         
-        Console.WriteLine("Trying to get result");
-        var resultSlot = craftingWindow.GetSlot(0);
-        var selected = craftingWindow.GetSelectedSlot();
-
         var timeout = new CancellationTokenSource();
-        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+        timeout.CancelAfter(TimeSpan.FromSeconds(1 * Math.Max(5, count)));
+        
+        var stackSlots = craftingWindow
+            .FindInventorySlotsToStack(recipe.Result, recipe.ResultCount * count)
+            .GetEnumerator();
 
+        if (!stackSlots.MoveNext())
+            throw new InvalidOperationException("Could not find any slot to put result item");
+        
         try
         {
-            await Task.Run(() => {
-                for (int i = 0; i < count; i++) {
-                    while (resultSlot.IsEmpty())
-                        Task.Delay(10);
+            await Task.Run(async () =>
+            {
+                var currentStackSlot = stackSlots.Current;
 
-                    // pickup result slot
-                    // TODO: _Craft(): All items could be picked up at once with shift click
-                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, resultSlot.SlotIndex);
+                for (int i = 0; i < count; i++)
+                {
+                    while (craftingWindow.GetSlot(0).Item?.Info.Type != recipe.Result)
+                        await Task.Delay(10);
+                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
+                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, currentStackSlot.SlotIndex);
+
+                    if (!craftingWindow.GetSlot(currentStackSlot.SlotIndex).IsFull())
+                        continue;
+
+                    if (!stackSlots.MoveNext())
+                        throw new InvalidOperationException("Could not find any slot to put result item");
+
+                    currentStackSlot = stackSlots.Current;
                 }
             }).WaitAsync(timeout.Token);
-        } catch (TaskCanceledException) 
-        { }
-
-        if (selected.Item?.Count != recipe.ResultCount * count)
+        } catch (TaskCanceledException)
         {
-            Logger.Warn("Crafting: Expected {Result} result items, but got {Actual}", recipe.ResultCount * count, selected.Item?.Count);
-            // TODO: _Craft(): if the correct amount wasn't crafted, somehow return the actual amount crafted 
+            Logger.Warn("Crafting timeouted");
+        } finally
+        {
+            stackSlots.Dispose();
         }
-
-        Console.WriteLine(selected); // TODO: Checken ob craftingWindow.GetSelectedSlot() == inventory.GetSelectedSlot()
         
-        if (null == selected.Item)
-            return;
-        
-        // put down result items somewhere in the inventory
-        craftingWindow.StackSelectedSlotInInventory(selected.Item.Count); 
-
         await windowPlugin!.CloseWindow(craftingWindow.WindowId);
     }
 }
