@@ -14,6 +14,7 @@ public class CraftingPlugin : Plugin
     
     public CraftingPlugin(MinecraftBot bot) : base(bot)
     { }
+    
     protected override async Task Init()
     {
         this.windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
@@ -69,8 +70,8 @@ public class CraftingPlugin : Plugin
             craftingWindow = await this.windowPlugin!.OpenContainer(craftingTable);
         }
         else craftingWindow = this.windowPlugin!.Inventory!;
-        var resultType = this.Bot.Data.Items.GetByType(recipe.Result);
         
+        var resultType = this.Bot.Data.Items.GetByType(recipe.Result);
         
         var perIteration = resultType.StackSize / recipe.ResultCount;
         perIteration = recipe.IngredientsCount.Keys
@@ -79,13 +80,16 @@ public class CraftingPlugin : Plugin
             .Prepend(perIteration)
             .Min();
         
-        var iterations = Math.Max(1, amount / perIteration);
+        var iterations = (int)Math.Ceiling(amount / (float)perIteration);
         var done = 0;
         for (int i = 0; i < iterations; i++)
         {
-            await this._Craft(recipe, craftingWindow, Math.Min(perIteration, amount - done));
-            done += Math.Min(perIteration, amount - done);
+            var count = Math.Min(perIteration, amount - done);
+            await this._Craft(recipe, craftingWindow, count);
+            done += count;
         }
+        
+        await windowPlugin!.CloseWindow(craftingWindow.WindowId);
     }
 
     private async Task _Craft(Recipe recipe, Window craftingWindow, int count)
@@ -117,36 +121,34 @@ public class CraftingPlugin : Plugin
         if (!stackSlots.MoveNext())
             throw new InvalidOperationException("Could not find any slot to put result item");
         
-        try
+        var currentStackSlot = stackSlots.Current;
+        var done = 0;
+        // pickup from result slot
+        for (; done < count; done++)
         {
-            await Task.Run(async () =>
+            while (craftingWindow.GetSlot(0).Item?.Info.Type != recipe.Result && !timeout.IsCancellationRequested)
+                await Task.Delay(10, timeout.Token);
+
+            if (timeout.IsCancellationRequested)
+                break;
+
+            if (craftingWindow.GetSlot(currentStackSlot.SlotIndex).IsFull())
             {
-                var currentStackSlot = stackSlots.Current;
+                if (!stackSlots.MoveNext())
+                    throw new InvalidOperationException("Could not find any slot to put result item");
 
-                for (int i = 0; i < count; i++)
-                {
-                    while (craftingWindow.GetSlot(0).Item?.Info.Type != recipe.Result)
-                        await Task.Delay(10);
-                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
-                    craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, currentStackSlot.SlotIndex);
-
-                    if (!craftingWindow.GetSlot(currentStackSlot.SlotIndex).IsFull())
-                        continue;
-
-                    if (!stackSlots.MoveNext())
-                        throw new InvalidOperationException("Could not find any slot to put result item");
-
-                    currentStackSlot = stackSlots.Current;
-                }
-            }).WaitAsync(timeout.Token);
-        } catch (TaskCanceledException)
-        {
-            Logger.Warn("Crafting timeouted");
-        } finally
-        {
-            stackSlots.Dispose();
+                currentStackSlot = stackSlots.Current;
+            }
+                    
+            craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
+            craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, currentStackSlot.SlotIndex);
         }
         
-        await windowPlugin!.CloseWindow(craftingWindow.WindowId);
+        stackSlots.Dispose();
+
+        if (done != count)
+        {
+            Logger.Warn("Could crafted {Actual} instead of {Expected}", done, count);
+        }
     }
 }

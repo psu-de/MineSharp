@@ -112,6 +112,9 @@ public class WindowPlugin : Plugin
 
     public Task CloseWindow(int id)
     {
+        if (id == 0)
+            return Task.CompletedTask;
+        
         if (!this._openWindows.Remove(id, out var window))
         {
             Logger.Warn("Tried to close window which is not open!");
@@ -164,7 +167,8 @@ public class WindowPlugin : Plugin
         if (this._cachedWindowItemsPacket == null)
             return window;
 
-        if (this._cachedWindowItemsPacket.WindowId == id && DateTime.Now - this._cacheTimestamp! <= TimeSpan.FromSeconds(5))
+        if (this._cachedWindowItemsPacket.WindowId == id 
+            && DateTime.Now - this._cacheTimestamp! <= TimeSpan.FromSeconds(5))
         {
             // use cache
             Logger.Debug("Applying cached window items for window with id=" + id);
@@ -190,7 +194,14 @@ public class WindowPlugin : Plugin
             click.GetChangedSlots(), 
             window.GetSelectedSlot().Item);
         await this.Bot.Client.SendPacket(windowClickPacket);
-        await Task.Delay(50);
+        
+        // limit the amount of clicks you can do per second
+        // if the limit is too low, the client and server will
+        // get desynced, and things like crafting won't work 
+        // correctly. A value between 30-50ms seems to work,
+        // but depends on the speed of the server and internet 
+        // connection, I guess.
+        await Task.Delay(40);
     }
 
     private void MainInventory_SlotUpdated(Window window, short index)
