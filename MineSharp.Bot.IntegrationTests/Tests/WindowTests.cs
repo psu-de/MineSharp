@@ -5,6 +5,12 @@ namespace MineSharp.Bot.IntegrationTests.Tests;
 
 public static class WindowTests
 {
+    public static async Task RunAll()
+    {
+        await TestInventoryUpdate();
+        await TestOpenContainer();
+    }
+    
     public static Task TestInventoryUpdate()
     {
         return IntegrationTest.RunTest("testInventoryUpdate", async (bot, source) =>

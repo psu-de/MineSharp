@@ -5,6 +5,17 @@ namespace MineSharp.Bot.IntegrationTests.Tests;
 
 public static class PlayerTests
 {
+    public static async Task RunAll()
+    {
+        await TestHealth();
+        await TestDeath();
+        await TestRespawn();
+        await TestPlayerJoin();
+        await TestPlayerLeave();
+        await TestWeatherChange();
+        await TestAttack();
+    }
+    
     public static Task TestHealth()
     {
         return IntegrationTest.RunTest("testHealth", (bot, source) =>

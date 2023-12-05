@@ -9,6 +9,13 @@ namespace MineSharp.Bot.IntegrationTests.Tests;
 
 public static class WorldTests
 {
+    public static async Task RunAll()
+    {
+        await TestPlaceBlock();
+        await TestMineBlock();
+        await TestMultiBlockUpdate();
+    }
+    
     public static Task TestBlockUpdate()
     {
         return IntegrationTest.RunTest("testBlockUpdate", async (bot, source) =>

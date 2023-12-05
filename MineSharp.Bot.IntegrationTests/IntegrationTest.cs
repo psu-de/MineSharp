@@ -39,7 +39,7 @@ public static class IntegrationTest
             await Task.Delay(commandDelay.Value);
         
         await chat.SendChat($"/trigger {testName}");
-        await Task.WhenAny(tsc.Task, Task.Delay(timeout), test);
+        await Task.WhenAny(tsc.Task, Task.Delay(timeout));
 
         if (test.Exception != null)
         {
