@@ -24,7 +24,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 - 🌍 World tracking (query the world for blocks)
 - ⛏️ Mining (very simple, needs some more work)
 - 👷‍♂️ Building (very simple, needs some more work)
-- ~~🛠️ Crafting~~
+- 🛠️ Crafting
 - 🪟 High-Level window Api
 - ⚔️ Attacking entities
 - ~~🏃 Movements (Walking, Sprinting, Jumping, Sneaking)~~
