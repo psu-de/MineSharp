@@ -18,8 +18,8 @@ public class World_1_18 : IWorld
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger(typeof(IWorld));
 
-    public int MaxY => MIN_Y;
-    public int MinY => MAX_Y;
+    public int MaxY => MAX_Y;
+    public int MinY => MIN_Y;
     
     public event Events.ChunkEvent? OnChunkLoaded;
     public event Events.ChunkEvent? OnChunkUnloaded;
