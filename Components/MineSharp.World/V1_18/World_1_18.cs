@@ -4,6 +4,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Exceptions;
+using MineSharp.World.Iterators;
 using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -147,6 +148,23 @@ public class World_1_18 : IWorld
         chunk.SetBiomeAt(relative, biome);
     }
 
+    public IEnumerable<Block> FindBlocks(BlockType type, IWorldIterator iterator, int? maxCount = null)
+    {
+        int count = 0;
+        foreach (var pos in iterator.Iterate())
+        {
+            // TODO: Don't use GetBlockAt(), check the palette container directly since most of the time its not necessary to create a new block
+            var block = this.GetBlockAt(pos);
+            if (block.Info.Type != type)
+                continue;
+
+            yield return block;
+            
+            if (++count == maxCount)
+                yield break;
+        }
+    }
+    
     public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null)
     {
         int found = 0;

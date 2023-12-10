@@ -2,6 +2,7 @@
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.World.Chunks;
+using MineSharp.World.Iterators;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.World;
@@ -34,6 +35,11 @@ public interface IWorld
     public Biome GetBiomeAt(Position position);
     public void SetBiomeAt(Position position, Biome biome);
 
+    public IEnumerable<Block> FindBlocks(BlockType type, IWorldIterator iterator, int? maxCount = null);
+    public Block? FindBlock(BlockType type, IWorldIterator iterator) => FindBlocks(type, iterator).FirstOrDefault();
+    
+    [Obsolete]
     public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null);
+    [Obsolete]
     public Block? FindBlock(int blockId) => FindBlocks(blockId).FirstOrDefault();
 }
