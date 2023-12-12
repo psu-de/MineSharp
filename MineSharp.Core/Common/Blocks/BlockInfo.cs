@@ -63,6 +63,19 @@ public class BlockInfo
         this.State = state;
     }
 
+    /// <summary>
+    /// Whether this block is considered solid.
+    /// TODO: Minecraft calculates this based on block collision shapes.
+    /// BlockBehaviour.java:470 calculateSolid()
+    /// </summary>
+    /// <returns></returns>
     public bool IsSolid()
-        => this.Type != BlockType.Air && this.Type != BlockType.CaveAir && this.Type != BlockType.VoidAir; 
+        => this.Type != BlockType.Air && this.Type != BlockType.CaveAir && this.Type != BlockType.VoidAir;
+
+    /// <summary>
+    /// Whether this block is a fluid.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsFluid()
+        => this.Type is BlockType.Water or BlockType.Lava;
 }

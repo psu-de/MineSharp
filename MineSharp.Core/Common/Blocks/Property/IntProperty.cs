@@ -11,7 +11,7 @@ public class IntProperty : IBlockProperty
         this.StateCount = stateCount;
     }
 
-    public T GetValue<T>(int state) where T : struct
+    public T GetValue<T>(int state)
     {
         if (typeof(T) != typeof(int))
         {

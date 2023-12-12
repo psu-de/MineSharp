@@ -83,7 +83,17 @@ public class Vector3
     /// <returns></returns>
     public double Length()
     {
-        return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+        return Math.Sqrt(this.LengthSquared());
+    }
+
+
+    /// <summary>
+    /// Returns the squared length of this vector instance
+    /// </summary>
+    /// <returns></returns>
+    public double LengthSquared()
+    {
+        return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
     }
 
     /// <summary>
@@ -109,13 +119,23 @@ public class Vector3
                diff.Z * diff.Z;
     }
 
+    public void Normalize()
+    {
+        var length = this.Length();
+        
+        var scale = length == 0 
+            ? 0 
+            : 1 / length;
+        this.X *= scale;
+        this.Y *= scale;
+        this.Z *= scale;
+    }
+
     public Vector3 Normalized()
     {
-        var scale = 1 / this.Length();
-        return new Vector3(
-            this.X * scale,
-            this.Y * scale,
-            this.Z * scale);
+        var clone = this.Clone();
+        clone.Normalize();
+        return clone;
     }
 
     public Vector3 Plus(Vector3 other)
@@ -138,7 +158,8 @@ public class Vector3
         => new Vector3(this.X, this.Y, this.Z);
 
     public override string ToString() 
-        => $"({this.X:0.##} / {this.Y:0.##} / {this.Z:0.##})";
+        => $"({this.X:0.####} / {this.Y:0.####} / {this.Z:0.####})";
 
-    public static implicit operator Position(Vector3 x) => new Position((int)Math.Floor(x.X), (int)Math.Ceiling(x.Y), (int)Math.Floor(x.Z));
+    public static explicit operator Position(Vector3 x) => new Position((int)Math.Floor(x.X), (int)Math.Ceiling(x.Y), (int)Math.Floor(x.Z));
+    public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
 }

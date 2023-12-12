@@ -10,7 +10,7 @@ public class BoolProperty : IBlockProperty
         this.Name = name;
     }
 
-    public T GetValue<T>(int state) where T : struct
+    public T GetValue<T>(int state)
     {
         if (typeof(T) != typeof(bool))
         {

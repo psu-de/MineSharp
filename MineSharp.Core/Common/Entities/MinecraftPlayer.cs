@@ -10,14 +10,41 @@ public class MinecraftPlayer
     public GameMode GameMode { get; set; }
     public Entity? Entity { get; set; }
     public PermissionLevel? PermissionLevel { get; set; }
+    public Dimension Dimension { get; set; }
+    public EntityPose Pose { get; set; }
 
-    public MinecraftPlayer(string username, UUID uuid, int ping, GameMode gameMode, Entity? entity, PermissionLevel? permissionLevel = null)
+    public MinecraftPlayer(string username, UUID uuid, int ping, GameMode gameMode, Entity? entity, Dimension dimension, PermissionLevel? permissionLevel = null)
     {
         this.Username = username;
         this.Uuid = uuid;
         this.Ping = ping;
         this.GameMode = gameMode;
         this.Entity = entity;
+        this.Dimension = dimension;
         this.PermissionLevel = permissionLevel;
+        this.Pose = EntityPose.Standing;
+    }
+    
+    /// <summary>
+    /// The position of this player's head.
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetHeadPosition() => this.Entity!.Position.Plus(Vector3.Up);
+
+    /// <summary>
+    /// The Y Coordinate of the eyes of this player
+    /// </summary>
+    /// <returns></returns>
+    public double GetEyeY()
+    {
+        var offset = this.Pose switch {
+            EntityPose.Swimming 
+                or EntityPose.FallFlying 
+                or EntityPose.SpinAttack => 0.4d,
+            EntityPose.Crouching => 1.27d,
+            _ => 1.62d
+        };
+
+        return this.Entity!.Position.Y + offset;
     }
 }

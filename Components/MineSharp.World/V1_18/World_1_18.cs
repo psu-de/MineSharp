@@ -26,6 +26,7 @@ public class World_1_18 : IWorld
     public event Events.ChunkEvent? OnChunkUnloaded;
     public event Events.BlockEvent? OnBlockUpdated;
 
+    private readonly BlockInfo _voidAir;
     private readonly MinecraftData _data;
     private readonly IDictionary<ChunkCoordinates, IChunk> _chunks;
 
@@ -33,6 +34,7 @@ public class World_1_18 : IWorld
     {
         this._data = data;
         this._chunks = new ConcurrentDictionary<ChunkCoordinates, IChunk>();
+        this._voidAir = this._data.Blocks.GetByType(BlockType.VoidAir);
     }
 
     public void LoadChunk(IChunk chunk)
@@ -101,18 +103,30 @@ public class World_1_18 : IWorld
 
     public Block GetBlockAt(Position position)
     {
-        if (!IsBlockLoaded(position, out var chunk))
+        try
         {
-            throw new ChunkNotLoadedException($"Block at {position} is not loaded.");
-        }
+            if (!IsBlockLoaded(position, out var chunk))
+            {
+                throw new ChunkNotLoadedException($"Block at {position} is not loaded.");
+            }
 
-        var relative = this.ToChunkPosition(position);
-        var blockState = chunk.GetBlockAt(relative);
-        var block = new Block(
-            this._data.Blocks.GetByState(blockState),
-            blockState,
-            position);
-        return block;
+            if (this.IsOutOfMap(position))
+            {
+                return new Block(this._voidAir, this._voidAir.MinState, position);
+            }
+
+            var relative = this.ToChunkPosition(position);
+            var blockState = chunk.GetBlockAt(relative);
+            var block = new Block(
+                this._data.Blocks.GetByState(blockState),
+                blockState,
+                position);
+            return block;
+        } catch (Exception)
+        {
+            Logger.Warn("Getting block at {pos} failed", position);
+            throw;
+        }
     }
     
     public void SetBlock(Block block)

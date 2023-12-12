@@ -2,9 +2,9 @@ namespace MineSharp.Core.Common;
 
 public class Position
 {
-    public int X { get; }
-    public int Y { get; }
-    public int Z { get; }
+    public int X { get; protected set; }
+    public int Y { get; protected set; }
+    public int Z { get; protected set; }
     
     public Position(ulong value)
     {
@@ -22,6 +22,13 @@ public class Position
         this.X = x;
         this.Y = y;
         this.Z = z;
+    }
+
+    public Position(double x, double y, double z)
+    {
+        this.X = (int)Math.Floor(x);
+        this.Y = (int)Math.Floor(y);
+        this.Z = (int)Math.Floor(z);
     }
 
     public static bool operator ==(Position a, Position b)
@@ -51,4 +58,21 @@ public class Position
     public override int GetHashCode() => this.X << 22 | this.Z << 12 & 0x3FF | this.Y & 0xFFF;
     
     public static explicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+}
+
+public class MutablePosition : Position
+{
+
+    public MutablePosition(ulong value) : base(value)
+    { }
+    
+    public MutablePosition(int x, int y, int z) : base(x, y, z)
+    { }
+
+    public void Set(int x, int y, int z)
+    {
+        this.X = x;
+        this.Y = y;
+        this.Z = z;
+    }
 }
