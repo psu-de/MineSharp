@@ -2,6 +2,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Physics;
+using MineSharp.Physics.Input;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
 
@@ -45,7 +46,7 @@ public class PhysicsPlugin : Plugin
         this.Self = this.playerPlugin.Self;
         await this.UpdateServerPos();
 
-        this.physics = new PlayerPhysics(this.Self!, this.worldPlugin.World);
+        this.physics = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, new InputControls());
     }
     
     public override Task OnTick()
@@ -131,7 +132,7 @@ public class PhysicsPlugin : Plugin
     /// <param name="position"></param>
     public void ForceLookAt(Position position)
     {
-        var pos = ((Vector3)position).Plus(new Vector3(0.5d, 0.5d, 0.5d));
+        var pos = new Vector3(0.5d, 0.5d, 0.5d).Plus(position);
         var r = pos.Minus(this.Self!.GetHeadPosition());
         var yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
         if (yaw < 0) yaw = 360 + yaw;
