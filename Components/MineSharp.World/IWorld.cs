@@ -18,6 +18,7 @@ public interface IWorld
     public event Events.BlockEvent OnBlockUpdated;
 
     public ChunkCoordinates ToChunkCoordinates(Position position);
+    public Position ToChunkPosition(Position position);
     public Position ToWorldPosition(ChunkCoordinates coordinates, Position position);
     public IChunk GetChunkAt(ChunkCoordinates coordinates);
     public bool IsChunkLoaded(ChunkCoordinates coordinates);

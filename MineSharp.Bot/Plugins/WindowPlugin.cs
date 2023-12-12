@@ -8,6 +8,7 @@ using MineSharp.Windows;
 using MineSharp.Windows.Clicks;
 using NLog;
 using System.Collections.Concurrent;
+using MineSharp.Windows.Specific;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -16,7 +17,7 @@ public class WindowPlugin : Plugin
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
     public Window? CurrentlyOpenedWindow { get; private set; }
-    public Window? Inventory { get; private set; }
+    public Inventory? Inventory { get; private set; }
     public Item? HeldItem => this.Inventory!
         .GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex))
         .Item;
@@ -66,8 +67,7 @@ public class WindowPlugin : Plugin
         this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
         this.Bot.Client.On<SetHeldItemPacket>(this.HandleHeldItemChange);
 
-        this.Inventory = this.OpenWindow(0, 
-            new WindowInfo("Inventory", "Inventory", 9, HasOffHandSlot: true));
+        this.CreateInventory();
 
         return base.Init();
     }
@@ -140,6 +140,19 @@ public class WindowPlugin : Plugin
 
         this.SelectedHotbarIndex = hotbarIndex;
         this.OnHeldItemChanged?.Invoke(this.Bot, this.HeldItem);
+    }
+
+    private void CreateInventory()
+    {
+        var inventory = new Inventory(this._mainInventory, this._synchronizeWindowClick);
+
+        lock (this._windowLock)
+        {
+            this._openWindows.TryAdd(inventory.WindowId, inventory);
+        }
+
+        this.Inventory = inventory;
+        this.OnWindowOpened?.Invoke(this.Bot, inventory);
     }
 
     private Window OpenWindow(int id, WindowInfo windowInfo)
