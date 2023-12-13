@@ -5,28 +5,28 @@ public class Attribute
     public string Key { get; set; }
     public double Base { get; set; }
     
-    private Dictionary<UUID, Modifier> modifiers { get; set; }
+    public Dictionary<UUID, Modifier> Modifiers { get; private set; }
     
     public Attribute(string key, double @base, Modifier[] modifiers)
     {
         this.Key = key;
         this.Base = @base;
-        this.modifiers = modifiers.ToDictionary(x => x.UUID);
+        this.Modifiers = modifiers.ToDictionary(x => x.UUID);
     }
 
     public void AddModifier(Modifier modifier)
     {
-        if (!this.modifiers.TryAdd(modifier.UUID, modifier))
-            this.modifiers[modifier.UUID] = modifier;
+        if (!this.Modifiers.TryAdd(modifier.UUID, modifier))
+            this.Modifiers[modifier.UUID] = modifier;
     }
 
     public void RemoveModifier(UUID uuid)
     {
-        this.modifiers.Remove(uuid);
+        this.Modifiers.Remove(uuid);
     }
     
     public double Value =>
-        this.modifiers.GroupBy(m => m.Value.Operation)
+        this.Modifiers.GroupBy(m => m.Value.Operation)
             .OrderBy(x => x.Key)
             .Aggregate(this.Base, (x, t) =>
             {
