@@ -1,3 +1,4 @@
+using MineSharp.Bot.Utils;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
@@ -275,8 +276,8 @@ public class PlayerPlugin : Plugin
                 packet.X,
                 packet.Y,
                 packet.Z),
-            packet.Pitch,
-            packet.Yaw,
+            NetUtils.FromAngleByte((sbyte)packet.Pitch),
+            NetUtils.FromAngleByte((sbyte)packet.Yaw),
             Vector3.Zero,
             true,
             new Dictionary<EffectType, Effect?>());

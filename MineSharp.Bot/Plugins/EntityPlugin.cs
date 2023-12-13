@@ -1,3 +1,4 @@
+using MineSharp.Bot.Utils;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
@@ -80,7 +81,10 @@ public class EntityPlugin : Plugin
             entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
-            new Vector3(ConvertToVelocity(packet.VelocityX), ConvertToVelocity(packet.VelocityY), ConvertToVelocity(packet.VelocityZ)),
+            new Vector3(
+                NetUtils.ConvertToVelocity(packet.VelocityX), 
+                NetUtils.ConvertToVelocity(packet.VelocityY), 
+                NetUtils.ConvertToVelocity(packet.VelocityZ)),
             true,
             new Dictionary<EffectType, Effect?>());
 
@@ -115,9 +119,9 @@ public class EntityPlugin : Plugin
         }
 
         entity.Velocity = new Vector3(
-            ConvertToVelocity(packet.VelocityX),
-            ConvertToVelocity(packet.VelocityY),
-            ConvertToVelocity(packet.VelocityZ));
+            NetUtils.ConvertToVelocity(packet.VelocityX),
+            NetUtils.ConvertToVelocity(packet.VelocityY),
+            NetUtils.ConvertToVelocity(packet.VelocityZ));
         
         return Task.CompletedTask;
     }
@@ -131,9 +135,9 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
 
         entity.Position.Add(new Vector3(
-            ConvertDeltaPosition(packet.DeltaX),
-            ConvertDeltaPosition(packet.DeltaY),
-            ConvertDeltaPosition(packet.DeltaZ)));
+            NetUtils.ConvertDeltaPosition(packet.DeltaX),
+            NetUtils.ConvertDeltaPosition(packet.DeltaY),
+            NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
         
         entity.IsOnGround = packet.OnGround;
 
@@ -150,12 +154,12 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
 
         entity.Position.Add(new Vector3(
-            ConvertDeltaPosition(packet.DeltaX),
-            ConvertDeltaPosition(packet.DeltaY),
-            ConvertDeltaPosition(packet.DeltaZ)));
+            NetUtils.ConvertDeltaPosition(packet.DeltaX),
+            NetUtils.ConvertDeltaPosition(packet.DeltaY),
+            NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
 
-        entity.Yaw = entity.Yaw;
-        entity.Pitch = entity.Pitch;
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
         this.OnEntityMoved?.Invoke(this.Bot, entity);
@@ -170,8 +174,8 @@ public class EntityPlugin : Plugin
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        entity.Yaw = packet.Yaw;
-        entity.Pitch = packet.Pitch;
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
         this.OnEntityMoved?.Invoke(this.Bot, entity);
@@ -191,8 +195,8 @@ public class EntityPlugin : Plugin
         entity.Position.Y = packet.Y;
         entity.Position.Z = packet.Z;
 
-        entity.Yaw = packet.Yaw;
-        entity.Pitch = packet.Pitch;
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         this.OnEntityMoved?.Invoke(this.Bot, entity);
 
         return Task.CompletedTask;
@@ -253,10 +257,4 @@ public class EntityPlugin : Plugin
 
         await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId));
     }
-
-    private static double ConvertToVelocity(double value)
-        => value / VELOCITY_CONVERSION;
-
-    private static double ConvertDeltaPosition(short delta)
-        => delta / (128 * 32d);
 }

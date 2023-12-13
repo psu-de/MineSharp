@@ -1,0 +1,60 @@
+using MineSharp.Core.Common;
+using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Entities;
+using MineSharp.Data;
+using MineSharp.World;
+using MineSharp.World.Iterators;
+
+namespace MineSharp.Physics.Utils;
+
+public static class WorldUtils
+{
+    public static bool CollidesWithWorld(AABB bb, IWorld world, MinecraftData data)
+    {
+        var iterator = new BoundingBoxIterator(bb);
+
+        return iterator.Iterate()
+            .Select(world.GetBlockAt)
+            .Where(x => x.IsSolid())
+            .Select(data.BlockCollisionShapes.GetForBlock)
+            .Any(x => x.Any(y => y.Intersects(bb)));
+    }
+    
+    public static bool IsOnClimbable(MinecraftPlayer player, IWorld world, ref Vector3 lastClimbPosition)
+    {
+        if (player.GameMode == GameMode.Spectator)
+            return false;
+
+        var position = (Position)player.Entity!.Position;
+        var blockAtFeet = world.GetBlockAt(position);
+
+        // TODO: Change once tags are implemented
+        if (blockAtFeet.Info.Type is BlockType.GlowLichen or BlockType.Ladder or BlockType.Scaffolding
+            or BlockType.TwistingVines or BlockType.Vine or BlockType.CaveVines or BlockType.WeepingVines)
+        {
+            lastClimbPosition = position;
+            return true;
+        }
+        if (!blockAtFeet.Info.Name.StartsWith("trapdoor"))
+            return false;
+
+        var blockBelowPos = (Position)Vector3.Down.Plus(blockAtFeet.Position);
+        var blockBelow = world.GetBlockAt(blockBelowPos);
+        if (!blockBelow.GetProperty<bool>("open")
+            || blockBelow.GetProperty<string>("facing") != blockAtFeet.GetProperty<string>("facing"))
+            return false;
+
+        lastClimbPosition = position;
+        return true;
+    }
+
+    public static double GetBlockJumpFactor(Position position, IWorld world)
+    {
+        var below = (Position)Vector3.Down.Plus(position);
+        var blockBelow = world.GetBlockAt(below);
+
+        return blockBelow.Info.Type == BlockType.HoneyBlock
+            ? PhysicsConst.HONEY_BLOCK_JUMP_FACTOR
+            : 1.0f;
+    }
+}

@@ -7,8 +7,8 @@ namespace MineSharp.Core.Common.Entities;
 public class Entity
 {
     public readonly EntityInfo Info;
-    
-    public int ServerId { get; set;}
+
+    public int ServerId { get; set; }
     public Vector3 Position { get; set; }
     public float Pitch { get; set; }
     public float Yaw { get; set; }
@@ -32,7 +32,18 @@ public class Entity
         this.Attributes = new ConcurrentDictionary<string, Attribute>();
         this.Vehicle = null;
     }
-    
+
+    public Attribute? GetAttribute(string name)
+    {
+        this.Attributes.TryGetValue(name, out var attr);
+        return attr;
+    }
+
+    public void AddAttribute(Attribute attribute)
+    {
+        this.Attributes.Add(attribute.Key, attribute);
+    }
+
     public int? GetEffectLevel(EffectType effectType)
     {
 

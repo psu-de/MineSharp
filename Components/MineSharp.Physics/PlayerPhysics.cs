@@ -1,28 +1,51 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Common.Entities.Attributes;
 using MineSharp.Data;
 using MineSharp.Physics.Input;
 using MineSharp.Physics.Utils;
 using MineSharp.World;
+using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;
 
-public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
+public class PlayerPhysics
 {
     public delegate void PlayerPhysicsBooleanEvent(PlayerPhysics sender, bool crouching);
 
     public event PlayerPhysicsBooleanEvent? OnCrouchingChanged;
     public event PlayerPhysicsBooleanEvent? OnSprintingChanged;
-    
-    public readonly MinecraftData Data = data;
-    public readonly MinecraftPlayer Player = player;
-    public readonly IWorld World = world;
-    
-    private readonly Input.Input input = new Input.Input(inputControls);
+
+    public readonly MinecraftData Data;
+    public readonly MinecraftPlayer Player;
+    public readonly IWorld World;
+
+    private readonly Input.Input input;
+
+    private Attribute speedAttribute;
     private PlayerState state = new PlayerState();
-    
     private HashSet<BlockType> fluidOnEyes = new HashSet<BlockType>();
+
+    public PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
+    {
+        this.Data = data;
+        this.Player = player;
+        this.World = world;
+        this.input = new Input.Input(inputControls);
+
+        if (!this.Player.Entity!.Attributes.ContainsKey(PhysicsConst.ATTR_MOVEMENT_SPEED))
+        {
+            this.speedAttribute = new Attribute(
+                PhysicsConst.ATTR_MOVEMENT_SPEED,
+                PhysicsConst.DEFAULT_PLAYER_SPEED,
+                Array.Empty<Modifier>());
+
+            this.Player.Entity!.AddAttribute(this.speedAttribute);
+        }
+        else this.speedAttribute = this.Player.Entity!.GetAttribute(PhysicsConst.ATTR_MOVEMENT_SPEED)!;
+    }
 
     public void OnTick()
     {
@@ -54,14 +77,13 @@ public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld wo
     private void MovementTick()
     {
         // TODO: Fix differences with java: MovementTick()
-        this.TruncateVelocity(this.Player.Entity!.Velocity);
-
-        bool forceCrouching = !PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data)
+        
+        this.state.IsCrouching = !PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data)
                               && this.input.Controls.SneakingKeyDown // Swimming, Sleeping, Vehicle, Flying ; LocalPlayer.java:631
                               || PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Standing, this.World, this.Data);
         
         var crouchSpeedFactor = (float)Math.Clamp(0.3f + 0.0, 0.0f, 1.0f); // Enchantment Soul Speed factor
-        this.input.Tick(forceCrouching, crouchSpeedFactor); // not only forceCrouching, but also swimming LocalPlayer.java:633
+        this.input.Tick(this.state.IsCrouching, crouchSpeedFactor); // not only forceCrouching, but also swimming LocalPlayer.java:633
         
         // Is using item LocalPlayer.java:635
         
@@ -77,43 +99,221 @@ public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld wo
         this.UpdateSprinting();
         
         // ability to fly for creative and spectator
-        var startedFlying = false;
+        // var startedFlying = false;
         
         // && is not flying && is not passenger
-        if (this.input.JumpedThisTick && !startedFlying && !this.IsOnClimbable())
-        {
+        // if (this.input.JumpedThisTick && !startedFlying && !this.IsOnClimbable())
+        // {
             // TODO: Elytra flying
             // Try start falling
             // LocalPlayer.java:707
+        // }
+
+        // && !this.Player.IsFlying
+        if (this.state.WasTouchingWater && this.input.Controls.SneakingKeyDown)
+        {
+            this.Player.Entity!.Velocity.Add(PhysicsConst.WaterDrag);
+        }
+        
+        // water vision
+        
+        // creative / spectator flying
+        
+        // jumping with vehicle
+
+        if (this.state.NoJumpDelay > 0)
+            this.state.NoJumpDelay--;
+        
+        this.TruncateVelocity(this.Player.Entity!.Velocity);
+
+        // && !this.Player.IsFlying
+        if (this.input.Controls.JumpingKeyDown)
+        {
+            this.TryJumping();
+        }
+        else this.state.NoJumpDelay = 0;
+        
+        // UpdateFallFlying() (Elytra)
+        var aabb = this.Player.Entity!.GetBoundingBox();
+        // reset fall distance?
+        
+        // travelRidden() if player 
+        this.Travel();
+    }
+
+    private void Travel()
+    {
+        // TODO: Swimming && !isPassenger()
+        // TODO: Ability to fly
+
+        var gravity = PhysicsConst.GRAVITY;
+        var isFalling = this.Player.Entity!.Velocity.Y <= 0.0;
+        if (isFalling && this.Player.Entity!.GetEffectLevel(EffectType.SlowFalling).HasValue)
+            gravity = PhysicsConst.SLOW_FALLING_GRAVITY;
+
+        var dx = this.Player.Entity!.Velocity.X * 0.98f;
+        var dz = this.Player.Entity!.Velocity.Z * 0.98f;
+        var block = this.World.GetBlockAt((Position)this.Player.Entity!.Position);
+        // LivingEntity.java:2015
+        // && !abilities.canFly
+        if (this.state.WasTouchingWater)
+        {
+            this.TravelWater(isFalling, dx, dz);
         }
     }
 
-    private bool IsOnClimbable()
+    private void TravelWater(bool isFalling, double dx, double dz)
     {
-        if (player.GameMode == GameMode.Spectator)
-            return false;
+        var lastY = this.Player.Entity!.Position.Y;
+        var waterFactor = this.state.IsSprinting ? 0.9f : 0.8f;
+        var speedFactor = 0.02f;
+        var depthStrider = 0.0f; // TODO: get Depth strider level
+        depthStrider = MathF.Max(3.0f, depthStrider);
 
-        var position = (Position)this.Player.Entity!.Position;
-        var blockAtFeet = this.World.GetBlockAt(position);
+        if (!this.Player.Entity!.IsOnGround)
+            depthStrider *= 0.5f;
 
-        // TODO: Change once tags are implemented
-        if (blockAtFeet.Info.Type is BlockType.GlowLichen or BlockType.Ladder or BlockType.Scaffolding
-            or BlockType.TwistingVines or BlockType.Vine or BlockType.CaveVines or BlockType.WeepingVines)
+        if (depthStrider > 0.0)
         {
-            this.state.LastClimbablePosition = position;
-            return true;
+            waterFactor += (0.54600006F - waterFactor) * depthStrider / 3.0F;
+            speedFactor += ((float)this.speedAttribute.Value - speedFactor) * depthStrider / 3.0F;
         }
-        if (!blockAtFeet.Info.Name.StartsWith("trapdoor"))
-            return false;
 
-        var blockBelowPos = (Position)Vector3.Down.Plus(blockAtFeet.Position);
-        var blockBelow = this.World.GetBlockAt(blockBelowPos);
-        if (!blockBelow.GetProperty<bool>("open")
-            || blockBelow.GetProperty<string>("facing") != blockAtFeet.GetProperty<string>("facing"))
-            return false;
+        if (this.Player.Entity!.GetEffectLevel(EffectType.DolphinsGrace).HasValue)
+            waterFactor = 0.96f;
+        
+        var moveVector = new Vector3(dx, 0, dz);
+        this.MoveRelative(moveVector, speedFactor, this.Player.Entity!.Pitch);
+        this.Move();
+    }
 
-        this.state.LastClimbablePosition = position;
-        return true;
+    private void Move()
+    {
+        var vec = this.Player.Entity!.Velocity.Clone();
+
+        if (this.state.StuckSpeedMultiplier.LengthSquared() > 1.0E-7D)
+        {
+            vec.Multiply(this.state.StuckSpeedMultiplier);
+            this.state.StuckSpeedMultiplier = Vector3.Zero;
+            this.Player.Entity!.Velocity = Vector3.Zero;
+        }
+
+        this.MaybeBackOffFromEdge(ref vec);
+        
+    }
+
+    private void MaybeBackOffFromEdge(ref Vector3 vec)
+    {
+        // TODO Fix differences with java
+        // Player.java:1054
+        // && this.IsAboveGround()
+        if (vec.Y > 0 || !this.input.Controls.SneakingKeyDown)
+            return;
+
+        var x = vec.X;
+        var z = vec.Z;
+        var entity = this.Player.Entity!;
+        
+        // TODO: Check for entity collisions, not only block collisions
+        const double increment = 0.05d;
+        while (x != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, 0.0), this.World, this.Data))
+        {
+            x = x switch {
+                < increment and >= -increment => 0.0,
+                > 0.0 => x - increment,
+                _ => x + increment
+            };
+        }
+
+        while (z != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(0.0, -1.0, z), this.World, this.Data))
+        {
+            z = z switch {
+                < increment and >= -increment => 0.0,
+                > 0.0 => z - increment,
+                _ => z + increment
+            };
+        }
+        
+        while(x != 0.0D && z != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, z), this.World, this.Data)) {
+            x = x switch {
+                < increment and >= -increment => 0.0,
+                > 0.0 => x - increment,
+                _ => x + increment
+            };
+
+            z = z switch {
+                < increment and >= -increment => 0.0,
+                > 0.0 => z - increment,
+                _ => z + increment
+            };
+        }
+
+        vec.X = x;
+        vec.Z = z;
+    }
+
+    private void MoveRelative(Vector3 vec, float scale, float pitch)
+    {
+        var length = vec.LengthSquared();
+        var move = Vector3.Zero;
+        if (length >= 1.0E-7D)
+        {
+            if (length > 1.0)
+                vec.Normalized();
+            vec.Scale(scale);
+
+            var sin = MathF.Sin(pitch * (MathF.PI / 180.0F));
+            var cos = MathF.Cos(pitch * (MathF.PI / 180.0F));
+            move = new Vector3(vec.X * cos - vec.Z * sin, vec.Y, vec.Z * cos + vec.X * sin);
+        }
+        
+        this.Player.Entity!.Velocity.Add(move);
+    }
+
+    private void TryJumping()
+    {
+        var fluidHeight = this.state.LavaHeight > 0.0
+            ? this.state.LavaHeight
+            : this.state.WaterHeight;
+
+        var isInWater = this.state.WasTouchingWater && fluidHeight > 0.0;
+        if (!isInWater || this.Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD)
+        {
+            if (this.state.LavaHeight <= 0.0 || this.Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD)
+            {
+                if ((this.Player.Entity!.IsOnGround || isInWater && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD) && this.state.NoJumpDelay == 0)
+                {
+                    this.JumpFromGround();
+                    this.state.NoJumpDelay = PhysicsConst.JUMP_DELAY;
+                }
+            }
+            else
+            {
+                this.JumpInFluid();
+            }
+        }
+        else
+        {
+            this.JumpInFluid();
+        }
+    }
+
+    private void JumpFromGround()
+    {
+        var jumpBoostFactor = 0.1d * (this.Player.Entity!.GetEffectLevel(EffectType.JumpBoost) + 1) ?? 0;
+        
+        this.Player.Entity!.Velocity.Y = 0.42d * WorldUtils.GetBlockJumpFactor((Position)this.Player.Entity!.Position, this.World) + jumpBoostFactor;
+        if (!this.state.IsSprinting)
+            return;
+
+        var pitch = this.Player.Entity!.Pitch * (MathF.PI / 180.0f);
+        this.Player.Entity!.Velocity.X -= 0.2F * MathF.Sin(pitch);
+        this.Player.Entity!.Velocity.Z += 0.2F * MathF.Cos(pitch);
+    }
+
+    private void JumpInFluid()
+    {
+        this.Player.Entity!.Velocity.Y += PhysicsConst.FLUID_JUMP_FACTOR;
     }
 
     private void UpdateSprinting()
@@ -135,6 +335,7 @@ public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld wo
 
         if ((!this.state.WasTouchingWater || this.state.WasUnderwater) && canStartSprinting && this.input.Controls.SprintingKeyDown)
         {
+            // TODO: Prob add sprinting attribute
             this.state.IsSprinting = true;
             Task.Run(() => this.OnSprintingChanged?.Invoke(this, this.state.IsSprinting));
         }
@@ -161,7 +362,7 @@ public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld wo
     {
         var pos = new Position(x, this.Player.Entity!.Position.Y, z);
 
-        if (!CollidesWithSuffocatingBlock(pos))
+        if (!this.CollidesWithSuffocatingBlock(pos))
         {
             return;
         }
@@ -203,7 +404,7 @@ public class PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld wo
         bb.MaxZ = position.Z + 1.0f;
         bb.Contract(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
-        return CollisionUtils.CollidesWithWorld(bb, this.World, this.Data);
+        return WorldUtils.CollidesWithWorld(bb, this.World, this.Data);
     }
 
     private void CheckIfUnderwater()

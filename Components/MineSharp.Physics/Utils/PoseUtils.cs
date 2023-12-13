@@ -31,7 +31,7 @@ public static class PoseUtils
             player.Entity.Position.Z);
         bb.Contract(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
-        return CollisionUtils.CollidesWithWorld(bb, world, data);
+        return WorldUtils.CollidesWithWorld(bb, world, data);
     }
 
 

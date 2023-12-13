@@ -31,20 +31,23 @@ public class MinecraftPlayer
     /// <returns></returns>
     public Vector3 GetHeadPosition() => this.Entity!.Position.Plus(Vector3.Up);
 
-    /// <summary>
-    /// The Y Coordinate of the eyes of this player
-    /// </summary>
-    /// <returns></returns>
-    public double GetEyeY()
+    public double GetEyeHeight()
     {
-        var offset = this.Pose switch {
+        return this.Pose switch {
             EntityPose.Swimming 
                 or EntityPose.FallFlying 
                 or EntityPose.SpinAttack => 0.4d,
             EntityPose.Crouching => 1.27d,
             _ => 1.62d
         };
-
-        return this.Entity!.Position.Y + offset;
+    }
+    
+    /// <summary>
+    /// The Y Coordinate of the eyes of this player
+    /// </summary>
+    /// <returns></returns>
+    public double GetEyeY()
+    {
+        return this.Entity!.Position.Y + this.GetEyeHeight();
     }
 }
