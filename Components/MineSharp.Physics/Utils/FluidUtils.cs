@@ -4,7 +4,7 @@ using MineSharp.World;
 
 namespace MineSharp.Physics.Utils;
 
-public static class FluidUtils
+internal static class FluidUtils
 {
     private const float MAX_FLUID_HEIGHT = 9.0f;
 

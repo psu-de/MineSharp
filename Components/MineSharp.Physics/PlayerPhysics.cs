@@ -7,6 +7,7 @@ using MineSharp.Data;
 using MineSharp.Physics.Input;
 using MineSharp.Physics.Utils;
 using MineSharp.World;
+using MineSharp.World.Iterators;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;
@@ -23,10 +24,9 @@ public class PlayerPhysics
     public readonly IWorld World;
 
     private readonly Input.Input input;
-
-    private Attribute speedAttribute;
-    private PlayerState state = new PlayerState();
-    private HashSet<BlockType> fluidOnEyes = new HashSet<BlockType>();
+    private readonly Attribute speedAttribute;
+    private readonly PlayerState state = new PlayerState();
+    private readonly HashSet<BlockType> fluidOnEyes = new HashSet<BlockType>();
 
     public PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
     {
@@ -49,6 +49,7 @@ public class PlayerPhysics
 
     public void OnTick()
     {
+        Console.WriteLine($"Vel: {this.Player.Entity!.Velocity}, Pos: {this.Player.Entity.Position}");
         if (GameMode.Spectator == this.Player.GameMode)
         {
             this.Player.Entity!.IsOnGround = false;
@@ -70,8 +71,7 @@ public class PlayerPhysics
         
         this.MovementTick();
         
-        this.Player.Entity!.Position.Add(
-            this.Player.Entity!.Velocity);
+        Console.WriteLine($"Vel: {this.Player.Entity!.Velocity}, Pos: {this.Player.Entity!.Position}");
     }
 
     private void MovementTick()
@@ -159,7 +159,75 @@ public class PlayerPhysics
         if (this.state.WasTouchingWater)
         {
             this.TravelWater(isFalling, dx, dz);
+        } // else if in laval
+        // else if fall flying (elytra)
+        else
+        {
+            this.TravelNormally(gravity, dx, dz);
         }
+    }
+
+    private void TravelNormally(double gravity, double dx, double dz)
+    {
+        var moveVector = new Vector3(dx, 0, dz);
+        var blockBelow = this.World.GetBlockAt(new Position(
+            this.Player.Entity!.Position.X,
+            this.Player.Entity!.Position.Y - 0.5f,
+            this.Player.Entity!.Position.Z));
+        var friction = PhysicsConst.GetBlockFriction(blockBelow.Info.Type);
+        var speedFactor = this.Player.Entity.IsOnGround ? friction * 0.91f : 0.91f;
+
+        var frictionInfluencedSpeed = this.Player.Entity.IsOnGround 
+            ? this.speedAttribute.Value * (0.21600002f / Math.Pow(speedFactor, 3))
+            : this.state.IsSprinting ? PhysicsConst.SPRINTING_FLYING_SPEED : PhysicsConst.FLYING_SPEED;
+        this.MoveRelative(moveVector, (float)frictionInfluencedSpeed, this.Player.Entity.Pitch);
+
+        this.CheckClimbable();
+        this.Move();
+
+        var vel = this.Player.Entity.Velocity;
+        var blockAtFeet = this.World.GetBlockAt((Position)this.Player.Entity.Position);
+        if ((this.state.HorizontalCollision || this.input.Controls.JumpingKeyDown)
+            && (WorldUtils.IsOnClimbable(this.Player, this.World, ref this.state.LastClimbablePosition) || blockAtFeet.Info.Type == BlockType.PowderSnow))
+        {
+            vel = new Vector3(vel.X, 0.2, vel.Z);
+        }
+
+        var velY = vel.Y;
+        var levitation = this.Player.Entity!.GetEffectLevel(EffectType.Levitation);
+        if (levitation.HasValue)
+            velY += (0.05d * (levitation.Value + 1) - velY) * 0.2d;
+        else if (!this.World.IsChunkLoaded(this.World.ToChunkCoordinates((Position)this.Player.Entity.Position)))
+        {
+            if (this.Player.Entity.Position.Y > this.World.MinY)
+                velY = 0.1d;
+            else velY = 0.0;
+        }
+        else
+            velY -= gravity;
+
+        this.Player.Entity.Velocity.X = vel.X * speedFactor;
+        this.Player.Entity.Velocity.Y = velY * 0.98f;
+        this.Player.Entity.Velocity.Z = vel.Z * speedFactor;
+    }
+
+    private void CheckClimbable()
+    {
+        if (!WorldUtils.IsOnClimbable(this.Player, this.World, ref this.state.LastClimbablePosition))
+            return;
+
+        var x = Math.Clamp(this.Player.Entity!.Velocity.X, -PhysicsConst.CLIMBING_SPEED, PhysicsConst.CLIMBING_SPEED);
+        var z = Math.Clamp(this.Player.Entity!.Velocity.Z, -PhysicsConst.CLIMBING_SPEED, PhysicsConst.CLIMBING_SPEED);
+        var y = Math.Max(this.Player.Entity!.Velocity.Y, -PhysicsConst.CLIMBING_SPEED);
+
+        var blockAtFeet = this.World.GetBlockAt((Position)this.Player.Entity.Position);
+        // && !abilities.flying
+        if (y < 0.0 && blockAtFeet.Info.Type != BlockType.Scaffolding && this.input.Controls.SneakingKeyDown)
+            y = 0.0;
+
+        this.Player.Entity!.Velocity.X = x;
+        this.Player.Entity!.Velocity.Y = y;
+        this.Player.Entity!.Velocity.Z = z;
     }
 
     private void TravelWater(bool isFalling, double dx, double dz)
@@ -185,6 +253,8 @@ public class PlayerPhysics
         var moveVector = new Vector3(dx, 0, dz);
         this.MoveRelative(moveVector, speedFactor, this.Player.Entity!.Pitch);
         this.Move();
+        
+        // TODO: Finish water movement
     }
 
     private void Move()
@@ -199,7 +269,162 @@ public class PlayerPhysics
         }
 
         this.MaybeBackOffFromEdge(ref vec);
+        var vec3 = this.Collide(vec);
+
+        var length = vec3.LengthSquared();
+        if (length > 1.0E-7D)
+        {
+            // reset fall distance
+            this.Player.Entity!.Position.Add(vec3);
+        }
+
+        var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-5F;
+        var collidedZ = Math.Abs(vec.Z - vec3.Z) > 1.0E-5F;
+        this.state.HorizontalCollision = collidedX || collidedZ;
+        this.state.VerticalCollision = vec.Y != vec3.Y;
+        this.state.MinorHorizontalCollision = IsCollisionMinor(vec3);
+
+        this.Player.Entity!.IsOnGround = this.state.VerticalCollision && vec.Y < 0;
+
+        if (this.state.HorizontalCollision)
+        {
+            if (collidedX)
+                this.Player.Entity.Velocity.X = 0.0;
+            else
+                this.Player.Entity.Velocity.Z = 0.0;
+        }
+    }
+
+    private Vector3 Collide(Vector3 vec)
+    {
+        var aabb = this.Player.Entity!.GetBoundingBox();
+        var vec3 = vec.LengthSquared() == 0.0 ? vec : CheckBoundingBoxCollisions(vec, aabb);
+
+        var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-3;
+        var collidedY = Math.Abs(vec.Y - vec3.Y) > 1.0E-3;
+        var collidedZ = Math.Abs(vec.Z - vec3.Z) > 1.0E-3;
+        var hitGround = this.Player.Entity!.IsOnGround || collidedY && vec.Y < 0.0;
         
+        Console.WriteLine("CollideY: " + collidedY);
+
+        if (hitGround && (collidedX || collidedZ))
+        {
+            var vec31 = CheckBoundingBoxCollisions(
+                new Vector3(vec.X, PhysicsConst.MAX_UP_STEP, vec.Z), 
+                aabb);
+            var vec32 = CheckBoundingBoxCollisions(
+                new Vector3(0.0, PhysicsConst.MAX_UP_STEP, 0.0), 
+                CollisionUtils.ExpandBoundingBox(aabb, vec.X, 0, vec.Z));
+
+            if (vec32.Y < PhysicsConst.MAX_UP_STEP)
+            {
+                var vec33 = CheckBoundingBoxCollisions(
+                        new Vector3(vec.X, 0, vec.Z),
+                        aabb.Clone().Offset(vec32.X, vec32.Y, vec32.Z))
+                    .Plus(vec32);
+
+                if (CollisionUtils.HorizontalDistanceSquared(vec33) > CollisionUtils.HorizontalDistanceSquared(vec31))
+                    vec31 = vec33;
+            }
+
+            if (CollisionUtils.HorizontalDistanceSquared(vec31) > CollisionUtils.HorizontalDistanceSquared(vec3))
+            {
+                vec31.Add(
+                    CheckBoundingBoxCollisions(
+                        new Vector3(0.0, -vec31.Y + vec.Y, 0.0),
+                        aabb.Clone().Offset(vec31.X, vec31.Y, vec31.Z)));
+                return vec31;
+            }
+        }
+
+        return vec3;
+    }
+
+    private bool IsCollisionMinor(Vector3 vec)
+    {
+        var pitchRadians = this.Player.Entity!.Pitch * (Math.PI / 180.0);
+        var sin = Math.Sin(pitchRadians);
+        var cos = Math.Cos(pitchRadians);
+
+        var x = this.input.StrafeImpulse * cos * 0.98 - this.input.ForwardImpulse * sin * 0.98;
+        var z = this.input.ForwardImpulse * cos * 0.98 - this.input.StrafeImpulse * sin * 0.98;
+
+        var s1 = Math.Pow(x, 2) + Math.Pow(z, 2);
+        var s2 = Math.Pow(vec.X, 2) + Math.Pow(vec.Z, 2);
+
+        if (s1 < 1.0E-5F || s2 < 1.0E-5F)
+            return false;
+
+        double d6 = x * vec.X + z * vec.Z;
+        double d7 = Math.Acos(d6 / Math.Sqrt(s1 * s2));
+        return d7 < 0.13962634F;
+    }
+    
+    private Vector3 CheckBoundingBoxCollisions(Vector3 direction, AABB aabb)
+    {
+        // TODO: Entity collision boxes
+        // TODO: World border collision
+
+        var iterator = new BoundingBoxIterator(aabb);
+        var shapes = iterator.Iterate()
+            .Select(this.World.GetBlockAt)
+            .Where(x => x.IsSolid())
+            .Select(this.Data.BlockCollisionShapes.GetForBlock)
+            .SelectMany(x => x)
+            .ToArray();
+
+        if (shapes.Length == 0)
+            return direction;
+        
+        // check for collisions
+        var mX = direction.X;
+        var mY = direction.Y;
+        var mZ = direction.Z;
+        
+        Console.WriteLine($"Collision Y:");
+        if (mY != 0.0)
+        {
+            Console.WriteLine($"mY={mY} AABB={aabb}");
+            mY = CalculateAxisOffset(CollisionUtils.Axis.YAxis, aabb, shapes, mY);
+            if (mY != 0.0)
+                aabb.Offset(0, mY, 0);
+        }
+        Console.WriteLine($"mY={mY} AABB={aabb}");
+        Console.WriteLine("--- --- --- --- ---");
+
+        var zDominant = Math.Abs(mX) < Math.Abs(mZ);
+        if (zDominant && mZ != 0.0)
+        {
+            mZ = CalculateAxisOffset(CollisionUtils.Axis.ZAxis, aabb, shapes, mZ);
+            if (mZ != 0.0)
+                aabb.Offset(0, 0, mZ);
+        }
+        
+        if (mX != 0.0)
+        {
+            mX = CalculateAxisOffset(CollisionUtils.Axis.XAxis, aabb, shapes, mX);
+            if (mX != 0.0)
+                aabb.Offset(0, 0, mX);
+        }
+
+        if (!zDominant && mZ != 0.0)
+        {
+            mZ = CalculateAxisOffset(CollisionUtils.Axis.ZAxis, aabb, shapes, mZ);
+        }
+
+        return new Vector3(mX, mY, mZ);
+    }
+
+    private double CalculateAxisOffset(CollisionUtils.Axis axis, AABB aabb, AABB[] shapes, double amount)
+    {
+        var value = amount;
+        if (value == 0.0 || Math.Abs(amount) < 1.0E-7)
+            return 0.0;
+
+        foreach (var shape in shapes)
+            value = CollisionUtils.CalculateMaxOffset(aabb, shape, axis, value);
+
+        return value;
     }
 
     private void MaybeBackOffFromEdge(ref Vector3 vec)
@@ -372,10 +597,10 @@ public class PlayerPhysics
         var diff = double.MaxValue;
         Vector3? direction = null;
 
-        foreach (var axis in VectorUtils.XZAxisVectors)
+        foreach (var axis in CollisionUtils.XZAxisVectors)
         {
-            var coord = VectorUtils.ChooseAxisCoordinate(axis, nX, 0.0, nZ);
-            coord = VectorUtils.IsPositiveAxisVector(axis)
+            var coord = CollisionUtils.ChooseAxisCoordinate(axis, nX, 0.0, nZ);
+            coord = CollisionUtils.IsPositiveAxisVector(axis)
                 ? 1.0 - coord
                 : coord;
 
@@ -474,7 +699,6 @@ public class PlayerPhysics
                     result = true;
                     d0 = Math.Max(fHeight - aabb.MinY, d0);
                     var flow = FluidUtils.GetFlow(this.World, block);
-                    Console.WriteLine($"Flow of {pos}: " + flow);
                     
                     if (d0 < 0.4d) 
                         flow.Scale(d0);

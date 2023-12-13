@@ -7,7 +7,7 @@ using MineSharp.World.Iterators;
 
 namespace MineSharp.Physics.Utils;
 
-public static class WorldUtils
+internal static class WorldUtils
 {
     public static bool CollidesWithWorld(AABB bb, IWorld world, MinecraftData data)
     {
@@ -15,7 +15,7 @@ public static class WorldUtils
 
         return iterator.Iterate()
             .Select(world.GetBlockAt)
-            .Where(x => x.IsSolid())
+            .Where(x => x.IsSolid()) // TODO: IsSolid() is not the same as in java
             .Select(data.BlockCollisionShapes.GetForBlock)
             .Any(x => x.Any(y => y.Intersects(bb)));
     }

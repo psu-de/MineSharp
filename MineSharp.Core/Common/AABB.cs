@@ -59,6 +59,9 @@ public class AABB
         this.MaxZ += z;
         return this;
     }
+    
+    public AABB Clone()
+        => new AABB(this.MinX, this.MinY, this.MinZ, this.MaxX, this.MaxY, this.MaxZ);
 
     public bool Intersects(AABB other)
     {

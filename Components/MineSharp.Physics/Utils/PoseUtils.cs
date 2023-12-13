@@ -2,11 +2,10 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Data;
 using MineSharp.World;
-using MineSharp.World.Iterators;
 
 namespace MineSharp.Physics.Utils;
 
-public static class PoseUtils
+internal static class PoseUtils
 {
     private static readonly IDictionary<EntityPose, AABB> PoseDimensions = new Dictionary<EntityPose, AABB>()
     {
@@ -20,7 +19,7 @@ public static class PoseUtils
     };
 
     public static AABB GetBBForPose(EntityPose pose)
-        => PoseDimensions[pose];
+        => PoseDimensions[pose].Clone();
 
     public static bool WouldPlayerCollideWithPose(MinecraftPlayer player, EntityPose pose, IWorld world, MinecraftData data)
     {

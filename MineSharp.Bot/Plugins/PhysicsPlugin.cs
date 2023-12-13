@@ -22,6 +22,8 @@ public class PhysicsPlugin : Plugin
     ///     Fires just before executing a physics tick
     /// </summary>
     public event Events.BotEvent? PhysicsTick;
+
+    public readonly InputControls InputControls;
     
     private PlayerState lastPlayerState;
     private PlayerPhysics? physics;
@@ -33,6 +35,7 @@ public class PhysicsPlugin : Plugin
     public PhysicsPlugin(MinecraftBot bot) : base(bot)
     {
         this.lastPlayerState = new PlayerState(0, 0, 0, 0, 0, false);
+        this.InputControls = new InputControls();
     }
 
     protected override async Task Init()
@@ -46,7 +49,7 @@ public class PhysicsPlugin : Plugin
         this.Self = this.playerPlugin.Self;
         await this.UpdateServerPos();
 
-        this.physics = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, new InputControls());
+        this.physics = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
     }
     
     public override Task OnTick()

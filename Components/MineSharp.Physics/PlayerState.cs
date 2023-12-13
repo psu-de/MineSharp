@@ -18,7 +18,7 @@ public class PlayerState
     
     public bool MinorHorizontalCollision { get; internal set; }
 
-    public Position LastClimbablePosition { get; internal set; } = (Position)Vector3.Zero;
+    public Vector3 LastClimbablePosition = Vector3.Zero;
 
     public int NoJumpDelay { get; internal set; } = 0;
 
