@@ -225,7 +225,7 @@ public sealed class MinecraftClient : IDisposable
         }
         else
         {
-            Logger.Info("Bundling packets!");
+            Logger.Debug("Bundling packets!");
         }
     }
     
