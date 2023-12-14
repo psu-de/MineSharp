@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MineSharp.Core.Common;
 
-public class PacketBuffer
+public class PacketBuffer : IDisposable, IAsyncDisposable
 {
     private readonly MemoryStream _buffer;
 
@@ -493,4 +493,14 @@ public class PacketBuffer
     
     
     #endregion
+
+    public void Dispose()
+    {
+        _buffer.Dispose();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _buffer.DisposeAsync();
+    }
 }

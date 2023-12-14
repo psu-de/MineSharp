@@ -295,7 +295,7 @@ public sealed class MinecraftClient : IDisposable
         this._stream!.WritePacket(buffer);
     }
 
-    private Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
+    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
     {
         // Only parse packets that are awaited by an handler.
         // Possible handlers are:
@@ -306,7 +306,10 @@ public sealed class MinecraftClient : IDisposable
         
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
-            return Task.CompletedTask; // TODO: Maybe add an event for unknown packets
+        {
+            await buffer.DisposeAsync();
+            return; // TODO: Maybe add an event for unknown packets
+        }
 
         var handlers = new List<AsyncPacketHandler>();
         // Internal packet handler
@@ -324,12 +327,16 @@ public sealed class MinecraftClient : IDisposable
         this._packetWaiters.TryGetValue(packetType, out var tsc);
 
         if (handlers.Count == 0 && tsc == null)
-            return Task.CompletedTask;
+        {
+            await buffer.DisposeAsync();
+            return;
+        }
         
         long size = buffer.ReadableBytes;
         try
         {
             var packet = factory(buffer, this._data);
+            await buffer.DisposeAsync();
             
             _ = Task.Run(async () =>
             {
@@ -353,8 +360,6 @@ public sealed class MinecraftClient : IDisposable
         {
             Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
         }
-
-        return Task.CompletedTask;
     }
 
     private async Task HandleOutgoingPacket(IPacket packet)
