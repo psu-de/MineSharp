@@ -116,30 +116,14 @@ public class MinecraftBot
     private void OnClientDisconnected(MinecraftClient sender, string reason)
         => this.OnBotDisconnected?.Invoke(this, reason);
 
-    /// <summary>
-    /// Creates a new MinecraftBot.
-    /// If you want an online session and login with an Microsoft Account, use your account email as username parameter.
-    /// </summary>
-    /// <param name="username">The Username of the Bot (offline session), or an microsoft account email (online session)</param>
-    /// <param name="hostnameOrIp">The Hostname of the Minecraft server.</param>
-    /// <param name="port">Port of the Minecraft server</param>
-    /// <param name="offline">When true, you won't be logged in to the minecraft services, and will only be able to join servers in offline-mode.</param>
-    /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
-    /// <param name="excludeDefaultPlugins">When true, the default plugins will not be added to the bot</param>
-    /// <returns></returns>
+
     public static async Task<MinecraftBot> CreateBot(
-        string username, 
-        string hostnameOrIp, 
+        string hostnameOrIp,
+        Session session,
         ushort port = 25565,
-        bool offline = false, 
         string? version = null,
         bool excludeDefaultPlugins = false)
     {
-        var session = offline switch {
-            true => Session.OfflineSession(username),
-            false => await Session.Login(username)
-        };
-        
         var data = version switch {
             null => await MinecraftClient.AutodetectServerVersion(hostnameOrIp, port),
             _ => MinecraftData.FromVersion(version)
@@ -163,5 +147,32 @@ public class MinecraftBot
             await bot.LoadPlugin(plugin);
 
         return bot;
+    }
+    
+    /// <summary>
+    /// Creates a new MinecraftBot.
+    /// If you want an online session and login with an Microsoft Account, use your account email as username parameter.
+    /// </summary>
+    /// <param name="username">The Username of the Bot (offline session), or an microsoft account email (online session)</param>
+    /// <param name="hostnameOrIp">The Hostname of the Minecraft server.</param>
+    /// <param name="port">Port of the Minecraft server</param>
+    /// <param name="offline">When true, you won't be logged in to the minecraft services, and will only be able to join servers in offline-mode.</param>
+    /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
+    /// <param name="excludeDefaultPlugins">When true, the default plugins will not be added to the bot</param>
+    /// <returns></returns>
+    public static async Task<MinecraftBot> CreateBot(
+        string username, 
+        string hostnameOrIp, 
+        ushort port = 25565,
+        bool offline = false, 
+        string? version = null,
+        bool excludeDefaultPlugins = false)
+    {
+        var session = offline switch {
+            true => Session.OfflineSession(username),
+            false => await MicrosoftAuth.Login(username)
+        };
+
+        return await CreateBot(hostnameOrIp, session, port, version, excludeDefaultPlugins);
     }
 }

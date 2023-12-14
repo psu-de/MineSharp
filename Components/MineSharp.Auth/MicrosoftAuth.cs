@@ -14,7 +14,7 @@ using System.Text;
 
 namespace MineSharp.Auth;
 
-internal static class MicrosoftAuth
+public static class MicrosoftAuth
 {
     private static readonly string ClientID = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
@@ -22,7 +22,7 @@ internal static class MicrosoftAuth
     public delegate void DeviceCodeHandler(DeviceCodeResult deviceCode);
     
     /// <summary>
-    /// Logins using a Microsoft Account
+    /// Obtain a valid minecraft session using a Microsoft Account
     /// </summary>
     /// <param name="username">The username, only used for caching.</param>
     /// <param name="handler">
@@ -30,7 +30,7 @@ internal static class MicrosoftAuth
     /// If none is provided, the link will open up in the default browser and the device code is written to the console
     /// </param>
     /// <returns>A Session instance</returns>
-    public static async Task<Session> MicrosoftLogin(string username, DeviceCodeHandler? handler = null)
+    public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null)
     {
         handler ??= DefaultDeviceCodeHandler;
         var cacheFolder = GetCacheForUser(username);
