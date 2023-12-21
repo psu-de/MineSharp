@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace MineSharp.Physics.Utils;
 
-internal static class CollisionUtils
+public static class CollisionUtils
 {
     public static readonly Vector3[] XZAxisVectors = new[] {
         Vector3.West, Vector3.East, Vector3.North, Vector3.South
@@ -38,20 +38,20 @@ internal static class CollisionUtils
         throw new ArgumentException("null vector as axis");
     }
 
-    public static double CalculateMaxOffset(AABB a, AABB b, Axis axis, double offset)
+    public static double CalculateMaxOffset(AABB a, AABB b, Axis axis, double displacement)
     {
         if (!IntersectsAxis(a, b, NextAxis(axis)) || !IntersectsAxis(a, b, PrevAxis(axis)))
-            return offset;
+            return displacement;
 
         var minA = GetBBMin(a, axis);
         var maxA = GetBBMax(a, axis);
         var minB = GetBBMin(b, axis);
-        var maxB = GetBBMin(b, axis);
+        var maxB = GetBBMax(b, axis);
 
-        return offset switch {
-            > 0 when maxB <= minA && maxB + offset > minA => Math.Clamp(minA - maxB, 0.0, offset),
-            < 0 when maxA <= minB && minB + offset < maxA => Math.Clamp(maxA - minB, offset, 0.0),
-            _ => offset
+        return displacement switch {
+            > 0 when maxB <= minA && maxB + displacement > minA => Math.Clamp(minA - maxB, 0.0, displacement),
+            < 0 when maxA <= minB && minB + displacement < maxA => Math.Clamp(maxA - minB, displacement, 0.0),
+            _ => displacement
         };
     }
 
@@ -103,7 +103,7 @@ internal static class CollisionUtils
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
     
-    private static bool IntersectsAxis(AABB a, AABB b, Axis axis)
+    public static bool IntersectsAxis(AABB a, AABB b, Axis axis)
     {
         var minA = GetBBMin(a, axis);
         var maxA = GetBBMax(a, axis);
@@ -111,14 +111,14 @@ internal static class CollisionUtils
         var minB = GetBBMin(b, axis);
         var maxB = GetBBMax(b, axis);
 
-        return minA >= minB && minA <= maxB
-               || maxA >= minB && maxA <= maxB
-               || minB >= minA && minB <= maxA
-               || maxB >= minA && maxB <= maxA
-               || minA == minA && maxA == maxB;
+        return minA > minB && minA < maxB
+               || maxA > minB && maxA < maxB
+               || minB > minA && minB < maxA
+               || maxB > minA && maxB < maxA
+               || minA == minB && maxA == maxB;
     }
 
-    private static Axis NextAxis(Axis axis)
+    public static Axis NextAxis(Axis axis)
     {
         return axis switch {
             Axis.XAxis => Axis.YAxis,
@@ -128,7 +128,7 @@ internal static class CollisionUtils
         };
     }
 
-    private static Axis PrevAxis(Axis axis)
+    public static Axis PrevAxis(Axis axis)
     {
         return axis switch {
             Axis.XAxis => Axis.ZAxis,

@@ -9,15 +9,30 @@ namespace MineSharp.Physics.Utils;
 
 internal static class WorldUtils
 {
+    public static AABB[] GetWorldBoundingBoxes(AABB bb, IWorld world, MinecraftData data)
+    {
+        var iterator = new BoundingBoxIterator(bb);
+
+        var blocks = iterator.Iterate()
+            .Select(world.GetBlockAt)
+            .Where(x => x.IsSolid()); // TODO: IsSolid() is not the same as in java
+
+        var bbs = new List<AABB>();
+        foreach (var block in blocks)
+        {
+            var shapes = data.BlockCollisionShapes.GetForBlock(block);
+            bbs.AddRange(shapes.Select(x => x.Offset(block.Position.X, block.Position.Y, block.Position.Z)));
+        }
+
+        return bbs.ToArray();
+    }
+    
     public static bool CollidesWithWorld(AABB bb, IWorld world, MinecraftData data)
     {
         var iterator = new BoundingBoxIterator(bb);
 
-        return iterator.Iterate()
-            .Select(world.GetBlockAt)
-            .Where(x => x.IsSolid()) // TODO: IsSolid() is not the same as in java
-            .Select(data.BlockCollisionShapes.GetForBlock)
-            .Any(x => x.Any(y => y.Intersects(bb)));
+        return GetWorldBoundingBoxes(bb, world, data)
+            .Any(y => y.Intersects(bb));
     }
     
     public static bool IsOnClimbable(MinecraftPlayer player, IWorld world, ref Vector3 lastClimbPosition)

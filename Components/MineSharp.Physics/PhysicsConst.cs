@@ -22,6 +22,7 @@ internal static class PhysicsConst
 
     public const string ATTR_MOVEMENT_SPEED = "generic.movement_speed";
     public const string SPRINTING_UUID = "662a6b8d-da3e-4c1c-8813-96ea6097278d";
+    public const double PLAYER_SPRINT_SPEED = 0.3d;
     public const double DEFAULT_PLAYER_SPEED = 0.1d;
     public const double FLYING_SPEED = 0.02f;
     public const double SPRINTING_FLYING_SPEED = 0.025999999F;
