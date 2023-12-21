@@ -150,8 +150,8 @@ public class PlayerPhysics
         if (isFalling && this.Player.Entity!.GetEffectLevel(EffectType.SlowFalling).HasValue)
             gravity = PhysicsConst.SLOW_FALLING_GRAVITY;
 
-        var dx = this.Player.Entity!.Velocity.X * 0.98f;
-        var dz = this.Player.Entity!.Velocity.Z * 0.98f;
+        var dx = this.movementInput.StrafeImpulse * 0.98f;
+        var dz = this.movementInput.ForwardImpulse * 0.98f;
         var block = this.World.GetBlockAt((Position)this.Player.Entity!.Position);
         // LivingEntity.java:2015
         // && !abilities.canFly
