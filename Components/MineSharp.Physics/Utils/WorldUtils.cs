@@ -29,8 +29,6 @@ internal static class WorldUtils
     
     public static bool CollidesWithWorld(AABB bb, IWorld world, MinecraftData data)
     {
-        var iterator = new BoundingBoxIterator(bb);
-
         return GetWorldBoundingBoxes(bb, world, data)
             .Any(y => y.Intersects(bb));
     }

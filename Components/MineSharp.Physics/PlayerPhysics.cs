@@ -29,6 +29,10 @@ public class PlayerPhysics
     private readonly Attribute speedAttribute;
     private readonly Modifier sprintingModifier;
     private readonly PlayerState state = new PlayerState();
+    
+    private static readonly Vector3[] XZAxisVectors = new[] {
+        Vector3.West, Vector3.East, Vector3.North, Vector3.South
+    };
 
     public PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
     {
@@ -316,7 +320,7 @@ public class PlayerPhysics
                 aabb);
             var vec32 = CheckBoundingBoxCollisions(
                 new Vector3(0.0, PhysicsConst.MAX_UP_STEP, 0.0), 
-                CollisionUtils.ExpandBoundingBox(aabb, vec.X, 0, vec.Z));
+                aabb.ExpandBoundingBox(vec.X, 0, vec.Z));
 
             if (vec32.Y < PhysicsConst.MAX_UP_STEP)
             {
@@ -325,11 +329,11 @@ public class PlayerPhysics
                         aabb.Clone().Offset(vec32.X, vec32.Y, vec32.Z))
                     .Plus(vec32);
 
-                if (CollisionUtils.HorizontalDistanceSquared(vec33) > CollisionUtils.HorizontalDistanceSquared(vec31))
+                if (vec33.HorizontalLengthSquared() > vec31.HorizontalLengthSquared())
                     vec31 = vec33;
             }
 
-            if (CollisionUtils.HorizontalDistanceSquared(vec31) > CollisionUtils.HorizontalDistanceSquared(vec3))
+            if (vec31.HorizontalLengthSquared() > vec3.HorizontalLengthSquared())
             {
                 vec31.Add(
                     CheckBoundingBoxCollisions(
@@ -379,7 +383,7 @@ public class PlayerPhysics
         
         if (mY != 0.0)
         {
-            mY = CalculateAxisOffset(CollisionUtils.Axis.YAxis, aabb, shapes, mY);
+            mY = CalculateAxisOffset(Axis.Y, aabb, shapes, mY);
             if (mY != 0.0)
                 aabb.Offset(0, mY, 0);
         }
@@ -387,34 +391,34 @@ public class PlayerPhysics
         var zDominant = Math.Abs(mX) < Math.Abs(mZ);
         if (zDominant && mZ != 0.0)
         {
-            mZ = CalculateAxisOffset(CollisionUtils.Axis.ZAxis, aabb, shapes, mZ);
+            mZ = CalculateAxisOffset(Axis.Z, aabb, shapes, mZ);
             if (mZ != 0.0)
                 aabb.Offset(0, 0, mZ);
         }
         
         if (mX != 0.0)
         {
-            mX = CalculateAxisOffset(CollisionUtils.Axis.XAxis, aabb, shapes, mX);
+            mX = CalculateAxisOffset(Axis.X, aabb, shapes, mX);
             if (mX != 0.0)
                 aabb.Offset(0, 0, mX);
         }
 
         if (!zDominant && mZ != 0.0)
         {
-            mZ = CalculateAxisOffset(CollisionUtils.Axis.ZAxis, aabb, shapes, mZ);
+            mZ = CalculateAxisOffset(Axis.Z, aabb, shapes, mZ);
         }
 
         return new Vector3(mX, mY, mZ);
     }
 
-    private double CalculateAxisOffset(CollisionUtils.Axis axis, AABB aabb, AABB[] shapes, double displacement)
+    private double CalculateAxisOffset(Axis axis, AABB aabb, AABB[] shapes, double displacement)
     {
         var value = displacement;
         if (value == 0.0 || Math.Abs(displacement) < 1.0E-7)
             return 0.0;
 
         foreach (var shape in shapes)
-            value = CollisionUtils.CalculateMaxOffset(shape, aabb, axis, value);
+            value = shape.CalculateMaxOffset(aabb, axis, value);
 
         return value;
     }
@@ -591,10 +595,10 @@ public class PlayerPhysics
         var diff = double.MaxValue;
         Vector3? direction = null;
 
-        foreach (var axis in CollisionUtils.XZAxisVectors)
+        foreach (var axis in XZAxisVectors)
         {
-            var coord = CollisionUtils.ChooseAxisCoordinate(axis, nX, 0.0, nZ);
-            coord = CollisionUtils.IsPositiveAxisVector(axis)
+            var coord = axis.ChooseValueForAxis(nX, 0.0, nZ);
+            coord = axis.IsPositiveAxisVector()
                 ? 1.0 - coord
                 : coord;
 
