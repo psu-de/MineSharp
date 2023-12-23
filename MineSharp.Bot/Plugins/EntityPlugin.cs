@@ -118,10 +118,9 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        entity.Velocity = new Vector3(
-            NetUtils.ConvertToVelocity(packet.VelocityX),
-            NetUtils.ConvertToVelocity(packet.VelocityY),
-            NetUtils.ConvertToVelocity(packet.VelocityZ));
+        entity.Velocity.X = NetUtils.ConvertToVelocity(packet.VelocityX);
+        entity.Velocity.Y = NetUtils.ConvertToVelocity(packet.VelocityY);
+        entity.Velocity.Z = NetUtils.ConvertToVelocity(packet.VelocityZ);
         
         return Task.CompletedTask;
     }
@@ -227,6 +226,7 @@ public class EntityPlugin : Plugin
             return;
 
         await this.WaitForInitialization();
+        Console.WriteLine($"Handle synchronize pos=({packet.X}, {packet.Y}, {packet.Z})");
         
         if ((packet.Flags & 0x01) == 0x01) 
             this._playerPlugin!.Entity!.Position.X += packet.X;

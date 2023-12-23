@@ -19,8 +19,8 @@ internal abstract class Axis
     {
         public static XAxis Instance = new ();
 
-        public override Axis Next { get; } = YAxis.Instance;
-        public override Axis Previous { get; } = ZAxis.Instance;
+        public override Axis Next => YAxis.Instance;
+        public override Axis Previous => ZAxis.Instance;
 
         public override double Choose(double x, double y, double z) => x;
         public override double GetBBMin(AABB aabb) => aabb.MinX;
@@ -32,8 +32,8 @@ internal abstract class Axis
         public static YAxis Instance = new ();
     
     
-        public override Axis Next { get; } = ZAxis.Instance;
-        public override Axis Previous { get; } = XAxis.Instance;
+        public override Axis Next => ZAxis.Instance;
+        public override Axis Previous => XAxis.Instance;
 
         public override double Choose(double x, double y, double z) => y;
         public override double GetBBMin(AABB aabb) => aabb.MinY;
@@ -45,8 +45,8 @@ internal abstract class Axis
         public static ZAxis Instance = new ();
     
     
-        public override Axis Next { get; } = XAxis.Instance;
-        public override Axis Previous { get; } = YAxis.Instance;
+        public override Axis Next => XAxis.Instance;
+        public override Axis Previous => YAxis.Instance;
 
         public override double Choose(double x, double y, double z) => z;
         public override double GetBBMin(AABB aabb) => aabb.MinZ;

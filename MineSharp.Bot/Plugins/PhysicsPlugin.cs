@@ -56,24 +56,27 @@ public class PhysicsPlugin : Plugin
     {
         if (!this.IsLoaded)
             return Task.CompletedTask;
-        
+
+        if (!this.playerPlugin!.IsAlive!.Value)
+            return Task.CompletedTask;
+
         _ = Task.Run(async () =>
         {
             try
             {
                 this.physics!.OnTick();
                 await this.UpdateServerPositionIfNeeded();
+                
+                if (this.PhysicsTick != null)
+                    await Task.Factory.FromAsync(
+                        (callback, obj) => this.PhysicsTick.BeginInvoke(this.Bot, callback, obj),
+                        this.PhysicsTick.EndInvoke,
+                        null);
             } catch (Exception e)
             {
                 Logger.Error(e.ToString());
             }
         });
-        
-        if (this.PhysicsTick != null)
-            return Task.Factory.FromAsync(
-                (callback, obj) => this.PhysicsTick.BeginInvoke(this.Bot, callback, obj),
-                this.PhysicsTick.EndInvoke,
-                null);
 
         return Task.CompletedTask;
     }
@@ -109,6 +112,7 @@ public class PhysicsPlugin : Plugin
         this.lastPlayerState.Pitch = this.Self!.Entity!.Pitch;
         this.lastPlayerState.OnGround = this.Self!.Entity!.IsOnGround;
 
+        Console.WriteLine($"Sending packet Pos={this.Self!.Entity.Position}");
         await this.Bot.Client.SendPacket(packet);
         
         if (BotMoved != null)

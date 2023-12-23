@@ -60,6 +60,7 @@ public class PlayerPhysics
 
     public void OnTick()
     {
+        Console.WriteLine($"Position={this.Player.Entity!.Position}, Velocity={this.Player.Entity!.Velocity}");
         if (GameMode.Spectator == this.Player.GameMode)
         {
             this.Player.Entity!.IsOnGround = false;
@@ -268,7 +269,9 @@ public class PlayerPhysics
         {
             vec.Multiply(this.state.StuckSpeedMultiplier);
             this.state.StuckSpeedMultiplier = Vector3.Zero;
-            this.Player.Entity!.Velocity = Vector3.Zero;
+            this.Player.Entity!.Velocity.X = 0;
+            this.Player.Entity!.Velocity.Y = 0;
+            this.Player.Entity!.Velocity.Z = 0;
         }
 
         this.MaybeBackOffFromEdge(ref vec);
@@ -278,7 +281,9 @@ public class PlayerPhysics
         if (length > 1.0E-7D)
         {
             // reset fall distance
+            Console.WriteLine($"Adding {vec3}");
             this.Player.Entity!.Position.Add(vec3);
+            Console.WriteLine($"Position now={this.Player.Entity!.Position}");
         }
 
         var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-5F;

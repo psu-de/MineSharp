@@ -9,10 +9,10 @@ public class Entity
     public readonly EntityInfo Info;
 
     public int ServerId { get; set; }
-    public Vector3 Position { get; set; }
+    public Vector3 Position { get; }
     public float Pitch { get; set; }
     public float Yaw { get; set; }
-    public Vector3 Velocity { get; set; }
+    public Vector3 Velocity { get; }
     public bool IsOnGround { get; set; }
     public IDictionary<EffectType, Effect?> Effects { get; }
     public IDictionary<string, Attribute> Attributes { get; }

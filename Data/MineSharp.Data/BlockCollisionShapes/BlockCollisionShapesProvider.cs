@@ -21,9 +21,13 @@ public class BlockCollisionShapesProvider
         => this._version.BlockToIndicesMap.TryGetValue(type, out indices);
 
     public AABB[] GetShapes(BlockType type, int index)
-        => this._version.BlockShapes[GetShapeIndices(type)[index]]
+    {
+        var shapes = GetShapeIndices(type);
+        var shape = shapes.Length > 1 ? shapes[index] : shapes[0];
+        return this._version.BlockShapes[shape]
             .Select(x => x.Clone())
-            .ToArray();
+            .ToArray();   
+    }
 
     public AABB[] GetForBlock(Block block)
         => GetShapes(block.Info.Type, block.Metadata);
