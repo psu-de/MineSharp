@@ -28,7 +28,7 @@ public class MaterialGenerator : IGenerator
         
         VersionMapGenerator.GetInstance().RegisterVersion("materials", version, path);
 
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Materials\\Versions");
+        var outdir = DirectoryUtils.GetDataSourceDirectory(Path.Join("Materials", "Versions"));
         var materials = await wrapper.GetMaterials(version);
         var items = (JArray)await wrapper.GetItems(version)!;
 

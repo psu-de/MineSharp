@@ -29,7 +29,7 @@ public class BlockCollisionShapesGenerator : IGenerator
         
         VersionMapGenerator.GetInstance().RegisterVersion("blockCollisionShapes", version, path);
         
-        var outdir = DirectoryUtils.GetDataSourceDirectory("BlockCollisionShapes\\Versions");
+        var outdir = DirectoryUtils.GetDataSourceDirectory(Path.Join("BlockCollisionShapes", "Versions"));
         var v = path.Replace("pc/", "").Replace(".", "_");
         var blockCollisionShapes = await wrapper.GetBlockCollisionShapes(version);
 

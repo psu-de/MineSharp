@@ -59,7 +59,7 @@ public class ProtocolGenerator : IGenerator
         VersionMapGenerator.GetInstance().RegisterVersion("protocol", version, path);
         
         var v = version.Replace(".", "_");
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Protocol\\Versions");
+        var outdir = DirectoryUtils.GetDataSourceDirectory(Path.Join("Protocol", "Versions"));
         var protocol = await wrapper.GetProtocol(version);
         
         var writer = new CodeWriter();

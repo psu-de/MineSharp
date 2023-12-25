@@ -35,7 +35,7 @@ public abstract class CommonGenerator : IGenerator
         }
         versionMap.RegisterVersion(this.DataKey, version, path);
 
-        var outdir = DirectoryUtils.GetDataSourceDirectory($"{this.Namespace}\\Versions");
+        var outdir = DirectoryUtils.GetDataSourceDirectory(Path.Join(this.Namespace, "Versions"));
         var v = path.Replace("pc/", "").Replace(".", "_");
         var data = await wrapper.Parse(version, this.DataKey);
         
@@ -57,7 +57,7 @@ public abstract class CommonGenerator : IGenerator
 
     private async Task GenerateTypeEnum(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory($"Common\\{this.Namespace}");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", this.Namespace));
         var data = await wrapper.Parse(Config.LatestVersion, this.DataKey);
 
         var values = this.GetProperties(data)

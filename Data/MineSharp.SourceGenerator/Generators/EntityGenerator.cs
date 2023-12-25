@@ -41,7 +41,7 @@ public class EntityGenerator : CommonGenerator
     
     protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Entities");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", "Entities"));
         var entities = await wrapper.GetEntities(Config.LatestVersion);
 
         var entityCategories = new HashSet<string>();

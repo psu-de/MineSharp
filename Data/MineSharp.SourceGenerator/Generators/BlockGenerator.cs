@@ -30,7 +30,7 @@ public class BlockGenerator : CommonGenerator
 
     protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Blocks");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", "Blocks"));
         var blocks = await wrapper.GetBlocks(Config.LatestVersion);
 
         var materials = new HashSet<string>();

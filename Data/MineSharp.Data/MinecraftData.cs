@@ -11,6 +11,7 @@ using MineSharp.Data.Effects;
 using MineSharp.Data.Enchantments;
 using MineSharp.Data.Entities;
 using MineSharp.Data.Items;
+using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
@@ -31,6 +32,7 @@ public class MinecraftData
     public MaterialsProvider Materials { get; }
     public RecipeProvider Recipes { get; }
     public WindowData Windows { get; } = new WindowData();
+    public LanguageProvider Language { get; }
     public MinecraftVersion Version { get; }
 
     private MinecraftData(
@@ -44,6 +46,7 @@ public class MinecraftData
         ProtocolProvider protocol,
         MaterialsProvider materials,
         RecipeProvider recipes,
+        LanguageProvider language,
         MinecraftVersion version)
     {
         this.Biomes = biomes;
@@ -56,6 +59,7 @@ public class MinecraftData
         this.Protocol = protocol;
         this.Materials = materials;
         this.Recipes = recipes;
+        this.Language = language;
         this.Version = version;
     }
 
@@ -71,6 +75,7 @@ public class MinecraftData
         var protocolType = GetClassType(VersionMap.Protocol[version]);
         var materialType = GetClassType(VersionMap.Materials[version]);
         var recipeType = GetClassType(VersionMap.Recipes[version]);
+        var languageType = GetClassType(VersionMap.Language[version]);
 
         var biomes = new BiomeProvider(
             (DataVersion<BiomeType, BiomeInfo>)Activator.CreateInstance(biomeType)!);
@@ -92,6 +97,8 @@ public class MinecraftData
             (ProtocolVersion)Activator.CreateInstance(protocolType)!);
         var recipes = new RecipeProvider(
             (RecipeData)Activator.CreateInstance(recipeType)!);
+        var language = new LanguageProvider(
+            (LanguageVersion)Activator.CreateInstance(languageType)!);
 
         return new MinecraftData(
             biomes,
@@ -104,6 +111,7 @@ public class MinecraftData
             protocol,
             materials,
             recipes,
+            language,
             VersionMap.Versions[version]);
     }
 

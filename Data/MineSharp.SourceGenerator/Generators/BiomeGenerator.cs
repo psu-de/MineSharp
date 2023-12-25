@@ -16,7 +16,7 @@ public class BiomeGenerator : CommonGenerator
 
     private async Task GenerateEnum(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Biomes");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", "Biomes"));
         var biomes = await wrapper.GetBiomes(Config.LatestVersion);
         var biomeCategories = new HashSet<string>();
 
@@ -37,7 +37,7 @@ public class BiomeGenerator : CommonGenerator
 
     protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Biomes");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", "Biomes"));
         var biomes = await wrapper.GetBiomes(Config.LatestVersion);
 
         var biomeCategories = new HashSet<string>();

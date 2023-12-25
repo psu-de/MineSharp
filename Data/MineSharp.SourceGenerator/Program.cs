@@ -17,6 +17,7 @@ var generators = new IGenerator[] {
     new ProtocolGenerator(),
     new MaterialGenerator(),
     new RecipeGenerator(),
+    new LanguageGenerator(),
     
     VersionMapGenerator.GetInstance()
 };

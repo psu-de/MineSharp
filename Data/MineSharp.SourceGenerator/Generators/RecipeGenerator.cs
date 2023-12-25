@@ -27,7 +27,7 @@ public class RecipeGenerator : IGenerator
         
         VersionMapGenerator.GetInstance().RegisterVersion("recipes", version, path);
         
-        var outdir = DirectoryUtils.GetDataSourceDirectory("Recipes\\Versions");
+        var outdir = DirectoryUtils.GetDataSourceDirectory(Path.Join("Recipes", "Versions"));
 
         var data = await wrapper.Parse(version, "recipes");
         var items = await wrapper.Parse(version, "items");

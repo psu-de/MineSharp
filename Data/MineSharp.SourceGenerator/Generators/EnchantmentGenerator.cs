@@ -15,7 +15,7 @@ public class EnchantmentGenerator : CommonGenerator
     
     protected override async Task WriteAdditionalItems(MinecraftDataWrapper wrapper)
     {
-        var outdir = DirectoryUtils.GetCoreSourceDirectory("Common\\Enchantments");
+        var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", "Enchantments"));
         var enchantments = await wrapper.GetEnchantments(Config.LatestVersion);
         var enchantmentCategories = new HashSet<string>();
 
