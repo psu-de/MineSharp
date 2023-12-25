@@ -80,11 +80,15 @@ public class PlayerPhysics
     private void MovementTick()
     {
         // TODO: Fix differences with java: MovementTick()
-        
+
+        var crouchedBefore = this.state.IsCrouching;
         this.state.IsCrouching = !PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data)
                               && this.movementInput.Controls.SneakingKeyDown // Swimming, Sleeping, Vehicle, Flying ; LocalPlayer.java:631
                               || PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Standing, this.World, this.Data);
-        
+
+        if (this.state.IsCrouching != crouchedBefore)
+            Task.Run(() => this.OnCrouchingChanged?.Invoke(this, this.state.IsCrouching));
+
         var crouchSpeedFactor = (float)Math.Clamp(0.3f + 0.0, 0.0f, 1.0f); // Enchantment Soul Speed factor
         this.movementInput.Tick(this.state.IsCrouching, crouchSpeedFactor); // not only forceCrouching, but also swimming LocalPlayer.java:633
         
