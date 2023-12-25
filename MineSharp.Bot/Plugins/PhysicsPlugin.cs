@@ -112,7 +112,6 @@ public class PhysicsPlugin : Plugin
         this.lastPlayerState.Pitch = this.Self!.Entity!.Pitch;
         this.lastPlayerState.OnGround = this.Self!.Entity!.IsOnGround;
 
-        Console.WriteLine($"Sending packet Pos={this.Self!.Entity.Position}");
         await this.Bot.Client.SendPacket(packet);
         
         if (BotMoved != null)

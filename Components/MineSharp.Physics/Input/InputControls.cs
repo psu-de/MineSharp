@@ -5,12 +5,12 @@ public class InputControls
     /// <summary>
     /// Whether the 'up' key is down (default W key)
     /// </summary>
-    public bool UpKeyDown { get; set; }
+    public bool ForwardKeyDown { get; set; }
     
     /// <summary>
     /// Whether the 'down' key is down (default S key)
     /// </summary>
-    public bool DownKeyDown { get; set; }
+    public bool BackwardKeyDown { get; set; }
     
     /// <summary>
     /// Whether the 'left' key is down (default A key)

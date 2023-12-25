@@ -15,7 +15,7 @@ public class MovementInput(InputControls controls)
         else if (!this.JumpedThisTick)
             this.JumpedThisTick = true;
         
-        this.ForwardImpulse = CalculateImpulse(this.Controls.UpKeyDown, this.Controls.DownKeyDown);
+        this.ForwardImpulse = CalculateImpulse(this.Controls.ForwardKeyDown, this.Controls.BackwardKeyDown);
         this.StrafeImpulse = CalculateImpulse(this.Controls.LeftKeyDown, this.Controls.RightKeyDown);
         
         if (!slow)

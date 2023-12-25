@@ -60,7 +60,6 @@ public class PlayerPhysics
 
     public void OnTick()
     {
-        Console.WriteLine($"Position={this.Player.Entity!.Position}, Velocity={this.Player.Entity!.Velocity}");
         if (GameMode.Spectator == this.Player.GameMode)
         {
             this.Player.Entity!.IsOnGround = false;
@@ -184,7 +183,7 @@ public class PlayerPhysics
         var frictionInfluencedSpeed = this.Player.Entity.IsOnGround 
             ? this.speedAttribute.Value * (0.21600002f / Math.Pow(speedFactor, 3))
             : this.state.IsSprinting ? PhysicsConst.SPRINTING_FLYING_SPEED : PhysicsConst.FLYING_SPEED;
-        this.MoveRelative(moveVector, (float)frictionInfluencedSpeed, this.Player.Entity.Pitch);
+        this.MoveRelative(moveVector, (float)frictionInfluencedSpeed, this.Player.Entity.Yaw);
 
         this.CheckClimbable();
         this.Move();
@@ -281,9 +280,7 @@ public class PlayerPhysics
         if (length > 1.0E-7D)
         {
             // reset fall distance
-            Console.WriteLine($"Adding {vec3}");
             this.Player.Entity!.Position.Add(vec3);
-            Console.WriteLine($"Position now={this.Player.Entity!.Position}");
         }
 
         var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-5F;
@@ -481,19 +478,19 @@ public class PlayerPhysics
     private void MoveRelative(Vector3 vec, float scale, float pitch)
     {
         var length = vec.LengthSquared();
-        var move = Vector3.Zero;
-        if (length >= 1.0E-7D)
-        {
-            if (length > 1.0)
-                vec.Normalized();
-            vec.Scale(scale);
-
-            var sin = MathF.Sin(pitch * (MathF.PI / 180.0F));
-            var cos = MathF.Cos(pitch * (MathF.PI / 180.0F));
-            move = new Vector3(vec.X * cos - vec.Z * sin, vec.Y, vec.Z * cos + vec.X * sin);
-        }
+        if (length < 1.0E-7D) 
+            return;
         
-        this.Player.Entity!.Velocity.Add(move);
+        if (length > 1.0)
+            vec.Normalized();
+        
+        vec.Scale(scale);
+
+        var sin = MathF.Sin(pitch * (MathF.PI / 180.0F));
+        var cos = MathF.Cos(pitch * (MathF.PI / 180.0F));
+        this.Player.Entity!.Velocity.X += vec.X * cos - vec.Z * sin;
+        this.Player.Entity!.Velocity.Y += vec.Y;
+        this.Player.Entity!.Velocity.Z += vec.Z * cos + vec.X * sin;
     }
 
     private void TryJumping()

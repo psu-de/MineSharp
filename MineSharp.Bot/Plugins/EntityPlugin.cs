@@ -226,7 +226,6 @@ public class EntityPlugin : Plugin
             return;
 
         await this.WaitForInitialization();
-        Console.WriteLine($"Handle synchronize pos=({packet.X}, {packet.Y}, {packet.Z})");
         
         if ((packet.Flags & 0x01) == 0x01) 
             this._playerPlugin!.Entity!.Position.X += packet.X;
