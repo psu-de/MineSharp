@@ -1,4 +1,5 @@
 using MineSharp.Bot.Chat;
+using MineSharp.Chat;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
@@ -12,9 +13,9 @@ public static class Events
 
     public delegate void BotStringEvent(MinecraftBot sender, string message);
 
-    public delegate void BotChatEvent(MinecraftBot sender, Core.Common.Chat message);
+    public delegate void BotChatEvent(MinecraftBot sender, ChatComponent message);
 
-    public delegate void BotChatMessageEvent(MinecraftBot sender, UUID? player, string message, ChatMessageType chatPosition, string? senderName);
+    public delegate void BotChatMessageEvent(MinecraftBot sender, UUID? player, ChatComponent message, ChatMessageType chatPosition, string? senderName);
 
     public delegate void EntityEvent(MinecraftBot sender, Entity entity);
     

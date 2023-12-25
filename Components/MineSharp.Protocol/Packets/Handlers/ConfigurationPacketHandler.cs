@@ -49,7 +49,7 @@ public class ConfigurationPacketHandler : IPacketHandler
     
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.JSON));
+        _ = Task.Run(() => this._client.Disconnect(packet.Reason.Json));
         return Task.CompletedTask;
     }
 

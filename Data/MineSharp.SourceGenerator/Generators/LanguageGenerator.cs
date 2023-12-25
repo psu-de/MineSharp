@@ -38,10 +38,10 @@ public class LanguageGenerator : IGenerator
         writer.WriteLine("namespace MineSharp.Data.Language.Versions;");
         writer.WriteLine();
         writer.Begin($"internal class Language_{v} : LanguageVersion");
-        writer.Begin("public override Dictionary<string. string> Translations { get; } = new()");
+        writer.Begin("public override Dictionary<string, string> Translations { get; } = new()");
         foreach (var prop in ((JObject)language).Properties())
         {
-            writer.WriteLine($"{{ {Str.String(prop.Name)}, {Str.String((string)prop.Value!)} }},");
+            writer.WriteLine($"{{ {Str.String(prop.Name)}, {Str.String(Sanitize((string)prop.Value!))} }},");
         }
 
         writer.Finish(semicolon: true);
@@ -49,5 +49,12 @@ public class LanguageGenerator : IGenerator
         
         await File.WriteAllTextAsync(
             Path.Join(outdir, $"Language_{v}.cs"), writer.ToString());
+    }
+
+    private static string Sanitize(string msg)
+    {
+        return msg.Replace("\\", "\\\\")
+            .Replace("\n", "\\n")
+            .Replace("\"", "\\\"");
     }
 }

@@ -1,3 +1,4 @@
+using MineSharp.Chat;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -8,21 +9,21 @@ public class DisconnectPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Configuration_Disconnect;
 
-    public Chat Reason { get; set; }
+    public ChatComponent Reason { get; set; }
 
-    public DisconnectPacket(Chat reason)
+    public DisconnectPacket(ChatComponent reason)
     {
         this.Reason = reason;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Reason.JSON);
+        buffer.WriteString(this.Reason.Json);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         string reason = buffer.ReadString();
-        return new DisconnectPacket(new Chat(reason));
+        return new DisconnectPacket(new ChatComponent(reason, version));
     }
 }

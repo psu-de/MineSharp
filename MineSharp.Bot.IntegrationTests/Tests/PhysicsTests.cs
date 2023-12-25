@@ -1,4 +1,5 @@
 using MineSharp.Bot.Plugins;
+using MineSharp.Chat;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -115,10 +116,9 @@ public static class PhysicsTests
     {
         var chat = bot.GetPlugin<ChatPlugin>();
 
-        chat.OnChatMessageReceived += (sender, player, message, position, name) =>
+        chat.OnChatMessageReceived += (sender, player, chatComponent, position, name) =>
         {
-            var msg = new Core.Common.Chat(message);
-            if (msg.Message == expectedMessage)
+            if (chatComponent.Message == expectedMessage)
                 source.TrySetResult(true);
         };
     }

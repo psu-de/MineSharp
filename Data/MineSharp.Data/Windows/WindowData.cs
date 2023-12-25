@@ -5,7 +5,7 @@ namespace MineSharp.Data.Windows;
 public class WindowData
 {
     private static IDictionary<string, WindowInfo> _windowMaps = new Dictionary<string, WindowInfo>();
-    private static IList<WindowInfo> _windows = new List<WindowInfo>();
+    private static List<WindowInfo> _windows = new List<WindowInfo>();
     private static IList<BlockType> _allowedBlocksToOpen = new List<BlockType>() {
         BlockType.Chest,
         BlockType.TrappedChest,
@@ -74,7 +74,7 @@ public class WindowData
 
 
     public IList<BlockType> AllowedBlocksToOpen => _allowedBlocksToOpen;
-    public IList<WindowInfo> Windows => _windows;
+    public List<WindowInfo> Windows => _windows;
     public IDictionary<string, WindowInfo> WindowMap => _windowMaps;
 
     private static void Register(WindowInfo info)

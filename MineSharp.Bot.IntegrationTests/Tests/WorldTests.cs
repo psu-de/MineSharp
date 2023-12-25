@@ -3,6 +3,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Chat;
+using MineSharp.Chat;
 using MineSharp.Core.Common.Blocks;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
@@ -69,12 +70,11 @@ public static class WorldTests
             var position = new Position(-8, -59, 20);
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
             
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
 
-                var chat = new MineSharp.Core.Common.Chat(message);
                 if (chat.Message == "testMineBlock success")
                 {
                     source.TrySetResult(true);
@@ -102,12 +102,11 @@ public static class WorldTests
             await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
             await bot.GetPlugin<ChatPlugin>().SendChat("/give @p dirt");
             
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, message, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
                 if (type != ChatMessageType.GameInfo)
                     return;
 
-                var chat = new MineSharp.Core.Common.Chat(message);
                 if (chat.Message == "testPlaceBlock success")
                 {
                     source.TrySetResult(true);
