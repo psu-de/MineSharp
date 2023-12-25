@@ -160,6 +160,7 @@ internal static class PacketPalette
         RegisterPacket<SwingArmPacket>(PacketType.SB_Play_ArmAnimation);
         RegisterPacket<InteractPacket>(PacketType.SB_Play_UseItem);
         RegisterPacket<SBCloseWindowPacket>(PacketType.SB_Play_CloseWindow);
+        RegisterPacket<EntityActionPacket>(PacketType.SB_Play_EntityAction);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

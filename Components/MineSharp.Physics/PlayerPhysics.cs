@@ -298,6 +298,7 @@ public class PlayerPhysics
             else
                 this.Player.Entity.Velocity.Z = 0.0;
         }
+        else this.state.MinorHorizontalCollision = false;
 
         if (this.state.VerticalCollision)
         {
@@ -568,8 +569,7 @@ public class PlayerPhysics
         {
             var cannotSprint = !this.movementInput.HasForwardImpulse(); // || hasEnoughFoodToStartSprinting()
             var stopSprinting = cannotSprint 
-                                || this.state.HorizontalCollision 
-                                || !this.state.MinorHorizontalCollision 
+                                || this.state.HorizontalCollision && !this.state.MinorHorizontalCollision 
                                 || this.state.WasTouchingWater && !this.state.WasUnderwater;
             
             // isSwimming() LocalPlayer.java:676

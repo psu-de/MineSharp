@@ -50,6 +50,8 @@ public class PhysicsPlugin : Plugin
         await this.UpdateServerPos();
 
         this.physics = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
+        this.physics.OnCrouchingChanged += OnSneakingChanged;
+        this.physics.OnSprintingChanged += OnSprintingChanged;
     }
     
     public override Task OnTick()
@@ -146,6 +148,30 @@ public class PhysicsPlugin : Plugin
         this.ForceSetRotation((float)yaw, (float)pitch);
     }
 
+    private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)
+    {
+        var packet = new EntityActionPacket(
+            this.playerPlugin!.Self!.Entity!.ServerId,
+            isSneaking
+                ? EntityActionPacket.EntityAction.StartSneaking
+                : EntityActionPacket.EntityAction.StopSneaking,
+            0);
+
+        this.Bot.Client.SendPacket(packet);
+    }
+
+    private void OnSprintingChanged(PlayerPhysics sender, bool isSprinting)
+    {
+        var packet = new EntityActionPacket(
+            this.playerPlugin!.Self!.Entity!.ServerId,
+            isSprinting
+                ? EntityActionPacket.EntityAction.StartSprinting
+                : EntityActionPacket.EntityAction.StopSprinting,
+            0);
+
+        this.Bot.Client.SendPacket(packet);
+    }
+    
     private record PlayerState
     {
         public double X { get; set; }
