@@ -7,15 +7,16 @@ namespace MineSharp.Core.Common.Entities;
 public class Entity
 {
     public readonly EntityInfo Info;
-    
-    public int ServerId { get; set;}
-    public Vector3 Position { get; set; }
+
+    public int ServerId { get; set; }
+    public Vector3 Position { get; }
     public float Pitch { get; set; }
     public float Yaw { get; set; }
-    public Vector3 Velocity { get; set; }
+    public Vector3 Velocity { get; }
     public bool IsOnGround { get; set; }
-    public IDictionary<EffectType, Effect?> Effects { get; set; }
-    public IDictionary<string, Attribute> Attributes { get; set; }
+    public IDictionary<EffectType, Effect?> Effects { get; }
+    public IDictionary<string, Attribute> Attributes { get; }
+    public Entity? Vehicle { get; set; }
 
 
     public Entity(EntityInfo info, int serverId, Vector3 position, float pitch, float yaw, Vector3 velocity, bool isOnGround, Dictionary<EffectType, Effect?> effects)
@@ -29,8 +30,20 @@ public class Entity
         this.IsOnGround = isOnGround;
         this.Effects = effects;
         this.Attributes = new ConcurrentDictionary<string, Attribute>();
+        this.Vehicle = null;
     }
-    
+
+    public Attribute? GetAttribute(string name)
+    {
+        this.Attributes.TryGetValue(name, out var attr);
+        return attr;
+    }
+
+    public void AddAttribute(Attribute attribute)
+    {
+        this.Attributes.Add(attribute.Key, attribute);
+    }
+
     public int? GetEffectLevel(EffectType effectType)
     {
 
@@ -44,4 +57,18 @@ public class Entity
 
     public override string ToString()
         => $"Entity(Info={this.Info}, Position={Position})";
+
+    public AABB GetBoundingBox()
+    {
+        var half = this.Info.Width / 2.0f;
+        var height = this.Info.Height;
+        
+        return new AABB(
+            this.Position.X - half,
+            this.Position.Y,
+            this.Position.Z - half,
+            this.Position.X + half,
+            this.Position.Y + height,
+            this.Position.Z + half);
+    }
 }

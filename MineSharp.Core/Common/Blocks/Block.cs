@@ -16,12 +16,15 @@ public class Block
         this.Position = position;
     }
 
-    public T GetProperty<T>(string name) where T : struct
+    public T GetProperty<T>(string name)
         => this.Info.State.GetPropertyValue<T>(name, this.State);
 
 
     public bool IsSolid()
         => this.Info.IsSolid();
+
+    public bool IsFluid()
+        => this.Info.IsFluid();
 
     public bool CanBeHarvestedBy(ItemType? item)
         => this.Info.HarvestTools == null 

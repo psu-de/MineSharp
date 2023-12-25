@@ -11,7 +11,7 @@ public class BlockState
         this._properties = properties;
     }
     
-    public T GetPropertyValue<T>(string name, int state) where T : struct
+    public T GetPropertyValue<T>(string name, int state)
     {
         for (int i = this._properties.Length - 1; i >= 0; i--)
         {

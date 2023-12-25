@@ -140,7 +140,8 @@ public class MinecraftBot
             new PlayerPlugin(bot),
             new WindowPlugin(bot),
             new WorldPlugin(bot),
-            new CraftingPlugin(bot)
+            new CraftingPlugin(bot),
+            new PhysicsPlugin(bot)
         };
 
         foreach (var plugin in defaultPlugins)

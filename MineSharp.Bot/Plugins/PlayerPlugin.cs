@@ -1,3 +1,4 @@
+using MineSharp.Bot.Utils;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
@@ -6,6 +7,7 @@ using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -161,7 +163,8 @@ public class PlayerPlugin : Plugin
             this.Bot.Session.UUID,
             0,
             (GameMode)loginPacket.GameMode,
-            entity);
+            entity,
+            this.ParseDimension(loginPacket.DimensionName));
 
         this.PlayerMap.TryAdd(entity.ServerId, this.Self);
 
@@ -248,6 +251,8 @@ public class PlayerPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
+
+        this.Self!.Dimension = this.ParseDimension(packet.Dimension);
         
         this.OnRespawned?.Invoke(this.Bot);
         return Task.CompletedTask;
@@ -271,8 +276,8 @@ public class PlayerPlugin : Plugin
                 packet.X,
                 packet.Y,
                 packet.Z),
-            packet.Pitch,
-            packet.Yaw,
+            NetUtils.FromAngleByte((sbyte)packet.Pitch),
+            NetUtils.FromAngleByte((sbyte)packet.Yaw),
             Vector3.Zero,
             true,
             new Dictionary<EffectType, Effect?>());
@@ -302,7 +307,7 @@ public class PlayerPlugin : Plugin
                             break;
                         }
 
-                        var newPlayer = new MinecraftPlayer(addAction.Name, entry.Player, -1, GameMode.Survival, null);
+                        var newPlayer = new MinecraftPlayer(addAction.Name, entry.Player, -1, GameMode.Survival, null, Core.Common.Dimension.Overworld);
                         this.Players.TryAdd(entry.Player, newPlayer);
                         this.OnPlayerJoined?.Invoke(this.Bot, newPlayer);
                         break;
@@ -435,5 +440,16 @@ public class PlayerPlugin : Plugin
         
         var permissionLevel = (PermissionLevel)(packet.Status - 24);
         player.PermissionLevel = permissionLevel;
+    }
+
+
+    private Dimension ParseDimension(string dimensionName)
+    {
+        return dimensionName switch {
+            "minecraft:overworld" => Core.Common.Dimension.Overworld,
+            "minecraft:the_nether" => Core.Common.Dimension.Nether,
+            "minecraft:the_end" => Core.Common.Dimension.End,
+            _ => throw new UnreachableException()
+        };
     }
 }

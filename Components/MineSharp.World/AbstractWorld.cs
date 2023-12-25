@@ -27,10 +27,13 @@ public abstract class AbstractWorld : IWorld
         = new ConcurrentDictionary<ChunkCoordinates, IChunk>();
 
     public readonly MinecraftData Data;
+    
+    private readonly BlockInfo OutOfMapBlock;
 
     protected AbstractWorld(MinecraftData data)
     {
         this.Data = data;
+        this.OutOfMapBlock = data.Blocks.GetByType(BlockType.Air);
     }
     
     [Pure]
@@ -115,6 +118,9 @@ public abstract class AbstractWorld : IWorld
 
     public Block GetBlockAt(Position position)
     {
+        if (IsOutOfMap(position))
+            return new Block(OutOfMapBlock, OutOfMapBlock.DefaultState, position);
+        
         if (!IsBlockLoaded(position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Block at {position} is not loaded.");

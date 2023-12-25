@@ -14,9 +14,9 @@ public class EnumProperty : IBlockProperty
         this.StateCount = this._acceptedValues.Length;
     }
     
-    public T GetValue<T>(int state) where T : struct
+    public T GetValue<T>(int state)
     {
-        if (!typeof(T).IsEnum)
+        if (typeof(T) != typeof(string))
         {
             throw new NotSupportedException("This is property can only be an enum.");
         }
@@ -26,6 +26,6 @@ public class EnumProperty : IBlockProperty
             throw new IndexOutOfRangeException($"State {state} is out of range for property with {this.StateCount} entries.");
         }
 
-        return Enum.Parse<T>(this._acceptedValues[state]);
+        return (T)(object)this._acceptedValues[state];
     }
 }

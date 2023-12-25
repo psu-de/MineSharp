@@ -1,4 +1,5 @@
-﻿using MineSharp.Auth;
+﻿using System.Collections.Concurrent;
+using MineSharp.Auth;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
@@ -30,7 +31,7 @@ public sealed class MinecraftClient : IDisposable
     private readonly TcpClient _client;
 
     private readonly Queue<(PacketType, PacketBuffer)> _bundledPackets;
-    private readonly Queue<PacketSendTask> _packetQueue;
+    private readonly ConcurrentQueue<PacketSendTask> _packetQueue;
     private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> _packetHandlers;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> _packetWaiters;
     private readonly TaskCompletionSource _gameJoinedTsc;
@@ -62,7 +63,7 @@ public sealed class MinecraftClient : IDisposable
     {
         this._data = data;
         this._client = new TcpClient();
-        this._packetQueue = new Queue<PacketSendTask>();
+        this._packetQueue = new ConcurrentQueue<PacketSendTask>();
         this._cancellation = new CancellationTokenSource();
         this._internalPacketHandler = new HandshakePacketHandler(this);
         this._packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
@@ -270,10 +271,8 @@ public sealed class MinecraftClient : IDisposable
 
     private async Task SendPackets()
     {
-        if (this._packetQueue.Count == 0)
+        if (!this._packetQueue.TryDequeue(out var task))
             return;
-
-        var task = this._packetQueue.Dequeue();
 
         if (task.Token is { IsCancellationRequested: true })
             return;

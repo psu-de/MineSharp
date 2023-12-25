@@ -48,7 +48,7 @@ public class WorldPlugin : Plugin
         var player = this.Bot.GetPlugin<PlayerPlugin>();
         await player.WaitForInitialization();
 
-        var chunkCoords = this.World!.ToChunkCoordinates(player.Entity!.Position);
+        var chunkCoords = this.World!.ToChunkCoordinates((Position)player.Entity!.Position);
         for (int x = chunkCoords.X - radius; x <= chunkCoords.X + radius; x++)
         {
             for (int z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
@@ -81,7 +81,7 @@ public class WorldPlugin : Plugin
         if (!block.Info.Diggable)
             return MineBlockStatus.NotDiggable;
 
-        if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo((Vector3)block.Position))
+        if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo(block.Position))
             return MineBlockStatus.TooFar;
         
         if (!this.World!.IsBlockLoaded(block.Position))

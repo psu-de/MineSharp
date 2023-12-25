@@ -24,6 +24,13 @@ public class Position
         this.Z = z;
     }
 
+    public Position(double x, double y, double z)
+    {
+        this.X = (int)Math.Floor(x);
+        this.Y = (int)Math.Floor(y);
+        this.Z = (int)Math.Floor(z);
+    }
+
     public static bool operator ==(Position a, Position b)
     {
         return a.ToULong() == b.ToULong();

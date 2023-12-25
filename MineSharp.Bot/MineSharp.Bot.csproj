@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Components\MineSharp.Commands\MineSharp.Commands.csproj" />
+      <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj" />
       <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
       <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
       <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
