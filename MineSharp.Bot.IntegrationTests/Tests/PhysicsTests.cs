@@ -12,6 +12,8 @@ public static class PhysicsTests
         await TestWalkRight();
         await TestWalkLeft();
         await TestWaterPushing();
+        await TestJump();
+        await TestCrouch();
     }
 
     public static Task TestGravity()
@@ -78,6 +80,34 @@ public static class PhysicsTests
         {
             ExpectChatMessage(bot, source, "testWaterPushing success");
             return Task.CompletedTask;
+        });
+    }
+
+    public static Task TestJump()
+    {
+        return IntegrationTest.RunTest("testJump", async (bot, source) =>
+        {
+            ExpectChatMessage(bot, source, "testJump success");
+            var physics = bot.GetPlugin<PhysicsPlugin>();
+
+            await Task.Delay(1000);
+
+            physics.InputControls.ForwardKeyDown = true;
+            physics.InputControls.JumpingKeyDown = true;
+        });
+    }
+    
+    public static Task TestCrouch()
+    {
+        return IntegrationTest.RunTest("testCrouch", async (bot, source) =>
+        {
+            ExpectChatMessage(bot, source, "testCrouch success");
+            var physics = bot.GetPlugin<PhysicsPlugin>();
+
+            await Task.Delay(1000);
+
+            physics.InputControls.ForwardKeyDown = true;
+            physics.InputControls.SneakingKeyDown = true;
         });
     }
 
