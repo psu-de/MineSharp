@@ -19,6 +19,7 @@ public class PlayPacketHandler : IPacketHandler
     {
         return packet switch {
             KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
+            BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             _ => Task.CompletedTask
         };
     }
@@ -29,11 +30,17 @@ public class PlayPacketHandler : IPacketHandler
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Play_KeepAlive; 
+        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter; 
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
         this._client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
+        return Task.CompletedTask;
+    }
+
+    public Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
+    {
+        this._client.HandleBundleDelimiter();
         return Task.CompletedTask;
     }
 }

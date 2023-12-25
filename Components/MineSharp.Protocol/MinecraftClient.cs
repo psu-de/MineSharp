@@ -30,11 +30,13 @@ public sealed class MinecraftClient : IDisposable
     private readonly CancellationTokenSource _cancellation;
     private readonly TcpClient _client;
 
+    private readonly Queue<(PacketType, PacketBuffer)> _bundledPackets;
     private readonly ConcurrentQueue<PacketSendTask> _packetQueue;
     private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> _packetHandlers;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> _packetWaiters;
     private readonly TaskCompletionSource _gameJoinedTsc;
 
+    private bool _bundlePackets;
     private IPacketHandler _internalPacketHandler;
     private MinecraftStream? _stream;
     private Task? _streamLoop;
@@ -67,6 +69,7 @@ public sealed class MinecraftClient : IDisposable
         this._packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
         this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc = new TaskCompletionSource();
+        this._bundledPackets = new Queue<(PacketType, PacketBuffer)>();
 
         this.Session = session;
         this.IP = IPHelper.ResolveHostname(hostnameOrIp);
@@ -200,6 +203,32 @@ public sealed class MinecraftClient : IDisposable
     
     internal void SetCompression(int threshold) 
         => this._stream!.SetCompression(threshold);
+
+    internal void HandleBundleDelimiter()
+    {
+        this._bundlePackets = !this._bundlePackets;
+        if (!this._bundlePackets)
+        {
+            Logger.Debug("Processing bundled packets");
+            var tasks = this._bundledPackets.Select(
+                    p => this.HandleIncomingPacket(p.Item1, p.Item2))
+                .ToArray();
+
+            Task.WaitAll(tasks);
+
+            var errors = tasks.Where(x => x.Exception != null);
+            foreach (var error in errors)
+            {
+                Logger.Error("Error handling bundled packet: {e}", error);
+            }
+        
+            this._bundledPackets.Clear();
+        }
+        else
+        {
+            Logger.Debug("Bundling packets!");
+        }
+    }
     
     private void StreamLoop()
     {
@@ -228,8 +257,11 @@ public sealed class MinecraftClient : IDisposable
             var buffer = this._stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
             var packetType = this._data.Protocol.FromPacketId(PacketFlow.Clientbound, this.GameState, packetId);
+
+            if (this._bundlePackets)
+                this._bundledPackets.Enqueue((packetType, buffer));
+            else await this.HandleIncomingPacket(packetType, buffer);
             
-            await this.HandleIncomingPacket(packetType, buffer);
             if (this.GameState != GameState.Play)
             {
                 await Task.Delay(1);
@@ -262,7 +294,7 @@ public sealed class MinecraftClient : IDisposable
         this._stream!.WritePacket(buffer);
     }
 
-    private Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
+    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
     {
         // Only parse packets that are awaited by an handler.
         // Possible handlers are:
@@ -273,7 +305,10 @@ public sealed class MinecraftClient : IDisposable
         
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
-            return Task.CompletedTask; // TODO: Maybe add an event for unknown packets
+        {
+            await buffer.DisposeAsync();
+            return; // TODO: Maybe add an event for unknown packets
+        }
 
         var handlers = new List<AsyncPacketHandler>();
         // Internal packet handler
@@ -291,12 +326,16 @@ public sealed class MinecraftClient : IDisposable
         this._packetWaiters.TryGetValue(packetType, out var tsc);
 
         if (handlers.Count == 0 && tsc == null)
-            return Task.CompletedTask;
+        {
+            await buffer.DisposeAsync();
+            return;
+        }
         
         long size = buffer.ReadableBytes;
         try
         {
             var packet = factory(buffer, this._data);
+            await buffer.DisposeAsync();
             
             _ = Task.Run(async () =>
             {
@@ -320,8 +359,6 @@ public sealed class MinecraftClient : IDisposable
         {
             Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
         }
-
-        return Task.CompletedTask;
     }
 
     private async Task HandleOutgoingPacket(IPacket packet)

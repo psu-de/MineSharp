@@ -24,16 +24,6 @@ public class Session
         this.Certificate = certificate;
     }
 
-    /// <summary>
-    /// Login via Microsoft to obtain a valid Minecraft online session.
-    /// </summary>
-    /// <param name="username">The username is only used for cache purposes and must not be the real username.</param>
-    /// <returns>A valid Session</returns>
-    public static Task<Session> Login(string username)
-    {
-        return MicrosoftAuth.MicrosoftLogin(username);
-    }
-
     public static Session OfflineSession(string username)
     {
         return new Session(username, UUID.NewUuid(), "", "", false);
