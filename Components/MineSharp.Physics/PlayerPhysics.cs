@@ -58,7 +58,7 @@ public class PlayerPhysics
             ModifierOp.Multiply);
     }
 
-    public void OnTick()
+    public void Tick()
     {
         if (GameMode.Spectator == this.Player.GameMode)
         {

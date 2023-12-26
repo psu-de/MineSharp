@@ -66,7 +66,7 @@ public class PhysicsPlugin : Plugin
         {
             try
             {
-                this.physics!.OnTick();
+                this.physics!.Tick();
                 await this.UpdateServerPositionIfNeeded();
                 
                 if (this.PhysicsTick != null)
