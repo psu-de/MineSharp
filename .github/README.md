@@ -17,7 +17,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 
 # Current features
 
-- ✨Supported Versions: 1.18.x - 1.20.1
+- ✨ Supported Versions: 1.18.x - 1.20.1
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
@@ -27,13 +27,13 @@ Minecraft Java 1.18 - 1.20.1 supported
 - 🛠️ Crafting
 - 🪟 High-Level window Api
 - ⚔️ Attacking entities
-- ~~🏃 Movements (Walking, Sprinting, Jumping, Sneaking)~~
-- ~~🔎 Simple Pathfinder~~
+- 🏃 Movements (Walking, Sprinting, Jumping, Sneaking)
 - 📝 Chat (Reading and Writing)
 
 # Roadmap
 
-- All crossed things will be supported soon!
+- ✨ Support 1.20.2 - 1.20.4
+- 🔎 Simple Pathfinder
 
 # Example
 ```csharp
