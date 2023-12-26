@@ -111,6 +111,8 @@ public abstract class AbstractWorld : IWorld
         this.OnChunkUnloaded?.Invoke(this, chunk);
     }
 
+    public abstract IChunk CreateChunk(ChunkCoordinates coordinates, BlockEntity[] entities);
+
     public abstract bool IsOutOfMap(Position position);
 
     public bool IsBlockLoaded(Position position, [NotNullWhen(true)] out IChunk? chunk)

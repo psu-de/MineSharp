@@ -224,7 +224,7 @@ public class WorldPlugin : Plugin
             return Task.CompletedTask;
         
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        var chunk = WorldVersion.CreateChunk(this.Bot.Data, coords, packet.BlockEntities);
+        var chunk = this.World.CreateChunk(coords, packet.BlockEntities);
         chunk.LoadData(packet.ChunkData);
         
         this.World!.LoadChunk(chunk);

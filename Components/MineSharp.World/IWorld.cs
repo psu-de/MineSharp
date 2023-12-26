@@ -24,6 +24,7 @@ public interface IWorld
     public bool IsChunkLoaded(ChunkCoordinates coordinates);
     public void LoadChunk(IChunk chunk);
     public void UnloadChunk(ChunkCoordinates coordinates);
+    public IChunk CreateChunk(ChunkCoordinates coordinates, BlockEntity[] entities);
 
     public bool IsOutOfMap(Position position);
     

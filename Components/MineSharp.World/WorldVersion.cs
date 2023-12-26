@@ -18,14 +18,4 @@ public static class WorldVersion
 
         throw new NotSupportedException($"MineSharp.World does currently not support minecraft version {version.Version}.");
     }
-
-    public static IChunk CreateChunk(MinecraftData version, ChunkCoordinates coordinates, BlockEntity[] entities)
-    {
-        if (version.Version >= Major_1_18)
-        {
-            return new Chunk_1_18(version, coordinates, entities);
-        }
-
-        throw new NotSupportedException($"MineSharp.World does currently not support minecraft version {version.Version}.");
-    }
 }

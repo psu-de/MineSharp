@@ -39,6 +39,11 @@ public class World_1_18 : AbstractWorld
         return false;
     }
 
+    public override IChunk CreateChunk(ChunkCoordinates coordinates, BlockEntity[] entities)
+    {
+        return new Chunk_1_18(this.Data, coordinates, entities);
+    }
+
     public IEnumerable<Block> FindBlocks(BlockType type, IWorldIterator iterator, int? maxCount = null)
     {
         int count = 0;
