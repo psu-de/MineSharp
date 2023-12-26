@@ -76,7 +76,7 @@ public sealed class Chunk_1_18 : IChunk
         section.SetBiomeAt(new Position(position.X, y, position.Z), biome);
     }
 
-    public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null)
+    public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
         int found = 0;
         for (int i = 0; i < this._sections.Length; i++)
@@ -87,7 +87,7 @@ public sealed class Chunk_1_18 : IChunk
             if (section == null)
                 continue;
             
-            foreach (var block in section.FindBlocks(blockId, left))
+            foreach (var block in section.FindBlocks(type, left))
             {
                 block.Position = new Position(
                     block.Position.X,

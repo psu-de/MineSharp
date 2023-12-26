@@ -25,6 +25,8 @@ public interface IChunkSection
     public Biome GetBiomeAt(Position position);
     public void SetBiomeAt(Position position, Biome biome);
 
-    public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null);
-    public Block? FindBlock(int blockId) => FindBlocks(blockId).FirstOrDefault();
+    [Obsolete]
+    public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
+    [Obsolete]
+    public Block? FindBlock(BlockType type) => FindBlocks(type).FirstOrDefault();
 }

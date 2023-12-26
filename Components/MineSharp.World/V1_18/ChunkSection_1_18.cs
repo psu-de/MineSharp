@@ -64,9 +64,9 @@ internal class ChunkSection_1_18 : IChunkSection
         this._biomeContainer.SetAt(index, biome.Info.Id);
     }
 
-    public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null)
+    public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
-        var info = this._data.Blocks.GetById(blockId);
+        var info = this._data.Blocks.GetByType(type);
         if (!this._blockContainer.Palette.ContainsState(info.MinState, info.MaxState) || maxCount == 0)
         {
             yield break;

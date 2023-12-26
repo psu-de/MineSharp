@@ -41,7 +41,7 @@ public interface IWorld
     public Block? FindBlock(BlockType type, IWorldIterator iterator) => FindBlocks(type, iterator).FirstOrDefault();
     
     [Obsolete]
-    public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null);
+    public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
     [Obsolete]
-    public Block? FindBlock(int blockId) => FindBlocks(blockId).FirstOrDefault();
+    public Block? FindBlock(BlockType type) => FindBlocks(type).FirstOrDefault();
 }

@@ -61,12 +61,12 @@ public class World_1_18 : AbstractWorld
         }
     }
     
-    public IEnumerable<Block> FindBlocks(int blockId, int? maxCount = null)
+    public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
         int found = 0;
         foreach (var chunk in this.Chunks.Values)
         {
-            foreach (var block in chunk.FindBlocks(blockId, maxCount - found))
+            foreach (var block in chunk.FindBlocks(type, maxCount - found))
             {
                 block.Position = this.ToWorldPosition(chunk.Coordinates, block.Position);
                 yield return block;
