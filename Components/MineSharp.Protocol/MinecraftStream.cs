@@ -12,8 +12,9 @@ internal class MinecraftStream
     private const int COMPRESSION_DISABLED = -1;
     
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    private static readonly Inflater Inflater = new Inflater();
-    private static readonly Deflater Deflater = new Deflater();
+    
+    private readonly Inflater Inflater = new Inflater();
+    private readonly Deflater Deflater = new Deflater();
     
     private readonly object _streamLock;
     private readonly NetworkStream _networkStream;
