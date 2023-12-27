@@ -28,7 +28,7 @@ internal static class PoseUtils
             player.Entity!.Position.X, 
             player.Entity.Position.Y, 
             player.Entity.Position.Z);
-        bb.Contract(1.0E-7D, 1.0E-7D, 1.0E-7D);
+        bb.Deflate(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
         return WorldUtils.CollidesWithWorld(bb, world, data);
     }

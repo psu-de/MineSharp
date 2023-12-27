@@ -39,6 +39,9 @@ public class CodeWriter
         this.WriteLine(slashes);
         this.WriteLine(str);
         this.WriteLine(slashes);
+        this.WriteLine();
+        this.WriteLine("#pragma warning disable CS1591");
+        this.WriteLine();
         return this;
     }
 
@@ -66,6 +69,8 @@ public class CodeWriter
 
     public override string ToString()
     {
+        this.WriteLine();
+        this.WriteLine("#pragma warning restore CS1591");
         return this._sb.ToString();
     }
 }

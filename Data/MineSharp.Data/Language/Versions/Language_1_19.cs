@@ -5345,3 +5345,5 @@ internal class Language_1_19 : LanguageVersion
         { "outOfMemory.message", "Minecraft has run out of memory.\n\nThis could be caused by a bug in the game or by the Java Virtual Machine not being allocated enough memory.\n\nTo prevent level corruption, the current game has quit. We've tried to free up enough memory to let you go back to the main menu and back to playing, but this may not have worked.\n\nPlease restart the game if you see this message again." },
     };
 }
+
+#pragma warning restore CS1591

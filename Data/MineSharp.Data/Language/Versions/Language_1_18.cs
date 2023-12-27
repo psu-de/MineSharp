@@ -5164,3 +5164,5 @@ internal class Language_1_18 : LanguageVersion
         { "sleep.skipping_night", "Sleeping through this night" },
     };
 }
+
+#pragma warning restore CS1591

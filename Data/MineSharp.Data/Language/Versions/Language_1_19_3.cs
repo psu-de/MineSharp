@@ -5829,3 +5829,5 @@ internal class Language_1_19_3 : LanguageVersion
         { "mco.account.privacy.info", "Read more about Mojang and privacy laws" },
     };
 }
+
+#pragma warning restore CS1591

@@ -6226,3 +6226,5 @@ internal class Language_1_20 : LanguageVersion
         { "upgrade.minecraft.netherite_upgrade", "Netherite Upgrade" },
     };
 }
+
+#pragma warning restore CS1591
