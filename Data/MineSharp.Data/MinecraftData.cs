@@ -19,20 +19,74 @@ using MineSharp.Data.Windows;
 
 namespace MineSharp.Data;
 
+/// <summary>
+/// Provides static data about a Minecraft version.
+/// </summary>
 public class MinecraftData
 {
+    /// <summary>
+    /// The Biome data provider for this version
+    /// </summary>
     public BiomeProvider Biomes { get; }
+    
+    /// <summary>
+    /// The Block data provider for this version
+    /// </summary>
     public BlockProvider Blocks { get; }
+    
+    /// <summary>
+    /// The Collision shape data provider for this version
+    /// </summary>
     public BlockCollisionShapesProvider BlockCollisionShapes { get; }
+    
+    /// <summary>
+    /// The effect data provider for this version
+    /// </summary>
     public EffectProvider Effects { get; }
+    
+    /// <summary>
+    /// The enchantment data provider for this version
+    /// </summary>
     public EnchantmentProvider Enchantments { get; }
+    
+    /// <summary>
+    /// The entity data provider for this version
+    /// </summary>
     public EntityProvider Entities { get; }
+    
+    /// <summary>
+    /// The item data provider for this version
+    /// </summary>
     public ItemProvider Items { get; }
+    
+    /// <summary>
+    /// The protocol data provider for this version
+    /// </summary>
     public ProtocolProvider Protocol { get; }
+    
+    /// <summary>
+    /// The material data provider for this version
+    /// </summary>
     public MaterialsProvider Materials { get; }
+    
+    /// <summary>
+    /// The recipe data provider for this version
+    /// </summary>
     public RecipeProvider Recipes { get; }
+    
+    /// <summary>
+    /// The window data for this version
+    /// </summary>
     public WindowData Windows { get; } = new WindowData();
+    
+    /// <summary>
+    /// The language data provider for this version
+    /// </summary>
     public LanguageProvider Language { get; }
+    
+    /// <summary>
+    /// The minecraft version of this instance
+    /// </summary>
     public MinecraftVersion Version { get; }
 
     private MinecraftData(
@@ -63,6 +117,12 @@ public class MinecraftData
         this.Version = version;
     }
 
+    
+    /// <summary>
+    /// Returns a MinecraftData object for the given version.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
     public static MinecraftData FromVersion(string version)
     {
         var biomeType = GetClassType(VersionMap.Biomes[version]);

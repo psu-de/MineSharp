@@ -4,13 +4,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.Data.Protocol;
 
+/// <summary>
+/// Provides protocol data.
+/// </summary>
 public class ProtocolProvider
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
     private readonly ProtocolVersion _version;
 
-    private Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>> _idToTypeMap;
+    private readonly Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>> _idToTypeMap;
     
     internal ProtocolProvider(ProtocolVersion version)
     {
@@ -33,9 +36,21 @@ public class ProtocolProvider
         }
     }
 
+    /// <summary>
+    /// Get a packet id by PacketType
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public int GetPacketId(PacketType type)
         => this._version.PacketIds[type];
 
+    /// <summary>
+    /// Get <see cref="PacketType"/> by id with given <paramref name="flow"/> <paramref name="state"/>
+    /// </summary>
+    /// <param name="flow"></param>
+    /// <param name="state"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public PacketType FromPacketId(PacketFlow flow, GameState state, int id)
     {
         try

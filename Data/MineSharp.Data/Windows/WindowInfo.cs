@@ -1,5 +1,13 @@
 namespace MineSharp.Data.Windows;
 
+/// <summary>
+/// Window descriptor.
+/// </summary>
+/// <param name="Name">The text id of the window</param>
+/// <param name="Title">The title of the window</param>
+/// <param name="UniqueSlots">The number of unique slots this window has</param>
+/// <param name="ExcludeInventory">Whether the player's inventory is excluded for this window</param>
+/// <param name="HasOffHandSlot">Whether the window has an offhand</param>
 public record WindowInfo(
     string Name, 
     string Title, 
@@ -7,6 +15,7 @@ public record WindowInfo(
     bool ExcludeInventory = false, 
     bool HasOffHandSlot = false);
 
+#pragma warning disable CS1591
 
 public enum PlayerWindowSlots
 {
@@ -257,3 +266,5 @@ public enum StonecutterWindowSlots
     HotbarStart = 29,
     HotbarEnd = 37
 }
+
+#pragma warning restore CS1591

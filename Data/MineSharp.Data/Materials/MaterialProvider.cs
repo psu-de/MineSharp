@@ -3,22 +3,27 @@ using MineSharp.Core.Common.Items;
 
 namespace MineSharp.Data.Materials;
 
+/// <summary>
+/// Provides information about materials.
+/// </summary>
 public class MaterialsProvider
 {
-    private MaterialVersion _version { get; }
+    private readonly MaterialVersion _version;
 
     internal MaterialsProvider(MaterialVersion version)
     {
         this._version = version;
     }
 
+    /// <summary>
+    /// Gets a multiplier for a given material and item type.
+    /// </summary>
+    /// <param name="material"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public float GetToolMultiplier(Material material, ItemType type)
     {
         var mat = this._version.Palette[material];
-        if (!mat.TryGetValue(type, out var multiplier))
-        {
-            return 1.0f;
-        }
-        return multiplier;
+        return mat.GetValueOrDefault(type, 1.0f);
     }
 }

@@ -2,6 +2,9 @@ using MineSharp.Core.Common.Blocks;
 
 namespace MineSharp.Data.Windows;
 
+/// <summary>
+/// Static Window data
+/// </summary>
 public class WindowData
 {
     private static IDictionary<string, WindowInfo> _windowMaps = new Dictionary<string, WindowInfo>();
@@ -73,8 +76,19 @@ public class WindowData
     }
 
 
+    /// <summary>
+    /// All blocks that can be opened
+    /// </summary>
     public IList<BlockType> AllowedBlocksToOpen => _allowedBlocksToOpen;
+    
+    /// <summary>
+    /// All available windows
+    /// </summary>
     public List<WindowInfo> Windows => _windows;
+    
+    /// <summary>
+    /// Map of window string id to WindowInfo
+    /// </summary>
     public IDictionary<string, WindowInfo> WindowMap => _windowMaps;
 
     private static void Register(WindowInfo info)
