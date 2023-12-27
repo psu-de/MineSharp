@@ -5,6 +5,16 @@
         <Nullable>enable</Nullable>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
         <LangVersion>12</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.Bot</Title>
+        <Authors>psu-de</Authors>
+        <Description>Create minecraft bots with ease using C#.</Description>
+        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <PackageTags>minecraft, minecraft-bot, bot-api, minecraft-api, bot-framework</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +23,13 @@
       <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
       <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
       <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
+
+      <None Include="README.md" Pack="true" PackagePath="\"/>
+
+      <None Include="icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
     </ItemGroup>
 
 </Project>

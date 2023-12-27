@@ -5,11 +5,28 @@
         <Nullable>enable</Nullable>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
         <LangVersion>12</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.World</Title>
+        <Authors>psu-de</Authors>
+        <Description>Implementation of the minecraft world system in C#.</Description>
+        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <PackageTags>minecraft, world</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+        
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        
+        <None Include="icon.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
 </Project>

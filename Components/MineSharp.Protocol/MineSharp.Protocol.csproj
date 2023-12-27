@@ -5,6 +5,16 @@
         <Nullable>enable</Nullable>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
         <LangVersion>12</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.Protocol</Title>
+        <Authors>psu-de</Authors>
+        <Description>Implementation of the Minecraft protocol.</Description>
+        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <PackageTags>minecraft, protocol, minecraft-protocol</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +22,13 @@
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
       <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj" />
       <ProjectReference Include="..\MineSharp.Chat\MineSharp.Chat.csproj" />
+
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+
+        <None Include="icon.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

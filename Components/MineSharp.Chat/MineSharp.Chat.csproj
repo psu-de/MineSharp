@@ -4,10 +4,27 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.Chat</Title>
+        <Authors>psu-de</Authors>
+        <Description>Chat component for MineSharp.</Description>
+        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <PackageTags>minecraft, chat, minecraft-chat</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+
+        <None Include="icon.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

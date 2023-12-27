@@ -5,10 +5,27 @@
         <Nullable>enable</Nullable>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
         <LangVersion>12</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.Data</Title>
+        <Authors>psu-de</Authors>
+        <Description>Static data for Minecraft.</Description>
+        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <PackageTags>minecraft, minecraft-data</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
+
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+
+        <None Include="icon.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
