@@ -1,12 +1,23 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
+/// <summary>
+/// A string block property.
+/// </summary>
 public class EnumProperty : IBlockProperty
 {
     private readonly string[] _acceptedValues;
     
+    /// <inheritdoc />
     public string Name { get; }
+    
+    /// <inheritdoc />
     public int StateCount { get; }
     
+    /// <summary>
+    /// Create a new EnumProperty
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="acceptedValues"></param>
     public EnumProperty(string name, string[] acceptedValues)
     {
         this._acceptedValues = acceptedValues;
@@ -14,6 +25,7 @@ public class EnumProperty : IBlockProperty
         this.StateCount = this._acceptedValues.Length;
     }
     
+    /// <inheritdoc />
     public T GetValue<T>(int state)
     {
         if (typeof(T) != typeof(string))

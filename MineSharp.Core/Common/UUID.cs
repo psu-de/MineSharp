@@ -1,7 +1,17 @@
 namespace MineSharp.Core.Common;
 
+// Thanks to MrZoidberg
+// https://gist.github.com/MrZoidberg/9bac07cf3f5aa5896f75
+
+/// <summary>
+/// Represents an immutable Java universally unique identifier (UUID).
+/// A UUID represents a 128-bit value.
+/// </summary>
 public struct UUID : IEquatable<UUID>
 {
+    /// <summary>
+    /// Empty UUID
+    /// </summary>
     public static readonly UUID Empty;
 
     static UUID()
@@ -65,7 +75,7 @@ public struct UUID : IEquatable<UUID>
     }
 
     /// <summary>
-    ///     Returns a value that indicates whether this instance and a specified <see cref="Uuid" />
+    ///     Returns a value that indicates whether this instance and a specified <paramref name="uuid"/>
     ///     object represent the same value.
     /// </summary>
     /// <param name="uuid">An object to compare to this instance.</param>
@@ -208,9 +218,7 @@ public struct UUID : IEquatable<UUID>
     /// <exception cref="ArgumentNullException">input is null.</exception>
     /// <exception cref="FormatException">input is not in a recognized format.</exception>
     public static UUID Parse(string input) => Guid.Parse(input);
-
-    public static UUID NewUuid() => Guid.NewGuid();
-
+    
     private static string GetDigits(long val, int digits)
     {
         var hi = 1L << digits * 4;

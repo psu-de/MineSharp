@@ -1,53 +1,67 @@
-using MineSharp.Core.Common.Effects;
-
 namespace MineSharp.Core.Common.Entities;
 
-public class MinecraftPlayer
+/// <summary>
+/// Represents a minecraft player entity.
+/// </summary>
+/// <param name="username"></param>
+/// <param name="uuid"></param>
+/// <param name="ping"></param>
+/// <param name="gameMode"></param>
+/// <param name="entity"></param>
+/// <param name="dimension"></param>
+/// <param name="permissionLevel"></param>
+public class MinecraftPlayer(
+    string username,
+    UUID uuid,
+    int ping,
+    GameMode gameMode,
+    Entity? entity,
+    Dimension dimension,
+    PermissionLevel? permissionLevel = null)
 {
-    public string Username { get; set; }
-    public UUID Uuid { get; set; }
-    public int Ping { get; set; }
-    public GameMode GameMode { get; set; }
-    public Entity? Entity { get; set; }
-    public PermissionLevel? PermissionLevel { get; set; }
-    public Dimension Dimension { get; set; }
-    public EntityPose Pose { get; set; }
-
-    public MinecraftPlayer(string username, UUID uuid, int ping, GameMode gameMode, Entity? entity, Dimension dimension, PermissionLevel? permissionLevel = null)
-    {
-        this.Username = username;
-        this.Uuid = uuid;
-        this.Ping = ping;
-        this.GameMode = gameMode;
-        this.Entity = entity;
-        this.Dimension = dimension;
-        this.PermissionLevel = permissionLevel;
-        this.Pose = EntityPose.Standing;
-    }
+    /// <summary>
+    /// The username of this player
+    /// </summary>
+    public string Username { get; set; } = username;
     
+    /// <summary>
+    /// The UUID of this player
+    /// </summary>
+    public UUID Uuid { get; set; } = uuid;
+    
+    /// <summary>
+    /// Ping of this player in ms
+    /// </summary>
+    public int Ping { get; set; } = ping;
+    
+    /// <summary>
+    /// The <see cref="MineSharp.Core.Common.GameMode"/> of the player
+    /// </summary>
+    public GameMode GameMode { get; set; } = gameMode;
+    
+    /// <summary>
+    /// The underlying <see cref="MineSharp.Core.Common.Entities.Entity"/> of the player
+    /// </summary>
+    public Entity? Entity { get; set; } = entity;
+    
+    /// <summary>
+    /// The permission level of this player
+    /// </summary>
+    public PermissionLevel? PermissionLevel { get; set; } = permissionLevel;
+    
+    /// <summary>
+    /// The dimension the player is currently in
+    /// </summary>
+    public Dimension Dimension { get; set; } = dimension;
+    
+    /// <summary>
+    /// The pose of this player (TODO: this is never updated...)
+    /// </summary>
+    public EntityPose Pose { get; set; } = EntityPose.Standing;
+
     /// <summary>
     /// The position of this player's head.
     /// </summary>
     /// <returns></returns>
     public Vector3 GetHeadPosition() => this.Entity!.Position.Plus(Vector3.Up);
-
-    public double GetEyeHeight()
-    {
-        return this.Pose switch {
-            EntityPose.Swimming 
-                or EntityPose.FallFlying 
-                or EntityPose.SpinAttack => 0.4d,
-            EntityPose.Crouching => 1.27d,
-            _ => 1.62d
-        };
-    }
-    
-    /// <summary>
-    /// The Y Coordinate of the eyes of this player
-    /// </summary>
-    /// <returns></returns>
-    public double GetEyeY()
-    {
-        return this.Entity!.Position.Y + this.GetEyeHeight();
-    }
 }

@@ -2,21 +2,38 @@ using fNbt;
 
 namespace MineSharp.Core.Common.Blocks;
 
-public class BlockEntity
+/// <summary>
+/// A Block entity
+/// </summary>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <param name="z"></param>
+/// <param name="type"></param>
+/// <param name="data"></param>
+public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
 {
-    public byte X { get; }
-    public short Y { get; }
-    public byte Z { get; }
+    /// <summary>
+    /// X coordinate
+    /// </summary>
+    public byte X { get; } = x;
     
-    public int Type { get; set; }
-    public NbtCompound Data { get; set; }
+    /// <summary>
+    /// Y coordinate
+    /// </summary>
+    public short Y { get; } = y;
+    
+    /// <summary>
+    /// Z coordinate
+    /// </summary>
+    public byte Z { get; } = z;
 
-    public BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
-    {
-        this.X = x;
-        this.Y = y;
-        this.Z = z;
-        this.Type = type;
-        this.Data = data;
-    }
+    /// <summary>
+    /// Type
+    /// </summary>
+    public int Type { get; set; } = type;
+    
+    /// <summary>
+    /// NBT data
+    /// </summary>
+    public NbtCompound Data { get; set; } = data;
 }

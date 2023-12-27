@@ -1,4 +1,4 @@
-using MineSharp.Core.Extensions;
+using MineSharp.Core.Common;
 using MineSharp.World.Containers.Palettes;
 
 namespace MineSharp.World.Containers;
@@ -43,7 +43,7 @@ internal abstract class PaletteContainer : IPaletteContainer
             this.Palette = newPalette;
     }
 
-    protected static (IPalette palette, IntBitArray data) FromStream(Stream buffer, byte maxBitsPerEntry)
+    protected static (IPalette palette, IntBitArray data) FromStream(PacketBuffer buffer, byte maxBitsPerEntry)
     {
         var bitsPerEntry = buffer.ReadByte();
         IPalette palette;

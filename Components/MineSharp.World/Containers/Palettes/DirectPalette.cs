@@ -1,4 +1,6 @@
-﻿namespace MineSharp.World.Containers.Palettes;
+﻿using MineSharp.Core.Common;
+
+namespace MineSharp.World.Containers.Palettes;
 
 internal class DirectPalette : IPalette
 {
@@ -15,7 +17,7 @@ internal class DirectPalette : IPalette
         return null;
     }
 
-    public static IPalette FromStream(Stream stream)
+    public static IPalette FromStream(PacketBuffer stream)
     {
         return new DirectPalette();
     }

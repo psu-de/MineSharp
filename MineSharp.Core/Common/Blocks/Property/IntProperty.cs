@@ -1,16 +1,20 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
-public class IntProperty : IBlockProperty
+/// <summary>
+/// An integer block state property.
+/// </summary>
+/// <param name="name"></param>
+/// <param name="stateCount"></param>
+public class IntProperty(string name, int stateCount) : IBlockProperty
 {
-    public string Name { get; }
-    public int StateCount { get; }
+    /// <inheritdoc />
+    public string Name { get; } = name;
 
-    public IntProperty(string name, int stateCount)
-    {
-        this.Name = name;
-        this.StateCount = stateCount;
-    }
+    /// <inheritdoc />
+    public int StateCount { get; } = stateCount;
 
+     
+    /// <inheritdoc />
     public T GetValue<T>(int state)
     {
         if (typeof(T) != typeof(int))

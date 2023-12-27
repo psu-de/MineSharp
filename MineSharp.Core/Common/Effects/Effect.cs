@@ -1,19 +1,33 @@
 namespace MineSharp.Core.Common.Effects;
 
-public class Effect
+/// <summary>
+/// An effect
+/// </summary>
+/// <param name="info"></param>
+/// <param name="amplifier"></param>
+/// <param name="startTime"></param>
+/// <param name="duration"></param>
+public class Effect(EffectInfo info, int amplifier, DateTime startTime, int duration)
 {
-    public readonly EffectInfo Info;
-    public DateTime StartTime { get; set; }
-    public int Amplifier { get; set; }
-    public int Duration { get; set; }
+    /// <summary>
+    /// Descriptor of this Effect
+    /// </summary>
+    public readonly EffectInfo Info = info;
+    /// <summary>
+    /// When this effect has started
+    /// </summary>
+    public DateTime StartTime { get; set; } = startTime;
 
-    public Effect(EffectInfo info, int amplifier, DateTime startTime, int duration)
-    {
-        this.Info = info;
-        this.StartTime = startTime;
-        this.Amplifier = amplifier;
-        this.Duration = duration;
-    }
-    
+    /// <summary>
+    /// Amplifier of this effect
+    /// </summary>
+    public int Amplifier { get; set; } = amplifier;
+
+    /// <summary>
+    /// Duration of this effect in Ticks
+    /// </summary>
+    public int Duration { get; set; } = duration;
+
+    /// <inheritdoc />
     public override string ToString() => $"Effect (Name={this.Info.Name} Id={this.Info.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
 }

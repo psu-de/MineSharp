@@ -1,15 +1,21 @@
 namespace MineSharp.Core.Common.Enchantments;
 
-public class Enchantment
+/// <summary>
+/// An enchantment
+/// </summary>
+/// <param name="info"></param>
+/// <param name="level"></param>
+public class Enchantment(EnchantmentInfo info, int level)
 {
-    public readonly EnchantmentInfo Info;
-    public int Level { get; set; }
+    /// <summary>
+    /// Descriptor of this enchantment
+    /// </summary>
+    public readonly EnchantmentInfo Info = info;
+    /// <summary>
+    /// The level of this enchantment
+    /// </summary>
+    public int Level { get; set; } = level;
 
-    public Enchantment(EnchantmentInfo info, int level)
-    {
-        this.Info = info;
-        this.Level = level;
-    }
-    
+    /// <inheritdoc />
     public override string ToString() => $"Enchantment (Name={this.Info.Name} Id={this.Info.Id} Level={this.Level})";
 }

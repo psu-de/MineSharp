@@ -1,7 +1,7 @@
 namespace MineSharp.Core.Exceptions;
 
-public abstract class MineSharpException : Exception
-{
-    public MineSharpException(string message) : base(message) 
-    { }
-}
+/// <summary>
+/// Exception thrown by MineSharp projects
+/// </summary>
+/// <param name="message"></param>
+public abstract class MineSharpException(string message) : Exception(message);

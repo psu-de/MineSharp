@@ -35,7 +35,7 @@ public sealed class Chunk_1_18 : IChunk
 
     public void LoadData(byte[] data)
     {
-        var buffer = new MemoryStream(data);
+        var buffer = new PacketBuffer(data);
         for (int i = 0; i < SECTION_COUNT; i++)
         {
             this._sections[i] = ChunkSection_1_18.FromStream(this._data, buffer);

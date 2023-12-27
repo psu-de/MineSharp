@@ -1,49 +1,67 @@
 using fNbt;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
-using MineSharp.Core.Common.Items;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MineSharp.Core.Common;
 
+/// <summary>
+/// Read and write values from and to a byte buffer.
+/// </summary>
 public class PacketBuffer : IDisposable, IAsyncDisposable
 {
     private readonly MemoryStream _buffer;
 
+    /// <summary>
+    /// The total size of the buffer
+    /// </summary>
     public long Size => _buffer.Length;
+    
+    /// <summary>
+    /// The number of readable bytes in the buffer
+    /// </summary>
     public long ReadableBytes => _buffer.Length - _buffer.Position;
+    
+    /// <summary>
+    /// The position in the buffer.
+    /// </summary>
     public long Position => _buffer.Position;
 
+    /// <summary>
+    /// Create a new empty, writable PacketBuffer
+    /// </summary>
     public PacketBuffer()
     {
         this._buffer = new MemoryStream();
     }
     
+    /// <summary>
+    /// Create a new readable PacketBuffer with <paramref name="bytes"/> as input.
+    /// </summary>
+    /// <param name="bytes"></param>
     public PacketBuffer(byte[] bytes)
     {
         this._buffer = new MemoryStream(bytes);
     }
 
+    /// <summary>
+    /// Return the buffer's byte array
+    /// </summary>
+    /// <returns></returns>
     public byte[] GetBuffer()
     {
         return this._buffer.ToArray();
     }
 
+    /// <summary>
+    /// Returns the buffer as hex values as a string
+    /// </summary>
+    /// <param name="cutToPosition"></param>
+    /// <returns></returns>
     public string HexDump(bool cutToPosition = false)
     {
         var hex = Convert.ToHexString(this.GetBuffer().Skip(cutToPosition ? (int)this.Position : 0).ToArray());
         return Regex.Replace(hex, ".{2}", "$0 ").TrimEnd();
-    }
-    
-    public void SetPosition(long pos)
-    {
-        if (pos < 0 || pos >= this.Size)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pos) + " cannot be negative or greater or equal to Size.");
-        }
-
-        this._buffer.Position = pos;
     }
 
     private void EnsureEnoughReadableBytes(int count)
@@ -54,6 +72,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
     
+    #pragma warning disable CS1591
     
     #region Reading
 
@@ -493,12 +512,20 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     
     
     #endregion
+    
+    #pragma warning restore CS1591
 
+    /// <summary>
+    /// Disposes the underlying <see cref="MemoryStream"/>
+    /// </summary>
     public void Dispose()
     {
         _buffer.Dispose();
     }
 
+    /// <summary>
+    /// Disposes the underlying <see cref="MemoryStream"/>
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         await _buffer.DisposeAsync();

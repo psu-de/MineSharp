@@ -1,14 +1,16 @@
 namespace MineSharp.Core.Common.Biomes;
 
-public class Biome
+/// <summary>
+/// Represents a minecraft biome
+/// </summary>
+public class Biome(BiomeInfo info)
 {
-    public readonly BiomeInfo Info;
+    /// <summary>
+    /// Descriptor of this biome
+    /// </summary>
+    public readonly BiomeInfo Info = info;
 
-    public Biome(BiomeInfo info)
-    {
-        this.Info = info;
-    }
-
+    /// <inheritdoc />
     public override string ToString()
     {
         return $"Biome (Info={this.Info})";

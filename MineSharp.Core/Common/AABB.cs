@@ -1,44 +1,85 @@
 namespace MineSharp.Core.Common;
 
+/// <summary>
+/// 3D Axis-Aligned Bounding Box used for all collisions
+/// </summary>
 public class AABB
 {
+    /// <summary>
+    /// Lower X coordinate
+    /// </summary>
     public double MinX { get; set; }
+    /// <summary>
+    /// Lower Y coordinate
+    /// </summary>
     public double MinY { get; set; }
+    /// <summary>
+    /// Lower Z coordinate
+    /// </summary>
     public double MinZ { get; set; }
+    /// <summary>
+    /// Upper X coordinate
+    /// </summary>
     public double MaxX { get; set; }
+    /// <summary>
+    /// Upper Y coordinate
+    /// </summary>
     public double MaxY { get; set; }
+    /// <summary>
+    /// Upper Z coordinate
+    /// </summary>
     public double MaxZ { get; set; }
+    /// <summary>
+    /// Width of this bounding box (MaxX - MinX)
+    /// </summary>
     public double Width => this.MaxX - this.MinX;
+    /// <summary>
+    /// Height of this bounding box (MaxY - MinY)
+    /// </summary>
     public double Height => this.MaxY - this.MinY;
+    /// <summary>
+    /// Depth of this bounding box (MaxZ - MinZ)
+    /// </summary>
     public double Depth => this.MaxZ - this.MinZ;
-
-    public AABB(float[] data)
+    
+    /// <summary>
+    /// Creates a new AABB
+    /// </summary>
+    /// <param name="minX"></param>
+    /// <param name="minY"></param>
+    /// <param name="minZ"></param>
+    /// <param name="maxX"></param>
+    /// <param name="maxY"></param>
+    /// <param name="maxZ"></param>
+    public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
     {
-        if (data.Length != 6)
-        {
-            throw new ArgumentException($"Expected array with length of 6.", nameof(data));
-        }
+        if (minX > maxX)
+            (maxX, minX) = (minX, maxX);
 
-        this.MinX = data[0];
-        this.MinY = data[1];
-        this.MinZ = data[2];
-        this.MaxX = data[3];
-        this.MaxY = data[4];
-        this.MaxZ = data[5];
+        if (minY > maxY)
+            (maxY, minY) = (minY, maxY);
+
+        if (minZ > maxZ)
+            (maxZ, minZ) = (minZ, maxZ);
+        
+        this.MinX = minX;
+        this.MinY = minY;
+        this.MinZ = minZ;
+        this.MaxX = maxX;
+        this.MaxY = maxY;
+        this.MaxZ = maxZ;
     }
     
-    public AABB(double x0, double y0, double z0, double x1, double y1, double z1)
-    {
-        this.MinX = x0;
-        this.MinY = y0;
-        this.MinZ = z0;
-        this.MaxX = x1;
-        this.MaxY = y1;
-        this.MaxZ = z1;
-    }
-    
 
-    public AABB Contract(double x, double y, double z)
+    /// <summary>
+    /// Deflate this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
+    /// Mutates this instance.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    public AABB Deflate(double x, double y, double z)
     {
         this.MinX += x;
         this.MinY += y;
@@ -49,6 +90,14 @@ public class AABB
         return this;
     }
 
+    /// <summary>
+    /// Offset this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>.
+    /// Mutates this instance.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
     public AABB Offset(double x, double y, double z)
     {
         this.MinX += x;
@@ -60,9 +109,18 @@ public class AABB
         return this;
     }
     
+    /// <summary>
+    /// Returns a clone of this instance.
+    /// </summary>
+    /// <returns></returns>
     public AABB Clone()
         => new AABB(this.MinX, this.MinY, this.MinZ, this.MaxX, this.MaxY, this.MaxZ);
 
+    /// <summary>
+    /// Whether this bounding box and the other bounding box intersect.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Intersects(AABB other)
     {
         if (this.MaxX >= other.MinX && this.MinX <= other.MaxX)
@@ -76,9 +134,6 @@ public class AABB
         return false;
     }
 
-    public bool Contains(double x, double y, double z) => this.MinX <= x && this.MaxX >= x &&
-                                                          this.MinY <= y && this.MaxY >= y &&
-                                                          this.MinZ <= z && this.MaxZ >= z;
-    
+    /// <inheritdoc />
     public override string ToString() => $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
 }

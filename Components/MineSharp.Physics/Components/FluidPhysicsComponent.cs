@@ -49,7 +49,7 @@ public class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movemen
     {
         var aabb = this.Player.Entity!
             .GetBoundingBox()
-            .Contract(0.001d, 0.001d, 0.001d);
+            .Deflate(0.001d, 0.001d, 0.001d);
 
         var fromX = (int)Math.Floor(aabb.MinX);
         var toX = (int)Math.Ceiling(aabb.MaxX);

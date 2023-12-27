@@ -2,34 +2,52 @@ using MineSharp.Core.Common.Items;
 
 namespace MineSharp.Core.Common.Recipes;
 
-public class Recipe
+
+/// <summary>
+/// Represents a crafting recipe
+/// </summary>
+/// <param name="ingredients"></param>
+/// <param name="outShape"></param>
+/// <param name="requiresCraftingTable"></param>
+/// <param name="result"></param>
+/// <param name="count"></param>
+public class Recipe(
+    ItemType?[] ingredients,
+    ItemType?[]? outShape,
+    bool requiresCraftingTable,
+    ItemType result,
+    int count)
 {
     /// <summary>
     /// Ingredients in shape (null for no item) from top left to bottom right
     /// </summary>
-    public ItemType?[] Ingredients { get; private set; }
+    public ItemType?[] Ingredients { get; private set; } = ingredients;
 
     /// <summary>
     /// Leftover items in crafting slots after crafting
     /// </summary>
-    public ItemType?[]? OutShape { get; private set; }
-        
+    public ItemType?[]? OutShape { get; private set; } = outShape;
+
     /// <summary>
     /// Whether the recipe requires a crafting table.
     /// </summary>
-    public bool RequiresCraftingTable { get; private set; }
-        
+    public bool RequiresCraftingTable { get; private set; } = requiresCraftingTable;
+
     /// <summary>
     /// Item id of the result
     /// </summary>
-    public ItemType Result { get; private set; }
+    public ItemType Result { get; private set; } = result;
 
     /// <summary>
     /// Number of result items
     /// </summary>
-    public int ResultCount { get; private set; }
+    public int ResultCount { get; private set; } = count;
 
-    public Dictionary<ItemType, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<ItemType, int>(), (x, y) =>
+    /// <summary>
+    /// How many of each <see cref="ItemType"/> are used.
+    /// </summary>
+    public Dictionary<ItemType, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<ItemType, int>(),
+        (x, y) =>
     {
         if (y == null)
         {
@@ -47,13 +65,4 @@ public class Recipe
         return x;
 
     });
-
-    public Recipe(ItemType?[] ingredients, ItemType?[]? outShape, bool requiresCraftingTable, ItemType result, int count)
-    {
-        this.Ingredients = ingredients;
-        this.OutShape = outShape;
-        this.RequiresCraftingTable = requiresCraftingTable;
-        this.Result = result;
-        this.ResultCount = count;
-    }
 }

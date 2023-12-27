@@ -1,15 +1,18 @@
 namespace MineSharp.Core.Common.Blocks.Property;
 
-public class BoolProperty : IBlockProperty
+/// <summary>
+/// A boolean block property
+/// </summary>
+/// <param name="name"></param>
+public class BoolProperty(string name) : IBlockProperty
 {
-    public string Name { get; }
+    /// <inheritdoc />
+    public string Name { get; } = name;
+    
+    /// <inheritdoc />
     public int StateCount => 2;
-
-    public BoolProperty(string name)
-    {
-        this.Name = name;
-    }
-
+    
+    /// <inheritdoc />
     public T GetValue<T>(int state)
     {
         if (typeof(T) != typeof(bool))

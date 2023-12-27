@@ -1,3 +1,4 @@
+using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.World.Containers.Palettes;
 
@@ -18,9 +19,9 @@ internal class BiomeContainer : PaletteContainer
         this.TotalNumberOfStates = data.Biomes.Count;
     }
 
-    public static BiomeContainer FromStream(MinecraftData data, Stream stream)
+    public static BiomeContainer FromStream(MinecraftData data, PacketBuffer buffer)
     {
-        (var palette, var bitArray) = PaletteContainer.FromStream(stream, MAX_BITS);
+        (var palette, var bitArray) = PaletteContainer.FromStream(buffer, MAX_BITS);
         return new BiomeContainer(data, palette, bitArray);
     }
 }

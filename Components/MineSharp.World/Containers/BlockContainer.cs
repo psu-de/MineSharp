@@ -1,3 +1,4 @@
+using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.World.Containers.Palettes;
 
@@ -18,9 +19,9 @@ internal class BlockContainer : PaletteContainer
         this.TotalNumberOfStates = data.Blocks.TotalBlockStateCount;
     }
     
-    public static BlockContainer FromStream(MinecraftData data, Stream stream)
+    public static BlockContainer FromStream(MinecraftData data, PacketBuffer buffer)
     {
-        (var palette, var bitArray) = PaletteContainer.FromStream(stream, MAX_BITS);
+        (var palette, var bitArray) = PaletteContainer.FromStream(buffer, MAX_BITS);
         return new BlockContainer(data, palette, bitArray);
     }
 }

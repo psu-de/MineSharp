@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Extensions;
+﻿using MineSharp.Core.Common;
 
 namespace MineSharp.World.Containers.Palettes;
 
@@ -32,7 +32,7 @@ internal class SingleValuePalette : IPalette
         return new IndirectPalette(map);
     }
     
-    public static IPalette FromStream(Stream buffer)
+    public static IPalette FromStream(PacketBuffer buffer)
     {
         return new SingleValuePalette(buffer.ReadVarInt());
     }

@@ -1,7 +1,6 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
-using MineSharp.Core.Extensions;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Containers;
@@ -106,7 +105,7 @@ internal class ChunkSection_1_18 : IChunkSection
     private int GetBlockIndex(int x, int y, int z)
         => y << 8 | z << 4 | x;
 
-    internal static ChunkSection_1_18 FromStream(MinecraftData data, Stream buffer)
+    internal static ChunkSection_1_18 FromStream(MinecraftData data, PacketBuffer buffer)
     {
         short solidBlockCount = buffer.ReadShort();
         var blockContainer = BlockContainer.FromStream(data, buffer);

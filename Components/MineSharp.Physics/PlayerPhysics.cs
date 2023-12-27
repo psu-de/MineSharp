@@ -631,7 +631,7 @@ public class PlayerPhysics
         bb.MinZ = position.Z;
         bb.MaxX = position.X + 1.0f;
         bb.MaxZ = position.Z + 1.0f;
-        bb.Contract(1.0E-7D, 1.0E-7D, 1.0E-7D);
+        bb.Deflate(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
         return WorldUtils.CollidesWithWorld(bb, this.World, this.Data);
     }

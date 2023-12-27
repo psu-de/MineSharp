@@ -26,7 +26,7 @@ public class Session
 
     public static Session OfflineSession(string username)
     {
-        return new Session(username, UUID.NewUuid(), "", "", false);
+        return new Session(username, Guid.NewGuid(), "", "", false);
     }
 
     public override string ToString()

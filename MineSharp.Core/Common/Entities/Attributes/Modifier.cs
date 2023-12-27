@@ -1,15 +1,9 @@
 namespace MineSharp.Core.Common.Entities.Attributes;
 
-public class Modifier
-{
-    public UUID UUID { get; set; }
-    public double Amount { get; set; }
-    public ModifierOp Operation { get; set; }
-
-    public Modifier(UUID uuid, double amount, ModifierOp operation)
-    {
-        this.UUID = uuid;
-        this.Amount = amount;
-        this.Operation = operation;
-    }
-}
+/// <summary>
+/// A modifier for an attribute
+/// </summary>
+/// <param name="UUID">The uuid associated with this Modifier. This is a constant value from minecraft java.</param>
+/// <param name="Amount"></param>
+/// <param name="Operation"></param>
+public record Modifier(UUID UUID, double Amount, ModifierOp Operation);
