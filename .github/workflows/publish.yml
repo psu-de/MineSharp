@@ -3,12 +3,6 @@
 name: publish
 on:
   workflow_dispatch: # Allow running the workflow manually from the GitHub UI
-  push:
-    branches:
-      - 'main'       # Run the workflow when pushing to the main branch
-  pull_request:
-    branches:
-      - '*'          # Run the workflow for all pull requests
   release:
     types:
       - published    # Run the workflow when a new GitHub release is published
@@ -35,7 +29,7 @@ jobs:
       uses: actions/setup-dotnet@v4
 
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
-    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }}
+    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} -p:Version=${{ github.event.release.tag_name }}
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v3
