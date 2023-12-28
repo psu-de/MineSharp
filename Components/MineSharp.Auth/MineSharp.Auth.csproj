@@ -19,7 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
 
-        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\" />
 
         <None Include="icon.png">
           <Pack>True</Pack>
@@ -30,6 +30,10 @@
     <ItemGroup>
       <PackageReference Include="CmlLib.Core.Auth.Microsoft" Version="2.2.0" />
       <PackageReference Include="CmlLib.Core.Auth.Microsoft.MsalClient" Version="2.0.0" />
+      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 

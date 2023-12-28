@@ -23,7 +23,7 @@
       <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj" />
       <ProjectReference Include="..\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj" />
 
-        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\" />
 
         <None Include="icon.png">
           <Pack>True</Pack>
@@ -32,6 +32,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="SharpZipLib" Version="1.4.2" />
     </ItemGroup>
 

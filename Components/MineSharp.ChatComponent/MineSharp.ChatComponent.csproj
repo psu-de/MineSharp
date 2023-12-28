@@ -14,13 +14,17 @@
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
         <PackageTags>minecraft, chat, minecraft-chat</PackageTags>
-        <RootNamespace>MineSharp.Chat</RootNamespace>
+        <RootNamespace>MineSharp.ChatComponent</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 
-        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\" />
 
         <None Include="icon.png">
           <Pack>True</Pack>
