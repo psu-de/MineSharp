@@ -1,4 +1,4 @@
-namespace MineSharp.Chat;
+namespace MineSharp.ChatComponent;
 
 /// <summary>
 /// Represents a Minecraft Text style

@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MineSharp.Data;
 
-namespace MineSharp.Chat;
+namespace MineSharp.ChatComponent;
 
 /*
  * Thanks to Minecraft-Console-Client
@@ -15,7 +15,7 @@ namespace MineSharp.Chat;
 /// <summary>
 /// Represents a Chat Message object
 /// </summary>
-public class ChatComponent
+public class Chat
 {
     /// <summary>
     /// The raw Json message
@@ -40,7 +40,7 @@ public class ChatComponent
     /// </summary>
     /// <param name="json"></param>
     /// <param name="data"></param>
-    public ChatComponent(string json, MinecraftData data)
+    public Chat(string json, MinecraftData data)
     {
         this.Json = json;
         this.data = data;

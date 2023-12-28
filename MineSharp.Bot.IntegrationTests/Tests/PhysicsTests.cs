@@ -1,5 +1,5 @@
 using MineSharp.Bot.Plugins;
-using MineSharp.Chat;
+using MineSharp.ChatComponent;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 

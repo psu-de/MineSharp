@@ -14,6 +14,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
         <PackageTags>minecraft, chat, minecraft-chat</PackageTags>
+        <RootNamespace>MineSharp.Chat</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

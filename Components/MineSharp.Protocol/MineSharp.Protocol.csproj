@@ -21,7 +21,7 @@
       <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
       <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj" />
-      <ProjectReference Include="..\MineSharp.Chat\MineSharp.Chat.csproj" />
+      <ProjectReference Include="..\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj" />
 
         <None Include="README.md" Pack="true" PackagePath="\"/>
 

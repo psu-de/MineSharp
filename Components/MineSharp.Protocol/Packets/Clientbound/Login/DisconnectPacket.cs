@@ -1,4 +1,4 @@
-using MineSharp.Chat;
+using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -16,13 +16,13 @@ public class DisconnectPacket : IPacket
     /// <summary>
     /// The reason for being disconnected
     /// </summary>
-    public ChatComponent Reason { get; set; }
+    public Chat Reason { get; set; }
 
     /// <summary>
     /// Create a new instance
     /// </summary>
     /// <param name="reason"></param>
-    public DisconnectPacket(ChatComponent reason)
+    public DisconnectPacket(Chat reason)
     {
         this.Reason = reason;
     }
@@ -37,7 +37,7 @@ public class DisconnectPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         string reason = buffer.ReadString();
-        return new DisconnectPacket(new ChatComponent(reason, version));
+        return new DisconnectPacket(new Chat(reason, version));
     }
 }
 #pragma warning restore CS1591

@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Data", "Data\Mine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.SourceGenerator", "Data\MineSharp.SourceGenerator\MineSharp.SourceGenerator.csproj", "{A1AC37F2-6209-473B-A787-0F1601998BEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Chat", "Components\MineSharp.Chat\MineSharp.Chat.csproj", "{6CFF9878-00D1-4FE3-9146-B6B2EE746A0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.ChatComponent", "Components\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj", "{6CFF9878-00D1-4FE3-9146-B6B2EE746A0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

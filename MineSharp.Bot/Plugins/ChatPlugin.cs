@@ -5,7 +5,7 @@ using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Protocol;
 using System.Diagnostics;
-using MineSharp.Chat;
+using MineSharp.ChatComponent;
 using ChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
 using SBChatMessage = MineSharp.Protocol.Packets.Serverbound.Play.ChatPacket;
 using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMessagePacket;
@@ -501,6 +501,6 @@ public class ChatPlugin : Plugin
 
     private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
     {
-        this.OnChatMessageReceived?.Invoke(this.Bot, sender, new ChatComponent(message, this.Bot.Data), type, senderName);
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, new ChatComponent.Chat(message, this.Bot.Data), type, senderName);
     }
 }

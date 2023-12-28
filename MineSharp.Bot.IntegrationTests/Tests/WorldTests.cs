@@ -3,7 +3,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Chat;
-using MineSharp.Chat;
+using MineSharp.ChatComponent;
 using MineSharp.Core.Common.Blocks;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
