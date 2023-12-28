@@ -112,7 +112,7 @@ public static class PhysicsTests
         });
     }
 
-    private static void ExpectChatMessage(MinecraftBot bot, TaskCompletionSource<bool> source, string expectedMessage)
+    private static void ExpectChatMessage(MineSharpBot bot, TaskCompletionSource<bool> source, string expectedMessage)
     {
         var chat = bot.GetPlugin<ChatPlugin>();
 

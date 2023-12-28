@@ -9,11 +9,11 @@ public static class IntegrationTest
     private const string HOST = "localhost";
     private const ushort PORT = 25565;
 
-    public delegate Task TestFunction(MinecraftBot bot, TaskCompletionSource<bool> source);
+    public delegate Task TestFunction(MineSharpBot bot, TaskCompletionSource<bool> source);
     
     public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
     {
-        var bot = await MinecraftBot.CreateBot("MineSharpBot", HOST, PORT, offline: true);
+        var bot = await MineSharpBot.CreateBot("MineSharpBot", HOST, PORT, offline: true);
         var chat = bot.GetPlugin<ChatPlugin>();
 
         if (!await bot.Connect())

@@ -34,7 +34,7 @@ public class ChatPlugin : Plugin
     /// Create a new ChatPlugin instance.
     /// </summary>
     /// <param name="bot"></param>
-    public ChatPlugin(MinecraftBot bot) : base(bot)
+    public ChatPlugin(MineSharpBot bot) : base(bot)
     {
         this._messageCollector = this.Bot.Data.Version.Protocol switch {
             >= ProtocolVersion.V_1_19_3 => new LastSeenMessageCollector1_19_3(),

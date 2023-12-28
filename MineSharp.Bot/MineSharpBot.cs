@@ -12,7 +12,7 @@ namespace MineSharp.Bot;
 /// A Minecraft Bot.
 /// The Minecraft Bot uses Plugins that contain helper methods to handle and send minecraft packets.
 /// </summary>
-public class MinecraftBot
+public class MineSharpBot
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -44,7 +44,7 @@ public class MinecraftBot
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
 
-    private MinecraftBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
+    private MineSharpBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
         this.Data = data;
         this.Session = session;
@@ -163,7 +163,7 @@ public class MinecraftBot
     /// <param name="version">Which Minecraft version to use</param>
     /// <param name="excludeDefaultPlugins">When true, no plugins are loaded initially</param>
     /// <returns></returns>
-    public static async Task<MinecraftBot> CreateBot(
+    public static async Task<MineSharpBot> CreateBot(
         string hostnameOrIp,
         Session session,
         ushort port = 25565,
@@ -175,7 +175,7 @@ public class MinecraftBot
             _ => MinecraftData.FromVersion(version)
         };
 
-        var bot = new MinecraftBot(data, session, hostnameOrIp, port);
+        var bot = new MineSharpBot(data, session, hostnameOrIp, port);
 
         if (excludeDefaultPlugins)
             return bot;
@@ -207,7 +207,7 @@ public class MinecraftBot
     /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
     /// <param name="excludeDefaultPlugins">When true, the default plugins will not be added to the bot</param>
     /// <returns></returns>
-    public static async Task<MinecraftBot> CreateBot(
+    public static async Task<MineSharpBot> CreateBot(
         string username, 
         string hostnameOrIp, 
         ushort port = 25565,

@@ -65,7 +65,7 @@ public class WindowPlugin : Plugin
     /// Create a new WindowPlugin instance
     /// </summary>
     /// <param name="bot"></param>
-    public WindowPlugin(MinecraftBot bot) : base(bot)
+    public WindowPlugin(MineSharpBot bot) : base(bot)
     {
         this._inventoryLoadedTsc = new TaskCompletionSource();
         this._openWindows = new ConcurrentDictionary<int, Window>();

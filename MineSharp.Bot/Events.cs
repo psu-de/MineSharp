@@ -14,21 +14,21 @@ public static class Events
 {
     #pragma warning disable CS1591
     
-    public delegate void BotEvent(MinecraftBot sender);
+    public delegate void BotEvent(MineSharpBot sender);
     
-    public delegate void BotStringEvent(MinecraftBot sender, string message);
+    public delegate void BotStringEvent(MineSharpBot sender, string message);
 
-    public delegate void BotChatEvent(MinecraftBot sender, ChatComponent message);
+    public delegate void BotChatEvent(MineSharpBot sender, ChatComponent message);
 
-    public delegate void BotChatMessageEvent(MinecraftBot sender, UUID? player, ChatComponent message, ChatMessageType chatPosition, string? senderName);
+    public delegate void BotChatMessageEvent(MineSharpBot sender, UUID? player, ChatComponent message, ChatMessageType chatPosition, string? senderName);
 
-    public delegate void EntityEvent(MinecraftBot sender, Entity entity);
+    public delegate void EntityEvent(MineSharpBot sender, Entity entity);
     
-    public delegate void PlayerEvent(MinecraftBot sender, MinecraftPlayer player);
+    public delegate void PlayerEvent(MineSharpBot sender, MinecraftPlayer player);
 
-    public delegate void WindowEvent(MinecraftBot sender, Window window);
+    public delegate void WindowEvent(MineSharpBot sender, Window window);
     
-    public delegate void ItemEvent(MinecraftBot sender, Item? item);
+    public delegate void ItemEvent(MineSharpBot sender, Item? item);
     
     #pragma warning restore CS1591
 }

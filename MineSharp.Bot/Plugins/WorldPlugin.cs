@@ -30,7 +30,7 @@ public class WorldPlugin : Plugin
     /// Create a new WorldPlugin instance
     /// </summary>
     /// <param name="bot"></param>
-    public WorldPlugin(MinecraftBot bot) : base(bot)
+    public WorldPlugin(MineSharpBot bot) : base(bot)
     {
         this.World = WorldVersion.CreateWorld(this.Bot.Data);
         

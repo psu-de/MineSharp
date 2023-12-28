@@ -3,14 +3,14 @@ using MineSharp.Protocol;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// Plugin for <see cref="MinecraftBot"/>. 
+/// Plugin for <see cref="MineSharpBot"/>. 
 /// </summary>
 public abstract class Plugin
 {
     /// <summary>
     /// The bot
     /// </summary>
-    protected MinecraftBot Bot { get; }
+    protected MineSharpBot Bot { get; }
 
     /// <summary>
     /// Whether this plugin is currently enabled
@@ -28,7 +28,7 @@ public abstract class Plugin
     /// Create a new Plugin instance
     /// </summary>
     /// <param name="bot"></param>
-    protected Plugin(MinecraftBot bot)
+    protected Plugin(MineSharpBot bot)
     {
         this.Bot = bot;
         this.IsEnabled = true;

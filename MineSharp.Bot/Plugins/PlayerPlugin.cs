@@ -126,7 +126,7 @@ public class PlayerPlugin : Plugin
     /// Create a new PlayerPlugin instance
     /// </summary>
     /// <param name="bot"></param>
-    public PlayerPlugin(MinecraftBot bot) : base(bot)
+    public PlayerPlugin(MineSharpBot bot) : base(bot)
     {
         this.Players = new ConcurrentDictionary<UUID, MinecraftPlayer>();
         this.PlayerMap = new ConcurrentDictionary<int, MinecraftPlayer>();

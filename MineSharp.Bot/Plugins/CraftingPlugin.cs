@@ -11,7 +11,7 @@ namespace MineSharp.Bot.Plugins;
 /// crafting menu or a crafting table.
 /// </summary>
 /// <param name="bot"></param>
-public class CraftingPlugin(MinecraftBot bot) : Plugin(bot)
+public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     

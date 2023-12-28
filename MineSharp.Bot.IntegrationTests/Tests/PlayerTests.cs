@@ -83,7 +83,7 @@ public static class PlayerTests
                 }
             };
 
-            var bot2 = await MinecraftBot.CreateBot(
+            var bot2 = await MineSharpBot.CreateBot(
                 secondBotName,
                 "localhost",
                 25565,
@@ -114,7 +114,7 @@ public static class PlayerTests
                 }
             };
 
-            var bot2 = await MinecraftBot.CreateBot(
+            var bot2 = await MineSharpBot.CreateBot(
                 secondBotName,
                 "localhost",
                 25565,

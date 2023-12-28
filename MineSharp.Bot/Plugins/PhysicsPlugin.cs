@@ -43,7 +43,7 @@ public class PhysicsPlugin : Plugin
     /// Create a new PhysicsPlugin instance
     /// </summary>
     /// <param name="bot"></param>
-    public PhysicsPlugin(MinecraftBot bot) : base(bot)
+    public PhysicsPlugin(MineSharpBot bot) : base(bot)
     {
         this.lastPlayerState = new PlayerState(0, 0, 0, 0, 0, false);
         this.InputControls = new InputControls();

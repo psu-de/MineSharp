@@ -39,7 +39,7 @@ public class EntityPlugin : Plugin
     /// Create a new EntityPlugin instance
     /// </summary>
     /// <param name="bot"></param>
-    public EntityPlugin(MinecraftBot bot) : base(bot)
+    public EntityPlugin(MineSharpBot bot) : base(bot)
     {
         this.Entities = new ConcurrentDictionary<int, Entity>();
         
