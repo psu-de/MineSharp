@@ -5,7 +5,7 @@ using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class ChatCommandPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatCommand;
@@ -26,6 +26,7 @@ public class ChatCommandPacket : IPacket
     /// <param name="command"></param>
     /// <param name="timestamp"></param>
     /// <param name="salt"></param>
+    /// <param name="signatures"></param>
     /// <param name="signedPreview"></param>
     public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview)
     {
@@ -159,3 +160,4 @@ public class ChatCommandPacket : IPacket
         }
     }
 }
+#pragma warning restore CS1591

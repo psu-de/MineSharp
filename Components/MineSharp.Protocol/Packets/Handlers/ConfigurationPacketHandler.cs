@@ -6,7 +6,7 @@ using NLog;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public class ConfigurationPacketHandler : IPacketHandler
+internal class ConfigurationPacketHandler : IPacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     

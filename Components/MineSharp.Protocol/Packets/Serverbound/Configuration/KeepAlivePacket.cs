@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-
+#pragma warning disable CS1591
 public class KeepAlivePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_KeepAlive;
@@ -25,3 +25,4 @@ public class KeepAlivePacket : IPacket
         return new KeepAlivePacket(buffer.ReadLong());
     }
 }
+#pragma warning restore CS1591

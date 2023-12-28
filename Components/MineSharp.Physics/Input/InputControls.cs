@@ -1,5 +1,8 @@
 namespace MineSharp.Physics.Input;
 
+/// <summary>
+/// Represents the Input keys for the physics simulation
+/// </summary>
 public class InputControls
 {
     /// <summary>

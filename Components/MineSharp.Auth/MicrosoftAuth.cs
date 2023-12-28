@@ -14,11 +14,18 @@ using System.Text;
 
 namespace MineSharp.Auth;
 
+/// <summary>
+/// Login to Microsoft services.
+/// </summary>
 public static class MicrosoftAuth
 {
     private static readonly string ClientID = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+    
+    /// <summary>
+    /// How to handle microsoft msal authentication.
+    /// </summary>
     public delegate void DeviceCodeHandler(DeviceCodeResult deviceCode);
     
     /// <summary>
@@ -79,7 +86,7 @@ public static class MicrosoftAuth
         if (certificates == null || certificates.RequiresRefresh())
         {
             Logger.Debug($"Fetching new certificates.");
-            certificates = await MinecraftAPI.FetchCertificates(mSession.AccessToken!);
+            certificates = await MinecraftApi.FetchCertificates(mSession.AccessToken!);
             certificates.Serialize(cacheFolder);
         }
 

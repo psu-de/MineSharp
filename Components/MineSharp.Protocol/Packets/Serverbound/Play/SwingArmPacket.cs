@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class SwingArmPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ArmAnimation;
@@ -26,3 +26,4 @@ public class SwingArmPacket : IPacket
             (PlayerHand)buffer.ReadVarInt());
     }
 }
+#pragma warning restore CS1591

@@ -1,7 +1,13 @@
 namespace MineSharp.Chat;
 
-public class TextStyle
+/// <summary>
+/// Represents a Minecraft Text style
+/// </summary>
+public class TextStyle(char code, string name)
 {
+    /// <summary>
+    /// All known text styles
+    /// </summary>
     public static TextStyle[] KnownStyles = new[] {
         new TextStyle('0', "black"),
         new TextStyle('1', "dark_blue"),
@@ -30,22 +36,34 @@ public class TextStyle
 
     private const char PREFIX = '$';
 
-    public char Code { get; private set; }
-    public string Name { get; private set; }
+    /// <summary>
+    /// The character for this style
+    /// </summary>
+    public char Code { get; private set; } = code;
+    
+    /// <summary>
+    /// The name of this text style
+    /// </summary>
+    public string Name { get; private set; } = name;
+    
+    /// <summary>
+    /// An array of alias names for this text style
+    /// </summary>
     public string[] Aliases { get; set; } = Array.Empty<string>();
 
-    public TextStyle(char code, string name)
-    {
-        this.Code = code;
-        this.Name = name;
-    }
 
-    public override string ToString() => $"{PREFIX}{this.Code}";
-
+    /// <summary>
+    /// Parse text style from string
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static TextStyle? GetTextStyle(string name)
     {
         return KnownStyles.FirstOrDefault(x =>
             string.Equals(name, x.Name, StringComparison.OrdinalIgnoreCase) ||
             x.Aliases.Any(y => string.Equals(name, y, StringComparison.OrdinalIgnoreCase)));
     }
+    
+    /// <inheritdoc />
+    public override string ToString() => $"{PREFIX}{this.Code}";
 }

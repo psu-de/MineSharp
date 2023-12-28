@@ -5,7 +5,7 @@ using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class ChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatMessage;
@@ -171,3 +171,4 @@ public class ChatMessagePacket : IPacket
         return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value, previousMessages, lastRejectedMessage);
     }
 }
+#pragma warning restore CS1591

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class MultiBlockUpdatePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_MultiBlockChange;
@@ -58,3 +58,4 @@ public class MultiBlockUpdatePacket : IPacket
         return new MultiBlockUpdatePacket(chunkSection, suppressLightUpdates, blocks);
     }
 }
+#pragma warning restore CS1591

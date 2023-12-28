@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-
+#pragma warning disable CS1591
 public class ClientInformationPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_Settings;
@@ -52,3 +52,4 @@ public class ClientInformationPacket : IPacket
             buffer.ReadBool());
     }
 }
+#pragma warning restore CS1591

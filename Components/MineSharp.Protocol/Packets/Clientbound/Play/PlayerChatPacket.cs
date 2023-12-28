@@ -5,7 +5,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 using System.Runtime.CompilerServices;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class PlayerChatPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_PlayerChat;
@@ -369,3 +369,4 @@ public class PlayerChatPacket : IPacket
         }
     }
 }
+#pragma warning restore CS1591

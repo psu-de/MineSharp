@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-
+#pragma warning disable CS1591
 public class ResourcePackResponsePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_ResourcePackReceive;
@@ -26,3 +26,4 @@ public class ResourcePackResponsePacket : IPacket
             buffer.ReadVarInt());
     }
 }
+#pragma warning restore CS1591

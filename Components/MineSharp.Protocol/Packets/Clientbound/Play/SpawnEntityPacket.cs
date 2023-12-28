@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 using System.Diagnostics;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class SpawnEntityPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_SpawnEntity;
@@ -74,3 +74,4 @@ public class SpawnEntityPacket : IPacket
         return new SpawnEntityPacket(entityId, objectUuid, type, x, y, z, pitch, yaw, headPitch, objectData, velocityX, velocityY, velocityZ);
     }
 }
+#pragma warning restore CS1591

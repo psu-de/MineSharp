@@ -6,15 +6,18 @@ using NLog;
 
 namespace MineSharp.Bot.Plugins;
 
-public class CraftingPlugin : Plugin
+/// <summary>
+/// Crafting plugin provides methods to craft items using the player's inventory
+/// crafting menu or a crafting table.
+/// </summary>
+/// <param name="bot"></param>
+public class CraftingPlugin(MinecraftBot bot) : Plugin(bot)
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
-    private WindowPlugin? windowPlugin; 
+    private WindowPlugin? windowPlugin;
     
-    public CraftingPlugin(MinecraftBot bot) : base(bot)
-    { }
-    
+    /// <inheritdoc />
     protected override async Task Init()
     {
         this.windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
@@ -42,6 +45,7 @@ public class CraftingPlugin : Plugin
     {
         return this.FindRecipes(type).FirstOrDefault();
     }
+    
     /// <summary>
     /// Returns how often this recipe can be crafted with the bots current inventory.
     /// </summary>
@@ -53,6 +57,15 @@ public class CraftingPlugin : Plugin
             .Select(kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) / kvp.Value)
             .Min();
     }
+    
+    /// <summary>
+    /// Craft the given recipe <paramref name="amount"/> of times.
+    /// If the recipe requires a crafting table, <paramref name="craftingTable"/> is used.
+    /// </summary>
+    /// <param name="recipe"></param>
+    /// <param name="craftingTable"></param>
+    /// <param name="amount"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task Craft(Recipe recipe, Block? craftingTable = null, int amount = 1)
     {
         if (amount > this.CraftableAmount(recipe))

@@ -2,7 +2,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public class StatusPacketHandler : IPacketHandler
+internal class StatusPacketHandler : IPacketHandler
 {
     private MinecraftClient _client;
 

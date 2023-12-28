@@ -2,9 +2,8 @@ using MineSharp.Core.Exceptions;
 
 namespace MineSharp.Protocol.Exceptions;
 
-public class UnexpectedPacketException : MineSharpException
-{
-
-    public UnexpectedPacketException(string message) : base(message)
-    { }
-}
+/// <summary>
+/// Thrown when a packet was unexpected.
+/// </summary>
+/// <param name="message"></param>
+public class UnexpectedPacketException(string message) : MineSharpException(message);

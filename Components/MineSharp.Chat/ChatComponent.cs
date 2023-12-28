@@ -11,15 +11,35 @@ namespace MineSharp.Chat;
  * 
  * This Class uses a lot of code from Protocol/Message/ChatParser.cs from MCC.
  */
+
+/// <summary>
+/// Represents a Chat Message object
+/// </summary>
 public class ChatComponent
 {
+    /// <summary>
+    /// The raw Json message
+    /// </summary>
     public string Json { get; }
+    
+    /// <summary>
+    /// The message without any styling
+    /// </summary>
     public string Message { get; private set; }
+    
+    /// <summary>
+    /// The styled message containing style codes
+    /// </summary>
     public string StyledMessage { get; private set; }
     
 
     private readonly MinecraftData data;
     
+    /// <summary>
+    /// Create a new ChatComponent
+    /// </summary>
+    /// <param name="json"></param>
+    /// <param name="data"></param>
     public ChatComponent(string json, MinecraftData data)
     {
         this.Json = json;
@@ -120,5 +140,6 @@ public class ChatComponent
         return result;
     }
 
+    /// <inheritdoc />
     public override string ToString() => this.Json;
 }

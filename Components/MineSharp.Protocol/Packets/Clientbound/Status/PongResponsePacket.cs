@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Status;
-
+#pragma warning disable CS1591
 public class PongResponsePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Status_Ping;
@@ -25,3 +25,4 @@ public class PongResponsePacket : IPacket
         return new PongResponsePacket(buffer.ReadLong());
     }
 }
+#pragma warning restore CS1591

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class ClientCommandPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ClientCommand;
@@ -26,3 +26,4 @@ public class ClientCommandPacket : IPacket
         return new ClientCommandPacket(actionId);
     }
 }
+#pragma warning restore CS1591

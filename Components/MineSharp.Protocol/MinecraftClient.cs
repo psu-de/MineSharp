@@ -17,13 +17,28 @@ using System.Net;
 
 namespace MineSharp.Protocol;
 
+/// <summary>
+/// A Minecraft client.
+/// Connect to a minecraft server.
+/// </summary>
 public sealed class MinecraftClient : IDisposable
 {
+    /// <summary>
+    /// The latest version supported
+    /// </summary>
     public const string LATEST_SUPPORTED_VERSION = "1.20.1";
     
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+    /// <summary>
+    /// Delegate for handling packets async
+    /// </summary>
     public delegate Task AsyncPacketHandler(IPacket packet);
+    
+    /// <summary>
+    /// Delegate for handling a specific packet async
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public delegate Task AsyncPacketHandler<in T>(T packet) where T : IPacket;
 
     private readonly MinecraftData _data;
@@ -54,11 +69,33 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public event Events.ClientStringEvent? OnDisconnected;
     
+    /// <summary>
+    /// The Session object for this client
+    /// </summary>
     public Session Session { get; }
+    
+    /// <summary>
+    /// The IP Address of the minecraft server
+    /// </summary>
     public IPAddress IP { get; }
+    
+    /// <summary>
+    /// The Port of the minecraft server
+    /// </summary>
     public ushort Port { get; }
+    
+    /// <summary>
+    /// The GameState the client is in
+    /// </summary>
     public GameState GameState { get; private set; }
 
+    /// <summary>
+    /// Create a new MinecraftClient instance
+    /// </summary>
+    /// <param name="data">The data used by the client</param>
+    /// <param name="session">The session object</param>
+    /// <param name="hostnameOrIp">Hostname or ip of the server</param>
+    /// <param name="port">Port of the server</param>
     public MinecraftClient(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
         this._data = data;
@@ -138,7 +175,7 @@ public sealed class MinecraftClient : IDisposable
     }
 
     /// <summary>
-    /// Registers an <see cref="handler"/> that will be called whenever an packet of type <see cref="T"/> is received
+    /// Registers an <paramref name="handler"/> that will be called whenever an packet of type <typeparamref name="T"/> is received
     /// </summary>
     /// <param name="handler">A delegate that will be called when a packet of type T is received</param>
     /// <typeparam name="T">The type of the packet</typeparam>
@@ -388,6 +425,7 @@ public sealed class MinecraftClient : IDisposable
             null);
     }
     
+    /// <inheritdoc />
     public void Dispose()
     {
         this._cancellation.Cancel();
@@ -396,11 +434,8 @@ public sealed class MinecraftClient : IDisposable
         this._client.Dispose();
         this._stream?.Close();
     }
-
     
     private record PacketSendTask(IPacket Packet, CancellationToken? Token, TaskCompletionSource Task);
-
-    
     
     /// <summary>
     /// Requests the server status and closes the connection.

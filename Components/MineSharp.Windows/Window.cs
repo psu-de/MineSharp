@@ -5,23 +5,65 @@ using NLog;
 
 namespace MineSharp.Windows;
 
+/// <summary>
+/// Represents a Minecraft window
+/// </summary>
 public class Window
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+    /// <summary>
+    /// Fired when a slot has changed
+    /// </summary>
     public delegate void SlotChanged(Window window, short index);
+    
+    /// <summary>
+    /// Delegate to synchronize a window when it has been clicked
+    /// </summary>
     public delegate Task WindowSynchronizer(Window window, WindowClick click);
 
     internal const short SELECTED_SLOT = -1;
     internal const short OFFHAND_SLOT = 45;
     internal const byte INVENTORY_ID = 0;
+    
+    /// <summary>
+    /// Fired when a slot changed
+    /// </summary>
+    public event SlotChanged? OnSlotChanged;
 
+    /// <summary>
+    /// Numerical id to identify the window
+    /// </summary>
     public byte WindowId { get; }
+    
+    /// <summary>
+    /// Window state id used to synchronize the window
+    /// </summary>
     public int StateId { get; set; }
+    
+    /// <summary>
+    /// The title of the window
+    /// </summary>
     public string Title { get; }
+    
+    /// <summary>
+    /// Number of slots in this window owned by this window
+    /// </summary>
     public short SlotCount { get; }
+    
+    /// <summary>
+    /// Whether this window has an offhand slot
+    /// </summary>
     public bool HasOffhandSlot { get; }
+    
+    /// <summary>
+    /// Window extensions (usually the player's inventory)
+    /// </summary>
     public Window? Inventory { get; }
+    
+    /// <summary>
+    /// Total number of slots (including window extension)
+    /// </summary>
     public int TotalSlotCount
     {
         get
@@ -38,8 +80,14 @@ public class Window
     private object SyncLock { get; }
     private bool IsSynchronized => this.Synchronizer != null;
 
-    public event SlotChanged? OnSlotChanged;
-
+    /// <summary>
+    /// Create a new window instance
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="title"></param>
+    /// <param name="uniqueSlotCount"></param>
+    /// <param name="inventory"></param>
+    /// <param name="windowSynchronizer"></param>
     public Window(byte id, string title, int uniqueSlotCount, Window? inventory = null, WindowSynchronizer? windowSynchronizer = null)
     {
         this.WindowId = id;
@@ -381,7 +429,7 @@ public class Window
     }
 
     /// <summary>
-    /// Put down the <see cref="count"/> items in <see cref="GetSelectedSlot"/> to the slot given
+    /// Put down the <paramref name="count"/> items in <see cref="GetSelectedSlot"/> to the slot given
     /// </summary>
     /// <param name="count"></param>
     /// <param name="slot"></param>
@@ -602,6 +650,7 @@ public class Window
         }
     }
     
+    /// <inheritdoc />
     public override string ToString()
     {
         return $"Window (Id={this.WindowId}, State={this.StateId}, Title={this.Title}, Slots={this.SlotCount}, HasInventory={this.Inventory != null})";

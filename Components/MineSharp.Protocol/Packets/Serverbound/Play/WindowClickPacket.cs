@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class WindowClickPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_WindowClick;
@@ -53,3 +53,4 @@ public class WindowClickPacket : IPacket
             buffer.ReadOptionalItem(version));
     }
 }   
+#pragma warning restore CS1591

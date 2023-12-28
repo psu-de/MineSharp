@@ -1,6 +1,6 @@
 namespace MineSharp.Physics.Input;
 
-public class MovementInput(InputControls controls)
+internal class MovementInput(InputControls controls)
 {
     public readonly InputControls Controls = controls;
 

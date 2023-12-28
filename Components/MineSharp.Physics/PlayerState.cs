@@ -2,7 +2,7 @@ using MineSharp.Core.Common;
 
 namespace MineSharp.Physics;
 
-public class PlayerState
+internal class PlayerState
 {
     public bool WasTouchingWater { get; internal set; }
     public bool WasUnderwater { get; internal set; }

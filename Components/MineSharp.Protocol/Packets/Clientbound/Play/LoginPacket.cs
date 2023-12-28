@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class LoginPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_Login;
@@ -185,3 +185,4 @@ public class LoginPacket : IPacket
             portalCooldown);
     }
 }
+#pragma warning restore CS1591

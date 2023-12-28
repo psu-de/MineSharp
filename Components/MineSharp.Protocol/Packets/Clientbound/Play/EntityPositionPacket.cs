@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class EntityPositionPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_RelEntityMove;
@@ -46,3 +46,4 @@ public class EntityPositionPacket : IPacket
             onGround);
     }
 }
+#pragma warning restore CS1591

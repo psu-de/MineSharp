@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 /// <summary>
 /// ChatPacket used before 1.19 to send a Chat message
 /// </summary>
@@ -28,3 +28,4 @@ public class ChatPacket : IPacket
         return new ChatPacket(buffer.ReadString());
     }
 }
+#pragma warning restore CS1591

@@ -2,10 +2,18 @@ using MineSharp.Core.Common;
 
 namespace MineSharp.World.Iterators;
 
+/// <summary>
+/// The Bounding Box iterator returns all Positions that may
+/// collide with the bounding box.
+/// </summary>
 public class BoundingBoxIterator : IWorldIterator
 {
-    private SpiralIterator _iterator;
+    private XYZIterator _iterator;
        
+    /// <summary>
+    /// Create a new instance
+    /// </summary>
+    /// <param name="aabb"></param>
     public BoundingBoxIterator(AABB aabb)
     {
         var minX = (int)Math.Floor(aabb.MinX - 1.0E-7D) - 1;
@@ -15,10 +23,11 @@ public class BoundingBoxIterator : IWorldIterator
         var minZ = (int)Math.Floor(aabb.MinZ - 1.0E-7D) - 1;
         var maxZ = (int)Math.Floor(aabb.MaxZ + 1.0E-7D) + 1;
         
-        this._iterator = new SpiralIterator(
+        this._iterator = new XYZIterator(
             new Position(minX, minY, minZ),
             new Position(maxX, maxY, maxZ));
     }
-
+    
+    /// <inheritdoc />
     public IEnumerable<Position> Iterate() => this._iterator.Iterate();
 }

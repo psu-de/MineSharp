@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MineSharp.Protocol.Cryptography;
 
-public class EncryptionHelper
+internal class EncryptionHelper
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     

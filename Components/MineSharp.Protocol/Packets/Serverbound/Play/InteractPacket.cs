@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class InteractPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_UseEntity;
@@ -93,3 +93,4 @@ public class InteractPacket : IPacket
         InteractAt = 2
     }
 }
+#pragma warning restore CS1591

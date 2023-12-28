@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Status;
-
+#pragma warning disable CS1591
 public class PingRequestPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Status_Ping;
@@ -25,3 +25,4 @@ public class PingRequestPacket : IPacket
         return new PingRequestPacket(buffer.ReadLong());
     }
 }
+#pragma warning restore CS1591

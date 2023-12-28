@@ -5,24 +5,90 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
+/// <summary>
+/// Chunk data and update light packet
+/// </summary>
 public class ChunkDataAndUpdateLightPacket : IPacket
 {
+    /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_MapChunk;
 
+    /// <summary>
+    /// X coordinate of the chunk
+    /// </summary>
     public int X { get; set; }
+    
+    /// <summary>
+    /// Y coordinate of the chunk
+    /// </summary>
     public int Z { get; set; }
+    
+    /// <summary>
+    /// Heightmaps
+    /// </summary>
     public NbtCompound Heightmaps { get; set; }
+    
+    /// <summary>
+    /// Raw chunk data
+    /// </summary>
     public byte[] ChunkData { get; set; }
+    
+    /// <summary>
+    /// Array of BlockEntities
+    /// </summary>
     public BlockEntity[] BlockEntities { get; set; }
+    
+    /// <summary>
+    /// Whether to trust edges (only sent before 1.20)
+    /// </summary>
     public bool? TrustEdges { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public long[] SkyLightMask { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public long[] BlockLightMask { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public long[] EmptySkyLightMask { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public long[] EmptyBlockLightMask { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public byte[][] SkyLight { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public byte[][] BlockLight { get; set; }
 
+    /// <summary>
+    /// Create a new instance
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    /// <param name="heightmaps"></param>
+    /// <param name="chunkData"></param>
+    /// <param name="blockEntities"></param>
+    /// <param name="trustEdges"></param>
+    /// <param name="skyLightMask"></param>
+    /// <param name="blockLightMask"></param>
+    /// <param name="emptyBlockLightMask"></param>
+    /// <param name="emptySkyLightMask"></param>
+    /// <param name="skyLight"></param>
+    /// <param name="blockLight"></param>
     public ChunkDataAndUpdateLightPacket(
         int x,
         int z,
@@ -51,6 +117,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         this.BlockLight = blockLight;
     }
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         
@@ -90,6 +157,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         }
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var x = buffer.ReadInt();
@@ -156,3 +224,4 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         return array;
     }
 }
+#pragma warning restore CS1591

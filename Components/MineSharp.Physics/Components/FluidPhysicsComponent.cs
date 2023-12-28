@@ -6,7 +6,7 @@ using MineSharp.World;
 
 namespace MineSharp.Physics.Components;
 
-public class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, MovementInput input, PlayerState state) 
+internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, MovementInput input, PlayerState state) 
     : PhysicsComponent(player, world, input, state)
 {
     private const float MAX_FLUID_HEIGHT = 9.0f;    

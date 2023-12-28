@@ -72,7 +72,15 @@ public class PlayerPlugin : Plugin
     /// Whether it is raining
     /// </summary>
     public bool IsRaining { get; set; }
+    
+    /// <summary>
+    /// The rain level
+    /// </summary>
     public float RainLevel { get; set; }
+    
+    /// <summary>
+    /// The thunder level
+    /// </summary>
     public float ThunderLevel { get; set; }
     
 
@@ -114,6 +122,10 @@ public class PlayerPlugin : Plugin
 
     private EntityPlugin? _entities;
 
+    /// <summary>
+    /// Create a new PlayerPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     public PlayerPlugin(MinecraftBot bot) : base(bot)
     {
         this.Players = new ConcurrentDictionary<UUID, MinecraftPlayer>();
@@ -137,6 +149,7 @@ public class PlayerPlugin : Plugin
     public Task Respawn()
         => this.Bot.Client.SendPacket(new ClientCommandPacket(0));
 
+    /// <inheritdoc />
     protected override async Task Init()
     {
         this._entities = this.Bot.GetPlugin<EntityPlugin>();

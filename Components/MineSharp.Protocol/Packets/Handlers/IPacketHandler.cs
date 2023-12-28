@@ -2,7 +2,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public interface IPacketHandler
+internal interface IPacketHandler
 {
     public Task HandleIncoming(IPacket packet);
     public Task HandleOutgoing(IPacket packet);

@@ -7,19 +7,29 @@ using MineSharp.World.Exceptions;
 
 namespace MineSharp.World.V1_18;
 
+/// <summary>
+/// Chunk implementation for >= 1.18
+/// </summary>
 public sealed class Chunk_1_18 : IChunk
 {
     private const int SECTION_COUNT = World_1_18.WORLD_HEIGHT / ChunkSection_1_18.SECTION_SIZE;
-    public int Size => ChunkSection_1_18.SECTION_SIZE;
     
+    /// <inheritdoc />
     public ChunkCoordinates Coordinates { get; }
 
+    /// <inheritdoc />
     public event Events.ChunkBlockEvent? OnBlockUpdated;
 
     private readonly MinecraftData _data;
     private readonly IChunkSection[] _sections;
     private readonly Dictionary<Position, BlockEntity> _blockEntities;
 
+    /// <summary>
+    /// Create a new instance
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="coordinates"></param>
+    /// <param name="blockEntities"></param>
     public Chunk_1_18(MinecraftData data, ChunkCoordinates coordinates, BlockEntity[] blockEntities)
     {
         this.Coordinates = coordinates;
@@ -33,6 +43,7 @@ public sealed class Chunk_1_18 : IChunk
         }
     }
 
+    /// <inheritdoc />
     public void LoadData(byte[] data)
     {
         var buffer = new PacketBuffer(data);
@@ -42,12 +53,14 @@ public sealed class Chunk_1_18 : IChunk
         }
     }
 
+    /// <inheritdoc />
     public BlockEntity? GetBlockEntity(Position position)
     {
         this._blockEntities.TryGetValue(position, out var entity);
         return entity;
     }
 
+    /// <inheritdoc />
     public int GetBlockAt(Position position)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
@@ -56,6 +69,7 @@ public sealed class Chunk_1_18 : IChunk
         return block;
     }
     
+    /// <inheritdoc />
     public void SetBlockAt(int state, Position position)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
@@ -64,18 +78,21 @@ public sealed class Chunk_1_18 : IChunk
         this.OnBlockUpdated?.Invoke(this, state, position);
     }
 
+    /// <inheritdoc />
     public Biome GetBiomeAt(Position position)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         return section.GetBiomeAt(new Position(position.X, y, position.Z));
     }
     
+    /// <inheritdoc />
     public void SetBiomeAt(Position position, Biome biome)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         section.SetBiomeAt(new Position(position.X, y, position.Z), biome);
     }
 
+    /// <inheritdoc />
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
         int found = 0;

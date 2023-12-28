@@ -13,15 +13,39 @@ using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;
 
+/// <summary>
+/// Simulate a Minecraft player in a minecraft world
+/// </summary>
 public class PlayerPhysics
 {
-    public delegate void PlayerPhysicsBooleanEvent(PlayerPhysics sender, bool crouching);
+    /// <summary>
+    /// Event with PlayerPhysics and a boolean value
+    /// </summary>
+    public delegate void PlayerPhysicsBooleanEvent(PlayerPhysics sender, bool value);
 
+    /// <summary>
+    /// Fired when the player starts or stops crouching
+    /// </summary>
     public event PlayerPhysicsBooleanEvent? OnCrouchingChanged;
+    
+    /// <summary>
+    /// Fired when the player starts or stops sprinting
+    /// </summary>
     public event PlayerPhysicsBooleanEvent? OnSprintingChanged;
-
+    
+    /// <summary>
+    /// The minecraft data used for this instance
+    /// </summary>
     public readonly MinecraftData Data;
+    
+    /// <summary>
+    /// The player to simulate
+    /// </summary>
     public readonly MinecraftPlayer Player;
+    
+    /// <summary>
+    /// The world
+    /// </summary>
     public readonly IWorld World;
 
     private readonly FluidPhysicsComponent fluidPhysics;
@@ -34,6 +58,13 @@ public class PlayerPhysics
         Vector3.West, Vector3.East, Vector3.North, Vector3.South
     };
 
+    /// <summary>
+    /// Create a new PlayerPhysics instance
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="player"></param>
+    /// <param name="world"></param>
+    /// <param name="inputControls"></param>
     public PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
     {
         this.Data = data;
@@ -58,6 +89,9 @@ public class PlayerPhysics
             ModifierOp.Multiply);
     }
 
+    /// <summary>
+    /// Simulate a single tick
+    /// </summary>
     public void Tick()
     {
         if (GameMode.Spectator == this.Player.GameMode)

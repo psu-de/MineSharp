@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class EntityActionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_EntityAction;
@@ -47,3 +47,5 @@ public class EntityActionPacket : IPacket
         StartFlyingWithElytra = 8
     }
 }
+
+#pragma warning restore CS1591

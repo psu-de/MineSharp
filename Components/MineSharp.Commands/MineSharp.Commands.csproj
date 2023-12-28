@@ -17,6 +17,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
         <PackageTags>minecraft, commands</PackageTags>
+        
+        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

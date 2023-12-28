@@ -2,9 +2,8 @@ using MineSharp.Core.Exceptions;
 
 namespace MineSharp.Bot.Exceptions;
 
-public class PluginNotLoadedException : MineSharpException
-{
-
-    public PluginNotLoadedException(string message) : base(message)
-    { }
-}
+/// <summary>
+/// Thrown when trying to get a plugin that is not loaded by the bot
+/// </summary>
+/// <param name="message"></param>
+public class PluginNotLoadedException(string message) : MineSharpException(message);

@@ -5,7 +5,7 @@ using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class MessageAcknowledgementPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
@@ -60,3 +60,4 @@ public class MessageAcknowledgementPacket : IPacket
     
     public static IPacket Read(PacketBuffer buffer, MinecraftData version) => throw new NotImplementedException();
 }
+#pragma warning restore CS1591

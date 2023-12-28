@@ -3,9 +3,9 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 /// <summary>
-/// SpawnPaintingPacket used for versions <= 1.18.2
+/// SpawnPaintingPacket used for versions &lt;= 1.18.2
 /// </summary>
 public class SpawnPaintingPacket : IPacket
 {
@@ -47,3 +47,4 @@ public class SpawnPaintingPacket : IPacket
         return new SpawnPaintingPacket(entityId, entityUuid, title, location, direction);
     }
 }
+#pragma warning restore CS1591

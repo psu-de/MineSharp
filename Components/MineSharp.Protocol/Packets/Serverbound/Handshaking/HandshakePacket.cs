@@ -5,6 +5,8 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
+#pragma warning disable CS1591
+
 public class HandshakePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Handshake_SetProtocol;
@@ -40,3 +42,5 @@ public class HandshakePacket : IPacket
         return new HandshakePacket(protocolVersion, host, port, nextState);
     }
 }
+
+#pragma warning restore CS1591

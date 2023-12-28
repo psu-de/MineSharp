@@ -6,17 +6,48 @@ using System.Text.RegularExpressions;
 
 namespace MineSharp.Auth.Responses;
 
+/// <summary>
+/// Player certificates from Mojang.
+/// Used to encrypt and decrypt messages.
+/// </summary>
 public class PlayerCertificate : ICachedResponse<PlayerCertificate>
 {
     private const string DATE_FORMAT = "yyyy-MM-ddTHH:mm:ss.ffffffZ";
     
-    public KeyPair Keys { get; set; }
-    public RSA RsaPublic { get; set; }
-    public RSA RsaPrivate { get; set; }
-    public byte[] PublicKeySignature { get; set; }
-    public byte[] PublicKeySignatureV2 { get; set; }
-    public DateTime ExpiresAt { get; set; }
-    public DateTime RefreshAfter { get; set; }
+    /// <summary>
+    /// The associated KeyPair
+    /// </summary>
+    public KeyPair Keys { get; }
+    
+    /// <summary>
+    /// The public RSA instance
+    /// </summary>
+    public RSA RsaPublic { get; }
+    
+    /// <summary>
+    /// The private RSA instance
+    /// </summary>
+    public RSA RsaPrivate { get; }
+    
+    /// <summary>
+    /// Public key signature
+    /// </summary>
+    public byte[] PublicKeySignature { get; }
+    
+    /// <summary>
+    /// Public key signature V2
+    /// </summary>
+    public byte[] PublicKeySignatureV2 { get; }
+    
+    /// <summary>
+    /// When the certificate expires
+    /// </summary>
+    public DateTime ExpiresAt { get; }
+    
+    /// <summary>
+    /// When the certificate should be refreshed
+    /// </summary>
+    public DateTime RefreshAfter { get; }
 
     private PlayerCertificate(KeyPair keys, byte[] publicKeySignature, byte[] publicKeySignatureV2, DateTime expiresAt, DateTime refreshAfter)
     {
@@ -59,17 +90,29 @@ public class PlayerCertificate : ICachedResponse<PlayerCertificate>
             DateTime.ParseExact(blob.RefreshedAfter, DATE_FORMAT, CultureInfo.InvariantCulture).ToUniversalTime());
     }
 
+    /// <summary>
+    /// Whether the certificates should be refreshed
+    /// </summary>
+    /// <returns></returns>
     public bool RequiresRefresh()
         => DateTime.UtcNow >= this.RefreshAfter;
 
-
+    /// <summary>
+    /// Serialize the certificates to the given path
+    /// </summary>
+    /// <param name="path"></param>
     public void Serialize(string path)
     {
         var file = Path.Join(path, "certificate.json");
         var json = JsonConvert.SerializeObject(this.ToBlob());
         File.WriteAllText(file, json);
     }
-
+    
+    /// <summary>
+    /// Deserialize the certificate from the given path
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public static PlayerCertificate? Deserialize(string path)
     {
         var file = Path.Join(path, "certificate.json");
@@ -104,5 +147,10 @@ public class PlayerCertificate : ICachedResponse<PlayerCertificate>
         return $"-----BEGIN RSA {keyType} KEY-----\n{str}\n-----END RSA {keyType} KEY-----";
     }
 
+    /// <summary>
+    /// A public / private key pair
+    /// </summary>
+    /// <param name="PrivateKey">The private key</param>
+    /// <param name="PublicKey">The public key</param>
     public record KeyPair(byte[] PrivateKey, byte[] PublicKey);
 }

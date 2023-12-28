@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class PlayerPositionPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_Position;
@@ -101,3 +101,4 @@ public class PlayerPositionPacket : IPacket
         return new PlayerPositionPacket(x, y, z, yaw, pitch, flags, teleportId, dismountVehicle);
     }
 }
+#pragma warning restore CS1591

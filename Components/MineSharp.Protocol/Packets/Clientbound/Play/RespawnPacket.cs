@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class RespawnPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_Respawn;
@@ -120,3 +120,4 @@ public class RespawnPacket : IPacket
             portalCooldown);
     }
 }
+#pragma warning restore CS1591

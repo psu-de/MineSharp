@@ -4,10 +4,20 @@ using MineSharp.Core.Common.Blocks;
 
 namespace MineSharp.World.Chunks;
 
+/// <summary>
+/// Interface for implementing a chunk.
+/// A chunk is an 16x16xWorldHeight area in the world.
+/// </summary>
 public interface IChunk
 {
+    /// <summary>
+    /// The size (X, Z direction) of a chunk
+    /// </summary>
     public const int SIZE = 16;
     
+    /// <summary>
+    /// Fired whenever a block in the chunk was updated
+    /// </summary>
     public event Events.ChunkBlockEvent OnBlockUpdated;
     
     /// <summary>
@@ -72,8 +82,20 @@ public interface IChunk
     /// <param name="biome"></param>
     public void SetBiomeAt(Position position, Biome biome);
 
+    /// <summary>
+    /// Search through the chunk for the given block type
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="maxCount"></param>
+    /// <returns></returns>
     [Obsolete]
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
+    
+    /// <summary>
+    /// Search through the chunk for the given block type and return the first block.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     [Obsolete]
     public Block? FindBlock(BlockType type) => FindBlocks(type).FirstOrDefault();
 }

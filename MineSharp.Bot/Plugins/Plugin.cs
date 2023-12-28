@@ -2,15 +2,32 @@ using MineSharp.Protocol;
 
 namespace MineSharp.Bot.Plugins;
 
+/// <summary>
+/// Plugin for <see cref="MinecraftBot"/>. 
+/// </summary>
 public abstract class Plugin
 {
+    /// <summary>
+    /// The bot
+    /// </summary>
     protected MinecraftBot Bot { get; }
 
+    /// <summary>
+    /// Whether this plugin is currently enabled
+    /// </summary>
     public bool IsEnabled { get; private set; }
+    
+    /// <summary>
+    /// Whether this plugin is loaded and functional
+    /// </summary>
     public bool IsLoaded { get; private set; }
 
     private readonly TaskCompletionSource _initializationTask;
 
+    /// <summary>
+    /// Create a new Plugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     protected Plugin(MinecraftBot bot)
     {
         this.Bot = bot;

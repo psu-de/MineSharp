@@ -9,12 +9,10 @@ using System.Collections.Concurrent;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// This Plugin tracks entities.
+/// This Plugin handles all kinds of packets regarding entities.
 /// </summary>
 public class EntityPlugin : Plugin
 {
-    private const double VELOCITY_CONVERSION = 8000d;
-    
     /// <summary>
     /// All Entities loaded by the client.
     /// </summary>
@@ -37,6 +35,10 @@ public class EntityPlugin : Plugin
 
     private PlayerPlugin? _playerPlugin;
 
+    /// <summary>
+    /// Create a new EntityPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     public EntityPlugin(MinecraftBot bot) : base(bot)
     {
         this.Entities = new ConcurrentDictionary<int, Entity>();
@@ -52,6 +54,7 @@ public class EntityPlugin : Plugin
         this.Bot.Client.On<PlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
     }
 
+    /// <inheritdoc />
     protected override async Task Init()
     {
         this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();

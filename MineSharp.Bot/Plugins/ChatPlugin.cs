@@ -12,6 +12,9 @@ using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMess
 
 namespace MineSharp.Bot.Plugins;
 
+/// <summary>
+/// ChatPlugin handles chat packets and provides methods to send chat messages and commands.
+/// </summary>
 public class ChatPlugin : Plugin
 {
     private readonly LastSeenMessageCollector? _messageCollector;
@@ -21,8 +24,16 @@ public class ChatPlugin : Plugin
 
     private CommandTree? _commandTree = null;
 
+    /// <summary>
+    /// Fired when a chat message is received
+    /// </summary>
     public event Events.BotChatMessageEvent? OnChatMessageReceived;
 
+    
+    /// <summary>
+    /// Create a new ChatPlugin instance.
+    /// </summary>
+    /// <param name="bot"></param>
     public ChatPlugin(MinecraftBot bot) : base(bot)
     {
         this._messageCollector = this.Bot.Data.Version.Protocol switch {
@@ -37,6 +48,7 @@ public class ChatPlugin : Plugin
         this.Bot.Client.On<DisguisedChatMessagePacket>(this.HandleDisguisedChatMessage);
     }
 
+    /// <inheritdoc />
     protected override async Task Init()
     {
         if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_3 && this.Bot.Session.OnlineSession)
@@ -54,6 +66,12 @@ public class ChatPlugin : Plugin
         await HandleDeclareCommandsPacket(packet);
     }
 
+    /// <summary>
+    /// Send a chat message to the Minecraft server.
+    /// If the message starts with a '/', a command is sent instead.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
     public Task SendChat(string message)
     {
         if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19
@@ -76,6 +94,12 @@ public class ChatPlugin : Plugin
 
     }
     
+    /// <summary>
+    /// Send a command to the server.
+    /// Can only be used for versions &gt;= 1.19
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
     public Task SendCommand(string command)
     {
         var arguments = new List<(string, string)>();

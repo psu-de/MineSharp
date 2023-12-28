@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-
+#pragma warning disable CS1591
 public class PongPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_Pong;
@@ -26,3 +26,4 @@ public class PongPacket : IPacket
             buffer.ReadInt());
     }
 }
+#pragma warning restore CS1591

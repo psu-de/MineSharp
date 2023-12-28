@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class WindowSetSlotPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_SetSlot;
@@ -36,3 +36,4 @@ public class WindowSetSlotPacket : IPacket
             buffer.ReadSlot(version));
     }
 }
+#pragma warning restore CS1591

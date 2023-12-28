@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class SetPlayerPositionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_Position;
@@ -38,3 +38,4 @@ public class SetPlayerPositionPacket : IPacket
         return new SetPlayerPositionPacket(x, y, z, isOnGround);
     }
 }
+#pragma warning restore CS1591

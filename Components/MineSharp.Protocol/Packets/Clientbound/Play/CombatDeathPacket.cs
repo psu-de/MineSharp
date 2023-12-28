@@ -3,13 +3,28 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
+/// <summary>
+/// Combat death packet
+/// </summary>
 public class CombatDeathPacket : IPacket
 {
+    /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_DeathCombatEvent;
 
+    /// <summary>
+    /// Id of the player
+    /// </summary>
     public int PlayerId { get; set; }
+    
+    /// <summary>
+    /// Id of the entity
+    /// </summary>
     public int? EntityId { get; set; }
+    
+    /// <summary>
+    /// Death message
+    /// </summary>
     public string Message { get; set; }
 
     /// <summary>
@@ -25,6 +40,11 @@ public class CombatDeathPacket : IPacket
         this.Message = message;
     }
 
+    /// <summary>
+    /// Constructor after 1.20
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="message"></param>
     public CombatDeathPacket(int playerId, string message)
     {
         this.PlayerId = playerId;
@@ -38,6 +58,7 @@ public class CombatDeathPacket : IPacket
         this.Message = message;
     }
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.PlayerId);
@@ -46,6 +67,7 @@ public class CombatDeathPacket : IPacket
         buffer.WriteString(this.Message);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var playerId = buffer.ReadVarInt();
@@ -56,3 +78,4 @@ public class CombatDeathPacket : IPacket
         return new CombatDeathPacket(playerId, entityId, message);
     }
 }
+#pragma warning restore CS1591

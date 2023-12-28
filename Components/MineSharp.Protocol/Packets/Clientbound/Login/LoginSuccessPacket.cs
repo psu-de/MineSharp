@@ -4,15 +4,36 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
-
+#pragma warning disable CS1591
+/// <summary>
+/// Login success packet
+/// </summary>
 public class LoginSuccessPacket : IPacket
 {
+    /// <inheritdoc />
     public PacketType Type => PacketType.CB_Login_Success;
 
+    /// <summary>
+    /// Uuid
+    /// </summary>
     public UUID Uuid { get; set; }
+    
+    /// <summary>
+    /// Username of the client
+    /// </summary>
     public string Username { get; set; }
+    
+    /// <summary>
+    /// A list of properties sent for versions &gt;= 1.19
+    /// </summary>
     public Property[]? Properties { get; set; }
 
+    /// <summary>
+    /// Create a new instance
+    /// </summary>
+    /// <param name="uuid"></param>
+    /// <param name="username"></param>
+    /// <param name="properties"></param>
     public LoginSuccessPacket(UUID uuid, string username, Property[]? properties = null)
     {
         this.Uuid = uuid;
@@ -20,6 +41,7 @@ public class LoginSuccessPacket : IPacket
         this.Properties = properties;
     }
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteUuid(this.Uuid);
@@ -38,6 +60,7 @@ public class LoginSuccessPacket : IPacket
         buffer.WriteVarIntArray(this.Properties, ((buffer, property) => property.Write(buffer)));
     }
     
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var uuid = buffer.ReadUuid();
@@ -52,12 +75,32 @@ public class LoginSuccessPacket : IPacket
         return new LoginSuccessPacket(uuid, username, properties);
     }
 
+    /// <summary>
+    /// A player property
+    /// </summary>
     public class Property : ISerializable<Property>
     {
+        /// <summary>
+        /// Name of this property
+        /// </summary>
         public string Name { get; set; }
+        
+        /// <summary>
+        /// Value of this property
+        /// </summary>
         public string Value { get; set; }
+        
+        /// <summary>
+        /// Signature
+        /// </summary>
         public string? Signature { get; set; }
 
+        /// <summary>
+        /// Create a new instance
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="signature"></param>
         public Property(string name, string value, string? signature)
         {
             this.Name = name;
@@ -65,6 +108,7 @@ public class LoginSuccessPacket : IPacket
             this.Signature = signature;
         }
 
+        /// <inheritdoc />
         public void Write(PacketBuffer buffer)
         {
             buffer.WriteString(this.Name);
@@ -77,6 +121,7 @@ public class LoginSuccessPacket : IPacket
             }
         }
 
+        /// <inheritdoc />
         public static Property Read(PacketBuffer buffer)
         {
             string name = buffer.ReadString();
@@ -92,3 +137,4 @@ public class LoginSuccessPacket : IPacket
         }
     }
 }
+#pragma warning restore CS1591

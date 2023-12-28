@@ -4,7 +4,7 @@ using MineSharp.Protocol.Packets.Clientbound.Play;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public class PlayPacketHandler : IPacketHandler
+internal class PlayPacketHandler : IPacketHandler
 {
     private MinecraftClient _client;
     private MinecraftData _data;

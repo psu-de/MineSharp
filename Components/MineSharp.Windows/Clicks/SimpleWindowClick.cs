@@ -125,7 +125,7 @@ internal class SimpleWindowClick : WindowClick
         if (!(this.Button == 0 || this.Button == 1))
             throw new NotSupportedException();
 
-        if (this.Slot == OutsideClick)
+        if (this.Slot == OUTSIDE_CLICK)
         {
             this.PerformOutsideClick();
             return;

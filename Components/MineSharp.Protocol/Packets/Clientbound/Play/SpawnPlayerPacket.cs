@@ -3,9 +3,9 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 /// <summary>
-/// SpawnPlayerPacket used for versions <= 1.20.1
+/// SpawnPlayerPacket used for versions &lt;= 1.20.1
 /// Merged with SpawnEntityPacket in 1.20.2
 /// </summary>
 public class SpawnPlayerPacket : IPacket
@@ -54,3 +54,4 @@ public class SpawnPlayerPacket : IPacket
         return new SpawnPlayerPacket(entityId, playerUuid, x, y, z, yaw, pitch);
     }
 }
+#pragma warning restore CS1591

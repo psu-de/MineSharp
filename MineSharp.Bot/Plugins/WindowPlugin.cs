@@ -12,17 +12,35 @@ using MineSharp.Windows.Specific;
 
 namespace MineSharp.Bot.Plugins;
 
+/// <summary>
+/// The Window plugin takes care of minecraft window's system.
+/// It handles the Bot's Inventory, window slot updates and provides
+/// methods to open blocks like chests, crafting tables, ...
+/// </summary>
 public class WindowPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
+    /// <summary>
+    /// The window currently opened by the bot. Null if none is open.
+    /// </summary>
     public Window? CurrentlyOpenedWindow { get; private set; }
+    
+    /// <summary>
+    /// The bots inventory window
+    /// </summary>
     public Inventory? Inventory { get; private set; }
+    
+    /// <summary>
+    /// The item the bot is currently holding
+    /// </summary>
     public Item? HeldItem => this.Inventory!
         .GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex))
         .Item;
 
-
+    /// <summary>
+    /// Index of the selected hot bar slot
+    /// </summary>
     public byte SelectedHotbarIndex { get; private set; }
     
     /// <summary>
@@ -43,7 +61,10 @@ public class WindowPlugin : Plugin
     private DateTime? _cacheTimestamp;
     private WindowItemsPacket? _cachedWindowItemsPacket;
 
-
+    /// <summary>
+    /// Create a new WindowPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     public WindowPlugin(MinecraftBot bot) : base(bot)
     {
         this._inventoryLoadedTsc = new TaskCompletionSource();
@@ -59,6 +80,7 @@ public class WindowPlugin : Plugin
         this._mainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
     }
     
+    /// <inheritdoc />
     protected override Task Init()
     {
         this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();   
@@ -72,10 +94,21 @@ public class WindowPlugin : Plugin
         return base.Init();
     }
 
+    /// <summary>
+    /// Wait until the bot's inventory items are loaded
+    /// </summary>
+    /// <returns></returns>
     public Task WaitForInventory() 
         => this._inventoryLoadedTsc.Task;
     
 
+    /// <summary>
+    /// Try to open the given block and return the opened window
+    /// </summary>
+    /// <param name="block"></param>
+    /// <param name="timeoutMs"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public async Task<Window> OpenContainer(Block block, int timeoutMs = 10 * 1000)
     {
         if (!this.Bot.Data.Windows.AllowedBlocksToOpen.Contains(block.Info.Type))
@@ -110,6 +143,11 @@ public class WindowPlugin : Plugin
         return window;
     }
 
+    /// <summary>
+    /// Close the window with the given id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public Task CloseWindow(int id)
     {
         if (id == 0)
@@ -130,6 +168,11 @@ public class WindowPlugin : Plugin
         return this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.CloseWindowPacket((byte)id));
     }
 
+    /// <summary>
+    /// Set the selected hot bar slot
+    /// </summary>
+    /// <param name="hotbarIndex"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task SelectHotbarIndex(byte hotbarIndex)
     {
         if (hotbarIndex > 8) 

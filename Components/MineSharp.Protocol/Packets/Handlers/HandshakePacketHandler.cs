@@ -4,7 +4,7 @@ using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public class HandshakePacketHandler : IPacketHandler
+internal class HandshakePacketHandler : IPacketHandler
 {
     private MinecraftClient _client;
     

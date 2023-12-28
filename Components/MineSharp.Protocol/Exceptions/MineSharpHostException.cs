@@ -2,8 +2,5 @@ using MineSharp.Core.Exceptions;
 
 namespace MineSharp.Protocol.Exceptions;
 
-public class MineSharpHostException : MineSharpException
-{
-
-    public MineSharpHostException(string message) : base(message) {}
-}
+/// <inheritdoc />
+public class MineSharpHostException(string message) : MineSharpException(message);

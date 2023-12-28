@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-
+#pragma warning disable CS1591
 public class PluginMessagePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_CustomPayload;
@@ -29,3 +29,4 @@ public class PluginMessagePacket : IPacket
         return new PluginMessagePacket(channelName, clone);
     }
 }
+#pragma warning restore CS1591

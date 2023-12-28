@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-public class LoginPacketHandler : IPacketHandler
+internal class LoginPacketHandler : IPacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
@@ -65,7 +65,7 @@ public class LoginPacketHandler : IPacketHandler
         // Authenticate
         if (this._client.Session.OnlineSession)
         {
-            if (!await MinecraftAPI.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
+            if (!await MinecraftApi.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
             {
                 throw new MineSharpAuthException("Error trying to authenticate with Mojang");
             }

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-
+#pragma warning disable CS1591
 public class LoginPluginResponsePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Login_LoginPluginResponse;
@@ -40,3 +40,4 @@ public class LoginPluginResponsePacket : IPacket
         return new LoginPluginResponsePacket(messageId, data);
     }
 }
+#pragma warning restore CS1591

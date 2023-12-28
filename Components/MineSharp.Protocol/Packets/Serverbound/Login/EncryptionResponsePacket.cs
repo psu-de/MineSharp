@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-
+#pragma warning disable CS1591
 public class EncryptionResponsePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Login_EncryptionBegin;
@@ -107,3 +107,4 @@ public class EncryptionResponsePacket : IPacket
         }
     }
 }
+#pragma warning restore CS1591

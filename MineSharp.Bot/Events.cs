@@ -7,10 +7,15 @@ using MineSharp.Windows;
 
 namespace MineSharp.Bot;
 
+/// <summary>
+/// Event delegates used by MineSharp.Bot
+/// </summary>
 public static class Events
 {
+    #pragma warning disable CS1591
+    
     public delegate void BotEvent(MinecraftBot sender);
-
+    
     public delegate void BotStringEvent(MinecraftBot sender, string message);
 
     public delegate void BotChatEvent(MinecraftBot sender, ChatComponent message);
@@ -24,4 +29,6 @@ public static class Events
     public delegate void WindowEvent(MinecraftBot sender, Window window);
     
     public delegate void ItemEvent(MinecraftBot sender, Item? item);
+    
+    #pragma warning restore CS1591
 }

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class TeleportEntityPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityTeleport;
@@ -52,3 +52,4 @@ public class TeleportEntityPacket : IPacket
             entityId, x, y, z, yaw, pitch, onGround);
     }
 }
+#pragma warning restore CS1591

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class SetEntityVelocityPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityVelocity;
@@ -38,3 +38,4 @@ public class SetEntityVelocityPacket : IPacket
         return new SetEntityVelocityPacket(entityId, velocityX, velocityY, velocityZ);
     }
 }
+#pragma warning restore CS1591

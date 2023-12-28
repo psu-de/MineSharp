@@ -10,15 +10,26 @@ using NLog;
 
 namespace MineSharp.Bot.Plugins;
 
+/// <summary>
+/// World plugin handles all kind of packets regarding the minecraft world,
+/// and provides methods to interact with it, like mining and digging.
+/// </summary>
 public class WorldPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
+    /// <summary>
+    /// The world of the Minecraft server
+    /// </summary>
     public IWorld World { get; private set; }
     
     private PlayerPlugin? _playerPlugin;
     private WindowPlugin? _windowPlugin;
 
+    /// <summary>
+    /// Create a new WorldPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     public WorldPlugin(MinecraftBot bot) : base(bot)
     {
         this.World = WorldVersion.CreateWorld(this.Bot.Data);
@@ -29,6 +40,7 @@ public class WorldPlugin : Plugin
         this.Bot.Client.On<MultiBlockUpdatePacket>(this.HandleMultiBlockUpdatePacket);
     }
 
+    /// <inheritdoc />
     protected override Task Init()
     {
         this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
@@ -60,6 +72,15 @@ public class WorldPlugin : Plugin
         }
     }
 
+    /// <summary>
+    /// Update the Command block at the given position
+    /// </summary>
+    /// <param name="location"></param>
+    /// <param name="command"></param>
+    /// <param name="mode"></param>
+    /// <param name="flags"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
     {
         if (this._playerPlugin?.Self?.GameMode != GameMode.Creative)
@@ -71,6 +92,13 @@ public class WorldPlugin : Plugin
         return this.Bot.Client.SendPacket(packet);
     }
 
+    /// <summary>
+    /// Mine the given block
+    /// </summary>
+    /// <param name="block">The block to mine</param>
+    /// <param name="face">The block face the bot is facing</param>
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
     public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null)
     {
         if (this._playerPlugin?.Self == null)
@@ -94,7 +122,7 @@ public class WorldPlugin : Plugin
 
         // first packet: Start digging
         var startPacket = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
-            (int)DiggingStatus.StartedDigging,
+            (int)PlayerActionStatus.StartedDigging,
             block.Position,
             face.Value,
             ++this.Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
@@ -124,7 +152,7 @@ public class WorldPlugin : Plugin
                 await Task.Delay(time);
 
                 var finishPacket = new PlayerActionPacket(
-                    (int)DiggingStatus.FinishedDigging,
+                    (int)PlayerActionStatus.FinishedDigging,
                     block.Position,
                     face.Value,
                     ++this.Bot.SequenceId);
@@ -142,7 +170,7 @@ public class WorldPlugin : Plugin
 
             if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p118)
             {
-                if ((DiggingStatus)p118.Status != DiggingStatus.StartedDigging)
+                if ((PlayerActionStatus)p118.Status != PlayerActionStatus.StartedDigging)
                     return MineBlockStatus.Failed;
             } // TODO: MineBlock: What happens in 1.19?
                 
@@ -154,7 +182,7 @@ public class WorldPlugin : Plugin
         } catch (TaskCanceledException)
         {
             var cancelPacket = new PlayerActionPacket(
-                (int)DiggingStatus.CancelledDigging,
+                (int)PlayerActionStatus.CancelledDigging,
                 block.Position,
                 face.Value,
                 ++this.Bot.SequenceId);
@@ -166,6 +194,12 @@ public class WorldPlugin : Plugin
         }
     }
 
+    /// <summary>
+    /// Place the block the bot is currently holding at the given position
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="hand"></param>
+    /// <param name="face"></param>
     public async Task PlaceBlock(Position position, PlayerHand hand = PlayerHand.MainHand, BlockFace face = BlockFace.Top)
     {
         // TODO: PlaceBlock: Hardcoded values

@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-
+#pragma warning disable CS1591
 public class UpdateCommandBlock : IPacket
 {
     public PacketType Type => PacketType.SB_Play_UpdateCommandBlock;
@@ -38,3 +38,5 @@ public class UpdateCommandBlock : IPacket
             buffer.ReadByte());
     }
 }
+
+#pragma warning restore CS1591

@@ -8,13 +8,17 @@ using NLog;
 
 namespace MineSharp.Bot.Plugins;
 
+/// <summary>
+/// Physics plugin simulates the player entity in the world.
+/// It also allows for walking, jumping and crouching.
+/// </summary>
 public class PhysicsPlugin : Plugin 
 {
     private const double POSITION_THRESHOLD = 0.01d;
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
     /// <summary>
-    ///     Fires when the Bot <see cref="BotEntity" /> moves
+    /// Fired when the Bot moves
     /// </summary>
     public event Events.BotEvent? BotMoved;
 
@@ -23,6 +27,9 @@ public class PhysicsPlugin : Plugin
     /// </summary>
     public event Events.BotEvent? PhysicsTick;
 
+    /// <summary>
+    /// The input controls used to control movement.
+    /// </summary>
     public readonly InputControls InputControls;
     
     private PlayerState lastPlayerState;
@@ -32,12 +39,17 @@ public class PhysicsPlugin : Plugin
 
     private MinecraftPlayer? Self;
 
+    /// <summary>
+    /// Create a new PhysicsPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
     public PhysicsPlugin(MinecraftBot bot) : base(bot)
     {
         this.lastPlayerState = new PlayerState(0, 0, 0, 0, 0, false);
         this.InputControls = new InputControls();
     }
 
+    /// <inheritdoc />
     protected override async Task Init()
     {
         this.playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
@@ -53,7 +65,8 @@ public class PhysicsPlugin : Plugin
         this.physics.OnCrouchingChanged += OnSneakingChanged;
         this.physics.OnSprintingChanged += OnSprintingChanged;
     }
-    
+
+    /// <inheritdoc />
     public override Task OnTick()
     {
         if (!this.IsLoaded)
@@ -83,7 +96,31 @@ public class PhysicsPlugin : Plugin
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Forces the bots rotation to the given yaw and pitch (in degrees)
+    /// </summary>
+    /// <param name="yaw"></param>
+    /// <param name="pitch"></param>
+    public void ForceSetRotation(float yaw, float pitch)
+    {
+        this.Self!.Entity!.Yaw = yaw;
+        this.Self!.Entity!.Pitch = pitch;
+    }
 
+    /// <summary>
+    /// Forces the bot to look at given position
+    /// </summary>
+    /// <param name="position"></param>
+    public void ForceLookAt(Position position)
+    {
+        var pos = new Vector3(0.5d, 0.5d, 0.5d).Plus(position);
+        var r = pos.Minus(this.Self!.GetHeadPosition());
+        var yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
+        if (yaw < 0) yaw = 360 + yaw;
+        var pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
+        this.ForceSetRotation((float)yaw, (float)pitch);
+    }
+    
     private async Task UpdateServerPositionIfNeeded()
     {
         if (Math.Abs(this.lastPlayerState.X - this.Self!.Entity!.Position.X) > POSITION_THRESHOLD 
@@ -121,31 +158,6 @@ public class PhysicsPlugin : Plugin
                 (callback, obj) => this.BotMoved.BeginInvoke(this.Bot, callback, obj),
                 this.BotMoved.EndInvoke,
                 null);
-    }
-
-    /// <summary>
-    ///     Forces the bots rotation to the given yaw and pitch (in degrees)
-    /// </summary>
-    /// <param name="yaw"></param>
-    /// <param name="pitch"></param>
-    public void ForceSetRotation(float yaw, float pitch)
-    {
-        this.Self!.Entity!.Yaw = yaw;
-        this.Self!.Entity!.Pitch = pitch;
-    }
-
-    /// <summary>
-    ///     Forces the bot to look at given position
-    /// </summary>
-    /// <param name="position"></param>
-    public void ForceLookAt(Position position)
-    {
-        var pos = new Vector3(0.5d, 0.5d, 0.5d).Plus(position);
-        var r = pos.Minus(this.Self!.GetHeadPosition());
-        var yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
-        if (yaw < 0) yaw = 360 + yaw;
-        var pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
-        this.ForceSetRotation((float)yaw, (float)pitch);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)

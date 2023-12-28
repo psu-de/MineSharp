@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class SystemChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_SystemChat;
@@ -51,3 +51,4 @@ public class SystemChatMessagePacket : IPacket
         return new SystemChatMessagePacket(content, buffer.ReadVarInt());
     }
 }
+#pragma warning restore CS1591

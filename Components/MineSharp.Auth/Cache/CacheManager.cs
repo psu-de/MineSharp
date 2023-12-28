@@ -1,6 +1,6 @@
 namespace MineSharp.Auth.Cache;
 
-public static class CacheManager
+internal static class CacheManager
 {
     public static string GetCachePath()
     {

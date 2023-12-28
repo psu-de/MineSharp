@@ -3,9 +3,9 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 /// <summary>
-/// SpawnLivingEntityPacket used for versions <= 1.18.2
+/// SpawnLivingEntityPacket used for versions &lt;= 1.18.2
 /// </summary>
 public class SpawnLivingEntityPacket : IPacket
 {
@@ -74,3 +74,4 @@ public class SpawnLivingEntityPacket : IPacket
             buffer.ReadShort());
     }
 }
+#pragma warning restore CS1591

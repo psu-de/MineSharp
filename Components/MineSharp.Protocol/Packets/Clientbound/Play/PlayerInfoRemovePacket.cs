@@ -3,7 +3,7 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class PlayerInfoRemovePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_PlayerRemove;
@@ -26,3 +26,4 @@ public class PlayerInfoRemovePacket : IPacket
         return new PlayerInfoRemovePacket(players);
     }
 }
+#pragma warning restore CS1591

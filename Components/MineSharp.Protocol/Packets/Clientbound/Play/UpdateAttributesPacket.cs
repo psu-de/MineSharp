@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-
+#pragma warning disable CS1591
 public class UpdateAttributesPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityUpdateAttributes;
@@ -65,3 +65,4 @@ public class UpdateAttributesPacket : IPacket
         return new Modifier(uuid, amount, (ModifierOp)operation);
     }
 }
+#pragma warning restore CS1591
