@@ -13,10 +13,12 @@
         <Title>MineSharp.Commands</Title>
         <Authors>psu-de</Authors>
         <Description>Command tree structure for MineSharp.</Description>
-        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageTags>minecraft, commands</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         
         <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
@@ -27,6 +29,7 @@
 
         <None Include="README.md" Pack="true" PackagePath="\" />
 
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
         <None Include="icon.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>

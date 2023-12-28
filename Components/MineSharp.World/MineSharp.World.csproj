@@ -11,10 +11,12 @@
         <Title>MineSharp.World</Title>
         <Authors>psu-de</Authors>
         <Description>Implementation of the minecraft world system in C#.</Description>
-        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageTags>minecraft, world</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,7 +24,8 @@
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
         
         <None Include="README.md" Pack="true" PackagePath="\" />
-        
+
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
         <None Include="icon.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>

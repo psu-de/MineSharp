@@ -11,10 +11,12 @@
         <Title>MineSharp.Windows</Title>
         <Authors>psu-de</Authors>
         <Description>Implementation of the Minecraft window system.</Description>
-        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageTags>minecraft, window-api</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,6 +24,7 @@
 
         <None Include="README.md" Pack="true" PackagePath="\" />
 
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
         <None Include="icon.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>

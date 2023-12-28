@@ -10,11 +10,13 @@
         <Title>MineSharp.Chat</Title>
         <Authors>psu-de</Authors>
         <Description>Chat component for MineSharp.</Description>
-        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageTags>minecraft, chat, minecraft-chat</PackageTags>
         <RootNamespace>MineSharp.ChatComponent</RootNamespace>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,7 +27,7 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 
         <None Include="README.md" Pack="true" PackagePath="\" />
-
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
         <None Include="icon.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>

@@ -10,17 +10,19 @@
         <Title>MineSharp.Auth</Title>
         <Authors>psu-xde</Authors>
         <Description>Authentication package for MineSharp.</Description>
-        <PackageProjectUrl>minesharp.io</PackageProjectUrl>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageTags>minecraft, authentication, msal</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
 
         <None Include="README.md" Pack="true" PackagePath="\" />
-
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
         <None Include="icon.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>
