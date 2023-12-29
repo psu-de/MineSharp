@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using MineSharp.Data;
+using Newtonsoft.Json;
 
 namespace MineSharp.ChatComponent;
 
@@ -44,9 +45,17 @@ public class Chat
     {
         this.Json = json;
         this.data = data;
-        
-        this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
-        this.Message = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
+
+        try
+        {
+            this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
+            this.Message = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
+        }
+        catch (JsonReaderException)
+        {
+            this.StyledMessage = this.Json;
+            this.Message = this.StyledMessage;
+        }
     }
 
     private string ParseComponent(JToken token, string styleCode = "")

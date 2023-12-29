@@ -5,7 +5,7 @@ using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Protocol;
 using System.Diagnostics;
-using MineSharp.ChatComponent;
+using NLog;
 using ChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
 using SBChatMessage = MineSharp.Protocol.Packets.Serverbound.Play.ChatPacket;
 using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMessagePacket;
@@ -17,6 +17,8 @@ namespace MineSharp.Bot.Plugins;
 /// </summary>
 public class ChatPlugin : Plugin
 {
+    private readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    
     private readonly LastSeenMessageCollector? _messageCollector;
     private readonly UUID _chatSession = new Guid();
     private int _messageCount = 0;
@@ -417,7 +419,14 @@ public class ChatPlugin : Plugin
     
     private Task HandleDeclareCommandsPacket(DeclareCommandsPacket packet)
     {
-        this._commandTree = CommandTree.Parse(packet.RawBuffer, this.Bot.Data);
+        try
+        {
+            this._commandTree = CommandTree.Parse(packet.RawBuffer, this.Bot.Data);
+        }
+        catch (Exception e)
+        {
+            Logger.Error($"Could not parse command tree: {e}");
+        }
         return Task.CompletedTask;
     }
 
@@ -429,33 +438,40 @@ public class ChatPlugin : Plugin
     /// <exception cref="UnreachableException"></exception>
     private Task HandleChatMessagePacket(PlayerChatPacket packet)
     {
-        // TODO: Advanced chat stuff like filtering and signature verification.
-
-        if (packet.Body is PlayerChatPacket.V1_19_2_3Body body && body.Signature != null)
+        try
         {
-            if (this._messageCollector is LastSeenMessageCollector1_19_2 collector1_19_2)
-            {
-                collector1_19_2.Push(new AcknowledgedMessage(true, body.Sender, body.Signature));
-                if (collector1_19_2.PendingAcknowledgements++ > 64)
-                {
-                    var messages = collector1_19_2.AcknowledgeMessages().Select(x => x.ToProtocolMessage()).ToArray();
-                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(messages, null));
-                }
-            } else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
-            {
-                int count = collector1_19_3.ResetCount();
-                if (count > 0)
-                    this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(count));
-            }
-        }
-        
-        (UUID sender, string message, ChatMessageType type) = packet.Body switch {
-            PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
-            PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
-            _ => throw new UnreachableException()
-        };
+            // TODO: Advanced chat stuff like filtering and signature verification.
 
-        this.HandleChatInternal(sender, message, type);
+            if (packet.Body is PlayerChatPacket.V1_19_2_3Body body && body.Signature != null)
+            {
+                if (this._messageCollector is LastSeenMessageCollector1_19_2 collector1_19_2)
+                {
+                    collector1_19_2.Push(new AcknowledgedMessage(true, body.Sender, body.Signature));
+                    if (collector1_19_2.PendingAcknowledgements++ > 64)
+                    {
+                        var messages = collector1_19_2.AcknowledgeMessages().Select(x => x.ToProtocolMessage()).ToArray();
+                        this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(messages, null));
+                    }
+                } else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
+                {
+                    int count = collector1_19_3.ResetCount();
+                    if (count > 0)
+                        this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(count));
+                }
+            }
+        
+            (UUID sender, string message, ChatMessageType type) = packet.Body switch {
+                PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
+                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
+                _ => throw new UnreachableException()
+            };
+            
+            this.HandleChatInternal(sender, message, type);
+        }
+        catch (Exception e)
+        {
+            Logger.Error("Error in chat message: " + e);
+        }
         
         return Task.CompletedTask;
     }
