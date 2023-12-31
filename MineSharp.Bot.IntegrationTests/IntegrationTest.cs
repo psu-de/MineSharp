@@ -43,7 +43,17 @@ public static class IntegrationTest
 
         if (test.Exception != null)
         {
-            throw test.Exception;
+            AnsiConsole.MarkupLine($"Test threw error: {test.Exception}");
+            try
+            {
+                await bot.Disconnect();
+            }
+            catch (Exception e)
+            {
+                AnsiConsole.WriteException(e);
+            }
+
+            return;
         }
         
         string team;

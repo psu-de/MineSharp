@@ -90,11 +90,6 @@ public class WindowTests
     [Test]
     public void SimpleClickTest()
     {
-        this._inventory.OnSlotChanged += (window, index) =>
-        {
-            Console.WriteLine($"Slot changed ({index}): {window.GetSlot(index)}");
-        };
-        
         this._inventory.SetSlot(new Slot(
             new Item(this._diamond, 16, null, null), 9));
 

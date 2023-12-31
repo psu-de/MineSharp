@@ -44,6 +44,7 @@ public class EntityPlugin : Plugin
         this.Entities = new ConcurrentDictionary<int, Entity>();
         
         this.Bot.Client.On<SpawnEntityPacket>(this.HandleSpawnEntityPacket);
+        this.Bot.Client.On<SpawnLivingEntityPacket>(this.HandleSpawnLivingEntityPacket);
         this.Bot.Client.On<RemoveEntitiesPacket>(this.HandleRemoveEntitiesPacket);
         this.Bot.Client.On<SetEntityVelocityPacket>(this.HandleSetEntityVelocityPacket);
         this.Bot.Client.On<EntityPositionPacket>(this.HandleUpdateEntityPositionPacket);
@@ -64,13 +65,33 @@ public class EntityPlugin : Plugin
     internal void AddEntity(Entity entity)
     {
         this.Entities.TryAdd(entity.ServerId, entity);
-        this.OnEntitySpawned?.Invoke(this.Bot, entity);
 
         if (null != this.OnEntitySpawned)
-            _ = Task.Factory.FromAsync(
-                (callback, obj) => this.OnEntitySpawned.BeginInvoke(this.Bot, entity, callback, obj),
-                this.OnEntitySpawned.EndInvoke,
-                null);
+        {
+            Task.Run(() => this.OnEntitySpawned?.Invoke(this.Bot, entity));
+        }
+    }
+
+    private Task HandleSpawnLivingEntityPacket(SpawnLivingEntityPacket packet)
+    {
+        if (!this.IsEnabled)
+            return Task.CompletedTask;
+        
+        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
+        
+        var newEntity = new Entity(
+            entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
+            packet.Pitch,
+            packet.Yaw,
+            new Vector3(
+                NetUtils.ConvertToVelocity(packet.VelocityX), 
+                NetUtils.ConvertToVelocity(packet.VelocityY), 
+                NetUtils.ConvertToVelocity(packet.VelocityZ)),
+            true,
+            new Dictionary<EffectType, Effect?>());
+
+        this.AddEntity(newEntity);
+        return Task.CompletedTask;
     }
 
     private Task HandleSpawnEntityPacket(SpawnEntityPacket packet)
