@@ -338,3 +338,4 @@ MineSharp.Bot.IntegrationTests/TestServer/*
 MineSharp.Bot.IntegrationTests/TestServer/**/*
 !MineSharp.Bot.IntegrationTests/TestServer/world/region/*
 !MineSharp.Bot.IntegrationTests/TestServer/world/data/scoreboard.dat
+!MineSharp.Bot.IntegrationTests/TestServer/world/level.dat
