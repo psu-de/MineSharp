@@ -1,5 +1,6 @@
 
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Physics;
 using MineSharp.Physics.Input;
@@ -12,8 +13,9 @@ namespace MineSharp.Bot.Plugins;
 /// Physics plugin simulates the player entity in the world.
 /// It also allows for walking, jumping and crouching.
 /// </summary>
-public class PhysicsPlugin : Plugin 
+public class PhysicsPlugin : Plugin
 {
+    private const float ROTATION_SMOOTHNESS = 0.2f;
     private const double POSITION_THRESHOLD = 0.01d;
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
@@ -38,6 +40,8 @@ public class PhysicsPlugin : Plugin
     private WorldPlugin? worldPlugin;
 
     private MinecraftPlayer? Self;
+
+    private LerpRotation? lerpRotation;
 
     /// <summary>
     /// Create a new PhysicsPlugin instance
@@ -66,6 +70,77 @@ public class PhysicsPlugin : Plugin
         this.physics.OnSprintingChanged += OnSprintingChanged;
     }
 
+    /// <summary>
+    /// Forces the bots rotation to the given yaw and pitch (in degrees)
+    /// </summary>
+    /// <param name="yaw"></param>
+    /// <param name="pitch"></param>
+    public void ForceSetRotation(float yaw, float pitch)
+    {
+        this.Self!.Entity!.Yaw = yaw;
+        this.Self!.Entity!.Pitch = pitch;
+    }
+
+    /// <summary>
+    /// Forces the bot to look at given position
+    /// </summary>
+    /// <param name="position"></param>
+    public void ForceLookAt(Vector3 position)
+    {
+        (var yaw, var pitch) = this.CalculateRotation(position);
+        this.ForceSetRotation(yaw, pitch);
+    }
+
+    /// <summary>
+    /// Forces the bot to look at the center of the given block
+    /// </summary>
+    /// <param name="block"></param>
+    public void ForceLookAt(Block block)
+        => this.ForceLookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position));
+
+    /// <summary>
+    /// Slowly look at the given yaw and pitch.
+    /// Use a higher smoothness value for faster rotation,
+    /// lower value for slower rotation.
+    /// </summary>
+    /// <param name="yaw"></param>
+    /// <param name="pitch"></param>
+    /// <param name="smoothness"></param>
+    public async Task Look(float yaw, float pitch, float smoothness = ROTATION_SMOOTHNESS)
+    {
+        this.lerpRotation?.Cancel();
+        this.lerpRotation = new LerpRotation(this.playerPlugin!.Self!, yaw, pitch, smoothness);
+
+        await this.lerpRotation.GetTask();
+
+        this.lerpRotation = null;
+    }
+
+    /// <summary>
+    /// Slowly look at the given position.
+    /// Use a higher smoothness value for faster rotation,
+    /// a lower value for slower rotation.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="smoothness"></param>
+    /// <returns></returns>
+    public Task LookAt(Vector3 position, float smoothness = ROTATION_SMOOTHNESS)
+    {
+        var rotation = this.CalculateRotation(position);
+        return this.Look(rotation.Yaw, rotation.Pitch);
+    }
+
+    /// <summary>
+    /// Slowly look at the center of the given block.
+    /// Use a higher smoothness value for faster rotation,
+    /// a lower value for slower rotation.
+    /// </summary>
+    /// <param name="block"></param>
+    /// <param name="smoothness"></param>
+    /// <returns></returns>
+    public Task LookAt(Block block, float smoothness = ROTATION_SMOOTHNESS)
+        => this.LookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position), smoothness);
+    
     /// <inheritdoc />
     public override Task OnTick()
     {
@@ -74,11 +149,12 @@ public class PhysicsPlugin : Plugin
 
         if (!this.playerPlugin!.IsAlive!.Value)
             return Task.CompletedTask;
-
+        
         _ = Task.Run(async () =>
         {
             try
             {
+                this.lerpRotation?.Tick();
                 this.physics!.Tick();
                 await this.UpdateServerPositionIfNeeded();
                 
@@ -96,29 +172,15 @@ public class PhysicsPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Forces the bots rotation to the given yaw and pitch (in degrees)
-    /// </summary>
-    /// <param name="yaw"></param>
-    /// <param name="pitch"></param>
-    public void ForceSetRotation(float yaw, float pitch)
-    {
-        this.Self!.Entity!.Yaw = yaw;
-        this.Self!.Entity!.Pitch = pitch;
-    }
-
-    /// <summary>
-    /// Forces the bot to look at given position
-    /// </summary>
-    /// <param name="position"></param>
-    public void ForceLookAt(Position position)
+    private (float Yaw, float Pitch) CalculateRotation(Vector3 position)
     {
         var pos = new Vector3(0.5d, 0.5d, 0.5d).Plus(position);
         var r = pos.Minus(this.Self!.GetHeadPosition());
-        var yaw = -Math.Atan2(r.X, r.Z) / Math.PI * 180;
+        var yaw = (float)(-Math.Atan2(r.X, r.Z) / Math.PI * 180);
         if (yaw < 0) yaw = 360 + yaw;
-        var pitch = -Math.Asin(r.Y / r.Length()) / Math.PI * 180;
-        this.ForceSetRotation((float)yaw, (float)pitch);
+        var pitch = (float)(-Math.Asin(r.Y / r.Length()) / Math.PI * 180);
+
+        return (yaw, pitch);
     }
     
     private async Task UpdateServerPositionIfNeeded()
@@ -204,5 +266,67 @@ public class PhysicsPlugin : Plugin
         }
 
         public override string ToString() => $"X={this.X} Y={this.Y} Z={this.Z} Yaw={this.Yaw} Pitch={this.Pitch} IsOnGround={this.OnGround}";
+    }
+
+    private class LerpRotation
+    {
+        private MinecraftPlayer player;
+        private float yawPerTick;
+        private float pitchPerTick;
+        private int remainingYawTicks;
+        private int remainingPitchTicks;
+        private bool completed;
+        private TaskCompletionSource task;
+
+        public LerpRotation(MinecraftPlayer player, float toYaw, float toPitch, float smoothness = ROTATION_SMOOTHNESS)
+        {
+            this.player = player;
+            
+            var deltaYaw = toYaw - player.Entity!.Yaw;
+            var deltaPitch = toPitch - player.Entity!.Pitch;
+
+            this.yawPerTick = deltaYaw * smoothness;
+            this.pitchPerTick = deltaPitch * smoothness;
+
+            var yawTicks = (int)(deltaYaw / yawPerTick);
+            var pitchTicks = (int)(deltaPitch / pitchPerTick);
+        
+            this.task = new TaskCompletionSource();
+            this.remainingYawTicks = yawTicks;
+            this.remainingPitchTicks = pitchTicks;
+        }
+
+        public void Tick()
+        {
+            if (this.completed)
+                return;
+            
+            if (this.remainingPitchTicks > 0)
+            {
+                this.remainingPitchTicks--;
+                this.player.Entity!.Pitch += this.pitchPerTick;
+            }
+        
+            if (this.remainingYawTicks > 0)
+            {
+                this.remainingYawTicks--;
+                this.player.Entity!.Yaw += this.yawPerTick;
+            }
+
+            if (this.remainingPitchTicks != 0 || this.remainingYawTicks != 0) 
+                return;
+            
+            this.completed = true;
+            this.task.TrySetResult();
+        }
+
+        public void Cancel()
+        {
+            this.completed = true;
+            this.task.TrySetCanceled();
+        }
+
+        public Task GetTask()
+            => this.task.Task;
     }
 }
