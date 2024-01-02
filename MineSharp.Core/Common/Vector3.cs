@@ -119,6 +119,18 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
+    /// Returns a new Vector which was scaled by <paramref name="scalar"/>
+    /// </summary>
+    /// <param name="scalar"></param>
+    /// <returns></returns>
+    public Vector3 Scaled(double scalar)
+    {
+        var vec = this.Clone();
+        vec.Scale(scalar);
+        return vec;
+    }
+
+    /// <summary>
     /// Returns the length of this vector.
     /// </summary>
     /// <returns></returns>

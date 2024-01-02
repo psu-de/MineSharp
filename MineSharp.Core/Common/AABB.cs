@@ -134,6 +134,30 @@ public class AABB
         return false;
     }
 
+    /// <summary>
+    /// Checks if the given line starting at <paramref name="origin"/> and moving along <paramref name="direction"/>
+    /// intersects this AABB.
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public bool IntersectsLine(Vector3 origin, Vector3 direction)
+    {
+        direction = direction.Normalized();
+
+        var tMinX = (this.MinX - origin.X) / direction.X;
+        var tMaxX = (this.MaxX - origin.X) / direction.X;
+        var tMinY = (this.MinY - origin.Y) / direction.Y;
+        var tMaxY = (this.MaxY - origin.Y) / direction.Y;
+        var tMinZ = (this.MinZ - origin.Z) / direction.Z;
+        var tMaxZ = (this.MaxZ - origin.Z) / direction.Z;
+
+        var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
+        var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
+        
+        return !(tMax < 0 || tMin > tMax);
+    }
+
     /// <inheritdoc />
     public override string ToString() => $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
 }

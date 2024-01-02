@@ -5,6 +5,7 @@ using MineSharp.Core.Common.Entities;
 using MineSharp.Physics;
 using MineSharp.Physics.Input;
 using MineSharp.Protocol.Packets.Serverbound.Play;
+using MineSharp.World.Iterators;
 using NLog;
 
 namespace MineSharp.Bot.Plugins;
@@ -140,6 +141,46 @@ public class PhysicsPlugin : Plugin
     /// <returns></returns>
     public Task LookAt(Block block, float smoothness = ROTATION_SMOOTHNESS)
         => this.LookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position), smoothness);
+
+    /// <summary>
+    /// Casts a ray from the players eyes, and returns the first block that is hit.
+    /// </summary>
+    /// <returns></returns>
+    public Task<Block?> Raycast(double distance = 64)
+    {
+        if (distance < 0)
+            return Task.FromResult<Block?>(null);
+
+        return Task.Run(() =>
+        {
+            var position = this.playerPlugin!.Self!.GetHeadPosition();
+            var lookVector = this.playerPlugin!.Self!.Entity!.GetLookVector();
+            var iterator = new RaycastIterator(
+                position,
+                lookVector,
+                length: distance);
+
+            foreach (var pos in iterator.Iterate())
+            {
+                var block = this.worldPlugin!.World.GetBlockAt(pos);
+
+                if (!block.IsSolid())
+                    continue;
+
+                var bbs = this.Bot.Data.BlockCollisionShapes.GetForBlock(block);
+
+                foreach (var bb in bbs)
+                {
+                    bb.Offset(block.Position.X, block.Position.Y, block.Position.Z);
+                    
+                    if (bb.IntersectsLine(position, lookVector))
+                        return block;
+                }
+            }
+
+            return null;
+        });
+    }
     
     /// <inheritdoc />
     public override Task OnTick()

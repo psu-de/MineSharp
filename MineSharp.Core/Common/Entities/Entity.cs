@@ -130,6 +130,26 @@ public class Entity(
             this.Position.Y + height,
             this.Position.Z + half);
     }
+
+    /// <summary>
+    /// The direction in which this entity is looking
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetLookVector()
+    {
+        var pitchRadians = this.Pitch * (MathF.PI / 180.0f);
+        var yawRadians = this.Yaw * (MathF.PI / 180.0);
+        
+        var len = Math.Cos(pitchRadians);
+        var x = len * Math.Sin(-yawRadians);
+        var y = -Math.Sin(pitchRadians);
+        var z = len * Math.Cos(yawRadians);
+        
+        var vec = new Vector3(x, y, z);
+        vec.Normalize();
+
+        return vec;
+    }
     
     /// <inheritdoc />
     public override string ToString()
