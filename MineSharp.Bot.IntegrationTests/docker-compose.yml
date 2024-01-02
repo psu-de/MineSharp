@@ -16,7 +16,7 @@ services:
       GENERATOR_SETTINGS: "{\"lakes\":false,\"features\":false,\"layers\":[{\"block\":\"minecraft:air\",\"height\":1}],\"structures\":{\"structures\":{}}}" # Void preset
     tty: true
     stdin_open: true
-    restart: unless-stopped
+    # restart: unless-stopped
     volumes:
       # attach a directory relative to the directory containing this compose file
       - ./TestServer:/data
