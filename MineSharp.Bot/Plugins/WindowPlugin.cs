@@ -101,7 +101,6 @@ public class WindowPlugin : Plugin
     public Task WaitForInventory() 
         => this._inventoryLoadedTsc.Task;
     
-
     /// <summary>
     /// Try to open the given block and return the opened window
     /// </summary>
@@ -169,6 +168,14 @@ public class WindowPlugin : Plugin
     }
 
     /// <summary>
+    /// Close the given window
+    /// </summary>
+    /// <param name="window"></param>
+    /// <returns></returns>
+    public Task CloseWindow(Window window)
+        => this.CloseWindow(window.WindowId);
+
+    /// <summary>
     /// Set the selected hot bar slot
     /// </summary>
     /// <param name="hotbarIndex"></param>
@@ -183,6 +190,18 @@ public class WindowPlugin : Plugin
 
         this.SelectedHotbarIndex = hotbarIndex;
         this.OnHeldItemChanged?.Invoke(this.Bot, this.HeldItem);
+    }
+
+    /// <summary>
+    /// Use the item the bot is currently holding in <paramref name="hand"/>
+    /// </summary>
+    /// <param name="hand"></param>
+    /// <returns></returns>
+    public Task UseItem(PlayerHand hand = PlayerHand.MainHand)
+    {
+        var packet = new UseItemPacket(hand, this.Bot.SequenceId++);
+
+        return this.Bot.Client.SendPacket(packet);
     }
 
     private void CreateInventory()
