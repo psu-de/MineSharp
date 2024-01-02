@@ -4,3 +4,5 @@ MineSharp 0.1.3:
  - added WorldIterator RaycastIterator
  - added Raycast() method to Physics plugin
  - added UseItem(hand) method to Window plugin
+ - added Serverbound SetHeldItemPacket
+ - added EquipItem() methods
