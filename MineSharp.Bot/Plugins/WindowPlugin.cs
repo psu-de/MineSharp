@@ -8,7 +8,11 @@ using MineSharp.Windows;
 using MineSharp.Windows.Clicks;
 using NLog;
 using System.Collections.Concurrent;
+using MineSharp.Bot.Exceptions;
 using MineSharp.Windows.Specific;
+
+using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
+using CBHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -87,7 +91,7 @@ public class WindowPlugin : Plugin
         
         this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
         this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
-        this.Bot.Client.On<SetHeldItemPacket>(this.HandleHeldItemChange);
+        this.Bot.Client.On<CBHeldItemPacket>(this.HandleHeldItemChange);
 
         this.CreateInventory();
 
@@ -184,8 +188,8 @@ public class WindowPlugin : Plugin
     {
         if (hotbarIndex > 8) 
             throw new ArgumentOutOfRangeException(nameof(hotbarIndex) + " must be between 0 and 8");
-
-        var packet = new SetHeldItemPacket(hotbarIndex);
+        
+        var packet = new SBHeldItemPacket((sbyte)hotbarIndex);
         await this.Bot.Client.SendPacket(packet);
 
         this.SelectedHotbarIndex = hotbarIndex;
@@ -202,6 +206,66 @@ public class WindowPlugin : Plugin
         var packet = new UseItemPacket(hand, this.Bot.SequenceId++);
 
         return this.Bot.Client.SendPacket(packet);
+    }
+
+    /// <summary>
+    /// Search inventory for item of type <paramref name="type"/>, and put it
+    /// in the bots <paramref name="hand"/>.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="hand"></param>
+    /// <returns></returns>
+    public async Task EquipItem(ItemType type, PlayerHand hand = PlayerHand.MainHand)
+    {
+        await this.WaitForInventory();
+        
+        var handSlot = hand == PlayerHand.MainHand 
+            ? this.Inventory!.GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex)) 
+            : this.Inventory!.GetSlot(Inventory.Slot.OffHand);
+
+        this._EquipItem(type, handSlot);
+    }
+
+    /// <summary>
+    /// Search inventory for item of type <paramref name="type"/>, and put it
+    /// in the specified equipment slot.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="equipSlot"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task EquipItem(ItemType type, Inventory.Slot equipSlot)
+    {
+        if (equipSlot == Inventory.Slot.CraftingResult)
+        {
+            throw new InvalidOperationException("cannot put something in CraftingResult slot");
+        }
+        
+        await this.WaitForInventory();
+
+        var slot = this.Inventory!.GetSlot(equipSlot);
+        
+        this._EquipItem(type, slot);
+    }
+
+    private void _EquipItem(ItemType type, Slot destination)
+    {
+        if (destination.Item?.Info.Type == type)
+            return;
+        
+        var slot = this.Inventory?.FindInventoryItems(type).FirstOrDefault();
+
+        if (slot == null)
+            throw new ItemNotFoundException(type);
+        
+        var wasEmpty = destination.IsEmpty();
+        
+        this.Inventory!.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
+        this.Inventory!.DoSimpleClick(WindowMouseButton.MouseLeft, destination.SlotIndex);
+        
+        if (!wasEmpty)
+        {
+            this.Inventory.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
+        }
     }
 
     private void CreateInventory()
@@ -345,7 +409,7 @@ public class WindowPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    private Task HandleHeldItemChange(SetHeldItemPacket packet)
+    private Task HandleHeldItemChange(CBHeldItemPacket packet)
     {
         this.SelectedHotbarIndex = (byte)packet.Slot;
         this.OnHeldItemChanged?.Invoke(this.Bot, this.HeldItem);
