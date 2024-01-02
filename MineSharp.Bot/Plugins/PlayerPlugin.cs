@@ -119,7 +119,7 @@ public class PlayerPlugin : Plugin
     /// </summary>
     public event Events.BotEvent? OnWeatherChanged;
 
-
+    private PhysicsPlugin physics;
     private EntityPlugin? _entities;
 
     /// <summary>
@@ -141,14 +141,7 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
         this.Bot.Client.On<EntityStatusPacket>(this.HandleEntityStatus);
     }
-
-    /// <summary>
-    /// Respawns the bot when its dead.
-    /// </summary>
-    /// <returns></returns>
-    public Task Respawn()
-        => this.Bot.Client.SendPacket(new ClientCommandPacket(0));
-
+    
     /// <inheritdoc />
     protected override async Task Init()
     {
@@ -196,7 +189,17 @@ public class PlayerPlugin : Plugin
                 positionPacket.Yaw,
                 positionPacket.Pitch,
                 this.Entity.IsOnGround));
+
+        this.physics = this.Bot.GetPlugin<PhysicsPlugin>();
     }
+    
+    /// <summary>
+    /// Respawns the bot when its dead.
+    /// </summary>
+    /// <returns></returns>
+    public Task Respawn()
+        => this.Bot.Client.SendPacket(new ClientCommandPacket(0));
+
     
     /// <summary>
     /// Plays a swinging arm animation for other players.
@@ -226,7 +229,7 @@ public class PlayerPlugin : Plugin
         var packet = new InteractPacket(
             entity.ServerId,
             InteractPacket.InteractionType.Attack,
-            false); // TODO: Sneaking hardcoded (physics required)
+            this.physics.Engine!.State.IsCrouching);
 
         return Task.WhenAll(
             this.Bot.Client.SendPacket(packet),

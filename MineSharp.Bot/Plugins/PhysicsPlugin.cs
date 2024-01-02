@@ -35,8 +35,12 @@ public class PhysicsPlugin : Plugin
     /// </summary>
     public readonly InputControls InputControls;
     
+    /// <summary>
+    /// The Physics engine for this plugin
+    /// </summary>
+    public PlayerPhysics? Engine { get; private set; }
+    
     private PlayerState lastPlayerState;
-    private PlayerPhysics? physics;
     private PlayerPlugin? playerPlugin;
     private WorldPlugin? worldPlugin;
 
@@ -66,9 +70,9 @@ public class PhysicsPlugin : Plugin
         this.Self = this.playerPlugin.Self;
         await this.UpdateServerPos();
 
-        this.physics = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
-        this.physics.OnCrouchingChanged += OnSneakingChanged;
-        this.physics.OnSprintingChanged += OnSprintingChanged;
+        this.Engine = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
+        this.Engine.OnCrouchingChanged += OnSneakingChanged;
+        this.Engine.OnSprintingChanged += OnSprintingChanged;
     }
 
     /// <summary>
@@ -196,7 +200,7 @@ public class PhysicsPlugin : Plugin
             try
             {
                 this.lerpRotation?.Tick();
-                this.physics!.Tick();
+                this.Engine!.Tick();
                 await this.UpdateServerPositionIfNeeded();
                 
                 if (this.PhysicsTick != null)
