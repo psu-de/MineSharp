@@ -8,22 +8,22 @@ public class SetHeldItemPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_HeldItemSlot;
     
-    public int Slot { get; set; }
+    public sbyte Slot { get; set; }
 
-    public SetHeldItemPacket(int slot)
+    public SetHeldItemPacket(sbyte slot)
     {
         this.Slot = slot;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.Slot);
+        buffer.WriteSByte(this.Slot);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new SetHeldItemPacket(
-            buffer.ReadVarInt());
+            buffer.ReadSByte());
     }
 }
 #pragma warning restore CS1591

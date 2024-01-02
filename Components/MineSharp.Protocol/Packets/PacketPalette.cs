@@ -28,6 +28,8 @@ using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Confi
 using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
 using CBCloseWindowPacket = MineSharp.Protocol.Packets.Clientbound.Play.CloseWindowPacket;
 using SBCloseWindowPacket = MineSharp.Protocol.Packets.Serverbound.Play.CloseWindowPacket;
+using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
+using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -138,7 +140,7 @@ internal static class PacketPalette
         RegisterPacket<WindowSetSlotPacket>(PacketType.CB_Play_SetSlot);
         RegisterPacket<OpenWindowPacket>(PacketType.CB_Play_OpenWindow);
         RegisterPacket<CBCloseWindowPacket>(PacketType.CB_Play_CloseWindow);
-        RegisterPacket<SetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
+        RegisterPacket<CBSetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
         RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
         RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
         RegisterPacket<EntityStatusPacket>(PacketType.CB_Play_EntityStatus);
@@ -162,6 +164,7 @@ internal static class PacketPalette
         RegisterPacket<SBCloseWindowPacket>(PacketType.SB_Play_CloseWindow);
         RegisterPacket<EntityActionPacket>(PacketType.SB_Play_EntityAction);
         RegisterPacket<UseItemPacket>(PacketType.SB_Play_UseItem);
+        RegisterPacket<SBSetHeldItemPacket>(PacketType.SB_Play_HeldItemSlot);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket
