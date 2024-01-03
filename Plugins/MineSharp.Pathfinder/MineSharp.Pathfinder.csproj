@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\MineSharp.Bot\MineSharp.Bot.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OptimizedPriorityQueue" Version="5.1.0" />
+    </ItemGroup>
+
+</Project>
