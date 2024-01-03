@@ -333,6 +333,11 @@ public class PhysicsPlugin : Plugin
             this.yawPerTick = deltaYaw * smoothness;
             this.pitchPerTick = deltaPitch * smoothness;
 
+            if (deltaYaw == 0)
+                yawPerTick = 1;
+            if (deltaPitch == 0)
+                pitchPerTick = 1;
+
             var yawTicks = (int)(deltaYaw / yawPerTick);
             var pitchTicks = (int)(deltaPitch / pitchPerTick);
         
