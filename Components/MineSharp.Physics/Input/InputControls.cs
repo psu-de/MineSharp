@@ -39,4 +39,18 @@ public class InputControls
     /// Whether the sprinting key is down
     /// </summary>
     public bool SprintingKeyDown { get; set; }
+
+    /// <summary>
+    /// Set all input controls to false.
+    /// </summary>
+    public void Reset()
+    {
+        this.ForwardKeyDown = false;
+        this.BackwardKeyDown = false;
+        this.LeftKeyDown = false;
+        this.RightKeyDown = false;
+        this.JumpingKeyDown = false;
+        this.SneakingKeyDown = false;
+        this.SprintingKeyDown = false;
+    }
 }
