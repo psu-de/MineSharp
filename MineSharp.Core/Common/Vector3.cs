@@ -235,6 +235,23 @@ public class Vector3(double x, double y, double z)
     public override string ToString() 
         => $"({this.X:0.####} / {this.Y:0.####} / {this.Z:0.####})";
 
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        if (obj is not Vector3 vec)
+            return false;
+
+        return this == vec;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return this.X.GetHashCode() 
+               ^ this.Y.GetHashCode() << 2 
+               ^ this.Z.GetHashCode() >> 2;
+    }
+
     /// <summary>
     /// Returns a new Position from this vector
     /// </summary>
@@ -248,4 +265,30 @@ public class Vector3(double x, double y, double z)
     /// <param name="x"></param>
     /// <returns></returns>
     public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+    
+    /// <summary>
+    /// Checks if the two vectors are equal
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator ==(Vector3 a, Vector3 b)
+    {
+        return Math.Abs(a.X - b.X) < 1e-7 
+               && Math.Abs(a.Y - b.Y) < 1e-7 
+               && Math.Abs(a.Z - b.Z) < 1e-7;
+    }
+    
+    /// <summary>
+    /// Checks if the two vectors are different.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator !=(Vector3 a, Vector3 b)
+    {
+        return Math.Abs(a.X - b.X) > 1e-7
+               || Math.Abs(a.Y - b.Y) > 1e-7
+               || Math.Abs(a.Z - b.Z) > 1e-7;
+    }
 }
