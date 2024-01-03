@@ -202,12 +202,8 @@ public class PhysicsPlugin : Plugin
                 this.lerpRotation?.Tick();
                 this.Engine!.Tick();
                 await this.UpdateServerPositionIfNeeded();
-                
-                if (this.PhysicsTick != null)
-                    await Task.Factory.FromAsync(
-                        (callback, obj) => this.PhysicsTick.BeginInvoke(this.Bot, callback, obj),
-                        this.PhysicsTick.EndInvoke,
-                        null);
+
+                this.PhysicsTick?.Invoke(this.Bot);
             } catch (Exception e)
             {
                 Logger.Error(e.ToString());
@@ -260,11 +256,7 @@ public class PhysicsPlugin : Plugin
 
         await this.Bot.Client.SendPacket(packet);
         
-        if (BotMoved != null)
-            await Task.Factory.FromAsync(
-                (callback, obj) => this.BotMoved.BeginInvoke(this.Bot, callback, obj),
-                this.BotMoved.EndInvoke,
-                null);
+        this.BotMoved?.Invoke(this.Bot);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)

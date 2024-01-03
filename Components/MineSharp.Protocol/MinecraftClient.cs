@@ -416,13 +416,7 @@ public sealed class MinecraftClient : IDisposable
 
     private Task InvokeReceivePacketAsync(IPacket packet)
     {
-        if (null == OnPacketReceived)
-            return Task.CompletedTask;
-
-        return Task.Factory.FromAsync(
-            (callback, obj) => this.OnPacketReceived.BeginInvoke(this, packet, callback, obj),
-            this.OnPacketReceived.EndInvoke,
-            null);
+        return Task.Run(() => this.OnPacketReceived?.Invoke(this, packet));
     }
     
     /// <inheritdoc />
