@@ -653,7 +653,7 @@ public class PlayerPhysics
             diff = coord;
         }
 
-        if (null == direction)
+        if (direction is null)
             return;
 
         if (direction.X != 0.0)
