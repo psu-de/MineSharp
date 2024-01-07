@@ -13,7 +13,7 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Minecraft Java 1.18 - 1.20.1 supported 
+Minecraft Java 1.18 - 1.20.2 supported 
 
 # Current features
 
