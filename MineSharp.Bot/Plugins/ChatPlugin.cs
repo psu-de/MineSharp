@@ -352,6 +352,7 @@ public class ChatPlugin : Plugin
 
         var salt = ChatSignature.GenerateSalt();
         byte[] signature = ChatSignature.SignChat1_19_3(
+            this.Bot.Data,
             this.Bot.Client.Session.Certificate!.RsaPrivate,
             message,
             this.Bot.Session.UUID,
@@ -395,6 +396,7 @@ public class ChatPlugin : Plugin
         foreach ((var name, var argument) in arguments)
         {
             var signature = ChatSignature.SignChat1_19_3(
+                this.Bot.Data,
                 this.Bot.Session.Certificate.RsaPrivate,
                 argument,
                 this.Bot.Session.UUID,

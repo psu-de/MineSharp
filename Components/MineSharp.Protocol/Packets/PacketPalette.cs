@@ -144,6 +144,8 @@ internal static class PacketPalette
         RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
         RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
         RegisterPacket<EntityStatusPacket>(PacketType.CB_Play_EntityStatus);
+        RegisterPacket<ChunkBatchStartPacket>(PacketType.CB_Play_ChunkBatchStart);
+        RegisterPacket<ChunkBatchFinishedPacket>(PacketType.CB_Play_ChunkBatchFinished);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
@@ -165,6 +167,7 @@ internal static class PacketPalette
         RegisterPacket<EntityActionPacket>(PacketType.SB_Play_EntityAction);
         RegisterPacket<UseItemPacket>(PacketType.SB_Play_UseItem);
         RegisterPacket<SBSetHeldItemPacket>(PacketType.SB_Play_HeldItemSlot);
+        RegisterPacket<ChunkBatchReceivedPacket>(PacketType.SB_Play_ChunkBatchReceived);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

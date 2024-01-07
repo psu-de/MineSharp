@@ -28,20 +28,30 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public long Position => _buffer.Position;
 
     /// <summary>
-    /// Create a new empty, writable PacketBuffer
+    /// Whether to use anonymous nbt compounds. This is used since
+    /// Minecraft Java 1.20.2
     /// </summary>
-    public PacketBuffer()
+    public bool UseAnonymousNbt { get; set; } = false;
+
+    /// <summary>
+    /// Create a new empty, writeable PacketBuffer
+    /// </summary>
+    /// <param name="useAnonymousNbt"></param>
+    public PacketBuffer(bool useAnonymousNbt)
     {
         this._buffer = new MemoryStream();
+        this.UseAnonymousNbt = useAnonymousNbt;
     }
-    
+
     /// <summary>
     /// Create a new readable PacketBuffer with <paramref name="bytes"/> as input.
     /// </summary>
     /// <param name="bytes"></param>
-    public PacketBuffer(byte[] bytes)
+    /// <param name="useAnonymousNbt"></param>
+    public PacketBuffer(byte[] bytes, bool useAnonymousNbt)
     {
         this._buffer = new MemoryStream(bytes);
+        this.UseAnonymousNbt = useAnonymousNbt;
     }
 
     /// <summary>
@@ -277,16 +287,16 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public NbtCompound ReadNbt()
     {
-        NbtTagType t = (NbtTagType)this.ReadByte();
+        var t = (NbtTagType)this.ReadByte();
         if (t != NbtTagType.Compound) 
             return new NbtCompound();
         _buffer.Position--;
 		
-        NbtFile file = new NbtFile() {BigEndian = true};
+        var file = new NbtFile() {BigEndian = true, Anonymous = this.UseAnonymousNbt };
 		
         file.LoadFromStream(_buffer, NbtCompression.None);
 		
-        return (NbtCompound)file.RootTag;
+        return file.RootTag;
     }
 
     public BlockEntity ReadBlockEntity()
@@ -497,7 +507,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             return;
         }
         
-        NbtFile f = new NbtFile(compound) { BigEndian = true };
+        NbtFile f = new NbtFile(compound) { BigEndian = true, Anonymous = this.UseAnonymousNbt };
         f.SaveToStream(_buffer, NbtCompression.None);
     }
     

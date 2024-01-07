@@ -14,6 +14,7 @@ using NLog;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
+using MineSharp.Protocol.Packets.Serverbound.Configuration;
 
 namespace MineSharp.Protocol;
 
@@ -50,6 +51,7 @@ public sealed class MinecraftClient : IDisposable
     private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> _packetHandlers;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> _packetWaiters;
     private readonly TaskCompletionSource _gameJoinedTsc;
+    private readonly bool _useAnonymousNbt;
 
     private bool _bundlePackets;
     private IPacketHandler _internalPacketHandler;
@@ -107,6 +109,7 @@ public sealed class MinecraftClient : IDisposable
         this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc = new TaskCompletionSource();
         this._bundledPackets = new Queue<(PacketType, PacketBuffer)>();
+        this._useAnonymousNbt = this._data.Version.Protocol >= ProtocolVersion.V_1_20_2;
 
         this.Session = session;
         this.IP = IPHelper.ResolveHostname(hostnameOrIp);
@@ -126,7 +129,7 @@ public sealed class MinecraftClient : IDisposable
         try
         {
             await this._client.ConnectAsync(this.IP, this.Port, this._cancellation.Token);
-            this._stream = new MinecraftStream(this._client.GetStream());
+            this._stream = new MinecraftStream(this._client.GetStream(), this._useAnonymousNbt);
             
             this.StreamLoop();
             Logger.Info("Connected, starting handshake...");
@@ -233,6 +236,17 @@ public sealed class MinecraftClient : IDisposable
 
         if (next == GameState.Play)
             this._gameJoinedTsc.TrySetResult();
+
+        if (next == GameState.Configuration)
+            this.SendPacket(new ClientInformationPacket(
+                "en_pt",
+                24,
+                0,
+                true,
+                0x7F,
+                1,
+                false,
+                true)); // TODO: Add a settings object #31
     }
 
     internal void EnableEncryption(byte[] key) 
@@ -324,7 +338,7 @@ public sealed class MinecraftClient : IDisposable
     {
         var packetId = this._data.Protocol.GetPacketId(packet.Type); 
         
-        var buffer = new PacketBuffer();
+        var buffer = new PacketBuffer(this._useAnonymousNbt);
         buffer.WriteVarInt(packetId);
         packet.Write(buffer, this._data);
 

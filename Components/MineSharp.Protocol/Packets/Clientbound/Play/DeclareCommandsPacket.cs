@@ -35,7 +35,7 @@ public class DeclareCommandsPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes));
+        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), version.Version.Protocol >= ProtocolVersion.V_1_20_2);
         return new DeclareCommandsPacket(clone);
     }
 }

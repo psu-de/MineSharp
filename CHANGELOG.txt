@@ -6,3 +6,5 @@ MineSharp 0.1.3:
  - added UseItem(hand) method to Window plugin
  - added Serverbound SetHeldItemPacket
  - added EquipItem() methods
+ - replaced MiNet.fNbt with MineSharp.fNbt
+ - Support Minecraft Java 1.20.2
