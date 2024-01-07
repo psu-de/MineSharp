@@ -9,6 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 public class SetHeldItemPacket : IPacket
 {
+    /// <inheritdoc />
     public PacketType Type => PacketType.SB_Play_HeldItemSlot;
     
     /// <summary>
