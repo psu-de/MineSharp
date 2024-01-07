@@ -13,11 +13,11 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Minecraft Java 1.18 - 1.20.1 supported 
+Minecraft Java 1.18 - 1.20.2 supported 
 
 # Current features
 
-- ✨ Supported Versions: 1.18.x - 1.20.1
+- ✨ Supported Versions: 1.18.x - 1.20.2
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
@@ -32,7 +32,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 
 # Roadmap
 
-- ✨ Support 1.20.2 - 1.20.4
+- ✨ Support 1.20.3 - 1.20.4
 - 🔎 Simple Pathfinder
 
 # Example
