@@ -20,6 +20,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Biomes.Versions.Biomes_1_20" },
         { "1.20.1", "MineSharp.Data.Biomes.Versions.Biomes_1_20" },
         { "1.20.2", "MineSharp.Data.Biomes.Versions.Biomes_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Biomes.Versions.Biomes_1_20_2" },
+        { "1.20.4", "MineSharp.Data.Biomes.Versions.Biomes_1_20_2" },
     };
     public static Dictionary<string, string> Blocks { get; } = new()
     {
@@ -33,6 +35,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Blocks.Versions.Blocks_1_20" },
         { "1.20.1", "MineSharp.Data.Blocks.Versions.Blocks_1_20" },
         { "1.20.2", "MineSharp.Data.Blocks.Versions.Blocks_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Blocks.Versions.Blocks_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Blocks.Versions.Blocks_1_20_4" },
     };
     public static Dictionary<string, string> BlockCollisionShapes { get; } = new()
     {
@@ -46,6 +50,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.BlockCollisionShapes.Versions.BlockCollisionShapes_1_20" },
         { "1.20.1", "MineSharp.Data.BlockCollisionShapes.Versions.BlockCollisionShapes_1_20" },
         { "1.20.2", "MineSharp.Data.BlockCollisionShapes.Versions.BlockCollisionShapes_1_20_2" },
+        { "1.20.3", "MineSharp.Data.BlockCollisionShapes.Versions.BlockCollisionShapes_1_20_3" },
+        { "1.20.4", "MineSharp.Data.BlockCollisionShapes.Versions.BlockCollisionShapes_1_20_3" },
     };
     public static Dictionary<string, string> Effects { get; } = new()
     {
@@ -59,6 +65,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Effects.Versions.Effects_1_20" },
         { "1.20.1", "MineSharp.Data.Effects.Versions.Effects_1_20" },
         { "1.20.2", "MineSharp.Data.Effects.Versions.Effects_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Effects.Versions.Effects_1_20_2" },
+        { "1.20.4", "MineSharp.Data.Effects.Versions.Effects_1_20_2" },
     };
     public static Dictionary<string, string> Enchantments { get; } = new()
     {
@@ -72,6 +80,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Enchantments.Versions.Enchantments_1_20" },
         { "1.20.1", "MineSharp.Data.Enchantments.Versions.Enchantments_1_20" },
         { "1.20.2", "MineSharp.Data.Enchantments.Versions.Enchantments_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Enchantments.Versions.Enchantments_1_20_2" },
+        { "1.20.4", "MineSharp.Data.Enchantments.Versions.Enchantments_1_20_2" },
     };
     public static Dictionary<string, string> Entities { get; } = new()
     {
@@ -85,6 +95,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Entities.Versions.Entities_1_20" },
         { "1.20.1", "MineSharp.Data.Entities.Versions.Entities_1_20" },
         { "1.20.2", "MineSharp.Data.Entities.Versions.Entities_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Entities.Versions.Entities_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Entities.Versions.Entities_1_20_3" },
     };
     public static Dictionary<string, string> Items { get; } = new()
     {
@@ -98,6 +110,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Items.Versions.Items_1_20" },
         { "1.20.1", "MineSharp.Data.Items.Versions.Items_1_20" },
         { "1.20.2", "MineSharp.Data.Items.Versions.Items_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Items.Versions.Items_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Items.Versions.Items_1_20_3" },
     };
     public static Dictionary<string, string> Protocol { get; } = new()
     {
@@ -111,6 +125,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Protocol.Versions.Protocol_1_20" },
         { "1.20.1", "MineSharp.Data.Protocol.Versions.Protocol_1_20" },
         { "1.20.2", "MineSharp.Data.Protocol.Versions.Protocol_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Protocol.Versions.Protocol_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Protocol.Versions.Protocol_1_20_3" },
     };
     public static Dictionary<string, string> Materials { get; } = new()
     {
@@ -124,6 +140,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Materials.Versions.Materials_1_20" },
         { "1.20.1", "MineSharp.Data.Materials.Versions.Materials_1_20" },
         { "1.20.2", "MineSharp.Data.Materials.Versions.Materials_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Materials.Versions.Materials_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Materials.Versions.Materials_1_20_3" },
     };
     public static Dictionary<string, string> Recipes { get; } = new()
     {
@@ -137,6 +155,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Recipes.Versions.Recipes_1_20" },
         { "1.20.1", "MineSharp.Data.Recipes.Versions.Recipes_1_20" },
         { "1.20.2", "MineSharp.Data.Recipes.Versions.Recipes_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Recipes.Versions.Recipes_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Recipes.Versions.Recipes_1_20_3" },
     };
     public static Dictionary<string, string> Language { get; } = new()
     {
@@ -150,6 +170,8 @@ internal static class VersionMap
         { "1.20", "MineSharp.Data.Language.Versions.Language_1_20" },
         { "1.20.1", "MineSharp.Data.Language.Versions.Language_1_20" },
         { "1.20.2", "MineSharp.Data.Language.Versions.Language_1_20_2" },
+        { "1.20.3", "MineSharp.Data.Language.Versions.Language_1_20_3" },
+        { "1.20.4", "MineSharp.Data.Language.Versions.Language_1_20_3" },
     };
     public static Dictionary<string, MinecraftVersion> Versions { get; } = new()
     {
@@ -163,6 +185,8 @@ internal static class VersionMap
         { "1.20", new MinecraftVersion("1.20", 763) },
         { "1.20.1", new MinecraftVersion("1.20.1", 763) },
         { "1.20.2", new MinecraftVersion("1.20.2", 764) },
+        { "1.20.3", new MinecraftVersion("1.20.3", 765) },
+        { "1.20.4", new MinecraftVersion("1.20.4", 765) },
     };
 }
 

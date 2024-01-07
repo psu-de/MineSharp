@@ -217,6 +217,14 @@ public enum PacketType
     SB_Play_ChunkBatchReceived = 66510,
     SB_Play_ConfigurationAcknowledged = 66511,
     SB_Play_PingRequest = 66512,
+    CB_Configuration_RemoveResourcePack = 1233,
+    CB_Configuration_AddResourcePack = 1234,
+    CB_Play_ResetScore = 979,
+    CB_Play_RemoveResourcePack = 980,
+    CB_Play_AddResourcePack = 981,
+    CB_Play_SetTickingState = 982,
+    CB_Play_StepTick = 983,
+    SB_Play_SetSlotState = 66520,
 }
 
 #pragma warning restore CS1591

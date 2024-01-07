@@ -58,18 +58,25 @@ public abstract class CommonGenerator : IGenerator
     private async Task GenerateTypeEnum(MinecraftDataWrapper wrapper)
     {
         var outdir = DirectoryUtils.GetCoreSourceDirectory(Path.Join("Common", this.Namespace));
-        var data = await wrapper.Parse(Config.LatestVersion, this.DataKey);
+        var tokens = new List<JToken>();
+        var dict = new Dictionary<string, int>();
 
-        var values = this.GetProperties(data)
-            .ToDictionary(
-                this.GetName, 
-                value => (int)value.SelectToken("id")!);
+        foreach (var version in Config.IncludedVersions.Reverse())
+        {
+            var data = await wrapper.Parse(version, this.DataKey);
+            foreach (var prop in this.GetProperties(data))
+            {
+                if (dict.ContainsKey(this.GetName(prop)))
+                    continue;
+                dict.Add(this.GetName(prop), dict.Count);
+            }
+        }
 
         await new EnumGenerator() {
             Namespace = $"MineSharp.Core.Common.{Namespace}",
             ClassName = $"{this.Singular}Type",
             Outfile = Path.Join(outdir, $"{this.Singular}Type.cs"),
-            Entries = values
+            Entries = dict
         }.Write();
     }
 

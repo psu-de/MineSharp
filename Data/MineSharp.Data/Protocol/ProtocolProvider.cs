@@ -61,7 +61,7 @@ public class ProtocolProvider
             return type;
         } catch (KeyNotFoundException)
         {
-            Logger.Debug($"Could not map {flow} -> {state} -> {id} to PacketType.");
+            Logger.Debug($"Could not map {flow} -> {state} -> 0x{id:X2} to PacketType.");
             throw;
         }
     }
