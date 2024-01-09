@@ -1,6 +1,7 @@
 [![Gitter](https://img.shields.io/gitter/room/MineSharp-net/community?style=for-the-badge)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Discord](https://img.shields.io/badge/Discord-Join-green?style=for-the-badge)](https://discord.gg/Pt6JT5nXMr)
 [![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
+[![Nuget](https://img.shields.io/nuget/v/MineSharp.Bot?style=for-the-badge)](https://www.nuget.org/packages/MineSharp.Bot)
 
 ![banner](banner.png)
 
