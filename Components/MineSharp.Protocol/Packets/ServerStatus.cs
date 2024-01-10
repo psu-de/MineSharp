@@ -86,8 +86,10 @@ public partial class ServerStatus
         var maxPlayers = (int)playersToken.SelectToken("max")!;
         var onlinePlayers = (int)playersToken.SelectToken("online")!;
 
-        var sampleToken = (JArray)playersToken.SelectToken("sample")!;
-        var sample = sampleToken.Count > 0 ? sampleToken.Select(x => (string)x.SelectToken("name")!).ToArray() : Array.Empty<string>();
+        var sampleToken = (JArray?)playersToken.SelectToken("sample");
+        var sample = (sampleToken != null && sampleToken.Count > 0) 
+            ? sampleToken.Select(x => (string)x.SelectToken("name")!).ToArray() 
+            : Array.Empty<string>();
 
         var description = new Chat(token.SelectToken("description")!.ToString(), data).Message;
         var favIcon = (string)token.SelectToken("favicon")!;
