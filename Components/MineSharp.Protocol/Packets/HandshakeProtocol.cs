@@ -16,7 +16,7 @@ internal static class HandshakeProtocol
             throw new ArgumentException("Next state must either be Login or Status.");
         }
         
-        var handshake = new HandshakePacket(data.Version.Protocol, client.IP.ToString(), client.Port, next);
+        var handshake = new HandshakePacket(data.Version.Protocol, client.Hostname, client.Port, next);
         await client.SendPacket(handshake);
 
         if (next == GameState.Status)

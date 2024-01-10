@@ -9,12 +9,12 @@ using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Status;
-using Newtonsoft.Json;
 using NLog;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Protocol;
 
@@ -77,6 +77,11 @@ public sealed class MinecraftClient : IDisposable
     public Session Session { get; }
     
     /// <summary>
+    /// The Hostname of the minecraft server provided in the constructor
+    /// </summary>
+    public string Hostname { get; }
+    
+    /// <summary>
     /// The IP Address of the minecraft server
     /// </summary>
     public IPAddress IP { get; }
@@ -98,7 +103,7 @@ public sealed class MinecraftClient : IDisposable
     /// <param name="session">The session object</param>
     /// <param name="hostnameOrIp">Hostname or ip of the server</param>
     /// <param name="port">Port of the server</param>
-    public MinecraftClient(MinecraftData data, Session session, string hostnameOrIp, ushort port)
+    public MinecraftClient(MinecraftData data, Session session, string hostnameOrIp, ushort port = 25565)
     {
         this._data = data;
         this._client = new TcpClient();
@@ -112,8 +117,9 @@ public sealed class MinecraftClient : IDisposable
         this._useAnonymousNbt = this._data.Version.Protocol >= ProtocolVersion.V_1_20_2;
 
         this.Session = session;
-        this.IP = IPHelper.ResolveHostname(hostnameOrIp);
         this.Port = port;
+        this.IP = IPHelper.ResolveHostname(hostnameOrIp, ref port);
+        this.Hostname = hostnameOrIp;
         this.GameState = GameState.Handshaking;
     }
 
@@ -450,9 +456,9 @@ public sealed class MinecraftClient : IDisposable
     /// Works only when <see cref="GameState"/> is <see cref="Core.Common.Protocol.GameState.Status"/>.
     /// </summary>
     /// <returns></returns>
-    public static async Task<ServerStatusResponseBlob> RequestServerStatus(
+    public static async Task<ServerStatus> RequestServerStatus(
         string hostnameOrIp,
-        ushort port,
+        ushort port = 25565,
         int timeout = 10000)
     {
         var latest = MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
@@ -466,12 +472,12 @@ public sealed class MinecraftClient : IDisposable
             throw new MineSharpHostException("Could not connect to server.");
 
         var timeoutCancellation = new CancellationTokenSource();
-        var taskCompletionSource = new TaskCompletionSource<ServerStatusResponseBlob>();
+        var taskCompletionSource = new TaskCompletionSource<ServerStatus>();
 
         client.On<StatusResponsePacket>(async packet =>
         {
             var json = packet.Response;
-            var response = JsonConvert.DeserializeObject<ServerStatusResponseBlob>(json)!;
+            var response = ServerStatus.FromJToken(JToken.Parse(json), client._data);
             taskCompletionSource.TrySetResult(response);
 
             // the server closes the connection 
@@ -498,10 +504,10 @@ public sealed class MinecraftClient : IDisposable
     /// <param name="hostname"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public static async Task<MinecraftData> AutodetectServerVersion(string hostname, ushort port)
+    public static Task<MinecraftData> AutodetectServerVersion(string hostname, ushort port)
     {
-        return await RequestServerStatus(hostname, port)
+        return RequestServerStatus(hostname, port)
             .ContinueWith(
-                prev => MinecraftData.FromVersion(prev.Result.Version.Name));
+                prev => MinecraftData.FromVersion(prev.Result.Version));
     }
 }
