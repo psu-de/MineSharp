@@ -44,7 +44,7 @@ public static class IntegrationTest
 
         if (test.Exception != null)
         {
-            AnsiConsole.MarkupLine($"Test threw error: {test.Exception}");
+            AnsiConsole.MarkupLine($"[red]Test threw error: {Markup.Escape(test.Exception.ToString())}[/]");
             try
             {
                 await bot.Disconnect();
