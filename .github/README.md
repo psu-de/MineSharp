@@ -14,11 +14,11 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Minecraft Java 1.18 - 1.20.2 supported 
+Minecraft Java 1.18 - 1.20.4 supported 
 
 # Current features
 
-- ✨ Supported Versions: 1.18.x - 1.20.2
+- ✨ Supported Versions: 1.18.x - 1.20.4
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
@@ -33,7 +33,7 @@ Minecraft Java 1.18 - 1.20.2 supported
 
 # Roadmap
 
-- ✨ Support 1.20.3 - 1.20.4
+- ~~✨ Support 1.20.3 - 1.20.4~~
 - 🔎 Simple Pathfinder
 
 # Example
@@ -41,7 +41,7 @@ Minecraft Java 1.18 - 1.20.2 supported
 using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 
-MinecraftBot bot = await MinecraftBot.CreateBot(
+MineSharpBot bot = await MineSharpBot.CreateBot(
     "MineSharpBot",
     "127.0.0.1",
     25565,
