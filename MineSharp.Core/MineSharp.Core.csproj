@@ -24,7 +24,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="MineSharp.fNbt" Version="1.0.1" />
+      <PackageReference Include="MineSharp.fNbt" Version="1.0.3" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="NLog" Version="5.1.3" />
       <None Include="README.md" Pack="true" PackagePath="\" />
