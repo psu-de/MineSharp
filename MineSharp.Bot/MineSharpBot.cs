@@ -1,9 +1,12 @@
-﻿using MineSharp.Auth;
+﻿using fNbt;
+using MineSharp.Auth;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Protocol;
+using MineSharp.Protocol.Packets.Clientbound.Configuration;
+using MineSharp.Protocol.Packets.Clientbound.Play;
 using NLog;
 
 namespace MineSharp.Bot;
@@ -36,6 +39,11 @@ public class MineSharpBot
     /// </summary>
     public readonly Session Session;
 
+    /// <summary>
+    /// NBT Registry sent by the server
+    /// </summary>
+    public NbtCompound Registry = [];
+
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource _cancellation;
     
@@ -54,6 +62,8 @@ public class MineSharpBot
         this._plugins = new Dictionary<Guid, Plugin>();
         
         this.Client.OnDisconnected += this.OnClientDisconnected;
+        this.Client.On<RegistryDataPacket>(packet => Task.FromResult(this.Registry = packet.RegistryData));
+        this.Client.On<LoginPacket>(packet => Task.FromResult(packet.RegistryCodec != null ? this.Registry = packet.RegistryCodec : null));
     }
     
     /// <summary>
