@@ -285,11 +285,16 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return bytes;
     }
 
-    public NbtCompound ReadNbt()
+    public NbtCompound? ReadNbtCompound()
+    {
+        return (NbtCompound?)this.ReadNbt();
+    }
+
+    public NbtTag? ReadNbt()
     {
         var t = (NbtTagType)this.ReadByte();
-        if (t != NbtTagType.Compound) 
-            return new NbtCompound();
+        if (t == NbtTagType.End) 
+            return null;
         _buffer.Position--;
 		
         var file = new NbtFile() {BigEndian = true, Anonymous = this.UseAnonymousNbt };
@@ -306,7 +311,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         var z = (byte)(packedXZ & 0xF);
         var y = this.ReadShort();
         var type = this.ReadVarInt();
-        var nbt = this.ReadNbt();
+        var nbt = this.ReadNbtCompound();
         
         return new BlockEntity(x, y, z, type, nbt);
     }
@@ -499,15 +504,15 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
 
-    public void WriteNbt(NbtCompound? compound)
+    public void WriteNbt(NbtTag? tag)
     {
-        if (compound == null || compound.Count == 0)
+        if (tag is null or NbtCompound { Count: 0 })
         {
             this._buffer.WriteByte((byte)NbtTagType.End);
             return;
         }
         
-        NbtFile f = new NbtFile(compound) { BigEndian = true, Anonymous = this.UseAnonymousNbt };
+        NbtFile f = new NbtFile(tag) { BigEndian = true, Anonymous = this.UseAnonymousNbt };
         f.SaveToStream(_buffer, NbtCompression.None);
     }
     

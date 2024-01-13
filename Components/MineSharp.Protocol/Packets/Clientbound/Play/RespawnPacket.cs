@@ -74,7 +74,7 @@ public class RespawnPacket : IPacket
 
         if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
-            var dimensionNbt = buffer.ReadNbt();
+            var dimensionNbt = buffer.ReadNbtCompound();
             dimension = dimensionNbt.Get<NbtString>("effects")!.Value;
         }
         else

@@ -141,12 +141,12 @@ public class LoginPacket : IPacket
         var gameMode = buffer.ReadByte();
         var previousGameMode = buffer.ReadSByte();
         var dimensionNames = buffer.ReadVarIntArray<string>(buf => buf.ReadString());
-        var registryCodec = buffer.ReadNbt();
+        var registryCodec = buffer.ReadNbtCompound();
 
         string dimensionType;
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
-            var dimensionTypeNbt = buffer.ReadNbt();
+            var dimensionTypeNbt = buffer.ReadNbtCompound();
             dimensionType = dimensionTypeNbt.Get<NbtString>("effects")!.Value;
         }
         else

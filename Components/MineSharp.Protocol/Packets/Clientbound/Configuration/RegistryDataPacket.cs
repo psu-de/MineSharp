@@ -37,7 +37,7 @@ public class RegistryDataPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new RegistryDataPacket(
-            buffer.ReadNbt());
+            buffer.ReadNbtCompound());
     }
 }
 #pragma warning restore CS1591
