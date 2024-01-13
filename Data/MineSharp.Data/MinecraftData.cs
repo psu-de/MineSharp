@@ -16,6 +16,7 @@ using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
 using MineSharp.Data.Windows;
+using MineSharp.Data.Windows.Versions;
 
 namespace MineSharp.Data;
 
@@ -77,7 +78,7 @@ public class MinecraftData
     /// <summary>
     /// The window data for this version
     /// </summary>
-    public WindowData Windows { get; } = new WindowData();
+    public WindowProvider Windows { get; }
     
     /// <summary>
     /// The language data provider for this version
@@ -100,6 +101,7 @@ public class MinecraftData
         ProtocolProvider protocol,
         MaterialsProvider materials,
         RecipeProvider recipes,
+        WindowProvider windows,
         LanguageProvider language,
         MinecraftVersion version)
     {
@@ -113,6 +115,7 @@ public class MinecraftData
         this.Protocol = protocol;
         this.Materials = materials;
         this.Recipes = recipes;
+        this.Windows = windows;
         this.Language = language;
         this.Version = version;
     }
@@ -137,6 +140,8 @@ public class MinecraftData
         var recipeType = GetClassType(VersionMap.Recipes[version]);
         var languageType = GetClassType(VersionMap.Language[version]);
 
+        var v = VersionMap.Versions[version];
+
         var biomes = new BiomeProvider(
             (DataVersion<BiomeType, BiomeInfo>)Activator.CreateInstance(biomeType)!);
         var blocks = new BlockProvider(
@@ -159,6 +164,11 @@ public class MinecraftData
             (RecipeData)Activator.CreateInstance(recipeType)!);
         var language = new LanguageProvider(
             (LanguageVersion)Activator.CreateInstance(languageType)!);
+        var windows = new WindowProvider(
+            v.Protocol > 764 
+                ? new WindowVersion1_20_3() 
+                : new WindowVersion1_16_1()
+        );
 
         return new MinecraftData(
             biomes,
@@ -171,6 +181,7 @@ public class MinecraftData
             protocol,
             materials,
             recipes,
+            windows,
             language,
             VersionMap.Versions[version]);
     }
