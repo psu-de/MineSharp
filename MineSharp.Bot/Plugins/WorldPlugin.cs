@@ -26,6 +26,8 @@ public class WorldPlugin : Plugin
     private PlayerPlugin? _playerPlugin;
     private WindowPlugin? _windowPlugin;
 
+    private DateTime? chunkBatchStart;
+
     /// <summary>
     /// Create a new WorldPlugin instance
     /// </summary>
@@ -38,6 +40,8 @@ public class WorldPlugin : Plugin
         this.Bot.Client.On<UnloadChunkPacket>(this.HandleUnloadChunkPacket);
         this.Bot.Client.On<BlockUpdatePacket>(this.HandleBlockUpdatePacket);
         this.Bot.Client.On<MultiBlockUpdatePacket>(this.HandleMultiBlockUpdatePacket);
+        this.Bot.Client.On<ChunkBatchStartPacket>(this.HandleChunkBatchStartPacket);
+        this.Bot.Client.On<ChunkBatchFinishedPacket>(this.HandleChunkBatchFinishedPacket);
     }
 
     /// <inheritdoc />
@@ -321,5 +325,35 @@ public class WorldPlugin : Plugin
         }
 
         return Task.CompletedTask;
+    }
+
+    private Task HandleChunkBatchStartPacket(ChunkBatchStartPacket packet)
+    {
+        if (this.chunkBatchStart != null)
+        {
+            Logger.Warn("Received ChunkBatchStartPacket, but last chunk batch was not cleared yet.");
+        }
+
+        this.chunkBatchStart = DateTime.Now;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleChunkBatchFinishedPacket(ChunkBatchFinishedPacket packet)
+    {
+        if (!this.chunkBatchStart.HasValue)
+        {
+            Logger.Warn("Received ChunkBatchFinishedPacket, but no chunk batch was started.");
+            return;
+        }
+        
+        var timeSpan = DateTime.Now - this.chunkBatchStart!.Value;
+        this.chunkBatchStart = null;
+
+        var cps = 25_000.0f / timeSpan.Microseconds;
+
+        if (float.IsNaN(cps) || float.IsInfinity(cps))
+            cps = 5;
+        
+        await this.Bot.Client.SendPacket(new ChunkBatchReceivedPacket(cps));
     }
 }

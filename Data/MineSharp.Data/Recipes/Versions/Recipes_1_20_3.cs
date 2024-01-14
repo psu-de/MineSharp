@@ -9,7 +9,7 @@ using MineSharp.Core.Common.Items;
 
 namespace MineSharp.Data.Recipes.Versions;
 
-internal class Recipes_1_20_2 : RecipeData
+internal class Recipes_1_20_3 : RecipeData
 {
     private static Dictionary<ItemType, Recipe[]> _recipes = new()
     {
@@ -2310,16 +2310,12 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.Diorite, ItemType.Quartz }, null, false, ItemType.Granite, 1)}
         },
         {
+            ItemType.NetherWartBlock,
+            new [] { new Recipe(new ItemType?[] { ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart }, null, true, ItemType.NetherWartBlock, 1)}
+        },
+        {
             ItemType.Andesite,
             new [] { new Recipe(new ItemType?[] { ItemType.Diorite, ItemType.Cobblestone }, null, false, ItemType.Andesite, 2)}
-        },
-        {
-            ItemType.FireCharge,
-            new [] { new Recipe(new ItemType?[] { ItemType.Gunpowder, ItemType.BlazePowder, ItemType.Coal }, null, false, ItemType.FireCharge, 3)}
-        },
-        {
-            ItemType.WritableBook,
-            new [] { new Recipe(new ItemType?[] { ItemType.Book, ItemType.InkSac, ItemType.Feather }, null, false, ItemType.WritableBook, 1)}
         },
         {
             ItemType.OakPlanks,
@@ -2328,10 +2324,6 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.SprucePlanks,
             new [] { new Recipe(new ItemType?[] { ItemType.SpruceLog }, null, false, ItemType.SprucePlanks, 4)}
-        },
-        {
-            ItemType.GlowItemFrame,
-            new [] { new Recipe(new ItemType?[] { ItemType.ItemFrame, ItemType.GlowInkSac }, null, false, ItemType.GlowItemFrame, 1)}
         },
         {
             ItemType.BirchPlanks,
@@ -2378,8 +2370,16 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.OrangeDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.OrangeConcretePowder, 8)}
         },
         {
+            ItemType.FireCharge,
+            new [] { new Recipe(new ItemType?[] { ItemType.Gunpowder, ItemType.BlazePowder, ItemType.Coal }, null, false, ItemType.FireCharge, 3)}
+        },
+        {
             ItemType.MagentaConcretePowder,
             new [] { new Recipe(new ItemType?[] { ItemType.MagentaDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.MagentaConcretePowder, 8)}
+        },
+        {
+            ItemType.WritableBook,
+            new [] { new Recipe(new ItemType?[] { ItemType.Book, ItemType.InkSac, ItemType.Feather }, null, false, ItemType.WritableBook, 1)}
         },
         {
             ItemType.LightBlueConcretePowder,
@@ -2390,16 +2390,12 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.YellowDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.YellowConcretePowder, 8)}
         },
         {
-            ItemType.PumpkinPie,
-            new [] { new Recipe(new ItemType?[] { ItemType.Pumpkin, ItemType.Sugar, ItemType.Egg }, null, false, ItemType.PumpkinPie, 1)}
-        },
-        {
             ItemType.LimeConcretePowder,
             new [] { new Recipe(new ItemType?[] { ItemType.LimeDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.LimeConcretePowder, 8)}
         },
         {
-            ItemType.FireworkRocket,
-            new [] { new Recipe(new ItemType?[] { ItemType.Gunpowder, ItemType.Paper }, null, false, ItemType.FireworkRocket, 3)}
+            ItemType.GlowItemFrame,
+            new [] { new Recipe(new ItemType?[] { ItemType.ItemFrame, ItemType.GlowInkSac }, null, false, ItemType.GlowItemFrame, 1)}
         },
         {
             ItemType.PinkConcretePowder,
@@ -2430,10 +2426,6 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.BrownDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.BrownConcretePowder, 8)}
         },
         {
-            ItemType.RabbitStew,
-            new [] { new Recipe(new ItemType?[] { ItemType.BakedPotato, ItemType.CookedRabbit, ItemType.Bowl, ItemType.Carrot, ItemType.BrownMushroom }, null, true, ItemType.RabbitStew, 1), new Recipe(new ItemType?[] { ItemType.BakedPotato, ItemType.CookedRabbit, ItemType.Bowl, ItemType.Carrot, ItemType.RedMushroom }, null, true, ItemType.RabbitStew, 1)}
-        },
-        {
             ItemType.GreenConcretePowder,
             new [] { new Recipe(new ItemType?[] { ItemType.GreenDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.GreenConcretePowder, 8)}
         },
@@ -2446,20 +2438,24 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.BlackDye, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Sand, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel, ItemType.Gravel }, null, true, ItemType.BlackConcretePowder, 8)}
         },
         {
+            ItemType.PumpkinPie,
+            new [] { new Recipe(new ItemType?[] { ItemType.Pumpkin, ItemType.Sugar, ItemType.Egg }, null, false, ItemType.PumpkinPie, 1)}
+        },
+        {
+            ItemType.FireworkRocket,
+            new [] { new Recipe(new ItemType?[] { ItemType.Gunpowder, ItemType.Paper }, null, false, ItemType.FireworkRocket, 3)}
+        },
+        {
+            ItemType.RabbitStew,
+            new [] { new Recipe(new ItemType?[] { ItemType.BakedPotato, ItemType.CookedRabbit, ItemType.Bowl, ItemType.Carrot, ItemType.BrownMushroom }, null, true, ItemType.RabbitStew, 1), new Recipe(new ItemType?[] { ItemType.BakedPotato, ItemType.CookedRabbit, ItemType.Bowl, ItemType.Carrot, ItemType.RedMushroom }, null, true, ItemType.RabbitStew, 1)}
+        },
+        {
             ItemType.BlueIce,
             new [] { new Recipe(new ItemType?[] { ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce, ItemType.PackedIce }, null, true, ItemType.BlueIce, 1)}
         },
         {
-            ItemType.BeetrootSoup,
-            new [] { new Recipe(new ItemType?[] { ItemType.Bowl, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot }, null, true, ItemType.BeetrootSoup, 1)}
-        },
-        {
             ItemType.WaxedCopperBlock,
             new [] { new Recipe(new ItemType?[] { ItemType.CopperBlock, ItemType.Honeycomb }, null, false, ItemType.WaxedCopperBlock, 1)}
-        },
-        {
-            ItemType.IronNugget,
-            new [] { new Recipe(new ItemType?[] { ItemType.IronIngot }, null, false, ItemType.IronNugget, 9)}
         },
         {
             ItemType.WaxedExposedCopper,
@@ -2474,16 +2470,16 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.OxidizedCopper, ItemType.Honeycomb }, null, false, ItemType.WaxedOxidizedCopper, 1)}
         },
         {
-            ItemType.MusicDisc5,
-            new [] { new Recipe(new ItemType?[] { ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5 }, null, true, ItemType.MusicDisc5, 1)}
+            ItemType.BeetrootSoup,
+            new [] { new Recipe(new ItemType?[] { ItemType.Bowl, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot, ItemType.Beetroot }, null, true, ItemType.BeetrootSoup, 1)}
+        },
+        {
+            ItemType.IronNugget,
+            new [] { new Recipe(new ItemType?[] { ItemType.IronIngot }, null, false, ItemType.IronNugget, 9)}
         },
         {
             ItemType.MuddyMangroveRoots,
             new [] { new Recipe(new ItemType?[] { ItemType.Mud, ItemType.MangroveRoots }, null, false, ItemType.MuddyMangroveRoots, 1)}
-        },
-        {
-            ItemType.FlowerBannerPattern,
-            new [] { new Recipe(new ItemType?[] { ItemType.Paper, ItemType.OxeyeDaisy }, null, false, ItemType.FlowerBannerPattern, 1)}
         },
         {
             ItemType.BambooBlock,
@@ -2492,6 +2488,14 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.Redstone,
             new [] { new Recipe(new ItemType?[] { ItemType.RedstoneBlock }, null, false, ItemType.Redstone, 9)}
+        },
+        {
+            ItemType.MusicDisc5,
+            new [] { new Recipe(new ItemType?[] { ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5, ItemType.DiscFragment5 }, null, true, ItemType.MusicDisc5, 1)}
+        },
+        {
+            ItemType.FlowerBannerPattern,
+            new [] { new Recipe(new ItemType?[] { ItemType.Paper, ItemType.OxeyeDaisy }, null, false, ItemType.FlowerBannerPattern, 1)}
         },
         {
             ItemType.CreeperBannerPattern,
@@ -2516,10 +2520,6 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.PolishedBlackstoneButton,
             new [] { new Recipe(new ItemType?[] { ItemType.PolishedBlackstone }, null, false, ItemType.PolishedBlackstoneButton, 1)}
-        },
-        {
-            ItemType.HoneyBottle,
-            new [] { new Recipe(new ItemType?[] { ItemType.HoneyBlock, ItemType.GlassBottle, ItemType.GlassBottle, ItemType.GlassBottle, ItemType.GlassBottle }, null, true, ItemType.HoneyBottle, 4)}
         },
         {
             ItemType.OakButton,
@@ -2566,16 +2566,52 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.WarpedPlanks }, null, false, ItemType.WarpedButton, 1)}
         },
         {
+            ItemType.HoneyBottle,
+            new [] { new Recipe(new ItemType?[] { ItemType.HoneyBlock, ItemType.GlassBottle, ItemType.GlassBottle, ItemType.GlassBottle, ItemType.GlassBottle }, null, true, ItemType.HoneyBottle, 4)}
+        },
+        {
+            ItemType.OrangeWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.OrangeDye, ItemType.BlackWool }, null, false, ItemType.OrangeWool, 1)}
+        },
+        {
+            ItemType.MagentaWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.MagentaDye, ItemType.BlackWool }, null, false, ItemType.MagentaWool, 1)}
+        },
+        {
+            ItemType.LightBlueWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.LightBlueDye, ItemType.BlackWool }, null, false, ItemType.LightBlueWool, 1)}
+        },
+        {
+            ItemType.YellowWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.YellowDye, ItemType.BlackWool }, null, false, ItemType.YellowWool, 1)}
+        },
+        {
+            ItemType.LimeWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.LimeDye, ItemType.BlackWool }, null, false, ItemType.LimeWool, 1)}
+        },
+        {
             ItemType.WhiteCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.WhiteDye }, null, false, ItemType.WhiteCandle, 1)}
+        },
+        {
+            ItemType.PinkWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.PinkDye, ItemType.BlackWool }, null, false, ItemType.PinkWool, 1)}
         },
         {
             ItemType.OrangeCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.OrangeDye }, null, false, ItemType.OrangeCandle, 1)}
         },
         {
+            ItemType.GrayWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.GrayDye, ItemType.BlackWool }, null, false, ItemType.GrayWool, 1)}
+        },
+        {
             ItemType.MagentaCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.MagentaDye }, null, false, ItemType.MagentaCandle, 1)}
+        },
+        {
+            ItemType.LightGrayWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.LightGrayDye, ItemType.BlackWool }, null, false, ItemType.LightGrayWool, 1)}
         },
         {
             ItemType.LightBlueCandle,
@@ -2586,28 +2622,56 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.YellowDye }, null, false, ItemType.YellowCandle, 1)}
         },
         {
+            ItemType.CyanWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.CyanDye, ItemType.BlackWool }, null, false, ItemType.CyanWool, 1)}
+        },
+        {
             ItemType.LimeCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.LimeDye }, null, false, ItemType.LimeCandle, 1)}
+        },
+        {
+            ItemType.PurpleWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.PurpleDye, ItemType.BlackWool }, null, false, ItemType.PurpleWool, 1)}
         },
         {
             ItemType.PinkCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.PinkDye }, null, false, ItemType.PinkCandle, 1)}
         },
         {
+            ItemType.BlueWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.BlueDye, ItemType.BlackWool }, null, false, ItemType.BlueWool, 1)}
+        },
+        {
             ItemType.GrayCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.GrayDye }, null, false, ItemType.GrayCandle, 1)}
+        },
+        {
+            ItemType.BrownWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.BrownDye, ItemType.BlackWool }, null, false, ItemType.BrownWool, 1)}
         },
         {
             ItemType.LightGrayCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.LightGrayDye }, null, false, ItemType.LightGrayCandle, 1)}
         },
         {
+            ItemType.GreenWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.GreenDye, ItemType.BlackWool }, null, false, ItemType.GreenWool, 1)}
+        },
+        {
             ItemType.CyanCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.CyanDye }, null, false, ItemType.CyanCandle, 1)}
         },
         {
+            ItemType.RedWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.RedDye, ItemType.BlackWool }, null, false, ItemType.RedWool, 1)}
+        },
+        {
             ItemType.PurpleCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.PurpleDye }, null, false, ItemType.PurpleCandle, 1)}
+        },
+        {
+            ItemType.BlackWool,
+            new [] { new Recipe(new ItemType?[] { ItemType.BlackDye, ItemType.BlueWool }, null, false, ItemType.BlackWool, 1)}
         },
         {
             ItemType.BlueCandle,
@@ -2626,68 +2690,8 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.RedDye }, null, false, ItemType.RedCandle, 1)}
         },
         {
-            ItemType.OrangeWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.OrangeDye, ItemType.BlackWool }, null, false, ItemType.OrangeWool, 1)}
-        },
-        {
-            ItemType.MagentaWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.MagentaDye, ItemType.BlackWool }, null, false, ItemType.MagentaWool, 1)}
-        },
-        {
             ItemType.BlackCandle,
             new [] { new Recipe(new ItemType?[] { ItemType.Candle, ItemType.BlackDye }, null, false, ItemType.BlackCandle, 1)}
-        },
-        {
-            ItemType.LightBlueWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.LightBlueDye, ItemType.BlackWool }, null, false, ItemType.LightBlueWool, 1)}
-        },
-        {
-            ItemType.YellowWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.YellowDye, ItemType.BlackWool }, null, false, ItemType.YellowWool, 1)}
-        },
-        {
-            ItemType.LimeWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.LimeDye, ItemType.BlackWool }, null, false, ItemType.LimeWool, 1)}
-        },
-        {
-            ItemType.PinkWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.PinkDye, ItemType.BlackWool }, null, false, ItemType.PinkWool, 1)}
-        },
-        {
-            ItemType.GrayWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.GrayDye, ItemType.BlackWool }, null, false, ItemType.GrayWool, 1)}
-        },
-        {
-            ItemType.LightGrayWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.LightGrayDye, ItemType.BlackWool }, null, false, ItemType.LightGrayWool, 1)}
-        },
-        {
-            ItemType.CyanWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.CyanDye, ItemType.BlackWool }, null, false, ItemType.CyanWool, 1)}
-        },
-        {
-            ItemType.PurpleWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.PurpleDye, ItemType.BlackWool }, null, false, ItemType.PurpleWool, 1)}
-        },
-        {
-            ItemType.BlueWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.BlueDye, ItemType.BlackWool }, null, false, ItemType.BlueWool, 1)}
-        },
-        {
-            ItemType.BrownWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.BrownDye, ItemType.BlackWool }, null, false, ItemType.BrownWool, 1)}
-        },
-        {
-            ItemType.GreenWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.GreenDye, ItemType.BlackWool }, null, false, ItemType.GreenWool, 1)}
-        },
-        {
-            ItemType.RedWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.RedDye, ItemType.BlackWool }, null, false, ItemType.RedWool, 1)}
-        },
-        {
-            ItemType.BlackWool,
-            new [] { new Recipe(new ItemType?[] { ItemType.BlackDye, ItemType.BlueWool }, null, false, ItemType.BlackWool, 1)}
         },
         {
             ItemType.ChestMinecart,
@@ -2750,6 +2754,10 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.CoalBlock }, null, false, ItemType.Coal, 9)}
         },
         {
+            ItemType.MossyCobblestone,
+            new [] { new Recipe(new ItemType?[] { ItemType.Cobblestone, ItemType.Vine }, null, false, ItemType.MossyCobblestone, 1), new Recipe(new ItemType?[] { ItemType.Cobblestone, ItemType.MossBlock }, null, false, ItemType.MossyCobblestone, 1)}
+        },
+        {
             ItemType.Diamond,
             new [] { new Recipe(new ItemType?[] { ItemType.DiamondBlock }, null, false, ItemType.Diamond, 9)}
         },
@@ -2780,10 +2788,6 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.NetheriteIngot,
             new [] { new Recipe(new ItemType?[] { ItemType.NetheriteBlock }, null, false, ItemType.NetheriteIngot, 9), new Recipe(new ItemType?[] { ItemType.NetheriteScrap, ItemType.NetheriteScrap, ItemType.NetheriteScrap, ItemType.NetheriteScrap, ItemType.GoldIngot, ItemType.GoldIngot, ItemType.GoldIngot, ItemType.GoldIngot }, null, true, ItemType.NetheriteIngot, 1)}
-        },
-        {
-            ItemType.MossyCobblestone,
-            new [] { new Recipe(new ItemType?[] { ItemType.Cobblestone, ItemType.Vine }, null, false, ItemType.MossyCobblestone, 1), new Recipe(new ItemType?[] { ItemType.Cobblestone, ItemType.MossBlock }, null, false, ItemType.MossyCobblestone, 1)}
         },
         {
             ItemType.MushroomStew,
@@ -2874,6 +2878,10 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.InkSac }, null, false, ItemType.BlackDye, 1), new Recipe(new ItemType?[] { ItemType.WitherRose }, null, false, ItemType.BlackDye, 1)}
         },
         {
+            ItemType.HayBlock,
+            new [] { new Recipe(new ItemType?[] { ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat }, null, true, ItemType.HayBlock, 1)}
+        },
+        {
             ItemType.BoneMeal,
             new [] { new Recipe(new ItemType?[] { ItemType.BoneBlock }, null, false, ItemType.BoneMeal, 9), new Recipe(new ItemType?[] { ItemType.Bone }, null, false, ItemType.BoneMeal, 3)}
         },
@@ -2882,8 +2890,8 @@ internal class Recipes_1_20_2 : RecipeData
             new [] { new Recipe(new ItemType?[] { ItemType.HoneyBottle }, null, false, ItemType.Sugar, 3), new Recipe(new ItemType?[] { ItemType.SugarCane }, null, false, ItemType.Sugar, 1)}
         },
         {
-            ItemType.HayBlock,
-            new [] { new Recipe(new ItemType?[] { ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat, ItemType.Wheat }, null, true, ItemType.HayBlock, 1)}
+            ItemType.PackedIce,
+            new [] { new Recipe(new ItemType?[] { ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice }, null, true, ItemType.PackedIce, 1)}
         },
         {
             ItemType.DriedKelp,
@@ -2896,10 +2904,6 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.MelonSeeds,
             new [] { new Recipe(new ItemType?[] { ItemType.MelonSlice }, null, false, ItemType.MelonSeeds, 1)}
-        },
-        {
-            ItemType.PackedIce,
-            new [] { new Recipe(new ItemType?[] { ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice, ItemType.Ice }, null, true, ItemType.PackedIce, 1)}
         },
         {
             ItemType.GoldNugget,
@@ -2924,10 +2928,6 @@ internal class Recipes_1_20_2 : RecipeData
         {
             ItemType.PrismarineBricks,
             new [] { new Recipe(new ItemType?[] { ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard, ItemType.PrismarineShard }, null, true, ItemType.PrismarineBricks, 1)}
-        },
-        {
-            ItemType.NetherWartBlock,
-            new [] { new Recipe(new ItemType?[] { ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart, ItemType.NetherWart }, null, true, ItemType.NetherWartBlock, 1)}
         },
     };
     public override Dictionary<ItemType, Recipe[]> Recipes => _recipes;

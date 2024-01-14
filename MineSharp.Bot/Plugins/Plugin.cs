@@ -1,4 +1,5 @@
 using MineSharp.Protocol;
+using NLog;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -7,6 +8,8 @@ namespace MineSharp.Bot.Plugins;
 /// </summary>
 public abstract class Plugin
 {
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    
     /// <summary>
     /// The bot
     /// </summary>
@@ -98,5 +101,6 @@ public abstract class Plugin
         this._initializationTask.TrySetResult();
 
         this.IsLoaded = true;
+        Logger.Info("Plugin loaded: {PluginName}", this.GetType().Name);
     }
 }

@@ -120,9 +120,8 @@ public class Chat
         }
             
         var ruleName = this.ParseComponent(translateProp);
-        return styleCode + TranslateString(ruleName, usingData)
+        return styleCode + TranslateString(ruleName, usingData.ToArray(), this.data)
                          + sb.ToString();
-
     }
 
     private string ParseArray(JArray jArray, string styleCode = "")
@@ -135,9 +134,16 @@ public class Chat
         return sb.ToString();
     }
     
-    private string TranslateString(string ruleName, List<string> usings)
+    /// <summary>
+    /// Translate a string using the given rule and format strings.
+    /// </summary>
+    /// <param name="ruleName"></param>
+    /// <param name="usings"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string TranslateString(string ruleName, string[] usings, MinecraftData data)
     {
-        var rule = this.data.Language.GetTranslation(ruleName);
+        var rule = data.Language.GetTranslation(ruleName);
 
         var usingIndex = 0;
         string result = Regex.Replace(rule, "%s", match => usings[usingIndex++]);

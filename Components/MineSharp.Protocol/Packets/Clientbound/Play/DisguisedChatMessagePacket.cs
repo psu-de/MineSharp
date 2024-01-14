@@ -1,3 +1,4 @@
+using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -24,6 +25,11 @@ public class DisguisedChatMessagePacket : IPacket
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20_3)
+        {
+            WriteV1_20_3(buffer, version);
+            return;
+        }
         buffer.WriteString(this.Message);
         buffer.WriteVarInt(this.ChatType);
         buffer.WriteString(this.Name);
@@ -31,13 +37,35 @@ public class DisguisedChatMessagePacket : IPacket
         if (this.Target != null)
             buffer.WriteString(this.Target);
     }
+
+    private void WriteV1_20_3(PacketBuffer buffer, MinecraftData data)
+    {
+        buffer.WriteNbt(new NbtString(this.Message));
+        buffer.WriteVarInt(this.ChatType);
+        buffer.WriteNbt(new NbtString(this.Name));
+        if (this.Target != null)
+            buffer.WriteNbt(new NbtString(this.Target));
+    }
+    
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20_3)
+            return ReadV1_20_3(buffer, version);
+        
         return new DisguisedChatMessagePacket(
             buffer.ReadString(),
             buffer.ReadVarInt(),
             buffer.ReadString(),
             buffer.ReadBool() ? buffer.ReadString() : null);
+    }
+
+    private static IPacket ReadV1_20_3(PacketBuffer buffer, MinecraftData version)
+    {
+        return new DisguisedChatMessagePacket(
+            buffer.ReadNbt()!.StringValue,
+            buffer.ReadVarInt(),
+            buffer.ReadNbt()!.StringValue,
+            buffer.ReadBool() ? buffer.ReadNbt()!.StringValue : null);
     }
 }
 #pragma warning restore CS1591

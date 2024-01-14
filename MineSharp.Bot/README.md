@@ -16,7 +16,7 @@ This is an example for a simple chat bot.
 using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 
-MinecraftBot bot = await MinecraftBot.CreateBot(
+MineSharpBot bot = await MineSharpBot.CreateBot(
     "MineSharpBot",
     "127.0.0.1",
     25565,

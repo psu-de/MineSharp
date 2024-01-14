@@ -155,13 +155,13 @@ public class PlayerPlugin : Plugin
         var positionPacket = await positionPacketTask;
 
         var entity = new Entity(
-            this.Bot.Data.Entities.GetByName("player"),
+            this.Bot.Data.Entities.GetByType(EntityType.Player),
             loginPacket.EntityId,
             new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z),
             positionPacket.Pitch,
             positionPacket.Yaw,
             new Vector3(0, 0, 0),
-            true,
+            false,
             new Dictionary<EffectType, Effect?>());
 
         this.Self = new MinecraftPlayer(

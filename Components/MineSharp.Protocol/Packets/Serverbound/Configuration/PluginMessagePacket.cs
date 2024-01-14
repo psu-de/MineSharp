@@ -25,7 +25,7 @@ public class PluginMessagePacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var channelName = buffer.ReadString();
-        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes));
+        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), version.Version.Protocol >= ProtocolVersion.V_1_20_2);
         return new PluginMessagePacket(channelName, clone);
     }
 }

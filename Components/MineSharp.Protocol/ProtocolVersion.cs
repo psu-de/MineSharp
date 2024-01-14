@@ -6,6 +6,11 @@ namespace MineSharp.Protocol;
 public static class ProtocolVersion
 {
     /// <summary>
+    /// Protocol version of Minecraft Java 1.20.3 & 1.20.4
+    /// </summary>
+    public const int V_1_20_3 = 765;
+    
+    /// <summary>
     /// Protocol version of Minecraft Java 1.20.2
     /// </summary>
     public const int V_1_20_2 = 764;

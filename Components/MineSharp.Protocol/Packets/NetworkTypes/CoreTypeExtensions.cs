@@ -30,7 +30,7 @@ internal static class CoreTypeExtensions
             data.Items.GetById(buffer.ReadVarInt()),
             buffer.ReadByte(),
             null,
-            buffer.ReadNbt());
+            buffer.ReadNbtCompound());
     }
     
     public static void WriteSlot(this PacketBuffer buffer, Slot slot)

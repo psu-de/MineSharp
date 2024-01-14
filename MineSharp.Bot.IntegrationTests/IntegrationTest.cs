@@ -13,6 +13,7 @@ public static class IntegrationTest
     
     public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
     {
+        AnsiConsole.MarkupLine($"[cyan]Running test {testName}...[/]");
         var bot = await MineSharpBot.CreateBot("MineSharpBot", HOST, PORT, offline: true);
         var chat = bot.GetPlugin<ChatPlugin>();
 
@@ -43,7 +44,7 @@ public static class IntegrationTest
 
         if (test.Exception != null)
         {
-            AnsiConsole.MarkupLine($"Test threw error: {test.Exception}");
+            AnsiConsole.MarkupLine($"[red]Test threw error: {Markup.Escape(test.Exception.ToString())}[/]");
             try
             {
                 await bot.Disconnect();

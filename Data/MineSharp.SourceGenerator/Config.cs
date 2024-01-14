@@ -13,7 +13,9 @@ public static class Config
         "1.19.4", 
         "1.20", 
         "1.20.1", 
-        "1.20.2"
+        "1.20.2",
+        "1.20.3",
+        "1.20.4"
     };
-    public static string LatestVersion = "1.20.2";
+    public static string LatestVersion = "1.20.4";
 }

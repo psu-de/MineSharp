@@ -1,10 +1,11 @@
-![banner](banner.png)
-
-# MineSharp
-
 [![Gitter](https://img.shields.io/gitter/room/MineSharp-net/community?style=for-the-badge)](https://gitter.im/MineSharp-net/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Discord](https://img.shields.io/badge/Discord-Join-green?style=for-the-badge)](https://discord.gg/Pt6JT5nXMr)
 [![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
+[![Nuget](https://img.shields.io/nuget/v/MineSharp.Bot?style=for-the-badge)](https://www.nuget.org/packages/MineSharp.Bot)
+
+![banner](banner.png)
+
+# MineSharp
 
 **This Project is not finished and under development!**
 
@@ -13,11 +14,11 @@ Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 If you're interested in this project, feel free to contribute!
 
-Minecraft Java 1.18 - 1.20.1 supported 
+Minecraft Java 1.18 - 1.20.4 supported 
 
 # Current features
 
-- ✨ Supported Versions: 1.18.x - 1.20.1
+- ✨ Supported Versions: 1.18.x - 1.20.4
 - 📈 Player Stats
 - ⚡ Events
 - 🐖 Entity tracking
@@ -32,7 +33,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 
 # Roadmap
 
-- ✨ Support 1.20.2 - 1.20.4
+- ~~✨ Support 1.20.3 - 1.20.4~~
 - 🔎 Simple Pathfinder
 
 # Example
@@ -40,7 +41,7 @@ Minecraft Java 1.18 - 1.20.1 supported
 using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 
-MinecraftBot bot = await MinecraftBot.CreateBot(
+MineSharpBot bot = await MineSharpBot.CreateBot(
     "MineSharpBot",
     "127.0.0.1",
     25565,

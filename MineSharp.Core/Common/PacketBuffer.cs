@@ -28,20 +28,30 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public long Position => _buffer.Position;
 
     /// <summary>
-    /// Create a new empty, writable PacketBuffer
+    /// Whether to use anonymous nbt compounds. This is used since
+    /// Minecraft Java 1.20.2
     /// </summary>
-    public PacketBuffer()
+    public bool UseAnonymousNbt { get; set; } = false;
+
+    /// <summary>
+    /// Create a new empty, writeable PacketBuffer
+    /// </summary>
+    /// <param name="useAnonymousNbt"></param>
+    public PacketBuffer(bool useAnonymousNbt)
     {
         this._buffer = new MemoryStream();
+        this.UseAnonymousNbt = useAnonymousNbt;
     }
-    
+
     /// <summary>
     /// Create a new readable PacketBuffer with <paramref name="bytes"/> as input.
     /// </summary>
     /// <param name="bytes"></param>
-    public PacketBuffer(byte[] bytes)
+    /// <param name="useAnonymousNbt"></param>
+    public PacketBuffer(byte[] bytes, bool useAnonymousNbt)
     {
         this._buffer = new MemoryStream(bytes);
+        this.UseAnonymousNbt = useAnonymousNbt;
     }
 
     /// <summary>
@@ -275,18 +285,23 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return bytes;
     }
 
-    public NbtCompound ReadNbt()
+    public NbtCompound? ReadNbtCompound()
     {
-        NbtTagType t = (NbtTagType)this.ReadByte();
-        if (t != NbtTagType.Compound) 
-            return new NbtCompound();
+        return (NbtCompound?)this.ReadNbt();
+    }
+
+    public NbtTag? ReadNbt()
+    {
+        var t = (NbtTagType)this.ReadByte();
+        if (t == NbtTagType.End) 
+            return null;
         _buffer.Position--;
 		
-        NbtFile file = new NbtFile() {BigEndian = true};
+        var file = new NbtFile() {BigEndian = true, Anonymous = this.UseAnonymousNbt };
 		
         file.LoadFromStream(_buffer, NbtCompression.None);
 		
-        return (NbtCompound)file.RootTag;
+        return file.RootTag;
     }
 
     public BlockEntity ReadBlockEntity()
@@ -296,7 +311,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         var z = (byte)(packedXZ & 0xF);
         var y = this.ReadShort();
         var type = this.ReadVarInt();
-        var nbt = this.ReadNbt();
+        var nbt = this.ReadNbtCompound();
         
         return new BlockEntity(x, y, z, type, nbt);
     }
@@ -489,15 +504,15 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
 
-    public void WriteNbt(NbtCompound? compound)
+    public void WriteNbt(NbtTag? tag)
     {
-        if (compound == null || compound.Count == 0)
+        if (tag is null or NbtCompound { Count: 0 })
         {
             this._buffer.WriteByte((byte)NbtTagType.End);
             return;
         }
         
-        NbtFile f = new NbtFile(compound) { BigEndian = true };
+        NbtFile f = new NbtFile(tag) { BigEndian = true, Anonymous = this.UseAnonymousNbt };
         f.SaveToStream(_buffer, NbtCompression.None);
     }
     

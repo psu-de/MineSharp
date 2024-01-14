@@ -17,7 +17,7 @@ namespace MineSharp.Bot.Plugins;
 /// </summary>
 public class ChatPlugin : Plugin
 {
-    private readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
     
     private readonly LastSeenMessageCollector? _messageCollector;
     private readonly UUID _chatSession = new Guid();
@@ -352,6 +352,7 @@ public class ChatPlugin : Plugin
 
         var salt = ChatSignature.GenerateSalt();
         byte[] signature = ChatSignature.SignChat1_19_3(
+            this.Bot.Data,
             this.Bot.Client.Session.Certificate!.RsaPrivate,
             message,
             this.Bot.Session.UUID,
@@ -395,6 +396,7 @@ public class ChatPlugin : Plugin
         foreach ((var name, var argument) in arguments)
         {
             var signature = ChatSignature.SignChat1_19_3(
+                this.Bot.Data,
                 this.Bot.Session.Certificate.RsaPrivate,
                 argument,
                 this.Bot.Session.UUID,
@@ -460,13 +462,14 @@ public class ChatPlugin : Plugin
                 }
             }
         
-            (UUID sender, string message, ChatMessageType type) = packet.Body switch {
-                PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, (ChatMessageType)v19.MessageType),
-                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, (ChatMessageType)v19_2.Type),
+            (UUID sender, string message, int type) = packet.Body switch {
+                PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, v19.MessageType),
+                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, v19_2.Type),
                 _ => throw new UnreachableException()
             };
-            
-            this.HandleChatInternal(sender, message, type);
+
+            var chatType = GetChatMessageTypeFromRegistry(type);
+            this.HandleChatInternal(sender, message, chatType);
         }
         catch (Exception e)
         {
@@ -496,10 +499,11 @@ public class ChatPlugin : Plugin
 
     private Task HandleDisguisedChatMessage(DisguisedChatMessagePacket packet)
     {
+        
         this.HandleChatInternal(
             null,
             packet.Message,
-            (ChatMessageType)packet.ChatType,
+            this.GetChatMessageTypeFromRegistry(packet.ChatType),
             packet.Target ?? packet.Name);
         return Task.CompletedTask;
     }
@@ -518,5 +522,29 @@ public class ChatPlugin : Plugin
     private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
     {
         this.OnChatMessageReceived?.Invoke(this.Bot, sender, new ChatComponent.Chat(message, this.Bot.Data), type, senderName);
+    }
+
+    private ChatMessageType GetChatMessageTypeFromRegistry(int index)
+    {
+        var val = this.Bot.Registry["minecraft:chat_type"]["value"][index]["name"]!.StringValue!;
+        return GetChatMessageType(val);
+    }
+    
+    private static ChatMessageType GetChatMessageType(string message)
+    {
+        return message switch {
+            "minecraft:chat" => ChatMessageType.Chat,
+            "minecraft:emote_command" => ChatMessageType.Emote,
+            "minecraft:say_command" => ChatMessageType.SayCommand,
+            "minecraft:team_msg_command_incoming" => ChatMessageType.TeamMessage,
+            "minecraft:msg_command_incoming" => ChatMessageType.SayCommand,
+            _ => UnknownChatMessage(message)
+        };
+    }
+
+    private static ChatMessageType UnknownChatMessage(string msg)
+    {
+        Logger.Debug("Unknown chat message type {message}.", msg);
+        return ChatMessageType.Raw;
     }
 }

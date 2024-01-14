@@ -162,7 +162,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     {
         var x = buffer.ReadInt();
         var z = buffer.ReadInt();
-        var heightmaps = buffer.ReadNbt();
+        var heightmaps = buffer.ReadNbtCompound();
         var chunkData = new byte[buffer.ReadVarInt()];
         buffer.ReadBytes(chunkData);
 

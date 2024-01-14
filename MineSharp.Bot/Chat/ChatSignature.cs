@@ -4,23 +4,23 @@
  *  - MinecraftClient/Protocol/Handlers/Protocol18.cs
  */
 
-using MineSharp.Commands;
 using MineSharp.Core.Common;
-using MineSharp.Protocol.Packets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using MineSharp.Data;
+using MineSharp.Protocol;
 
 namespace MineSharp.Bot.Chat;
 
 internal static class ChatSignature
 {
-    public static byte[] SignChat1_19_3(RSA rsa, string message, UUID playerUuid, UUID chatSession, int messageCount, long salt, DateTimeOffset timestamp, AcknowledgedMessage[] acknowledged)
+    public static byte[] SignChat1_19_3(MinecraftData data, RSA rsa, string message, UUID playerUuid, UUID chatSession, int messageCount, long salt, DateTimeOffset timestamp, AcknowledgedMessage[] acknowledged)
     {
         var messageBytes = Encoding.UTF8.GetBytes(message);
         
-        var signData = new PacketBuffer();
+        var signData = new PacketBuffer(data.Version.Protocol >= ProtocolVersion.V_1_20_2);
         signData.WriteInt(1);
         signData.WriteUuid(playerUuid);
         signData.WriteUuid(chatSession);
@@ -38,7 +38,7 @@ internal static class ChatSignature
 
     public static byte[] SignChat1_19_2(RSA rsa, string message, UUID playerUuid, DateTimeOffset timestamp, long salt, AcknowledgedMessage[] messageList, byte[]? precedingSignature)
     {
-        var hashData = new PacketBuffer();
+        var hashData = new PacketBuffer(false);
         hashData.WriteLong(salt);
         hashData.WriteLong(timestamp.ToUnixTimeSeconds());
         hashData.WriteBytes(Encoding.UTF8.GetBytes(message));
@@ -53,7 +53,7 @@ internal static class ChatSignature
         
         byte[] hash = SHA256.HashData(hashData.GetBuffer());
 
-        var signData = new PacketBuffer();
+        var signData = new PacketBuffer(false);
         if (precedingSignature != null)
             signData.WriteBytes(precedingSignature);
         
@@ -65,8 +65,8 @@ internal static class ChatSignature
 
     public static byte[] SignChat1_19_1(RSA rsa, string message, UUID uuid, DateTimeOffset timestamp, long salt)
     {
-        string json = new JObject(new JProperty("text", message)).ToString(Formatting.None);
-        var signData = new PacketBuffer();
+        var json = new JObject(new JProperty("text", message)).ToString(Formatting.None);
+        var signData = new PacketBuffer(false);
         
         signData.WriteLong(salt);
         signData.WriteUuid(uuid);

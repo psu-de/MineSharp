@@ -65,7 +65,7 @@ public class PhysicsPlugin : Plugin
         this.worldPlugin = this.Bot.GetPlugin<WorldPlugin>();
         
         await this.playerPlugin.WaitForInitialization();
-        await this.worldPlugin.WaitForChunks();
+        await this.worldPlugin.WaitForChunks(3);
 
         this.Self = this.playerPlugin.Self;
         await this.UpdateServerPos();

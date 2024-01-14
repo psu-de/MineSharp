@@ -34,6 +34,7 @@ public class ClientInformationPacket : IPacket
         buffer.WriteString(this.Locale);
         buffer.WriteByte(this.ViewDistance);
         buffer.WriteVarInt(this.ChatMode);
+        buffer.WriteBool(this.ChatColors);
         buffer.WriteByte(this.DisplayedSkinParts);
         buffer.WriteVarInt(this.MainHand);
         buffer.WriteBool(this.EnableTextFiltering);
