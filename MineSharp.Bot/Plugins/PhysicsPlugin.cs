@@ -48,6 +48,8 @@ public class PhysicsPlugin : Plugin
 
     private LerpRotation? lerpRotation;
 
+    private uint tickCounter = 0;
+
     /// <summary>
     /// Create a new PhysicsPlugin instance
     /// </summary>
@@ -73,6 +75,22 @@ public class PhysicsPlugin : Plugin
         this.Engine = new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
         this.Engine.OnCrouchingChanged += OnSneakingChanged;
         this.Engine.OnSprintingChanged += OnSprintingChanged;
+    }
+
+    /// <summary>
+    /// Wait for <paramref name="count"/> physics ticks
+    /// </summary>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public async Task WaitForTick(int count = 1)
+    {
+        var before = this.tickCounter;
+        var expected = before + count;
+
+        while (this.tickCounter < expected)
+        {
+            await Task.Delay(1);
+        }
     }
 
     /// <summary>
@@ -208,6 +226,8 @@ public class PhysicsPlugin : Plugin
             {
                 Logger.Error(e.ToString());
             }
+
+            this.tickCounter++;
         });
 
         return Task.CompletedTask;
