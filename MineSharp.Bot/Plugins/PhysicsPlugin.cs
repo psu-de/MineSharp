@@ -67,7 +67,6 @@ public class PhysicsPlugin : Plugin
         this.worldPlugin = this.Bot.GetPlugin<WorldPlugin>();
         
         await this.playerPlugin.WaitForInitialization();
-        await this.worldPlugin.WaitForChunks(3);
 
         this.Self = this.playerPlugin.Self;
         await this.UpdateServerPos();
@@ -131,6 +130,12 @@ public class PhysicsPlugin : Plugin
     /// <param name="smoothness"></param>
     public async Task Look(float yaw, float pitch, float smoothness = ROTATION_SMOOTHNESS)
     {
+        var dYaw = yaw - this.Self!.Entity!.Yaw;
+        var dPitch = pitch - this.Self!.Entity!.Pitch;
+
+        if (Math.Abs(dYaw) < 0.1 && Math.Abs(dPitch) < 0.1)
+            return;
+        
         this.lerpRotation?.Cancel();
         this.lerpRotation = new LerpRotation(this.playerPlugin!.Self!, yaw, pitch, smoothness);
 
@@ -235,13 +240,14 @@ public class PhysicsPlugin : Plugin
 
     private (float Yaw, float Pitch) CalculateRotation(Vector3 position)
     {
-        var pos = new Vector3(0.5d, 0.5d, 0.5d).Plus(position);
-        var r = pos.Minus(this.Self!.GetHeadPosition());
-        var yaw = (float)(-Math.Atan2(r.X, r.Z) / Math.PI * 180);
-        if (yaw < 0) yaw = 360 + yaw;
-        var pitch = (float)(-Math.Asin(r.Y / r.Length()) / Math.PI * 180);
+        const double deg2rad = 180 / Math.PI; 
+        var delta = position.Minus(this.Self!.GetHeadPosition());
+        delta.Normalize();
+        
+        var yaw = deg2rad * Math.Atan2(-delta.X, delta.Z);
+        var pitch = deg2rad * -Math.Asin(delta.Y / delta.Length());
 
-        return (yaw, pitch);
+        return ((float)yaw, (float)pitch);
     }
     
     private async Task UpdateServerPositionIfNeeded()

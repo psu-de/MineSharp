@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+
 namespace MineSharp.Core.Common;
 
 /// <summary>
@@ -67,45 +69,130 @@ public class Vector3(double x, double y, double z)
     /// Component-wise vector addition.
     /// </summary>
     /// <param name="other"></param>
-    public void Add(Vector3 other)
+    /// <returns>this</returns>
+    public Vector3 Add(Vector3 other)
     {
         this.X += other.X;
         this.Y += other.Y;
         this.Z += other.Z;
+
+        return this;
     }
 
+    /// <summary>
+    /// Component-wise vector addition
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns>this</returns>
+    public Vector3 Add(double x, double y, double z)
+    {
+        this.X += x;
+        this.Y += y;
+        this.Z += z;
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Returns a new Vector with the <paramref name="other"/> added
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    [Pure]
+    public Vector3 Plus(Vector3 other)
+    {
+        return new Vector3(
+            this.X + other.X,
+            this.Y + other.Y,
+            this.Z + other.Z);
+    }
+    
     /// <summary>
     /// Component-wise vector subtraction.
     /// </summary>
     /// <param name="other"></param>
-    public void Subtract(Vector3 other)
+    public Vector3 Subtract(Vector3 other)
     {
         this.X -= other.X;
         this.Y -= other.Y;
         this.Z -= other.Z;
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Component-wise vector subtraction.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    public Vector3 Subtract(double x, double y, double z)
+    {
+        this.X -= x;
+        this.Y -= y;
+        this.Z -= z;
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Returns a new Vector with <paramref name="other"/> subtracted
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    [Pure]
+    public Vector3 Minus(Vector3 other)
+    {
+        return new Vector3(
+            this.X - other.X,
+            this.Y - other.Y,
+            this.Z - other.Z);
     }
 
     /// <summary>
     /// Component-wise vector multiplication.
     /// </summary>
     /// <param name="other"></param>
-    public void Multiply(Vector3 other)
+    public Vector3 Multiply(Vector3 other)
     {
         this.X *= other.X;
         this.Y *= other.Y;
         this.Z *= other.Z;
+
+        return this;
     }
+    
+    /// <summary>
+    /// Returns a new Vector3 multiplied by <paramref name="other"/>
+    /// </summary>
+    /// <param name="other"></param>
+    [Pure]
+    public Vector3 Multiplied(Vector3 other)
+        => this.Clone().Multiply(other);
 
     /// <summary>
     /// Component-wise vector division.
     /// </summary>
     /// <param name="other"></param>
-    public void Divide(Vector3 other)
+    public Vector3 Divide(Vector3 other)
     {
         this.X /= other.X;
         this.Y /= other.Y;
         this.Z /= other.Z;
+
+        return this;
     }
+
+    /// <summary>
+    /// Returns a new Vector3 divided by <paramref name="other"/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    [Pure]
+    public Vector3 Divided(Vector3 other)
+        => this.Clone().Divide(other);
 
     /// <summary>
     /// Scale this vector by a scalar
@@ -123,6 +210,7 @@ public class Vector3(double x, double y, double z)
     /// </summary>
     /// <param name="scalar"></param>
     /// <returns></returns>
+    [Pure]
     public Vector3 Scaled(double scalar)
     {
         var vec = this.Clone();
@@ -131,9 +219,33 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
+    /// Floor all values of this vector
+    /// </summary>
+    /// <returns>this</returns>
+    public Vector3 Floor()
+    {
+        this.X = Math.Floor(this.X);
+        this.Y = Math.Floor(this.Y);
+        this.Z = Math.Floor(this.Z);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Return a new Vector3 with all values floored
+    /// </summary>
+    /// <returns></returns>
+    [Pure]
+    public Vector3 Floored()
+    {
+        return this.Clone().Floor();
+    }
+
+    /// <summary>
     /// Returns the length of this vector.
     /// </summary>
     /// <returns></returns>
+    [Pure]
     public double Length()
     {
         return Math.Sqrt(this.LengthSquared());
@@ -144,6 +256,7 @@ public class Vector3(double x, double y, double z)
     /// Returns the squared length of this vector instance
     /// </summary>
     /// <returns></returns>
+    [Pure]
     public double LengthSquared()
     {
         return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
@@ -154,6 +267,7 @@ public class Vector3(double x, double y, double z)
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
+    [Pure]
     public double DistanceTo(Vector3 other)
     {
         return this.Minus(other).Length();
@@ -164,6 +278,7 @@ public class Vector3(double x, double y, double z)
     /// </summary>
     /// <param name="other"></param>
     /// <returns>The distance squared.</returns>
+    [Pure]
     public double DistanceToSquared(Vector3 other)
     {
         var diff = this.Minus(other);
@@ -191,6 +306,7 @@ public class Vector3(double x, double y, double z)
     /// Returns a new normalized instance of this vector
     /// </summary>
     /// <returns></returns>
+    [Pure]
     public Vector3 Normalized()
     {
         var clone = this.Clone();
@@ -199,35 +315,10 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
-    /// Returns a new Vector with the <paramref name="other"/> added
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public Vector3 Plus(Vector3 other)
-    {
-        return new Vector3(
-            this.X + other.X,
-            this.Y + other.Y,
-            this.Z + other.Z);
-    }
-
-    /// <summary>
-    /// Returns a new Vector with <paramref name="other"/> subtracted
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public Vector3 Minus(Vector3 other)
-    {
-        return new Vector3(
-            this.X - other.X,
-            this.Y - other.Y,
-            this.Z - other.Z);
-    }
-
-    /// <summary>
     /// Returns this vector cloned
     /// </summary>
     /// <returns></returns>
+    [Pure]
     public Vector3 Clone()
         => new Vector3(this.X, this.Y, this.Z);
 
@@ -291,4 +382,40 @@ public class Vector3(double x, double y, double z)
                || Math.Abs(a.Y - b.Y) > 1e-7
                || Math.Abs(a.Z - b.Z) > 1e-7;
     }
+
+    /// <summary>
+    /// Component-wise vector addition
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Vector3 operator +(Vector3 a, Vector3 b)
+        => a.Plus(b);
+
+    /// <summary>
+    /// Component-wise vector subtraction
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Vector3 operator -(Vector3 a, Vector3 b)
+        => a.Minus(b);
+
+    /// <summary>
+    /// Component-wise vector multiplication
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Vector3 operator *(Vector3 a, Vector3 b)
+        => a.Multiplied(b);
+
+    /// <summary>
+    /// Component-wise vector division
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Vector3 operator /(Vector3 a, Vector3 b)
+        => a.Divided(b);
 }

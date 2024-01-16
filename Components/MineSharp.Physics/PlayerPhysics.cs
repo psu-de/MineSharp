@@ -102,6 +102,13 @@ public class PlayerPhysics
         {
             this.Player.Entity!.IsOnGround = false;
         }
+
+        // TODO: The Vanilla client does some things even when the Chunk is not loaded
+        if (!this.World.IsChunkLoaded(
+                this.World.ToChunkCoordinates((Position)this.Player.Entity!.Position)))
+        {
+            return;
+        }
         
         // TODO: PlayerPhysics fix differences to java
         // Player.java:216 takeXpDelay
