@@ -4,11 +4,14 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.World;
+using NLog;
 
 namespace MineSharp.Pathfinder.Moves;
 
 public class DirectMove(Vector3 motion) : IMove
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger(); 
+    
     /// <inheritdoc />
     public Vector3 Motion { get; } = motion;
     
@@ -26,25 +29,59 @@ public class DirectMove(Vector3 motion) : IMove
             world, 
             data);
     }
-    
-    /// <inheritdoc />
-    public Task DoTick(PlayerPlugin playerPlugin, PhysicsPlugin physics, int count, Movements movements)
-    {
-        physics.InputControls.SprintingKeyDown = movements.AllowSprinting;
-        physics.InputControls.ForwardKeyDown = true;
-
-        return Task.CompletedTask;
-    }
 
     /// <inheritdoc />
-    public async Task StartMove(PlayerPlugin playerPlugin, PhysicsPlugin physics, int count, Movements movements)
+    public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
-        var target = playerPlugin.Self!.Entity!.Position.Plus(this.Motion.Scaled(count));
+        var player = bot.GetPlugin<PlayerPlugin>();
+        var physics = bot.GetPlugin<PhysicsPlugin>();
         
-        var normalized = this.Motion.Normalized();
-        var yaw = (180 / MathF.PI) * (float)Math.Atan2(-normalized.X, normalized.Z);
-
         physics.InputControls.Reset();
-        await physics.Look(yaw, playerPlugin.Self!.Entity!.Pitch);
+
+        var target = player.Self!.Entity!.Position
+            .Floored()
+            .Add(0.5, 0.0, 0.5)
+            .Add(this.Motion.Scaled(count));
+        
+        await physics.LookAt(target);
+        var forward = true;
+        var sprint = movements.AllowSprinting;
+        var hasStoppedSprinting = !movements.AllowSprinting;
+        var prevDst = double.MaxValue;
+        
+        while (true)
+        {
+            physics.InputControls.ForwardKeyDown = forward;
+            physics.InputControls.SprintingKeyDown = sprint;
+            await physics.WaitForTick();
+
+            if (!forward)
+            {
+                // adjust rotation when close to target
+                await physics.LookAt(target);
+                forward = true;
+            }
+
+            var dst = target.DistanceToSquared(player.Self!.Entity!.Position);
+            if (dst > prevDst)
+            {
+                Logger.Warn("Getting further away from target!");
+                throw new Exception(); // TODO: Better exception
+            }
+            
+            if (dst <= 0.0625)
+                break;
+
+            if (hasStoppedSprinting || dst > 0.5)
+                continue;
+
+            // stop walking for one tick to stop sprinting
+            // bot could move too far if it is too fast
+            forward = false;
+            sprint = false;
+            hasStoppedSprinting = true;
+        }
+        
+        physics.InputControls.Reset();
     }
 }

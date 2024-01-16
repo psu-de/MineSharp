@@ -3,6 +3,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using MineSharp.Pathfinder.Algorithm;
 using MineSharp.Pathfinder.Moves;
+using NLog;
 
 namespace MineSharp.Pathfinder;
 
@@ -12,6 +13,8 @@ namespace MineSharp.Pathfinder;
 /// </summary>
 public class Pathfinder(MineSharpBot bot) : Plugin(bot)
 {
+    private static ILogger Logger = LogManager.GetCurrentClassLogger();
+    
     private AStar? astar;
     private PhysicsPlugin? physics;
     private WorldPlugin? worldPlugin;
@@ -37,10 +40,10 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         var start = this.playerPlugin!.Self!.Entity!.Position;
         var path = this.astar!.FindPath((Position)start, position);
         
-        Console.WriteLine($"Found path with {path.Nodes.Length} nodes");
+        Logger.Debug("Found path with {count} nodes", path.Nodes.Length);
         foreach (var node in path.Nodes)
         {
-            Console.WriteLine($"Move: {node.Count} * {node.Move.Motion} - {node.Move.GetType()}");
+            Logger.Debug("Move: {count} * {motion} - {moveType}", node.Count, node.Move.Motion, node.Move.GetType());
 
             await this.PerformMove(node.Move, node.Count);
         }
@@ -53,42 +56,8 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
     /// </summary>
     /// <param name="move"></param>
     /// <param name="count"></param>
-    public async Task PerformMove(IMove move, int count = 1)
+    public Task PerformMove(IMove move, int count = 1)
     {
-        var target = this.playerPlugin!.Entity!.Position.Plus(
-            move.Motion.Scaled(count));
-        
-        var tsc = new TaskCompletionSource();
-
-        void PhysicsTick(MineSharpBot bot)
-        {
-            move.DoTick(this.playerPlugin!, this.physics!, count, this.movements)
-                .Wait();
-            
-            var dst = playerPlugin.Self!.Entity!.Position
-                .DistanceToSquared(target);
-            
-            if (dst <= 0.223)
-                tsc.SetResult();
-        }
-        
-        await move.StartMove(this.playerPlugin!,
-            this.physics!,
-            count,
-            this.movements);
-
-        this.physics!.PhysicsTick += PhysicsTick;
-
-        await tsc.Task;
-
-        this.physics!.PhysicsTick -= PhysicsTick;
-        
-        physics.InputControls.Reset();
-
-        await move.StopMove(
-            this.playerPlugin!,
-            this.physics,
-            count,
-            this.movements);
+        return move.PerformMove(this.Bot, count, this.movements);
     }
 }

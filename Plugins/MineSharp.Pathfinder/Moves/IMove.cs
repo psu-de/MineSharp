@@ -33,36 +33,13 @@ public interface IMove
     /// joint together.
     /// </summary>
     public bool CanBeLinked { get; }
-    
-    /// <summary>
-    /// Perform a single move tick.
-    /// </summary>
-    /// <param name="playerPlugin"></param>
-    /// <param name="physics"></param>
-    /// <param name="count"></param>
-    /// <param name="movements"></param>
-    /// <returns></returns>
-    internal Task DoTick(PlayerPlugin playerPlugin, PhysicsPlugin physics, int count, Movements movements);
 
     /// <summary>
-    /// Called once before performing the move
+    /// Perform the move
     /// </summary>
-    /// <param name="playerPlugin"></param>
-    /// <param name="physics"></param>
+    /// <param name="bot"></param>
     /// <param name="count"></param>
     /// <param name="movements"></param>
     /// <returns></returns>
-    internal Task StartMove(PlayerPlugin playerPlugin, PhysicsPlugin physics, int count, Movements movements)
-        => Task.CompletedTask;
-
-    /// <summary>
-    /// Called once after the move has been performed
-    /// </summary>
-    /// <param name="playerPlugin"></param>
-    /// <param name="physics"></param>
-    /// <param name="count"></param>
-    /// <param name="movements"></param>
-    /// <returns></returns>
-    internal Task StopMove(PlayerPlugin playerPlugin, PhysicsPlugin physics, int count, Movements movements)
-        => Task.CompletedTask;
+    internal Task PerformMove(MineSharpBot bot, int count, Movements movements);
 }
