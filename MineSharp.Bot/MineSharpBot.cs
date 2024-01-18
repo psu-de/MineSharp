@@ -52,7 +52,7 @@ public class MineSharpBot
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
 
-    private MineSharpBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
+    internal MineSharpBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
     {
         this.Data = data;
         this.Session = session;
@@ -161,75 +161,4 @@ public class MineSharpBot
 
     private void OnClientDisconnected(MinecraftClient sender, string reason)
         => this.OnBotDisconnected?.Invoke(this, reason);
-
-
-    /// <summary>
-    /// Create a new Minecraft bot.
-    /// Tries to detect the Minecraft server version automatically if none was provided.
-    /// </summary>
-    /// <param name="hostnameOrIp">The hostname or ip address of the server</param>
-    /// <param name="session">A session object</param>
-    /// <param name="port">Port of the minecraft server</param>
-    /// <param name="version">Which Minecraft version to use</param>
-    /// <param name="excludeDefaultPlugins">When true, no plugins are loaded initially</param>
-    /// <returns></returns>
-    public static async Task<MineSharpBot> CreateBot(
-        string hostnameOrIp,
-        Session session,
-        ushort port = 25565,
-        string? version = null,
-        bool excludeDefaultPlugins = false)
-    {
-        var data = version switch {
-            null => await MinecraftClient.AutodetectServerVersion(hostnameOrIp, port),
-            _ => MinecraftData.FromVersion(version)
-        };
-
-        var bot = new MineSharpBot(data, session, hostnameOrIp, port);
-
-        if (excludeDefaultPlugins)
-            return bot;
-
-        Plugin[] defaultPlugins = {
-            new ChatPlugin(bot),
-            new EntityPlugin(bot),
-            new PlayerPlugin(bot),
-            new WindowPlugin(bot),
-            new WorldPlugin(bot),
-            new CraftingPlugin(bot),
-            new PhysicsPlugin(bot)
-        };
-
-        foreach (var plugin in defaultPlugins)
-            await bot.LoadPlugin(plugin);
-
-        return bot;
-    }
-    
-    /// <summary>
-    /// Creates a new MinecraftBot.
-    /// If you want an online session and login with an Microsoft Account, use your account email as username parameter.
-    /// </summary>
-    /// <param name="username">The Username of the Bot (offline session), or an microsoft account email (online session)</param>
-    /// <param name="hostnameOrIp">The Hostname of the Minecraft server.</param>
-    /// <param name="port">Port of the Minecraft server</param>
-    /// <param name="offline">When true, you won't be logged in to the minecraft services, and will only be able to join servers in offline-mode.</param>
-    /// <param name="version">The minecraft version to use. If null, MineSharp will try to automatically detect the version.</param>
-    /// <param name="excludeDefaultPlugins">When true, the default plugins will not be added to the bot</param>
-    /// <returns></returns>
-    public static async Task<MineSharpBot> CreateBot(
-        string username, 
-        string hostnameOrIp, 
-        ushort port = 25565,
-        bool offline = false, 
-        string? version = null,
-        bool excludeDefaultPlugins = false)
-    {
-        var session = offline switch {
-            true => Session.OfflineSession(username),
-            false => await MicrosoftAuth.Login(username)
-        };
-
-        return await CreateBot(hostnameOrIp, session, port, version, excludeDefaultPlugins);
-    }
 }

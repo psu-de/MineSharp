@@ -14,7 +14,13 @@ public static class IntegrationTest
     public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
     {
         AnsiConsole.MarkupLine($"[cyan]Running test {testName}...[/]");
-        var bot = await MineSharpBot.CreateBot("MineSharpBot", HOST, PORT, offline: true);
+        
+        var bot = await new BotBuilder()
+            .Host(HOST)
+            .Port(PORT)
+            .OfflineSession("MineSharpBot")
+            .CreateAsync();
+        
         var chat = bot.GetPlugin<ChatPlugin>();
 
         if (!await bot.Connect())
