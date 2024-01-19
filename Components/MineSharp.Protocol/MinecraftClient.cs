@@ -42,9 +42,10 @@ public sealed class MinecraftClient : IDisposable
     /// <typeparam name="T"></typeparam>
     public delegate Task AsyncPacketHandler<in T>(T packet) where T : IPacket;
 
-    private readonly MinecraftData _data;
+    internal readonly MinecraftApi? Api;
+        
     private readonly CancellationTokenSource _cancellation;
-    private readonly TcpClient _client;
+    private readonly ITcpClientFactory? _tcpTcpFactory; 
 
     private readonly Queue<(PacketType, PacketBuffer)> _bundledPackets;
     private readonly ConcurrentQueue<PacketSendTask> _packetQueue;
@@ -53,10 +54,13 @@ public sealed class MinecraftClient : IDisposable
     private readonly TaskCompletionSource _gameJoinedTsc;
     private readonly bool _useAnonymousNbt;
 
+    private GameState gameState;
     private bool _bundlePackets;
+    private TcpClient? _client;
     private IPacketHandler _internalPacketHandler;
     private MinecraftStream? _stream;
     private Task? _streamLoop;
+    public IPAddress ip;
 
     /// <summary>
     /// Fires whenever the client received a known Packet
@@ -71,42 +75,45 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public event Events.ClientStringEvent? OnDisconnected;
     
+   
+    /// <summary>
+    /// The MinecraftData object of this client
+    /// </summary>
+    public readonly MinecraftData Data;
+
     /// <summary>
     /// The Session object for this client
     /// </summary>
-    public Session Session { get; }
-    
+    public readonly Session Session;
+
     /// <summary>
     /// The Hostname of the minecraft server provided in the constructor
     /// </summary>
-    public string Hostname { get; }
-    
-    /// <summary>
-    /// The IP Address of the minecraft server
-    /// </summary>
-    public IPAddress IP { get; }
-    
+    public readonly string Hostname;
+
     /// <summary>
     /// The Port of the minecraft server
     /// </summary>
-    public ushort Port { get; }
-    
-    /// <summary>
-    /// The GameState the client is in
-    /// </summary>
-    public GameState GameState { get; private set; }
+    public readonly ushort Port;
 
     /// <summary>
-    /// Create a new MinecraftClient instance
+    /// Create a new MinecraftClient
     /// </summary>
     /// <param name="data">The data used by the client</param>
     /// <param name="session">The session object</param>
     /// <param name="hostnameOrIp">Hostname or ip of the server</param>
     /// <param name="port">Port of the server</param>
-    public MinecraftClient(MinecraftData data, Session session, string hostnameOrIp, ushort port = 25565)
+    /// <param name="api">Optional: instance of MinecraftApi</param>
+    /// <param name="tcpFactory">Optional: TcpClient factory</param>
+    public MinecraftClient(
+        MinecraftData data,
+        Session session,
+        string hostnameOrIp,
+        ushort port = 25565,
+        MinecraftApi? api = null,
+        ITcpClientFactory? tcpFactory = null)
     {
-        this._data = data;
-        this._client = new TcpClient();
+        this.Data = data;
         this._packetQueue = new ConcurrentQueue<PacketSendTask>();
         this._cancellation = new CancellationTokenSource();
         this._internalPacketHandler = new HandshakePacketHandler(this);
@@ -114,13 +121,18 @@ public sealed class MinecraftClient : IDisposable
         this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc = new TaskCompletionSource();
         this._bundledPackets = new Queue<(PacketType, PacketBuffer)>();
-        this._useAnonymousNbt = this._data.Version.Protocol >= ProtocolVersion.V_1_20_2;
+        this._useAnonymousNbt = this.Data.Version.Protocol >= ProtocolVersion.V_1_20_2;
+        this._tcpTcpFactory = tcpFactory;
+        this.ip = IPHelper.ResolveHostname(hostnameOrIp, ref port);
 
+        if (session.OnlineSession)
+            api ??= new MinecraftApi();
+        
+        this.Api = api;
         this.Session = session;
         this.Port = port;
-        this.IP = IPHelper.ResolveHostname(hostnameOrIp, ref port);
         this.Hostname = hostnameOrIp;
-        this.GameState = GameState.Handshaking;
+        this.gameState = GameState.Handshaking;
     }
 
     /// <summary>
@@ -130,16 +142,30 @@ public sealed class MinecraftClient : IDisposable
     /// <returns>A task that resolves once connected. Results in true when connected successfully, false otherwise.</returns>
     public async Task<bool> Connect(GameState nextState)
     {
-        Logger.Debug($"Connecting to {this.IP}:{this.Port}.");
-
+        if (this._client is not null && this._client.Connected)
+        {
+            Logger.Warn($"Client is already connected!");
+            return false;
+        }
+        
+        Logger.Debug($"Connecting to {this.ip}:{this.Port}.");
+        
         try
         {
-            await this._client.ConnectAsync(this.IP, this.Port, this._cancellation.Token);
+            if (this._tcpTcpFactory == null)
+            {
+                this._client = new TcpClient();
+                await this._client.ConnectAsync(this.ip, this.Port, this._cancellation.Token);
+            }
+            else
+            {
+                this._client = this._tcpTcpFactory.CreateOpenConnection(this.ip.ToString(), this.Port);
+            }
             this._stream = new MinecraftStream(this._client.GetStream(), this._useAnonymousNbt);
             
             this.StreamLoop();
             Logger.Info("Connected, starting handshake...");
-            await HandshakeProtocol.PerformHandshake(this, nextState, this._data);
+            await HandshakeProtocol.PerformHandshake(this, nextState, this.Data);
             
         } catch (SocketException ex)
         {
@@ -171,6 +197,9 @@ public sealed class MinecraftClient : IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
+        if (this._client is null)
+            throw new InvalidOperationException("MinecraftClient is not connected.");
+        
         if (!this._client.Connected)
         {
             throw new InvalidOperationException("Client is not connected.");
@@ -221,7 +250,7 @@ public sealed class MinecraftClient : IDisposable
     }
     
     /// <summary>
-    /// Waits until the client jumps into the Play <see cref="GameState"/>
+    /// Waits until the client jumps into the Play <see cref="gameState"/>
     /// </summary>
     /// <returns></returns>
     public Task WaitForGame()
@@ -229,14 +258,14 @@ public sealed class MinecraftClient : IDisposable
 
     internal void UpdateGameState(GameState next)
     {
-        this.GameState = next;
+        this.gameState = next;
 
         this._internalPacketHandler = next switch {
             GameState.Handshaking => new HandshakePacketHandler(this),
-            GameState.Login => new LoginPacketHandler(this, this._data),
+            GameState.Login => new LoginPacketHandler(this, this.Data),
             GameState.Status => new StatusPacketHandler(this),
-            GameState.Configuration => new ConfigurationPacketHandler(this, this._data),
-            GameState.Play => new PlayPacketHandler(this, this._data),
+            GameState.Configuration => new ConfigurationPacketHandler(this, this.Data),
+            GameState.Play => new PlayPacketHandler(this, this.Data),
             _ => throw new UnreachableException()
         };
 
@@ -309,17 +338,17 @@ public sealed class MinecraftClient : IDisposable
     
     private async Task ReceivePackets()
     {
-        while (this._client.Available > 0 && !this._cancellation.IsCancellationRequested)
+        while (this._client!.Available > 0 && !this._cancellation.IsCancellationRequested)
         {
             var buffer = this._stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
-            var packetType = this._data.Protocol.FromPacketId(PacketFlow.Clientbound, this.GameState, packetId);
+            var packetType = this.Data.Protocol.FromPacketId(PacketFlow.Clientbound, this.gameState, packetId);
 
             if (this._bundlePackets)
                 this._bundledPackets.Enqueue((packetType, buffer));
             else await this.HandleIncomingPacket(packetType, buffer);
             
-            if (this.GameState != GameState.Play)
+            if (this.gameState != GameState.Play)
             {
                 await Task.Delay(1);
             }
@@ -342,11 +371,11 @@ public sealed class MinecraftClient : IDisposable
     
     private void DispatchPacket(IPacket packet)
     {
-        var packetId = this._data.Protocol.GetPacketId(packet.Type); 
+        var packetId = this.Data.Protocol.GetPacketId(packet.Type); 
         
         var buffer = new PacketBuffer(this._useAnonymousNbt);
         buffer.WriteVarInt(packetId);
-        packet.Write(buffer, this._data);
+        packet.Write(buffer, this.Data);
 
         this._stream!.WritePacket(buffer);
     }
@@ -391,7 +420,7 @@ public sealed class MinecraftClient : IDisposable
         long size = buffer.ReadableBytes;
         try
         {
-            var packet = factory(buffer, this._data);
+            var packet = factory(buffer, this.Data);
             await buffer.DisposeAsync();
             
             _ = Task.Run(async () =>
@@ -445,7 +474,7 @@ public sealed class MinecraftClient : IDisposable
         this._cancellation.Cancel();
         this._streamLoop?.Wait();
         
-        this._client.Dispose();
+        this._client?.Dispose();
         this._stream?.Close();
     }
     
@@ -453,20 +482,23 @@ public sealed class MinecraftClient : IDisposable
     
     /// <summary>
     /// Requests the server status and closes the connection.
-    /// Works only when <see cref="GameState"/> is <see cref="Core.Common.Protocol.GameState.Status"/>.
+    /// Works only when <see cref="gameState"/> is <see cref="Core.Common.Protocol.GameState.Status"/>.
     /// </summary>
     /// <returns></returns>
     public static async Task<ServerStatus> RequestServerStatus(
         string hostnameOrIp,
         ushort port = 25565,
-        int timeout = 10000)
+        int timeout = 10000,
+        ITcpClientFactory? tcpFactory = null)
     {
         var latest = MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
         var client = new MinecraftClient(
             latest,
             Session.OfflineSession("RequestStatus"),
             hostnameOrIp,
-            port);
+            port,
+            null, // api is not used for requesting server status
+            tcpFactory);
 
         if (!await client.Connect(GameState.Status))
             throw new MineSharpHostException("Could not connect to server.");
@@ -477,7 +509,7 @@ public sealed class MinecraftClient : IDisposable
         client.On<StatusResponsePacket>(async packet =>
         {
             var json = packet.Response;
-            var response = ServerStatus.FromJToken(JToken.Parse(json), client._data);
+            var response = ServerStatus.FromJToken(JToken.Parse(json), client.Data);
             taskCompletionSource.TrySetResult(response);
 
             // the server closes the connection 

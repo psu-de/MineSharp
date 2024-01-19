@@ -40,6 +40,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="starksoft.aspen" Version="1.1.8" />
     </ItemGroup>
 
 </Project>

@@ -83,11 +83,10 @@ public static class PlayerTests
                 }
             };
 
-            var bot2 = await MineSharpBot.CreateBot(
-                secondBotName,
-                "localhost",
-                25565,
-                offline: true);
+            var bot2 = await new BotBuilder()
+                .Host("localhost")
+                .OfflineSession(secondBotName)
+                .CreateAsync();
 
             if (!await bot2.Connect())
             {
@@ -114,12 +113,11 @@ public static class PlayerTests
                 }
             };
 
-            var bot2 = await MineSharpBot.CreateBot(
-                secondBotName,
-                "localhost",
-                25565,
-                offline: true);
-
+            var bot2 = await new BotBuilder()
+                .Host("localhost")
+                .OfflineSession(secondBotName)
+                .CreateAsync();
+ 
             if (!await bot2.Connect())
             {
                 source.TrySetResult(false);

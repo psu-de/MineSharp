@@ -32,7 +32,6 @@ internal class LoginPacketHandler : IPacketHandler
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
             EncryptionRequestPacket encryption => HandleEncryptionRequest(encryption),
             SetCompressionPacket compression => HandleSetCompression(compression),
-            LoginPluginRequestPacket pluginRequest => HandlePluginRequest(pluginRequest),
             LoginSuccessPacket success => HandleLoginSuccess(success),
             _ => throw new UnreachableException()
         };
@@ -61,11 +60,11 @@ internal class LoginPacketHandler : IPacketHandler
         aes.GenerateKey();
 
         var hex = EncryptionHelper.ComputeHash(packet.ServerId, aes.Key, packet.PublicKey);
-        
+
         // Authenticate
         if (this._client.Session.OnlineSession)
         {
-            if (!await MinecraftApi.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
+            if (!await this._client.Api!.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
             {
                 throw new MineSharpAuthException("Error trying to authenticate with Mojang");
             }
@@ -81,7 +80,7 @@ internal class LoginPacketHandler : IPacketHandler
         EncryptionResponsePacket response;
         if (ProtocolVersion.IsBetween(this._data.Version.Protocol ,ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2)
             && this._client.Session.OnlineSession 
-            && this._client.Session.Certificate != null)
+            && this._client.Session.Certificate is not null)
         {
             var salt = (long)RandomNumberGenerator.GetInt32(int.MaxValue) << 32 | (uint)RandomNumberGenerator.GetInt32(int.MaxValue);
             
@@ -106,11 +105,6 @@ internal class LoginPacketHandler : IPacketHandler
         Logger.Debug($"Enabling compression, threshold = {packet.Threshold}.");
         this._client.SetCompression(packet.Threshold);
         return Task.CompletedTask;
-    }
-
-    private Task HandlePluginRequest(LoginPluginRequestPacket packet)
-    {
-        throw new NotImplementedException();
     }
 
     private Task HandleLoginSuccess(LoginSuccessPacket packet)
