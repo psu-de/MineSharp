@@ -36,10 +36,13 @@ public static class MicrosoftAuth
     /// When the user has to login in the browser, handler() is called. It should open up a browser window and show the user the deviceCode.UserCode
     /// If none is provided, the link will open up in the default browser and the device code is written to the console
     /// </param>
+    /// <param name="api"></param>
     /// <returns>A Session instance</returns>
-    public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null)
+    public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null, MinecraftApi? api = null)
     {
         handler ??= DefaultDeviceCodeHandler;
+        api ??= new MinecraftApi();
+        
         var cacheFolder = GetCacheForUser(username);
         
         var cacheSettings = new MsalCacheSettings() 
@@ -86,7 +89,7 @@ public static class MicrosoftAuth
         if (certificates == null || certificates.RequiresRefresh())
         {
             Logger.Debug($"Fetching new certificates.");
-            certificates = await MinecraftApi.FetchCertificates(mSession.AccessToken!);
+            certificates = await api.FetchCertificates(mSession.AccessToken!);
             certificates.Serialize(cacheFolder);
         }
 
@@ -115,7 +118,7 @@ public static class MicrosoftAuth
 
     private static void DefaultDeviceCodeHandler(DeviceCodeResult result)
     {
-        Console.WriteLine($"Microsoft login: ");
+        Console.WriteLine("Microsoft login: ");
         Console.WriteLine($"Goto {result.VerificationUrl} and enter the following code: '{result.UserCode}'");
         OpenUrl(result.VerificationUrl);
     }

@@ -52,11 +52,11 @@ public class MineSharpBot
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
 
-    internal MineSharpBot(MinecraftData data, Session session, string hostnameOrIp, ushort port)
+    internal MineSharpBot(MinecraftClient client)
     {
-        this.Data = data;
-        this.Session = session;
-        this.Client = new MinecraftClient(data, session, hostnameOrIp, port);
+        this.Client = client;
+        this.Data = this.Client.Data;
+        this.Session = this.Client.Session;
 
         this._cancellation = new CancellationTokenSource();
         this._plugins = new Dictionary<Guid, Plugin>();
