@@ -117,11 +117,11 @@ public class LoginPacket : IPacket
         buffer.WriteBool(this.IsFlat);
         
         buffer.WriteBool(this.HasDeathLocation);
-        if (!this.HasDeathLocation)
-            return;
-
-        buffer.WriteString(this.DeathDimensionName!);
-        buffer.WriteULong(this.DeathLocation!.ToULong());
+        if (this.HasDeathLocation)
+        {
+            buffer.WriteString(this.DeathDimensionName!);
+            buffer.WriteULong(this.DeathLocation!.ToULong());
+        }
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
         {
