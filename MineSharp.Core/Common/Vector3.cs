@@ -263,6 +263,19 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
+    /// Returns the horizontal squared length of this vector
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    [Pure]
+    public double HorizontalDistanceToSquared(Vector3 other)
+    {
+        var dX = this.X - other.X;
+        var dZ = this.Z - other.Z;
+        return dX * dX + dZ + dZ;
+    }
+
+    /// <summary>
     /// Returns the distance to the <paramref name="other"/> vector.
     /// </summary>
     /// <param name="other"></param>
@@ -324,7 +337,7 @@ public class Vector3(double x, double y, double z)
 
     /// <inheritdoc />
     public override string ToString() 
-        => $"({this.X:0.####} / {this.Y:0.####} / {this.Z:0.####})";
+        => $"({this.X:0.#####} / {this.Y:0.#####} / {this.Z:0.#####})";
 
     /// <inheritdoc />
     public override bool Equals(object? obj)

@@ -15,7 +15,7 @@ internal static class PhysicsConst
 
     public const double CLIMBING_SPEED = 0.15; 
         
-    public const double MAX_UP_STEP = 1.0;
+    public const double MAX_UP_STEP = 0.6;
     public const double FLUID_JUMP_THRESHOLD = 0.4d;
     public const double FLUID_JUMP_FACTOR = 0.04d;
     public const int JUMP_DELAY = 10;

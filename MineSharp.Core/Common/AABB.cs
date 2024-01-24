@@ -90,6 +90,23 @@ public class AABB
         return this;
     }
 
+    public AABB Extend(double x, double y, double z)
+    {
+        if (x > 0)
+            this.MaxX += x;
+        else this.MinX += x;
+
+        if (y > 0)
+            this.MaxY += y;
+        else this.MinY += y;
+
+        if (z > 0)
+            this.MaxZ += z;
+        else this.MinZ += z;
+
+        return this;
+    }
+
     /// <summary>
     /// Offset this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>.
     /// Mutates this instance.
