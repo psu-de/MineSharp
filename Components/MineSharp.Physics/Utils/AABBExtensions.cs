@@ -14,14 +14,16 @@ internal static class AABBExtensions
         var minB = axis.GetBBMin(other);
         var maxB = axis.GetBBMax(other);
 
-        return displacement switch {
-            > 0 when maxB <= minA && maxB + displacement > minA => Math.Clamp(minA - maxB, 0.0, displacement),
-            < 0 when maxA <= minB && minB + displacement < maxA => Math.Clamp(maxA - minB, displacement, 0.0),
-            _ => displacement
-        };
+        if (displacement > 0 && maxB <= minA && maxB + displacement > minA)
+            return Math.Clamp(minA - maxB, 0.0, displacement);
+
+        if (displacement < 0 && maxA <= minB && minB + displacement < maxA)
+            return Math.Clamp(maxA - minB, displacement, 0.0);
+
+        return displacement;
     }
 
-    public static AABB ExpandBoundingBox(this AABB aabb, double x, double y, double z)
+    public static AABB ExpandedBoundingBox(this AABB aabb, double x, double y, double z)
     {
         double minX = aabb.MinX;
         double minY = aabb.MinY;
@@ -40,7 +42,6 @@ internal static class AABBExtensions
         else 
             maxY += y;
         
-
         if (z < 0.0D)
             minZ += z;
         else if (z > 0.0D)

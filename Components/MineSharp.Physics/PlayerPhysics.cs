@@ -8,7 +8,7 @@ using MineSharp.Physics.Components;
 using MineSharp.Physics.Input;
 using MineSharp.Physics.Utils;
 using MineSharp.World;
-
+using NLog;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;
@@ -127,9 +127,12 @@ public class PlayerPhysics
         // TODO: Fix differences with java: MovementTick()
 
         var crouchedBefore = this.State.IsCrouching;
-        this.State.IsCrouching = !PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data)
-                              && this.movementInput.Controls.SneakingKeyDown // Swimming, Sleeping, Vehicle, Flying ; LocalPlayer.java:631
-                              || PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Standing, this.World, this.Data);
+        
+        var collidesCrouching = PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data);
+        var collidesStanding = PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Standing, this.World, this.Data);
+        // Swimming, Sleeping, Vehicle, Flying ; LocalPlayer.java:631
+        this.State.IsCrouching = !collidesCrouching
+                              && this.movementInput.Controls.SneakingKeyDown || collidesStanding; 
 
         if (this.State.IsCrouching != crouchedBefore)
             Task.Run(() => this.OnCrouchingChanged?.Invoke(this, this.State.IsCrouching));
@@ -237,7 +240,8 @@ public class PlayerPhysics
         this.CheckClimbable();
         this.Move();
 
-        var vel = this.Player.Entity.Velocity;
+        var vel = this.Player.Entity.Velocity.Clone();
+        
         var blockAtFeet = this.World.GetBlockAt((Position)this.Player.Entity.Position);
         if ((this.State.HorizontalCollision || this.movementInput.Controls.JumpingKeyDown)
             && (WorldUtils.IsOnClimbable(this.Player, this.World, ref this.State.LastClimbablePosition) || blockAtFeet.Info.Type == BlockType.PowderSnow))
@@ -251,9 +255,7 @@ public class PlayerPhysics
             velY += (0.05d * (levitation.Value + 1) - velY) * 0.2d;
         else if (!this.World.IsChunkLoaded(this.World.ToChunkCoordinates((Position)this.Player.Entity.Position)))
         {
-            if (this.Player.Entity.Position.Y > this.World.MinY)
-                velY = 0.1d;
-            else velY = 0.0;
+            velY = this.Player.Entity.Position.Y > this.World.MinY ? 0.1d : 0.0;
         }
         else
             velY -= gravity;
@@ -324,7 +326,7 @@ public class PlayerPhysics
 
         this.MaybeBackOffFromEdge(ref vec);
         var vec3 = this.Collide(vec);
-
+        
         var length = vec3.LengthSquared();
         if (length > 1.0E-7D)
         {
@@ -358,44 +360,47 @@ public class PlayerPhysics
     private Vector3 Collide(Vector3 vec)
     {
         var aabb = this.Player.Entity!.GetBoundingBox();
-        var vec3 = vec.LengthSquared() == 0.0 ? vec : CheckBoundingBoxCollisions(vec, aabb);
-
-        var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-5;
-        var collidedY = Math.Abs(vec.Y - vec3.Y) > 1.0E-5;
-        var collidedZ = Math.Abs(vec.Z - vec3.Z) > 1.0E-5;
+        var collidedVec = vec.LengthSquared() == 0.0 ? vec : CheckBoundingBoxCollisions(vec, aabb);
+        
+        var collidedX = Math.Abs(vec.X - collidedVec.X) > 1.0E-5;
+        var collidedY = Math.Abs(vec.Y - collidedVec.Y) > 1.0E-5;
+        var collidedZ = Math.Abs(vec.Z - collidedVec.Z) > 1.0E-5;
         var hitGround = this.Player.Entity!.IsOnGround || collidedY && vec.Y < 0.0;
 
         if (hitGround && (collidedX || collidedZ))
         {
-            var vec31 = CheckBoundingBoxCollisions(
+            var collidedUpXZ = CheckBoundingBoxCollisions(
                 new Vector3(vec.X, PhysicsConst.MAX_UP_STEP, vec.Z), 
                 aabb);
-            var vec32 = CheckBoundingBoxCollisions(
+            var collidedUp0 = CheckBoundingBoxCollisions(
                 new Vector3(0.0, PhysicsConst.MAX_UP_STEP, 0.0), 
-                aabb.ExpandBoundingBox(vec.X, 0, vec.Z));
-
-            if (vec32.Y < PhysicsConst.MAX_UP_STEP)
+                aabb.ExpandedBoundingBox(vec.X, 0, vec.Z));
+            
+            if (collidedUp0.Y < PhysicsConst.MAX_UP_STEP)
             {
-                var vec33 = CheckBoundingBoxCollisions(
+                var collidedAbove = CheckBoundingBoxCollisions(
                         new Vector3(vec.X, 0, vec.Z),
-                        aabb.Clone().Offset(vec32.X, vec32.Y, vec32.Z))
-                    .Plus(vec32);
-
-                if (vec33.HorizontalLengthSquared() > vec31.HorizontalLengthSquared())
-                    vec31 = vec33;
+                        aabb.Clone().Offset(collidedUp0.X, collidedUp0.Y, collidedUp0.Z))
+                    .Plus(collidedUp0);
+                
+                if (collidedAbove.HorizontalLengthSquared() > collidedUpXZ.HorizontalLengthSquared())
+                {
+                    collidedUpXZ = collidedAbove; 
+                }
             }
 
-            if (vec31.HorizontalLengthSquared() > vec3.HorizontalLengthSquared())
+            if (collidedUpXZ.HorizontalLengthSquared() > collidedVec.HorizontalLengthSquared())
             {
-                vec31.Add(
+                collidedUpXZ.Add(
                     CheckBoundingBoxCollisions(
-                        new Vector3(0.0, -vec31.Y + vec.Y, 0.0),
-                        aabb.Clone().Offset(vec31.X, vec31.Y, vec31.Z)));
-                return vec31;
+                        new Vector3(0.0, -collidedUpXZ.Y + vec.Y, 0.0),
+                        aabb.Clone().Offset(collidedUpXZ.X, collidedUpXZ.Y, collidedUpXZ.Z)));
+                
+                return collidedUpXZ;
             }
         }
 
-        return vec3;
+        return collidedVec;
     }
 
     private bool IsCollisionMinor(Vector3 vec)
@@ -422,9 +427,14 @@ public class PlayerPhysics
     {
         // TODO: Entity collision boxes
         // TODO: World border collision
-        
-        var shapes = WorldUtils.GetWorldBoundingBoxes(aabb, this.World, this.Data);
 
+        aabb = aabb.Clone();
+        
+        var shapes = WorldUtils.GetWorldBoundingBoxes(
+            aabb.ExpandedBoundingBox(direction.X, direction.Y, direction.Z), 
+            this.World, 
+            this.Data);
+        
         if (shapes.Length == 0)
             return direction;
         
@@ -452,7 +462,7 @@ public class PlayerPhysics
         {
             mX = CalculateAxisOffset(Axis.X, aabb, shapes, mX);
             if (mX != 0.0)
-                aabb.Offset(0, 0, mX);
+                aabb.Offset(mX, 0, 0);
         }
 
         if (!zDominant && mZ != 0.0)
@@ -532,7 +542,7 @@ public class PlayerPhysics
             return;
         
         if (length > 1.0)
-            vec.Normalized();
+            vec = vec.Normalized();
         
         vec.Scale(scale);
 
