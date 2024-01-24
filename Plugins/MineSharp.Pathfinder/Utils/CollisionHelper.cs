@@ -32,14 +32,20 @@ internal static class CollisionHelper
         return false;
     }
 
-    private static AABB[] GetBoundingBoxes(Block block, MinecraftData data)
+    internal static bool IntersectsWithBlock(AABB bb, Block block, MinecraftData data)
+    {
+        var blockBbs = GetBoundingBoxes(block, data);
+        return blockBbs.Any(b => b.Intersects(bb));
+    }
+
+    internal static AABB[] GetBoundingBoxes(Block block, MinecraftData data)
     {
         return data.BlockCollisionShapes.GetForBlock(block)
             .Select(x => x.Offset(block.Position.X, block.Position.Y, block.Position.Z))
             .ToArray();
     }
 
-    private static AABB GetPlayerBoundingBox(Vector3 pos)
+    internal static AABB GetPlayerBoundingBox(Vector3 pos)
     {
         var bb = new AABB(-0.3, 0, -0.3, 0.3, 1.8, 0.3)
             .Offset(pos.X, pos.Y, pos.Z);

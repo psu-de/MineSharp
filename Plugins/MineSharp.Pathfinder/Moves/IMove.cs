@@ -14,6 +14,11 @@ namespace MineSharp.Pathfinder.Moves;
 public interface IMove
 {
     /// <summary>
+    /// The max squared distance to the target.
+    /// </summary>
+    protected const double THRESHOLD_COMPLETED = 0.0625;
+    
+    /// <summary>
     /// Relative movement vector for this move
     /// </summary>
     public Vector3 Motion { get; }
@@ -26,7 +31,7 @@ public interface IMove
     /// <summary>
     /// Checks if the move is possible
     /// </summary>
-    public bool IsMovePossible(Vector3 position, IWorld world, MinecraftData data);
+    public bool IsMovePossible(Position position, IWorld world, MinecraftData data);
 
     /// <summary>
     /// Whether multiple instances of this move can be

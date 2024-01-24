@@ -21,25 +21,30 @@ public class Movements
         Vector3.South.Plus(Vector3.East),
         Vector3.South.Plus(Vector3.West)
     ];
-    
-    public static readonly Movements Default = new ()
-    {
-        AllowJumping = true,
-        AllowSprinting = true
-    };
-    
-    public required bool AllowSprinting { get; init; }
 
-    public required bool AllowJumping { get; init; }
+    public static readonly Movements Default = new(true, true);
+    
+    public bool AllowSprinting { get; }
+
+    public bool AllowJumping { get; }
 
     public readonly IMove[] PossibleMoves;
     
-    public Movements()
+    public Movements(bool allowSprinting, bool allowJumping)
     {
+        this.AllowSprinting = allowSprinting;
+        this.AllowJumping = allowJumping;
+        
         var moves = new List<IMove>();
         
         moves.AddRange(Directions.Select(x => new DirectMove(x)));
         moves.AddRange(DiagonalDirections.Select(x => new DirectMove(x)));
+
+        if (this.AllowJumping)
+        {
+            moves.AddRange(Directions.Select(x => new JumpUpMove(x)));
+            moves.AddRange(DiagonalDirections.Select(x => new JumpUpMove(x)));
+        }
 
         this.PossibleMoves = moves.ToArray();
     }

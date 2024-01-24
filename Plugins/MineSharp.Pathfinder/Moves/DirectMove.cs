@@ -4,10 +4,15 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.World;
+using MineSharp.World.Iterators;
 using NLog;
 
 namespace MineSharp.Pathfinder.Moves;
 
+/// <summary>
+/// Move to a directly adjacent block
+/// </summary>
+/// <param name="motion"></param>
 public class DirectMove(Vector3 motion) : IMove
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger(); 
@@ -22,12 +27,20 @@ public class DirectMove(Vector3 motion) : IMove
     public bool CanBeLinked => true;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Vector3 position, IWorld world, MinecraftData data)
+    public bool IsMovePossible(Position position, IWorld world, MinecraftData data)
     {
-        return CollisionHelper.HasBlockSpaceForStanding(
-            position.Plus(this.Motion), 
-            world, 
-            data);
+        var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
+        playerBb.Offset(
+            0.5 + this.Motion.X / 2, 
+            0, 
+            0.5 + this.Motion.Z / 2);
+
+        return new BoundingBoxIterator(playerBb)
+            .Iterate()
+            .Select(world.GetBlockAt)
+            .Select(x => CollisionHelper.GetBoundingBoxes(x, data))
+            .SelectMany(x => x)
+            .Any(x => x.Intersects(playerBb));
     }
 
     /// <inheritdoc />
@@ -69,7 +82,7 @@ public class DirectMove(Vector3 motion) : IMove
                 throw new Exception(); // TODO: Better exception
             }
             
-            if (dst <= 0.0625)
+            if (dst <= IMove.THRESHOLD_COMPLETED)
                 break;
 
             if (hasStoppedSprinting || dst > 0.5)
