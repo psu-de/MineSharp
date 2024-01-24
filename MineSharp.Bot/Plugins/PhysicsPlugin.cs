@@ -93,6 +93,17 @@ public class PhysicsPlugin : Plugin
     }
 
     /// <summary>
+    /// Wait until the entity hit the ground
+    /// </summary>
+    public async Task WaitForOnGround()
+    {
+        while (!this.playerPlugin?.Entity!.IsOnGround ?? false)
+        {
+            await this.WaitForTick();
+        }
+    }
+
+    /// <summary>
     /// Forces the bots rotation to the given yaw and pitch (in degrees)
     /// </summary>
     /// <param name="yaw"></param>

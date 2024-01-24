@@ -7,6 +7,7 @@ MineSharp 0.1.4:
  - added AutoRespawn Plugin (not enabled by default)
  - added BotBuilder to create bots
  - added support for proxies
+ - added WaitForOnGround() method to physics plugin
 
 MineSharp 0.1.3:
  - handle SpawnLivingEntity packet
