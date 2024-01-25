@@ -45,6 +45,9 @@ public class Movements
             moves.AddRange(Directions.Select(x => new JumpUpMove(x)));
             moves.AddRange(DiagonalDirections.Select(x => new JumpUpMove(x)));
         }
+        
+        moves.AddRange(Directions.Select(x => new FallDownMove(x)));
+        moves.AddRange(DiagonalDirections.Select(x => new FallDownMove(x)));
 
         this.PossibleMoves = moves.ToArray();
     }

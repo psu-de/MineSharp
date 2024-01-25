@@ -250,16 +250,25 @@ public class Vector3(double x, double y, double z)
     {
         return Math.Sqrt(this.LengthSquared());
     }
-
-
+    
     /// <summary>
-    /// Returns the squared length of this vector instance
+    /// Returns the square length of this vector instance
     /// </summary>
     /// <returns></returns>
     [Pure]
     public double LengthSquared()
     {
         return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
+    }
+
+    /// <summary>
+    /// Returns the square horizontal length of this vector
+    /// </summary>
+    /// <returns></returns>
+    [Pure]
+    public double HorizontalLengthSquared()
+    {
+        return this.X * this.X + this.Z * this.Z;
     }
 
     /// <summary>

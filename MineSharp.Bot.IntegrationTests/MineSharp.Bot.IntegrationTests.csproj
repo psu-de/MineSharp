@@ -11,6 +11,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj" />
+      <ProjectReference Include="..\Plugins\MineSharp.Pathfinder\MineSharp.Pathfinder.csproj" />
     </ItemGroup>
 
     <ItemGroup>

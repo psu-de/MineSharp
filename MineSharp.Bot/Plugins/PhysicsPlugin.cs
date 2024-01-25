@@ -256,7 +256,10 @@ public class PhysicsPlugin : Plugin
         delta.Normalize();
         
         var yaw = deg2rad * Math.Atan2(-delta.X, delta.Z);
-        var pitch = deg2rad * -Math.Asin(delta.Y / delta.Length());
+        var pitch = deg2rad * -Math.Asin(delta.Y);
+
+        if (yaw < 0)
+            yaw += 360;
 
         return ((float)yaw, (float)pitch);
     }
