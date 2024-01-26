@@ -52,7 +52,11 @@ public class MineSharpBot
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
 
-    internal MineSharpBot(MinecraftClient client)
+    /// <summary>
+    /// Create a new MineSharpBot instance with a <see cref="MinecraftClient"/>
+    /// </summary>
+    /// <param name="client"></param>
+    public MineSharpBot(MinecraftClient client)
     {
         this.Client = client;
         this.Data = this.Client.Data;
