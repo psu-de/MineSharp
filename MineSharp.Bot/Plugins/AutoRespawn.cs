@@ -8,6 +8,11 @@ public class AutoRespawn : Plugin
     private PlayerPlugin? player;
 
     /// <summary>
+    /// The time waited before respawning
+    /// </summary>
+    public TimeSpan RespawnDelay = TimeSpan.Zero;
+    
+    /// <summary>
     /// Create a new AutoRespawn instance
     /// </summary>
     /// <param name="bot"></param>
@@ -25,6 +30,16 @@ public class AutoRespawn : Plugin
 
     private void OnBotDied(MineSharpBot bot)
     {
-        this.player!.Respawn().Wait();
+        Task.Run(Respawn);
+    }
+
+    private async Task Respawn()
+    {
+        if (this.RespawnDelay.TotalMilliseconds > 0)
+        {
+            await Task.Delay(this.RespawnDelay);
+        }   
+        
+        await this.player!.Respawn();
     }
 }

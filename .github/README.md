@@ -3,21 +3,21 @@
 [![License](https://img.shields.io/github/license/psu-de/MineSharp?style=for-the-badge)](https://github.com/psu-de/MineSharp/blob/main/LICENSE)
 [![Nuget](https://img.shields.io/nuget/v/MineSharp.Bot?style=for-the-badge)](https://www.nuget.org/packages/MineSharp.Bot)
 
+\
 ![banner](banner.png)
 
 # MineSharp
-
 **This Project is not finished and under development!**
 
-Create Minecraft bots with C#! \
-Inspired by [Mineflayer](https://github.com/PrismarineJS/mineflayer).
+MineSharp is a framework to work with minecraft. \
+My goal is to create a bot framework which is able to do anything you can do in the vanilla client,
+but theoretically MineSharp could also be used to create a Server or custom client.
+
+Currently MineSharp works with **Minecraft Java 1.18 - 1.20.4**.
 
 If you're interested in this project, feel free to contribute!
 
-Minecraft Java 1.18 - 1.20.4 supported 
-
 # Current features
-
 - ✨ Supported Versions: 1.18.x - 1.20.4
 - 📈 Player Stats
 - ⚡ Events
@@ -32,26 +32,24 @@ Minecraft Java 1.18 - 1.20.4 supported
 - 📝 Chat (Reading and Writing)
 
 # Roadmap
+- 🔎 Simple Pathfinder (see [feature/pathfinder](https://github.com/psu-de/MineSharp/pull/32))
 
-- ~~✨ Support 1.20.3 - 1.20.4~~
-- 🔎 Simple Pathfinder
-
-# Example
+# Example Snippet
+See [MineSharp.Bot](../MineSharp.Bot/README.md) for more information about creating bots.
 ```csharp
 using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 
-MineSharpBot bot = await MineSharpBot.CreateBot(
-    "MineSharpBot",
-    "127.0.0.1",
-    25565,
-    offline: true);
+MineSharpBot bot = await new BotBuilder()
+    .Host("localhost")
+    .OfflineSession("MineSharpBot")
+    .CreateAsync();
 
-var chat = bot.GetPlugin<ChatPlugin>();
+ChatPlugin chat = bot.GetPlugin<ChatPlugin>();
 
 if (!await bot.Connect()) 
 {
-    Console.WriteLine("Could not connect to server!");
+    Console.WriteLine("Could not connect to server! Is the server running?");
     Environment.Exit(1);
 }
 
@@ -67,55 +65,9 @@ while (true)
     if (input != null)
         await chat.SendChat(input);
 }
-
 ```
 
-# Projects Overview
-
-### [MineSharp.Core](../MineSharp.Core)
-
-Contains core functionality and common Minecraft types like Entity, Block, etc...
-
-### [MineSharp.Data](../MineSharp.Data)
-MineSharp.Data is a wrapper for [minecraft-data](https://github.com/PrismarineJS/minecraft-data).
-Currently the following data is supported:
- - Biomes
- - Blocks
- - Collisions
- - Effects
- - Enchantments
- - Entities
- - Features
- - Items
- - Language
- - Protocol (Packet id's and names)
- - Recipes
-
-### [MineSharp.Bot](../MineSharp.Bot)
-
-API to directly interact with a minecraft server. \
-See [MineSharp.Bot README](../MineSharp.Bot)
-
-## Components
-
-### [MineSharp.Auth](../Components/MineSharp.Auth)
-
-Used to login to Microsoft, connect to Mojang Auth servers and create a Minecraft Session.
-
-### [MineSharp.Physics](../Components/MineSharp.Physics)
-
-Logic to simulate entity physics from minecraft\
-Thanks to [ConcreteMC/Alex](https://github.com/ConcreteMC/Alex)
-
-### [MineSharp.Protocol](../Components/MineSharp.Protocol)
-
-Implements the Minecraft Protocol. Contains logic to connect to a Minecraft server and read/write packets from/to it.
-
-### [MineSharp.World](../Components/MineSharp.World)
-
-Basic functionality to represent a Minecraft World and interact with it.
-
-### Links
+### Credits
 Without the following resources this project would not be possible. Thanks to all people involved in those projects!
 
 - [wiki.vg](https://wiki.vg)
