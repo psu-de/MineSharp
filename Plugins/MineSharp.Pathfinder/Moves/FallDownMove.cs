@@ -58,29 +58,42 @@ public class FallDownMove(Vector3 motion) : IMove
         await physics.LookAt(target);
         
         var wasFalling = false;
-        var threshold = this.Motion.LengthSquared() * (0.05 * 0.05);
+        var entity = player.Entity!;
         
         physics.InputControls.Reset();
         physics.InputControls.ForwardKeyDown = true;
+        Console.WriteLine($"FallDownMove! Motion = {this.Motion} TargetEdge = {targetEdge}");
         while (true)
         {
             await physics.WaitForTick();
-            
-            if (!wasFalling && !player.Entity!.IsOnGround)
+
+            if (!wasFalling && !entity.IsOnGround)
             {
-                physics.InputControls.BackwardKeyDown = true;
+                physics.InputControls.ForwardKeyDown = false;
+                physics.InputControls.BackwardKeyDown = false;
                 wasFalling = true;
             }
-
-            if (wasFalling && player.Entity!.Velocity.HorizontalLengthSquared() <= threshold)
+            
+            if (!wasFalling && !physics.InputControls.BackwardKeyDown)
             {
-                
+                var reachedDx = this.Motion.X == 0 ||
+                                ReachedTargetEdge(targetEdge.X, entity.Position.X, entity.Velocity.X);
+                var reachedDz = this.Motion.Z == 0 ||
+                                ReachedTargetEdge(targetEdge.Z, entity.Position.Z, entity.Velocity.Z);
+
+                if (reachedDx && reachedDz)
+                {
+                    physics.InputControls.BackwardKeyDown = true;
+                }
+            }
+
+            if (wasFalling && entity.IsOnGround)
+            {
+                physics.ForceLookAt(target); // TODO: Only force look at when target angle is close
+                physics.InputControls.ForwardKeyDown = true;
             }
             
-            // if (player.Entity.Velocity.)
-            
             var dst = target.DistanceToSquared(player.Self!.Entity!.Position);
-            
             if (dst <= IMove.THRESHOLD_COMPLETED)
                 break;
         }
@@ -88,6 +101,15 @@ public class FallDownMove(Vector3 motion) : IMove
         physics.InputControls.Reset();
     }
 
+    private bool ReachedTargetEdge(double edge, double pos, double vel)
+    {
+        var positionNextTick = pos + vel;
+
+        return vel > 0
+            ? positionNextTick > edge || Math.Abs(edge - positionNextTick) <= 0.05
+            : positionNextTick < edge || Math.Abs(edge - positionNextTick) <= 0.05;
+    }
+
     private double GetBoundingBoxEdge(double axisMotion)
-        => this.Motion.X > 0 ? 0.3 : 0.7;
+        => axisMotion > 0 ? 0.3 : 0.7;
 }
