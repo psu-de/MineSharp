@@ -3,6 +3,7 @@ using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
+using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Common.Recipes;
@@ -14,27 +15,32 @@ namespace MineSharp.Data.Framework;
 /// <summary>
 /// Interface for implementing indexed biome data
 /// </summary>
-public interface IBiomeData : IIndexedData<BiomeType, BiomeInfo>;
+public interface IBiomeData : ITypeIdNameIndexedData<BiomeType, BiomeInfo>;
 
 /// <summary>
 /// Interface for implementing indexed block data
 /// </summary>
-public interface IBlockData : IIndexedData<BlockType, BlockInfo>;
+public interface IBlockData : ITypeIdNameIndexedData<BlockType, BlockInfo>;
 
 /// <summary>
-/// Inteface for implementing indexed effect data
+/// Interface for implementing indexed effect data
 /// </summary>
-public interface IEffectData : IIndexedData<EffectType, EffectInfo>;
+public interface IEffectData : ITypeIdNameIndexedData<EffectType, EffectInfo>;
 
 /// <summary>
-/// Inteface for implementing indexed enchantment data
+/// Interface for implementing indexed enchantment data
 /// </summary>
-public interface IEnchantmentData : IIndexedData<EnchantmentType, EnchantmentInfo>;
+public interface IEnchantmentData : ITypeIdNameIndexedData<EnchantmentType, EnchantmentInfo>;
 
 /// <summary>
-/// Inteface for implementing indexed entity data
+/// Interface for implementing indexed entity data
 /// </summary>
-public interface IEntityData : IIndexedData<ItemType, ItemInfo>;
+public interface IEntityData : ITypeIdNameIndexedData<EntityType, EntityInfo>;
+
+/// <summary>
+/// Interface for implementing indexed item data
+/// </summary>
+public interface IItemData : ITypeIdNameIndexedData<ItemType, ItemInfo>;
 
 /// <summary>
 /// Interface for implementing indexed block collision shape data
@@ -67,6 +73,14 @@ public interface IBlockCollisionShapeData
         var entry = indices.Length > 0 ? indices[index] : indices[0];
         return GetShapes(entry);
     }
+
+    /// <summary>
+    /// Return the bounding boxes for a block
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    public AABB[] GetForBlock(Block block)
+        => GetShapes(block.Info.Type, block.State);
 }
 
 /// <summary>

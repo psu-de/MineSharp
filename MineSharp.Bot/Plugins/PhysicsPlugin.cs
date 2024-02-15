@@ -205,7 +205,7 @@ public class PhysicsPlugin : Plugin
                 if (!block.IsSolid())
                     continue;
 
-                var bbs = this.Bot.Data.BlockCollisionShapes.GetForBlock(block);
+                var bbs = this.Bot.Data.BlockCollisionShapes.GetShapes(block.Info.Type, block.State);
 
                 foreach (var bb in bbs)
                 {

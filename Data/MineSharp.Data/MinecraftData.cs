@@ -10,80 +10,89 @@ using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
 using MineSharp.Data.Enchantments;
 using MineSharp.Data.Entities;
+using MineSharp.Data.Exceptions;
+using MineSharp.Data.Framework;
+using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Items;
-using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
-using MineSharp.Data.Recipes;
-using MineSharp.Data.Windows;
-using MineSharp.Data.Windows.Versions;
+using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace MineSharp.Data;
 
 /// <summary>
 /// Provides static data about a Minecraft version.
 /// </summary>
-public class MinecraftData
+public class MinecraftData : IMinecraftData
 {
+    private static readonly MinecraftDataRepository MinecraftDataRepository =
+        new (
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "MineSharp",
+                "MinecraftData"),
+            new HttpClient()); 
+    
     /// <summary>
     /// The Biome data provider for this version
     /// </summary>
-    public BiomeProvider Biomes { get; }
+    public IBiomeData Biomes { get; }
     
     /// <summary>
     /// The Block data provider for this version
     /// </summary>
-    public BlockProvider Blocks { get; }
+    public IBlockData Blocks { get; }
     
     /// <summary>
     /// The Collision shape data provider for this version
     /// </summary>
-    public BlockCollisionShapesProvider BlockCollisionShapes { get; }
+    public IBlockCollisionShapeData BlockCollisionShapes { get; }
     
     /// <summary>
     /// The effect data provider for this version
     /// </summary>
-    public EffectProvider Effects { get; }
+    public IEffectData Effects { get; }
     
     /// <summary>
     /// The enchantment data provider for this version
     /// </summary>
-    public EnchantmentProvider Enchantments { get; }
+    public IEnchantmentData Enchantments { get; }
     
     /// <summary>
     /// The entity data provider for this version
     /// </summary>
-    public EntityProvider Entities { get; }
+    public IEntityData Entities { get; }
     
     /// <summary>
     /// The item data provider for this version
     /// </summary>
-    public ItemProvider Items { get; }
+    public IItemData Items { get; }
     
     /// <summary>
     /// The protocol data provider for this version
     /// </summary>
-    public ProtocolProvider Protocol { get; }
+    public IProtocolData Protocol { get; }
     
     /// <summary>
     /// The material data provider for this version
     /// </summary>
-    public MaterialsProvider Materials { get; }
+    public IMaterialData Materials { get; }
     
     /// <summary>
     /// The recipe data provider for this version
     /// </summary>
-    public RecipeProvider Recipes { get; }
+    public IRecipeData Recipes { get; }
     
     /// <summary>
     /// The window data for this version
     /// </summary>
-    public WindowProvider Windows { get; }
+    public IWindowData Windows { get; }
     
     /// <summary>
     /// The language data provider for this version
     /// </summary>
-    public LanguageProvider Language { get; }
+    public ILanguageData Language { get; }
     
     /// <summary>
     /// The minecraft version of this instance
@@ -91,107 +100,75 @@ public class MinecraftData
     public MinecraftVersion Version { get; }
 
     private MinecraftData(
-        BiomeProvider biomes,
-        BlockProvider blocks,
-        BlockCollisionShapesProvider blockCollisionShapes,
-        EffectProvider effects,
-        EnchantmentProvider enchantments,
-        EntityProvider entities,
-        ItemProvider items,
-        ProtocolProvider protocol,
-        MaterialsProvider materials,
-        RecipeProvider recipes,
-        WindowProvider windows,
-        LanguageProvider language,
+        IDataProvider<BiomeInfo[]> biomes,
+        IDataProvider<BlockInfo[]> blocks,
+        IDataProvider<BlockCollisionShapeDataBlob> blockCollisionShapes,
+        IDataProvider<EffectInfo[]> effects,
+        IDataProvider<EnchantmentInfo[]> enchantments,
+        IDataProvider<EntityInfo[]> entities,
+        IDataProvider<ItemInfo[]> items,
+        IDataProvider<ProtocolDataBlob> protocol,
+        IDataProvider<MaterialDataBlob> materials,
+        IDataProvider<object> recipes,
+        IDataProvider<object> windows,
+        IDataProvider<object> language,
         MinecraftVersion version)
     {
-        this.Biomes = biomes;
-        this.Blocks = blocks;
-        this.BlockCollisionShapes = blockCollisionShapes;
-        this.Effects = effects;
-        this.Enchantments = enchantments;
-        this.Entities = entities;
-        this.Items = items;
-        this.Protocol = protocol;
-        this.Materials = materials;
-        this.Recipes = recipes;
-        this.Windows = windows;
-        this.Language = language;
+        this.Biomes = new BiomeData(biomes);
+        this.Blocks = new BlockData(blocks);
+        this.BlockCollisionShapes = new BlockCollisionShapeData(blockCollisionShapes, this);
+        this.Effects = new EffectData(effects);
+        this.Enchantments = new EnchantmentData(enchantments);
+        this.Entities = new EntityData(entities);
+        this.Items = new ItemData(items);
+        this.Protocol = new ProtocolData(protocol);
+        this.Materials = new MaterialData(materials);
+        this.Recipes = null;
+        this.Windows = null;
+        this.Language = null;
         this.Version = version;
     }
-
     
     /// <summary>
     /// Returns a MinecraftData object for the given version.
     /// </summary>
     /// <param name="version"></param>
     /// <returns></returns>
-    public static MinecraftData FromVersion(string version)
+    public static async Task<MinecraftData> FromVersion(string version)
     {
-        var biomeType = GetClassType(VersionMap.Biomes[version]);
-        var blockType = GetClassType(VersionMap.Blocks[version]);
-        var blockCollisionShapeType = GetClassType(VersionMap.BlockCollisionShapes[version]);
-        var effectType = GetClassType(VersionMap.Effects[version]);
-        var enchantmentType = GetClassType(VersionMap.Enchantments[version]);
-        var entityType = GetClassType(VersionMap.Entities[version]);
-        var itemType = GetClassType(VersionMap.Items[version]);
-        var protocolType = GetClassType(VersionMap.Protocol[version]);
-        var materialType = GetClassType(VersionMap.Materials[version]);
-        var recipeType = GetClassType(VersionMap.Recipes[version]);
-        var languageType = GetClassType(VersionMap.Language[version]);
+        var resourceMap = await MinecraftDataRepository.GetResourceMap();
 
-        var v = VersionMap.Versions[version];
+        var versionToken = resourceMap.SelectToken($"pc.{version}");
+        if (null == versionToken)
+            throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
 
-        var biomes = new BiomeProvider(
-            (DataVersion<BiomeType, BiomeInfo>)Activator.CreateInstance(biomeType)!);
-        var blocks = new BlockProvider(
-            (DataVersion<BlockType, BlockInfo>)Activator.CreateInstance(blockType)!);
-        var blockCollisionShapes = new BlockCollisionShapesProvider(
-            (BlockCollisionShapesVersion)Activator.CreateInstance(blockCollisionShapeType)!);
-        var effects = new EffectProvider(
-            (DataVersion<EffectType, EffectInfo>)Activator.CreateInstance(effectType)!);
-        var enchantments = new EnchantmentProvider(
-            (DataVersion<EnchantmentType, EnchantmentInfo>)Activator.CreateInstance(enchantmentType)!);
-        var entities = new EntityProvider(
-            (DataVersion<EntityType, EntityInfo>)Activator.CreateInstance(entityType)!);
-        var items = new ItemProvider(
-            (DataVersion<ItemType, ItemInfo>)Activator.CreateInstance(itemType)!);
-        var materials = new MaterialsProvider(
-            (MaterialVersion)Activator.CreateInstance(materialType)!);
-        var protocol = new ProtocolProvider(
-            (ProtocolVersion)Activator.CreateInstance(protocolType)!);
-        var recipes = new RecipeProvider(
-            (RecipeData)Activator.CreateInstance(recipeType)!);
-        var language = new LanguageProvider(
-            (LanguageVersion)Activator.CreateInstance(languageType)!);
-        var windows = new WindowProvider(
-            v.Protocol > 764 
-                ? new WindowVersion1_20_3() 
-                : new WindowVersion1_16_1()
-        );
+        var biomeToken = await LoadAsset("biomes", versionToken);
+        var shapesToken = await LoadAsset("blockCollisionShapes", versionToken);
+        
+        
+        var biomeProvider = new BiomeProvider(biomeToken);
+        var shapesProvider = new BlockCollisionShapesProvider(shapesToken);
 
         return new MinecraftData(
-            biomes,
-            blocks,
-            blockCollisionShapes,
-            effects,
-            enchantments,
-            entities,
-            items,
-            protocol,
-            materials,
-            recipes,
-            windows,
-            language,
-            VersionMap.Versions[version]);
+            biomeProvider,
+            null,
+            shapesProvider,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     }
 
-    private static Type GetClassType(string className)
+    private static async Task<JToken> LoadAsset(string resource, JToken version)
     {
-        var type = Type.GetType(className);
-        if (null == type)
-            throw new NotImplementedException($"{className} is not implemented.");
-
-        return type;
+        return await MinecraftDataRepository.GetAsset(
+            $"{resource}.json", 
+            (string)version.SelectToken(resource)!);
     }
 }

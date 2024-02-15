@@ -1,69 +1,57 @@
+using Humanizer;
+using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Biomes;
 
-/// <summary>
-/// Biome Data Provider.
-/// Indexes static <see cref="BiomeInfo"/>'s by id, name and BiomeType
-/// </summary>
-public class BiomeProvider : DataProvider<BiomeType, BiomeInfo>
+internal class BiomeProvider(JToken token) : IDataProvider<BiomeInfo[]>
 {
-    private Dictionary<int, BiomeInfo> IdToBiomeMap { get; }
-    private Dictionary<string, BiomeInfo> NameToBiomeMap { get; }
-    
-    /// <summary>
-    /// Total count of biomes
-    /// </summary>
-    public int Count => IdToBiomeMap.Count();
-    
-    internal BiomeProvider(DataVersion<BiomeType, BiomeInfo> version) : base(version)
+    private EnumNameLookup<BiomeType> typeLookup = new();
+    private EnumNameLookup<BiomeCategory> categoryLookup = new();
+    private EnumNameLookup<Dimension> dimensionLookup = new();
+
+    public BiomeInfo[] GetData()
     {
-        this.IdToBiomeMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        this.NameToBiomeMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
+        if (token.Type != JTokenType.Array)
+        {
+            throw new InvalidOperationException("Expected data token to be an array");
+        }
+
+        var length = token.Count();
+        var data = new BiomeInfo[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            data[i] = TokenToBiome(token[i]!);
+        }
+
+        return data;
     }
 
-    /// <summary>
-    /// Get a <see cref="BiomeInfo"/> by numeric id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public BiomeInfo GetById(int id) => this.IdToBiomeMap[id];
-    
-    /// <summary>
-    /// Try to get a <see cref="BiomeInfo"/> by numeric id. Returns false if not found.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="biome"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out BiomeInfo? biome)
-        => this.IdToBiomeMap.TryGetValue(id, out biome);
-    
-    /// <summary>
-    /// Get a <see cref="BiomeInfo"/> by name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public BiomeInfo GetByName(string name) => this.NameToBiomeMap[name];
+    private BiomeInfo TokenToBiome(JToken dataToken)
+    {
+        var id = (int)dataToken.SelectToken("id")!;
+        var name = (string)dataToken.SelectToken("name")!;
+        var displayName = (string)dataToken.SelectToken("displayToken")!;
+        var category = (string)dataToken.SelectToken("category")!;
+        var temperature = (float)dataToken.SelectToken("temperature")!;
+        var precipitation = (string)dataToken.SelectToken("precipitation")! != "none";
+        var dimension = (string)dataToken.SelectToken("dimension")!;
+        var color = (int)dataToken.SelectToken("color")!;
 
-    /// <summary>
-    /// Try to get a <see cref="BiomeInfo"/> by name. Returns false if not found.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="biome"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out BiomeInfo? biome)
-        => this.NameToBiomeMap.TryGetValue(name, out biome);
-    
-    /// <summary>
-    /// Get Biome info by id
-    /// </summary>
-    /// <param name="id"></param>
-    public BiomeInfo this[int id] => GetById(id);
-
-    /// <summary>
-    /// Get Biome Info by name
-    /// </summary>
-    /// <param name="name"></param>
-    public BiomeInfo this[string name] => GetByName(name);
+        return new BiomeInfo(
+            id,
+            typeLookup.FromName(NameUtils.GetBiomeName(name)),
+            name,
+            displayName,
+            categoryLookup.FromName(category.Pascalize()),
+            temperature,
+            precipitation,
+            dimensionLookup.FromName(dimension),
+            color
+        );
+    }
 }
