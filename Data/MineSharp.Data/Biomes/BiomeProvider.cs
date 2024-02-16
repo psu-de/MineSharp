@@ -7,31 +7,38 @@ using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Biomes;
 
-internal class BiomeProvider(JToken token) : IDataProvider<BiomeInfo[]>
+internal class BiomeProvider : IDataProvider<BiomeInfo[]>
 {
-    private EnumNameLookup<BiomeType> typeLookup = new();
-    private EnumNameLookup<BiomeCategory> categoryLookup = new();
-    private EnumNameLookup<Dimension> dimensionLookup = new();
+    private static readonly EnumNameLookup<BiomeType> BiomeTypeLookup = new();
+    private static readonly EnumNameLookup<BiomeCategory> CategoryLookup = new();
+    private static readonly EnumNameLookup<Dimension> DimensionLookup = new();
 
-    public BiomeInfo[] GetData()
+    private readonly JArray token;
+    
+    public BiomeProvider(JToken token)
     {
         if (token.Type != JTokenType.Array)
         {
-            throw new InvalidOperationException("Expected data token to be an array");
+            throw new InvalidOperationException("Expected the token to be an array");
         }
-
-        var length = token.Count();
+        
+        this.token = (token as JArray)!;
+    }
+    
+    public BiomeInfo[] GetData()
+    {
+        var length = token.Count;
         var data = new BiomeInfo[length];
 
         for (int i = 0; i < length; i++)
         {
-            data[i] = TokenToBiome(token[i]!);
+            data[i] = FromToken(token[i]!);
         }
 
         return data;
     }
 
-    private BiomeInfo TokenToBiome(JToken dataToken)
+    private static BiomeInfo FromToken(JToken dataToken)
     {
         var id = (int)dataToken.SelectToken("id")!;
         var name = (string)dataToken.SelectToken("name")!;
@@ -44,13 +51,13 @@ internal class BiomeProvider(JToken token) : IDataProvider<BiomeInfo[]>
 
         return new BiomeInfo(
             id,
-            typeLookup.FromName(NameUtils.GetBiomeName(name)),
+            BiomeTypeLookup.FromName(NameUtils.GetBiomeName(name)),
             name,
             displayName,
-            categoryLookup.FromName(category.Pascalize()),
+            CategoryLookup.FromName(category.Pascalize()),
             temperature,
             precipitation,
-            dimensionLookup.FromName(dimension),
+            DimensionLookup.FromName(dimension),
             color
         );
     }
