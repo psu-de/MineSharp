@@ -13,7 +13,7 @@ namespace MineSharp.Core.Common.Blocks;
 /// <param name="resistance"></param>
 /// <param name="minState"></param>
 /// <param name="maxState"></param>
-/// <param name="diggable"></param>
+/// <param name="unbreakable"></param>
 /// <param name="transparent"></param>
 /// <param name="filterLight"></param>
 /// <param name="emitLight"></param>
@@ -32,14 +32,12 @@ public class BlockInfo(
     float resistance,
     int minState,
     int maxState,
-    bool diggable,
+    bool unbreakable,
     bool transparent,
     byte filterLight,
     byte emitLight,
-    string boundingBox,
-    int stackSize,
     Material[] materials,
-    ItemType[]? harvestTools,
+    ItemType[] harvestTools,
     int defaultState,
     BlockState state)
 {
@@ -76,9 +74,9 @@ public class BlockInfo(
     /// </summary>
     public readonly int MaxState = maxState;
     /// <summary>
-    /// Whether this block is diggable
+    /// Whether this block is unbreakable
     /// </summary>
-    public readonly bool Diggable = diggable;
+    public readonly bool Unbreakable = unbreakable;
     /// <summary>
     /// Whether this block is transparent
     /// </summary>
@@ -92,22 +90,13 @@ public class BlockInfo(
     /// </summary>
     public readonly byte EmitLight = emitLight;
     /// <summary>
-    /// Name of the bounding box used for this block (either 'block' or 'empty')
-    /// </summary>
-    public readonly string BoundingBox = boundingBox;
-    /// <summary>
-    /// The stack size of this block
-    /// </summary>
-    /// Todo: this is from minecraft-data, but it should probably not be in the block descriptor because the item descriptor has the stack size
-    public readonly int StackSize = stackSize;
-    /// <summary>
     /// An array of Materials which can be used to destroy this block faster
     /// </summary>
     public readonly Material[] Materials = materials;
     /// <summary>
     /// An array of Items that can be used to harvest this block
     /// </summary>
-    public readonly ItemType[]? HarvestTools = harvestTools;
+    public readonly ItemType[] HarvestTools = harvestTools;
     /// <summary>
     /// The default state of this block
     /// </summary>
