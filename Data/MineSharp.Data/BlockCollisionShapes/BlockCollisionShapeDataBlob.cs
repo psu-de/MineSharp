@@ -1,5 +1,7 @@
+using MineSharp.Core.Common.Blocks;
+
 namespace MineSharp.Data.BlockCollisionShapes;
 
 public record BlockCollisionShapeDataBlob(
-    Dictionary<string, int[]> BlockToIndicesMap,
+    Dictionary<BlockType, int[]> BlockToIndicesMap,
     Dictionary<int, float[][]> IndexToShapeMap);

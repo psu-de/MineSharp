@@ -1,10 +1,15 @@
+using MineSharp.Core.Common.Blocks;
+using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.BlockCollisionShapes;
 
-internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockCollisionShapeDataBlob>
+internal class BlockCollisionShapesProvider(JToken token, IBlockData blocks) : IDataProvider<BlockCollisionShapeDataBlob>
 {
+    private static readonly EnumNameLookup<BlockType> BlockTypeLookup = new();
+    
     public BlockCollisionShapeDataBlob GetData()
     {
         var blocks = (JObject)token.SelectToken("blocks")!;
@@ -12,7 +17,7 @@ internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockC
         
         var blockDict = blocks.Properties()
             .ToDictionary(
-                x => x.Name, 
+                x => BlockTypeLookup.FromName(NameUtils.GetBlockName(x.Name)), 
                 x => ToIntArray(x.Value));
 
         var shapesDict = shapes.Properties()

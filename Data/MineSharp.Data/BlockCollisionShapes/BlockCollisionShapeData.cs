@@ -6,7 +6,7 @@ using MineSharp.Data.Internal;
 
 namespace MineSharp.Data.BlockCollisionShapes;
 
-internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob> provider, IMinecraftData parent) 
+internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob> provider) 
     : IndexedData<BlockCollisionShapeDataBlob>(provider), IBlockCollisionShapeData
 {
     private Dictionary<BlockType, int[]> typeToIndices = new();
@@ -14,11 +14,7 @@ internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob
     
     protected override void InitializeData(BlockCollisionShapeDataBlob data)
     {
-        foreach (var (name, indices) in data.BlockToIndicesMap)
-        {
-            this.typeToIndices.Add(parent.Blocks.ByName(name).Type, indices);
-        }
-
+        this.typeToIndices = data.BlockToIndicesMap;
         this.indexToShape = data.IndexToShapeMap;
     }
 
