@@ -33,11 +33,12 @@ internal class MinecraftDataRepository
 
     public async Task<JToken> GetAsset(string file, string version)
     {
-        var filePath = this.GetFilePath(file, version);
-        if (!File.Exists(Path.Combine(this.cache, filePath)))
-            await DownloadAsset(filePath);
+        var relativePath = this.GetFilePath(file, version);
+        var cachePath = Path.Combine(this.cache, relativePath);
+        if (!File.Exists(cachePath))
+            await DownloadAsset(relativePath);
 
-        return JToken.Parse(await File.ReadAllTextAsync(filePath));
+        return JToken.Parse(await File.ReadAllTextAsync(cachePath));
     }
 
     private async Task DownloadAsset(string file)
