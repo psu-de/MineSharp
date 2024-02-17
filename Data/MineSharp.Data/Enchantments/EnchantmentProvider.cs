@@ -14,7 +14,7 @@ internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
     
     public EnchantmentProvider(JToken token)
     {
-        if (token.Type == JTokenType.Array)
+        if (token.Type != JTokenType.Array)
         {
             throw new ArgumentException("Expected token to be an array");
         }
