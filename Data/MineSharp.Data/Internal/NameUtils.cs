@@ -34,6 +34,13 @@ internal static class NameUtils
     public static string GetBiomeName(string name)
         => CommonGetName(name);
 
+    public static string GetBiomeCategory(string name)
+    {
+        if (name == "icy")
+            name = "ice";
+        return CommonGetName(name);
+    }
+
     public static string GetBlockName(string name)
         => CommonGetName(name);
 
@@ -44,5 +51,8 @@ internal static class NameUtils
         => CommonGetName(name);
 
     public static string GetEntityName(string name)
+        => CommonGetName(name);
+
+    public static string GetDimensionName(string name)
         => CommonGetName(name);
 }

@@ -54,10 +54,10 @@ internal class BiomeProvider : IDataProvider<BiomeInfo[]>
             BiomeTypeLookup.FromName(NameUtils.GetBiomeName(name)),
             name,
             displayName,
-            CategoryLookup.FromName(category.Pascalize()),
+            CategoryLookup.FromName(NameUtils.GetBiomeCategory(category)),
             temperature,
             precipitation,
-            DimensionLookup.FromName(dimension),
+            DimensionLookup.FromName(NameUtils.GetDimensionName(dimension)),
             color
         );
     }

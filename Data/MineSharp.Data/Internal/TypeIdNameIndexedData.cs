@@ -16,9 +16,9 @@ internal class TypeIdNameIndexedData<TEnum, TInfo>(IDataProvider<TInfo[]> provid
     protected override void InitializeData(TInfo[] data)
     {
         var tInfo = typeof(TInfo);
-        var idField = tInfo.GetField("Id", BindingFlags.Instance)!;
-        var typeField = tInfo.GetField("Type", BindingFlags.Instance)!;
-        var nameField = tInfo.GetField("Name", BindingFlags.Instance)!;
+        var idField = tInfo.GetProperty("Id")!;
+        var typeField = tInfo.GetProperty("Type")!;
+        var nameField = tInfo.GetProperty("Name")!;
         
         foreach (var entry in data)
         {
@@ -28,27 +28,30 @@ internal class TypeIdNameIndexedData<TEnum, TInfo>(IDataProvider<TInfo[]> provid
         }
     }
 
-    public TInfo ByType(TEnum type)
+    public TInfo? ByType(TEnum type)
     {
         if (!this.Loaded)
             this.Load();
 
-        return this.typeToInfo[type];
+        this.typeToInfo.TryGetValue(type, out var value);
+        return value;
     }
 
-    public TInfo ById(int id)
+    public TInfo? ById(int id)
     {
         if (!this.Loaded)
             this.Load();
 
-        return this.idToInfo[id];
+        this.idToInfo.TryGetValue(id, out var value);
+        return value;
     }
 
-    public TInfo ByName(string name)
+    public TInfo? ByName(string name)
     {
         if (!this.Loaded)
             this.Load();
 
-        return this.nameToInfo[name];
+        this.nameToInfo.TryGetValue(name, out var value);
+        return value;
     }
 }

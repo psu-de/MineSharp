@@ -18,6 +18,7 @@ using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
 using Newtonsoft.Json.Linq;
 using NLog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.Data;
 
@@ -100,32 +101,32 @@ public class MinecraftData : IMinecraftData
     public MinecraftVersion Version { get; }
 
     private MinecraftData(
-        IDataProvider<BiomeInfo[]> biomes,
-        IDataProvider<BlockInfo[]> blocks,
-        IDataProvider<BlockCollisionShapeDataBlob> blockCollisionShapes,
-        IDataProvider<EffectInfo[]> effects,
-        IDataProvider<EnchantmentInfo[]> enchantments,
-        IDataProvider<EntityInfo[]> entities,
-        IDataProvider<ItemInfo[]> items,
-        IDataProvider<ProtocolDataBlob> protocol,
-        IDataProvider<MaterialDataBlob> materials,
-        IDataProvider<object> recipes,
-        IDataProvider<object> windows,
-        IDataProvider<object> language,
+        IBiomeData biomes,
+        IBlockData blocks,
+        IBlockCollisionShapeData blockCollisionShapes,
+        IEffectData effects,
+        IEnchantmentData enchantments,
+        IEntityData entities,
+        IItemData items,
+        IProtocolData protocol,
+        IMaterialData materials,
+        IRecipeData recipes,
+        IWindowData windows,
+        ILanguageData language,
         MinecraftVersion version)
     {
-        this.Biomes = new BiomeData(biomes);
-        this.Blocks = new BlockData(blocks);
-        this.BlockCollisionShapes = new BlockCollisionShapeData(blockCollisionShapes, this);
-        this.Effects = new EffectData(effects);
-        this.Enchantments = new EnchantmentData(enchantments);
-        this.Entities = new EntityData(entities);
-        this.Items = new ItemData(items);
-        this.Protocol = new ProtocolData(protocol);
-        this.Materials = new MaterialData(materials);
-        this.Recipes = null;
-        this.Windows = null;
-        this.Language = null;
+        this.Biomes = biomes;
+        this.Blocks = blocks;
+        this.BlockCollisionShapes = blockCollisionShapes;
+        this.Effects = effects;
+        this.Enchantments = enchantments;
+        this.Entities = entities;
+        this.Items = items;
+        this.Protocol = protocol;
+        this.Materials = materials;
+        this.Recipes = recipes;
+        this.Windows = windows;
+        this.Language = language;
         this.Version = version;
     }
     
@@ -136,27 +137,33 @@ public class MinecraftData : IMinecraftData
     /// <returns></returns>
     public static async Task<MinecraftData> FromVersion(string version)
     {
-        var resourceMap = await MinecraftDataRepository.GetResourceMap();
-
-        var versionToken = resourceMap.SelectToken($"pc.{version}");
-        if (null == versionToken)
+        if (!await TryGetVersion(version, out var versionToken))
             throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
 
         var biomeToken = await LoadAsset("biomes", versionToken);
         var shapesToken = await LoadAsset("blockCollisionShapes", versionToken);
-        
-        
-        var biomeProvider = new BiomeProvider(biomeToken);
-        var shapesProvider = new BlockCollisionShapesProvider(shapesToken);
+        var blocksToken = await LoadAsset("blocks", versionToken);
+        var itemsToken = await LoadAsset("items", versionToken);
+        var effectsToken = await LoadAsset("effects", versionToken);
+        var enchantmentsToken = await LoadAsset("enchantments", versionToken);
+        var entitiesToken = await LoadAsset("entities", versionToken);
 
+        var biomes = new BiomeData(new BiomeProvider(biomeToken));
+        var items = new ItemData(new ItemProvider(itemsToken));
+        var blocks = new BlockData(new BlockProvider(blocksToken, items));
+        var shapes = new BlockCollisionShapeData(new BlockCollisionShapesProvider(shapesToken, blocks));
+        var effects = new EffectData(new EffectProvider(effectsToken));
+        var enchantments = new EnchantmentData(new EnchantmentProvider(enchantmentsToken));
+        var entities = new EntityData(new EntityProvider(entitiesToken));
+        
         return new MinecraftData(
-            biomeProvider,
-            null,
-            shapesProvider,
-            null,
-            null,
-            null,
-            null,
+            biomes,
+            blocks,
+            shapes,
+            effects,
+            enchantments,
+            entities,
+            items,
             null,
             null,
             null,
@@ -165,10 +172,21 @@ public class MinecraftData : IMinecraftData
             null);
     }
 
-    private static async Task<JToken> LoadAsset(string resource, JToken version)
+    private static Task<JToken> LoadAsset(string resource, JToken version)
     {
-        return await MinecraftDataRepository.GetAsset(
+        return MinecraftDataRepository.GetAsset(
             $"{resource}.json", 
             (string)version.SelectToken(resource)!);
+    }
+
+    private static async Task<JToken?> TryGetVersion(string version)
+    {
+        var resourceMap = await MinecraftDataRepository.GetResourceMap();
+
+        var versionToken = resourceMap["pc"]?[version];
+        if (versionToken is not null)
+            return versionToken;
+        
+        var protocolVersions = await MinecraftDataRepository.GetAsset("")
     }
 }

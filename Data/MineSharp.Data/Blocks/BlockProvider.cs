@@ -45,7 +45,7 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
         var id = (int)dataToken.SelectToken("id")!;
         var name = (string)dataToken.SelectToken("name")!;
         var displayName = (string)dataToken.SelectToken("displayToken")!;
-        var hardness = (float)dataToken.SelectToken("hardness")!;
+        var hardness = (float?)dataToken.SelectToken("hardness") ?? float.MaxValue;
         var resistance = (float)dataToken.SelectToken("resistance")!;
         var minState = (int)dataToken.SelectToken("minStateId")!;
         var maxState = (int)dataToken.SelectToken("maxStateId")!;
@@ -53,7 +53,7 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
         var transparent = (bool)dataToken.SelectToken("transparent")!;
         var filterLight = (byte)dataToken.SelectToken("filterLight")!;
         var emitLight = (byte)dataToken.SelectToken("emitLight")!;
-        var materials = (string)dataToken.SelectToken("materials")!;
+        var materials = (string)dataToken.SelectToken("material")!;
         var harvestTools = (JObject?)dataToken.SelectToken("harvestTools");
         var states = (JArray)dataToken.SelectToken("states")!;
         var defaultState = (int)dataToken.SelectToken("defaultState")!;

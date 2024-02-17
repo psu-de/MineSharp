@@ -51,7 +51,7 @@ internal class ItemProvider : IDataProvider<ItemInfo[]>
 
         return new ItemInfo(
             id,
-            ItemTypeLookup.FromName(name),
+            ItemTypeLookup.FromName(NameUtils.GetItemName(name)),
             name,
             displayName,
             stackSize,
