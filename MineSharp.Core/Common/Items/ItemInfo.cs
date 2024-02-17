@@ -20,5 +20,5 @@ public record ItemInfo(
     string DisplayName,
     int StackSize,
     int? MaxDurability,
-    EnchantmentCategory[]? EnchantCategories,
-    ItemType[]? RepairWith);
+    EnchantmentCategory[] EnchantCategories,
+    ItemType[] RepairWith);
