@@ -1,9 +1,3 @@
-using MineSharp.Core.Common.Biomes;
-using MineSharp.Core.Common.Blocks;
-using MineSharp.Core.Common.Effects;
-using MineSharp.Core.Common.Enchantments;
-using MineSharp.Core.Common.Entities;
-using MineSharp.Core.Common.Items;
 using MineSharp.Data.Biomes;
 using MineSharp.Data.BlockCollisionShapes;
 using MineSharp.Data.Blocks;
@@ -12,13 +6,8 @@ using MineSharp.Data.Enchantments;
 using MineSharp.Data.Entities;
 using MineSharp.Data.Exceptions;
 using MineSharp.Data.Framework;
-using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Items;
-using MineSharp.Data.Materials;
-using MineSharp.Data.Protocol;
 using Newtonsoft.Json.Linq;
-using NLog;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MineSharp.Data;
 
@@ -33,7 +22,10 @@ public class MinecraftData : IMinecraftData
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "MineSharp",
                 "MinecraftData"),
-            new HttpClient()); 
+            new HttpClient());
+
+    private static readonly Lazy<Dictionary<string, JToken>> ProtocolVersions = new(LoadProtocolVersions);
+    private static readonly Dictionary<string, MinecraftData> LoadedData = new();
     
     /// <summary>
     /// The Biome data provider for this version
@@ -137,7 +129,11 @@ public class MinecraftData : IMinecraftData
     /// <returns></returns>
     public static async Task<MinecraftData> FromVersion(string version)
     {
-        if (!await TryGetVersion(version, out var versionToken))
+        if (LoadedData.TryGetValue(version, out var loaded))
+            return loaded;
+        
+        var versionToken = await TryGetVersion(version);
+        if (versionToken is null)
             throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
 
         var biomeToken = await LoadAsset("biomes", versionToken);
@@ -156,7 +152,7 @@ public class MinecraftData : IMinecraftData
         var enchantments = new EnchantmentData(new EnchantmentProvider(enchantmentsToken));
         var entities = new EntityData(new EntityProvider(entitiesToken));
         
-        return new MinecraftData(
+        var data = new MinecraftData(
             biomes,
             blocks,
             shapes,
@@ -170,6 +166,9 @@ public class MinecraftData : IMinecraftData
             null,
             null,
             null);
+        
+        LoadedData.Add(version, data);
+        return data;
     }
 
     private static Task<JToken> LoadAsset(string resource, JToken version)
@@ -186,7 +185,25 @@ public class MinecraftData : IMinecraftData
         var versionToken = resourceMap["pc"]?[version];
         if (versionToken is not null)
             return versionToken;
-        
-        var protocolVersions = await MinecraftDataRepository.GetAsset("")
+
+        if (!ProtocolVersions.Value.TryGetValue(version, out var token))
+            return null;
+
+        var majorVersion = (string)token.SelectToken("majorVersion")!;
+        return resourceMap["pc"]?[majorVersion];
+    }
+
+    private static Dictionary<string, JToken> LoadProtocolVersions()
+    {
+        var protocolVersions = (JArray) MinecraftDataRepository.GetAsset(
+            "protocolVersions.json", 
+            "pc/common")
+            .Result;
+
+        return protocolVersions
+            .DistinctBy(x => (string)x.SelectToken("minecraftVersion")!)
+            .ToDictionary(
+                x => (string)x.SelectToken("minecraftVersion")!, 
+                x => x);
     }
 }
