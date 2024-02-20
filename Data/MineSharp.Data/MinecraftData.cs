@@ -11,6 +11,8 @@ using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
+using MineSharp.Data.Windows;
+using MineSharp.Data.Windows.Versions;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data;
@@ -140,6 +142,9 @@ public class MinecraftData : IMinecraftData
         if (versionToken is null)
             throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
 
+        var protocolVersion = (int)ProtocolVersions.Value[version].SelectToken("version")!;
+        var minecraftVersion = new MinecraftVersion(version, protocolVersion);
+            
         var biomeToken = await LoadAsset("biomes", versionToken);
         var shapesToken = await LoadAsset("blockCollisionShapes", versionToken);
         var blocksToken = await LoadAsset("blocks", versionToken);
@@ -163,6 +168,7 @@ public class MinecraftData : IMinecraftData
         var materials = new MaterialData(new MaterialsProvider(materialsToken, items));
         var recipes = new RecipeData(new RecipeProvider(recipesToken, items));
         var language = new LanguageData(new LanguageProvider(languageToken));
+        var windows = GetWindowData(minecraftVersion);
         
         var data = new MinecraftData(
             biomes,
@@ -175,9 +181,9 @@ public class MinecraftData : IMinecraftData
             protocol,
             materials,
             recipes,
-            null,
+            windows,
             language,
-            null);
+            minecraftVersion);
         
         LoadedData.Add(version, data);
         return data;
@@ -217,5 +223,15 @@ public class MinecraftData : IMinecraftData
             .ToDictionary(
                 x => (string)x.SelectToken("minecraftVersion")!, 
                 x => x);
+    }
+
+    private static IWindowData GetWindowData(MinecraftVersion version)
+    {
+        return version.Protocol switch
+        {
+            >= 765 => new WindowData(new WindowVersion1_20_3()),
+            >= 736 => new WindowData(new WindowVersion1_16_1()),
+            _ => throw new NotSupportedException()
+        };
     }
 }

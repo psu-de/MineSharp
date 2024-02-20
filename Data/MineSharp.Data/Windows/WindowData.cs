@@ -1,11 +1,11 @@
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Data.Framework;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
 
 namespace MineSharp.Data.Windows;
 
-/// <summary>
-/// Static Window data
-/// </summary>
-public class WindowProvider
+internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<WindowInfo[]>(provider), IWindowData
 {
     private static IList<BlockType> _allowedBlocksToOpen = new List<BlockType>() {
         BlockType.Chest,
@@ -44,28 +44,37 @@ public class WindowProvider
         BlockType.Loom,
         BlockType.Stonecutter
     };
-    private WindowVersion version;
+    
+    private IDataProvider<WindowInfo[]> provider;
     private IDictionary<string, WindowInfo> windowMap;
-
-    internal WindowProvider(WindowVersion version)
-    {
-        this.version = version;
-        this.windowMap = this.Windows.ToDictionary(x => x.Name);
-    }
 
 
     /// <summary>
     /// All blocks that can be opened
     /// </summary>
     public IList<BlockType> AllowedBlocksToOpen => _allowedBlocksToOpen;
-    
-    /// <summary>
-    /// All available windows
-    /// </summary>
-    public WindowInfo[] Windows => this.version.Windows;
-    
-    /// <summary>
-    /// Map of window string id to WindowInfo
-    /// </summary>
-    public IDictionary<string, WindowInfo> WindowMap => windowMap;
+
+    private WindowInfo[]? Windows { get; set; }
+
+    protected override void InitializeData(WindowInfo[] data)
+    {
+        this.Windows = data;
+        this.windowMap = this.Windows.ToDictionary(x => x.Name);
+    }
+
+    public WindowInfo ById(int id)
+    {
+        if (!this.Loaded)
+            this.Load();
+        
+        return this.Windows![id];
+    }
+
+    public WindowInfo ByName(string name)
+    {
+        if (!this.Loaded)
+            this.Load();
+
+        return this.windowMap[name];
+    }
 }
