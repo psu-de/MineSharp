@@ -7,6 +7,7 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Exceptions;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Items;
+using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
@@ -149,6 +150,7 @@ public class MinecraftData : IMinecraftData
         var protocolToken = await LoadAsset("protocol", versionToken);
         var materialsToken = await LoadAsset("materials", versionToken);
         var recipesToken = await LoadAsset("recipes", versionToken);
+        var languageToken = await LoadAsset("language", versionToken);
 
         var biomes = new BiomeData(new BiomeProvider(biomeToken));
         var items = new ItemData(new ItemProvider(itemsToken));
@@ -160,6 +162,7 @@ public class MinecraftData : IMinecraftData
         var protocol = new ProtocolData(new ProtocolProvider(protocolToken));
         var materials = new MaterialData(new MaterialsProvider(materialsToken, items));
         var recipes = new RecipeData(new RecipeProvider(recipesToken, items));
+        var language = new LanguageData(new LanguageProvider(languageToken));
         
         var data = new MinecraftData(
             biomes,
@@ -173,7 +176,7 @@ public class MinecraftData : IMinecraftData
             materials,
             recipes,
             null,
-            null,
+            language,
             null);
         
         LoadedData.Add(version, data);

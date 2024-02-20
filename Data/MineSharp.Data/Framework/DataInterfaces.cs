@@ -93,7 +93,7 @@ public interface ILanguageData
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public string GetTranslation(string name);
+    public string? GetTranslation(string name);
 }
 
 /// <summary>
