@@ -29,7 +29,7 @@ internal class ProtocolData(IDataProvider<ProtocolDataBlob> provider) : IndexedD
         return this.typeToId[type];
     }
 
-    public PacketType FromPacketType(PacketFlow flow, GameState state, int id)
+    public PacketType GetPacketType(PacketFlow flow, GameState state, int id)
     {
         if (!this.Loaded)
             this.Load();

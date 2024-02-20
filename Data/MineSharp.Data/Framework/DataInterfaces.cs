@@ -129,7 +129,7 @@ public interface IProtocolData
     /// <param name="state"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public PacketType FromPacketType(PacketFlow flow, GameState state, int id);
+    public PacketType GetPacketType(PacketFlow flow, GameState state, int id);
 }
 
 /// <summary>
