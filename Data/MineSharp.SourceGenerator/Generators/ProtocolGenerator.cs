@@ -75,11 +75,11 @@ public class ProtocolGenerator : IGenerator
         
             var cbIdMapping = ((JObject)protocol.SelectToken($"{ns}.toClient.types.packet[1][0].type[1].mappings")!)
                 .Properties()
-                .ToDictionary(x => this.GetPacketName((string)x.Value!, "toClient", ns), x => x.Name);
+                .ToDictionary(x => NameUtils.GetPacketName((string)x.Value!, "toClient", ns), x => x.Name);
         
             var sbIdMapping = ((JObject)protocol.SelectToken($"{ns}.toServer.types.packet[1][0].type[1].mappings")!)
                 .Properties()
-                .ToDictionary(x => this.GetPacketName((string)x.Value!, "toServer", ns), x => x.Name);
+                .ToDictionary(x => NameUtils.GetPacketName((string)x.Value!, "toServer", ns), x => x.Name);
             
             foreach (var kvp in cbIdMapping)
             {
@@ -105,19 +105,8 @@ public class ProtocolGenerator : IGenerator
 
         return obj.Properties()
             .Select(x => (string)x.Value!)
-            .Select(x => GetPacketName(x, direction, @namespace))
+            .Select(x => NameUtils.GetPacketName(x, direction, @namespace))
             .ToArray();
-    }
-
-    private string GetPacketName(string name, string direction, string ns)
-    {
-        direction = direction == "toClient" ? "CB" : "SB";
-        ns = ns == "handshaking" ? "Handshake" : ns.Pascalize();
-        name = name.Pascalize()
-            .Replace("Packet", "")
-            .Replace("ConfiguationAcknowledged", "ConfigurationAcknowledged");
-
-        return $"{direction}_{ns}_{name}";
     }
 }
 

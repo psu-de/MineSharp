@@ -55,4 +55,18 @@ internal static class NameUtils
 
     public static string GetDimensionName(string name)
         => CommonGetName(name);
+
+    public static string GetGameState(string name)
+        => CommonGetName(name);
+    
+    public static string GetPacketName(string name, string direction, string ns)
+    {
+        direction = direction == "toClient" ? "CB" : "SB";
+        ns = ns == "handshaking" ? "Handshake" : ns.Pascalize();
+        name = name.Pascalize()
+            .Replace("Packet", "")
+            .Replace("ConfiguationAcknowledged", "ConfigurationAcknowledged");
+
+        return $"{direction}_{ns}_{name}";
+    }
 }

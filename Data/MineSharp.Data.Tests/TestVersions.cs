@@ -2,7 +2,7 @@ namespace MineSharp.Data.Tests;
 
 public class Tests
 {
-    private static readonly string[] VERSIONS =
+    private static readonly string[] Versions =
     [
         "1.18", "1.18.1", "1.18.2",
         "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
@@ -10,9 +10,9 @@ public class Tests
     ];
 
     [Test]
-    public void Test1()
+    public void TestLoadData()
     {
-        foreach (var version in VERSIONS)
+        foreach (var version in Versions)
         {
             MinecraftData.FromVersion(version).Wait();
         }

@@ -7,6 +7,9 @@ using MineSharp.Data.Entities;
 using MineSharp.Data.Exceptions;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Items;
+using MineSharp.Data.Materials;
+using MineSharp.Data.Protocol;
+using MineSharp.Data.Recipes;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data;
@@ -143,6 +146,9 @@ public class MinecraftData : IMinecraftData
         var effectsToken = await LoadAsset("effects", versionToken);
         var enchantmentsToken = await LoadAsset("enchantments", versionToken);
         var entitiesToken = await LoadAsset("entities", versionToken);
+        var protocolToken = await LoadAsset("protocol", versionToken);
+        var materialsToken = await LoadAsset("materials", versionToken);
+        var recipesToken = await LoadAsset("recipes", versionToken);
 
         var biomes = new BiomeData(new BiomeProvider(biomeToken));
         var items = new ItemData(new ItemProvider(itemsToken));
@@ -151,6 +157,9 @@ public class MinecraftData : IMinecraftData
         var effects = new EffectData(new EffectProvider(effectsToken));
         var enchantments = new EnchantmentData(new EnchantmentProvider(enchantmentsToken));
         var entities = new EntityData(new EntityProvider(entitiesToken));
+        var protocol = new ProtocolData(new ProtocolProvider(protocolToken));
+        var materials = new MaterialData(new MaterialsProvider(materialsToken, items));
+        var recipes = new RecipeData(new RecipeProvider(recipesToken, items));
         
         var data = new MinecraftData(
             biomes,
@@ -160,9 +169,9 @@ public class MinecraftData : IMinecraftData
             enchantments,
             entities,
             items,
-            null,
-            null,
-            null,
+            protocol,
+            materials,
+            recipes,
             null,
             null,
             null);

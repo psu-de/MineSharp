@@ -142,7 +142,7 @@ public interface IRecipeData
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public Recipe[] ByItem(ItemType type);
+    public Recipe[]? ByItem(ItemType type);
 }
 
 /// <summary>

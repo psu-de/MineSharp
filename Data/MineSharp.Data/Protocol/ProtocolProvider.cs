@@ -1,68 +1,64 @@
 using MineSharp.Core.Common.Protocol;
-using NLog;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Protocol;
 
-/// <summary>
-/// Provides protocol data.
-/// </summary>
-public class ProtocolProvider
+internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
 {
-    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly EnumNameLookup<GameState> StateLookup = new();
+    private static readonly EnumNameLookup<PacketType> TypeLookup = new();
     
-    private readonly ProtocolVersion _version;
+    private JObject token;
 
-    private readonly Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>> _idToTypeMap;
-    
-    internal ProtocolProvider(ProtocolVersion version)
+    public ProtocolProvider(JToken token)
     {
-        this._version = version;
-        
-        this._idToTypeMap = new Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>>();
-        foreach (var flow in Enum.GetValues<PacketFlow>())
+        if (token.Type != JTokenType.Object)
         {
-            this._idToTypeMap.Add(flow, new Dictionary<GameState, Dictionary<int, PacketType>>());
-            foreach (var state in Enum.GetValues<GameState>())
-                this._idToTypeMap[flow].Add(state, new Dictionary<int, PacketType>());
+            throw new ArgumentException("Expected token to be an object");
         }
-        
-        foreach (var kvp in this._version.PacketIds)
+
+        this.token = (JObject)token;
+    }
+    
+    public ProtocolDataBlob GetData()
+    {
+        var byFlow = new Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>>
         {
-            var intVal = (int)kvp.Key;
-            var state = (GameState)(sbyte)(intVal >> 8 & 0xFF);
-            var flow = (PacketFlow)(sbyte)(intVal >> 16 & 0xFF);
-            this._idToTypeMap[flow][state].Add(kvp.Value, kvp.Key);
+            { PacketFlow.Clientbound, new Dictionary<GameState, Dictionary<int, PacketType>>() },
+            { PacketFlow.Serverbound, new Dictionary<GameState, Dictionary<int, PacketType>>() }
+        };
+
+        foreach (var ns in this.token.Properties())
+        {
+            if (ns.Name == "types")
+                continue;
+
+            var state = StateLookup.FromName(NameUtils.GetGameState(ns.Name));
+            
+            var cbPackets = CollectPackets(ns.Name, "toClient");
+            var sbPackets = CollectPackets(ns.Name, "toServer");
+            
+            byFlow[PacketFlow.Clientbound].Add(state, cbPackets);
+            byFlow[PacketFlow.Serverbound].Add(state, sbPackets);
         }
+
+        return new ProtocolDataBlob(byFlow);
     }
 
-    /// <summary>
-    /// Get a packet id by PacketType
-    /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    public int GetPacketId(PacketType type)
-        => this._version.PacketIds[type];
-
-    /// <summary>
-    /// Get <see cref="PacketType"/> by id with given <paramref name="flow"/> <paramref name="state"/>
-    /// </summary>
-    /// <param name="flow"></param>
-    /// <param name="state"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public PacketType FromPacketId(PacketFlow flow, GameState state, int id)
+    private Dictionary<int, PacketType> CollectPackets(string ns, string direction)
     {
-        try
-        {
-            var direction = this._idToTypeMap[flow];
-            var gameState = direction[state];
-            var type = gameState[id];
-            return type;
-        } catch (KeyNotFoundException)
-        {
-            Logger.Debug($"Could not map {flow} -> {state} -> 0x{id:X2} to PacketType.");
-            throw;
-        }
+        var obj = (JObject)token.SelectToken($"{ns}.{direction}.types.packet[1][0].type[1].mappings")!;
+
+        return obj.Properties()
+            .ToDictionary(
+                x => Convert.ToInt32(x.Name, 16),
+                x => TypeLookup.FromName(
+                    NameUtils.GetPacketName(
+                        (string)x.Value!, 
+                        direction, 
+                        ns))
+                );
     }
 }
