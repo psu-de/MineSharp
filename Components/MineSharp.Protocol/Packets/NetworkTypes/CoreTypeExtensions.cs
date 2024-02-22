@@ -27,7 +27,7 @@ internal static class CoreTypeExtensions
             return null;
 
         return new Item(
-            data.Items.GetById(buffer.ReadVarInt()),
+            data.Items.ById(buffer.ReadVarInt())!,
             buffer.ReadByte(),
             null,
             buffer.ReadNbtCompound());

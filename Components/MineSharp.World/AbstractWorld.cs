@@ -47,7 +47,7 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// </summary>
     public readonly MinecraftData Data = data;
     
-    private readonly BlockInfo OutOfMapBlock = data.Blocks.GetByType(BlockType.Air);
+    private readonly BlockInfo OutOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
     
     /// <inheritdoc />
     [Pure]
@@ -161,7 +161,7 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
         var relative = this.ToChunkPosition(position);
         var blockState = chunk.GetBlockAt(relative);
         var block = new Block(
-            this.Data.Blocks.GetByState(blockState),
+            this.Data.Blocks.ByState(blockState)!,
             blockState,
             position);
         return block;
@@ -233,7 +233,7 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     {
         var worldPosition = this.ToWorldPosition(chunk.Coordinates, position);
         this.OnBlockUpdated?.Invoke(this, new Block( // TODO: Hier jedes mal ein neuen block zu erstellen ist quatsch
-            this.Data.Blocks.GetByState(state), state, worldPosition));
+            this.Data.Blocks.ByState(state)!, state, worldPosition));
     }
 
     private int NonNegativeMod(int x, int m)

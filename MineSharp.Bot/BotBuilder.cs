@@ -216,7 +216,7 @@ public class BotBuilder
         if (this.data is not null)
             data = this.data;
         else if (this.versionStr is not null)
-            data = MinecraftData.FromVersion(this.versionStr);
+            data = await MinecraftData.FromVersion(this.versionStr);
         else if (this.autoDetect)
             data = await TryAutoDetectVersion(this.proxyProvider, this.hostname, this.port);
         else throw new ArgumentNullException(nameof(this.data), "No data provided. Set either Data() or AutoDetectVersion(true)");
@@ -274,6 +274,6 @@ public class BotBuilder
             Logger.Warn($"MineSharp was not tested on server brand '{status.Brand}'");
         }
         
-        return MinecraftData.FromVersion(status.Version);
+        return await MinecraftData.FromVersion(status.Version);
     }
 }

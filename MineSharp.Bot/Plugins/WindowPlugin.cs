@@ -139,7 +139,7 @@ public class WindowPlugin : Plugin
 
         var result = await receive;
 
-        var windowInfo = this.Bot.Data.Windows.Windows[result.InventoryType];
+        var windowInfo = this.Bot.Data.Windows.ById(result.InventoryType);
         var window = this.OpenWindow(result.WindowId, windowInfo);
         this.CurrentlyOpenedWindow = window;
         

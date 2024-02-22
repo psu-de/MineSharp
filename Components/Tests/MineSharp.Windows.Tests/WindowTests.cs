@@ -17,13 +17,13 @@ public class WindowTests
     [SetUp]
     public void Setup()
     {
-        this._data = MinecraftData.FromVersion("1.19.3");
+        this._data = MinecraftData.FromVersion("1.19.3").Result;
         this._mainInventory = new Window(255, "", 4 * 9, null, null);
         this._inventory = new Window(0, "Inventory", 9, this._mainInventory, null);
 
-        this._oakLog = this._data.Items.GetByName("oak_log");
-        this._netherStar = this._data.Items.GetByName("nether_star");
-        this._diamond = this._data.Items.GetByName("diamond");
+        this._oakLog = this._data.Items.ByName("oak_log")!;
+        this._netherStar = this._data.Items.ByName("nether_star")!;
+        this._diamond = this._data.Items.ByName("diamond")!;
     }
     
     [Test]

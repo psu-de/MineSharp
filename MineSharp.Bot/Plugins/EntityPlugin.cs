@@ -77,7 +77,7 @@ public class EntityPlugin : Plugin
         if (!this.IsEnabled)
             return Task.CompletedTask;
         
-        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
+        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
         
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
@@ -99,7 +99,7 @@ public class EntityPlugin : Plugin
         if (!this.IsEnabled)
             return Task.CompletedTask;
         
-        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
+        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
         
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),

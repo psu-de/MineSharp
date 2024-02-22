@@ -7,7 +7,7 @@ namespace MineSharp.Data.Windows;
 
 internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<WindowInfo[]>(provider), IWindowData
 {
-    private static IList<BlockType> _allowedBlocksToOpen = new List<BlockType>() {
+    private static readonly IList<BlockType> StaticAllowedBlocksToOpen = new List<BlockType>() {
         BlockType.Chest,
         BlockType.TrappedChest,
         BlockType.EnderChest,
@@ -52,7 +52,7 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
     /// <summary>
     /// All blocks that can be opened
     /// </summary>
-    public IList<BlockType> AllowedBlocksToOpen => _allowedBlocksToOpen;
+    public IList<BlockType> AllowedBlocksToOpen => StaticAllowedBlocksToOpen;
 
     private WindowInfo[]? Windows { get; set; }
 

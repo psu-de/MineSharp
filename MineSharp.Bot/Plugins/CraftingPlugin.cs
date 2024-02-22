@@ -31,7 +31,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     /// <returns></returns>
     public IEnumerable<Recipe> FindRecipes(ItemType type)
     {
-        return this.Bot.Data.Recipes.GetRecipesForItem(type)
+        return this.Bot.Data.Recipes.ByItem(type)!
             .Where(recipe => 
                 recipe.IngredientsCount.All(
                     kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) > kvp.Value));
@@ -84,11 +84,11 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
         }
         else craftingWindow = this.windowPlugin!.Inventory!;
         
-        var resultType = this.Bot.Data.Items.GetByType(recipe.Result);
+        var resultType = this.Bot.Data.Items.ByType(recipe.Result)!;
         
         var perIteration = resultType.StackSize / recipe.ResultCount;
         perIteration = recipe.IngredientsCount.Keys
-            .Select(x => this.Bot.Data.Items.GetByType(x))
+            .Select(x => this.Bot.Data.Items.ByType(x)!)
             .Select(x => x.StackSize)
             .Prepend(perIteration)
             .Min();

@@ -51,18 +51,20 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
         var resultCount = (int)recipe.SelectToken("result.count")!;
 
         var ingredientsToken = recipe.SelectToken("ingredients");
-        var ingredients = ingredientsToken is null
-            ? IngredientsFromArray((JArray)ingredientsToken!)!
+        var ingredients = ingredientsToken is not null
+            ? IngredientsFromArray((JArray)ingredientsToken)
             : IngredientsFromShape((JArray)recipe.SelectToken("inShape")!)!;
 
         var outShapeToken = (JArray?)recipe.SelectToken("outShape");
         var outShape = IngredientsFromShape(outShapeToken);
 
+        var itemType = this.items.ById(resultId)!.Type;
+
         return new Recipe(
             ingredients,
             outShape,
             ingredients.Length > 4,
-            this.items.ById(resultId)!.Type,
+            itemType,
             resultCount);
     }
 

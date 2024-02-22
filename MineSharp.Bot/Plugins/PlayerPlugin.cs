@@ -148,14 +148,14 @@ public class PlayerPlugin : Plugin
         this._entities = this.Bot.GetPlugin<EntityPlugin>();
         var loginPacketTask = this.Bot.Client.WaitForPacket<LoginPacket>();
         var positionPacketTask = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
-
+        
         await Task.WhenAll(loginPacketTask, positionPacketTask);
-
+        
         var loginPacket = await loginPacketTask;
         var positionPacket = await positionPacketTask;
 
         var entity = new Entity(
-            this.Bot.Data.Entities.GetByType(EntityType.Player),
+            this.Bot.Data.Entities.ByType(EntityType.Player)!,
             loginPacket.EntityId,
             new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z),
             positionPacket.Pitch,
@@ -286,7 +286,7 @@ public class PlayerPlugin : Plugin
         }
 
         var entity = new Entity(
-            this.Bot.Data.Entities.GetByName("player"),
+            this.Bot.Data.Entities.ByType(EntityType.Player)!,
             packet.EntityId,
             new Vector3(
                 packet.X,

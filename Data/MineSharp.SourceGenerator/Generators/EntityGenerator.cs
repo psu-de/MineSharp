@@ -27,7 +27,7 @@ public class EntityGenerator : CommonGenerator
         var width = (float)token.SelectToken("width")!;
         var height = (float)token.SelectToken("height")!;
         var type = (string)token.SelectToken("type")!;
-        var category = GetCategory(token.SelectToken("category")!);
+        var category = NameUtils.GetEntityCategory((string)token.SelectToken("category")!);
 
         return $"new EntityInfo({id}, " +
                $"EntityType.{name.Pascalize()}, " +
@@ -49,7 +49,7 @@ public class EntityGenerator : CommonGenerator
 
         foreach (var entity in (JArray)entities)
         {
-            var category = GetCategory(entity.SelectToken("category")!);
+            var category = NameUtils.GetEntityCategory((string)entity.SelectToken("category")!);
             entityCategories.Add(category);
             entityTypes.Add(((string)entity.SelectToken("type")!).Pascalize());
         }
@@ -71,13 +71,5 @@ public class EntityGenerator : CommonGenerator
                 .Select((x, i) => (x, i))
                 .ToDictionary(x => x.x, x => x.i)
         }.Write();
-    }
-    
-    private string GetCategory(JToken token)
-    {
-        var val = (string)token!;
-        if (val == "UNKNOWN")
-            val = val.ToLower();
-        return val.Pascalize();
     }
 }
