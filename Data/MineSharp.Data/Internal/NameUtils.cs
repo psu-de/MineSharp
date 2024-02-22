@@ -50,6 +50,9 @@ internal static class NameUtils
     public static string GetEnchantmentName(string name)
         => CommonGetName(name);
 
+    public static string GetEnchantmentCategory(string name)
+        => CommonGetName(name);
+
     public static string GetEntityName(string name)
         => CommonGetName(name);
     

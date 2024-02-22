@@ -12,7 +12,7 @@ public static class DirectoryUtils
         return Path.Join(GetProjectDirectory(), "minecraft-data");
     }
 
-    public static string GetCoreSourceDirectory()
+    public static string GetSourceDirectory()
     {
         var current = Environment.CurrentDirectory;
         var source = Path.Join(current, "CoreSource");
@@ -22,44 +22,16 @@ public static class DirectoryUtils
 
         return source;
     }
-
-    public static string GetDataSourceDirectory()
-    {
-        var current = Environment.CurrentDirectory;
-        var source = Path.Join(current, "DataSource");
-        
-        if (!Directory.Exists(source))
-            Directory.CreateDirectory(source);
-
-        return source;
-    }
     
-    public static string GetDataSourceDirectory(string subdirectory)
+    public static string GetSourceDirectory(string subdirectory)
     {
-        var source = GetDataSourceDirectory();
+        var source = GetSourceDirectory();
 
         var path = Path.Join(source, subdirectory);
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
 
         return path;
-    }
-    
-    public static string GetCoreSourceDirectory(string subdirectory)
-    {
-        var source = GetCoreSourceDirectory();
-
-        var path = Path.Join(source, subdirectory);
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
-
-        return path;
-    }
-
-    public static string GetMineSharpDataProjectDirectory()
-    {
-        var project = GetProjectDirectory();
-        return Path.Join(project, "..", "MineSharp.Data");
     }
     
     public static string GetMineSharpCoreProjectDirectory()
