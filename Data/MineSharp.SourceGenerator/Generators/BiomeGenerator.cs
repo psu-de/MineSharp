@@ -22,7 +22,7 @@ public class BiomeGenerator : CommonGenerator
 
         foreach (var biome in (JArray)biomes)
         {
-            biomeCategories.Add(GetCategory(biome));
+            biomeCategories.Add(NameUtils.GetBiomeCategory((string)biome!));
         }
         
         await new EnumGenerator() {
@@ -71,7 +71,7 @@ public class BiomeGenerator : CommonGenerator
         var id = (int)token.SelectToken("id")!;
         var name = (string)token.SelectToken("name")!;
         var displayName = (string)token.SelectToken("displayName")!;
-        var category = GetCategory(token.SelectToken("category")!);
+        var category = NameUtils.GetBiomeCategory((string)token.SelectToken("category")!);
         var temperature = (float)token.SelectToken("temperature")!;
         var dimension = (string)token.SelectToken("dimension")!;
         var color = (int)token.SelectToken("color")!;
@@ -91,13 +91,5 @@ public class BiomeGenerator : CommonGenerator
                $"{Str.Bool(precipitation)}, " +
                $"Dimension.{dimension.Pascalize()}, " +
                $"{color})";
-    }
-
-    private string GetCategory(JToken token)
-    {
-        var str = (string)token!;
-        if (str == "icy")
-            str = "ice";
-        return str.Pascalize();
     }
 }

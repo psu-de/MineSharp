@@ -1,63 +1,61 @@
 using MineSharp.Core.Common.Entities;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Entities;
 
-/// <summary>
-/// Provides static data about entities.
-/// </summary>
-public class EntityProvider : DataProvider<EntityType, EntityInfo>
+internal class EntityProvider : IDataProvider<EntityInfo[]>
 {
-    private Dictionary<int, EntityInfo> IdToEnchantmentMap { get; }
-    private Dictionary<string, EntityInfo> NameToEnchantmentMap { get; }
+    private static readonly EnumNameLookup<EntityType> EntityTypeLookup = new();
+    private static readonly EnumNameLookup<EntityCategory> EntityCategoryLookup = new();
+    private static readonly EnumNameLookup<MobType> MobTypeLookup = new();
     
-    internal EntityProvider(DataVersion<EntityType, EntityInfo> version) : base(version)
+    
+    private JArray token;
+
+    public EntityProvider(JToken token)
     {
-        this.IdToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        this.NameToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
+        if (token.Type != JTokenType.Array)
+        {
+            throw new ArgumentException($"Expected token to be an array");
+        }
+
+        this.token = (JArray)token;
     }
     
-    /// <summary>
-    /// Get an EntityInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public EntityInfo GetById(int id) => this.IdToEnchantmentMap[id];
-    
-    /// <summary>
-    /// Try to get an EntityInfo by id. Returns false if not found
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out EntityInfo? effect)
-        => this.IdToEnchantmentMap.TryGetValue(id, out effect);
-    
-    /// <summary>
-    /// Get an EntityInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public EntityInfo GetByName(string name) => this.NameToEnchantmentMap[name];
+    public EntityInfo[] GetData()
+    {
+        var data = new EntityInfo[this.token.Count];
 
-    /// <summary>
-    /// Try to get an EntityInfo by name. Returns false if not found
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out EntityInfo? effect)
-        => this.NameToEnchantmentMap.TryGetValue(name, out effect);
-    
-    /// <summary>
-    /// Get an EntityInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    public EntityInfo this[int id] => GetById(id);
+        for (int i = 0; i < token.Count; i++)
+        {
+            data[i] = FromToken(this.token[i]);
+        }
 
-    /// <summary>
-    /// Get an EntityInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    public EntityInfo this[string name] => GetByName(name);
+        return data;
+    }
+
+
+    private static EntityInfo FromToken(JToken token)
+    {
+        var id = (int)token.SelectToken("id")!;
+        var name = (string)token.SelectToken("name")!;
+        var displayName = (string)token.SelectToken("displayName")!;
+        var width = (float)token.SelectToken("width")!;
+        var height = (float)token.SelectToken("height")!;
+        var mobType = (string)token.SelectToken("type")!;
+        var category = (string)token.SelectToken("category")!;
+
+        return new EntityInfo(
+            id,
+            EntityTypeLookup.FromName(NameUtils.GetEntityName(name)),
+            name,
+            displayName,
+            width,
+            height,
+            MobTypeLookup.FromName(NameUtils.GetEntityName(mobType)),
+            EntityCategoryLookup.FromName(NameUtils.GetEntityName(category))
+        );
+    }
 }

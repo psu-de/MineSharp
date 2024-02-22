@@ -1,63 +1,87 @@
+using Humanizer;
+using MineSharp.Core.Common;
+using MineSharp.Core.Common.Biomes;
+using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Items;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Items;
 
-/// <summary>
-/// Provides static data about items.
-/// </summary>
-public class ItemProvider : DataProvider<ItemType, ItemInfo>
+internal class ItemProvider : IDataProvider<ItemInfo[]>
 {
-    private Dictionary<int, ItemInfo> IdToEnchantmentMap { get; }
-    private Dictionary<string, ItemInfo> NameToEnchantmentMap { get; }
+    private static readonly EnumNameLookup<ItemType> ItemTypeLookup = new();
+    private static readonly EnumNameLookup<EnchantmentCategory> EnchantmentCategoryLookup = new();
+
+    private readonly JArray token;
     
-    internal ItemProvider(DataVersion<ItemType, ItemInfo> version) : base(version)
+    public ItemProvider(JToken token)
     {
-        this.IdToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        this.NameToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
+        if (token.Type != JTokenType.Array)
+        {
+            throw new InvalidOperationException("Expected the token to be an array");
+        }
+        
+        this.token = (token as JArray)!;
     }
     
-    /// <summary>
-    /// Get an ItemInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public ItemInfo GetById(int id) => this.IdToEnchantmentMap[id];
-    
-    /// <summary>
-    /// Try to get an ItemInfo by id. Returns false if not found.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out ItemInfo? effect)
-        => this.IdToEnchantmentMap.TryGetValue(id, out effect);
-    
-    /// <summary>
-    /// Get an ItemInfo by name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public ItemInfo GetByName(string name) => this.NameToEnchantmentMap[name];
+    public ItemInfo[] GetData()
+    {
+        var length = token.Count;
+        var data = new ItemInfo[length];
 
-    /// <summary>
-    /// Try to get an ItemInfo by name. Returns false if not found.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out ItemInfo? effect)
-        => this.NameToEnchantmentMap.TryGetValue(name, out effect);
-    
-    /// <summary>
-    /// Get an ItemInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    public ItemInfo this[int id] => GetById(id);
+        for (int i = 0; i < length; i++)
+        {
+            data[i] = FromToken(token[i]!);
+        }
 
-    /// <summary>
-    /// Get an ItemInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    public ItemInfo this[string name] => GetByName(name);
+        return data;
+    }
+
+    private static ItemInfo FromToken(JToken dataToken)
+    {
+        var id = (int)dataToken.SelectToken("id")!;
+        var name = (string)dataToken.SelectToken("name")!;
+        var displayName = (string)dataToken.SelectToken("displayToken")!;
+        var stackSize = (int)dataToken.SelectToken("stackSize")!;
+        var durability = (int?)dataToken.SelectToken("maxDurability")!;
+        var enchantments = (JArray?)dataToken.SelectToken("enchantCategories");
+        var repairWith = (JArray?)dataToken.SelectToken("repairWith")!;
+
+        return new ItemInfo(
+            id,
+            ItemTypeLookup.FromName(NameUtils.GetItemName(name)),
+            name,
+            displayName,
+            stackSize,
+            durability,
+            GetEnchantments(enchantments),
+            GetRepairItems(repairWith)
+        );
+    }
+
+    private static EnchantmentCategory[] GetEnchantments(JArray? enchantments)
+    {
+        if (enchantments == null)
+            return Array.Empty<EnchantmentCategory>();
+
+        return enchantments
+            .ToObject<string[]>()!
+            .Select(NameUtils.GetEnchantmentName)
+            .Select(EnchantmentCategoryLookup.FromName)
+            .ToArray();
+    }
+
+    private static ItemType[] GetRepairItems(JArray? repairWith)
+    {
+        if (repairWith == null)
+            return Array.Empty<ItemType>();
+
+        return repairWith
+            .ToObject<string[]>()!
+            .Select(NameUtils.GetItemName)
+            .Select(ItemTypeLookup.FromName)
+            .ToArray();
+    }
 }

@@ -1,9 +1,9 @@
 using Humanizer;
 
-namespace MineSharp.SourceGenerator.Utils;
+namespace MineSharp.Data.Internal;
 
-// IMPORTANT: When changing anything here, it must be changed at MineSharp.Data/Internal/NameUtils.cs as well 
-public static class NameUtils
+// IMPORTANT: Must be the same code as MineSharp.SourceGenerator/Utils/NameUtils.cs
+internal static class NameUtils
 {
     private static string CommonGetName(string x)
         => x.Pascalize();

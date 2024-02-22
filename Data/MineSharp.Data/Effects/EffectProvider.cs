@@ -1,66 +1,50 @@
 using MineSharp.Core.Common.Effects;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Effects;
 
-/// <summary>
-/// Provides static data about effects
-/// Indexes EffectInfo's by id and name
-/// </summary>
-public class EffectProvider : DataProvider<EffectType, EffectInfo>
+internal class EffectProvider : IDataProvider<EffectInfo[]>
 {
-    
-    private Dictionary<int, EffectInfo> IdToEffectMap { get; }
-    private Dictionary<string, EffectInfo> NameToEffectMap { get; }
-    
-    internal EffectProvider(DataVersion<EffectType, EffectInfo> version) : base(version)
+    private static readonly EnumNameLookup<EffectType> EffectTypeLookup = new();
+
+    private JArray token;
+
+    public EffectProvider(JToken token)
     {
-        this.IdToEffectMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        this.NameToEffectMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
+        if (token.Type != JTokenType.Array)
+        {
+            throw new ArgumentException("Expected token to be an array");
+        }
+
+        this.token = (JArray)token;
     }
     
-    /// <summary>
-    /// Get a EffectInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public EffectInfo GetById(int id) => this.IdToEffectMap[id];
-    
-    /// <summary>
-    /// Try to get an EffectInfo by id. Returns false if not found.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out EffectInfo? effect)
-        => this.IdToEffectMap.TryGetValue(id, out effect);
-    
-    /// <summary>
-    /// Get an EffectInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public EffectInfo GetByName(string name) => this.NameToEffectMap[name];
+    public EffectInfo[] GetData()
+    {
+        var data = new EffectInfo[this.token.Count];
 
-    /// <summary>
-    /// Try to get an EffectInfo by name. Returns false if not found.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out EffectInfo? effect)
-        => this.NameToEffectMap.TryGetValue(name, out effect);
-    
+        for (int i = 0; i < token.Count; i++)
+        {
+            data[i] = FromToken(this.token[i]);
+        }
 
-    /// <summary>
-    /// Get an EffectInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    public EffectInfo this[int id] => GetById(id);
+        return data;
+    }
 
-    /// <summary>
-    /// Get an EffectInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    public EffectInfo this[string name] => GetByName(name);
+    private static EffectInfo FromToken(JToken token)
+    {
+        var id = (int)token.SelectToken("id")!;
+        var name = (string)token.SelectToken("name")!;
+        var displayName = (string)token.SelectToken("displayName")!;
+        var isGood = (string)token.SelectToken("type")! == "good";
+
+        return new EffectInfo(
+            id,
+            EffectTypeLookup.FromName(NameUtils.GetEffectName(name)),
+            name,
+            displayName,
+            isGood);
+    }
 }

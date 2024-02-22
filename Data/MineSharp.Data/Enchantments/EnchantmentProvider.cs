@@ -1,63 +1,89 @@
 using MineSharp.Core.Common.Enchantments;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Enchantments;
 
-/// <summary>
-/// Provides static data for enchantments
-/// </summary>
-public class EnchantmentProvider : DataProvider<EnchantmentType, EnchantmentInfo>
+internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
 {
-    private Dictionary<int, EnchantmentInfo> IdToEnchantmentMap { get; }
-    private Dictionary<string, EnchantmentInfo> NameToEnchantmentMap { get; }
+    private static readonly EnumNameLookup<EnchantmentType> EnchantmentTypeLookup = new();
+    private static readonly EnumNameLookup<EnchantmentCategory> EnchantmentCategoryLookup = new();
     
-    internal EnchantmentProvider(DataVersion<EnchantmentType, EnchantmentInfo> version) : base(version)
+    private JArray token;
+    
+    public EnchantmentProvider(JToken token)
     {
-        this.IdToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        this.NameToEnchantmentMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
+        if (token.Type != JTokenType.Array)
+        {
+            throw new ArgumentException("Expected token to be an array");
+        }
+
+        this.token = (JArray)token;
     }
     
-    /// <summary>
-    /// Get an EnchantmentInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public EnchantmentInfo GetById(int id) => this.IdToEnchantmentMap[id];
-    
-    /// <summary>
-    /// Try to get an EnchantmentInfo by id. Returns false if not found
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out EnchantmentInfo? effect)
-        => this.IdToEnchantmentMap.TryGetValue(id, out effect);
-    
-    /// <summary>
-    /// Get an EnchantmentInfo by name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public EnchantmentInfo GetByName(string name) => this.NameToEnchantmentMap[name];
+    public EnchantmentInfo[] GetData()
+    {
+        var data = new EnchantmentInfo[this.token.Count];
 
-    /// <summary>
-    /// Try to get an EnchantmentInfo by name. Returns false if not found
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="effect"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out EnchantmentInfo? effect)
-        => this.NameToEnchantmentMap.TryGetValue(name, out effect);
-    
-    /// <summary>
-    /// Get an EnchantmentInfo by id
-    /// </summary>
-    /// <param name="id"></param>
-    public EnchantmentInfo this[int id] => GetById(id);
+        for (int i = 0; i < this.token.Count; i++)
+        {
+            data[i] = FromToken(this.token[i]);
+        }
 
-    /// <summary>
-    /// Get an EnchantmentInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    public EnchantmentInfo this[string name] => GetByName(name);
+        return data;
+    }
+
+    private static EnchantmentInfo FromToken(JToken token)
+    {
+        var id = (int)token.SelectToken("id")!;
+        var name = (string)token.SelectToken("name")!;
+        var displayName = (string)token.SelectToken("displayName")!;
+        var maxLevel = (int)token.SelectToken("maxLevel")!;
+        var minCost = (JObject)token.SelectToken("minCost")!;
+        var maxCost = (JObject)token.SelectToken("maxCost")!;
+        var treasureOnly = (bool)token.SelectToken("treasureOnly")!;
+        var curse = (bool)token.SelectToken("curse")!;
+        var exclude = (JArray)token.SelectToken("exclude")!;
+        var category = (string)token.SelectToken("category")!;
+        var weight = (int)token.SelectToken("weight")!;
+        var tradeable = (bool)token.SelectToken("tradeable")!;
+        var discoverable = (bool)token.SelectToken("discoverable")!;
+
+        return new EnchantmentInfo(
+            id,
+            EnchantmentTypeLookup.FromName(NameUtils.GetEnchantmentName(name)),
+            name,
+            displayName,
+            maxLevel,
+            GetEnchantmentCost(minCost),
+            GetEnchantmentCost(maxCost),
+            treasureOnly,
+            curse,
+            GetExclusions(exclude),
+            EnchantmentCategoryLookup.FromName(NameUtils.GetEnchantmentName(category)),
+            weight,
+            tradeable,
+            discoverable);
+    }
+
+    private static EnchantCost GetEnchantmentCost(JObject obj)
+    {
+        var a = (int)obj.SelectToken("a")!;
+        var b = (int)obj.SelectToken("b")!;
+
+        return new EnchantCost(a, b);
+    }
+
+    private static EnchantmentType[] GetExclusions(JArray array)
+    {
+        if (array.Count == 0)
+            return Array.Empty<EnchantmentType>();
+
+        return array
+            .ToObject<string[]>()!
+            .Select(NameUtils.GetEnchantmentName)
+            .Select(EnchantmentTypeLookup.FromName)
+            .ToArray();
+    }
 }

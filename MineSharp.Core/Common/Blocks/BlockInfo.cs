@@ -13,12 +13,10 @@ namespace MineSharp.Core.Common.Blocks;
 /// <param name="resistance"></param>
 /// <param name="minState"></param>
 /// <param name="maxState"></param>
-/// <param name="diggable"></param>
+/// <param name="unbreakable"></param>
 /// <param name="transparent"></param>
 /// <param name="filterLight"></param>
 /// <param name="emitLight"></param>
-/// <param name="boundingBox"></param>
-/// <param name="stackSize"></param>
 /// <param name="materials"></param>
 /// <param name="harvestTools"></param>
 /// <param name="defaultState"></param>
@@ -32,90 +30,79 @@ public class BlockInfo(
     float resistance,
     int minState,
     int maxState,
-    bool diggable,
+    bool unbreakable,
     bool transparent,
     byte filterLight,
     byte emitLight,
-    string boundingBox,
-    int stackSize,
     Material[] materials,
-    ItemType[]? harvestTools,
+    ItemType[] harvestTools,
     int defaultState,
     BlockState state)
 {
     /// <summary>
     /// The numerical id of this block (depends on Minecraft version)
     /// </summary>
-    public readonly int Id = id;
+    public int Id { get; } = id;
     /// <summary>
     /// The internal <see cref="BlockType"/> of this block (independent from Minecraft version)
     /// </summary>
-    public readonly BlockType Type = type;
+    public BlockType Type { get; } = type;
     /// <summary>
     /// The text id of this block
     /// </summary>
-    public readonly string Name = name;
+    public string Name { get; } = name;
     /// <summary>
     /// Minecraft's display name for this block
     /// </summary>
-    public readonly string DisplayName = displayName;
+    public string DisplayName { get; } = displayName;
     /// <summary>
     /// Hardness value of the block
     /// </summary>
-    public readonly float Hardness = hardness;
+    public float Hardness { get; } = hardness;
     /// <summary>
     /// Resistance value of this block
     /// </summary>
-    public readonly float Resistance = resistance;
+    public float Resistance { get; } = resistance;
     /// <summary>
     /// The smallest block state possible.
     /// </summary>
-    public readonly int MinState = minState;
+    public int MinState { get; } = minState;
     /// <summary>
     /// The highest block state possible.
     /// </summary>
-    public readonly int MaxState = maxState;
+    public int MaxState { get; } = maxState;
     /// <summary>
-    /// Whether this block is diggable
+    /// Whether this block is unbreakable
     /// </summary>
-    public readonly bool Diggable = diggable;
+    public bool Unbreakable { get; } = unbreakable;
     /// <summary>
     /// Whether this block is transparent
     /// </summary>
-    public readonly bool Transparent = transparent;
+    public bool Transparent { get; } = transparent;
     /// <summary>
     /// How much light this block filters (0-15)
     /// </summary>
-    public readonly byte FilterLight = filterLight;
+    public byte FilterLight { get; } = filterLight;
     /// <summary>
     /// How much light this block is emitting (0-15)
     /// </summary>
-    public readonly byte EmitLight = emitLight;
-    /// <summary>
-    /// Name of the bounding box used for this block (either 'block' or 'empty')
-    /// </summary>
-    public readonly string BoundingBox = boundingBox;
-    /// <summary>
-    /// The stack size of this block
-    /// </summary>
-    /// Todo: this is from minecraft-data, but it should probably not be in the block descriptor because the item descriptor has the stack size
-    public readonly int StackSize = stackSize;
+    public byte EmitLight { get; } = emitLight;
     /// <summary>
     /// An array of Materials which can be used to destroy this block faster
     /// </summary>
-    public readonly Material[] Materials = materials;
+    public Material[] Materials { get; } = materials;
     /// <summary>
     /// An array of Items that can be used to harvest this block
     /// </summary>
-    public readonly ItemType[]? HarvestTools = harvestTools;
+    public ItemType[] HarvestTools { get; } = harvestTools;
     /// <summary>
     /// The default state of this block
     /// </summary>
-    public readonly int DefaultState = defaultState;
+    public int DefaultState { get; } = defaultState;
     /// <summary>
     /// The block state containing all properties of this block
     /// </summary>
-    public readonly BlockState State = state;
+    public BlockState State { get; } = state;
 
     /// <summary>
     /// Whether this block is considered solid.
