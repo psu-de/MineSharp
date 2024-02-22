@@ -11,6 +11,11 @@ public interface ITypeIdNameIndexedData<in TEnum, out TInfo>
     where TInfo : class 
 {
     /// <summary>
+    /// The number of data entries
+    /// </summary>
+    public int Count { get; }
+    
+    /// <summary>
     /// Get <typeparamref name="TInfo"/> by type
     /// </summary>
     /// <param name="type"></param>

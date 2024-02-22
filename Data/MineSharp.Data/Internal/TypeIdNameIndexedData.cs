@@ -9,12 +9,16 @@ internal class TypeIdNameIndexedData<TEnum, TInfo>(IDataProvider<TInfo[]> provid
     where TEnum : struct, Enum
     where TInfo : class
 {
+    public int Count { get; private set; } = -1;
+
     private readonly Dictionary<TEnum, TInfo> typeToInfo = new();
     private readonly Dictionary<int, TInfo> idToInfo = new();
     private readonly Dictionary<string, TInfo> nameToInfo = new();
     
     protected override void InitializeData(TInfo[] data)
     {
+        this.Count = data.Length;
+        
         var tInfo = typeof(TInfo);
         var idField = tInfo.GetProperty("Id")!;
         var typeField = tInfo.GetProperty("Type")!;

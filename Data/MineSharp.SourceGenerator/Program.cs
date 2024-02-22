@@ -6,37 +6,21 @@ AnsiConsole.Write(new FigletText("SourceGenerator").Color(Color.Aqua));
 
 var data = new MinecraftDataWrapper(DirectoryUtils.GetMinecraftDataDirectory());
 
-var generators = new IGenerator[] {
-    new BiomeGenerator(),
-    new BlockGenerator(),
-    new BlockCollisionShapesGenerator(),
-    new EffectGenerator(),
-    new EnchantmentGenerator(),
-    new EntityGenerator(),
-    new ItemGenerator(),
-    new ProtocolGenerator(),
-    new MaterialGenerator(),
-    new RecipeGenerator(),
-    new LanguageGenerator(),
-    
-    VersionMapGenerator.GetInstance()
+var generators = new [] {
+    new BiomeGenerator().Run(data),
+    new BlockGenerator().Run(data),
+    new EffectGenerator().Run(data),
+    new EnchantmentGenerator().Run(data),
+    new EntityGenerator().Run(data),
+    new ItemGenerator().Run(data),
+    new ProtocolGenerator().Run(data)
 };
 
-if (Directory.Exists(DirectoryUtils.GetDataSourceDirectory()))
-    Directory.Delete(DirectoryUtils.GetDataSourceDirectory(), true);
+if (Directory.Exists(DirectoryUtils.GetSourceDirectory()))
+    Directory.Delete(DirectoryUtils.GetSourceDirectory(), true);
 
-if (Directory.Exists(DirectoryUtils.GetCoreSourceDirectory()))
-    Directory.Delete(DirectoryUtils.GetCoreSourceDirectory(), true);
+await Task.WhenAll(generators);
 
-foreach (var generator in generators)
-{
-    await AnsiConsole.Status()
-        .StartAsync($" Generating {generator.Name}...", async ctx =>
-        {
-            await generator.Run(data);
-            AnsiConsole.MarkupLine($" ✅ Generated {generator.Name}");
-        });
-}
 
 void RecursiveCopy(string source, string target)
 {
@@ -51,5 +35,4 @@ void RecursiveCopy(string source, string target)
     }
 }
 
-RecursiveCopy(DirectoryUtils.GetDataSourceDirectory(), DirectoryUtils.GetMineSharpDataProjectDirectory());
-RecursiveCopy(DirectoryUtils.GetCoreSourceDirectory(), DirectoryUtils.GetMineSharpCoreProjectDirectory());
+RecursiveCopy(DirectoryUtils.GetSourceDirectory(), DirectoryUtils.GetMineSharpCoreProjectDirectory());

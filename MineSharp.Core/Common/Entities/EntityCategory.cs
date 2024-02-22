@@ -8,8 +8,8 @@ namespace MineSharp.Core.Common.Entities;
 
 public enum EntityCategory
 {
-    PassiveMobs = 0,
-    Unknown = 1,
+    Unknown = 0,
+    PassiveMobs = 1,
     Immobile = 2,
     Projectiles = 3,
     HostileMobs = 4,

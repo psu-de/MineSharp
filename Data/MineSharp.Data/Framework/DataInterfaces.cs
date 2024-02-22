@@ -20,7 +20,20 @@ public interface IBiomeData : ITypeIdNameIndexedData<BiomeType, BiomeInfo>;
 /// <summary>
 /// Interface for implementing indexed block data
 /// </summary>
-public interface IBlockData : ITypeIdNameIndexedData<BlockType, BlockInfo>;
+public interface IBlockData : ITypeIdNameIndexedData<BlockType, BlockInfo>
+{
+    /// <summary>
+    /// The total number of block states
+    /// </summary>
+    public int TotalBlockStateCount { get; }
+
+    /// <summary>
+    /// Get a block info by state
+    /// </summary>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    public BlockInfo? ByState(int state);
+}
 
 /// <summary>
 /// Interface for implementing indexed effect data
@@ -70,7 +83,7 @@ public interface IBlockCollisionShapeData
     public AABB[] GetShapes(BlockType type, int index)
     {
         var indices = GetShapeIndices(type);
-        var entry = indices.Length > 0 ? indices[index] : indices[0];
+        var entry = indices.Length > 1 ? indices[index] : indices[0];
         return GetShapes(entry);
     }
 
@@ -80,7 +93,7 @@ public interface IBlockCollisionShapeData
     /// <param name="block"></param>
     /// <returns></returns>
     public AABB[] GetForBlock(Block block)
-        => GetShapes(block.Info.Type, block.State);
+        => GetShapes(block.Info.Type, block.Metadata);
 }
 
 /// <summary>
@@ -93,7 +106,7 @@ public interface ILanguageData
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public string GetTranslation(string name);
+    public string? GetTranslation(string name);
 }
 
 /// <summary>
@@ -129,7 +142,7 @@ public interface IProtocolData
     /// <param name="state"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public PacketType FromPacketType(PacketFlow flow, GameState state, int id);
+    public PacketType GetPacketType(PacketFlow flow, GameState state, int id);
 }
 
 /// <summary>
@@ -150,6 +163,11 @@ public interface IRecipeData
 /// </summary>
 public interface IWindowData
 {
+    /// <summary>
+    /// A list of blocks that can be opened
+    /// </summary>
+    public IList<BlockType> AllowedBlocksToOpen { get; }
+
     /// <summary>
     /// Get a window info by id
     /// </summary>

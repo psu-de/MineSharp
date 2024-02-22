@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.BlockCollisionShapes;
 
-internal class BlockCollisionShapesProvider(JToken token, IBlockData blocks) : IDataProvider<BlockCollisionShapeDataBlob>
+internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockCollisionShapeDataBlob>
 {
     private static readonly EnumNameLookup<BlockType> BlockTypeLookup = new();
     

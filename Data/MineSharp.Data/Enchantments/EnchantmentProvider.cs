@@ -61,7 +61,7 @@ internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
             treasureOnly,
             curse,
             GetExclusions(exclude),
-            EnchantmentCategoryLookup.FromName(NameUtils.GetEnchantmentName(category)),
+            EnchantmentCategoryLookup.FromName(NameUtils.GetEnchantmentCategory(category)),
             weight,
             tradeable,
             discoverable);

@@ -33,11 +33,11 @@ internal class ChunkSection_1_18 : IChunkSection
     public void SetBlockAt(int state, Position position)
     {
         var index = GetBlockIndex(position);
-        var old = this._data.Blocks.GetByState( 
-            this._blockContainer.GetAt(index));
+        var old = this._data.Blocks.ByState( 
+            this._blockContainer.GetAt(index))!;
 
         bool wasSolid = old.IsSolid();
-        bool isSolid = this._data.Blocks.GetByState(state).IsSolid();
+        bool isSolid = this._data.Blocks.ByState(state)!.IsSolid();
 
         if (wasSolid != isSolid)
         {
@@ -54,7 +54,7 @@ internal class ChunkSection_1_18 : IChunkSection
     {
         var index = GetBiomeIndex(position);
         var state = this._biomeContainer.GetAt(index);
-        return new Biome(this._data.Biomes.GetById(state));
+        return new Biome(this._data.Biomes.ById(state)!);
     }
     
     public void SetBiomeAt(Position position, Biome biome)
@@ -65,7 +65,7 @@ internal class ChunkSection_1_18 : IChunkSection
 
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
-        var info = this._data.Blocks.GetByType(type);
+        var info = this._data.Blocks.ByType(type)!;
         if (!this._blockContainer.Palette.ContainsState(info.MinState, info.MaxState) || maxCount == 0)
         {
             yield break;

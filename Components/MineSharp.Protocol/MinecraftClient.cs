@@ -60,7 +60,7 @@ public sealed class MinecraftClient : IDisposable
     private IPacketHandler _internalPacketHandler;
     private MinecraftStream? _stream;
     private Task? _streamLoop;
-    public IPAddress ip;
+    private IPAddress ip;
 
     /// <summary>
     /// Fires whenever the client received a known Packet
@@ -342,7 +342,7 @@ public sealed class MinecraftClient : IDisposable
         {
             var buffer = this._stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
-            var packetType = this.Data.Protocol.FromPacketId(PacketFlow.Clientbound, this.gameState, packetId);
+            var packetType = this.Data.Protocol.GetPacketType(PacketFlow.Clientbound, this.gameState, packetId);
 
             if (this._bundlePackets)
                 this._bundledPackets.Enqueue((packetType, buffer));
@@ -491,7 +491,7 @@ public sealed class MinecraftClient : IDisposable
         int timeout = 10000,
         ITcpClientFactory? tcpFactory = null)
     {
-        var latest = MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
+        var latest = await MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
         var client = new MinecraftClient(
             latest,
             Session.OfflineSession("RequestStatus"),
@@ -536,10 +536,10 @@ public sealed class MinecraftClient : IDisposable
     /// <param name="hostname"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public static Task<MinecraftData> AutodetectServerVersion(string hostname, ushort port)
+    public static async Task<MinecraftData> AutodetectServerVersion(string hostname, ushort port)
     {
-        return RequestServerStatus(hostname, port)
-            .ContinueWith(
-                prev => MinecraftData.FromVersion(prev.Result.Version));
+        var status = await RequestServerStatus(hostname, port);
+        
+        return await MinecraftData.FromVersion(status.Version);
     }
 }

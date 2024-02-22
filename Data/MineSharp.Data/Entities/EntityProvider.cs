@@ -55,7 +55,7 @@ internal class EntityProvider : IDataProvider<EntityInfo[]>
             width,
             height,
             MobTypeLookup.FromName(NameUtils.GetEntityName(mobType)),
-            EntityCategoryLookup.FromName(NameUtils.GetEntityName(category))
+            EntityCategoryLookup.FromName(NameUtils.GetEntityCategory(category))
         );
     }
 }

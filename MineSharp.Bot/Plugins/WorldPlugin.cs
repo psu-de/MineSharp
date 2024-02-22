@@ -110,7 +110,7 @@ public class WorldPlugin : Plugin
         
         await this.WaitForChunks();
         
-        if (!block.Info.Diggable)
+        if (block.Info.Unbreakable)
             return MineBlockStatus.NotDiggable;
 
         if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo(block.Position))
@@ -233,7 +233,7 @@ public class WorldPlugin : Plugin
         if (heldItem != null)
         {
             toolMultiplier = block.Info.Materials
-                .Select(x => this.Bot.Data.Materials.GetToolMultiplier(x, heldItem.Info.Type))
+                .Select(x => this.Bot.Data.Materials.GetMultiplier(x, heldItem.Info.Type))
                 .Max();
         }
             
@@ -286,7 +286,7 @@ public class WorldPlugin : Plugin
         if (!this.IsEnabled)
             return Task.CompletedTask;
         
-        var blockInfo = this.Bot.Data.Blocks.GetByState(packet.StateId);
+        var blockInfo = this.Bot.Data.Blocks.ByState(packet.StateId)!;
         var block = new Block(blockInfo, packet.StateId, packet.Location);
 
         this.World!.SetBlock(block);
