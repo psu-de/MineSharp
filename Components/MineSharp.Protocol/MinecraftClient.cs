@@ -60,7 +60,7 @@ public sealed class MinecraftClient : IDisposable
     private IPacketHandler _internalPacketHandler;
     private MinecraftStream? _stream;
     private Task? _streamLoop;
-    public IPAddress ip;
+    private IPAddress ip;
 
     /// <summary>
     /// Fires whenever the client received a known Packet

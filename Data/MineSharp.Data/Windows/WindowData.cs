@@ -44,9 +44,8 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
         BlockType.Loom,
         BlockType.Stonecutter
     };
-    
-    private IDataProvider<WindowInfo[]> provider;
-    private IDictionary<string, WindowInfo> windowMap;
+
+    private Dictionary<string, WindowInfo> windowMap = new();
 
 
     /// <summary>

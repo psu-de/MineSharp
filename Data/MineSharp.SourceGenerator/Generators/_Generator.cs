@@ -26,7 +26,7 @@ public class Generator(string dataKey, Func<JToken, string> selector, string cla
             ClassName = className,
             Namespace = $"MineSharp.Core.Common.{ns}",
             Outfile = Path.Join(outDir, className + ".cs"),
-            Entries = set.ToDictionary(x => x, x => counter++)
+            Entries = set.ToDictionary(x => x, _ => counter++)
         }.Write();
     }
 }

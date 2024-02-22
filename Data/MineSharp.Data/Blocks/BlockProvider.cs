@@ -95,7 +95,7 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
             .Select(x => x.Name)
             .Select(x => Convert.ToInt32(x))
             .Select(items.ById)
-            .Select(x => x.Type)
+            .Select(x => x!.Type)
             .ToArray();
     }
 
@@ -120,7 +120,8 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
         return type switch {
             "bool" => new BoolProperty(name),
             "int" => new IntProperty(name, numValues),
-            "enum" => new EnumProperty(name, obj.SelectToken("values")!.ToObject<string[]>()!)
+            "enum" => new EnumProperty(name, obj.SelectToken("values")!.ToObject<string[]>()!),
+            _ => throw new NotSupportedException($"Property of type '{type}' is not supported.")
         };
     }
 }

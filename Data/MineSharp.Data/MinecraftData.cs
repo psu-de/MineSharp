@@ -20,7 +20,7 @@ namespace MineSharp.Data;
 /// <summary>
 /// Provides static data about a Minecraft version.
 /// </summary>
-public class MinecraftData : IMinecraftData
+public class MinecraftData
 {
     private static readonly MinecraftDataRepository MinecraftDataRepository =
         new (
@@ -160,7 +160,7 @@ public class MinecraftData : IMinecraftData
         var biomes = new BiomeData(new BiomeProvider(biomeToken));
         var items = new ItemData(new ItemProvider(itemsToken));
         var blocks = new BlockData(new BlockProvider(blocksToken, items));
-        var shapes = new BlockCollisionShapeData(new BlockCollisionShapesProvider(shapesToken, blocks));
+        var shapes = new BlockCollisionShapeData(new BlockCollisionShapesProvider(shapesToken));
         var effects = new EffectData(new EffectProvider(effectsToken));
         var enchantments = new EnchantmentData(new EnchantmentProvider(enchantmentsToken));
         var entities = new EntityData(new EntityProvider(entitiesToken));
