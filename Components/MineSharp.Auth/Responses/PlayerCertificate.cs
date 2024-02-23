@@ -89,8 +89,8 @@ public class PlayerCertificate : ICachedResponse<PlayerCertificate>
                 DecodeKey(blob.KeyPair.PublicKey)),
             Convert.FromBase64String(blob.PublicKeySignature),
             Convert.FromBase64String(blob.PublicKeySignatureV2),
-            DateTime.ParseExact(blob.ExpiresAt, DATE_FORMAT, CultureInfo.InvariantCulture).ToUniversalTime(),
-            DateTime.ParseExact(blob.RefreshedAfter, DATE_FORMAT, CultureInfo.InvariantCulture).ToUniversalTime());
+            DateTime.Parse(blob.ExpiresAt).ToUniversalTime(),
+            DateTime.Parse(blob.RefreshedAfter).ToUniversalTime());
     }
 
     /// <summary>
