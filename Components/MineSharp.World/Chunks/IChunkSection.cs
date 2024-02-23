@@ -22,8 +22,8 @@ public interface IChunkSection
     /// <param name="position"></param>
     /// <returns></returns>
     public int GetBlockAt(Position position);
-    
-    
+
+
     /// <summary>
     /// Set the block state at the given position.
     /// </summary>
@@ -37,7 +37,7 @@ public interface IChunkSection
     /// <param name="position">Position must be relative to the chunk section</param>
     /// <returns></returns>
     public Biome GetBiomeAt(Position position);
-    
+
     /// <summary>
     /// Set the biome at the given position
     /// </summary>
@@ -53,7 +53,7 @@ public interface IChunkSection
     /// <returns></returns>
     [Obsolete]
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
-    
+
     /// <summary>
     /// Search through the chunk section for the given block type and return the first block.
     /// </summary>

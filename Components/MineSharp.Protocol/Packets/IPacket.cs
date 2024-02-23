@@ -13,7 +13,7 @@ public interface IPacket
     /// The corresponding <see cref="PacketType"/>
     /// </summary>
     public PacketType Type { get; }
-    
+
     /// <summary>
     /// Serialize the packet data into the buffer.
     /// </summary>

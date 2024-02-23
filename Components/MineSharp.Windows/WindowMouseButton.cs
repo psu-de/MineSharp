@@ -9,12 +9,12 @@ public enum WindowMouseButton
     /// The left mouse button
     /// </summary>
     MouseLeft = 0,
-    
+
     /// <summary>
     /// The right mouse button
     /// </summary>
     MouseRight = 1,
-    
+
     /// <summary>
     /// The middle mouse button
     /// </summary>

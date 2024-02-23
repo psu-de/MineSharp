@@ -11,12 +11,12 @@ public class KeepAlivePacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_KeepAlive;
-    
+
     /// <summary>
     /// The keep alive id
     /// </summary>
     public long KeepAliveId { get; set; }
-    
+
     /// <summary>
     /// Create a new instance
     /// </summary>
@@ -25,7 +25,7 @@ public class KeepAlivePacket : IPacket
     {
         this.KeepAliveId = keepAliveId;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

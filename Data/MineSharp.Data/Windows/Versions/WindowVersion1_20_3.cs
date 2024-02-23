@@ -1,9 +1,11 @@
+using MineSharp.Data.Framework.Providers;
+
 namespace MineSharp.Data.Windows.Versions;
 
-internal class WindowVersion1_20_3 : WindowVersion
+internal class WindowVersion1_20_3 : IDataProvider<WindowInfo[]>
 {
-
-    public override WindowInfo[] Windows { get; } = [
+    private static readonly WindowInfo[] Windows =
+    [
         new WindowInfo("minecraft:generic_9x1", "", 9),
         new WindowInfo("minecraft:generic_9x2", "", 18),
         new WindowInfo("minecraft:generic_9x3", "", 27),
@@ -30,4 +32,9 @@ internal class WindowVersion1_20_3 : WindowVersion
         new WindowInfo("minecraft:cartography", "Cartography Table", 3),
         new WindowInfo("minecraft:stonecutter", "Stonecutter", 2),
     ];
+
+    public WindowInfo[] GetData()
+    {
+        return Windows;
+    }
 }

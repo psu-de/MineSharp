@@ -9,18 +9,18 @@ public class DisguisedChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_ProfilelessChat;
 
-    public string Message { get; set; }
-    public int ChatType { get; set; }
-    public string Name { get; set; }
-    public string? Target { get; set; }
+    public string  Message  { get; set; }
+    public int     ChatType { get; set; }
+    public string  Name     { get; set; }
+    public string? Target   { get; set; }
 
 
     public DisguisedChatMessagePacket(string message, int chatType, string name, string? target)
     {
-        this.Message = message;
+        this.Message  = message;
         this.ChatType = chatType;
-        this.Name = name;
-        this.Target = target;
+        this.Name     = name;
+        this.Target   = target;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -30,6 +30,7 @@ public class DisguisedChatMessagePacket : IPacket
             WriteV1_20_3(buffer, version);
             return;
         }
+
         buffer.WriteString(this.Message);
         buffer.WriteVarInt(this.ChatType);
         buffer.WriteString(this.Name);
@@ -46,12 +47,12 @@ public class DisguisedChatMessagePacket : IPacket
         if (this.Target != null)
             buffer.WriteNbt(new NbtString(this.Target));
     }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol >= ProtocolVersion.V_1_20_3)
             return ReadV1_20_3(buffer, version);
-        
+
         return new DisguisedChatMessagePacket(
             buffer.ReadString(),
             buffer.ReadVarInt(),

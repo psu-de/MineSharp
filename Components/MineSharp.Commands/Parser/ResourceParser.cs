@@ -10,6 +10,6 @@ public class ResourceParser : IParser
     }
 
 
-    public string GetName() => "minecraft:resource";
-    public int GetArgumentCount() => 1;
+    public string GetName()          => "minecraft:resource";
+    public int    GetArgumentCount() => 1;
 }

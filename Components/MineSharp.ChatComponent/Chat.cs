@@ -9,7 +9,7 @@ namespace MineSharp.ChatComponent;
 /*
  * Thanks to Minecraft-Console-Client
  * https://github.com/MCCTeam/Minecraft-Console-Client
- * 
+ *
  * This Class uses a lot of code from Protocol/Message/ChatParser.cs from MCC.
  */
 
@@ -22,20 +22,20 @@ public class Chat
     /// The raw Json message
     /// </summary>
     public string Json { get; }
-    
+
     /// <summary>
     /// The message without any styling
     /// </summary>
     public string Message { get; private set; }
-    
+
     /// <summary>
     /// The styled message containing style codes
     /// </summary>
     public string StyledMessage { get; private set; }
-    
+
 
     private readonly MinecraftData data;
-    
+
     /// <summary>
     /// Create a new ChatComponent
     /// </summary>
@@ -49,37 +49,38 @@ public class Chat
         try
         {
             this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
-            this.Message = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
+            this.Message       = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
         }
         catch (JsonReaderException)
         {
             this.StyledMessage = this.Json;
-            this.Message = this.StyledMessage;
+            this.Message       = this.StyledMessage;
         }
     }
 
     private string ParseComponent(JToken token, string styleCode = "")
     {
-        return token.Type switch {
-            JTokenType.Array => ParseArray((JArray)token, styleCode),
-            JTokenType.Object => ParseObject((JObject)token, styleCode),
-            JTokenType.String => (string)token!,
+        return token.Type switch
+        {
+            JTokenType.Array   => ParseArray((JArray)token, styleCode),
+            JTokenType.Object  => ParseObject((JObject)token, styleCode),
+            JTokenType.String  => (string)token!,
             JTokenType.Integer => (string)token!,
-            _ => throw new Exception($"Type {token.Type} is not supported")
+            _                  => throw new Exception($"Type {token.Type} is not supported")
         };
     }
 
     private string ParseObject(JObject jObject, string styleCode = "")
     {
         var sb = new StringBuilder();
-        
+
         var colorProp = jObject.GetValue("color");
         if (colorProp != null)
         {
             var color = ParseComponent(colorProp);
             var style = TextStyle.GetTextStyle(color);
-            styleCode = style != null 
-                ? style.ToString() 
+            styleCode = style != null
+                ? style.ToString()
                 : string.Empty;
         }
 
@@ -92,7 +93,7 @@ public class Chat
                 sb.Append(this.ParseComponent(item, styleCode) + "§r");
         }
 
-        var textProp = jObject.GetValue("text");
+        var textProp      = jObject.GetValue("text");
         var translateProp = jObject.GetValue("translate");
 
         if (textProp != null)
@@ -100,13 +101,13 @@ public class Chat
             return styleCode + ParseComponent(textProp, styleCode) + sb.ToString();
         }
 
-        if (translateProp == null) 
+        if (translateProp == null)
             return sb.ToString();
-        
+
         var usingData = new List<string>();
 
         var usingProp = jObject.GetValue("using");
-        var withProp = jObject.GetValue("with");
+        var withProp  = jObject.GetValue("with");
         if (usingProp != null && withProp == null)
             withProp = usingProp;
 
@@ -118,7 +119,7 @@ public class Chat
                 usingData.Add(this.ParseComponent(array[i], styleCode));
             }
         }
-            
+
         var ruleName = this.ParseComponent(translateProp);
         return styleCode + TranslateString(ruleName, usingData.ToArray(), this.data)
                          + sb.ToString();
@@ -131,9 +132,10 @@ public class Chat
         {
             sb.Append(ParseComponent(token, styleCode));
         }
+
         return sb.ToString();
     }
-    
+
     /// <summary>
     /// Translate a string using the given rule and format strings.
     /// </summary>
@@ -145,8 +147,8 @@ public class Chat
     {
         var rule = data.Language.GetTranslation(ruleName);
 
-        var usingIndex = 0;
-        string result = Regex.Replace(rule, "%s", match => usings[usingIndex++]);
+        var    usingIndex = 0;
+        string result     = Regex.Replace(rule, "%s", match => usings[usingIndex++]);
         result = Regex.Replace(result, "%(\\d)\\$s", match =>
         {
             var idx = match.Groups[1].Value[0] - '1';

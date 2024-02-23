@@ -16,16 +16,16 @@ public static class WorldTests
         await TestMineBlock();
         await TestMultiBlockUpdate();
     }
-    
+
     public static Task TestBlockUpdate()
     {
         return IntegrationTest.RunTest("testBlockUpdate", async (bot, source) =>
         {
             var world = bot.GetPlugin<WorldPlugin>();
-            var chat = bot.GetPlugin<ChatPlugin>();
+            var chat  = bot.GetPlugin<ChatPlugin>();
             await world.WaitForInitialization();
             await chat.WaitForInitialization();
-        
+
             var expectedPosition = new Position(-9, -61, 22);
 
             world.World!.OnBlockUpdated += (sender, block) =>
@@ -48,13 +48,13 @@ public static class WorldTests
             var relative = new Position(-9, -61, 21);
             var expectedBlocks = new List<ulong>(
                 Enumerable.Range(0, 8)
-                .Select(x => new Position(relative.X - x, relative.Y, relative.Z))
-                .Select(x => x.ToULong()));
+                          .Select(x => new Position(relative.X - x, relative.Y, relative.Z))
+                          .Select(x => x.ToULong()));
 
             bot.GetPlugin<WorldPlugin>().World.OnBlockUpdated += (sender, block) =>
             {
                 expectedBlocks.Remove(block.Position.ToULong());
-                
+
                 if (expectedBlocks.Count == 0)
                     source.TrySetResult(true);
             };
@@ -69,7 +69,7 @@ public static class WorldTests
 
             var position = new Position(-8, -59, 20);
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
-            
+
             bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
                 if (chat.Message.Contains("testMineBlock success"))
@@ -77,9 +77,9 @@ public static class WorldTests
                     source.TrySetResult(true);
                 }
             };
-            
+
             await Task.Delay(1000);
-            
+
             var result = await bot.GetPlugin<WorldPlugin>().MineBlock(
                 bot.GetPlugin<WorldPlugin>().World!.GetBlockAt(position));
 
@@ -98,7 +98,7 @@ public static class WorldTests
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
             await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
             await bot.GetPlugin<ChatPlugin>().SendChat("/give @p dirt");
-            
+
             bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
                 if (chat.Message.Contains("testPlaceBlock success"))
@@ -106,7 +106,7 @@ public static class WorldTests
                     source.TrySetResult(true);
                 }
             };
-            
+
             await Task.Delay(1000);
             await bot.GetPlugin<WorldPlugin>().PlaceBlock(position);
         });

@@ -1,29 +1,52 @@
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
+using MineSharp.Data.Framework;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Materials;
 
-/// <summary>
-/// Provides information about materials.
-/// </summary>
-public class MaterialsProvider
+internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
 {
-    private readonly MaterialVersion _version;
+    private static readonly EnumNameLookup<Material> MaterialLookup = new();
 
-    internal MaterialsProvider(MaterialVersion version)
+    private JObject   token;
+    private IItemData items;
+
+    public MaterialsProvider(JToken token, IItemData items)
     {
-        this._version = version;
+        if (token.Type != JTokenType.Object)
+        {
+            throw new ArgumentException("Expected token to be an object");
+        }
+
+        this.token = (JObject)token;
+        this.items = items;
     }
 
-    /// <summary>
-    /// Gets a multiplier for a given material and item type.
-    /// </summary>
-    /// <param name="material"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    public float GetToolMultiplier(Material material, ItemType type)
+    public MaterialDataBlob GetData()
     {
-        var mat = this._version.Palette[material];
-        return mat.GetValueOrDefault(type, 1.0f);
+        var data = new Dictionary<Material, Dictionary<ItemType, float>>();
+
+        foreach (var property in token.Properties())
+        {
+            if (property.Name.Contains(';'))
+                continue;
+
+            var material    = MaterialLookup.FromName(NameUtils.GetMaterial(property.Name));
+            var multipliers = CollectItemMultipliers((JObject)property.Value);
+            data.Add(material, multipliers);
+        }
+
+        return new MaterialDataBlob(data);
+    }
+
+    private Dictionary<ItemType, float> CollectItemMultipliers(JObject obj)
+    {
+        return obj.Properties()
+                  .ToDictionary(
+                       x => this.items.ById(Convert.ToInt32(x.Name))!.Type,
+                       x => (float)x.Value);
     }
 }

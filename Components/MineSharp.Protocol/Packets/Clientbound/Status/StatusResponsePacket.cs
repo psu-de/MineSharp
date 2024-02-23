@@ -14,10 +14,10 @@ public class StatusResponsePacket : IPacket
     {
         this.Response = response;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Response);            
+        buffer.WriteString(this.Response);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

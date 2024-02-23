@@ -16,12 +16,12 @@ public class CombatDeathPacket : IPacket
     /// Id of the player
     /// </summary>
     public int PlayerId { get; set; }
-    
+
     /// <summary>
     /// Id of the entity
     /// </summary>
     public int? EntityId { get; set; }
-    
+
     /// <summary>
     /// Death message
     /// </summary>
@@ -37,7 +37,7 @@ public class CombatDeathPacket : IPacket
     {
         this.PlayerId = playerId;
         this.EntityId = entityId;
-        this.Message = message;
+        this.Message  = message;
     }
 
     /// <summary>
@@ -48,14 +48,14 @@ public class CombatDeathPacket : IPacket
     public CombatDeathPacket(int playerId, string message)
     {
         this.PlayerId = playerId;
-        this.Message = message;
+        this.Message  = message;
     }
 
     private CombatDeathPacket(int playerId, int? entityId, string message)
     {
         this.PlayerId = playerId;
         this.EntityId = entityId;
-        this.Message = message;
+        this.Message  = message;
     }
 
     /// <inheritdoc />
@@ -70,7 +70,7 @@ public class CombatDeathPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var playerId = buffer.ReadVarInt();
+        var  playerId = buffer.ReadVarInt();
         int? entityId = null;
         if (version.Version.Protocol < ProtocolVersion.V_1_20)
             entityId = buffer.ReadInt();

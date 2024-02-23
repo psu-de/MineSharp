@@ -10,6 +10,6 @@ public class RangeParser : IParser
     }
 
 
-    public string GetName() => "minecraft:range";
-    public int GetArgumentCount() => 1;
+    public string GetName()          => "minecraft:range";
+    public int    GetArgumentCount() => 1;
 }

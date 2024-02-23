@@ -8,14 +8,14 @@ public class SetEntityVelocityPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityVelocity;
 
-    public int EntityId { get; set; }
+    public int   EntityId  { get; set; }
     public short VelocityX { get; set; }
     public short VelocityY { get; set; }
     public short VelocityZ { get; set; }
 
     public SetEntityVelocityPacket(int entityId, short velocityX, short velocityY, short velocityZ)
     {
-        this.EntityId = entityId;
+        this.EntityId  = entityId;
         this.VelocityX = velocityX;
         this.VelocityY = velocityY;
         this.VelocityZ = velocityZ;
@@ -31,7 +31,7 @@ public class SetEntityVelocityPacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var entityId = buffer.ReadVarInt();
+        var entityId  = buffer.ReadVarInt();
         var velocityX = buffer.ReadShort();
         var velocityY = buffer.ReadShort();
         var velocityZ = buffer.ReadShort();

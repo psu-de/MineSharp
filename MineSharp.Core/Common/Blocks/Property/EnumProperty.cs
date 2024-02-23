@@ -6,13 +6,13 @@ namespace MineSharp.Core.Common.Blocks.Property;
 public class EnumProperty : IBlockProperty
 {
     private readonly string[] _acceptedValues;
-    
+
     /// <inheritdoc />
     public string Name { get; }
-    
+
     /// <inheritdoc />
     public int StateCount { get; }
-    
+
     /// <summary>
     /// Create a new EnumProperty
     /// </summary>
@@ -21,10 +21,10 @@ public class EnumProperty : IBlockProperty
     public EnumProperty(string name, string[] acceptedValues)
     {
         this._acceptedValues = acceptedValues;
-        this.Name = name;
-        this.StateCount = this._acceptedValues.Length;
+        this.Name            = name;
+        this.StateCount      = this._acceptedValues.Length;
     }
-    
+
     /// <inheritdoc />
     public T GetValue<T>(int state)
     {
@@ -32,7 +32,7 @@ public class EnumProperty : IBlockProperty
         {
             throw new NotSupportedException("This is property can only be an enum.");
         }
-        
+
         if (state >= this.StateCount)
         {
             throw new IndexOutOfRangeException($"State {state} is out of range for property with {this.StateCount} entries.");

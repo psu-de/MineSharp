@@ -11,17 +11,17 @@ public class Attribute
     /// The name of this Attribute
     /// </summary>
     public string Key { get; }
-    
+
     /// <summary>
     /// The base value of this attribute
     /// </summary>
     public double Base { get; }
-    
+
     /// <summary>
     /// The modifiers active for this attribute. Indexed by their UUID
     /// </summary>
     public Dictionary<UUID, Modifier> Modifiers { get; }
-    
+
     /// <summary>
     /// Create a new Attribute
     /// </summary>
@@ -30,8 +30,8 @@ public class Attribute
     /// <param name="modifiers"></param>
     public Attribute(string key, double @base, Modifier[] modifiers)
     {
-        this.Key = key;
-        this.Base = @base;
+        this.Key       = key;
+        this.Base      = @base;
         this.Modifiers = modifiers.ToDictionary(x => x.UUID);
     }
 
@@ -53,7 +53,7 @@ public class Attribute
     {
         this.Modifiers.Remove(uuid);
     }
-    
+
     /// <summary>
     /// Calculate the Multiplier of this attribute with all modifiers.
     /// </summary>
@@ -61,14 +61,15 @@ public class Attribute
         this.Modifiers.GroupBy(m => m.Value.Operation)
             .OrderBy(x => x.Key)
             .Aggregate(this.Base, (x, t) =>
-            {
-                var op = t.Key;
-                var modifiers = t.Select(x => x.Value);
-                return op switch {
-                    ModifierOp.Add => modifiers.Aggregate(x, (y, t) => y += t.Amount),
-                    ModifierOp.MultiplyBase => x * (1 + modifiers.Select(x => x.Amount).Sum()),
-                    ModifierOp.Multiply => modifiers.Aggregate(x, (y, t) => y *= 1 + t.Amount),
-                    _ => throw new UnreachableException()
-                };
-            });
+             {
+                 var op        = t.Key;
+                 var modifiers = t.Select(x => x.Value);
+                 return op switch
+                 {
+                     ModifierOp.Add          => modifiers.Aggregate(x, (y, t) => y += t.Amount),
+                     ModifierOp.MultiplyBase => x * (1 + modifiers.Select(x => x.Amount).Sum()),
+                     ModifierOp.Multiply     => modifiers.Aggregate(x, (y, t) => y *= 1 + t.Amount),
+                     _                       => throw new UnreachableException()
+                 };
+             });
 }

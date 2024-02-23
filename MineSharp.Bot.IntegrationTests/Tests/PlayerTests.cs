@@ -15,7 +15,7 @@ public static class PlayerTests
         await TestWeatherChange();
         await TestAttack();
     }
-    
+
     public static Task TestHealth()
     {
         return IntegrationTest.RunTest("testHealth", (bot, source) =>
@@ -73,7 +73,7 @@ public static class PlayerTests
         return IntegrationTest.RunTest("testPlayerJoin", async (bot, source) =>
         {
             const string secondBotName = "MineSharpBot2";
-            var player = bot.GetPlugin<PlayerPlugin>();
+            var          player        = bot.GetPlugin<PlayerPlugin>();
 
             player.OnPlayerJoined += (sender, player) =>
             {
@@ -84,9 +84,9 @@ public static class PlayerTests
             };
 
             var bot2 = await new BotBuilder()
-                .Host("localhost")
-                .OfflineSession(secondBotName)
-                .CreateAsync();
+                            .Host("localhost")
+                            .OfflineSession(secondBotName)
+                            .CreateAsync();
 
             if (!await bot2.Connect())
             {
@@ -94,16 +94,16 @@ public static class PlayerTests
             }
 
             await Task.Delay(1000);
-            await bot2.Disconnect(); 
+            await bot2.Disconnect();
         });
     }
-    
+
     public static Task TestPlayerLeave()
     {
         return IntegrationTest.RunTest("testPlayerLeave", async (bot, source) =>
         {
             const string secondBotName = "MineSharpBot2";
-            var player = bot.GetPlugin<PlayerPlugin>();
+            var          player        = bot.GetPlugin<PlayerPlugin>();
 
             player.OnPlayerLeft += (sender, player) =>
             {
@@ -114,17 +114,17 @@ public static class PlayerTests
             };
 
             var bot2 = await new BotBuilder()
-                .Host("localhost")
-                .OfflineSession(secondBotName)
-                .CreateAsync();
- 
+                            .Host("localhost")
+                            .OfflineSession(secondBotName)
+                            .CreateAsync();
+
             if (!await bot2.Connect())
             {
                 source.TrySetResult(false);
             }
 
             await Task.Delay(500);
-            await bot2.Disconnect(); 
+            await bot2.Disconnect();
         });
     }
 
@@ -150,13 +150,13 @@ public static class PlayerTests
     {
         return IntegrationTest.RunTest("testAttack", async (bot, source) =>
         {
-            var player = bot.GetPlugin<PlayerPlugin>();
+            var player   = bot.GetPlugin<PlayerPlugin>();
             var entities = bot.GetPlugin<EntityPlugin>();
 
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p 16 -60 21");
 
             Entity? chicken = null;
-            
+
             entities.OnEntitySpawned += async (sender, entity) =>
             {
                 if (entity.Info.Type != EntityType.Chicken)
@@ -165,7 +165,7 @@ public static class PlayerTests
                 chicken = entity;
                 await player.Attack(entity);
             };
-            
+
             entities.OnEntityDespawned += (sender, entity) =>
             {
                 if (entity.ServerId == chicken?.ServerId)
@@ -173,7 +173,7 @@ public static class PlayerTests
                     source.TrySetResult(true);
                 }
             };
-            
+
             await Task.Delay(1000);
         }, commandDelay: 1000);
     }

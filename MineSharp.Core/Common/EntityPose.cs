@@ -5,7 +5,7 @@ namespace MineSharp.Core.Common;
 /// </summary>
 public enum EntityPose
 {
-    #pragma warning disable CS1591
+#pragma warning disable CS1591
     Standing,
     FallFlying,
     Sleeping,
@@ -21,5 +21,5 @@ public enum EntityPose
     Sniffling,
     Emerging,
     Digging
-    #pragma warning restore CS1591
+#pragma warning restore CS1591
 }

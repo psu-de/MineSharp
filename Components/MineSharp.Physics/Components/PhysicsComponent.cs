@@ -7,9 +7,9 @@ namespace MineSharp.Physics.Components;
 internal abstract class PhysicsComponent(MinecraftPlayer player, IWorld world, MovementInput input, PlayerState state)
 {
     protected readonly MinecraftPlayer Player = player;
-    protected readonly IWorld World = world;
-    protected readonly MovementInput Input = input;
-    protected readonly PlayerState State = state;
+    protected readonly IWorld          World  = world;
+    protected readonly MovementInput   Input  = input;
+    protected readonly PlayerState     State  = state;
 
     public abstract void Tick();
 }

@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Cryptography;
 /// </summary>
 public class AesStream : Stream
 {
-    private readonly Stream _baseStream;
+    private readonly Stream              _baseStream;
     private readonly BufferedBlockCipher _decryptCipher;
     private readonly BufferedBlockCipher _encryptCipher;
 
@@ -30,7 +30,7 @@ public class AesStream : Stream
 
         this._baseStream = new CipherStream(stream, this._decryptCipher, this._encryptCipher);
     }
-    
+
     /// <inheritdoc />
     public override bool CanRead => this._baseStream.CanRead;
 

@@ -9,17 +9,17 @@ public class Position
     /// The X coordinate
     /// </summary>
     public int X { get; protected set; }
-    
+
     /// <summary>
     /// The Y coordinate
     /// </summary>
     public int Y { get; protected set; }
-    
+
     /// <summary>
     /// The Z coordinate
     /// </summary>
     public int Z { get; protected set; }
-    
+
     /// <summary>
     /// Create a new Position from a packed ulong <paramref name="value"/>
     /// </summary>
@@ -27,11 +27,13 @@ public class Position
     public Position(ulong value)
     {
         this.X = (int)(value >> 38);
-        this.Y = (int)(value & 0xFFF);
+        this.Y = (int)(value       & 0xFFF);
         this.Z = (int)(value >> 12 & 0x3FFFFFF);
 
         if (this.X >= Math.Pow(2, 25)) { this.X -= (int)Math.Pow(2, 26); }
+
         if (this.Y >= Math.Pow(2, 11)) { this.Y -= (int)Math.Pow(2, 12); }
+
         if (this.Z >= Math.Pow(2, 25)) { this.Z -= (int)Math.Pow(2, 26); }
     }
 
@@ -72,7 +74,7 @@ public class Position
     {
         return a.ToULong() == b.ToULong();
     }
-    
+
     /// <summary>
     /// Checks if the two positions do not represent the same point
     /// </summary>
@@ -106,7 +108,7 @@ public class Position
 
     /// <inheritdoc />
     public override int GetHashCode() => this.X << 22 | this.Z << 12 & 0x3FF | this.Y & 0xFFF;
-    
+
     /// <summary>
     /// Convert a Position to a Vector
     /// </summary>
@@ -120,11 +122,10 @@ public class Position
 /// </summary>
 public class MutablePosition : Position
 {
-
     /// <inheritdoc />
     public MutablePosition(ulong value) : base(value)
     { }
-    
+
     /// <inheritdoc />
     public MutablePosition(int x, int y, int z) : base(x, y, z)
     { }

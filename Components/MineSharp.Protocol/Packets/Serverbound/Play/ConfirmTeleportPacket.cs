@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class ConfirmTeleportPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_TeleportConfirm;
-    
+
     public int TeleportId { get; set; }
 
     public ConfirmTeleportPacket(int teleportId)

@@ -18,20 +18,20 @@ namespace MineSharp.Core.Common.Enchantments;
 /// <param name="Tradeable"></param>
 /// <param name="Discoverable"></param>
 public record EnchantmentInfo(
-    int Id,
-    EnchantmentType Type,
-    string Name,
-    string DisplayName,
-    int MaxLevel,
-    EnchantCost MinCost,
-    EnchantCost MaxCost,
-    bool TreasureOnly,
-    bool Curse,
-    EnchantmentType[] Exclude,
+    int                 Id,
+    EnchantmentType     Type,
+    string              Name,
+    string              DisplayName,
+    int                 MaxLevel,
+    EnchantCost         MinCost,
+    EnchantCost         MaxCost,
+    bool                TreasureOnly,
+    bool                Curse,
+    EnchantmentType[]   Exclude,
     EnchantmentCategory Category,
-    int Weight,
-    bool Tradeable,
-    bool Discoverable);
+    int                 Weight,
+    bool                Tradeable,
+    bool                Discoverable);
 
 /// <summary>
 /// Enchantment cost

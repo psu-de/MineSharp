@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 public class FinishConfigurationPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_FinishConfiguration;
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
 

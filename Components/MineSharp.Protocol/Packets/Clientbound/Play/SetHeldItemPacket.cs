@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class SetHeldItemPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_HeldItemSlot;
-    
+
     public sbyte Slot { get; set; }
 
     public SetHeldItemPacket(sbyte slot)

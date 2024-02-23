@@ -9,12 +9,12 @@ public enum ModifierOp
     /// The value of the modifier is added to the attribute
     /// </summary>
     Add = 0,
-    
+
     /// <summary>
     /// The base of the Attribute is multiplied with 1 + the value of the Modifier and added to the attribute
     /// </summary>
     MultiplyBase = 1,
-    
+
     /// <summary>
     /// The attribute's value is multiplied with the modifiers value
     /// </summary>

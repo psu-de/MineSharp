@@ -18,57 +18,57 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     /// X coordinate of the chunk
     /// </summary>
     public int X { get; set; }
-    
+
     /// <summary>
     /// Y coordinate of the chunk
     /// </summary>
     public int Z { get; set; }
-    
+
     /// <summary>
     /// Heightmaps
     /// </summary>
     public NbtCompound Heightmaps { get; set; }
-    
+
     /// <summary>
     /// Raw chunk data
     /// </summary>
     public byte[] ChunkData { get; set; }
-    
+
     /// <summary>
     /// Array of BlockEntities
     /// </summary>
     public BlockEntity[] BlockEntities { get; set; }
-    
+
     /// <summary>
     /// Whether to trust edges (only sent before 1.20)
     /// </summary>
     public bool? TrustEdges { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public long[] SkyLightMask { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public long[] BlockLightMask { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public long[] EmptySkyLightMask { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public long[] EmptyBlockLightMask { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
     public byte[][] SkyLight { get; set; }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -90,50 +90,49 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     /// <param name="skyLight"></param>
     /// <param name="blockLight"></param>
     public ChunkDataAndUpdateLightPacket(
-        int x,
-        int z,
-        NbtCompound heightmaps,
-        byte[] chunkData,
+        int           x,
+        int           z,
+        NbtCompound   heightmaps,
+        byte[]        chunkData,
         BlockEntity[] blockEntities,
-        bool? trustEdges,
-        long[] skyLightMask,
-        long[] blockLightMask,
-        long[] emptyBlockLightMask,
-        long[] emptySkyLightMask,
-        byte[][] skyLight,
-        byte[][] blockLight)
+        bool?         trustEdges,
+        long[]        skyLightMask,
+        long[]        blockLightMask,
+        long[]        emptyBlockLightMask,
+        long[]        emptySkyLightMask,
+        byte[][]      skyLight,
+        byte[][]      blockLight)
     {
-        this.X = x;
-        this.Z = z;
-        this.Heightmaps = heightmaps;
-        this.ChunkData = chunkData;
-        this.BlockEntities = blockEntities;
-        this.TrustEdges = trustEdges;
-        this.SkyLightMask = skyLightMask;
-        this.BlockLightMask = blockLightMask;
+        this.X                   = x;
+        this.Z                   = z;
+        this.Heightmaps          = heightmaps;
+        this.ChunkData           = chunkData;
+        this.BlockEntities       = blockEntities;
+        this.TrustEdges          = trustEdges;
+        this.SkyLightMask        = skyLightMask;
+        this.BlockLightMask      = blockLightMask;
         this.EmptyBlockLightMask = emptyBlockLightMask;
-        this.EmptySkyLightMask = emptySkyLightMask;
-        this.SkyLight = skyLight;
-        this.BlockLight = blockLight;
+        this.EmptySkyLightMask   = emptySkyLightMask;
+        this.SkyLight            = skyLight;
+        this.BlockLight          = blockLight;
     }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        
         if (version.Version.Protocol < ProtocolVersion.V_1_20 && this.TrustEdges == null)
             throw new ArgumentNullException(nameof(this.TrustEdges));
-        
+
         buffer.WriteInt(this.X);
         buffer.WriteInt(this.Z);
         buffer.WriteNbt(this.Heightmaps);
         buffer.WriteVarInt(this.ChunkData.Length);
         buffer.WriteBytes(this.ChunkData);
-        
+
         buffer.WriteVarInt(this.BlockEntities.Length);
         foreach (var entity in this.BlockEntities)
             buffer.WriteBlockEntity(entity);
-        
+
         if (version.Version.Protocol < ProtocolVersion.V_1_20)
             buffer.WriteBool(this.TrustEdges!.Value);
         WriteLongArray(this.SkyLightMask, buffer);
@@ -147,8 +146,8 @@ public class ChunkDataAndUpdateLightPacket : IPacket
             buffer.WriteVarInt(array.Length);
             buffer.WriteBytes(array);
         }
-        
-        
+
+
         buffer.WriteVarInt(this.BlockLight.Length);
         foreach (var array in this.BlockLight)
         {
@@ -160,10 +159,10 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var x = buffer.ReadInt();
-        var z = buffer.ReadInt();
+        var x          = buffer.ReadInt();
+        var z          = buffer.ReadInt();
         var heightmaps = buffer.ReadNbtCompound();
-        var chunkData = new byte[buffer.ReadVarInt()];
+        var chunkData  = new byte[buffer.ReadVarInt()];
         buffer.ReadBytes(chunkData);
 
         var blockEntities = new BlockEntity[buffer.ReadVarInt()];
@@ -173,17 +172,17 @@ public class ChunkDataAndUpdateLightPacket : IPacket
         bool? trustEdges = null;
         if (version.Version.Protocol < ProtocolVersion.V_1_20)
             trustEdges = buffer.ReadBool();
-        var skyLightMask = ReadLongArray(buffer);
-        var blockLightMask = ReadLongArray(buffer);
-        var emptySkyLightMask = ReadLongArray(buffer);
+        var skyLightMask        = ReadLongArray(buffer);
+        var blockLightMask      = ReadLongArray(buffer);
+        var emptySkyLightMask   = ReadLongArray(buffer);
         var emptyBlockLightMask = ReadLongArray(buffer);
-        var skyLight = new byte[buffer.ReadVarInt()][];
+        var skyLight            = new byte[buffer.ReadVarInt()][];
         for (int i = 0; i < skyLight.Length; i++)
         {
             skyLight[i] = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(skyLight[i]);
         }
-        
+
         var blockLight = new byte[buffer.ReadVarInt()][];
         for (int i = 0; i < blockLight.Length; i++)
         {
@@ -215,8 +214,8 @@ public class ChunkDataAndUpdateLightPacket : IPacket
 
     private static long[] ReadLongArray(PacketBuffer buffer)
     {
-        int length = buffer.ReadVarInt();
-        long[] array = new long[length];
+        int    length = buffer.ReadVarInt();
+        long[] array  = new long[length];
 
         for (int i = 0; i < array.Length; i++)
             array[i] = buffer.ReadLong();

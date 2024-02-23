@@ -16,13 +16,13 @@ namespace MineSharp.Core.Common.Entities;
 /// <param name="isOnGround"></param>
 /// <param name="effects"></param>
 public class Entity(
-    EntityInfo info,
-    int serverId,
-    Vector3 position,
-    float pitch,
-    float yaw,
-    Vector3 velocity,
-    bool isOnGround,
+    EntityInfo                      info,
+    int                             serverId,
+    Vector3                         position,
+    float                           pitch,
+    float                           yaw,
+    Vector3                         velocity,
+    bool                            isOnGround,
     Dictionary<EffectType, Effect?> effects)
 {
     /// <summary>
@@ -104,7 +104,6 @@ public class Entity(
     /// <returns></returns>
     public int? GetEffectLevel(EffectType effectType)
     {
-
         if (!this.Effects.TryGetValue(effectType, out var effect))
         {
             return null;
@@ -119,9 +118,9 @@ public class Entity(
     /// <returns></returns>
     public AABB GetBoundingBox()
     {
-        var half = this.Info.Width / 2.0f;
+        var half   = this.Info.Width / 2.0f;
         var height = this.Info.Height;
-        
+
         return new AABB(
             this.Position.X - half,
             this.Position.Y,
@@ -138,19 +137,19 @@ public class Entity(
     public Vector3 GetLookVector()
     {
         var pitchRadians = this.Pitch * (MathF.PI / 180.0f);
-        var yawRadians = this.Yaw * (MathF.PI / 180.0);
-        
+        var yawRadians   = this.Yaw   * (MathF.PI / 180.0);
+
         var len = Math.Cos(pitchRadians);
-        var x = len * Math.Sin(-yawRadians);
-        var y = -Math.Sin(pitchRadians);
-        var z = len * Math.Cos(yawRadians);
-        
+        var x   = len * Math.Sin(-yawRadians);
+        var y   = -Math.Sin(pitchRadians);
+        var z   = len * Math.Cos(yawRadians);
+
         var vec = new Vector3(x, y, z);
         vec.Normalize();
 
         return vec;
     }
-    
+
     /// <inheritdoc />
     public override string ToString()
         => $"Entity(Info={this.Info}, Position={Position})";

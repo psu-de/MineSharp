@@ -7,10 +7,10 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class SystemChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_SystemChat;
-    
-    public string Content { get; set; }
-    public int? ChatType { get; set; }
-    public bool? IsOverlay { get; set; }
+
+    public string Content   { get; set; }
+    public int?   ChatType  { get; set; }
+    public bool?  IsOverlay { get; set; }
 
     /// <summary>
     /// Constructor for 1.19.1
@@ -19,7 +19,7 @@ public class SystemChatMessagePacket : IPacket
     /// <param name="chatType"></param>
     public SystemChatMessagePacket(string content, int chatType)
     {
-        this.Content = content;
+        this.Content  = content;
         this.ChatType = chatType;
     }
 
@@ -30,18 +30,19 @@ public class SystemChatMessagePacket : IPacket
     /// <param name="isOverlay"></param>
     public SystemChatMessagePacket(string content, bool isOverlay)
     {
-        this.Content = content;
+        this.Content   = content;
         this.IsOverlay = isOverlay;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Content);
-        
+
         if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
             buffer.WriteBool(this.IsOverlay!.Value);
         else buffer.WriteVarInt(this.ChatType!.Value);
     }
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var content = buffer.ReadString();

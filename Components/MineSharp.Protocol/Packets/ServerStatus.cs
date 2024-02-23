@@ -15,90 +15,91 @@ public partial class ServerStatus
     /// The version string (fe. 1.20.1). Some server's send version ranges, in this case, the latest version is used.
     /// </summary>
     public readonly string Version;
-    
+
     /// <summary>
     /// The protocol version used by the server.
     /// </summary>
     public readonly int ProtocolVersion;
-    
+
     /// <summary>
     /// The server brand. 'Vanilla' if the server does not further specifies it.
     /// </summary>
     public readonly string Brand;
-    
+
     /// <summary>
     /// The max number of players that can join.
     /// </summary>
     public readonly int MaxPlayers;
-    
+
     /// <summary>
     /// How many players are currently on the server.
     /// </summary>
     public readonly int Online;
-    
+
     /// <summary>
     /// A sample of players currently playing.
     /// </summary>
     public readonly string[] PlayerSample;
-    
+
     /// <summary>
     /// The servers MOTD.
     /// </summary>
     public string MOTD;
-    
+
     /// <summary>
     /// The servers favicon as a png data uri.
     /// </summary>
     public string FavIcon;
-    
+
     /// <summary>
     /// Whether the server enforces secure chat.
     /// </summary>
     public bool EnforceSecureChat;
-    
+
     /// <summary>
     /// 
     /// </summary>
     public bool PreviewsChat;
 
-    private ServerStatus(string version, int protocolVersion, string brand, int maxPlayers, int online, string[] playerSample, string motd, string favIcon, bool enforceSecureChat, bool previewsChat)
+    private ServerStatus(string version, int  protocolVersion, string brand, int maxPlayers, int online, string[] playerSample, string motd,
+                         string favIcon, bool enforceSecureChat, bool previewsChat)
     {
-        this.Version = version;
-        this.ProtocolVersion = protocolVersion;
-        this.Brand = brand;
-        this.MaxPlayers = maxPlayers;
-        this.Online = online;
-        this.PlayerSample = playerSample;
-        this.MOTD = motd;
-        this.FavIcon = favIcon;
+        this.Version           = version;
+        this.ProtocolVersion   = protocolVersion;
+        this.Brand             = brand;
+        this.MaxPlayers        = maxPlayers;
+        this.Online            = online;
+        this.PlayerSample      = playerSample;
+        this.MOTD              = motd;
+        this.FavIcon           = favIcon;
         this.EnforceSecureChat = enforceSecureChat;
-        this.PreviewsChat = previewsChat;
+        this.PreviewsChat      = previewsChat;
     }
 
     internal static ServerStatus FromJToken(JToken token, MinecraftData data)
     {
         var versionToken = token.SelectToken("version") ?? throw new InvalidOperationException();
         var playersToken = token.SelectToken("players") ?? throw new InvalidOperationException();
-        
-        var versionString = (string)versionToken.SelectToken("name")!;
-        var protocol = (int)versionToken.SelectToken("protocol")!;
 
-        var maxPlayers = (int)playersToken.SelectToken("max")!;
+        var versionString = (string)versionToken.SelectToken("name")!;
+        var protocol      = (int)versionToken.SelectToken("protocol")!;
+
+        var maxPlayers    = (int)playersToken.SelectToken("max")!;
         var onlinePlayers = (int)playersToken.SelectToken("online")!;
 
         var sampleToken = (JArray?)playersToken.SelectToken("sample");
-        var sample = (sampleToken != null && sampleToken.Count > 0) 
-            ? sampleToken.Select(x => (string)x.SelectToken("name")!).ToArray() 
+        var sample = (sampleToken != null && sampleToken.Count > 0)
+            ? sampleToken.Select(x => (string)x.SelectToken("name")!).ToArray()
             : Array.Empty<string>();
 
         var description = new Chat(token.SelectToken("description")!.ToString(), data).Message;
-        var favIcon = (string)token.SelectToken("favicon")!;
+        var favIcon     = (string)token.SelectToken("favicon")!;
 
         var enforceSecureChatToken = token.SelectToken("enforcesSecureChat");
-        var enforceSecureChat = enforceSecureChatToken != null && (bool)enforceSecureChatToken;
+        var enforceSecureChat      = enforceSecureChatToken != null && (bool)enforceSecureChatToken;
 
         var previewsChatToken = token.SelectToken("previewsChat");
-        var previewsChat = previewsChatToken != null && (bool)previewsChatToken;
+        var previewsChat      = previewsChatToken != null && (bool)previewsChatToken;
 
         (var brand, var version) = ParseVersion(versionString);
 
@@ -119,7 +120,7 @@ public partial class ServerStatus
     {
         var match = ParseVersionString().Match(versionString);
 
-        var brand = match.Groups[1].Value.TrimEnd(' ');
+        var brand   = match.Groups[1].Value.TrimEnd(' ');
         var version = match.Groups[2].Value;
 
         if (string.IsNullOrEmpty(brand))
@@ -132,12 +133,12 @@ public partial class ServerStatus
     }
 
     /// <inheritdoc />
-    public override string ToString() => $"ServerStatus (Brand={Brand}, " +
-                                         $"Version={this.Version}, " +
-                                         $"Protocol={this.ProtocolVersion}, " +
-                                         $"MaxPlayers={this.MaxPlayers}, " +
-                                         $"Online={this.Online}, " +
-                                         $"MOTD={this.MOTD}, " +
+    public override string ToString() => $"ServerStatus (Brand={Brand}, "                 +
+                                         $"Version={this.Version}, "                      +
+                                         $"Protocol={this.ProtocolVersion}, "             +
+                                         $"MaxPlayers={this.MaxPlayers}, "                +
+                                         $"Online={this.Online}, "                        +
+                                         $"MOTD={this.MOTD}, "                            +
                                          $"EnforcesSecureChat={this.EnforceSecureChat}, " +
                                          $"PreviewsChat={this.PreviewsChat})";
 

@@ -16,7 +16,7 @@ public class BlockUpdatePacket : IPacket
     /// The location of the block update
     /// </summary>
     public Position Location { get; set; }
-    
+
     /// <summary>
     /// The new state id
     /// </summary>
@@ -30,9 +30,9 @@ public class BlockUpdatePacket : IPacket
     public BlockUpdatePacket(Position location, int stateId)
     {
         this.Location = location;
-        this.StateId = stateId;
+        this.StateId  = stateId;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -44,7 +44,7 @@ public class BlockUpdatePacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var location = new Position(buffer.ReadULong());
-        var stateId = buffer.ReadVarInt();
+        var stateId  = buffer.ReadVarInt();
         return new BlockUpdatePacket(location, stateId);
     }
 }

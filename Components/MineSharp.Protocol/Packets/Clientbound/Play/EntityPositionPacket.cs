@@ -7,19 +7,19 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class EntityPositionPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_RelEntityMove;
-    
-    public int EntityId { get; set; }
-    public short DeltaX { get; set; }
-    public short DeltaY { get; set; }
-    public short DeltaZ { get; set; }
-    public bool OnGround { get; set; }
+
+    public int   EntityId { get; set; }
+    public short DeltaX   { get; set; }
+    public short DeltaY   { get; set; }
+    public short DeltaZ   { get; set; }
+    public bool  OnGround { get; set; }
 
     public EntityPositionPacket(int entityId, short deltaX, short deltaY, short deltaZ, bool onGround)
     {
         this.EntityId = entityId;
-        this.DeltaX = deltaX;
-        this.DeltaY = deltaY;
-        this.DeltaZ = deltaZ;
+        this.DeltaX   = deltaX;
+        this.DeltaY   = deltaY;
+        this.DeltaZ   = deltaZ;
         this.OnGround = onGround;
     }
 
@@ -35,11 +35,11 @@ public class EntityPositionPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
-        var deltaX = buffer.ReadShort();
-        var deltaY = buffer.ReadShort();
-        var deltaZ = buffer.ReadShort();
+        var deltaX   = buffer.ReadShort();
+        var deltaY   = buffer.ReadShort();
+        var deltaZ   = buffer.ReadShort();
         var onGround = buffer.ReadBool();
-        
+
         return new EntityPositionPacket(
             entityId,
             deltaX, deltaY, deltaZ,

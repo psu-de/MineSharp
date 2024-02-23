@@ -14,14 +14,14 @@ namespace MineSharp.Auth;
 public class MinecraftApi
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     private const string SERVICE_URL = "https://api.minecraftservices.com";
     private const string SESSION_URL = "https://sessionserver.mojang.com";
-    
+
     private readonly HttpClient client;
-    private readonly string ServiceUrl;
-    private readonly string SessionUrl;
-    
+    private readonly string     ServiceUrl;
+    private readonly string     SessionUrl;
+
     /// <summary>
     /// Create a new MinecraftApi instance
     /// </summary>
@@ -46,7 +46,7 @@ public class MinecraftApi
     /// <param name="sessionService"></param>
     public MinecraftApi(HttpClient client, string minecraftService = SERVICE_URL, string sessionService = SESSION_URL)
     {
-        this.client = client;
+        this.client     = client;
         this.ServiceUrl = minecraftService;
         this.SessionUrl = sessionService;
     }
@@ -63,12 +63,11 @@ public class MinecraftApi
         Logger.Debug($"Sending join server request to mojang.");
         var request = new HttpRequestMessage(HttpMethod.Post, $"{this.SessionUrl}/session/minecraft/join");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        var content = new JoinServerBlob() {
-            ServerId = hash,
-            AccessToken = sessionToken,
-            SelectedProfile = uuid.ToString().Replace("-", "").ToLower()
+        var content = new JoinServerBlob()
+        {
+            ServerId = hash, AccessToken = sessionToken, SelectedProfile = uuid.ToString().Replace("-", "").ToLower()
         };
-        
+
         HttpContent body = new StringContent(JsonConvert.SerializeObject(content));
         body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -81,7 +80,7 @@ public class MinecraftApi
         Logger.Error("Session server returned error code: " + response.StatusCode + "  " + await response.Content.ReadAsStringAsync());
         return false;
     }
-    
+
     /// <summary>
     /// Fetch user certificates from minecraft services
     /// </summary>
@@ -100,5 +99,4 @@ public class MinecraftApi
 
         return PlayerCertificate.FromBlob(blob);
     }
-    
 }

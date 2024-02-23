@@ -10,7 +10,7 @@ public class StatusRequestPacket : IPacket
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new StatusRequestPacket();

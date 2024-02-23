@@ -12,7 +12,7 @@ public class ChunkBatchReceivedPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.SB_Play_ChunkBatchReceived;
-    
+
     /// <summary>
     /// ChunksPerTick
     /// </summary>
@@ -26,7 +26,7 @@ public class ChunkBatchReceivedPacket : IPacket
     {
         this.ChunksPerTick = chunksPerTick;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

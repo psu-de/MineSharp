@@ -1,102 +1,128 @@
 using MineSharp.Core.Common.Blocks;
-using System.Diagnostics.CodeAnalysis;
+using MineSharp.Core.Common.Blocks.Property;
+using MineSharp.Core.Common.Items;
+using MineSharp.Data.Framework;
+using MineSharp.Data.Framework.Providers;
+using MineSharp.Data.Internal;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Blocks;
 
-/// <summary>
-/// Provides static data bout blocks for a version.
-/// Indexes blocks by id, name, type and state.
-/// </summary>
-public class BlockProvider : DataProvider<BlockType, BlockInfo>
+internal class BlockProvider : IDataProvider<BlockInfo[]>
 {
-    private Dictionary<int, BlockInfo> IdToBlockMap { get; }
-    private Dictionary<string, BlockInfo> NameToBlockMap { get; }
-    private Dictionary<int, BlockInfo> StateToBlockMap { get; }
+    private static readonly EnumNameLookup<BlockType> BlockTypeLookup = new();
+    private static readonly EnumNameLookup<Material>  MaterialLookup  = new();
 
+    private readonly JArray    token;
+    private readonly IItemData items;
 
-    /// <summary>
-    /// The total number of block states.
-    /// </summary>
-    public int TotalBlockStateCount => StateToBlockMap.Count;
-    
-    internal BlockProvider(DataVersion<BlockType, BlockInfo> version) : base(version)
+    public BlockProvider(JToken token, IItemData items)
     {
-        IdToBlockMap = version.Palette.ToDictionary(x => x.Value.Id, x => x.Value);
-        NameToBlockMap = version.Palette.ToDictionary(x => x.Value.Name, x => x.Value);
-        StateToBlockMap = BuildStateMap();
-    }
-
-    private Dictionary<int, BlockInfo> BuildStateMap()
-    {
-        var map = new Dictionary<int, BlockInfo>();
-        foreach (var block in this.Version.Palette)
+        if (token.Type != JTokenType.Array)
         {
-            for (int i = block.Value.MinState; i <= block.Value.MaxState; i++)
-            {
-                map.Add(i, block.Value);
-            }
+            throw new InvalidOperationException("Expected the token to be an array");
         }
-        return map;
+
+        this.token = (token as JArray)!;
+        this.items = items;
     }
-    
-    /// <summary>
-    /// Get a Block inf o by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public BlockInfo GetById(int id) => IdToBlockMap[id];
 
-    /// <summary>
-    /// Try to get a block info by id. Returns false when not found.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="block"></param>
-    /// <returns></returns>
-    public bool TryGetById(int id, [NotNullWhen(true)] out BlockInfo? block)
-        => IdToBlockMap.TryGetValue(id, out block);
+    public BlockInfo[] GetData()
+    {
+        var length = token.Count;
+        var data   = new BlockInfo[length];
 
-    /// <summary>
-    /// Get a block info by state
-    /// </summary>
-    /// <param name="state"></param>
-    /// <returns></returns>
-    public BlockInfo GetByState(int state) => StateToBlockMap[state];
+        for (int i = 0; i < length; i++)
+        {
+            data[i] = FromToken(token[i], items);
+        }
 
-    /// <summary>
-    /// Tries to get a block info by state. Returns false when not found.
-    /// </summary>
-    /// <param name="state"></param>
-    /// <param name="block"></param>
-    /// <returns></returns>
-    public bool TryGetByState(int state, [NotNullWhen(true)] out BlockInfo? block)
-        => StateToBlockMap.TryGetValue(state, out block);
+        return data;
+    }
 
-    /// <summary>
-    /// Get a BlockInfo by name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public BlockInfo GetByName(string name) => NameToBlockMap[name];
+    private static BlockInfo FromToken(JToken dataToken, IItemData items)
+    {
+        var id           = (int)dataToken.SelectToken("id")!;
+        var name         = (string)dataToken.SelectToken("name")!;
+        var displayName  = (string)dataToken.SelectToken("displayToken")!;
+        var hardness     = (float?)dataToken.SelectToken("hardness") ?? float.MaxValue;
+        var resistance   = (float)dataToken.SelectToken("resistance")!;
+        var minState     = (int)dataToken.SelectToken("minStateId")!;
+        var maxState     = (int)dataToken.SelectToken("maxStateId")!;
+        var unbreakable  = !(bool)dataToken.SelectToken("diggable")!;
+        var transparent  = (bool)dataToken.SelectToken("transparent")!;
+        var filterLight  = (byte)dataToken.SelectToken("filterLight")!;
+        var emitLight    = (byte)dataToken.SelectToken("emitLight")!;
+        var materials    = (string)dataToken.SelectToken("material")!;
+        var harvestTools = (JObject?)dataToken.SelectToken("harvestTools");
+        var states       = (JArray)dataToken.SelectToken("states")!;
+        var defaultState = (int)dataToken.SelectToken("defaultState")!;
 
-    /// <summary>
-    /// Try to get a BlockInfo by name. Returns false if not found
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="block"></param>
-    /// <returns></returns>
-    public bool TryGetByName(string name, [NotNullWhen(true)] out BlockInfo? block)
-        => NameToBlockMap.TryGetValue(name, out block);
-    
+        return new BlockInfo(
+            id,
+            BlockTypeLookup.FromName(NameUtils.GetBiomeName(name)),
+            name,
+            displayName,
+            hardness,
+            resistance,
+            minState,
+            maxState,
+            unbreakable,
+            transparent,
+            filterLight,
+            emitLight,
+            GetMaterials(materials),
+            GetHarvestTools(harvestTools, items),
+            defaultState,
+            GetBlockState(states)
+        );
+    }
 
-    /// <summary>
-    /// Get a BlockInfo by id.
-    /// </summary>
-    /// <param name="id"></param>
-    public BlockInfo this[int id] => GetById(id);
+    private static Material[] GetMaterials(string str)
+    {
+        return str.Split(";")
+                  .Select(NameUtils.GetMaterial)
+                  .Select(MaterialLookup.FromName)
+                  .ToArray();
+    }
 
-    /// <summary>
-    /// Get a BlockInfo by name
-    /// </summary>
-    /// <param name="name"></param>
-    public BlockInfo this[string name] => GetByName(name);
+    private static ItemType[] GetHarvestTools(JObject? array, IItemData items)
+    {
+        if (array == null)
+            return Array.Empty<ItemType>();
+
+        return array.Properties()
+                    .Select(x => x.Name)
+                    .Select(x => Convert.ToInt32(x))
+                    .Select(items.ById)
+                    .Select(x => x!.Type)
+                    .ToArray();
+    }
+
+    private static BlockState GetBlockState(JArray states)
+    {
+        if (states.Count == 0)
+            return new BlockState(Array.Empty<IBlockProperty>());
+
+        var properties = states
+                        .Select(x => GetBlockProperty((JObject)x))
+                        .ToArray();
+
+        return new BlockState(properties);
+    }
+
+    private static IBlockProperty GetBlockProperty(JObject obj)
+    {
+        var name      = (string)obj.SelectToken("name")!;
+        var type      = (string)obj.SelectToken("type")!;
+        var numValues = (int)obj.SelectToken("num_values")!;
+
+        return type switch
+        {
+            "bool" => new BoolProperty(name),
+            "int"  => new IntProperty(name, numValues),
+            "enum" => new EnumProperty(name, obj.SelectToken("values")!.ToObject<string[]>()!),
+            _      => throw new NotSupportedException($"Property of type '{type}' is not supported.")
+        };
+    }
 }

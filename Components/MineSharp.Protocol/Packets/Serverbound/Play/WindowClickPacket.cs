@@ -9,22 +9,22 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class WindowClickPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_WindowClick;
-    
-    public byte WindowId { get; set; }
-    public int StateId { get; set; }
-    public short Slot { get; set; }
-    public sbyte MouseButton { get; set; }
-    public int Mode { get; set; }
+
+    public byte   WindowId     { get; set; }
+    public int    StateId      { get; set; }
+    public short  Slot         { get; set; }
+    public sbyte  MouseButton  { get; set; }
+    public int    Mode         { get; set; }
     public Slot[] ChangedSlots { get; set; }
-    public Item? SelectedItem { get; set; }
+    public Item?  SelectedItem { get; set; }
 
     public WindowClickPacket(byte windowId, int stateId, short slot, sbyte mouseButton, int mode, Slot[] changedSlots, Item? selectedItem)
     {
-        this.WindowId = windowId;
-        this.StateId = stateId;
-        this.Slot = slot;
-        this.MouseButton = mouseButton;
-        this.Mode = mode;
+        this.WindowId     = windowId;
+        this.StateId      = stateId;
+        this.Slot         = slot;
+        this.MouseButton  = mouseButton;
+        this.Mode         = mode;
         this.ChangedSlots = changedSlots;
         this.SelectedItem = selectedItem;
     }
@@ -52,5 +52,5 @@ public class WindowClickPacket : IPacket
             buffer.ReadVarIntArray(buff => buff.ReadSlot(version)),
             buffer.ReadOptionalItem(version));
     }
-}   
+}
 #pragma warning restore CS1591

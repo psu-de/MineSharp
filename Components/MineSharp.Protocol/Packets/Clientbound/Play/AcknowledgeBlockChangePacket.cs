@@ -12,7 +12,7 @@ public class AcknowledgeBlockChangePacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_AcknowledgePlayerDigging;
-    
+
     /// <summary>
     /// The body of this packet.
     /// Different minecraft versions use different packet bodies.
@@ -44,13 +44,13 @@ public class AcknowledgeBlockChangePacket : IPacket
     {
         this.Body = body;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         this.Body.Write(buffer);
     }
-    
+
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
@@ -89,17 +89,17 @@ public class AcknowledgeBlockChangePacket : IPacket
         /// The Position of the block
         /// </summary>
         public Position Location { get; set; }
-        
+
         /// <summary>
         /// Block state
         /// </summary>
         public int Block { get; set; }
-        
+
         /// <summary>
         /// Status of the block change
         /// </summary>
         public int Status { get; set; }
-        
+
         /// <summary>
         /// Whether the block change was successful
         /// </summary>
@@ -114,9 +114,9 @@ public class AcknowledgeBlockChangePacket : IPacket
         /// <param name="successful"></param>
         public PacketBody_1_18(Position location, int block, int status, bool successful)
         {
-            this.Location = location;
-            this.Block = block;
-            this.Status = status;
+            this.Location   = location;
+            this.Block      = block;
+            this.Status     = status;
             this.Successful = successful;
         }
 
@@ -149,7 +149,7 @@ public class AcknowledgeBlockChangePacket : IPacket
         /// Sequence id used for synchronization
         /// </summary>
         public int SequenceId { get; set; }
-        
+
         /// <summary>
         /// Create a new instance
         /// </summary>

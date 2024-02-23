@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{4B55
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Pathfinder", "Plugins\MineSharp.Pathfinder\MineSharp.Pathfinder.csproj", "{043D339E-C2F8-4243-9B0B-4F7C689BCA39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{4ACDE03F-0503-4CFC-B638-5E9B8BCEC0C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{043D339E-C2F8-4243-9B0B-4F7C689BCA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{043D339E-C2F8-4243-9B0B-4F7C689BCA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{043D339E-C2F8-4243-9B0B-4F7C689BCA39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ACDE03F-0503-4CFC-B638-5E9B8BCEC0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ACDE03F-0503-4CFC-B638-5E9B8BCEC0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ACDE03F-0503-4CFC-B638-5E9B8BCEC0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ACDE03F-0503-4CFC-B638-5E9B8BCEC0C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{63B60BB4-DB86-423A-9585-82FD060089F2} = {CAB43D13-C4AC-4D69-AB04-ECF9B514115D}

@@ -16,7 +16,7 @@ public readonly struct ChunkCoordinates(int x, int z)
     /// The Z coordinate
     /// </summary>
     public int Z { get; } = z;
-    
+
     /// <inheritdoc />
     public override string ToString() => $"({this.X} / {this.Z})";
 

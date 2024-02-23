@@ -7,17 +7,17 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class PlayerSessionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatSessionUpdate;
-    
-    public UUID SessionId { get; set; }
-    public long ExpiresAt { get; set; }
-    public byte[] PublicKey { get; set; }
+
+    public UUID   SessionId    { get; set; }
+    public long   ExpiresAt    { get; set; }
+    public byte[] PublicKey    { get; set; }
     public byte[] KeySignature { get; set; }
 
     public PlayerSessionPacket(UUID sessionId, long expiresAt, byte[] publicKey, byte[] keySignature)
     {
-        this.SessionId = sessionId;
-        this.ExpiresAt = expiresAt;
-        this.PublicKey = publicKey;
+        this.SessionId    = sessionId;
+        this.ExpiresAt    = expiresAt;
+        this.PublicKey    = publicKey;
         this.KeySignature = keySignature;
     }
 

@@ -7,18 +7,18 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class EntityActionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_EntityAction;
-    
-    public int EntityId { get; set; }
-    public EntityAction Action { get; set; }
-    public int JumpBoost { get; set; }
-    
+
+    public int          EntityId  { get; set; }
+    public EntityAction Action    { get; set; }
+    public int          JumpBoost { get; set; }
+
     public EntityActionPacket(int entityId, EntityAction action, int jumpBoost)
     {
-        EntityId = entityId;
-        Action = action;
+        EntityId  = entityId;
+        Action    = action;
         JumpBoost = jumpBoost;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.EntityId);
@@ -36,14 +36,14 @@ public class EntityActionPacket : IPacket
 
     public enum EntityAction
     {
-        StartSneaking = 0,
-        StopSneaking = 1,
-        LeaveBed = 2,
-        StartSprinting = 3,
-        StopSprinting = 4,
-        StartJumpWithHorse = 5,
-        StopJumpWithHorse = 6,
-        OpenVehicleInventory = 7,
+        StartSneaking         = 0,
+        StopSneaking          = 1,
+        LeaveBed              = 2,
+        StartSprinting        = 3,
+        StopSprinting         = 4,
+        StartJumpWithHorse    = 5,
+        StopJumpWithHorse     = 6,
+        OpenVehicleInventory  = 7,
         StartFlyingWithElytra = 8
     }
 }

@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class PlayerInfoRemovePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_PlayerRemove;
-    
+
     public UUID[] Players { get; set; }
 
     public PlayerInfoRemovePacket(UUID[] players)
@@ -19,7 +19,7 @@ public class PlayerInfoRemovePacket : IPacket
     {
         buffer.WriteVarIntArray(this.Players, (buffer, uuid) => buffer.WriteUuid(uuid));
     }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var players = buffer.ReadVarIntArray(buffer => buffer.ReadUuid());

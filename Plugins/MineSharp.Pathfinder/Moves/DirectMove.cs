@@ -48,51 +48,30 @@ public class DirectMove(Vector3 motion) : IMove
     {
         var player = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
-        
-        physics.InputControls.Reset();
 
+        physics.InputControls.Reset();
+        
+        await physics.Look(0, 0);
+        await MovementUtils.MoveToBlockCenter(player.Self!, physics);
+        
+        Logger.Info($"At block center: {player.Entity?.Position}");
+        
         var target = player.Self!.Entity!.Position
             .Floored()
             .Add(0.5, 0.0, 0.5)
             .Add(this.Motion.Scaled(count));
+
+        var targetBlock = (Position)target;
         
-        await physics.LookAt(target);
-        var forward = true;
-        var sprint = movements.AllowSprinting;
-        var hasStoppedSprinting = !movements.AllowSprinting;
-        var prevDst = double.MaxValue;
-        
+        MovementUtils.SetHorizontalMovementsFromVector(
+            this.Motion, physics.InputControls);
+
         while (true)
         {
-            physics.InputControls.ForwardKeyDown = forward;
-            physics.InputControls.SprintingKeyDown = sprint;
             await physics.WaitForTick();
 
-            if (!forward)
-            {
-                // adjust rotation when close to target
-                await physics.LookAt(target);
-                forward = true;
-            }
-
-            var dst = target.DistanceToSquared(player.Self!.Entity!.Position);
-            if (dst > prevDst)
-            {
-                Logger.Warn("Getting further away from target!");
-                throw new Exception(); // TODO: Better exception
-            }
-            
-            if (dst <= IMove.THRESHOLD_COMPLETED)
+            if ((Position)player.Entity!.Position == targetBlock)
                 break;
-
-            if (hasStoppedSprinting || dst > 0.5)
-                continue;
-
-            // stop walking for one tick to stop sprinting
-            // bot could move too far if it is too fast
-            forward = false;
-            sprint = false;
-            hasStoppedSprinting = true;
         }
         
         physics.InputControls.Reset();

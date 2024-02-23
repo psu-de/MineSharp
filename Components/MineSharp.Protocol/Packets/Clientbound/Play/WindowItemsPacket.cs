@@ -9,17 +9,17 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class WindowItemsPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_WindowItems;
-    
-    public byte WindowId { get; set; }
-    public int StateId { get; set; }
-    public Item?[] Items { get; set; }
-    public Item? SelectedItem { get; set; }
+
+    public byte    WindowId     { get; set; }
+    public int     StateId      { get; set; }
+    public Item?[] Items        { get; set; }
+    public Item?   SelectedItem { get; set; }
 
     public WindowItemsPacket(byte windowId, int stateId, Item?[] items, Item? selectedItem)
     {
-        this.WindowId = windowId;
-        this.StateId = stateId;
-        this.Items = items;
+        this.WindowId     = windowId;
+        this.StateId      = stateId;
+        this.Items        = items;
         this.SelectedItem = selectedItem;
     }
 

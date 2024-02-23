@@ -7,9 +7,9 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class CloseWindowPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_CloseWindow;
-    
+
     public byte WindowId { get; set; }
-    
+
     public CloseWindowPacket(byte windowId)
     {
         this.WindowId = windowId;

@@ -14,16 +14,17 @@ namespace MineSharp.Bot.Plugins;
 public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     private WindowPlugin? windowPlugin;
-    
+
     /// <inheritdoc />
     protected override async Task Init()
     {
         this.windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
-        
+
         await this.windowPlugin.WaitForInventory();
     }
+
     /// <summary>
     /// Find all recipes containing only resources the bot has currently in the inventory.
     /// </summary>
@@ -31,11 +32,12 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     /// <returns></returns>
     public IEnumerable<Recipe> FindRecipes(ItemType type)
     {
-        return this.Bot.Data.Recipes.GetRecipesForItem(type)
-            .Where(recipe => 
-                recipe.IngredientsCount.All(
-                    kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) > kvp.Value));
+        return this.Bot.Data.Recipes.ByItem(type)!
+                   .Where(recipe =>
+                        recipe.IngredientsCount.All(
+                            kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) > kvp.Value));
     }
+
     /// <summary>
     /// Get the first recipe that can currently be crafted by the bot
     /// </summary>
@@ -45,7 +47,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     {
         return this.FindRecipes(type).FirstOrDefault();
     }
-    
+
     /// <summary>
     /// Returns how often this recipe can be crafted with the bots current inventory.
     /// </summary>
@@ -54,10 +56,10 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     public int CraftableAmount(Recipe recipe)
     {
         return recipe.IngredientsCount
-            .Select(kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) / kvp.Value)
-            .Min();
+                     .Select(kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) / kvp.Value)
+                     .Min();
     }
-    
+
     /// <summary>
     /// Craft the given recipe <paramref name="amount"/> of times.
     /// If the recipe requires a crafting table, <paramref name="craftingTable"/> is used.
@@ -72,7 +74,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
         {
             throw new InvalidOperationException($"The bot cannot craft this recipe {amount} times.");
         }
-        
+
         Window craftingWindow;
         if (recipe.RequiresCraftingTable)
         {
@@ -80,28 +82,29 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
             {
                 throw new InvalidOperationException("The recipe requires a crafting table but none was provided.");
             }
+
             craftingWindow = await this.windowPlugin!.OpenContainer(craftingTable);
         }
         else craftingWindow = this.windowPlugin!.Inventory!;
-        
-        var resultType = this.Bot.Data.Items.GetByType(recipe.Result);
-        
+
+        var resultType = this.Bot.Data.Items.ByType(recipe.Result)!;
+
         var perIteration = resultType.StackSize / recipe.ResultCount;
         perIteration = recipe.IngredientsCount.Keys
-            .Select(x => this.Bot.Data.Items.GetByType(x))
-            .Select(x => x.StackSize)
-            .Prepend(perIteration)
-            .Min();
-        
+                             .Select(x => this.Bot.Data.Items.ByType(x)!)
+                             .Select(x => x.StackSize)
+                             .Prepend(perIteration)
+                             .Min();
+
         var iterations = (int)Math.Ceiling(amount / (float)perIteration);
-        var done = 0;
+        var done       = 0;
         for (int i = 0; i < iterations; i++)
         {
             var count = Math.Min(perIteration, amount - done);
             await this._Craft(recipe, craftingWindow, count);
             done += count;
         }
-        
+
         await windowPlugin!.CloseWindow(craftingWindow.WindowId);
     }
 
@@ -109,7 +112,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     {
         // 0 is always the result slot
         // crafting slots are indexed from top left to bottom right, starting at 1
-        
+
         // put in ingredients
         for (short i = 0; i < recipe.Ingredients.Length; i++)
         {
@@ -118,24 +121,24 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
             {
                 continue;
             }
-            
+
             var craftingSlot = (short)(i + 1);
             craftingWindow.PickupInventoryItems(item.Value, count);
             craftingWindow.PutDownItems(count, craftingSlot);
         }
-        
+
         var timeout = new CancellationTokenSource();
         timeout.CancelAfter(TimeSpan.FromSeconds(1 * Math.Max(5, count)));
-        
+
         var stackSlots = craftingWindow
-            .FindInventorySlotsToStack(recipe.Result, recipe.ResultCount * count)
-            .GetEnumerator();
+                        .FindInventorySlotsToStack(recipe.Result, recipe.ResultCount * count)
+                        .GetEnumerator();
 
         if (!stackSlots.MoveNext())
             throw new InvalidOperationException("Could not find any slot to put result item");
-        
+
         var currentStackSlot = stackSlots.Current;
-        var done = 0;
+        var done             = 0;
         // pickup from result slot
         for (; done < count; done++)
         {
@@ -152,11 +155,11 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
 
                 currentStackSlot = stackSlots.Current;
             }
-                    
+
             craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, 0);
             craftingWindow.DoSimpleClick(WindowMouseButton.MouseLeft, currentStackSlot.SlotIndex);
         }
-        
+
         stackSlots.Dispose();
 
         if (done != count)

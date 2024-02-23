@@ -11,17 +11,17 @@ public abstract class WindowClick
     /// Slot index when clicking outside of the window
     /// </summary>
     public const int OUTSIDE_CLICK = -999;
-    
+
     /// <summary>
     /// The clicked window
     /// </summary>
     public Window Window { get; }
-    
+
     /// <summary>
     /// Number identifying the clicked button
     /// </summary>
     public byte Button { get; }
-    
+
     /// <summary>
     /// Slot index of clicked slot
     /// </summary>
@@ -41,7 +41,7 @@ public abstract class WindowClick
     protected WindowClick(Window window, short slot, byte button)
     {
         this.Window = window;
-        this.Slot = slot;
+        this.Slot   = slot;
         this.Button = button;
     }
 
@@ -50,7 +50,7 @@ public abstract class WindowClick
     /// </summary>
     /// <returns></returns>
     public abstract Slot[] GetChangedSlots();
-        
+
     /// <summary>
     /// Performs the click on <see cref="Window"/>
     /// </summary>

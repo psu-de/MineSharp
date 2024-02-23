@@ -7,11 +7,11 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class PlayerActionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_BlockDig;
-    
-    public int Status { get; set; }
-    public Position Location { get; set; }
-    public BlockFace Face { get; set; }
-    public int? SequenceId { get; set; }
+
+    public int       Status     { get; set; }
+    public Position  Location   { get; set; }
+    public BlockFace Face       { get; set; }
+    public int?      SequenceId { get; set; }
 
     /// <summary>
     /// Constructor for versions before 1.19
@@ -21,9 +21,9 @@ public class PlayerActionPacket : IPacket
     /// <param name="face"></param>
     public PlayerActionPacket(int status, Position location, BlockFace face)
     {
-        this.Status = status;
+        this.Status   = status;
         this.Location = location;
-        this.Face = face;
+        this.Face     = face;
     }
 
 
@@ -36,9 +36,9 @@ public class PlayerActionPacket : IPacket
     /// <param name="sequenceId"></param>
     public PlayerActionPacket(int status, Position location, BlockFace face, int? sequenceId)
     {
-        this.Status = status;
-        this.Location = location;
-        this.Face = face;
+        this.Status     = status;
+        this.Location   = location;
+        this.Face       = face;
         this.SequenceId = sequenceId;
     }
 
@@ -47,7 +47,7 @@ public class PlayerActionPacket : IPacket
         buffer.WriteVarInt(this.Status);
         buffer.WriteULong(this.Location.ToULong());
         buffer.WriteByte((byte)this.Face);
-        
+
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
             buffer.WriteVarInt(this.SequenceId!.Value);
     }
@@ -60,7 +60,7 @@ public class PlayerActionPacket : IPacket
                 new Position(buffer.ReadULong()),
                 (BlockFace)buffer.ReadByte(),
                 buffer.ReadVarInt());
-        
+
         return new PlayerActionPacket(
             buffer.ReadVarInt(),
             new Position(buffer.ReadULong()),

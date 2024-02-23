@@ -14,7 +14,7 @@ public class ClientCommandPacket : IPacket
     {
         this.ActionId = actionId;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.ActionId);

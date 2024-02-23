@@ -9,32 +9,32 @@ public enum PlayerActionStatus
     /// Digging has started
     /// </summary>
     StartedDigging = 0,
-    
+
     /// <summary>
     /// Digging has been cancelled
     /// </summary>
     CancelledDigging = 1,
-    
+
     /// <summary>
     /// Digging is complete
     /// </summary>
     FinishedDigging = 2,
-    
+
     /// <summary>
     /// Drop the item stack
     /// </summary>
     DropItemStack = 3,
-    
+
     /// <summary>
     /// Drop a single item
     /// </summary>
     DropItem = 4,
-    
+
     /// <summary>
     /// Finished eating or shot bow
     /// </summary>
     ShootArrow_FinishedEating = 5,
-    
+
     /// <summary>
     /// Swap item to off hand
     /// </summary>

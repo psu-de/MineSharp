@@ -9,12 +9,13 @@ namespace MineSharp.Protocol;
 internal static class IPHelper
 {
     private static readonly LookupClient Client = new LookupClient();
-    
+
     public static IPAddress ResolveHostname(string hostnameOrIp, ref ushort port)
     {
         var type = Uri.CheckHostName(hostnameOrIp);
-        return type switch {
-            UriHostNameType.Dns => _ResolveHostname(hostnameOrIp, ref port),
+        return type switch
+        {
+            UriHostNameType.Dns  => _ResolveHostname(hostnameOrIp, ref port),
             UriHostNameType.IPv4 => IPAddress.Parse(hostnameOrIp),
 
             _ => throw new MineSharpHostException("Hostname not supported: " + hostnameOrIp)
@@ -25,15 +26,15 @@ internal static class IPHelper
     {
         if (port != 25565 || hostname == "localhost")
             return DnsLookup(hostname);
-        
+
         var result = Client.Query($"_minecraft._tcp.{hostname}", QueryType.SRV);
 
         if (result.HasError)
             return DnsLookup(hostname);
 
         var srvRecord = result.Answers
-            .OfType<SrvRecord>()
-            .FirstOrDefault();
+                              .OfType<SrvRecord>()
+                              .FirstOrDefault();
 
         if (srvRecord == null)
             return DnsLookup(hostname); // No SRV record, fallback to hostname
@@ -51,6 +52,6 @@ internal static class IPHelper
     private static IPAddress DnsLookup(string hostname)
     {
         return Client.GetHostEntry(hostname).AddressList.FirstOrDefault()
-               ?? throw new MineSharpAuthException($"Could not find ip for hostname ('{hostname}')");
+            ?? throw new MineSharpAuthException($"Could not find ip for hostname ('{hostname}')");
     }
 }

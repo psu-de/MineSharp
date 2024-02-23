@@ -9,7 +9,7 @@ public enum PacketFlow
     /// Packets sent to the client by the server
     /// </summary>
     Clientbound,
-    
+
     /// <summary>
     /// Packets sent to the server by the client
     /// </summary>
