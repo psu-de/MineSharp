@@ -17,7 +17,7 @@ public class EntityGenerator
             typeGenerator.Generate(wrapper),
             categoryGenerator.Generate(wrapper));
     }
-    
+
     private static string GetName(JToken token)
     {
         var name = (string)token.SelectToken("name")!;

@@ -12,12 +12,12 @@ public class ChatPacket : IPacket
     public PacketType Type => PacketType.SB_Play_Chat;
 
     public string Message { get; set; }
-    
+
     public ChatPacket(string message)
     {
         this.Message = message;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Message);

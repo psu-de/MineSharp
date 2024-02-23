@@ -8,7 +8,7 @@ public class ProtocolGenerator
     public async Task Run(MinecraftDataWrapper wrapper)
     {
         var set = new HashSet<string>();
-        
+
         foreach (var version in Config.IncludedVersions)
         {
             var obj = (JObject)await wrapper.GetProtocol(version);
@@ -27,7 +27,7 @@ public class ProtocolGenerator
             {
                 set.Add(packet);
             }
-            
+
             foreach (var packet in CollectPackets(protocol, ns.Name, "toServer"))
             {
                 set.Add(packet);

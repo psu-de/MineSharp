@@ -7,7 +7,8 @@ namespace MineSharp.Data.Windows;
 
 internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<WindowInfo[]>(provider), IWindowData
 {
-    private static readonly IList<BlockType> StaticAllowedBlocksToOpen = new List<BlockType>() {
+    private static readonly IList<BlockType> StaticAllowedBlocksToOpen = new List<BlockType>()
+    {
         BlockType.Chest,
         BlockType.TrappedChest,
         BlockType.EnderChest,
@@ -57,7 +58,7 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
 
     protected override void InitializeData(WindowInfo[] data)
     {
-        this.Windows = data;
+        this.Windows   = data;
         this.windowMap = this.Windows.ToDictionary(x => x.Name);
     }
 
@@ -65,7 +66,7 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
     {
         if (!this.Loaded)
             this.Load();
-        
+
         return this.Windows![id];
     }
 

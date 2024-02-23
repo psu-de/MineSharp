@@ -14,42 +14,42 @@ public class Vector3(double x, double y, double z)
     /// (1, 1, 1)
     /// </summary>
     public static Vector3 One => new Vector3(1, 1, 1);
-    
+
     /// <summary>
     /// Zero Vector
     /// </summary>
     public static Vector3 Zero => new Vector3(0, 0, 0);
-    
+
     /// <summary>
     /// Unit vector pointing up
     /// </summary>
     public static Vector3 Up => new Vector3(0, 1, 0);
-    
+
     /// <summary>
     /// Unit vector pointing down
     /// </summary>
     public static Vector3 Down => new Vector3(0, -1, 0);
-    
+
     /// <summary>
     /// Unit vector pointing north
     /// </summary>
     public static Vector3 North => new Vector3(0, 0, -1);
-    
+
     /// <summary>
     /// Unit vector pointing south
     /// </summary>
     public static Vector3 South => new Vector3(0, 0, 1);
-    
+
     /// <summary>
     /// Unit vector pointing west
     /// </summary>
     public static Vector3 West => new Vector3(-1, 0, 0);
-    
+
     /// <summary>
     /// Unit vector pointing east
     /// </summary>
     public static Vector3 East => new Vector3(1, 0, 0);
-    
+
     /// <summary>
     /// The X coordinate
     /// </summary>
@@ -94,7 +94,7 @@ public class Vector3(double x, double y, double z)
 
         return this;
     }
-    
+
     /// <summary>
     /// Returns a new Vector with the <paramref name="other"/> added
     /// </summary>
@@ -108,7 +108,7 @@ public class Vector3(double x, double y, double z)
             this.Y + other.Y,
             this.Z + other.Z);
     }
-    
+
     /// <summary>
     /// Component-wise vector subtraction.
     /// </summary>
@@ -121,7 +121,7 @@ public class Vector3(double x, double y, double z)
 
         return this;
     }
-    
+
     /// <summary>
     /// Component-wise vector subtraction.
     /// </summary>
@@ -136,7 +136,7 @@ public class Vector3(double x, double y, double z)
 
         return this;
     }
-    
+
     /// <summary>
     /// Returns a new Vector with <paramref name="other"/> subtracted
     /// </summary>
@@ -163,7 +163,7 @@ public class Vector3(double x, double y, double z)
 
         return this;
     }
-    
+
     /// <summary>
     /// Returns a new Vector3 multiplied by <paramref name="other"/>
     /// </summary>
@@ -295,7 +295,7 @@ public class Vector3(double x, double y, double z)
     public double DistanceToSquared(Vector3 other)
     {
         var diff = this.Minus(other);
-        return diff.X * diff.X + 
+        return diff.X * diff.X +
                diff.Y * diff.Y +
                diff.Z * diff.Z;
     }
@@ -306,9 +306,9 @@ public class Vector3(double x, double y, double z)
     public void Normalize()
     {
         var length = this.Length();
-        
-        var scale = length == 0 
-            ? 0 
+
+        var scale = length == 0
+            ? 0
             : 1 / length;
         this.X *= scale;
         this.Y *= scale;
@@ -336,7 +336,7 @@ public class Vector3(double x, double y, double z)
         => new Vector3(this.X, this.Y, this.Z);
 
     /// <inheritdoc />
-    public override string ToString() 
+    public override string ToString()
         => $"({this.X:0.#####} / {this.Y:0.#####} / {this.Z:0.#####})";
 
     /// <inheritdoc />
@@ -351,9 +351,9 @@ public class Vector3(double x, double y, double z)
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return this.X.GetHashCode() 
-               ^ this.Y.GetHashCode() << 2 
-               ^ this.Z.GetHashCode() >> 2;
+        return this.X.GetHashCode()
+             ^ this.Y.GetHashCode() << 2
+             ^ this.Z.GetHashCode() >> 2;
     }
 
     /// <summary>
@@ -362,14 +362,14 @@ public class Vector3(double x, double y, double z)
     /// <param name="x"></param>
     /// <returns></returns>
     public static explicit operator Position(Vector3 x) => new Position(x.X, x.Y, x.Z);
-    
+
     /// <summary>
     /// Returns a new Vector from a Position
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
     public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
-    
+
     /// <summary>
     /// Checks if the two vectors are equal
     /// </summary>
@@ -378,11 +378,11 @@ public class Vector3(double x, double y, double z)
     /// <returns></returns>
     public static bool operator ==(Vector3 a, Vector3 b)
     {
-        return Math.Abs(a.X - b.X) < 1e-7 
-               && Math.Abs(a.Y - b.Y) < 1e-7 
-               && Math.Abs(a.Z - b.Z) < 1e-7;
+        return Math.Abs(a.X - b.X) < 1e-7
+            && Math.Abs(a.Y - b.Y) < 1e-7
+            && Math.Abs(a.Z - b.Z) < 1e-7;
     }
-    
+
     /// <summary>
     /// Checks if the two vectors are different.
     /// </summary>
@@ -392,8 +392,8 @@ public class Vector3(double x, double y, double z)
     public static bool operator !=(Vector3 a, Vector3 b)
     {
         return Math.Abs(a.X - b.X) > 1e-7
-               || Math.Abs(a.Y - b.Y) > 1e-7
-               || Math.Abs(a.Z - b.Z) > 1e-7;
+            || Math.Abs(a.Y - b.Y) > 1e-7
+            || Math.Abs(a.Z - b.Z) > 1e-7;
     }
 
     /// <summary>

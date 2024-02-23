@@ -13,15 +13,15 @@ namespace MineSharp.World.V1_18;
 public sealed class Chunk_1_18 : IChunk
 {
     private const int SECTION_COUNT = World_1_18.WORLD_HEIGHT / ChunkSection_1_18.SECTION_SIZE;
-    
+
     /// <inheritdoc />
     public ChunkCoordinates Coordinates { get; }
 
     /// <inheritdoc />
     public event Events.ChunkBlockEvent? OnBlockUpdated;
 
-    private readonly MinecraftData _data;
-    private readonly IChunkSection[] _sections;
+    private readonly MinecraftData                     _data;
+    private readonly IChunkSection[]                   _sections;
     private readonly Dictionary<Position, BlockEntity> _blockEntities;
 
     /// <summary>
@@ -32,10 +32,10 @@ public sealed class Chunk_1_18 : IChunk
     /// <param name="blockEntities"></param>
     public Chunk_1_18(MinecraftData data, ChunkCoordinates coordinates, BlockEntity[] blockEntities)
     {
-        this.Coordinates = coordinates;
-        this._data = data;
+        this.Coordinates    = coordinates;
+        this._data          = data;
         this._blockEntities = new Dictionary<Position, BlockEntity>();
-        this._sections = new IChunkSection[SECTION_COUNT];
+        this._sections      = new IChunkSection[SECTION_COUNT];
 
         foreach (var entity in blockEntities)
         {
@@ -68,13 +68,13 @@ public sealed class Chunk_1_18 : IChunk
 
         return block;
     }
-    
+
     /// <inheritdoc />
     public void SetBlockAt(int state, Position position)
     {
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         section.SetBlockAt(state, new Position(position.X, y, position.Z));
-        
+
         this.OnBlockUpdated?.Invoke(this, state, position);
     }
 
@@ -84,7 +84,7 @@ public sealed class Chunk_1_18 : IChunk
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         return section.GetBiomeAt(new Position(position.X, y, position.Z));
     }
-    
+
     /// <inheritdoc />
     public void SetBiomeAt(Position position, Biome biome)
     {
@@ -98,12 +98,12 @@ public sealed class Chunk_1_18 : IChunk
         int found = 0;
         for (int i = 0; i < this._sections.Length; i++)
         {
-            var left = maxCount - found;
+            var left    = maxCount - found;
             var section = this._sections[i];
-            
+
             if (section == null)
                 continue;
-            
+
             foreach (var block in section.FindBlocks(type, left))
             {
                 block.Position = new Position(
@@ -111,7 +111,7 @@ public sealed class Chunk_1_18 : IChunk
                     FromChunkSectionY(block.Position.Y, i),
                     block.Position.Z);
                 yield return block;
-                
+
                 if (++found >= maxCount)
                     yield break;
             }
@@ -128,7 +128,7 @@ public sealed class Chunk_1_18 : IChunk
 
         return (y, this._sections[sectionIndex]);
     }
-    
+
     private int ToChunkSectionY(int y)
     {
         int v = y % ChunkSection_1_18.SECTION_SIZE;

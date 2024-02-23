@@ -16,12 +16,12 @@ public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
     /// X coordinate
     /// </summary>
     public byte X { get; } = x;
-    
+
     /// <summary>
     /// Y coordinate
     /// </summary>
     public short Y { get; } = y;
-    
+
     /// <summary>
     /// Z coordinate
     /// </summary>
@@ -31,7 +31,7 @@ public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
     /// Type
     /// </summary>
     public int Type { get; set; } = type;
-    
+
     /// <summary>
     /// NBT data
     /// </summary>

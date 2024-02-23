@@ -9,39 +9,47 @@ public class AABB
     /// Lower X coordinate
     /// </summary>
     public double MinX { get; set; }
+
     /// <summary>
     /// Lower Y coordinate
     /// </summary>
     public double MinY { get; set; }
+
     /// <summary>
     /// Lower Z coordinate
     /// </summary>
     public double MinZ { get; set; }
+
     /// <summary>
     /// Upper X coordinate
     /// </summary>
     public double MaxX { get; set; }
+
     /// <summary>
     /// Upper Y coordinate
     /// </summary>
     public double MaxY { get; set; }
+
     /// <summary>
     /// Upper Z coordinate
     /// </summary>
     public double MaxZ { get; set; }
+
     /// <summary>
     /// Width of this bounding box (MaxX - MinX)
     /// </summary>
     public double Width => this.MaxX - this.MinX;
+
     /// <summary>
     /// Height of this bounding box (MaxY - MinY)
     /// </summary>
     public double Height => this.MaxY - this.MinY;
+
     /// <summary>
     /// Depth of this bounding box (MaxZ - MinZ)
     /// </summary>
     public double Depth => this.MaxZ - this.MinZ;
-    
+
     /// <summary>
     /// Creates a new AABB
     /// </summary>
@@ -61,7 +69,7 @@ public class AABB
 
         if (minZ > maxZ)
             (maxZ, minZ) = (minZ, maxZ);
-        
+
         this.MinX = minX;
         this.MinY = minY;
         this.MinZ = minZ;
@@ -69,7 +77,7 @@ public class AABB
         this.MaxY = maxY;
         this.MaxZ = maxZ;
     }
-    
+
 
     /// <summary>
     /// Deflate this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
@@ -93,15 +101,15 @@ public class AABB
     public AABB Extend(double x, double y, double z)
     {
         if (x > 0)
-            this.MaxX += x;
+            this.MaxX  += x;
         else this.MinX += x;
 
         if (y > 0)
-            this.MaxY += y;
+            this.MaxY  += y;
         else this.MinY += y;
 
         if (z > 0)
-            this.MaxZ += z;
+            this.MaxZ  += z;
         else this.MinZ += z;
 
         return this;
@@ -125,7 +133,7 @@ public class AABB
         this.MaxZ += z;
         return this;
     }
-    
+
     /// <summary>
     /// Returns a clone of this instance.
     /// </summary>
@@ -146,8 +154,10 @@ public class AABB
             {
                 return false;
             }
+
             return this.MaxZ >= other.MinZ && this.MinZ <= other.MaxZ;
         }
+
         return false;
     }
 
@@ -171,10 +181,11 @@ public class AABB
 
         var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
         var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
-        
+
         return !(tMax < 0 || tMin > tMax);
     }
 
     /// <inheritdoc />
-    public override string ToString() => $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
+    public override string ToString() =>
+        $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
 }

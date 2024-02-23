@@ -17,16 +17,17 @@ namespace MineSharp.World.V1_18;
 public class World_1_18 : AbstractWorld
 {
     internal const int WORLD_HEIGHT = MAX_Y - MIN_Y;
-    internal const int MIN_Y = -64;
-    internal const int MAX_Y = 320;
+    internal const int MIN_Y        = -64;
+    internal const int MAX_Y        = 320;
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger(typeof(IWorld));
 
     /// <inheritdoc />
     public override int MaxY => MAX_Y;
+
     /// <inheritdoc />
     public override int MinY => MIN_Y;
-    
+
     /// <inheritdoc />
     public World_1_18(MinecraftData data) : base(data)
     { }
@@ -34,15 +35,15 @@ public class World_1_18 : AbstractWorld
     /// <inheritdoc />
     public override bool IsOutOfMap(Position position)
     {
-        if (position.Y <= MinY || position.Y >= MaxY) 
+        if (position.Y <= MinY || position.Y >= MaxY)
             return true;
-        
-        if (Math.Abs(position.X) >= 29999984) 
+
+        if (Math.Abs(position.X) >= 29999984)
             return true;
-        
-        if (Math.Abs(position.Z) >= 29999984) 
+
+        if (Math.Abs(position.Z) >= 29999984)
             return true;
-        
+
         return false;
     }
 

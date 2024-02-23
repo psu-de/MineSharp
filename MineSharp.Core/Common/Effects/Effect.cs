@@ -13,6 +13,7 @@ public class Effect(EffectInfo info, int amplifier, DateTime startTime, int dura
     /// Descriptor of this Effect
     /// </summary>
     public readonly EffectInfo Info = info;
+
     /// <summary>
     /// When this effect has started
     /// </summary>
@@ -29,5 +30,6 @@ public class Effect(EffectInfo info, int amplifier, DateTime startTime, int dura
     public int Duration { get; set; } = duration;
 
     /// <inheritdoc />
-    public override string ToString() => $"Effect (Name={this.Info.Name} Id={this.Info.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
+    public override string ToString() =>
+        $"Effect (Name={this.Info.Name} Id={this.Info.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
 }

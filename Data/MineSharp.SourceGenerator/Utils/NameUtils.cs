@@ -7,7 +7,7 @@ public static class NameUtils
 {
     private static string CommonGetName(string x)
         => x.Pascalize();
-    
+
     public static string GetMaterial(string x)
     {
         if (x == "coweb")
@@ -22,12 +22,13 @@ public static class NameUtils
     {
         name = CommonGetName(name);
 
-        return name switch {
+        return name switch
+        {
             "PotteryShardArcher" => "ArcherPotterySherd",
-            "PotteryShardPrize" => "PrizePotterySherd",
+            "PotteryShardPrize"  => "PrizePotterySherd",
             "PotteryShardArmsUp" => "ArmsUpPotterySherd",
-            "PotteryShardSkull" => "SkullPotterySherd",
-            _ => name
+            "PotteryShardSkull"  => "SkullPotterySherd",
+            _                    => name
         };
     }
 
@@ -49,7 +50,7 @@ public static class NameUtils
 
     public static string GetEnchantmentName(string name)
         => CommonGetName(name);
-    
+
     public static string GetEnchantmentCategory(string name)
         => CommonGetName(name);
 
@@ -68,14 +69,14 @@ public static class NameUtils
 
     public static string GetGameState(string name)
         => CommonGetName(name);
-    
+
     public static string GetPacketName(string name, string direction, string ns)
     {
         direction = direction == "toClient" ? "CB" : "SB";
-        ns = ns == "handshaking" ? "Handshake" : ns.Pascalize();
+        ns        = ns        == "handshaking" ? "Handshake" : ns.Pascalize();
         name = name.Pascalize()
-            .Replace("Packet", "")
-            .Replace("ConfiguationAcknowledged", "ConfigurationAcknowledged");
+                   .Replace("Packet", "")
+                   .Replace("ConfiguationAcknowledged", "ConfigurationAcknowledged");
 
         return $"{direction}_{ns}_{name}";
     }

@@ -11,7 +11,7 @@ internal class LastSeenMessageCollector1_19_3 : LastSeenMessageCollector
     private const int CAPACITY = 20;
 
     private AcknowledgedMessage? _lastEntry = null;
-    private int _index;
+    private int                  _index;
 
     public LastSeenMessageCollector1_19_3() : base(CAPACITY)
     {
@@ -39,24 +39,24 @@ internal class LastSeenMessageCollector1_19_3 : LastSeenMessageCollector
     public byte[] Collect(out int count, out AcknowledgedMessage[] acknowledgedMessages)
     {
         count = this.ResetCount();
-        var bitset = new byte[3];
+        var bitset                   = new byte[3];
         var acknowledgedMessagesList = new List<AcknowledgedMessage>();
 
         for (int i = 0; i < this.AcknowledgedMessages.Length; i++)
         {
-            int j = (this._index + i) % this.AcknowledgedMessages.Length;
+            int                  j       = (this._index + i) % this.AcknowledgedMessages.Length;
             AcknowledgedMessage? message = this.AcknowledgedMessages[j];
-            
+
             if (message == null)
                 continue;
 
             bitset[i / 8] |= (byte)(1 << i % 8);
             acknowledgedMessagesList.Add(message);
 
-            message.Pending = false;
+            message.Pending              = false;
             this.AcknowledgedMessages[j] = message;
         }
-        
+
         acknowledgedMessages = acknowledgedMessagesList.ToArray();
         return bitset;
     }

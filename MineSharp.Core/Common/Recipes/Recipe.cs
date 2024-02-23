@@ -2,7 +2,6 @@ using MineSharp.Core.Common.Items;
 
 namespace MineSharp.Core.Common.Recipes;
 
-
 /// <summary>
 /// Represents a crafting recipe
 /// </summary>
@@ -12,11 +11,11 @@ namespace MineSharp.Core.Common.Recipes;
 /// <param name="result"></param>
 /// <param name="count"></param>
 public class Recipe(
-    ItemType?[] ingredients,
+    ItemType?[]  ingredients,
     ItemType?[]? outShape,
-    bool requiresCraftingTable,
-    ItemType result,
-    int count)
+    bool         requiresCraftingTable,
+    ItemType     result,
+    int          count)
 {
     /// <summary>
     /// Ingredients in shape (null for no item) from top left to bottom right
@@ -48,21 +47,20 @@ public class Recipe(
     /// </summary>
     public Dictionary<ItemType, int> IngredientsCount => Ingredients.Aggregate(new Dictionary<ItemType, int>(),
         (x, y) =>
-    {
-        if (y == null)
         {
+            if (y == null)
+            {
+                return x;
+            }
+
+            if (!x.TryGetValue(y.Value, out var count))
+            {
+                x.Add(y.Value, 1);
+                return x;
+            }
+
+            count      += 1;
+            x[y.Value] =  count;
             return x;
-        }
-
-        if (!x.TryGetValue(y.Value, out var count))
-        {
-            x.Add(y.Value, 1);
-            return x;
-        }
-
-        count += 1;
-        x[y.Value] = count;
-        return x;
-
-    });
+        });
 }

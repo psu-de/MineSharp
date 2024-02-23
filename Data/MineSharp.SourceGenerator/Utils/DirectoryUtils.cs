@@ -15,14 +15,14 @@ public static class DirectoryUtils
     public static string GetSourceDirectory()
     {
         var current = Environment.CurrentDirectory;
-        var source = Path.Join(current, "CoreSource");
-        
+        var source  = Path.Join(current, "CoreSource");
+
         if (!Directory.Exists(source))
             Directory.CreateDirectory(source);
 
         return source;
     }
-    
+
     public static string GetSourceDirectory(string subdirectory)
     {
         var source = GetSourceDirectory();
@@ -33,7 +33,7 @@ public static class DirectoryUtils
 
         return path;
     }
-    
+
     public static string GetMineSharpCoreProjectDirectory()
     {
         var project = GetProjectDirectory();

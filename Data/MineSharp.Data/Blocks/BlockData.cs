@@ -8,11 +8,10 @@ namespace MineSharp.Data.Blocks;
 internal class BlockData(IDataProvider<BlockInfo[]> provider)
     : TypeIdNameIndexedData<BlockType, BlockInfo>(provider), IBlockData
 {
-    
     private BlockInfo[]? sortedByState;
 
     public int TotalBlockStateCount { get; private set; } = -1;
-    
+
     public BlockInfo? ByState(int state)
     {
         if (!this.Loaded)
@@ -35,9 +34,9 @@ internal class BlockData(IDataProvider<BlockInfo[]> provider)
     protected override void InitializeData(BlockInfo[] data)
     {
         Array.Sort(data, (a, b) => a.MinState.CompareTo(b.MinState));
-        this.sortedByState = data;
+        this.sortedByState        = data;
         this.TotalBlockStateCount = this.sortedByState[^1].MaxState + 1;
-        
+
         base.InitializeData(data);
     }
 }

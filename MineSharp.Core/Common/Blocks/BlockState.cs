@@ -24,8 +24,10 @@ public class BlockState(params IBlockProperty[] properties)
             {
                 return prop.GetValue<T>(state % prop.StateCount);
             }
+
             state /= prop.StateCount;
         }
+
         return default(T)!;
     }
 }

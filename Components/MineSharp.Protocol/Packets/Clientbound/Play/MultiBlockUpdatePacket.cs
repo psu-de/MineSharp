@@ -8,9 +8,9 @@ public class MultiBlockUpdatePacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_MultiBlockChange;
 
-    public long ChunkSection { get; set; }
-    public bool? SuppressLightUpdates { get; set; }
-    public long[] Blocks { get; set; }
+    public long   ChunkSection         { get; set; }
+    public bool?  SuppressLightUpdates { get; set; }
+    public long[] Blocks               { get; set; }
 
     /// <summary>
     /// Constructor for before 1.20
@@ -20,11 +20,11 @@ public class MultiBlockUpdatePacket : IPacket
     /// <param name="blocks"></param>
     public MultiBlockUpdatePacket(long chunkSection, bool? suppressLightUpdates, long[] blocks)
     {
-        this.ChunkSection = chunkSection;
+        this.ChunkSection         = chunkSection;
         this.SuppressLightUpdates = suppressLightUpdates;
-        this.Blocks = blocks;
+        this.Blocks               = blocks;
     }
-    
+
     /// <summary>
     /// Constructor >= 1.20
     /// </summary>
@@ -32,16 +32,16 @@ public class MultiBlockUpdatePacket : IPacket
     /// <param name="blocks"></param>
     public MultiBlockUpdatePacket(long chunkSection, long[] blocks)
     {
-        this.ChunkSection = chunkSection;
+        this.ChunkSection         = chunkSection;
         this.SuppressLightUpdates = null;
-        this.Blocks = blocks;
+        this.Blocks               = blocks;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_20 && this.SuppressLightUpdates == null)
             throw new ArgumentNullException(nameof(this.SuppressLightUpdates));
-        
+
         buffer.WriteLong(this.ChunkSection);
         if (version.Version.Protocol < ProtocolVersion.V_1_20)
             buffer.WriteBool(this.SuppressLightUpdates!.Value);
@@ -50,7 +50,7 @@ public class MultiBlockUpdatePacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var chunkSection = buffer.ReadLong();
+        var   chunkSection         = buffer.ReadLong();
         bool? suppressLightUpdates = null;
         if (version.Version.Protocol < ProtocolVersion.V_1_20)
             suppressLightUpdates = buffer.ReadBool();

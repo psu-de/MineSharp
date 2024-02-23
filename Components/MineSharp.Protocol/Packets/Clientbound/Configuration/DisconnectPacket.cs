@@ -26,7 +26,7 @@ public class DisconnectPacket : IPacket
     {
         this.Reason = reason;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

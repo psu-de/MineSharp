@@ -14,11 +14,11 @@ namespace MineSharp.Core.Common.Items;
 /// <param name="EnchantCategories">A list of enchantment that are available on the item</param>
 /// <param name="RepairWith">A list of items that can repair the item</param>
 public record ItemInfo(
-    int Id,
-    ItemType Type,
-    string Name,
-    string DisplayName,
-    int StackSize,
-    int? MaxDurability,
+    int                   Id,
+    ItemType              Type,
+    string                Name,
+    string                DisplayName,
+    int                   StackSize,
+    int?                  MaxDurability,
     EnchantmentCategory[] EnchantCategories,
-    ItemType[] RepairWith);
+    ItemType[]            RepairWith);

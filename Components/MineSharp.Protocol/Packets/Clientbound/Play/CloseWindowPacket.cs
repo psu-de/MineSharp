@@ -11,12 +11,12 @@ public class CloseWindowPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_CloseWindow;
-    
+
     /// <summary>
     /// The id of the window to close
     /// </summary>
     public byte WindowId { get; set; }
-    
+
     /// <summary>
     /// Create a new instance
     /// </summary>

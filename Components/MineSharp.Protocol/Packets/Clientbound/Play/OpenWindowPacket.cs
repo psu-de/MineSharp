@@ -7,16 +7,16 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class OpenWindowPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_OpenWindow;
-    
-    public int WindowId { get; set; }
-    public int InventoryType { get; set; }
-    public string WindowTitle { get; set; }
+
+    public int    WindowId      { get; set; }
+    public int    InventoryType { get; set; }
+    public string WindowTitle   { get; set; }
 
     public OpenWindowPacket(int windowId, int inventoryType, string windowTitle)
     {
-        this.WindowId = windowId;
+        this.WindowId      = windowId;
         this.InventoryType = inventoryType;
-        this.WindowTitle = windowTitle;
+        this.WindowTitle   = windowTitle;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)

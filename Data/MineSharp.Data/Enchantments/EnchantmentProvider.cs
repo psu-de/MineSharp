@@ -7,11 +7,11 @@ namespace MineSharp.Data.Enchantments;
 
 internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
 {
-    private static readonly EnumNameLookup<EnchantmentType> EnchantmentTypeLookup = new();
+    private static readonly EnumNameLookup<EnchantmentType>     EnchantmentTypeLookup     = new();
     private static readonly EnumNameLookup<EnchantmentCategory> EnchantmentCategoryLookup = new();
-    
+
     private JArray token;
-    
+
     public EnchantmentProvider(JToken token)
     {
         if (token.Type != JTokenType.Array)
@@ -21,7 +21,7 @@ internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
 
         this.token = (JArray)token;
     }
-    
+
     public EnchantmentInfo[] GetData()
     {
         var data = new EnchantmentInfo[this.token.Count];
@@ -36,18 +36,18 @@ internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
 
     private static EnchantmentInfo FromToken(JToken token)
     {
-        var id = (int)token.SelectToken("id")!;
-        var name = (string)token.SelectToken("name")!;
-        var displayName = (string)token.SelectToken("displayName")!;
-        var maxLevel = (int)token.SelectToken("maxLevel")!;
-        var minCost = (JObject)token.SelectToken("minCost")!;
-        var maxCost = (JObject)token.SelectToken("maxCost")!;
+        var id           = (int)token.SelectToken("id")!;
+        var name         = (string)token.SelectToken("name")!;
+        var displayName  = (string)token.SelectToken("displayName")!;
+        var maxLevel     = (int)token.SelectToken("maxLevel")!;
+        var minCost      = (JObject)token.SelectToken("minCost")!;
+        var maxCost      = (JObject)token.SelectToken("maxCost")!;
         var treasureOnly = (bool)token.SelectToken("treasureOnly")!;
-        var curse = (bool)token.SelectToken("curse")!;
-        var exclude = (JArray)token.SelectToken("exclude")!;
-        var category = (string)token.SelectToken("category")!;
-        var weight = (int)token.SelectToken("weight")!;
-        var tradeable = (bool)token.SelectToken("tradeable")!;
+        var curse        = (bool)token.SelectToken("curse")!;
+        var exclude      = (JArray)token.SelectToken("exclude")!;
+        var category     = (string)token.SelectToken("category")!;
+        var weight       = (int)token.SelectToken("weight")!;
+        var tradeable    = (bool)token.SelectToken("tradeable")!;
         var discoverable = (bool)token.SelectToken("discoverable")!;
 
         return new EnchantmentInfo(
@@ -81,9 +81,9 @@ internal class EnchantmentProvider : IDataProvider<EnchantmentInfo[]>
             return Array.Empty<EnchantmentType>();
 
         return array
-            .ToObject<string[]>()!
-            .Select(NameUtils.GetEnchantmentName)
-            .Select(EnchantmentTypeLookup.FromName)
-            .ToArray();
+              .ToObject<string[]>()!
+              .Select(NameUtils.GetEnchantmentName)
+              .Select(EnchantmentTypeLookup.FromName)
+              .ToArray();
     }
 }

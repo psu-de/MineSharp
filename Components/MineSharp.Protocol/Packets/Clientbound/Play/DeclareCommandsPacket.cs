@@ -25,7 +25,7 @@ public class DeclareCommandsPacket : IPacket
     {
         this.RawBuffer = buffer;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

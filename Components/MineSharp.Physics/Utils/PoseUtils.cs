@@ -12,9 +12,9 @@ internal static class PoseUtils
         { EntityPose.Standing, CreateAABB(0.6f, 1.6f) },
         { EntityPose.Sleeping, CreateAABB(0.2f, 0.2f) },
         { EntityPose.FallFlying, CreateAABB(0.6f, 0.6f) },
-        { EntityPose.Swimming, CreateAABB(0.6f, 0.6f) }, 
-        { EntityPose.SpinAttack, CreateAABB(0.6f, 0.6f) }, 
-        { EntityPose.Crouching, CreateAABB(0.6f, 1.5f) }, 
+        { EntityPose.Swimming, CreateAABB(0.6f, 0.6f) },
+        { EntityPose.SpinAttack, CreateAABB(0.6f, 0.6f) },
+        { EntityPose.Crouching, CreateAABB(0.6f, 1.5f) },
         { EntityPose.Dying, CreateAABB(0.2f, 0.2f) },
     };
 
@@ -25,8 +25,8 @@ internal static class PoseUtils
     {
         var bb = GetBBForPose(pose);
         bb.Offset(
-            player.Entity!.Position.X, 
-            player.Entity.Position.Y, 
+            player.Entity!.Position.X,
+            player.Entity.Position.Y,
             player.Entity.Position.Z);
         bb.Deflate(1.0E-7D, 1.0E-7D, 1.0E-7D);
 

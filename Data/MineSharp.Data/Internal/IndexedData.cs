@@ -5,8 +5,8 @@ namespace MineSharp.Data.Internal;
 
 internal abstract class IndexedData<T>(IDataProvider<T> provider)
 {
-    protected bool Loaded { get; private set; } = false;
-    private IDataProvider<T>? provider = provider;
+    protected bool              Loaded { get; private set; } = false;
+    private   IDataProvider<T>? provider = provider;
 
     protected abstract void InitializeData(T data);
 
@@ -14,10 +14,10 @@ internal abstract class IndexedData<T>(IDataProvider<T> provider)
     {
         if (this.Loaded)
             return;
-        
+
         this.InitializeData(this.provider!.GetData());
-        
+
         this.provider = null;
-        this.Loaded = true;
+        this.Loaded   = true;
     }
 }

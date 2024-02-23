@@ -7,7 +7,7 @@ namespace MineSharp.Data.Language;
 internal class LanguageData(IDataProvider<LanguageDataBlob> provider) : IndexedData<LanguageDataBlob>(provider), ILanguageData
 {
     private Dictionary<string, string> translations = new();
-    
+
     public string? GetTranslation(string name)
     {
         if (!this.Loaded)

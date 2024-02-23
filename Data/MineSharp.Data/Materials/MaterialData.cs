@@ -9,7 +9,7 @@ namespace MineSharp.Data.Materials;
 internal class MaterialData(IDataProvider<MaterialDataBlob> provider) : IndexedData<MaterialDataBlob>(provider), IMaterialData
 {
     private Dictionary<Material, Dictionary<ItemType, float>> multiplierMap = new();
-    
+
     protected override void InitializeData(MaterialDataBlob data)
     {
         this.multiplierMap = data.MultiplierMap;

@@ -9,11 +9,11 @@ public class LoginStartPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Login_LoginStart;
 
-    public string Username { get; set; }
-    public SignatureContainer? Signature { get; set; }
-    public UUID? PlayerUuid { get; set; }
+    public string              Username   { get; set; }
+    public SignatureContainer? Signature  { get; set; }
+    public UUID?               PlayerUuid { get; set; }
 
-    
+
     /// <summary>
     /// Constructor for versions before 1.19
     /// </summary>
@@ -30,11 +30,11 @@ public class LoginStartPacket : IPacket
     /// <param name="playerUuid"></param>
     public LoginStartPacket(string username, UUID? playerUuid)
     {
-        this.Username = username;
+        this.Username   = username;
         this.PlayerUuid = playerUuid;
     }
-    
-    
+
+
     /// <summary>
     /// Constructor for version 1.19-1.19.2
     /// </summary>
@@ -43,11 +43,11 @@ public class LoginStartPacket : IPacket
     /// <param name="playerUuid"></param>
     public LoginStartPacket(string username, SignatureContainer? signature, UUID? playerUuid = null)
     {
-        this.Username = username;
-        this.Signature = signature;
+        this.Username   = username;
+        this.Signature  = signature;
         this.PlayerUuid = playerUuid;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(this.Username);
@@ -71,21 +71,22 @@ public class LoginStartPacket : IPacket
             {
                 buffer.WriteUuid(this.PlayerUuid!.Value);
             }
+
             return;
         }
 
         if (!this.PlayerUuid.HasValue)
             throw new ArgumentNullException(nameof(this.PlayerUuid));
-        
+
         buffer.WriteUuid(this.PlayerUuid.Value);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var username = buffer.ReadString();
-        SignatureContainer? signature = null;
-        UUID? playerUuid = null;
-        
+        var                 username   = buffer.ReadString();
+        SignatureContainer? signature  = null;
+        UUID?               playerUuid = null;
+
         if (version.Version.Protocol is >= ProtocolVersion.V_1_19 and <= ProtocolVersion.V_1_19_2)
         {
             signature = SignatureContainer.Read(buffer);
@@ -101,7 +102,7 @@ public class LoginStartPacket : IPacket
 
     public class SignatureContainer : ISerializable<SignatureContainer>
     {
-        public long Timestamp { get; set; }
+        public long   Timestamp { get; set; }
         public byte[] PublicKey { get; set; }
         public byte[] Signature { get; set; }
 
@@ -111,7 +112,7 @@ public class LoginStartPacket : IPacket
             this.PublicKey = publicKey;
             this.Signature = signature;
         }
-        
+
         public void Write(PacketBuffer buffer)
         {
             buffer.WriteLong(this.Timestamp);
@@ -123,7 +124,7 @@ public class LoginStartPacket : IPacket
 
         public static SignatureContainer Read(PacketBuffer buffer)
         {
-            var timestamp = buffer.ReadLong();
+            var        timestamp = buffer.ReadLong();
             Span<byte> publicKey = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(publicKey);
             Span<byte> signature = new byte[buffer.ReadVarInt()];

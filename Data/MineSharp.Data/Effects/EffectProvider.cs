@@ -20,7 +20,7 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
 
         this.token = (JArray)token;
     }
-    
+
     public EffectInfo[] GetData()
     {
         var data = new EffectInfo[this.token.Count];
@@ -35,10 +35,10 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
 
     private static EffectInfo FromToken(JToken token)
     {
-        var id = (int)token.SelectToken("id")!;
-        var name = (string)token.SelectToken("name")!;
+        var id          = (int)token.SelectToken("id")!;
+        var name        = (string)token.SelectToken("name")!;
         var displayName = (string)token.SelectToken("displayName")!;
-        var isGood = (string)token.SelectToken("type")! == "good";
+        var isGood      = (string)token.SelectToken("type")! == "good";
 
         return new EffectInfo(
             id,

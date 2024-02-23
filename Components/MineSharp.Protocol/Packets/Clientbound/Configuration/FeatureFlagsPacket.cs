@@ -11,12 +11,12 @@ public class FeatureFlagsPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
-    
+
     /// <summary>
     /// The enabled feature flags
     /// </summary>
     public string[] FeatureFlags { get; set; }
-    
+
     /// <summary>
     /// Create a new instance
     /// </summary>

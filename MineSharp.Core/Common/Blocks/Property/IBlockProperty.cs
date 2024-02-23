@@ -9,7 +9,7 @@ public interface IBlockProperty
     /// The name of the property.
     /// </summary>
     public string Name { get; }
-    
+
     /// <summary>
     /// The number of different states this property has.
     /// </summary>

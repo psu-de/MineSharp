@@ -16,12 +16,12 @@ public class EncryptionRequestPacket : IPacket
     /// The hashed server id
     /// </summary>
     public string ServerId { get; set; }
-    
+
     /// <summary>
     /// The public key of the server
     /// </summary>
     public byte[] PublicKey { get; set; }
-    
+
     /// <summary>
     /// Verify token
     /// </summary>
@@ -35,11 +35,11 @@ public class EncryptionRequestPacket : IPacket
     /// <param name="verifyToken"></param>
     public EncryptionRequestPacket(string serverId, byte[] publicKey, byte[] verifyToken)
     {
-        this.ServerId = serverId;
-        this.PublicKey = publicKey;
+        this.ServerId    = serverId;
+        this.PublicKey   = publicKey;
         this.VerifyToken = verifyToken;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -53,7 +53,7 @@ public class EncryptionRequestPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var serverId = buffer.ReadString();
+        var        serverId  = buffer.ReadString();
         Span<byte> publicKey = stackalloc byte[buffer.ReadVarInt()];
         buffer.ReadBytes(publicKey);
         Span<byte> verifyToken = stackalloc byte[buffer.ReadVarInt()];

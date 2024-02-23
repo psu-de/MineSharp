@@ -16,7 +16,7 @@ internal class LanguageProvider : IDataProvider<LanguageDataBlob>
 
         this.token = (JObject)token;
     }
-    
+
     public LanguageDataBlob GetData()
     {
         return new LanguageDataBlob(token.ToObject<Dictionary<string, string>>()!);

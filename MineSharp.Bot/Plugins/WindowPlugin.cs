@@ -10,7 +10,6 @@ using NLog;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Windows.Specific;
-
 using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
 using CBHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
 
@@ -24,45 +23,46 @@ namespace MineSharp.Bot.Plugins;
 public class WindowPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     /// <summary>
     /// The window currently opened by the bot. Null if none is open.
     /// </summary>
     public Window? CurrentlyOpenedWindow { get; private set; }
-    
+
     /// <summary>
     /// The bots inventory window
     /// </summary>
     public Inventory? Inventory { get; private set; }
-    
+
     /// <summary>
     /// The item the bot is currently holding
     /// </summary>
     public Item? HeldItem => this.Inventory!
-        .GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex))
-        .Item;
+                                 .GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex))
+                                 .Item;
 
     /// <summary>
     /// Index of the selected hot bar slot
     /// </summary>
     public byte SelectedHotbarIndex { get; private set; }
-    
+
     /// <summary>
     /// Fires whenever a window is opened (fe: Chest opened)
     /// </summary>
     public event Events.WindowEvent? OnWindowOpened;
+
     /// <summary>
     /// Fires whenever the bots held item changed.
     /// </summary>
     public event Events.ItemEvent? OnHeldItemChanged;
-    
-    private readonly TaskCompletionSource _inventoryLoadedTsc;
-    private readonly IDictionary<int, Window> _openWindows;
-    private readonly object _windowLock;
-    private readonly Window _mainInventory;
 
-    private PlayerPlugin? _playerPlugin;
-    private DateTime? _cacheTimestamp;
+    private readonly TaskCompletionSource     _inventoryLoadedTsc;
+    private readonly IDictionary<int, Window> _openWindows;
+    private readonly object                   _windowLock;
+    private readonly Window                   _mainInventory;
+
+    private PlayerPlugin?      _playerPlugin;
+    private DateTime?          _cacheTimestamp;
     private WindowItemsPacket? _cachedWindowItemsPacket;
 
     /// <summary>
@@ -72,23 +72,23 @@ public class WindowPlugin : Plugin
     public WindowPlugin(MineSharpBot bot) : base(bot)
     {
         this._inventoryLoadedTsc = new TaskCompletionSource();
-        this._openWindows = new ConcurrentDictionary<int, Window>();
-        this._windowLock = new object();
-        
+        this._openWindows        = new ConcurrentDictionary<int, Window>();
+        this._windowLock         = new object();
+
         this._mainInventory = new Window(
             255,
             "MainInventory",
-            4 * 9, 
-            null, 
+            4 * 9,
+            null,
             this._synchronizeWindowClick);
         this._mainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
     }
-    
+
     /// <inheritdoc />
     protected override Task Init()
     {
-        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();   
-        
+        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
+
         this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
         this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
         this.Bot.Client.On<CBHeldItemPacket>(this.HandleHeldItemChange);
@@ -102,9 +102,9 @@ public class WindowPlugin : Plugin
     /// Wait until the bot's inventory items are loaded
     /// </summary>
     /// <returns></returns>
-    public Task WaitForInventory() 
+    public Task WaitForInventory()
         => this._inventoryLoadedTsc.Task;
-    
+
     /// <summary>
     /// Try to open the given block and return the opened window
     /// </summary>
@@ -120,15 +120,15 @@ public class WindowPlugin : Plugin
         }
 
         PlaceBlockPacket packet = new PlaceBlockPacket(
-            (int)PlayerHand.MainHand, 
+            (int)PlayerHand.MainHand,
             block.Position,
             BlockFace.Top,
             0.5f,
             0.5f,
-            0.5f, 
+            0.5f,
             false,
             ++this.Bot.SequenceId);
-        
+
         _ = this.Bot.Client.SendPacket(packet);
         _ = this._playerPlugin?.SwingArm();
         var receive = this.Bot.Client.WaitForPacket<OpenWindowPacket>();
@@ -140,9 +140,9 @@ public class WindowPlugin : Plugin
         var result = await receive;
 
         var windowInfo = this.Bot.Data.Windows.ById(result.InventoryType);
-        var window = this.OpenWindow(result.WindowId, windowInfo);
+        var window     = this.OpenWindow(result.WindowId, windowInfo);
         this.CurrentlyOpenedWindow = window;
-        
+
         return window;
     }
 
@@ -155,18 +155,18 @@ public class WindowPlugin : Plugin
     {
         if (id == 0)
             return Task.CompletedTask;
-        
+
         if (!this._openWindows.Remove(id, out var window))
         {
             Logger.Warn("Tried to close window which is not open!");
             return Task.CompletedTask;
         }
-        
+
         if (this.CurrentlyOpenedWindow?.WindowId == window.WindowId)
         {
             this.CurrentlyOpenedWindow = null;
         }
-        
+
         // TODO: window.Close();
         return this.Bot.Client.SendPacket(new Protocol.Packets.Serverbound.Play.CloseWindowPacket((byte)id));
     }
@@ -186,9 +186,9 @@ public class WindowPlugin : Plugin
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task SelectHotbarIndex(byte hotbarIndex)
     {
-        if (hotbarIndex > 8) 
+        if (hotbarIndex > 8)
             throw new ArgumentOutOfRangeException(nameof(hotbarIndex) + " must be between 0 and 8");
-        
+
         var packet = new SBHeldItemPacket((sbyte)hotbarIndex);
         await this.Bot.Client.SendPacket(packet);
 
@@ -218,9 +218,9 @@ public class WindowPlugin : Plugin
     public async Task EquipItem(ItemType type, PlayerHand hand = PlayerHand.MainHand)
     {
         await this.WaitForInventory();
-        
-        var handSlot = hand == PlayerHand.MainHand 
-            ? this.Inventory!.GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex)) 
+
+        var handSlot = hand == PlayerHand.MainHand
+            ? this.Inventory!.GetSlot((short)(PlayerWindowSlots.HotbarStart + this.SelectedHotbarIndex))
             : this.Inventory!.GetSlot(Inventory.Slot.OffHand);
 
         this._EquipItem(type, handSlot);
@@ -239,11 +239,11 @@ public class WindowPlugin : Plugin
         {
             throw new InvalidOperationException("cannot put something in CraftingResult slot");
         }
-        
+
         await this.WaitForInventory();
 
         var slot = this.Inventory!.GetSlot(equipSlot);
-        
+
         this._EquipItem(type, slot);
     }
 
@@ -251,17 +251,17 @@ public class WindowPlugin : Plugin
     {
         if (destination.Item?.Info.Type == type)
             return;
-        
+
         var slot = this.Inventory?.FindInventoryItems(type).FirstOrDefault();
 
         if (slot == null)
             throw new ItemNotFoundException(type);
-        
+
         var wasEmpty = destination.IsEmpty();
-        
+
         this.Inventory!.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
         this.Inventory!.DoSimpleClick(WindowMouseButton.MouseLeft, destination.SlotIndex);
-        
+
         if (!wasEmpty)
         {
             this.Inventory.DoSimpleClick(WindowMouseButton.MouseLeft, slot.SlotIndex);
@@ -291,13 +291,13 @@ public class WindowPlugin : Plugin
         }
 
         var window = new Window(
-            (byte)id, 
-            windowInfo.Title, 
-            windowInfo.UniqueSlots, 
-            windowInfo.ExcludeInventory ? null : this._mainInventory, 
+            (byte)id,
+            windowInfo.Title,
+            windowInfo.UniqueSlots,
+            windowInfo.ExcludeInventory ? null : this._mainInventory,
             this._synchronizeWindowClick);
-        
-        lock(this._windowLock) 
+
+        lock (this._windowLock)
         {
             if (!this._openWindows.TryAdd(id, window))
                 Logger.Warn($"Could not add window with id {id}, it already existed.");
@@ -306,8 +306,8 @@ public class WindowPlugin : Plugin
         if (this._cachedWindowItemsPacket == null)
             return window;
 
-        if (this._cachedWindowItemsPacket.WindowId == id 
-            && DateTime.Now - this._cacheTimestamp! <= TimeSpan.FromSeconds(5))
+        if (this._cachedWindowItemsPacket.WindowId == id
+         && DateTime.Now - this._cacheTimestamp!   <= TimeSpan.FromSeconds(5))
         {
             // use cache
             Logger.Debug("Applying cached window items for window with id=" + id);
@@ -316,8 +316,8 @@ public class WindowPlugin : Plugin
 
         // delete cache
         this._cachedWindowItemsPacket = null;
-        this._cacheTimestamp = null;
-        
+        this._cacheTimestamp          = null;
+
         this.OnWindowOpened?.Invoke(this.Bot, window);
         return window;
     }
@@ -325,15 +325,15 @@ public class WindowPlugin : Plugin
     private async Task _synchronizeWindowClick(Window window, WindowClick click)
     {
         var windowClickPacket = new WindowClickPacket(
-            window.WindowId, 
+            window.WindowId,
             window.StateId,
             click.Slot,
             (sbyte)click.Button,
             (sbyte)click.ClickMode,
-            click.GetChangedSlots(), 
+            click.GetChangedSlots(),
             window.GetSelectedSlot().Item);
         await this.Bot.Client.SendPacket(windowClickPacket);
-        
+
         // limit the amount of clicks you can do per second
         // if the limit is too low, the client and server will
         // get desynced, and things like crafting won't work 
@@ -350,7 +350,7 @@ public class WindowPlugin : Plugin
             this.OnHeldItemChanged?.Invoke(this.Bot, window.GetSlot(index).Item);
         }
     }
-    
+
     private Task HandleSetSlot(WindowSetSlotPacket packet)
     {
         Window? window;
@@ -366,18 +366,19 @@ public class WindowPlugin : Plugin
 
         if (window == null)
         {
-            Logger.Warn($"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened, {this.CurrentlyOpenedWindow?.ToString() ?? "null"}, {this.Inventory?.ToString() ?? "null"}");
+            Logger.Warn(
+                $"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened, {this.CurrentlyOpenedWindow?.ToString() ?? "null"}, {this.Inventory?.ToString() ?? "null"}");
             return Task.CompletedTask;
         }
-        
+
         Logger.Debug("Handle set slot: {Slot}", packet.Slot);
-        
+
         window.StateId = packet.StateId;
         window.SetSlot(packet.Slot);
 
         return Task.CompletedTask;
     }
-    
+
     private Task HandleWindowItems(WindowItemsPacket packet)
     {
         Window? window;
@@ -388,16 +389,17 @@ public class WindowPlugin : Plugin
                 Logger.Warn($"Received {packet.GetType().Name} for windowId={packet.WindowId}, but its not opened");
                 // Cache items in case it gets opened in a bit
                 this._cachedWindowItemsPacket = packet;
-                this._cacheTimestamp = DateTime.Now;
+                this._cacheTimestamp          = DateTime.Now;
 
                 return Task.CompletedTask;
             }
+
             Logger.Debug($"HandleWindowItems for window {window.Title}");
         }
-        
+
         var slots = packet.Items
-            .Select((x, i) => new Slot(x, (short)i))
-            .ToArray();
+                          .Select((x, i) => new Slot(x, (short)i))
+                          .ToArray();
         window.StateId = packet.StateId;
         window.SetSlots(slots);
 

@@ -15,7 +15,8 @@ public class BotBuilder
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly Type[] DefaultPlugins = [
+    private static readonly Type[] DefaultPlugins =
+    [
         typeof(ChatPlugin),
         typeof(EntityPlugin),
         typeof(PlayerPlugin),
@@ -26,21 +27,21 @@ public class BotBuilder
     ];
 
     private string? hostname;
-    private ushort port = 25565;
-    
+    private ushort  port = 25565;
+
     // MinecraftData variables
-    private string? versionStr;
+    private string?        versionStr;
     private MinecraftData? data;
-    private bool autoDetect = true;
-    
+    private bool           autoDetect = true;
+
     // Plugins 
-    private List<Type> plugins = [];
-    private bool excludeDefaultPlugins = false;
-    
+    private List<Type> plugins               = [];
+    private bool       excludeDefaultPlugins = false;
+
     // Session variables
-    private Session? session;
-    private string? microsoftLoginUsername = null;
-    private MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler = null;
+    private Session?                         session;
+    private string?                          microsoftLoginUsername = null;
+    private MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler      = null;
 
     // proxy
     private ProxyFactory? proxyProvider = null;
@@ -154,7 +155,7 @@ public class BotBuilder
     public BotBuilder OnlineSession(string usernameOrEmail, MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler = null)
     {
         this.microsoftLoginUsername = usernameOrEmail;
-        this.deviceCodeHandler = deviceCodeHandler;
+        this.deviceCodeHandler      = deviceCodeHandler;
         return this;
     }
 
@@ -181,7 +182,7 @@ public class BotBuilder
         this.proxyProvider = new ProxyFactory(type, hostname, port);
         return this;
     }
-    
+
     /// <summary>
     /// Use a proxy for minecraft services and Minecraft client
     /// </summary>
@@ -211,7 +212,7 @@ public class BotBuilder
         this.proxyProvider ??= new ProxyFactory();
 
         MinecraftApi api = new MinecraftApi(this.proxyProvider.CreateHttpClient());
-        
+
         MinecraftData? data;
         if (this.data is not null)
             data = this.data;
@@ -226,7 +227,9 @@ public class BotBuilder
             session = this.session;
         else if (this.microsoftLoginUsername is not null)
             session = await MicrosoftAuth.Login(this.microsoftLoginUsername, this.deviceCodeHandler);
-        else throw new ArgumentNullException(nameof(this.session), "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
+        else
+            throw new ArgumentNullException(nameof(this.session),
+                "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
 
         var client = new MinecraftClient(
             data,
@@ -235,9 +238,9 @@ public class BotBuilder
             this.port,
             api,
             this.proxyProvider);
-        
+
         var bot = new MineSharpBot(client);
-        
+
         if (!this.excludeDefaultPlugins)
             this.plugins.AddRange(DefaultPlugins);
 
@@ -248,6 +251,7 @@ public class BotBuilder
             {
                 throw new Exception($"Could not create plugin of type {type.Name}");
             }
+
             await bot.LoadPlugin(plugin);
         }
 
@@ -273,7 +277,7 @@ public class BotBuilder
         {
             Logger.Warn($"MineSharp was not tested on server brand '{status.Brand}'");
         }
-        
+
         return await MinecraftData.FromVersion(status.Version);
     }
 }

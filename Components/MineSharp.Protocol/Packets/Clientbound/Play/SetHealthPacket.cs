@@ -8,14 +8,14 @@ public class SetHealthPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_UpdateHealth;
 
-    public float Health { get; set; }
-    public int Food { get; set; }
+    public float Health     { get; set; }
+    public int   Food       { get; set; }
     public float Saturation { get; set; }
 
     public SetHealthPacket(float health, int food, float saturation)
     {
-        this.Health = health;
-        this.Food = food;
+        this.Health     = health;
+        this.Food       = food;
         this.Saturation = saturation;
     }
 
@@ -28,8 +28,8 @@ public class SetHealthPacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var health = buffer.ReadFloat();
-        var food = buffer.ReadVarInt();
+        var health     = buffer.ReadFloat();
+        var food       = buffer.ReadVarInt();
         var saturation = buffer.ReadFloat();
         return new SetHealthPacket(health, food, saturation);
     }

@@ -11,7 +11,7 @@ public class FinishConfigurationPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_FinishConfiguration;
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }

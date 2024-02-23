@@ -33,19 +33,19 @@ public static class PhysicsTests
         {
             ExpectChatMessage(bot, source, "testWalk success");
             var physics = bot.GetPlugin<PhysicsPlugin>();
-            
+
             await Task.Delay(1000);
             physics.InputControls.ForwardKeyDown = true;
         });
     }
-    
+
     public static Task TestWalkBackward()
     {
         return IntegrationTest.RunTest("testWalkBackwards", async (bot, source) =>
         {
             ExpectChatMessage(bot, source, "testWalk success");
             var physics = bot.GetPlugin<PhysicsPlugin>();
-            
+
             await Task.Delay(1000);
             physics.InputControls.BackwardKeyDown = true;
         });
@@ -57,19 +57,19 @@ public static class PhysicsTests
         {
             ExpectChatMessage(bot, source, "testWalk success");
             var physics = bot.GetPlugin<PhysicsPlugin>();
-            
+
             await Task.Delay(1000);
             physics.InputControls.LeftKeyDown = true;
         });
     }
-    
+
     public static Task TestWalkRight()
     {
         return IntegrationTest.RunTest("testWalkRight", async (bot, source) =>
         {
             ExpectChatMessage(bot, source, "testWalk success");
             var physics = bot.GetPlugin<PhysicsPlugin>();
-            
+
             await Task.Delay(1000);
             physics.InputControls.RightKeyDown = true;
         });
@@ -97,7 +97,7 @@ public static class PhysicsTests
             physics.InputControls.JumpingKeyDown = true;
         });
     }
-    
+
     public static Task TestCrouch()
     {
         return IntegrationTest.RunTest("testCrouch", async (bot, source) =>
@@ -107,7 +107,7 @@ public static class PhysicsTests
 
             await Task.Delay(1000);
 
-            physics.InputControls.ForwardKeyDown = true;
+            physics.InputControls.ForwardKeyDown  = true;
             physics.InputControls.SneakingKeyDown = true;
         });
     }

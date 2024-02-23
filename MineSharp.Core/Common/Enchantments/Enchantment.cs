@@ -11,6 +11,7 @@ public class Enchantment(EnchantmentInfo info, int level)
     /// Descriptor of this enchantment
     /// </summary>
     public readonly EnchantmentInfo Info = info;
+
     /// <summary>
     /// The level of this enchantment
     /// </summary>

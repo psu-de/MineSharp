@@ -14,7 +14,7 @@ internal class LastSeenMessageCollector1_19_2 : LastSeenMessageCollector
 
     public LastSeenMessageCollector1_19_2() : base(CAPACITY)
     { }
-    
+
     public override bool Push(AcknowledgedMessage message)
     {
         var last = message;
@@ -22,7 +22,7 @@ internal class LastSeenMessageCollector1_19_2 : LastSeenMessageCollector
         {
             var entry = this.AcknowledgedMessages[i]!;
             this.AcknowledgedMessages[i] = last;
-            last = entry;
+            last                         = entry;
 
             if (message.Sender != entry.Sender)
                 continue;
@@ -36,7 +36,7 @@ internal class LastSeenMessageCollector1_19_2 : LastSeenMessageCollector
 
         this.LastSeenMessages = new AcknowledgedMessage[Count];
         Array.Copy(this.AcknowledgedMessages, this.LastSeenMessages, this.Count);
-        
+
         return false;
     }
 

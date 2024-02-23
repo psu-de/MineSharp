@@ -9,21 +9,21 @@ namespace MineSharp.Data.BlockCollisionShapes;
 internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockCollisionShapeDataBlob>
 {
     private static readonly EnumNameLookup<BlockType> BlockTypeLookup = new();
-    
+
     public BlockCollisionShapeDataBlob GetData()
     {
         var blocks = (JObject)token.SelectToken("blocks")!;
         var shapes = (JObject)token.SelectToken("shapes")!;
-        
+
         var blockDict = blocks.Properties()
-            .ToDictionary(
-                x => BlockTypeLookup.FromName(NameUtils.GetBlockName(x.Name)), 
-                x => ToIntArray(x.Value));
+                              .ToDictionary(
+                                   x => BlockTypeLookup.FromName(NameUtils.GetBlockName(x.Name)),
+                                   x => ToIntArray(x.Value));
 
         var shapesDict = shapes.Properties()
-            .ToDictionary(
-                x => Convert.ToInt32(x.Name), 
-                x => ToFloatArray(x.Value));
+                               .ToDictionary(
+                                    x => Convert.ToInt32(x.Name),
+                                    x => ToFloatArray(x.Value));
 
         return new BlockCollisionShapeDataBlob(
             blockDict,

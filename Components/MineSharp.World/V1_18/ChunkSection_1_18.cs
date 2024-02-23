@@ -10,8 +10,8 @@ namespace MineSharp.World.V1_18;
 internal class ChunkSection_1_18 : IChunkSection
 {
     public const int SECTION_SIZE = 16;
-    
-    private readonly MinecraftData _data;
+
+    private readonly MinecraftData  _data;
     private readonly BiomeContainer _biomeContainer;
     private readonly BlockContainer _blockContainer;
 
@@ -19,7 +19,7 @@ internal class ChunkSection_1_18 : IChunkSection
 
     public ChunkSection_1_18(MinecraftData data, short blockCount, BlockContainer blocks, BiomeContainer biomes)
     {
-        this._data = data;
+        this._data           = data;
         this.SolidBlockCount = blockCount;
         this._blockContainer = blocks;
         this._biomeContainer = biomes;
@@ -29,15 +29,15 @@ internal class ChunkSection_1_18 : IChunkSection
     {
         return this._blockContainer.GetAt(this.GetBlockIndex(position));
     }
-    
+
     public void SetBlockAt(int state, Position position)
     {
         var index = GetBlockIndex(position);
-        var old = this._data.Blocks.ByState( 
+        var old = this._data.Blocks.ByState(
             this._blockContainer.GetAt(index))!;
 
         bool wasSolid = old.IsSolid();
-        bool isSolid = this._data.Blocks.ByState(state)!.IsSolid();
+        bool isSolid  = this._data.Blocks.ByState(state)!.IsSolid();
 
         if (wasSolid != isSolid)
         {
@@ -56,7 +56,7 @@ internal class ChunkSection_1_18 : IChunkSection
         var state = this._biomeContainer.GetAt(index);
         return new Biome(this._data.Biomes.ById(state)!);
     }
-    
+
     public void SetBiomeAt(Position position, Biome biome)
     {
         var index = GetBiomeIndex(position);
@@ -82,7 +82,7 @@ internal class ChunkSection_1_18 : IChunkSection
                     var value = this._blockContainer.GetAt(index);
                     if (value < info.MinState || value > info.MaxState)
                         continue;
-                    
+
                     yield return new Block(info, value, new Position(x, y, z));
                     found++;
 
@@ -93,7 +93,7 @@ internal class ChunkSection_1_18 : IChunkSection
         }
     }
 
-    
+
     private int GetBiomeIndex(Position position)
     {
         return position.Y >> 2 << 2 | position.Z >> 2 << 2 | position.X >> 2;
@@ -108,8 +108,8 @@ internal class ChunkSection_1_18 : IChunkSection
     internal static ChunkSection_1_18 FromStream(MinecraftData data, PacketBuffer buffer)
     {
         short solidBlockCount = buffer.ReadShort();
-        var blockContainer = BlockContainer.FromStream(data, buffer);
-        var biomeContainer = BiomeContainer.FromStream(data, buffer);
+        var   blockContainer  = BlockContainer.FromStream(data, buffer);
+        var   biomeContainer  = BiomeContainer.FromStream(data, buffer);
 
         return new ChunkSection_1_18(data, solidBlockCount, blockContainer, biomeContainer);
     }

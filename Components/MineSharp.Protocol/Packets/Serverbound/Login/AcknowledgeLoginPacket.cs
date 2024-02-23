@@ -12,7 +12,7 @@ public class AcknowledgeLoginPacket : IPacket
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version) => new AcknowledgeLoginPacket();
 }
 #pragma warning restore CS1591

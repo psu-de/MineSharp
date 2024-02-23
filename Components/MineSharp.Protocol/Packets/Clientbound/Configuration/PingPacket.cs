@@ -9,10 +9,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 /// </summary>
 public class PingPacket : IPacket
 {
-    
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_Ping;
- 
+
     /// <summary>
     /// The id of the ping
     /// </summary>
@@ -32,7 +31,7 @@ public class PingPacket : IPacket
     {
         buffer.WriteInt(this.Id);
     }
-    
+
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {

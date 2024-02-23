@@ -18,11 +18,11 @@ namespace MineSharp.Bot.Plugins;
 public class ChatPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     private readonly LastSeenMessageCollector? _messageCollector;
-    private readonly UUID _chatSession = new Guid();
-    private int _messageCount = 0;
-    private byte[]? _precedingSignature = null; // only used for 1.19.2 chat signing
+    private readonly UUID                      _chatSession        = new Guid();
+    private          int                       _messageCount       = 0;
+    private          byte[]?                   _precedingSignature = null; // only used for 1.19.2 chat signing
 
     private CommandTree? _commandTree = null;
 
@@ -31,19 +31,20 @@ public class ChatPlugin : Plugin
     /// </summary>
     public event Events.BotChatMessageEvent? OnChatMessageReceived;
 
-    
+
     /// <summary>
     /// Create a new ChatPlugin instance.
     /// </summary>
     /// <param name="bot"></param>
     public ChatPlugin(MineSharpBot bot) : base(bot)
     {
-        this._messageCollector = this.Bot.Data.Version.Protocol switch {
+        this._messageCollector = this.Bot.Data.Version.Protocol switch
+        {
             >= ProtocolVersion.V_1_19_3 => new LastSeenMessageCollector1_19_3(),
             >= ProtocolVersion.V_1_19_2 => new LastSeenMessageCollector1_19_2(),
-            _ => null
+            _                           => null
         };
-        
+
         this.Bot.Client.On<PlayerChatPacket>(this.HandleChatMessagePacket);
         this.Bot.Client.On<ChatPacket>(this.HandleChat);
         this.Bot.Client.On<SystemChatMessagePacket>(this.HandleSystemChatMessage);
@@ -63,7 +64,7 @@ public class ChatPlugin : Plugin
                     this.Bot.Client.Session.Certificate.PublicKeySignatureV2
                 ));
         }
-        
+
         var packet = await this.Bot.Client.WaitForPacket<DeclareCommandsPacket>();
         await HandleDeclareCommandsPacket(packet);
     }
@@ -77,13 +78,14 @@ public class ChatPlugin : Plugin
     public Task SendChat(string message)
     {
         if (this.Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19
-            && message.StartsWith('/'))
+         && message.StartsWith('/'))
         {
             return SendCommand(message.Substring(1));
         }
 
         // signed chat messages since 1.19
-        return this.Bot.Data.Version.Protocol switch {
+        return this.Bot.Data.Version.Protocol switch
+        {
             // 1.19.3
             >= ProtocolVersion.V_1_19_3 => this.SendChat1_19_3(message),
             // 1.19.2
@@ -93,9 +95,8 @@ public class ChatPlugin : Plugin
             // Literally every version before.
             _ => this.Bot.Client.SendPacket(new SBChatMessage(message))
         };
-
     }
-    
+
     /// <summary>
     /// Send a command to the server.
     /// Can only be used for versions &gt;= 1.19
@@ -110,7 +111,8 @@ public class ChatPlugin : Plugin
             arguments = CollectCommandArgumentsRecursive(this._commandTree!.RootIndex, command);
         }
 
-        return this.Bot.Data.Version.Protocol switch {
+        return this.Bot.Data.Version.Protocol switch
+        {
             // 1.19.3
             >= ProtocolVersion.V_1_19_3 => this.SendCommand1_19_3(command, arguments),
             // 1.19.2
@@ -120,14 +122,13 @@ public class ChatPlugin : Plugin
             // Literally every version before
             _ => this.SendChat("/" + command)
         };
-
     }
-    
-    
+
+
     /*
      * Thanks to Minecraft-Console-Client
      * https://github.com/MCCTeam/Minecraft-Console-Client
-     * 
+     *
      * This Method uses a lot of code from MinecraftClient/Protocol/Handlers/Packet/s2c/DeclareCommands.cs from MCC.
      */
     private List<(string, string)> CollectCommandArgumentsRecursive(int nodeIdx, string command, List<(string, string)>? arguments = null)
@@ -136,10 +137,10 @@ public class ChatPlugin : Plugin
             throw new InvalidOperationException();
 
         arguments ??= new List<(string, string)>();
-        
-        var node = this._commandTree.Nodes[nodeIdx];
+
+        var node    = this._commandTree.Nodes[nodeIdx];
         var lastArg = command;
-        
+
         switch (node.Flags & 0x03)
         {
             case 0: // root
@@ -154,13 +155,14 @@ public class ChatPlugin : Plugin
                 break;
             case 2: // argument
             {
-                int argCnt = node.Parser?.GetArgumentCount() ?? 1;
-                string[] arg = command.Split(' ', argCnt + 1);
+                int      argCnt = node.Parser?.GetArgumentCount() ?? 1;
+                string[] arg    = command.Split(' ', argCnt + 1);
                 if ((node.Flags & 0x04) > 0)
                 {
                     if (node.Parser != null && node.Parser.GetName() == "minecraft:message")
                         arguments.Add((node.Name!, command));
                 }
+
                 if (arg.Length != argCnt + 1)
                     return arguments;
                 lastArg = arg[^1];
@@ -172,16 +174,16 @@ public class ChatPlugin : Plugin
             nodeIdx = this._commandTree.Nodes[nodeIdx].RedirectNode;
 
         return this._commandTree.Nodes[nodeIdx]
-            .Children
-            .Aggregate(arguments, (cur, idx) => this.CollectCommandArgumentsRecursive(idx, lastArg, cur));
+                   .Children
+                   .Aggregate(arguments, (cur, idx) => this.CollectCommandArgumentsRecursive(idx, lastArg, cur));
     }
-    
+
 
     private Task SendChat1_19_1(string message)
     {
         byte[] signature;
-        var timestamp = DateTimeOffset.UtcNow;
-        var salt = ChatSignature.GenerateSalt();
+        var    timestamp = DateTimeOffset.UtcNow;
+        var    salt      = ChatSignature.GenerateSalt();
 
         if (!this.Bot.Session.OnlineSession || this.Bot.Session.Certificate == null)
         {
@@ -192,7 +194,7 @@ public class ChatPlugin : Plugin
             signature = ChatSignature.SignChat1_19_1(
                 this.Bot.Client.Session.Certificate!.RsaPrivate,
                 message,
-                this.Bot.Client.Session.UUID, 
+                this.Bot.Client.Session.UUID,
                 timestamp,
                 salt);
         }
@@ -205,7 +207,7 @@ public class ChatPlugin : Plugin
                 signature,
                 false));
     }
-    
+
     private Task SendCommand1_19_1(string command, List<(string, string)> arguments)
     {
         var timestamp = DateTimeOffset.UtcNow;
@@ -221,8 +223,8 @@ public class ChatPlugin : Plugin
                     false));
         }
 
-        var signatures = new List<ChatCommandPacket.ArgumentSignature>();
-        long salt = ChatSignature.GenerateSalt();
+        var  signatures = new List<ChatCommandPacket.ArgumentSignature>();
+        long salt       = ChatSignature.GenerateSalt();
         foreach ((var name, var argument) in arguments)
         {
             var signature = ChatSignature.SignChat1_19_1(
@@ -231,10 +233,10 @@ public class ChatPlugin : Plugin
                 this.Bot.Session.UUID,
                 timestamp,
                 salt);
-            
+
             signatures.Add(new ChatCommandPacket.ArgumentSignature(name, signature));
         }
-        
+
         return this.Bot.Client.SendPacket(
             new ChatCommandPacket(
                 command,
@@ -242,21 +244,20 @@ public class ChatPlugin : Plugin
                 salt,
                 signatures.ToArray(),
                 false));
-        
     }
-    
+
     private Task SendChat1_19_2(string message)
     {
-        var collector = (LastSeenMessageCollector1_19_2)this._messageCollector!;
-        var messages = collector.AcknowledgeMessages();
-        var timestamp = DateTimeOffset.UtcNow;
+        var    collector = (LastSeenMessageCollector1_19_2)this._messageCollector!;
+        var    messages  = collector.AcknowledgeMessages();
+        var    timestamp = DateTimeOffset.UtcNow;
         byte[] signature;
-        long salt = ChatSignature.GenerateSalt();
+        long   salt = ChatSignature.GenerateSalt();
 
         if (!this.Bot.Session.OnlineSession || this.Bot.Session.Certificate == null)
         {
             signature = Array.Empty<byte>();
-            salt = 0;
+            salt      = 0;
         }
         else
         {
@@ -281,14 +282,14 @@ public class ChatPlugin : Plugin
             false,
             messages.Select(x => x.ToProtocolMessage()).ToArray(),
             null
-            ));
+        ));
     }
-    
+
     private Task SendCommand1_19_2(string command, List<(string, string)> arguments)
     {
-        var collector = (LastSeenMessageCollector1_19_2)this._messageCollector!;
+        var collector    = (LastSeenMessageCollector1_19_2)this._messageCollector!;
         var acknowledged = collector.AcknowledgeMessages();
-        
+
         var timestamp = DateTimeOffset.UtcNow;
 
         if (!this.Bot.Session.OnlineSession || this.Bot.Session.Certificate == null)
@@ -304,8 +305,8 @@ public class ChatPlugin : Plugin
                     null));
         }
 
-        var signatures = new List<ChatCommandPacket.ArgumentSignature>();
-        long salt = ChatSignature.GenerateSalt();
+        var  signatures = new List<ChatCommandPacket.ArgumentSignature>();
+        long salt       = ChatSignature.GenerateSalt();
         foreach ((var name, var argument) in arguments)
         {
             var signature = ChatSignature.SignChat1_19_2(
@@ -316,10 +317,10 @@ public class ChatPlugin : Plugin
                 salt,
                 acknowledged,
                 this._precedingSignature);
-            
+
             signatures.Add(new ChatCommandPacket.ArgumentSignature(name, signature));
         }
-        
+
         return this.Bot.Client.SendPacket(
             new ChatCommandPacket(
                 command,
@@ -329,14 +330,13 @@ public class ChatPlugin : Plugin
                 false,
                 acknowledged.Select(x => x.ToProtocolMessage()).ToArray(),
                 null));
-        
     }
 
     private Task SendChat1_19_3(string message)
     {
-        var collector = (LastSeenMessageCollector1_19_3)this._messageCollector!;
+        var    collector            = (LastSeenMessageCollector1_19_3)this._messageCollector!;
         byte[] acknowledgedBitfield = collector.Collect(out var count, out var acknowledged);
-        
+
         var timestamp = DateTimeOffset.UtcNow;
 
         if (!this.Bot.Session.OnlineSession || this.Bot.Session.Certificate == null)
@@ -373,10 +373,10 @@ public class ChatPlugin : Plugin
     }
 
     private Task SendCommand1_19_3(string command, List<(string, string)> arguments)
-    {       
-        var collector = (LastSeenMessageCollector1_19_3)this._messageCollector!;
+    {
+        var    collector            = (LastSeenMessageCollector1_19_3)this._messageCollector!;
         byte[] acknowledgedBitfield = collector.Collect(out var count, out var acknowledged);
-        
+
         var timestamp = DateTimeOffset.UtcNow;
 
         if (!this.Bot.Session.OnlineSession || this.Bot.Session.Certificate == null)
@@ -391,8 +391,8 @@ public class ChatPlugin : Plugin
                     acknowledgedBitfield));
         }
 
-        var signatures = new List<ChatCommandPacket.ArgumentSignature>();
-        long salt = ChatSignature.GenerateSalt();
+        var  signatures = new List<ChatCommandPacket.ArgumentSignature>();
+        long salt       = ChatSignature.GenerateSalt();
         foreach ((var name, var argument) in arguments)
         {
             var signature = ChatSignature.SignChat1_19_3(
@@ -405,10 +405,10 @@ public class ChatPlugin : Plugin
                 salt,
                 timestamp,
                 acknowledged);
-            
+
             signatures.Add(new ChatCommandPacket.ArgumentSignature(name, signature));
         }
-        
+
         return this.Bot.Client.SendPacket(
             new ChatCommandPacket(
                 command,
@@ -418,7 +418,7 @@ public class ChatPlugin : Plugin
                 count,
                 acknowledgedBitfield));
     }
-    
+
     private Task HandleDeclareCommandsPacket(DeclareCommandsPacket packet)
     {
         try
@@ -429,6 +429,7 @@ public class ChatPlugin : Plugin
         {
             Logger.Error($"Could not parse command tree: {e}");
         }
+
         return Task.CompletedTask;
     }
 
@@ -454,18 +455,20 @@ public class ChatPlugin : Plugin
                         var messages = collector1_19_2.AcknowledgeMessages().Select(x => x.ToProtocolMessage()).ToArray();
                         this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(messages, null));
                     }
-                } else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
+                }
+                else if (this._messageCollector is LastSeenMessageCollector1_19_3 collector1_19_3)
                 {
                     int count = collector1_19_3.ResetCount();
                     if (count > 0)
                         this.Bot.Client.SendPacket(new MessageAcknowledgementPacket(count));
                 }
             }
-        
-            (UUID sender, string message, int type) = packet.Body switch {
-                PlayerChatPacket.V1_19Body v19 => (v19.Sender, v19.SignedChat, v19.MessageType),
+
+            (UUID sender, string message, int type) = packet.Body switch
+            {
+                PlayerChatPacket.V1_19Body v19       => (v19.Sender, v19.SignedChat, v19.MessageType),
                 PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, v19_2.Type),
-                _ => throw new UnreachableException()
+                _                                    => throw new UnreachableException()
             };
 
             var chatType = GetChatMessageTypeFromRegistry(type);
@@ -475,7 +478,7 @@ public class ChatPlugin : Plugin
         {
             Logger.Error("Error in chat message: " + e);
         }
-        
+
         return Task.CompletedTask;
     }
 
@@ -488,18 +491,17 @@ public class ChatPlugin : Plugin
         }
         else
         {
-            type = packet.IsOverlay!.Value 
-                ? ChatMessageType.GameInfo 
+            type = packet.IsOverlay!.Value
+                ? ChatMessageType.GameInfo
                 : ChatMessageType.SystemMessage;
         }
-        
+
         this.HandleChatInternal(null, packet.Content, type);
         return Task.CompletedTask;
     }
 
     private Task HandleDisguisedChatMessage(DisguisedChatMessagePacket packet)
     {
-        
         this.HandleChatInternal(
             null,
             packet.Message,
@@ -529,16 +531,17 @@ public class ChatPlugin : Plugin
         var val = this.Bot.Registry["minecraft:chat_type"]["value"][index]["name"]!.StringValue!;
         return GetChatMessageType(val);
     }
-    
+
     private static ChatMessageType GetChatMessageType(string message)
     {
-        return message switch {
-            "minecraft:chat" => ChatMessageType.Chat,
-            "minecraft:emote_command" => ChatMessageType.Emote,
-            "minecraft:say_command" => ChatMessageType.SayCommand,
+        return message switch
+        {
+            "minecraft:chat"                      => ChatMessageType.Chat,
+            "minecraft:emote_command"             => ChatMessageType.Emote,
+            "minecraft:say_command"               => ChatMessageType.SayCommand,
             "minecraft:team_msg_command_incoming" => ChatMessageType.TeamMessage,
-            "minecraft:msg_command_incoming" => ChatMessageType.SayCommand,
-            _ => UnknownChatMessage(message)
+            "minecraft:msg_command_incoming"      => ChatMessageType.SayCommand,
+            _                                     => UnknownChatMessage(message)
         };
     }
 

@@ -1,4 +1,3 @@
-
 namespace MineSharp.Data.Framework;
 
 /// <summary>
@@ -6,29 +5,29 @@ namespace MineSharp.Data.Framework;
 /// </summary>
 /// <typeparam name="TEnum"></typeparam>
 /// <typeparam name="TInfo"></typeparam>
-public interface ITypeIdNameIndexedData<in TEnum, out TInfo> 
-    where TEnum : struct, Enum 
-    where TInfo : class 
+public interface ITypeIdNameIndexedData<in TEnum, out TInfo>
+    where TEnum : struct, Enum
+    where TInfo : class
 {
     /// <summary>
     /// The number of data entries
     /// </summary>
     public int Count { get; }
-    
+
     /// <summary>
     /// Get <typeparamref name="TInfo"/> by type
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public TInfo? ByType(TEnum type);
-    
+
     /// <summary>
     /// Get <typeparamref name="TInfo"/> by numeric id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     public TInfo? ById(int id);
-  
+
     /// <summary>
     /// Get <typeparamref name="TInfo"/> by name id
     /// </summary>
@@ -38,7 +37,7 @@ public interface ITypeIdNameIndexedData<in TEnum, out TInfo>
 
     /// <inheritdoc cref="ByType"/>
     public TInfo? this[TEnum type] => ByType(type);
-    
+
     /// <inheritdoc cref="ById"/>
     public TInfo? this[int id] => ById(id);
 

@@ -15,7 +15,7 @@ internal static class HandshakeProtocol
         {
             throw new ArgumentException("Next state must either be Login or Status.");
         }
-        
+
         var handshake = new HandshakePacket(data.Version.Protocol, client.Hostname, client.Port, next);
         await client.SendPacket(handshake);
 
@@ -23,15 +23,15 @@ internal static class HandshakeProtocol
         {
             return;
         }
-        
+
         var login = GetLoginPacket(data, client.Session);
         await client.SendPacket(login);
     }
-    
+
     private static LoginStartPacket GetLoginPacket(MinecraftData data, Session session)
     {
         LoginStartPacket.SignatureContainer? signature = null;
-        
+
         if (data.Version.Protocol >= ProtocolVersion.V_1_19_3 && session.Certificate != null)
         {
             signature = new LoginStartPacket.SignatureContainer(

@@ -16,12 +16,12 @@ public class LoginPluginRequestPacket : IPacket
     /// The message id
     /// </summary>
     public int MessageId { get; set; }
-    
+
     /// <summary>
     /// The channel identifier
     /// </summary>
     public string Channel { get; set; } // TODO: Identifier
-    
+
     /// <summary>
     /// The raw message data
     /// </summary>
@@ -36,10 +36,10 @@ public class LoginPluginRequestPacket : IPacket
     public LoginPluginRequestPacket(int messageId, string channel, byte[] data)
     {
         this.MessageId = messageId;
-        this.Channel = channel;
-        this.Data = data;
+        this.Channel   = channel;
+        this.Data      = data;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -52,8 +52,8 @@ public class LoginPluginRequestPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
-        var channel = buffer.ReadString();
-        var data = buffer.RestBuffer();
+        var channel   = buffer.ReadString();
+        var data      = buffer.RestBuffer();
 
         return new LoginPluginRequestPacket(messageId, channel, data);
     }

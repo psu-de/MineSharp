@@ -7,20 +7,21 @@ namespace MineSharp.Protocol.Packets.Handlers;
 internal class PlayPacketHandler : IPacketHandler
 {
     private MinecraftClient _client;
-    private MinecraftData _data;
+    private MinecraftData   _data;
 
     public PlayPacketHandler(MinecraftClient client, MinecraftData data)
     {
         this._client = client;
-        this._data = data;
+        this._data   = data;
     }
 
     public Task HandleIncoming(IPacket packet)
     {
-        return packet switch {
-            KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
+        return packet switch
+        {
+            KeepAlivePacket keepAlive             => HandleKeepAlive(keepAlive),
             BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
-            _ => Task.CompletedTask
+            _                                     => Task.CompletedTask
         };
     }
 
@@ -30,7 +31,7 @@ internal class PlayPacketHandler : IPacketHandler
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter; 
+        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter;
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {

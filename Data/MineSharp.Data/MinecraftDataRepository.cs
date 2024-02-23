@@ -5,16 +5,16 @@ namespace MineSharp.Data;
 
 internal class MinecraftDataRepository
 {
-    private static ILogger Logger = LogManager.GetCurrentClassLogger();
-    private const string GithubRepository = "https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/";
+    private static ILogger Logger           = LogManager.GetCurrentClassLogger();
+    private const  string  GithubRepository = "https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/";
 
-    private readonly string cache;
+    private readonly string     cache;
     private readonly HttpClient client;
 
     public MinecraftDataRepository(string cache, HttpClient client)
     {
         this.client = client;
-        this.cache = cache;
+        this.cache  = cache;
 
         if (!Directory.Exists(this.cache))
         {
@@ -34,7 +34,7 @@ internal class MinecraftDataRepository
     public async Task<JToken> GetAsset(string file, string version)
     {
         var relativePath = this.GetFilePath(file, version);
-        var cachePath = Path.Combine(this.cache, relativePath);
+        var cachePath    = Path.Combine(this.cache, relativePath);
         if (!File.Exists(cachePath))
             await DownloadAsset(relativePath);
 
@@ -46,15 +46,15 @@ internal class MinecraftDataRepository
         file = file.Replace(Path.DirectorySeparatorChar, '/');
         var url = GithubRepository + file;
 
-        var cacheFilePath = Path.Combine(this.cache, file);
+        var cacheFilePath  = Path.Combine(this.cache, file);
         var cacheDirectory = Path.GetDirectoryName(cacheFilePath) ?? throw new FileNotFoundException();
-        
+
         if (!Directory.Exists(cacheDirectory))
             Directory.CreateDirectory(cacheDirectory!);
 
         try
         {
-            await using var stream = await this.client.GetStreamAsync(url);
+            await using var stream     = await this.client.GetStreamAsync(url);
             await using var fileStream = new FileStream(cacheFilePath, FileMode.OpenOrCreate, FileAccess.Write);
 
             await stream.CopyToAsync(fileStream);

@@ -7,11 +7,11 @@ namespace MineSharp.Data.Entities;
 
 internal class EntityProvider : IDataProvider<EntityInfo[]>
 {
-    private static readonly EnumNameLookup<EntityType> EntityTypeLookup = new();
+    private static readonly EnumNameLookup<EntityType>     EntityTypeLookup     = new();
     private static readonly EnumNameLookup<EntityCategory> EntityCategoryLookup = new();
-    private static readonly EnumNameLookup<MobType> MobTypeLookup = new();
-    
-    
+    private static readonly EnumNameLookup<MobType>        MobTypeLookup        = new();
+
+
     private JArray token;
 
     public EntityProvider(JToken token)
@@ -23,7 +23,7 @@ internal class EntityProvider : IDataProvider<EntityInfo[]>
 
         this.token = (JArray)token;
     }
-    
+
     public EntityInfo[] GetData()
     {
         var data = new EntityInfo[this.token.Count];
@@ -39,13 +39,13 @@ internal class EntityProvider : IDataProvider<EntityInfo[]>
 
     private static EntityInfo FromToken(JToken token)
     {
-        var id = (int)token.SelectToken("id")!;
-        var name = (string)token.SelectToken("name")!;
+        var id          = (int)token.SelectToken("id")!;
+        var name        = (string)token.SelectToken("name")!;
         var displayName = (string)token.SelectToken("displayName")!;
-        var width = (float)token.SelectToken("width")!;
-        var height = (float)token.SelectToken("height")!;
-        var mobType = (string)token.SelectToken("type")!;
-        var category = (string)token.SelectToken("category")!;
+        var width       = (float)token.SelectToken("width")!;
+        var height      = (float)token.SelectToken("height")!;
+        var mobType     = (string)token.SelectToken("type")!;
+        var category    = (string)token.SelectToken("category")!;
 
         return new EntityInfo(
             id,

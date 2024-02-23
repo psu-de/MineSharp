@@ -10,36 +10,36 @@ public class ChatMessagePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatMessage;
 
-    public string Message { get; set; }
-    public long Timestamp { get; set; }
-    public long Salt { get; set; }
-    public byte[]? Signature { get; set; }
-    public bool? SignedPreview { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public int? MessageCount { get; set; }
-    public byte[]? Acknowledged { get; set; }
+    public string             Message             { get; set; }
+    public long               Timestamp           { get; set; }
+    public long               Salt                { get; set; }
+    public byte[]?            Signature           { get; set; }
+    public bool?              SignedPreview       { get; set; }
+    public ChatMessageItem[]? PreviousMessages    { get; set; }
+    public ChatMessageItem?   LastRejectedMessage { get; set; }
+    public int?               MessageCount        { get; set; }
+    public byte[]?            Acknowledged        { get; set; }
 
     public ChatMessagePacket(
-        string message,
-        long timestamp,
-        long salt,
-        byte[]? signature,
-        bool? signedPreview,
+        string             message,
+        long               timestamp,
+        long               salt,
+        byte[]?            signature,
+        bool?              signedPreview,
         ChatMessageItem[]? previousMessages,
-        ChatMessageItem? lastRejectedMessage,
-        int? messageCount,
-        byte[]? acknowledged)
+        ChatMessageItem?   lastRejectedMessage,
+        int?               messageCount,
+        byte[]?            acknowledged)
     {
-        this.Message = message;
-        this.Timestamp = timestamp;
-        this.Salt = salt;
-        this.Signature = signature;
-        this.SignedPreview = signedPreview;
-        this.PreviousMessages = previousMessages;
+        this.Message             = message;
+        this.Timestamp           = timestamp;
+        this.Salt                = salt;
+        this.Signature           = signature;
+        this.SignedPreview       = signedPreview;
+        this.PreviousMessages    = previousMessages;
         this.LastRejectedMessage = lastRejectedMessage;
-        this.MessageCount = messageCount;
-        this.Acknowledged = acknowledged;
+        this.MessageCount        = messageCount;
+        this.Acknowledged        = acknowledged;
 
         if (acknowledged != null && acknowledged.Length != 3)
         {
@@ -51,7 +51,8 @@ public class ChatMessagePacket : IPacket
         : this(message, timestamp, salt, signature, signedPreview, null, null, null, null)
     { }
 
-    public ChatMessagePacket(string message, long timestamp, long salt, byte[] signature, bool signedPreview, ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
+    public ChatMessagePacket(string            message,          long timestamp, long salt, byte[] signature, bool signedPreview,
+                             ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
         : this(message, timestamp, salt, signature, signedPreview, previousMessages, lastRejectedMessage, null, null)
     { }
 
@@ -119,15 +120,15 @@ public class ChatMessagePacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var message = buffer.ReadString();
-        var timestamp = buffer.ReadLong();
-        var salt = buffer.ReadLong();
-        byte[]? signature;
-        bool? signedPreview;
+        var                message   = buffer.ReadString();
+        var                timestamp = buffer.ReadLong();
+        var                salt      = buffer.ReadLong();
+        byte[]?            signature;
+        bool?              signedPreview;
         ChatMessageItem[]? previousMessages;
-        ChatMessageItem? lastRejectedMessage;
-        int? messageCount;
-        byte[]? acknowledged;
+        ChatMessageItem?   lastRejectedMessage;
+        int?               messageCount;
+        byte[]?            acknowledged;
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {

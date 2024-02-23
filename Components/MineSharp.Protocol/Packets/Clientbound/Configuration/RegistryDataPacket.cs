@@ -12,7 +12,7 @@ public class RegistryDataPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_RegistryData;
-    
+
     /// <summary>
     /// The registry data
     /// </summary>

@@ -83,7 +83,7 @@ public interface IBlockCollisionShapeData
     public AABB[] GetShapes(BlockType type, int index)
     {
         var indices = GetShapeIndices(type);
-        var entry = indices.Length > 1 ? indices[index] : indices[0];
+        var entry   = indices.Length > 1 ? indices[index] : indices[0];
         return GetShapes(entry);
     }
 

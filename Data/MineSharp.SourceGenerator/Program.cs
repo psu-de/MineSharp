@@ -6,13 +6,10 @@ AnsiConsole.Write(new FigletText("SourceGenerator").Color(Color.Aqua));
 
 var data = new MinecraftDataWrapper(DirectoryUtils.GetMinecraftDataDirectory());
 
-var generators = new [] {
-    new BiomeGenerator().Run(data),
-    new BlockGenerator().Run(data),
-    new EffectGenerator().Run(data),
-    new EnchantmentGenerator().Run(data),
-    new EntityGenerator().Run(data),
-    new ItemGenerator().Run(data),
+var generators = new[]
+{
+    new BiomeGenerator().Run(data), new BlockGenerator().Run(data), new EffectGenerator().Run(data),
+    new EnchantmentGenerator().Run(data), new EntityGenerator().Run(data), new ItemGenerator().Run(data),
     new ProtocolGenerator().Run(data)
 };
 
@@ -29,7 +26,7 @@ void RecursiveCopy(string source, string target)
         Directory.CreateDirectory(dirPath.Replace(source, target));
     }
 
-    foreach (string newPath in Directory.GetFiles(source, "*.*",SearchOption.AllDirectories))
+    foreach (string newPath in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories))
     {
         File.Copy(newPath, newPath.Replace(source, target), true);
     }

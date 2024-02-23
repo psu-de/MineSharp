@@ -28,12 +28,12 @@ public class MineSharpBot
     /// The <see cref="MinecraftData"/> instance used by this bot
     /// </summary>
     public readonly MinecraftData Data;
-    
+
     /// <summary>
     /// The underlying <see cref="MinecraftClient"/> used by this bot
     /// </summary>
     public readonly MinecraftClient Client;
-    
+
     /// <summary>
     /// The <see cref="Session"/> object used by this bot
     /// </summary>
@@ -45,8 +45,8 @@ public class MineSharpBot
     public NbtCompound Registry = [];
 
     private readonly IDictionary<Guid, Plugin> _plugins;
-    private readonly CancellationTokenSource _cancellation;
-    
+    private readonly CancellationTokenSource   _cancellation;
+
     private Task? _tickLoop;
 
     // This field is used for syncing block updates since 1.19.
@@ -58,18 +58,18 @@ public class MineSharpBot
     /// <param name="client"></param>
     public MineSharpBot(MinecraftClient client)
     {
-        this.Client = client;
-        this.Data = this.Client.Data;
+        this.Client  = client;
+        this.Data    = this.Client.Data;
         this.Session = this.Client.Session;
 
         this._cancellation = new CancellationTokenSource();
-        this._plugins = new Dictionary<Guid, Plugin>();
-        
+        this._plugins      = new Dictionary<Guid, Plugin>();
+
         this.Client.OnDisconnected += this.OnClientDisconnected;
         this.Client.On<RegistryDataPacket>(packet => Task.FromResult(this.Registry = packet.RegistryData));
         this.Client.On<LoginPacket>(packet => Task.FromResult(packet.RegistryCodec != null ? this.Registry = packet.RegistryCodec : null));
     }
-    
+
     /// <summary>
     /// Load the given plugin and initialize it when the bot is already connected
     /// </summary>
@@ -80,7 +80,7 @@ public class MineSharpBot
 
         if (this._tickLoop == null)
             return;
-        
+
         await plugin.Initialize();
     }
 
@@ -117,7 +117,7 @@ public class MineSharpBot
         await Task.WhenAll(
             this._plugins.Values
                 .Select(pl => pl.Initialize()));
-        
+
         this._tickLoop = this.TickLoop();
 
         return true;
@@ -132,9 +132,9 @@ public class MineSharpBot
         if (this._tickLoop is { Status: TaskStatus.Running })
         {
             this._cancellation.Cancel();
-            await this._tickLoop!;   
+            await this._tickLoop!;
         }
-        
+
         await this.Client.Disconnect(reason);
     }
 
@@ -145,10 +145,10 @@ public class MineSharpBot
             var start = DateTime.Now;
 
             var tasks = this._plugins.Values
-                .Where(plugin => plugin.IsEnabled)
-                .Select(plugin => plugin.OnTick())
-                .ToArray();
-            
+                            .Where(plugin => plugin.IsEnabled)
+                            .Select(plugin => plugin.OnTick())
+                            .ToArray();
+
             await Task.WhenAll(tasks);
 
             var errors = tasks.Where(x => x.Exception != null);

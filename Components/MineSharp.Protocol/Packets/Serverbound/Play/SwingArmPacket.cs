@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class SwingArmPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ArmAnimation;
-    
+
     public PlayerHand Hand { get; set; }
 
     public SwingArmPacket(PlayerHand hand)
@@ -19,7 +19,7 @@ public class SwingArmPacket : IPacket
     {
         buffer.WriteVarInt((int)this.Hand);
     }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new SwingArmPacket(

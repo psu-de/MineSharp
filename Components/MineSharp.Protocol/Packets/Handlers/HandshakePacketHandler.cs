@@ -7,12 +7,12 @@ namespace MineSharp.Protocol.Packets.Handlers;
 internal class HandshakePacketHandler : IPacketHandler
 {
     private MinecraftClient _client;
-    
+
     public HandshakePacketHandler(MinecraftClient client)
     {
         this._client = client;
     }
-    
+
     public Task HandleIncoming(IPacket packet)
     {
         return Task.CompletedTask;
@@ -20,12 +20,13 @@ internal class HandshakePacketHandler : IPacketHandler
 
     public Task HandleOutgoing(IPacket packet)
     {
-        return packet switch {
+        return packet switch
+        {
             HandshakePacket handshake => HandleHandshake(handshake),
             _ => throw new UnexpectedPacketException($"Unexpected outgoing packet during handshaking: {packet.GetType().FullName}")
         };
     }
-    
+
     public bool HandlesIncoming(PacketType type) => false;
 
 

@@ -14,7 +14,7 @@ public class KeepAlivePacket : IPacket
     {
         this.KeepAliveId = id;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(this.KeepAliveId);

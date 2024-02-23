@@ -14,12 +14,12 @@ public interface IChunk
     /// The size (X, Z direction) of a chunk
     /// </summary>
     public const int SIZE = 16;
-    
+
     /// <summary>
     /// Fired whenever a block in the chunk was updated
     /// </summary>
     public event Events.ChunkBlockEvent OnBlockUpdated;
-    
+
     /// <summary>
     /// The XZ Coordinates of this chunk.
     /// </summary>
@@ -30,7 +30,7 @@ public interface IChunk
     /// </summary>
     /// <param name="data"></param>
     public void LoadData(byte[] data);
-    
+
     /// <summary>
     /// Returns the block entity at the given position or null if no
     /// block entity exists at the position.
@@ -51,7 +51,7 @@ public interface IChunk
     /// <param name="position"></param>
     /// <returns></returns>
     public int GetBlockAt(Position position);
-    
+
 
     /// <summary>
     /// Sets the block state at the given position.
@@ -71,7 +71,7 @@ public interface IChunk
     /// <param name="position"></param>
     /// <returns></returns>
     public Biome GetBiomeAt(Position position);
-    
+
     /// <summary>
     /// Sets the biome of the at the given position
     ///
@@ -90,7 +90,7 @@ public interface IChunk
     /// <returns></returns>
     [Obsolete]
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
-    
+
     /// <summary>
     /// Search through the chunk for the given block type and return the first block.
     /// </summary>

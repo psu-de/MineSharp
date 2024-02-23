@@ -7,9 +7,9 @@ namespace MineSharp.Data.Protocol;
 
 internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
 {
-    private static readonly EnumNameLookup<GameState> StateLookup = new();
-    private static readonly EnumNameLookup<PacketType> TypeLookup = new();
-    
+    private static readonly EnumNameLookup<GameState>  StateLookup = new();
+    private static readonly EnumNameLookup<PacketType> TypeLookup  = new();
+
     private JObject token;
 
     public ProtocolProvider(JToken token)
@@ -21,7 +21,7 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
 
         this.token = (JObject)token;
     }
-    
+
     public ProtocolDataBlob GetData()
     {
         var byFlow = new Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>>
@@ -36,10 +36,10 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
                 continue;
 
             var state = StateLookup.FromName(NameUtils.GetGameState(ns.Name));
-            
+
             var cbPackets = CollectPackets(ns.Name, "toClient");
             var sbPackets = CollectPackets(ns.Name, "toServer");
-            
+
             byFlow[PacketFlow.Clientbound].Add(state, cbPackets);
             byFlow[PacketFlow.Serverbound].Add(state, sbPackets);
         }
@@ -52,13 +52,13 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
         var obj = (JObject)token.SelectToken($"{ns}.{direction}.types.packet[1][0].type[1].mappings")!;
 
         return obj.Properties()
-            .ToDictionary(
-                x => Convert.ToInt32(x.Name, 16),
-                x => TypeLookup.FromName(
-                    NameUtils.GetPacketName(
-                        (string)x.Value!, 
-                        direction, 
-                        ns))
-                );
+                  .ToDictionary(
+                       x => Convert.ToInt32(x.Name, 16),
+                       x => TypeLookup.FromName(
+                           NameUtils.GetPacketName(
+                               (string)x.Value!,
+                               direction,
+                               ns))
+                   );
     }
 }

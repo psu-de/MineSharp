@@ -19,14 +19,14 @@ public class Generator(string dataKey, Func<JToken, string> selector, string cla
             }
         }
 
-        var outDir = DirectoryUtils.GetSourceDirectory(Path.Join("Common", ns));
+        var outDir  = DirectoryUtils.GetSourceDirectory(Path.Join("Common", ns));
         var counter = 0;
         await new EnumGenerator()
         {
             ClassName = className,
             Namespace = $"MineSharp.Core.Common.{ns}",
-            Outfile = Path.Join(outDir, className + ".cs"),
-            Entries = set.ToDictionary(x => x, _ => counter++)
+            Outfile   = Path.Join(outDir, className + ".cs"),
+            Entries   = set.ToDictionary(x => x, _ => counter++)
         }.Write();
     }
 }

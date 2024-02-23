@@ -11,4 +11,12 @@ namespace MineSharp.Core.Common.Entities;
 /// <param name="Height">The height of this entity</param>
 /// <param name="MobType"></param>
 /// <param name="Category"></param>
-public record EntityInfo(int Id, EntityType Type, string Name, string DisplayName, float Width, float Height, MobType MobType, EntityCategory Category);
+public record EntityInfo(
+    int            Id,
+    EntityType     Type,
+    string         Name,
+    string         DisplayName,
+    float          Width,
+    float          Height,
+    MobType        MobType,
+    EntityCategory Category);

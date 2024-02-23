@@ -11,14 +11,14 @@ namespace MineSharp.Bot.Chat;
 
 internal class AcknowledgedMessage
 {
-    public bool Pending { get; set; }
-    public UUID Sender { get; set; }
+    public bool   Pending   { get; set; }
+    public UUID   Sender    { get; set; }
     public byte[] Signature { get; set; }
 
     public AcknowledgedMessage(bool pending, UUID sender, byte[] signature)
     {
-        this.Pending = pending;
-        this.Sender = sender;
+        this.Pending   = pending;
+        this.Sender    = sender;
         this.Signature = signature;
     }
 

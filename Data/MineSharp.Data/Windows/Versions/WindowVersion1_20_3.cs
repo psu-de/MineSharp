@@ -4,7 +4,8 @@ namespace MineSharp.Data.Windows.Versions;
 
 internal class WindowVersion1_20_3 : IDataProvider<WindowInfo[]>
 {
-    private static readonly WindowInfo[] Windows = [
+    private static readonly WindowInfo[] Windows =
+    [
         new WindowInfo("minecraft:generic_9x1", "", 9),
         new WindowInfo("minecraft:generic_9x2", "", 18),
         new WindowInfo("minecraft:generic_9x3", "", 27),

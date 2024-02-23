@@ -17,12 +17,12 @@ public class LoginSuccessPacket : IPacket
     /// Uuid
     /// </summary>
     public UUID Uuid { get; set; }
-    
+
     /// <summary>
     /// Username of the client
     /// </summary>
     public string Username { get; set; }
-    
+
     /// <summary>
     /// A list of properties sent for versions &gt;= 1.19
     /// </summary>
@@ -36,8 +36,8 @@ public class LoginSuccessPacket : IPacket
     /// <param name="properties"></param>
     public LoginSuccessPacket(UUID uuid, string username, Property[]? properties = null)
     {
-        this.Uuid = uuid;
-        this.Username = username;
+        this.Uuid       = uuid;
+        this.Username   = username;
         this.Properties = properties;
     }
 
@@ -51,22 +51,22 @@ public class LoginSuccessPacket : IPacket
         {
             return;
         }
-        
+
         if (this.Properties == null)
         {
             throw new PacketVersionException("Login Success packets expect to have properties set after version 1.19");
         }
-            
+
         buffer.WriteVarIntArray(this.Properties, ((buffer, property) => property.Write(buffer)));
     }
-    
+
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var uuid = buffer.ReadUuid();
-        var username = buffer.ReadString();
+        var         uuid       = buffer.ReadUuid();
+        var         username   = buffer.ReadString();
         Property[]? properties = null;
-        
+
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             properties = buffer.ReadVarIntArray(Property.Read);
@@ -84,12 +84,12 @@ public class LoginSuccessPacket : IPacket
         /// Name of this property
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Value of this property
         /// </summary>
         public string Value { get; set; }
-        
+
         /// <summary>
         /// Signature
         /// </summary>
@@ -103,8 +103,8 @@ public class LoginSuccessPacket : IPacket
         /// <param name="signature"></param>
         public Property(string name, string value, string? signature)
         {
-            this.Name = name;
-            this.Value = value;
+            this.Name      = name;
+            this.Value     = value;
             this.Signature = signature;
         }
 
@@ -124,15 +124,15 @@ public class LoginSuccessPacket : IPacket
         /// <inheritdoc />
         public static Property Read(PacketBuffer buffer)
         {
-            string name = buffer.ReadString();
-            string value = buffer.ReadString();
+            string  name      = buffer.ReadString();
+            string  value     = buffer.ReadString();
             string? signature = null;
-            
+
             if (buffer.ReadBool())
             {
                 signature = buffer.ReadString();
             }
-            
+
             return new Property(name, value, signature);
         }
     }

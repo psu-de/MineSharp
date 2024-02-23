@@ -13,7 +13,7 @@ public static class Events
     /// A chunk delegate
     /// </summary>
     public delegate void ChunkEvent(IWorld sender, IChunk chunk);
-    
+
     /// <summary>
     /// A block delegate
     /// </summary>

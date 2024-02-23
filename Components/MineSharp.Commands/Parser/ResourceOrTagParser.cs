@@ -8,7 +8,7 @@ public class ResourceOrTagParser : IParser
     {
         this.Registry = registry;
     }
-    
-    public string GetName() => "minecraft:resource_or_tag";
-    public int GetArgumentCount() => 1;
+
+    public string GetName()          => "minecraft:resource_or_tag";
+    public int    GetArgumentCount() => 1;
 }

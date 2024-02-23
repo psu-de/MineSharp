@@ -19,15 +19,15 @@ namespace MineSharp.Auth;
 /// </summary>
 public static class MicrosoftAuth
 {
-    private static readonly string ClientID = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
-    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly string  ClientID = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
+    private static readonly ILogger Logger   = LogManager.GetCurrentClassLogger();
 
-    
+
     /// <summary>
     /// How to handle microsoft msal authentication.
     /// </summary>
     public delegate void DeviceCodeHandler(DeviceCodeResult deviceCode);
-    
+
     /// <summary>
     /// Obtain a valid minecraft session using a Microsoft Account
     /// </summary>
@@ -41,34 +41,32 @@ public static class MicrosoftAuth
     public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null, MinecraftApi? api = null)
     {
         handler ??= DefaultDeviceCodeHandler;
-        api ??= new MinecraftApi();
-        
+        api     ??= new MinecraftApi();
+
         var cacheFolder = GetCacheForUser(username);
-        
-        var cacheSettings = new MsalCacheSettings() 
-        {
-            CacheDir = cacheFolder
-        };
+
+        var cacheSettings = new MsalCacheSettings() { CacheDir = cacheFolder };
 
         var app = await MsalMinecraftLoginHelper.BuildApplicationWithCache(ClientID, cacheSettings);
         var loginHandler = new LoginHandlerBuilder()
-            .WithCachePath(Path.Join(cacheFolder, "session.json"))
-            .ForJavaEdition()
-            .WithMsalOAuth(app, factory => factory.CreateDeviceCodeApi(result =>
-            {
-                handler(result);
-                return Task.CompletedTask;
-            }))
-            .Build();
+                          .WithCachePath(Path.Join(cacheFolder, "session.json"))
+                          .ForJavaEdition()
+                          .WithMsalOAuth(app, factory => factory.CreateDeviceCodeApi(result =>
+                           {
+                               handler(result);
+                               return Task.CompletedTask;
+                           }))
+                          .Build();
 
         MSession mSession;
-        bool cached = false;
+        bool     cached = false;
         try
         {
             var result = await loginHandler.LoginFromCache();
             mSession = result.GameSession;
-            cached = true;
-        } catch (Exception)
+            cached   = true;
+        }
+        catch (Exception)
         {
             var result = await loginHandler.LoginFromOAuth();
             mSession = result.GameSession;
@@ -79,12 +77,12 @@ public static class MicrosoftAuth
             if (!cached) // If the cached session is invalid, try to get a new session
             {
                 throw new MineSharpAuthException("Could not login to a valid session");
-            } 
-            
+            }
+
             var result = await loginHandler.LoginFromOAuth();
             mSession = result.GameSession;
         }
-        
+
         var certificates = PlayerCertificate.Deserialize(cacheFolder);
         if (certificates == null || certificates.RequiresRefresh())
         {
@@ -105,14 +103,14 @@ public static class MicrosoftAuth
     private static string GetCacheForUser(string username)
     {
         var filename = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(username)));
-        var cache = CacheManager.Get("Sessions");
-        var path = Path.Join(cache, filename);
+        var cache    = CacheManager.Get("Sessions");
+        var path     = Path.Join(cache, filename);
 
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);
         }
-        
+
         return Path.Join(path);
     }
 
@@ -122,7 +120,7 @@ public static class MicrosoftAuth
         Console.WriteLine($"Goto {result.VerificationUrl} and enter the following code: '{result.UserCode}'");
         OpenUrl(result.VerificationUrl);
     }
-    
+
     /// <summary>
     /// Open URL
     /// </summary>

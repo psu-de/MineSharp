@@ -11,7 +11,7 @@ internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
 {
     private static readonly EnumNameLookup<Material> MaterialLookup = new();
 
-    private JObject token;
+    private JObject   token;
     private IItemData items;
 
     public MaterialsProvider(JToken token, IItemData items)
@@ -20,7 +20,7 @@ internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
         {
             throw new ArgumentException("Expected token to be an object");
         }
-        
+
         this.token = (JObject)token;
         this.items = items;
     }
@@ -28,13 +28,13 @@ internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
     public MaterialDataBlob GetData()
     {
         var data = new Dictionary<Material, Dictionary<ItemType, float>>();
-        
+
         foreach (var property in token.Properties())
         {
             if (property.Name.Contains(';'))
                 continue;
 
-            var material = MaterialLookup.FromName(NameUtils.GetMaterial(property.Name));
+            var material    = MaterialLookup.FromName(NameUtils.GetMaterial(property.Name));
             var multipliers = CollectItemMultipliers((JObject)property.Value);
             data.Add(material, multipliers);
         }
@@ -45,8 +45,8 @@ internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
     private Dictionary<ItemType, float> CollectItemMultipliers(JObject obj)
     {
         return obj.Properties()
-            .ToDictionary(
-                x => this.items.ById(Convert.ToInt32(x.Name))!.Type,
-                x => (float)x.Value);
+                  .ToDictionary(
+                       x => this.items.ById(Convert.ToInt32(x.Name))!.Type,
+                       x => (float)x.Value);
     }
 }

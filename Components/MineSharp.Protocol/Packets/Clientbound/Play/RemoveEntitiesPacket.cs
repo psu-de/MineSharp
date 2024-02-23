@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class RemoveEntitiesPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityDestroy;
-    
+
     public int[] EntityIds { get; set; }
 
     public RemoveEntitiesPacket(int[] entityIds)
@@ -19,6 +19,7 @@ public class RemoveEntitiesPacket : IPacket
     {
         buffer.WriteVarIntArray(this.EntityIds, (buf, i) => buf.WriteVarInt(i));
     }
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityIds = buffer.ReadVarIntArray(buf => buf.ReadVarInt());

@@ -13,7 +13,7 @@ internal static class CoreTypeExtensions
 
         if (!present)
             return;
-        
+
         buffer.WriteVarInt(item!.Info.Id);
         buffer.WriteByte(item!.Count);
         buffer.WriteNbt(item!.Metadata);
@@ -32,18 +32,18 @@ internal static class CoreTypeExtensions
             null,
             buffer.ReadNbtCompound());
     }
-    
+
     public static void WriteSlot(this PacketBuffer buffer, Slot slot)
     {
         buffer.WriteShort(slot.SlotIndex);
         buffer.WriteOptionalItem(slot.Item);
     }
-    
+
     public static Slot ReadSlot(this PacketBuffer buffer, MinecraftData data)
     {
-        var slotIndex = buffer.ReadShort();
-        Item? item = buffer.ReadOptionalItem(data);
-        
+        var   slotIndex = buffer.ReadShort();
+        Item? item      = buffer.ReadOptionalItem(data);
+
         return new Slot(item, slotIndex);
     }
 }

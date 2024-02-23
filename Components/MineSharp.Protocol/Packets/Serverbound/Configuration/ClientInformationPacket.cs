@@ -8,23 +8,24 @@ public class ClientInformationPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_Settings;
 
-    public string Locale { get; set; }
-    public byte ViewDistance { get; set; }
-    public int ChatMode { get; set; }
-    public bool ChatColors { get; set; }
-    public byte DisplayedSkinParts { get; set; }
-    public int MainHand { get; set; }
-    public bool EnableTextFiltering { get; set; }
-    public bool AllowServerListings { get; set; }
+    public string Locale              { get; set; }
+    public byte   ViewDistance        { get; set; }
+    public int    ChatMode            { get; set; }
+    public bool   ChatColors          { get; set; }
+    public byte   DisplayedSkinParts  { get; set; }
+    public int    MainHand            { get; set; }
+    public bool   EnableTextFiltering { get; set; }
+    public bool   AllowServerListings { get; set; }
 
-    public ClientInformationPacket(string locale, byte viewDistance, int chatMode, bool chatColors, byte displayedSkinParts, int mainHand, bool enableTextFiltering, bool allowServerListings)
+    public ClientInformationPacket(string locale, byte viewDistance, int chatMode, bool chatColors, byte displayedSkinParts, int mainHand,
+                                   bool   enableTextFiltering, bool allowServerListings)
     {
-        this.Locale = locale;
-        this.ViewDistance = viewDistance;
-        this.ChatMode = chatMode;
-        this.ChatColors = chatColors;
-        this.DisplayedSkinParts = displayedSkinParts;
-        this.MainHand = mainHand;
+        this.Locale              = locale;
+        this.ViewDistance        = viewDistance;
+        this.ChatMode            = chatMode;
+        this.ChatColors          = chatColors;
+        this.DisplayedSkinParts  = displayedSkinParts;
+        this.MainHand            = mainHand;
         this.EnableTextFiltering = enableTextFiltering;
         this.AllowServerListings = allowServerListings;
     }
@@ -40,6 +41,7 @@ public class ClientInformationPacket : IPacket
         buffer.WriteBool(this.EnableTextFiltering);
         buffer.WriteBool(this.AllowServerListings);
     }
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new ClientInformationPacket(

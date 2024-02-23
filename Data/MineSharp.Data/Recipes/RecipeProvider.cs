@@ -1,4 +1,3 @@
-
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Common.Recipes;
 using MineSharp.Data.Framework;
@@ -9,7 +8,7 @@ namespace MineSharp.Data.Recipes;
 
 internal class RecipeProvider : IDataProvider<RecipeDataBlob>
 {
-    private JObject token;
+    private JObject   token;
     private IItemData items;
 
     public RecipeProvider(JToken token, IItemData items)
@@ -22,16 +21,16 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
         this.token = (JObject)token;
         this.items = items;
     }
-    
+
     public RecipeDataBlob GetData()
     {
         var data = new Dictionary<ItemType, Recipe[]>();
-        
+
         foreach (var property in this.token.Properties())
         {
-            var itemId = Convert.ToInt32(property.Name);
+            var itemId  = Convert.ToInt32(property.Name);
             var recipes = (JArray)property.Value;
-            
+
             data.Add(this.items.ById(itemId)!.Type, CollectRecipes(recipes));
         }
 
@@ -41,13 +40,13 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
     private Recipe[] CollectRecipes(JArray array)
     {
         return array
-            .Select(RecipeFromToken)
-            .ToArray();
+              .Select(RecipeFromToken)
+              .ToArray();
     }
 
     private Recipe RecipeFromToken(JToken recipe)
     {
-        var resultId = (int)recipe.SelectToken("result.id")!;
+        var resultId    = (int)recipe.SelectToken("result.id")!;
         var resultCount = (int)recipe.SelectToken("result.count")!;
 
         var ingredientsToken = recipe.SelectToken("ingredients");
@@ -56,7 +55,7 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
             : IngredientsFromShape((JArray)recipe.SelectToken("inShape")!)!;
 
         var outShapeToken = (JArray?)recipe.SelectToken("outShape");
-        var outShape = IngredientsFromShape(outShapeToken);
+        var outShape      = IngredientsFromShape(outShapeToken);
 
         var itemType = this.items.ById(resultId)!.Type;
 
@@ -71,16 +70,16 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
     private ItemType?[] IngredientsFromArray(JArray array)
     {
         return array.ToObject<int[]>()!
-            .Select(x => (ItemType?)this.items.ById(x)!.Type)
-            .ToArray();
+                    .Select(x => (ItemType?)this.items.ById(x)!.Type)
+                    .ToArray();
     }
-    
+
     private ItemType?[]? IngredientsFromShape(JArray? array)
     {
         if (array is null)
             return null;
-        
-        var shape = array.ToObject<int?[][]>()!;
+
+        var shape       = array.ToObject<int?[][]>()!;
         var ingredients = new List<ItemType?>(9);
 
         var skippedNulls = 0; // null values are only added to the list if there comes another non null item after
@@ -94,11 +93,11 @@ internal class RecipeProvider : IDataProvider<RecipeDataBlob>
                     skippedNulls++;
                     continue;
                 }
-                
+
                 if (skippedNulls > 0)
                     ingredients.AddRange(Enumerable.Repeat<ItemType?>(null, skippedNulls));
                 skippedNulls = 0;
-                
+
                 ingredients.Add(this.items.ById(id.Value)!.Type);
             }
         }

@@ -11,11 +11,11 @@ public class BundleDelimiterPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_BundleDelimiter;
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
-    
+
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
         => new BundleDelimiterPacket();

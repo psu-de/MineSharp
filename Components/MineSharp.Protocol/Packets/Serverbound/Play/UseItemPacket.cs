@@ -11,12 +11,12 @@ public class UseItemPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.SB_Play_UseItem;
-    
+
     /// <summary>
     /// The Hand used
     /// </summary>
     public PlayerHand Hand { get; set; }
-    
+
     /// <summary>
     /// Sequence id used to synchronize server and client.
     /// Only used for versions &gt;= 1.19
@@ -41,12 +41,12 @@ public class UseItemPacket : IPacket
     {
         this.SequenceId = sequenceId;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt((int)this.Hand);
-        
+
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
             buffer.WriteVarInt((int)this.SequenceId!);
     }

@@ -8,7 +8,7 @@ namespace MineSharp.Data.Recipes;
 internal class RecipeData(RecipeProvider provider) : IndexedData<RecipeDataBlob>(provider), IRecipeData
 {
     private Dictionary<ItemType, Recipe[]> recipes = new();
-    
+
     public Recipe[]? ByItem(ItemType type)
     {
         if (!this.Loaded)

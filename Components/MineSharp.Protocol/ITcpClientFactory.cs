@@ -7,8 +7,6 @@ namespace MineSharp.Protocol;
 /// </summary>
 public interface ITcpClientFactory
 {
-    
-    
     /// <summary>
     /// Create an open tcp client
     /// </summary>
