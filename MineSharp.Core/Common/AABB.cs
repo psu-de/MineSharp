@@ -148,17 +148,9 @@ public class AABB
     /// <returns></returns>
     public bool Intersects(AABB other)
     {
-        if (this.MaxX >= other.MinX && this.MinX <= other.MaxX)
-        {
-            if (this.MaxY < other.MinY || this.MinY > other.MaxY)
-            {
-                return false;
-            }
-
-            return this.MaxZ >= other.MinZ && this.MinZ <= other.MaxZ;
-        }
-
-        return false;
+        return this.MaxX > other.MinX && this.MinX < other.MaxX
+            && this.MaxY > other.MinY && this.MinY < other.MaxY
+            && this.MaxZ > other.MinZ && this.MinZ < other.MaxZ;
     }
 
     /// <summary>

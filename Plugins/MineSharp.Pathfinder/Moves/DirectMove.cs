@@ -40,12 +40,13 @@ public class DirectMove(Vector3 motion) : IMove
             .Select(world.GetBlockAt)
             .Select(x => CollisionHelper.GetBoundingBoxes(x, data))
             .SelectMany(x => x)
-            .Any(x => x.Intersects(playerBb));
+            .All(x => !x.Intersects(playerBb));
     }
 
     /// <inheritdoc />
     public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
-    {
+    { 
+        // TODO: IsMovePossible() ist nicht korrekt
         var player = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
 
@@ -53,8 +54,6 @@ public class DirectMove(Vector3 motion) : IMove
         
         await physics.Look(0, 0);
         await MovementUtils.MoveToBlockCenter(player.Self!, physics);
-        
-        Logger.Info($"At block center: {player.Entity?.Position}");
         
         var target = player.Self!.Entity!.Position
             .Floored()
@@ -70,10 +69,11 @@ public class DirectMove(Vector3 motion) : IMove
         {
             await physics.WaitForTick();
 
-            if ((Position)player.Entity!.Position == targetBlock)
+            if (MovementUtils.IsOnSameBlock(player.Self, targetBlock))
                 break;
         }
         
         physics.InputControls.Reset();
+        await MovementUtils.MoveToBlockCenter(player.Self, physics);
     }
 }
