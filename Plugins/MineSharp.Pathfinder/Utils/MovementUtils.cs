@@ -7,6 +7,15 @@ namespace MineSharp.Pathfinder.Utils;
 
 internal static class MovementUtils
 {
+    private const double DISTANCE_THRESHOLD = 0.15 * 0.15;
+
+    public static bool IsOnSameBlock(MinecraftPlayer player, Position block)
+    {
+        return (int)player.Entity!.Position.X == block.X
+            && (int)player.Entity!.Position.Y == block.Y
+            && (int)player.Entity!.Position.Z == block.Z;
+    }
+    
     public static void SetHorizontalMovementsFromVector(Vector3 movement, InputControls controls)
     {
         controls.Reset();
@@ -28,7 +37,7 @@ internal static class MovementUtils
     {
         var target = player.Entity!.Position
                            .Floored()
-                            .Add(0.5, 0.0, 0.5);
+                           .Add(0.5, 0.0, 0.5);
 
         while (true)
         {
@@ -41,13 +50,9 @@ internal static class MovementUtils
                             .Plus(player.Entity.Velocity)
                             .HorizontalDistanceToSquared(target);
             
-            Console.WriteLine($"Vec = {vec} "                    +
-                              $"Pos = {player.Entity.Position} " +
-                              $"Vel = {player.Entity.Velocity} " +
-                              $"Trg = {target}" +
-                              $"Dst = {dst}"); 
+            Console.WriteLine($"Dst = {dst}");
             
-            if (dst < 0.1 * 0.1)
+            if (dst < DISTANCE_THRESHOLD)
                 break;
         }
         

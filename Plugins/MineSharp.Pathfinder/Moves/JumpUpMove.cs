@@ -37,7 +37,7 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
             .Select(world.GetBlockAt)
             .Select(x => CollisionHelper.GetBoundingBoxes(x, data))
             .SelectMany(x => x)
-            .Any(x => x.Intersects(playerBb));
+            .All(x => !x.Intersects(playerBb));
     }
 
 
@@ -55,41 +55,27 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
             .Add(this.Motion)
             .Add(0.5, 0.0, 0.5);
 
-        await physics.LookAt(target);
+        var targetBlock = (Position)target;
 
-        physics.InputControls.ForwardKeyDown = true;
+        await physics.Look(0, 0);
+        
+        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
         physics.InputControls.JumpingKeyDown = true;
-        physics.InputControls.SprintingKeyDown = movements.AllowSprinting && Math.Abs(this.Motion.LengthSquared() - 1) < 0.01;
-
-        var prevDst = double.MaxValue;
         
         while (true)
         {
             await physics.WaitForTick();
-            if (!player.Entity!.IsOnGround)
-            {
-                physics.InputControls.JumpingKeyDown = false;
-                await physics.WaitForOnGround();
-                physics.InputControls.ForwardKeyDown = false;
-                await physics.LookAt(target);
-                physics.InputControls.ForwardKeyDown = true;
-            }
-            
-            // keep jumping if below target block
-            physics.InputControls.JumpingKeyDown = player.Entity.Position.Y - target.Y < 0.0;
-            
-            var dst = player.Self!.Entity!.Position
-                .DistanceToSquared(target);
 
-            if (dst > prevDst)
-                await physics.LookAt(target);
-
-            if (dst <= IMove.THRESHOLD_COMPLETED)
+            if ((int)player.Entity!.Position.X == targetBlock.X
+             && (int)player.Entity!.Position.Z == targetBlock.Z)
             {
                 break;
             }
         }
         
         physics.InputControls.Reset();
+        await physics.WaitForOnGround();
+
+        await MovementUtils.MoveToBlockCenter(player.Self, physics);
     }
 }
