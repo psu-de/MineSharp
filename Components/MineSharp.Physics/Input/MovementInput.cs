@@ -5,8 +5,8 @@ internal class MovementInput(InputControls controls)
     public readonly InputControls Controls = controls;
 
     public float ForwardImpulse { get; set; }
-    public float StrafeImpulse { get; set; }
-    public bool JumpedThisTick { get; set; }
+    public float StrafeImpulse  { get; set; }
+    public bool  JumpedThisTick { get; set; }
 
     public void Tick(bool slow, float sneakFactor)
     {
@@ -14,20 +14,20 @@ internal class MovementInput(InputControls controls)
             this.JumpedThisTick = false;
         else if (!this.JumpedThisTick)
             this.JumpedThisTick = true;
-        
+
         this.ForwardImpulse = CalculateImpulse(this.Controls.ForwardKeyDown, this.Controls.BackwardKeyDown);
-        this.StrafeImpulse = CalculateImpulse(this.Controls.LeftKeyDown, this.Controls.RightKeyDown);
-        
+        this.StrafeImpulse  = CalculateImpulse(this.Controls.LeftKeyDown, this.Controls.RightKeyDown);
+
         if (!slow)
             return;
 
         this.ForwardImpulse *= sneakFactor;
-        this.StrafeImpulse *= sneakFactor;
+        this.StrafeImpulse  *= sneakFactor;
     }
 
     public bool HasForwardImpulse()
         => this.ForwardImpulse > 1.0E-5F;
-    
+
     public bool HasSprintingImpulse(bool isUnderwater)
     {
         return isUnderwater
@@ -37,7 +37,7 @@ internal class MovementInput(InputControls controls)
 
     private float CalculateImpulse(bool a, bool b)
     {
-        if (a == b) 
+        if (a == b)
             return 0.0f;
 
         return a

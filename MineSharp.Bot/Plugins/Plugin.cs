@@ -9,7 +9,7 @@ namespace MineSharp.Bot.Plugins;
 public abstract class Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     /// <summary>
     /// The bot
     /// </summary>
@@ -19,7 +19,7 @@ public abstract class Plugin
     /// Whether this plugin is currently enabled
     /// </summary>
     public bool IsEnabled { get; private set; }
-    
+
     /// <summary>
     /// Whether this plugin is loaded and functional
     /// </summary>
@@ -33,11 +33,11 @@ public abstract class Plugin
     /// <param name="bot"></param>
     protected Plugin(MineSharpBot bot)
     {
-        this.Bot = bot;
-        this.IsEnabled = true;
+        this.Bot                 = bot;
+        this.IsEnabled           = true;
         this._initializationTask = new TaskCompletionSource();
     }
-    
+
     /// <summary>
     /// This method is called once when the plugin starts.
     /// </summary>
@@ -75,9 +75,9 @@ public abstract class Plugin
         if (this.IsEnabled == enabled)
             return;
 
-        if (enabled) 
+        if (enabled)
             await this.OnEnable();
-        else 
+        else
             await this.OnDisable();
 
         this.IsEnabled = enabled;
@@ -91,7 +91,7 @@ public abstract class Plugin
     {
         return this._initializationTask.Task;
     }
-    
+
     internal async Task Initialize()
     {
         if (this.IsLoaded)

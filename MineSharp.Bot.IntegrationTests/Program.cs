@@ -30,13 +30,13 @@ using MineSharp.World.Chunks;
 // Pos = (8,5 / 1 / 9,56925), Vel = (0 / -0,0784 / 0,00819) IsOnGround=True
 
 
-var data = MinecraftData.FromVersion("1.20.2");
+var data = await MinecraftData.FromVersion("1.20.2");
 var world = WorldVersion.CreateWorld(data);
 var chunk = world.CreateChunk(new ChunkCoordinates(0, 0), Array.Empty<BlockEntity>());
 
 var input = new InputControls();
 var entity = new Entity(
-    data.Entities.GetByType(EntityType.Player), 
+    data.Entities.ByType(EntityType.Player)!, 
     0, 
     new Vector3(8.5, 2, 8.5), 
     0.0f, 
@@ -54,7 +54,7 @@ for (int i = 0; i < 24; i++)
 chunk.LoadData(chunkBuffer.ToArray());
 world.LoadChunk(chunk);
 
-var stone = data.Blocks.GetByType(BlockType.Stone);
+var stone = data.Blocks.ByType(BlockType.Stone)!;
 world.SetBlock(new Block(stone, stone.DefaultState, new Position(8, 1, 8)));
 world.SetBlock(new Block(stone, stone.DefaultState, new Position(9, 1, 9)));
 

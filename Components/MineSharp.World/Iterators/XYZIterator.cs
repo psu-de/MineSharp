@@ -8,11 +8,11 @@ namespace MineSharp.World.Iterators;
 public class XYZIterator : IWorldIterator
 {
     private readonly Position origin;
-    private readonly int width;
-    private readonly int height;
-    private readonly int depth;
-    private readonly int end;
-    
+    private readonly int      width;
+    private readonly int      height;
+    private readonly int      depth;
+    private readonly int      end;
+
     private int index;
     private int x;
     private int y;
@@ -26,21 +26,20 @@ public class XYZIterator : IWorldIterator
     public XYZIterator(Position origin, Position to)
     {
         this.origin = origin;
-        this.width = to.X - origin.X;
+        this.width  = to.X - origin.X;
         this.height = to.Y - origin.Y;
-        this.depth = to.Z - origin.Z;
-        this.end = this.width * this.height * this.depth;
-        
+        this.depth  = to.Z - origin.Z;
+        this.end    = this.width * this.height * this.depth;
     }
-    
+
     /// <inheritdoc />
     public IEnumerable<Position> Iterate()
     {
         while (this.Advance())
         {
             yield return new Position(
-                this.origin.X + this.x, 
-                this.origin.Y + this.y, 
+                this.origin.X + this.x,
+                this.origin.Y + this.y,
                 this.origin.Z + this.z);
         }
     }
@@ -52,8 +51,8 @@ public class XYZIterator : IWorldIterator
 
         var i = this.index / this.width;
         this.x = this.index % this.width;
-        this.y = i % this.height;
-        this.z = i / this.height;
+        this.y = i          % this.height;
+        this.z = i          / this.height;
         this.index++;
         return true;
     }

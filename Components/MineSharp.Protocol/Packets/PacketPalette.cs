@@ -11,7 +11,6 @@ using MineSharp.Protocol.Packets.Serverbound.Login;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using NLog;
-
 using CBKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePacket;
 using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAlivePacket;
 using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMessagePacket;
@@ -36,17 +35,17 @@ namespace MineSharp.Protocol.Packets;
 internal static class PacketPalette
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData version);
-    
+
     private static readonly IDictionary<PacketType, PacketFactory> PacketFactories;
-    private static readonly IDictionary<Guid, PacketType> ClassToTypeMap;
+    private static readonly IDictionary<Guid, PacketType>          ClassToTypeMap;
 
     static PacketPalette()
     {
         PacketFactories = new Dictionary<PacketType, PacketFactory>();
-        ClassToTypeMap = new Dictionary<Guid, PacketType>();
-        
+        ClassToTypeMap  = new Dictionary<Guid, PacketType>();
+
         InitializePackets();
     }
 
@@ -66,12 +65,12 @@ internal static class PacketPalette
         var guid = typeof(T).GUID;
         return ClassToTypeMap[guid];
     }
-    
+
     private static void InitializePackets()
     {
         // Handshaking
         RegisterPacket<HandshakePacket>(PacketType.SB_Handshake_SetProtocol);
-        
+
         // Login
         RegisterPacket<LoginDisconnectPacket>(PacketType.CB_Login_Disconnect);
         RegisterPacket<EncryptionRequestPacket>(PacketType.CB_Login_EncryptionBegin);
@@ -83,14 +82,14 @@ internal static class PacketPalette
         RegisterPacket<EncryptionResponsePacket>(PacketType.SB_Login_EncryptionBegin);
         RegisterPacket<LoginPluginResponsePacket>(PacketType.SB_Login_LoginPluginResponse);
         RegisterPacket<AcknowledgeLoginPacket>(PacketType.SB_Login_LoginAcknowledged);
-        
+
         // Status
         RegisterPacket<StatusResponsePacket>(PacketType.CB_Status_ServerInfo);
         RegisterPacket<PongResponsePacket>(PacketType.CB_Status_Ping);
-        
+
         RegisterPacket<StatusRequestPacket>(PacketType.SB_Status_PingStart);
         RegisterPacket<PingRequestPacket>(PacketType.SB_Status_Ping);
-        
+
         // Configuration
         RegisterPacket<CBPluginMessagePacket>(PacketType.CB_Configuration_CustomPayload);
         RegisterPacket<ConfigurationDisconnectPacket>(PacketType.CB_Configuration_Disconnect);
@@ -106,7 +105,7 @@ internal static class PacketPalette
         RegisterPacket<SBConfigurationKeepAlivePacket>(PacketType.SB_Configuration_KeepAlive);
         RegisterPacket<PongPacket>(PacketType.SB_Configuration_Pong);
         RegisterPacket<ResourcePackResponsePacket>(PacketType.SB_Configuration_ResourcePackReceive);
-        
+
         // Play
         RegisterPacket<SpawnPaintingPacket>(PacketType.CB_Play_SpawnEntityPainting);
         RegisterPacket<SpawnLivingEntityPacket>(PacketType.CB_Play_SpawnEntityLiving);

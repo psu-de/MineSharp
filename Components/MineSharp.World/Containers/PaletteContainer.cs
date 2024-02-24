@@ -5,17 +5,17 @@ namespace MineSharp.World.Containers;
 
 internal abstract class PaletteContainer : IPaletteContainer
 {
-    public IPalette Palette { get; set; }
-    public IntBitArray Data { get; set; }
-    public abstract int Capacity { get; }
-    public abstract int TotalNumberOfStates { get; }
-    public abstract byte MinBits { get; }
-    public abstract byte MaxBits { get; }
+    public          IPalette    Palette             { get; set; }
+    public          IntBitArray Data                { get; set; }
+    public abstract int         Capacity            { get; }
+    public abstract int         TotalNumberOfStates { get; }
+    public abstract byte        MinBits             { get; }
+    public abstract byte        MaxBits             { get; }
 
     protected PaletteContainer(IPalette palette, IntBitArray data)
     {
         this.Palette = palette;
-        this.Data = data;
+        this.Data    = data;
     }
 
     public int GetAt(int index)
@@ -32,7 +32,7 @@ internal abstract class PaletteContainer : IPaletteContainer
         var value = this.Data.Get(index);
         return this.Palette.Get(value);
     }
-    
+
     public void SetAt(int index, int state)
     {
         if (index < 0 || index >= this.Capacity)
@@ -45,16 +45,18 @@ internal abstract class PaletteContainer : IPaletteContainer
 
     protected static (IPalette palette, IntBitArray data) FromStream(PacketBuffer buffer, byte maxBitsPerEntry)
     {
-        var bitsPerEntry = buffer.ReadByte();
+        var      bitsPerEntry = buffer.ReadByte();
         IPalette palette;
 
         if (bitsPerEntry == 0)
         {
             palette = SingleValuePalette.FromStream(buffer);
-        } else if (bitsPerEntry <= maxBitsPerEntry)
+        }
+        else if (bitsPerEntry <= maxBitsPerEntry)
         {
             palette = IndirectPalette.FromStream(buffer);
-        } else
+        }
+        else
         {
             palette = DirectPalette.FromStream(buffer);
         }

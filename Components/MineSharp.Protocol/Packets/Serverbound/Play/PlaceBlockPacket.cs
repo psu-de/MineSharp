@@ -7,15 +7,15 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class PlaceBlockPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_BlockPlace;
-    
-    public int Hand { get; set; }
-    public Position Location { get; set; }
-    public BlockFace Direction { get; set; }
-    public float CursorX { get; set; }
-    public float CursorY { get; set; }
-    public float CursorZ { get; set; }
-    public bool InsideBlock { get; set; }
-    public int? SequenceId { get; set; }
+
+    public int       Hand        { get; set; }
+    public Position  Location    { get; set; }
+    public BlockFace Direction   { get; set; }
+    public float     CursorX     { get; set; }
+    public float     CursorY     { get; set; }
+    public float     CursorZ     { get; set; }
+    public bool      InsideBlock { get; set; }
+    public int?      SequenceId  { get; set; }
 
     /// <summary>
     /// Constructor >= 1.19
@@ -28,16 +28,17 @@ public class PlaceBlockPacket : IPacket
     /// <param name="cursorZ"></param>
     /// <param name="insideBlock"></param>
     /// <param name="sequenceId"></param>
-    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY, float cursorZ, bool insideBlock, int sequenceId)
+    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY, float cursorZ, bool insideBlock,
+                            int sequenceId)
     {
-        this.Hand = hand;
-        this.Location = location;
-        this.Direction = direction;
-        this.CursorX = cursorX;
-        this.CursorY = cursorY;
-        this.CursorZ = cursorZ;
+        this.Hand        = hand;
+        this.Location    = location;
+        this.Direction   = direction;
+        this.CursorX     = cursorX;
+        this.CursorY     = cursorY;
+        this.CursorZ     = cursorZ;
         this.InsideBlock = insideBlock;
-        this.SequenceId = sequenceId;
+        this.SequenceId  = sequenceId;
     }
 
     /// <summary>
@@ -52,12 +53,12 @@ public class PlaceBlockPacket : IPacket
     /// <param name="insideBlock"></param>
     public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY, float cursorZ, bool insideBlock)
     {
-        this.Hand = hand;
-        this.Location = location;
-        this.Direction = direction;
-        this.CursorX = cursorX;
-        this.CursorY = cursorY;
-        this.CursorZ = cursorZ;
+        this.Hand        = hand;
+        this.Location    = location;
+        this.Direction   = direction;
+        this.CursorX     = cursorX;
+        this.CursorY     = cursorY;
+        this.CursorZ     = cursorZ;
         this.InsideBlock = insideBlock;
     }
 
@@ -76,14 +77,15 @@ public class PlaceBlockPacket : IPacket
             buffer.WriteVarInt(this.SequenceId!.Value);
         }
     }
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var hand = buffer.ReadVarInt();
-        var position = new Position(buffer.ReadULong());
-        var direction = buffer.ReadVarInt();
-        var cursorX = buffer.ReadFloat();
-        var cursorY = buffer.ReadFloat();
-        var cursorZ = buffer.ReadFloat();
+        var hand        = buffer.ReadVarInt();
+        var position    = new Position(buffer.ReadULong());
+        var direction   = buffer.ReadVarInt();
+        var cursorX     = buffer.ReadFloat();
+        var cursorY     = buffer.ReadFloat();
+        var cursorZ     = buffer.ReadFloat();
         var insideBlock = buffer.ReadBool();
 
         if (version.Version.Protocol < ProtocolVersion.V_1_19)

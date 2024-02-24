@@ -8,7 +8,7 @@ internal static class VectorExtensions
     {
         return vector.X * vector.X + vector.Z * vector.Z;
     }
-    
+
     public static bool IsPositiveAxisVector(this Vector3 axis)
     {
         if (axis.X != 0)

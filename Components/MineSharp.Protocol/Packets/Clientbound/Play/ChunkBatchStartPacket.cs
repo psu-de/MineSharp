@@ -12,7 +12,7 @@ public class ChunkBatchStartPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_ChunkBatchStart;
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }

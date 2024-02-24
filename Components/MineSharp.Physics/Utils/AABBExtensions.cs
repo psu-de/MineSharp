@@ -31,17 +31,17 @@ internal static class AABBExtensions
         double maxX = aabb.MaxX;
         double maxY = aabb.MaxY;
         double maxZ = aabb.MaxZ;
-        
-        if (x < 0.0D) 
-            minX += x; 
+
+        if (x < 0.0D)
+            minX += x;
         else
             maxX += x;
 
         if (y < 0.0D)
             minY += y;
-        else 
+        else
             maxY += y;
-        
+
         if (z < 0.0D)
             minZ += z;
         else if (z > 0.0D)
@@ -49,7 +49,7 @@ internal static class AABBExtensions
 
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
-    
+
     public static bool IntersectsAxis(this AABB aabb, AABB b, Axis axis)
     {
         var minA = axis.GetBBMin(aabb);
@@ -58,10 +58,10 @@ internal static class AABBExtensions
         var minB = axis.GetBBMin(b);
         var maxB = axis.GetBBMax(b);
 
-        return minA > minB && minA < maxB
-               || maxA > minB && maxA < maxB
-               || minB > minA && minB < maxA
-               || maxB > minA && maxB < maxA
-               || minA == minB && maxA == maxB;
+        return minA > minB  && minA < maxB
+            || maxA > minB  && maxA < maxB
+            || minB > minA  && minB < maxA
+            || maxB > minA  && maxB < maxA
+            || minA == minB && maxA == maxB;
     }
 }

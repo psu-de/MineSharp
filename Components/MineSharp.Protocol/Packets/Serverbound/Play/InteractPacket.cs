@@ -7,14 +7,14 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class InteractPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_UseEntity;
-    
-    public int EntityId { get; set; }
+
+    public int             EntityId    { get; set; }
     public InteractionType Interaction { get; set; }
-    public float? TargetX { get; set; }
-    public float? TargetY { get; set; }
-    public float? TargetZ { get; set; }
-    public PlayerHand? Hand { get; set; }
-    public bool Sneaking { get; set; }
+    public float?          TargetX     { get; set; }
+    public float?          TargetY     { get; set; }
+    public float?          TargetZ     { get; set; }
+    public PlayerHand?     Hand        { get; set; }
+    public bool            Sneaking    { get; set; }
 
     /// <summary>
     /// Constructor
@@ -24,9 +24,9 @@ public class InteractPacket : IPacket
     /// <param name="sneaking"></param>
     public InteractPacket(int entityId, InteractionType interaction, bool sneaking)
     {
-        this.EntityId = entityId;
+        this.EntityId    = entityId;
         this.Interaction = interaction;
-        this.Sneaking = sneaking;
+        this.Sneaking    = sneaking;
     }
 
     /// <summary>
@@ -40,13 +40,13 @@ public class InteractPacket : IPacket
     /// <param name="sneaking"></param>
     public InteractPacket(int entityId, float targetX, float targetY, float targetZ, PlayerHand hand, bool sneaking)
     {
-        this.EntityId = entityId;
+        this.EntityId    = entityId;
         this.Interaction = InteractionType.InteractAt;
-        this.TargetX = targetX;
-        this.TargetY = targetY;
-        this.TargetZ = targetZ;
-        this.Hand = hand;
-        this.Sneaking = sneaking;
+        this.TargetX     = targetX;
+        this.TargetY     = targetY;
+        this.TargetZ     = targetZ;
+        this.Hand        = hand;
+        this.Sneaking    = sneaking;
     }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -60,14 +60,15 @@ public class InteractPacket : IPacket
             buffer.WriteFloat(this.TargetZ!.Value);
             buffer.WriteVarInt((int)this.Hand!.Value);
         }
+
         buffer.WriteBool(this.Sneaking);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var entityId = buffer.ReadVarInt();
+        var entityId    = buffer.ReadVarInt();
         var interaction = (InteractionType)buffer.ReadVarInt();
-        
+
         if (InteractionType.InteractAt == interaction)
         {
             return new InteractPacket(
@@ -78,7 +79,7 @@ public class InteractPacket : IPacket
                 (PlayerHand)buffer.ReadVarInt(),
                 buffer.ReadBool());
         }
-        
+
         return new InteractPacket(
             entityId,
             interaction,
@@ -88,8 +89,8 @@ public class InteractPacket : IPacket
 
     public enum InteractionType
     {
-        Interact = 0,
-        Attack = 1,
+        Interact   = 0,
+        Attack     = 1,
         InteractAt = 2
     }
 }

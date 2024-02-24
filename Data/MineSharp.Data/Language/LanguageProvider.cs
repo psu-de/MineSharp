@@ -1,23 +1,24 @@
+using MineSharp.Data.Framework.Providers;
+using Newtonsoft.Json.Linq;
+
 namespace MineSharp.Data.Language;
 
-/// <summary>
-/// Provides translation strings from minecraft.
-/// </summary>
-public class LanguageProvider
+internal class LanguageProvider : IDataProvider<LanguageDataBlob>
 {
+    private JObject token;
 
-    private readonly LanguageVersion _version;
-    
-    internal LanguageProvider(LanguageVersion version)
+    public LanguageProvider(JToken token)
     {
-        this._version = version;
+        if (token.Type != JTokenType.Object)
+        {
+            throw new ArgumentException("Expected token to be an object");
+        }
+
+        this.token = (JObject)token;
     }
 
-    /// <summary>
-    /// Get a translation by name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public string GetTranslation(string name)
-        => this._version.Translations[name];
+    public LanguageDataBlob GetData()
+    {
+        return new LanguageDataBlob(token.ToObject<Dictionary<string, string>>()!);
+    }
 }

@@ -8,16 +8,16 @@ public class SetPlayerPositionPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_Position;
 
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public bool IsOnGround { get; set; }
+    public double X          { get; set; }
+    public double Y          { get; set; }
+    public double Z          { get; set; }
+    public bool   IsOnGround { get; set; }
 
     public SetPlayerPositionPacket(double x, double y, double z, bool isOnGround)
     {
-        this.X = x;
-        this.Y = y;
-        this.Z = z;
+        this.X          = x;
+        this.Y          = y;
+        this.Z          = z;
         this.IsOnGround = isOnGround;
     }
 
@@ -31,9 +31,9 @@ public class SetPlayerPositionPacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var x = buffer.ReadDouble();
-        var y = buffer.ReadDouble();
-        var z = buffer.ReadDouble();
+        var x          = buffer.ReadDouble();
+        var y          = buffer.ReadDouble();
+        var z          = buffer.ReadDouble();
         var isOnGround = buffer.ReadBool();
         return new SetPlayerPositionPacket(x, y, z, isOnGround);
     }

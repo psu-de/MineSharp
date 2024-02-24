@@ -9,13 +9,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class UpdateAttributesPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_EntityUpdateAttributes;
-    
-    public int EntityId { get; set; }
+
+    public int         EntityId   { get; set; }
     public Attribute[] Attributes { get; set; }
 
     public UpdateAttributesPacket(int entityId, Attribute[] attributes)
     {
-        this.EntityId = entityId;
+        this.EntityId   = entityId;
         this.Attributes = attributes;
     }
 
@@ -27,7 +27,7 @@ public class UpdateAttributesPacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var entityId = buffer.ReadVarInt();
+        var entityId   = buffer.ReadVarInt();
         var attributes = buffer.ReadVarIntArray(ReadAttribute);
 
         return new UpdateAttributesPacket(entityId, attributes);
@@ -49,8 +49,8 @@ public class UpdateAttributesPacket : IPacket
 
     private static Attribute ReadAttribute(PacketBuffer buffer)
     {
-        var key = buffer.ReadString();
-        var value = buffer.ReadDouble();
+        var key       = buffer.ReadString();
+        var value     = buffer.ReadDouble();
         var modifiers = buffer.ReadVarIntArray(ReadModifier);
 
         return new Attribute(key, value, modifiers);
@@ -58,8 +58,8 @@ public class UpdateAttributesPacket : IPacket
 
     private static Modifier ReadModifier(PacketBuffer buffer)
     {
-        var uuid = buffer.ReadUuid();
-        var amount = buffer.ReadDouble();
+        var uuid      = buffer.ReadUuid();
+        var amount    = buffer.ReadDouble();
         var operation = buffer.ReadByte();
 
         return new Modifier(uuid, amount, (ModifierOp)operation);

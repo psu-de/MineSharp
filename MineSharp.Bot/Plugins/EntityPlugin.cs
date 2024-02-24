@@ -22,12 +22,12 @@ public class EntityPlugin : Plugin
     /// Fires whenever an entity spawns in the bots visible range.
     /// </summary>
     public event Events.EntityEvent? OnEntitySpawned;
-    
+
     /// <summary>
     /// Fires whenever an entity despawned in the bots visible range.
     /// </summary>
     public event Events.EntityEvent? OnEntityDespawned;
-    
+
     /// <summary>
     /// Fires whenever an entity moved in the bots visible range.
     /// </summary>
@@ -42,7 +42,7 @@ public class EntityPlugin : Plugin
     public EntityPlugin(MineSharpBot bot) : base(bot)
     {
         this.Entities = new ConcurrentDictionary<int, Entity>();
-        
+
         this.Bot.Client.On<SpawnEntityPacket>(this.HandleSpawnEntityPacket);
         this.Bot.Client.On<SpawnLivingEntityPacket>(this.HandleSpawnLivingEntityPacket);
         this.Bot.Client.On<RemoveEntitiesPacket>(this.HandleRemoveEntitiesPacket);
@@ -61,7 +61,7 @@ public class EntityPlugin : Plugin
         this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
         await this._playerPlugin.WaitForInitialization();
     }
-    
+
     internal void AddEntity(Entity entity)
     {
         this.Entities.TryAdd(entity.ServerId, entity);
@@ -76,16 +76,16 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
-        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
-        
+
+        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
+
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
             new Vector3(
-                NetUtils.ConvertToVelocity(packet.VelocityX), 
-                NetUtils.ConvertToVelocity(packet.VelocityY), 
+                NetUtils.ConvertToVelocity(packet.VelocityX),
+                NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
             true,
             new Dictionary<EffectType, Effect?>());
@@ -98,16 +98,16 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
-        var entityInfo = this.Bot.Data.Entities.GetById(packet.EntityType);
-        
+
+        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
+
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
             new Vector3(
-                NetUtils.ConvertToVelocity(packet.VelocityX), 
-                NetUtils.ConvertToVelocity(packet.VelocityY), 
+                NetUtils.ConvertToVelocity(packet.VelocityX),
+                NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
             true,
             new Dictionary<EffectType, Effect?>());
@@ -120,12 +120,12 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         foreach (var entityId in packet.EntityIds)
         {
             if (!this.Entities.Remove(entityId, out var entity))
                 continue;
-            
+
             this.OnEntityDespawned?.Invoke(this.Bot, entity);
         }
 
@@ -136,7 +136,7 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
         {
             return Task.CompletedTask;
@@ -145,7 +145,7 @@ public class EntityPlugin : Plugin
         entity.Velocity.X = NetUtils.ConvertToVelocity(packet.VelocityX);
         entity.Velocity.Y = NetUtils.ConvertToVelocity(packet.VelocityY);
         entity.Velocity.Z = NetUtils.ConvertToVelocity(packet.VelocityZ);
-        
+
         return Task.CompletedTask;
     }
 
@@ -153,7 +153,7 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -161,7 +161,7 @@ public class EntityPlugin : Plugin
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
-        
+
         entity.IsOnGround = packet.OnGround;
 
         this.OnEntityMoved?.Invoke(this.Bot, entity);
@@ -172,7 +172,7 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -181,8 +181,8 @@ public class EntityPlugin : Plugin
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
 
-        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
-        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
+        entity.Yaw        = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch      = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
         this.OnEntityMoved?.Invoke(this.Bot, entity);
@@ -193,12 +193,12 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
-        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
+        entity.Yaw        = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch      = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
         this.OnEntityMoved?.Invoke(this.Bot, entity);
@@ -218,7 +218,7 @@ public class EntityPlugin : Plugin
         entity.Position.Y = packet.Y;
         entity.Position.Z = packet.Z;
 
-        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Yaw   = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         this.OnEntityMoved?.Invoke(this.Bot, entity);
 
@@ -229,7 +229,7 @@ public class EntityPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
@@ -238,7 +238,7 @@ public class EntityPlugin : Plugin
             if (!entity.Attributes.TryAdd(attribute.Key, attribute))
             {
                 entity.Attributes[attribute.Key] = attribute;
-            } 
+            }
         }
 
         return Task.CompletedTask;
@@ -250,30 +250,30 @@ public class EntityPlugin : Plugin
             return;
 
         await this.WaitForInitialization();
-        
-        if ((packet.Flags & 0x01) == 0x01) 
+
+        if ((packet.Flags & 0x01) == 0x01)
             this._playerPlugin!.Entity!.Position.X += packet.X;
-        else 
+        else
             this._playerPlugin!.Entity!.Position.X = packet.X;
 
-        if ((packet.Flags & 0x02) == 0x02) 
+        if ((packet.Flags & 0x02) == 0x02)
             this._playerPlugin!.Entity!.Position.Y += packet.Y;
-        else 
+        else
             this._playerPlugin!.Entity!.Position.Y = packet.Y;
 
-        if ((packet.Flags & 0x04) == 0x04) 
+        if ((packet.Flags & 0x04) == 0x04)
             this._playerPlugin!.Entity!.Position.Z += packet.Z;
-        else 
+        else
             this._playerPlugin!.Entity!.Position.Z = packet.Z;
 
-        if ((packet.Flags & 0x08) == 0x08) 
+        if ((packet.Flags & 0x08) == 0x08)
             this._playerPlugin!.Entity!.Pitch += packet.Pitch;
-        else 
+        else
             this._playerPlugin!.Entity!.Pitch = packet.Pitch;
 
-        if ((packet.Flags & 0x10) == 0x10) 
+        if ((packet.Flags & 0x10) == 0x10)
             this._playerPlugin!.Entity!.Yaw += packet.Yaw;
-        else 
+        else
             this._playerPlugin!.Entity!.Yaw = packet.Yaw;
 
         // TODO: Dismount Vehicle

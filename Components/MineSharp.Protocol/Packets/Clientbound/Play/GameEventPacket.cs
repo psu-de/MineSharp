@@ -7,8 +7,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class GameEventPacket : IPacket
 {
     public PacketType Type => PacketType.CB_Play_GameStateChange;
-    
-    public byte Event { get; set; }
+
+    public byte  Event { get; set; }
     public float Value { get; set; }
 
     public GameEventPacket(byte @event, float value)
@@ -26,7 +26,7 @@ public class GameEventPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var @event = buffer.ReadByte();
-        var value = buffer.ReadFloat();
+        var value  = buffer.ReadFloat();
         return new GameEventPacket(@event, value);
     }
 }

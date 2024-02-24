@@ -10,15 +10,15 @@ public class ChatCommandPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_ChatCommand;
 
-    public string Command { get; set; }
-    public long Timestamp { get; set; }
-    public long Salt { get; set; }
-    public ArgumentSignature[] Signatures { get; set; }
-    public bool? SignedPreview { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public int? MessageCount { get; set; }
-    public byte[]? Acknowledged { get; set; }
+    public string              Command             { get; set; }
+    public long                Timestamp           { get; set; }
+    public long                Salt                { get; set; }
+    public ArgumentSignature[] Signatures          { get; set; }
+    public bool?               SignedPreview       { get; set; }
+    public ChatMessageItem[]?  PreviousMessages    { get; set; }
+    public ChatMessageItem?    LastRejectedMessage { get; set; }
+    public int?                MessageCount        { get; set; }
+    public byte[]?             Acknowledged        { get; set; }
 
     /// <summary>
     /// Constructor for 1.19 - 1.19.1 
@@ -30,10 +30,10 @@ public class ChatCommandPacket : IPacket
     /// <param name="signedPreview"></param>
     public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview)
     {
-        this.Command = command;
-        this.Timestamp = timestamp;
-        this.Salt = salt;
-        this.Signatures = signatures;
+        this.Command       = command;
+        this.Timestamp     = timestamp;
+        this.Salt          = salt;
+        this.Signatures    = signatures;
         this.SignedPreview = signedPreview;
     }
 
@@ -47,14 +47,15 @@ public class ChatCommandPacket : IPacket
     /// <param name="signedPreview"></param>
     /// <param name="previousMessages"></param>
     /// <param name="lastRejectedMessage"></param>
-    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview, ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
+    public ChatCommandPacket(string            command, long timestamp, long salt, ArgumentSignature[] signatures, bool signedPreview,
+                             ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
     {
-        this.Command = command;
-        this.Timestamp = timestamp;
-        this.Salt = salt;
-        this.Signatures = signatures;
-        this.SignedPreview = signedPreview;
-        this.PreviousMessages = previousMessages;
+        this.Command             = command;
+        this.Timestamp           = timestamp;
+        this.Salt                = salt;
+        this.Signatures          = signatures;
+        this.SignedPreview       = signedPreview;
+        this.PreviousMessages    = previousMessages;
         this.LastRejectedMessage = lastRejectedMessage;
     }
 
@@ -67,12 +68,13 @@ public class ChatCommandPacket : IPacket
     /// <param name="signatures"></param>
     /// <param name="messageCount"></param>
     /// <param name="acknowledged"></param>
-    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, int messageCount, byte[] acknowledged)
+    public ChatCommandPacket(string command, long timestamp, long salt, ArgumentSignature[] signatures, int messageCount,
+                             byte[] acknowledged)
     {
-        this.Command = command;
-        this.Timestamp = timestamp;
-        this.Salt = salt;
-        this.Signatures = signatures;
+        this.Command      = command;
+        this.Timestamp    = timestamp;
+        this.Salt         = salt;
+        this.Signatures   = signatures;
         this.MessageCount = messageCount;
         this.Acknowledged = acknowledged;
     }
@@ -98,12 +100,14 @@ public class ChatCommandPacket : IPacket
         {
             if (this.Acknowledged == null)
             {
-                throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have {nameof(this.Acknowledged)} set for versions >= 1.19.3");
+                throw new PacketVersionException(
+                    $"{nameof(ChatCommandPacket)} must have {nameof(this.Acknowledged)} set for versions >= 1.19.3");
             }
 
             if (!this.MessageCount.HasValue)
             {
-                throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have {nameof(this.MessageCount)} set for versions >= 1.19.3");
+                throw new PacketVersionException(
+                    $"{nameof(ChatCommandPacket)} must have {nameof(this.MessageCount)} set for versions >= 1.19.3");
             }
 
             buffer.WriteVarInt(this.MessageCount.Value);
@@ -116,7 +120,8 @@ public class ChatCommandPacket : IPacket
 
         if (this.PreviousMessages == null)
         {
-            throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have {nameof(this.PreviousMessages)} set for version 1.19.2");
+            throw new PacketVersionException(
+                $"{nameof(ChatCommandPacket)} must have {nameof(this.PreviousMessages)} set for version 1.19.2");
         }
 
         buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
@@ -141,7 +146,7 @@ public class ChatCommandPacket : IPacket
         public ArgumentSignature(string argumentName, byte[] signature)
         {
             this.ArgumentName = argumentName;
-            this.Signature = signature;
+            this.Signature    = signature;
         }
 
         public void Write(PacketBuffer buffer, MinecraftData version)

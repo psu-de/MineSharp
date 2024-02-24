@@ -11,7 +11,7 @@ namespace MineSharp.World;
 public static class WorldVersion
 {
     private static readonly MinecraftVersion Major_1_18 = new MinecraftVersion("1.18", -1);
-    
+
     /// <summary>
     /// Create a new IWorld for the given version
     /// </summary>

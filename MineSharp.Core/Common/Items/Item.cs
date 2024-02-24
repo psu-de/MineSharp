@@ -2,7 +2,6 @@ using fNbt;
 
 namespace MineSharp.Core.Common.Items;
 
-
 /// <summary>
 /// Represents an Item
 /// </summary>
@@ -16,7 +15,7 @@ public class Item(ItemInfo info, byte count, int? damage, NbtCompound? metadata)
     /// The item descriptor
     /// </summary>
     public readonly ItemInfo Info = info;
-    
+
     /// <summary>
     /// The number of items on the stack
     /// </summary>
@@ -42,6 +41,6 @@ public class Item(ItemInfo info, byte count, int? damage, NbtCompound? metadata)
     }
 
     /// <inheritdoc />
-    public override string ToString() 
+    public override string ToString()
         => $"Item(Type={Info.Type}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
 }

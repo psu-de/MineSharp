@@ -13,7 +13,7 @@ public class IntProperty(string name, int stateCount) : IBlockProperty
     /// <inheritdoc />
     public int StateCount { get; } = stateCount;
 
-     
+
     /// <inheritdoc />
     public T GetValue<T>(int state)
     {

@@ -38,7 +38,7 @@ public class Block(BlockInfo info, int state, Position position)
     /// <returns></returns>
     public T GetProperty<T>(string name)
         => this.Info.State.GetPropertyValue<T>(name, this.State);
-    
+
     /// <summary>
     /// Whether this block is considered solid
     /// </summary>
@@ -59,8 +59,8 @@ public class Block(BlockInfo info, int state, Position position)
     /// <param name="item"></param>
     /// <returns></returns>
     public bool CanBeHarvestedBy(ItemType? item)
-        => this.Info.HarvestTools == null 
-           || (item != null && this.Info.HarvestTools.Contains(item.Value));
+        => this.Info.HarvestTools == null
+        || (item != null && this.Info.HarvestTools.Contains(item.Value));
 
     /// <inheritdoc />
     public override string ToString() => $"Block (Position={Position}, State={State}, Type={Info.Type})";

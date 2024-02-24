@@ -16,7 +16,7 @@ public class PluginMessagePacket : IPacket
     /// The name of the channel the data was sent
     /// </summary>
     public string ChannelName { get; set; }
-    
+
     /// <summary>
     /// The message data
     /// </summary>
@@ -30,9 +30,9 @@ public class PluginMessagePacket : IPacket
     public PluginMessagePacket(string channelName, PacketBuffer data)
     {
         this.ChannelName = channelName;
-        this.Data = data;
+        this.Data        = data;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

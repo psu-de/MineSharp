@@ -14,7 +14,7 @@ public class PongResponsePacket : IPacket
     {
         this.Payload = payload;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(this.Payload);

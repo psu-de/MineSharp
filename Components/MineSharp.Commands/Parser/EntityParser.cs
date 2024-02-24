@@ -8,7 +8,7 @@ public class EntityParser : IParser
     {
         this.Flags = flags;
     }
-    
-    public string GetName() => "minecraft:entity";
-    public int GetArgumentCount() => 1;
+
+    public string GetName()          => "minecraft:entity";
+    public int    GetArgumentCount() => 1;
 }

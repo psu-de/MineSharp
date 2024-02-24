@@ -15,13 +15,13 @@ internal class IndirectPalette : IPalette
     {
         for (var i = 0; i < this._map!.Count; i++)
         {
-            if (minState <= this._map[i] && this._map[i] <= maxState) 
+            if (minState <= this._map[i] && this._map[i] <= maxState)
                 return true;
         }
 
         return false;
     }
-    
+
     public int Get(int index) => this._map[index];
 
     public IPalette? Set(int index, int state, IPaletteContainer container)
@@ -34,26 +34,27 @@ internal class IndirectPalette : IPalette
         }
 
         // add the new state to the palette
-        var newMapSize = this._map!.Count + 1;
+        var newMapSize      = this._map!.Count + 1;
         var newBitsPerEntry = (byte)Math.Ceiling(Math.Log2(newMapSize));
-        
+
         if (newBitsPerEntry > container.MaxBits)
         {
-            var bits = (int)Math.Ceiling(Math.Log2(container.TotalNumberOfStates));
-            long[] data = new long[bits];
-            var newData = new IntBitArray(data, newBitsPerEntry);
+            var    bits    = (int)Math.Ceiling(Math.Log2(container.TotalNumberOfStates));
+            long[] data    = new long[bits];
+            var    newData = new IntBitArray(data, newBitsPerEntry);
 
             for (var i = 0; i < container.Capacity; i++)
                 newData.Set(i, container.GetAt(i));
-            
+
             newData.Set(index, state);
 
             container.Data = newData;
             return new DirectPalette();
         }
+
         container.Data.ChangeBitsPerEntry(newBitsPerEntry);
         container.Data.Set(index, this._map.Count);
-        
+
         var newMap = new List<int>(this._map) { state };
         return new IndirectPalette(newMap);
     }

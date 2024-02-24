@@ -8,10 +8,10 @@ public class BoolProperty(string name) : IBlockProperty
 {
     /// <inheritdoc />
     public string Name { get; } = name;
-    
+
     /// <inheritdoc />
     public int StateCount => 2;
-    
+
     /// <inheritdoc />
     public T GetValue<T>(int state)
     {

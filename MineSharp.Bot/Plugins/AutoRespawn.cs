@@ -11,7 +11,7 @@ public class AutoRespawn : Plugin
     /// The time waited before respawning
     /// </summary>
     public TimeSpan RespawnDelay = TimeSpan.Zero;
-    
+
     /// <summary>
     /// Create a new AutoRespawn instance
     /// </summary>
@@ -22,7 +22,7 @@ public class AutoRespawn : Plugin
     /// <inheritdoc />
     protected override Task Init()
     {
-        this.player = this.Bot.GetPlugin<PlayerPlugin>();
+        this.player        =  this.Bot.GetPlugin<PlayerPlugin>();
         this.player.OnDied += this.OnBotDied;
 
         return Task.CompletedTask;
@@ -38,8 +38,8 @@ public class AutoRespawn : Plugin
         if (this.RespawnDelay.TotalMilliseconds > 0)
         {
             await Task.Delay(this.RespawnDelay);
-        }   
-        
+        }
+
         await this.player!.Respawn();
     }
 }

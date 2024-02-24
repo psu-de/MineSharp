@@ -8,15 +8,15 @@ public class LoginPluginResponsePacket : IPacket
 {
     public PacketType Type => PacketType.SB_Login_LoginPluginResponse;
 
-    public int MessageId { get; set; }
-    public byte[]? Data { get; set; }
+    public int     MessageId { get; set; }
+    public byte[]? Data      { get; set; }
 
     public LoginPluginResponsePacket(int messageId, byte[]? data)
     {
         this.MessageId = messageId;
-        this.Data = data;
+        this.Data      = data;
     }
-    
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(this.MessageId);
@@ -31,9 +31,10 @@ public class LoginPluginResponsePacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
-        var hasData = buffer.ReadBool();
-        var data = hasData switch {
-            true => buffer.RestBuffer(),
+        var hasData   = buffer.ReadBool();
+        var data = hasData switch
+        {
+            true  => buffer.RestBuffer(),
             false => null
         };
 

@@ -17,12 +17,12 @@ namespace MineSharp.Bot.Plugins;
 public class WorldPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     /// <summary>
     /// The world of the Minecraft server
     /// </summary>
     public IWorld World { get; private set; }
-    
+
     private PlayerPlugin? _playerPlugin;
     private WindowPlugin? _windowPlugin;
 
@@ -35,7 +35,7 @@ public class WorldPlugin : Plugin
     public WorldPlugin(MineSharpBot bot) : base(bot)
     {
         this.World = WorldVersion.CreateWorld(this.Bot.Data);
-        
+
         this.Bot.Client.On<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
         this.Bot.Client.On<UnloadChunkPacket>(this.HandleUnloadChunkPacket);
         this.Bot.Client.On<BlockUpdatePacket>(this.HandleBlockUpdatePacket);
@@ -60,7 +60,7 @@ public class WorldPlugin : Plugin
     {
         if (radius < 0)
             throw new ArgumentException($"{nameof(radius)} must be positive.");
-        
+
         var player = this.Bot.GetPlugin<PlayerPlugin>();
         await player.WaitForInitialization();
 
@@ -91,7 +91,7 @@ public class WorldPlugin : Plugin
         {
             throw new Exception("Player must be in creative mode.");
         }
-        
+
         var packet = new UpdateCommandBlock(location, command, mode, flags);
         return this.Bot.Client.SendPacket(packet);
     }
@@ -107,20 +107,20 @@ public class WorldPlugin : Plugin
     {
         if (this._playerPlugin?.Self == null)
             await this._playerPlugin?.WaitForInitialization()!;
-        
+
         await this.WaitForChunks();
-        
-        if (!block.Info.Diggable)
+
+        if (block.Info.Unbreakable)
             return MineBlockStatus.NotDiggable;
 
         if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo(block.Position))
             return MineBlockStatus.TooFar;
-        
+
         if (!this.World!.IsBlockLoaded(block.Position))
             return MineBlockStatus.BlockNotLoaded;
 
         cancellation ??= CancellationToken.None;
-        face ??= BlockFace.Top; // TODO: Figure out how to calculate BlockFace
+        face         ??= BlockFace.Top; // TODO: Figure out how to calculate BlockFace
 
         var time = this.CalculateBreakingTime(block);
 
@@ -133,7 +133,7 @@ public class WorldPlugin : Plugin
 
         var animationCts = new CancellationTokenSource();
         animationCts.CancelAfter(time);
-        
+
         var diggingAnim = Task.Run(async () =>
         {
             while (true)
@@ -145,7 +145,7 @@ public class WorldPlugin : Plugin
                     break;
             }
         }, animationCts.Token);
-        
+
         try
         {
             await this.Bot.Client.SendPacket(startPacket, cancellation);
@@ -161,7 +161,7 @@ public class WorldPlugin : Plugin
                     face.Value,
                     ++this.Bot.SequenceId);
 
-                var send = this.Bot.Client.SendPacket(finishPacket);
+                var send    = this.Bot.Client.SendPacket(finishPacket);
                 var receive = this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>();
 
                 await Task.WhenAll(send, receive);
@@ -169,28 +169,29 @@ public class WorldPlugin : Plugin
             }, cancellation.Value);
 
             var ack = await this.Bot.Client
-                .WaitForPacket<AcknowledgeBlockChangePacket>()
-                .WaitAsync(cancellation.Value);
+                                .WaitForPacket<AcknowledgeBlockChangePacket>()
+                                .WaitAsync(cancellation.Value);
 
             if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p118)
             {
                 if ((PlayerActionStatus)p118.Status != PlayerActionStatus.StartedDigging)
                     return MineBlockStatus.Failed;
             } // TODO: MineBlock: What happens in 1.19?
-                
+
             ack = await sendAgain;
 
-            return ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false } 
-                ? MineBlockStatus.Failed 
+            return ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false }
+                ? MineBlockStatus.Failed
                 : MineBlockStatus.Finished;
-        } catch (TaskCanceledException)
+        }
+        catch (TaskCanceledException)
         {
             var cancelPacket = new PlayerActionPacket(
                 (int)PlayerActionStatus.CancelledDigging,
                 block.Position,
                 face.Value,
                 ++this.Bot.SequenceId);
-            
+
             animationCts.Cancel();
             await this.Bot.Client.SendPacket(cancelPacket);
 
@@ -221,24 +222,24 @@ public class WorldPlugin : Plugin
             this.Bot.Client.SendPacket(packet),
             this._playerPlugin!.SwingArm());
     }
-    
+
     private int CalculateBreakingTime(Block block)
     {
         if (this._playerPlugin?.Self?.GameMode == GameMode.Creative)
             return 0;
-        
-        var heldItem = this._windowPlugin?.HeldItem;
+
+        var   heldItem       = this._windowPlugin?.HeldItem;
         float toolMultiplier = 1;
 
         if (heldItem != null)
         {
             toolMultiplier = block.Info.Materials
-                .Select(x => this.Bot.Data.Materials.GetToolMultiplier(x, heldItem.Info.Type))
-                .Max();
+                                  .Select(x => this.Bot.Data.Materials.GetMultiplier(x, heldItem.Info.Type))
+                                  .Max();
         }
-            
-        float efficiencyLevel = 0; // TODO: Efficiency level
-        float hasteLevel = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.Haste) ?? 0;
+
+        float efficiencyLevel    = 0; // TODO: Efficiency level
+        float hasteLevel         = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.Haste)         ?? 0;
         float miningFatigueLevel = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
 
         toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
@@ -260,23 +261,23 @@ public class WorldPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        var chunk = this.World.CreateChunk(coords, packet.BlockEntities);
+        var chunk  = this.World.CreateChunk(coords, packet.BlockEntities);
         chunk.LoadData(packet.ChunkData);
-        
+
         this.World!.LoadChunk(chunk);
-        
+
         return Task.CompletedTask;
     }
 
     private Task HandleUnloadChunkPacket(UnloadChunkPacket packet)
-    {        
+    {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
+
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        
+
         this.World!.UnloadChunk(coords);
         return Task.CompletedTask;
     }
@@ -285,9 +286,9 @@ public class WorldPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
-        var blockInfo = this.Bot.Data.Blocks.GetByState(packet.StateId);
-        var block = new Block(blockInfo, packet.StateId, packet.Location);
+
+        var blockInfo = this.Bot.Data.Blocks.ByState(packet.StateId)!;
+        var block     = new Block(blockInfo, packet.StateId, packet.Location);
 
         this.World!.SetBlock(block);
         return Task.CompletedTask;
@@ -297,28 +298,28 @@ public class WorldPlugin : Plugin
     {
         if (!this.IsEnabled)
             return Task.CompletedTask;
-        
-        var sectionX = packet.ChunkSection >> 42;
+
+        var sectionX = packet.ChunkSection       >> 42;
         var sectionY = packet.ChunkSection << 44 >> 44;
         var sectionZ = packet.ChunkSection << 22 >> 42;
-        
-        if (sectionX > Math.Pow(2, 21)) 
+
+        if (sectionX > Math.Pow(2, 21))
             sectionX -= (int)Math.Pow(2, 22);
-        
-        if (sectionY > Math.Pow(2, 19)) 
+
+        if (sectionY > Math.Pow(2, 19))
             sectionY -= (int)Math.Pow(2, 20);
-        
-        if (sectionZ > Math.Pow(2, 21)) 
+
+        if (sectionZ > Math.Pow(2, 21))
             sectionZ -= (int)Math.Pow(2, 22);
 
         var coords = new ChunkCoordinates((int)sectionX, (int)sectionZ);
-        var chunk = this.World!.GetChunkAt(coords);
+        var chunk  = this.World!.GetChunkAt(coords);
 
         foreach (var l in packet.Blocks)
         {
-            var blockZ = (int)(l >> 4 & 0x0F);
-            var blockX = (int)(l >> 8 & 0x0F);
-            var blockY = (int)(l & 0x0F) + (int)sectionY * IChunk.SIZE;
+            var blockZ  = (int)(l >> 4 & 0x0F);
+            var blockX  = (int)(l >> 8 & 0x0F);
+            var blockY  = (int)(l & 0x0F) + (int)sectionY * IChunk.SIZE;
             var stateId = (int)(l >> 12);
 
             chunk.SetBlockAt(stateId, new Position(blockX, blockY, blockZ));
@@ -345,7 +346,7 @@ public class WorldPlugin : Plugin
             Logger.Warn("Received ChunkBatchFinishedPacket, but no chunk batch was started.");
             return;
         }
-        
+
         var timeSpan = DateTime.Now - this.chunkBatchStart!.Value;
         this.chunkBatchStart = null;
 
@@ -353,7 +354,7 @@ public class WorldPlugin : Plugin
 
         if (float.IsNaN(cps) || float.IsInfinity(cps))
             cps = 5;
-        
+
         await this.Bot.Client.SendPacket(new ChunkBatchReceivedPacket(cps));
     }
 }

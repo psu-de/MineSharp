@@ -10,33 +10,17 @@ namespace MineSharp.Protocol.Cryptography;
 internal class EncryptionHelper
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    
+
     public static RSA? DecodePublicKey(byte[] publicKeyBytes)
     {
-        var ms = new MemoryStream(publicKeyBytes);
-        var rd = new BinaryReader(ms);
-        byte[] seqOid = {
-            0x30,
-            0x0D,
-            0x06,
-            0x09,
-            0x2A,
-            0x86,
-            0x48,
-            0x86,
-            0xF7,
-            0x0D,
-            0x01,
-            0x01,
-            0x01,
-            0x05,
-            0x00
-        };
-        var seq = new byte[15];
+        var    ms     = new MemoryStream(publicKeyBytes);
+        var    rd     = new BinaryReader(ms);
+        byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
+        var    seq    = new byte[15];
 
         try
         {
-            byte byteValue;
+            byte   byteValue;
             ushort shortValue;
 
             shortValue = rd.ReadUInt16();
@@ -65,7 +49,7 @@ internal class EncryptionHelper
 
             shortValue = rd.ReadUInt16();
 
-            if (shortValue == 0x8103) rd.ReadByte();
+            if (shortValue      == 0x8103) rd.ReadByte();
             else if (shortValue == 0x8203)
                 rd.ReadInt16();
             else
@@ -86,7 +70,7 @@ internal class EncryptionHelper
 
             shortValue = rd.ReadUInt16();
 
-            if (shortValue == 0x8130) rd.ReadByte();
+            if (shortValue      == 0x8130) rd.ReadByte();
             else if (shortValue == 0x8230)
                 rd.ReadInt16();
             else
@@ -104,18 +88,20 @@ internal class EncryptionHelper
 
             GetTraits(rsAparams.Modulus.Length * 8, out var sizeMod, out var sizeExp);
 
-            rsAparams.Modulus = AlignBytes(rsAparams.Modulus, sizeMod);
+            rsAparams.Modulus  = AlignBytes(rsAparams.Modulus, sizeMod);
             rsAparams.Exponent = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), sizeExp);
 
             rsa.ImportParameters(rsAparams);
 
             return rsa;
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             Logger.Warn($"PublicKey Decode Exception: {e}");
 
             return null;
-        } finally
+        }
+        finally
         {
             rd.Close();
         }
@@ -154,13 +140,14 @@ internal class EncryptionHelper
 
             return buf;
         }
+
         return inputBytes;
     }
 
     private static int DecodeIntegerSize(BinaryReader rd)
     {
         byte byteValue;
-        int count;
+        int  count;
 
         byteValue = rd.ReadByte();
 
@@ -171,14 +158,14 @@ internal class EncryptionHelper
         if (byteValue == 0x81)
         {
             count = rd.ReadByte();
-        } else if (byteValue == 0x82)
+        }
+        else if (byteValue == 0x82)
         {
             var hi = rd.ReadByte();
             var lo = rd.ReadByte();
-            count = BitConverter.ToUInt16(new[] {
-                lo, hi
-            }, 0);
-        } else
+            count = BitConverter.ToUInt16(new[] { lo, hi }, 0);
+        }
+        else
         {
             count = byteValue;
         }
@@ -196,12 +183,13 @@ internal class EncryptionHelper
     private static void GetTraits(int modulusLengthInBits, out int sizeMod, out int sizeExp)
     {
         var assumedLength = -1;
-        var logbase = Math.Log(modulusLengthInBits, 2);
+        var logbase       = Math.Log(modulusLengthInBits, 2);
 
         if (logbase == (int)logbase)
         {
             assumedLength = modulusLengthInBits;
-        } else
+        }
+        else
         {
             assumedLength = (int)(logbase + 1.0);
             assumedLength = (int)Math.Pow(2, assumedLength);
@@ -247,8 +235,8 @@ internal class EncryptionHelper
     {
         var rx = new Regex("-+[^-]+-+");
         var der = rx.Replace(pem, "")
-            .Replace("\r", "")
-            .Replace("\n", "");
+                    .Replace("\r", "")
+                    .Replace("\n", "");
 
         return der;
     }
@@ -256,18 +244,18 @@ internal class EncryptionHelper
     public static string ComputeHash(string serverId, byte[] key, byte[] publicKey)
     {
         byte[] bytes = Encoding.ASCII.GetBytes(serverId)
-            .Concat(key)
-            .Concat(publicKey)
-            .ToArray();
-        
+                               .Concat(key)
+                               .Concat(publicKey)
+                               .ToArray();
+
         var hash = SHA1.HashData(bytes);
         Array.Reverse(hash);
         var b = new BigInteger(hash);
-        
-        var hex = b < 0 
+
+        var hex = b < 0
             ? "-" + (-b).ToString("x")
             : b.ToString("x");
-        
+
         return hex.TrimStart('0');
     }
 }

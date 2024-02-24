@@ -9,17 +9,17 @@ public enum GameMode
     /// Survival game mode
     /// </summary>
     Survival = 0,
-    
+
     /// <summary>
     /// Creative game mode
     /// </summary>
     Creative = 1,
-    
+
     /// <summary>
     /// Adventure game mode
     /// </summary>
     Adventure = 3,
-    
+
     /// <summary>
     /// Spectator game mode
     /// </summary>

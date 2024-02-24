@@ -26,7 +26,7 @@ public struct UUID : IEquatable<UUID>
     /// <param name="leastSignificantBits">The least significant 64 bits of the UUID</param>
     public UUID(long mostSignificantBits, long leastSignificantBits)
     {
-        this.MostSignificantBits = mostSignificantBits;
+        this.MostSignificantBits  = mostSignificantBits;
         this.LeastSignificantBits = leastSignificantBits;
     }
 
@@ -42,7 +42,7 @@ public struct UUID : IEquatable<UUID>
         if (b.Length != 16)
             throw new ArgumentException("Length of the UUID byte array should be 16");
 
-        this.MostSignificantBits = BitConverter.ToInt64(b, 0);
+        this.MostSignificantBits  = BitConverter.ToInt64(b, 0);
         this.LeastSignificantBits = BitConverter.ToInt64(b, 8);
     }
 
@@ -80,7 +80,8 @@ public struct UUID : IEquatable<UUID>
     /// </summary>
     /// <param name="uuid">An object to compare to this instance.</param>
     /// <returns>true if <paramref name="uuid" /> is equal to this instance; otherwise, false.</returns>
-    public bool Equals(UUID uuid) => this.MostSignificantBits == uuid.MostSignificantBits && this.LeastSignificantBits == uuid.LeastSignificantBits;
+    public bool Equals(UUID uuid) =>
+        this.MostSignificantBits == uuid.MostSignificantBits && this.LeastSignificantBits == uuid.LeastSignificantBits;
 
     /// <summary>
     ///     Returns the hash code for this instance.
@@ -94,9 +95,9 @@ public struct UUID : IEquatable<UUID>
     /// <returns>A string representation of this UUID.</returns>
     public override string ToString() =>
         //return ((Guid)this).ToString();
-        GetDigits(this.MostSignificantBits >> 32, 8) + "-" +
-        GetDigits(this.MostSignificantBits >> 16, 4) + "-" +
-        GetDigits(this.MostSignificantBits, 4) + "-" +
+        GetDigits(this.MostSignificantBits >> 32, 8)  + "-" +
+        GetDigits(this.MostSignificantBits >> 16, 4)  + "-" +
+        GetDigits(this.MostSignificantBits, 4)        + "-" +
         GetDigits(this.LeastSignificantBits >> 48, 4) + "-" +
         GetDigits(this.LeastSignificantBits, 12);
 
@@ -106,25 +107,14 @@ public struct UUID : IEquatable<UUID>
     /// <returns>A 16-element byte array</returns>
     public byte[] ToByteArray()
     {
-        var uuidMostSignificantBytes = BitConverter.GetBytes(this.MostSignificantBits);
+        var uuidMostSignificantBytes  = BitConverter.GetBytes(this.MostSignificantBits);
         var uuidLeastSignificantBytes = BitConverter.GetBytes(this.LeastSignificantBits);
-        byte[] bytes = {
-            uuidMostSignificantBytes[0],
-            uuidMostSignificantBytes[1],
-            uuidMostSignificantBytes[2],
-            uuidMostSignificantBytes[3],
-            uuidMostSignificantBytes[4],
-            uuidMostSignificantBytes[5],
-            uuidMostSignificantBytes[6],
-            uuidMostSignificantBytes[7],
-            uuidLeastSignificantBytes[0],
-            uuidLeastSignificantBytes[1],
-            uuidLeastSignificantBytes[2],
-            uuidLeastSignificantBytes[3],
-            uuidLeastSignificantBytes[4],
-            uuidLeastSignificantBytes[5],
-            uuidLeastSignificantBytes[6],
-            uuidLeastSignificantBytes[7]
+        byte[] bytes =
+        {
+            uuidMostSignificantBytes[0], uuidMostSignificantBytes[1], uuidMostSignificantBytes[2], uuidMostSignificantBytes[3],
+            uuidMostSignificantBytes[4], uuidMostSignificantBytes[5], uuidMostSignificantBytes[6], uuidMostSignificantBytes[7],
+            uuidLeastSignificantBytes[0], uuidLeastSignificantBytes[1], uuidLeastSignificantBytes[2], uuidLeastSignificantBytes[3],
+            uuidLeastSignificantBytes[4], uuidLeastSignificantBytes[5], uuidLeastSignificantBytes[6], uuidLeastSignificantBytes[7]
         };
 
         return bytes;
@@ -152,25 +142,14 @@ public struct UUID : IEquatable<UUID>
             return default(Guid);
         }
 
-        var uuidMostSignificantBytes = BitConverter.GetBytes(uuid.MostSignificantBits);
+        var uuidMostSignificantBytes  = BitConverter.GetBytes(uuid.MostSignificantBits);
         var uuidLeastSignificantBytes = BitConverter.GetBytes(uuid.LeastSignificantBits);
-        byte[] guidBytes = {
-            uuidMostSignificantBytes[4],
-            uuidMostSignificantBytes[5],
-            uuidMostSignificantBytes[6],
-            uuidMostSignificantBytes[7],
-            uuidMostSignificantBytes[2],
-            uuidMostSignificantBytes[3],
-            uuidMostSignificantBytes[0],
-            uuidMostSignificantBytes[1],
-            uuidLeastSignificantBytes[7],
-            uuidLeastSignificantBytes[6],
-            uuidLeastSignificantBytes[5],
-            uuidLeastSignificantBytes[4],
-            uuidLeastSignificantBytes[3],
-            uuidLeastSignificantBytes[2],
-            uuidLeastSignificantBytes[1],
-            uuidLeastSignificantBytes[0]
+        byte[] guidBytes =
+        {
+            uuidMostSignificantBytes[4], uuidMostSignificantBytes[5], uuidMostSignificantBytes[6], uuidMostSignificantBytes[7],
+            uuidMostSignificantBytes[2], uuidMostSignificantBytes[3], uuidMostSignificantBytes[0], uuidMostSignificantBytes[1],
+            uuidLeastSignificantBytes[7], uuidLeastSignificantBytes[6], uuidLeastSignificantBytes[5], uuidLeastSignificantBytes[4],
+            uuidLeastSignificantBytes[3], uuidLeastSignificantBytes[2], uuidLeastSignificantBytes[1], uuidLeastSignificantBytes[0]
         };
 
         return new Guid(guidBytes);
@@ -187,23 +166,10 @@ public struct UUID : IEquatable<UUID>
         }
 
         var guidBytes = value.ToByteArray();
-        byte[] uuidBytes = {
-            guidBytes[6],
-            guidBytes[7],
-            guidBytes[4],
-            guidBytes[5],
-            guidBytes[0],
-            guidBytes[1],
-            guidBytes[2],
-            guidBytes[3],
-            guidBytes[15],
-            guidBytes[14],
-            guidBytes[13],
-            guidBytes[12],
-            guidBytes[11],
-            guidBytes[10],
-            guidBytes[9],
-            guidBytes[8]
+        byte[] uuidBytes =
+        {
+            guidBytes[6], guidBytes[7], guidBytes[4], guidBytes[5], guidBytes[0], guidBytes[1], guidBytes[2], guidBytes[3],
+            guidBytes[15], guidBytes[14], guidBytes[13], guidBytes[12], guidBytes[11], guidBytes[10], guidBytes[9], guidBytes[8]
         };
 
 
@@ -218,7 +184,7 @@ public struct UUID : IEquatable<UUID>
     /// <exception cref="ArgumentNullException">input is null.</exception>
     /// <exception cref="FormatException">input is not in a recognized format.</exception>
     public static UUID Parse(string input) => Guid.Parse(input);
-    
+
     private static string GetDigits(long val, int digits)
     {
         var hi = 1L << digits * 4;

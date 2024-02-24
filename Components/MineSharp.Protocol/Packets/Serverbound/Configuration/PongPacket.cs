@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 public class PongPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Configuration_Pong;
- 
+
     public int Id { get; set; }
 
     public PongPacket(int id)
@@ -19,7 +19,7 @@ public class PongPacket : IPacket
     {
         buffer.WriteInt(this.Id);
     }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new PongPacket(

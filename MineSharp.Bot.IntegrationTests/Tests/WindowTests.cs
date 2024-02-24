@@ -10,7 +10,7 @@ public static class WindowTests
         await TestInventoryUpdate();
         await TestOpenContainer();
     }
-    
+
     public static Task TestInventoryUpdate()
     {
         return IntegrationTest.RunTest("testInventoryUpdate", async (bot, source) =>
@@ -39,18 +39,18 @@ public static class WindowTests
             await Task.Delay(1000);
 
             var blockPos = new Position(17, -58, 24);
-            var block = bot.GetPlugin<WorldPlugin>().World.GetBlockAt(blockPos);
+            var block    = bot.GetPlugin<WorldPlugin>().World.GetBlockAt(blockPos);
 
             var window = await bot.GetPlugin<WindowPlugin>().OpenContainer(block);
             await Task.Delay(1000);
             var slot = window.GetSlot(0);
 
             await Task.Delay(1000);
-            
+
             source.TrySetResult(
-                window.SlotCount == 3 * 9
-                && slot.Item?.Info.Name == "soul_sand"
-                && slot.Item?.Count == 48);
+                window.SlotCount     == 3 * 9
+             && slot.Item?.Info.Name == "soul_sand"
+             && slot.Item?.Count     == 48);
         });
     }
 }

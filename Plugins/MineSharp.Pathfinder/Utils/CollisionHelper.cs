@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Data;
+using MineSharp.Physics.Input;
 using MineSharp.World;
 
 namespace MineSharp.Pathfinder.Utils;

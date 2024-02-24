@@ -9,7 +9,7 @@ public enum PlayerHand
     /// The Main hand
     /// </summary>
     MainHand = 0,
-    
+
     /// <summary>
     /// The Off hand
     /// </summary>

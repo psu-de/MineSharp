@@ -13,22 +13,22 @@ public class ChatPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Play_Chat;
-    
+
     /// <summary>
     /// The chat message
     /// </summary>
     public string Message { get; set; }
-    
+
     /// <summary>
     /// The position of the chat message
     /// </summary>
     public byte Position { get; set; }
-    
+
     /// <summary>
     /// The UUID of the message sender
     /// </summary>
     public UUID Sender { get; set; }
-    
+
     /// <summary>
     /// Create a new instance
     /// </summary>
@@ -37,9 +37,9 @@ public class ChatPacket : IPacket
     /// <param name="sender"></param>
     public ChatPacket(string message, byte position, UUID sender)
     {
-        this.Message = message;
+        this.Message  = message;
         this.Position = position;
-        this.Sender = sender;
+        this.Sender   = sender;
     }
 
     /// <inheritdoc />

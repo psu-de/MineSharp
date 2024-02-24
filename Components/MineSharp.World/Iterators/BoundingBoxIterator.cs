@@ -9,7 +9,7 @@ namespace MineSharp.World.Iterators;
 public class BoundingBoxIterator : IWorldIterator
 {
     private XYZIterator _iterator;
-       
+
     /// <summary>
     /// Create a new instance
     /// </summary>
@@ -22,12 +22,12 @@ public class BoundingBoxIterator : IWorldIterator
         var maxY = (int)Math.Floor(aabb.MaxY + 1.0E-7D) + 1;
         var minZ = (int)Math.Floor(aabb.MinZ - 1.0E-7D) - 1;
         var maxZ = (int)Math.Floor(aabb.MaxZ + 1.0E-7D) + 1;
-        
+
         this._iterator = new XYZIterator(
             new Position(minX, minY, minZ),
             new Position(maxX, maxY, maxZ));
     }
-    
+
     /// <inheritdoc />
     public IEnumerable<Position> Iterate() => this._iterator.Iterate();
 }

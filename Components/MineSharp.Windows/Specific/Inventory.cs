@@ -27,27 +27,27 @@ public class Inventory(Window? inventory = null, Window.WindowSynchronizer? wind
         /// The player's 2x2 crafting result slot
         /// </summary>
         CraftingResult = 0,
-        
+
         /// <summary>
         /// The helmet slot index
         /// </summary>
         Helmet = 5,
-        
+
         /// <summary>
         /// The chest plate slot index
         /// </summary>
         Chest = 6,
-        
+
         /// <summary>
         /// The leggins slot index
         /// </summary>
         Leggings = 7,
-        
+
         /// <summary>
         /// The boots slot index
         /// </summary>
         Boots = 8,
-        
+
         /// <summary>
         /// The offhand slot index
         /// </summary>

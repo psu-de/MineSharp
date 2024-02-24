@@ -9,10 +9,10 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 public class MessageAcknowledgementPacket : IPacket
 {
     public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
-    
-    public int? Count { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
+
+    public int?               Count               { get; set; }
+    public ChatMessageItem[]? PreviousMessages    { get; set; }
+    public ChatMessageItem?   LastRejectedMessage { get; set; }
 
     /**
      * Constructor for >= 1.19.3
@@ -27,7 +27,7 @@ public class MessageAcknowledgementPacket : IPacket
      */
     public MessageAcknowledgementPacket(ChatMessageItem[]? previousMessages, ChatMessageItem? lastRejectedMessage)
     {
-        this.PreviousMessages = previousMessages;
+        this.PreviousMessages    = previousMessages;
         this.LastRejectedMessage = lastRejectedMessage;
     }
 
@@ -39,7 +39,7 @@ public class MessageAcknowledgementPacket : IPacket
             {
                 throw new PacketVersionException($"Expected {nameof(Count)} to be set for versions >= 1.19.3");
             }
-            
+
             buffer.WriteVarInt(this.Count.Value);
             return;
         }
@@ -48,7 +48,7 @@ public class MessageAcknowledgementPacket : IPacket
         {
             throw new PacketVersionException($"Expected {nameof(PreviousMessages)} to be set for versions >= 1.19.3");
         }
-        
+
         buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 
         var hasLastRejectedMessage = this.LastRejectedMessage != null;
@@ -57,7 +57,7 @@ public class MessageAcknowledgementPacket : IPacket
             return;
         this.LastRejectedMessage!.Write(buffer, version);
     }
-    
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version) => throw new NotImplementedException();
 }
 #pragma warning restore CS1591

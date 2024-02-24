@@ -12,7 +12,7 @@ public class ChatMessageItem
     /// Sender of the message
     /// </summary>
     public UUID? Sender { get; set; }
-    
+
     /// <summary>
     /// Signature bytes
     /// </summary>
@@ -26,7 +26,7 @@ public class ChatMessageItem
     {
         this.Signature = signature;
     }
-    
+
     /// <summary>
     /// Creates a new instance
     /// </summary>
@@ -34,13 +34,13 @@ public class ChatMessageItem
     /// <param name="signature"></param>
     public ChatMessageItem(UUID sender, byte[] signature)
     {
-        this.Sender = sender;
+        this.Sender    = sender;
         this.Signature = signature;
     }
 
     private ChatMessageItem(UUID? sender, byte[]? signature)
     {
-        this.Sender = sender;
+        this.Sender    = sender;
         this.Signature = signature;
     }
 
@@ -63,7 +63,6 @@ public class ChatMessageItem
             if (this.Signature != null)
                 buffer.WriteBytes(this.Signature.AsSpan());
         }
-        
     }
 
     /// <summary>
@@ -74,12 +73,12 @@ public class ChatMessageItem
     /// <returns></returns>
     public static ChatMessageItem Read(PacketBuffer buffer, MinecraftData version)
     {
-        UUID? uuid = null;
+        UUID?   uuid      = null;
         byte[]? signature = null;
 
         if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
         {
-            uuid = buffer.ReadUuid();
+            uuid      = buffer.ReadUuid();
             signature = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(signature);
         }
@@ -92,7 +91,7 @@ public class ChatMessageItem
                 buffer.ReadBytes(signature);
             }
         }
-        
+
 
         return new ChatMessageItem(uuid, signature);
     }

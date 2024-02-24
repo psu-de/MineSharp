@@ -13,22 +13,22 @@ public class Session
     /// The Username for this session
     /// </summary>
     public string Username { get; }
-    
+
     /// <summary>
     /// The UUID associated with the minecraft account
     /// </summary>
     public UUID UUID { get; }
-    
+
     /// <summary>
     /// The client token for this session
     /// </summary>
     public string ClientToken { get; }
-    
+
     /// <summary>
     /// The session token for this session
     /// </summary>
     public string SessionToken { get; }
-    
+
     /// <summary>
     /// Whether this session is online (authenticated with minecraft services)
     /// </summary>
@@ -39,14 +39,15 @@ public class Session
     /// </summary>
     public PlayerCertificate? Certificate { get; set; }
 
-    internal Session(string username, UUID uuid, string clientToken, string sessionToken, bool isOnline, PlayerCertificate? certificate = null)
+    internal Session(string             username, UUID uuid, string clientToken, string sessionToken, bool isOnline,
+                     PlayerCertificate? certificate = null)
     {
-        this.Username = username;
-        this.UUID = uuid;
-        this.ClientToken = clientToken;
-        this.SessionToken = sessionToken;
+        this.Username      = username;
+        this.UUID          = uuid;
+        this.ClientToken   = clientToken;
+        this.SessionToken  = sessionToken;
         this.OnlineSession = isOnline;
-        this.Certificate = certificate;
+        this.Certificate   = certificate;
     }
 
     /// <summary>

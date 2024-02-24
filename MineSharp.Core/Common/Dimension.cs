@@ -9,12 +9,12 @@ public enum Dimension
     /// Overworld
     /// </summary>
     Overworld,
-    
+
     /// <summary>
     /// The nether dimension
     /// </summary>
     Nether,
-    
+
     /// <summary>
     /// The End dimension
     /// </summary>

@@ -11,7 +11,7 @@ public class SetCompressionPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Login_Compress;
-    
+
     /// <summary>
     /// Threshold for when to use compression
     /// </summary>
@@ -25,7 +25,7 @@ public class SetCompressionPacket : IPacket
     {
         this.Threshold = threshold;
     }
-    
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

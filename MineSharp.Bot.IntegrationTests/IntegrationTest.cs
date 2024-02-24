@@ -10,17 +10,17 @@ public static class IntegrationTest
     private const ushort PORT = 25565;
 
     public delegate Task TestFunction(MineSharpBot bot, TaskCompletionSource<bool> source);
-    
+
     public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
     {
         AnsiConsole.MarkupLine($"[cyan]Running test {testName}...[/]");
-        
+
         var bot = await new BotBuilder()
-            .Host(HOST)
-            .Port(PORT)
-            .OfflineSession("MineSharpBot")
-            .CreateAsync();
-        
+                       .Host(HOST)
+                       .Port(PORT)
+                       .OfflineSession("MineSharpBot")
+                       .CreateAsync();
+
         var chat = bot.GetPlugin<ChatPlugin>();
 
         if (!await bot.Connect())
@@ -39,12 +39,12 @@ public static class IntegrationTest
 
         await Task.Delay(3 * 1000);
 
-        var tsc = new TaskCompletionSource<bool>();
+        var tsc  = new TaskCompletionSource<bool>();
         var test = callback(bot, tsc);
 
         if (commandDelay.HasValue)
             await Task.Delay(commandDelay.Value);
-        
+
         await chat.SendChat($"/trigger {testName}");
         await Task.WhenAny(tsc.Task, Task.Delay(timeout));
 
@@ -62,14 +62,14 @@ public static class IntegrationTest
 
             return;
         }
-        
+
         string team;
         if (tsc.Task.IsCompleted)
         {
             AnsiConsole.MarkupLine(
-                tsc.Task.Result 
+                tsc.Task.Result
                     ? $"[lime]Test success: {testName}[/]"
-                    : $"[red1]Test failed: {testName}[/]" );
+                    : $"[red1]Test failed: {testName}[/]");
             team = tsc.Task.Result ? "Successful" : "Failed";
         }
         else

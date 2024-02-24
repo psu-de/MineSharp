@@ -16,12 +16,12 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// The total size of the buffer
     /// </summary>
     public long Size => _buffer.Length;
-    
+
     /// <summary>
     /// The number of readable bytes in the buffer
     /// </summary>
     public long ReadableBytes => _buffer.Length - _buffer.Position;
-    
+
     /// <summary>
     /// The position in the buffer.
     /// </summary>
@@ -39,7 +39,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// <param name="useAnonymousNbt"></param>
     public PacketBuffer(bool useAnonymousNbt)
     {
-        this._buffer = new MemoryStream();
+        this._buffer         = new MemoryStream();
         this.UseAnonymousNbt = useAnonymousNbt;
     }
 
@@ -50,7 +50,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// <param name="useAnonymousNbt"></param>
     public PacketBuffer(byte[] bytes, bool useAnonymousNbt)
     {
-        this._buffer = new MemoryStream(bytes);
+        this._buffer         = new MemoryStream(bytes);
         this.UseAnonymousNbt = useAnonymousNbt;
     }
 
@@ -81,16 +81,15 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             throw new EndOfStreamException();
         }
     }
-    
-    #pragma warning disable CS1591
-    
+
+#pragma warning disable CS1591
+
     #region Reading
 
-    
     public int ReadBytes(Span<byte> bytes)
     {
         EnsureEnoughReadableBytes(bytes.Length);
-        
+
         return this._buffer.Read(bytes);
     }
 
@@ -98,7 +97,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     {
         EnsureEnoughReadableBytes(count);
 
-        int read = 0;
+        int    read  = 0;
         byte[] bytes = new byte[count];
         while (read < count)
             read += this._buffer.Read(bytes, read, count - read);
@@ -120,10 +119,10 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         return (byte)this._buffer.ReadByte();
     }
-    
-    public sbyte ReadSByte() 
+
+    public sbyte ReadSByte()
         => (sbyte)this.ReadByte();
-    
+
     public bool ReadBool()
     {
         return this.ReadByte() == 1;
@@ -135,14 +134,14 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         int b0 = this._buffer.ReadByte();
         int b1 = this._buffer.ReadByte();
-        
+
         if (BitConverter.IsLittleEndian)
             return (ushort)(b0 << 8 | b1);
 
         return (ushort)(b0 | b1 << 8);
     }
-    
-    public short ReadShort() => 
+
+    public short ReadShort() =>
         (short)this.ReadUShort();
 
     public uint ReadUInt()
@@ -156,11 +155,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         if (BitConverter.IsLittleEndian)
             return (uint)(b0 << 24 | b1 << 16 | b2 << 8 | b3);
-         
+
         return (uint)(b0 | b1 << 8 | b2 << 16 | b3 << 24);
     }
-    
-    public int ReadInt() 
+
+    public int ReadInt()
         => (int)this.ReadUInt();
 
     public ulong ReadULong()
@@ -181,33 +180,33 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         return (ulong)(b0 | b1 << 8 | b2 << 16 | b3 << 24 | b4 << 32 | b5 << 40 | b6 << 48 | b7 << 56);
     }
-    
-    public long ReadLong() 
+
+    public long ReadLong()
         => (long)this.ReadULong();
 
     public float ReadFloat()
     {
         EnsureEnoughReadableBytes(4);
-        
+
         Span<byte> bytes = stackalloc byte[sizeof(float)];
         this.ReadBytes(bytes);
-        
+
         if (BitConverter.IsLittleEndian)
             bytes.Reverse();
-        
+
         return BitConverter.ToSingle(bytes);
     }
 
     public double ReadDouble()
     {
         EnsureEnoughReadableBytes(8);
-        
+
         Span<byte> bytes = stackalloc byte[sizeof(double)];
         this.ReadBytes(bytes);
-        
+
         if (BitConverter.IsLittleEndian)
             bytes.Reverse();
-        
+
         return BitConverter.ToDouble(bytes);
     }
 
@@ -215,45 +214,47 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     {
         int value = 0;
         int shift = 0;
-		
-        while (true) {
+
+        while (true)
+        {
             byte b = this.ReadByte();
             value |= ((b & (int)0x7f) << shift);
             if ((b & 0x80) == 0x00)
                 break;
-		
+
             shift += 7;
-            if (shift >= 32) 
+            if (shift >= 32)
                 throw new Exception("varint is too big");
         }
-		
+
         return value;
     }
 
     public long ReadVarLong()
     {
         long value = 0;
-        int shift = 0;
-		
-        while (true) {
+        int  shift = 0;
+
+        while (true)
+        {
             byte b = this.ReadByte();
             value |= ((b & (long)0x7f) << shift);
             if ((b & 0x80) == 0x00)
                 break;
-		
+
             shift += 7;
             if (shift >= 64) throw new Exception("varlong is too big");
         }
-		
-        return value; 
+
+        return value;
     }
 
     public string ReadString(Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
 
-        int length = this.ReadVarInt();
-        Span<byte> bytes = stackalloc byte[length];
+        int        length = this.ReadVarInt();
+        Span<byte> bytes  = stackalloc byte[length];
         this.ReadBytes(bytes);
 
         return encoding.GetString(bytes);
@@ -293,26 +294,26 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public NbtTag? ReadNbt()
     {
         var t = (NbtTagType)this.ReadByte();
-        if (t == NbtTagType.End) 
+        if (t == NbtTagType.End)
             return null;
         _buffer.Position--;
-		
-        var file = new NbtFile() {BigEndian = true, Anonymous = this.UseAnonymousNbt };
-		
+
+        var file = new NbtFile() { BigEndian = true, Anonymous = this.UseAnonymousNbt };
+
         file.LoadFromStream(_buffer, NbtCompression.None);
-		
+
         return file.RootTag;
     }
 
     public BlockEntity ReadBlockEntity()
     {
         var packedXZ = this.ReadByte();
-        var x = (byte)(packedXZ >> 4 & 0xF);
-        var z = (byte)(packedXZ & 0xF);
-        var y = this.ReadShort();
-        var type = this.ReadVarInt();
-        var nbt = this.ReadNbtCompound();
-        
+        var x        = (byte)(packedXZ >> 4 & 0xF);
+        var z        = (byte)(packedXZ      & 0xF);
+        var y        = this.ReadShort();
+        var type     = this.ReadVarInt();
+        var nbt      = this.ReadNbtCompound();
+
         return new BlockEntity(x, y, z, type, nbt);
     }
 
@@ -324,7 +325,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         return Read<T>();
     }
-    
+
     public T? ReadOptional<T>(bool _ = false) where T : struct
     {
         var available = this.ReadBool();
@@ -338,34 +339,33 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public T Read<T>()
     {
         var type = Type.GetTypeCode(typeof(T));
-        
-        object value = type switch {
+
+        object value = type switch
+        {
             TypeCode.Boolean => this.ReadBool(),
-            TypeCode.SByte => this.ReadSByte(),
-            TypeCode.Byte => this.ReadByte(),
-            TypeCode.Int16 => this.ReadShort(),
-            TypeCode.Int32 => this.ReadInt(),
-            TypeCode.Int64 => this.ReadLong(),
-            
+            TypeCode.SByte   => this.ReadSByte(),
+            TypeCode.Byte    => this.ReadByte(),
+            TypeCode.Int16   => this.ReadShort(),
+            TypeCode.Int32   => this.ReadInt(),
+            TypeCode.Int64   => this.ReadLong(),
+
             TypeCode.UInt16 => this.ReadUShort(),
             TypeCode.UInt32 => this.ReadUInt(),
             TypeCode.UInt64 => this.ReadULong(),
-            
+
             TypeCode.String => this.ReadString(),
             TypeCode.Single => this.ReadFloat(),
             TypeCode.Double => this.ReadBool(),
-            _ => throw new NotSupportedException()
+            _               => throw new NotSupportedException()
         };
         return (T)value;
     }
-    
-    
+
     #endregion
 
 
     #region Writing
-    
-    
+
     public void WriteBytes(Span<byte> bytes)
     {
         this._buffer.Write(bytes);
@@ -376,9 +376,9 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         this.WriteByte((byte)(value ? 1 : 0));
     }
 
-    public void WriteByte(byte b) 
+    public void WriteByte(byte b)
         => this._buffer.WriteByte(b);
-    
+
     public void WriteSByte(sbyte b) => this.WriteByte((byte)b);
 
     public void WriteUShort(ushort value)
@@ -386,14 +386,14 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         if (BitConverter.IsLittleEndian)
         {
             this.WriteByte((byte)(value >> 8 & 0xFF));
-            this.WriteByte((byte)(value & 0xFF));
+            this.WriteByte((byte)(value      & 0xFF));
             return;
         }
-        
-        this.WriteByte((byte)(value & 0xFF));
+
+        this.WriteByte((byte)(value      & 0xFF));
         this.WriteByte((byte)(value >> 8 & 0xFF));
     }
-    
+
     public void WriteShort(short value) => this.WriteUShort((ushort)value);
 
     public void WriteUInt(uint value)
@@ -402,17 +402,17 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         {
             this.WriteByte((byte)(value >> 24 & 0xFF));
             this.WriteByte((byte)(value >> 16 & 0xFF));
-            this.WriteByte((byte)(value >> 8 & 0xFF));
-            this.WriteByte((byte)(value & 0xFF));
+            this.WriteByte((byte)(value >> 8  & 0xFF));
+            this.WriteByte((byte)(value       & 0xFF));
             return;
         }
-        
-        this.WriteByte((byte)(value & 0xFF));
-        this.WriteByte((byte)(value >> 8 & 0xFF));
+
+        this.WriteByte((byte)(value       & 0xFF));
+        this.WriteByte((byte)(value >> 8  & 0xFF));
         this.WriteByte((byte)(value >> 16 & 0xFF));
         this.WriteByte((byte)(value >> 24 & 0xFF));
     }
-    
+
     public void WriteInt(int value) => this.WriteUInt((uint)value);
 
     public void WriteULong(ulong value)
@@ -425,13 +425,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             this.WriteByte((byte)(value >> 32 & 0xFF));
             this.WriteByte((byte)(value >> 24 & 0xFF));
             this.WriteByte((byte)(value >> 16 & 0xFF));
-            this.WriteByte((byte)(value >> 8 & 0xFF));
-            this.WriteByte((byte)(value & 0xFF));
+            this.WriteByte((byte)(value >> 8  & 0xFF));
+            this.WriteByte((byte)(value       & 0xFF));
             return;
         }
-        
-        this.WriteByte((byte)(value & 0xFF));
-        this.WriteByte((byte)(value >> 8 & 0xFF));
+
+        this.WriteByte((byte)(value       & 0xFF));
+        this.WriteByte((byte)(value >> 8  & 0xFF));
         this.WriteByte((byte)(value >> 16 & 0xFF));
         this.WriteByte((byte)(value >> 24 & 0xFF));
         this.WriteByte((byte)(value >> 32 & 0xFF));
@@ -439,7 +439,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         this.WriteByte((byte)(value >> 48 & 0xFF));
         this.WriteByte((byte)(value >> 56 & 0xFF));
     }
-    
+
     public void WriteLong(long value) => this.WriteULong((ulong)value);
 
     public void WriteFloat(float value)
@@ -463,6 +463,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
                 this._buffer.WriteByte((byte)value);
                 return;
             }
+
             this._buffer.WriteByte((byte)(value & 0x7F | 0x80));
             value >>= 7;
         }
@@ -470,20 +471,22 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public void WriteVarLong(int value)
     {
-        while ((value & ~0x7F) != 0x00) {
+        while ((value & ~0x7F) != 0x00)
+        {
             this._buffer.WriteByte((byte)((value & 0xFF) | 0x80));
             value >>= 7;
         }
+
         this._buffer.WriteByte((byte)value);
     }
 
     public void WriteString(string value, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
-        
-        Span<byte> bytes = stackalloc byte[encoding.GetByteCount(value)];
-        int length = encoding.GetBytes(value, bytes);
-        
+
+        Span<byte> bytes  = stackalloc byte[encoding.GetByteCount(value)];
+        int        length = encoding.GetBytes(value, bytes);
+
         this.WriteVarInt(length);
         this.WriteBytes(bytes);
     }
@@ -511,11 +514,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             this._buffer.WriteByte((byte)NbtTagType.End);
             return;
         }
-        
+
         NbtFile f = new NbtFile(tag) { BigEndian = true, Anonymous = this.UseAnonymousNbt };
         f.SaveToStream(_buffer, NbtCompression.None);
     }
-    
+
     public void WriteBlockEntity(BlockEntity entity)
     {
         var packedXZ = (byte)(entity.X << 4 & 0xF | entity.Z & 0xF);
@@ -524,11 +527,10 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         this.WriteVarInt(entity.Type);
         this.WriteNbt(entity.Data);
     }
-    
-    
+
     #endregion
-    
-    #pragma warning restore CS1591
+
+#pragma warning restore CS1591
 
     /// <summary>
     /// Disposes the underlying <see cref="MemoryStream"/>

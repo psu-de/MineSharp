@@ -11,7 +11,7 @@ internal class StatusPacketHandler : IPacketHandler
         this._client = client;
     }
 
-    public Task HandleIncoming(IPacket packet) => Task.CompletedTask;
-    public Task HandleOutgoing(IPacket packet) => Task.CompletedTask;
-    public bool HandlesIncoming(PacketType type) => false;
+    public Task HandleIncoming(IPacket     packet) => Task.CompletedTask;
+    public Task HandleOutgoing(IPacket     packet) => Task.CompletedTask;
+    public bool HandlesIncoming(PacketType type)   => false;
 }
