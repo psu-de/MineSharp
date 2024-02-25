@@ -31,7 +31,7 @@ public interface IMove
     /// <summary>
     /// Checks if the move is possible
     /// </summary>
-    public bool IsMovePossible(Position position, IWorld world, MinecraftData data);
+    public bool IsMovePossible(Position position, IWorld world);
 
     /// <summary>
     /// Whether multiple instances of this move can be

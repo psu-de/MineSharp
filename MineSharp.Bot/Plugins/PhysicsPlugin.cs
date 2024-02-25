@@ -235,15 +235,13 @@ public class PhysicsPlugin : Plugin
                 this.lerpRotation?.Tick();
                 this.Engine!.Tick();
                 await this.UpdateServerPositionIfNeeded();
-
-                this.PhysicsTick?.Invoke(this.Bot);
             }
             catch (Exception e)
             {
                 Logger.Error(e.ToString());
             }
 
-            this.tickCounter++;
+            Interlocked.Increment(ref this.tickCounter);
         });
 
         return Task.CompletedTask;

@@ -21,6 +21,9 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     /// <inheritdoc />
+    public MinecraftData Data { get; } = data;
+    
+    /// <inheritdoc />
     public abstract int MaxY { get; }
 
     /// <inheritdoc />
@@ -41,11 +44,6 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// </summary>
     protected ConcurrentDictionary<ChunkCoordinates, IChunk> Chunks
         = new ConcurrentDictionary<ChunkCoordinates, IChunk>();
-
-    /// <summary>
-    /// The MinecraftData instance used for this world
-    /// </summary>
-    public readonly MinecraftData Data = data;
 
     private readonly BlockInfo OutOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
 

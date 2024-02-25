@@ -92,7 +92,7 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
         
         foreach (var move in this.Movements.PossibleMoves)
         {
-            if (!move.IsMovePossible(node.Position, world, data))
+            if (!move.IsMovePossible(node.Position, world))
                 continue;
 
             var pos = move.Motion.Plus(node.Position);

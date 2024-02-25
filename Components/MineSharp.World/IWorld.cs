@@ -4,6 +4,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.World.Chunks;
 using MineSharp.World.Iterators;
 using System.Diagnostics.CodeAnalysis;
+using MineSharp.Data;
 
 namespace MineSharp.World;
 
@@ -12,6 +13,11 @@ namespace MineSharp.World;
 /// </summary>
 public interface IWorld
 {
+    /// <summary>
+    /// MinecraftData instance for this world
+    /// </summary>
+    public MinecraftData Data { get; }
+    
     /// <summary>
     /// The max Y coordinate (build height)
     /// </summary>

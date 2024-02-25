@@ -24,7 +24,7 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
     public bool CanBeLinked => false;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world, MinecraftData data)
+    public bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
         playerBb.Offset(
@@ -32,12 +32,7 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
             1, 
             0.5 + this.Motion.Z / 2);
 
-        return new BoundingBoxIterator(playerBb)
-            .Iterate()
-            .Select(world.GetBlockAt)
-            .Select(x => CollisionHelper.GetBoundingBoxes(x, data))
-            .SelectMany(x => x)
-            .All(x => !x.Intersects(playerBb));
+        return !CollisionHelper.CollidesWithWord(playerBb, world);
     }
 
 
