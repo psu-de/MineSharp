@@ -27,7 +27,7 @@ public class DirectMove(Vector3 motion) : IMove
     public bool CanBeLinked => true;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world, MinecraftData data)
+    public bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
         playerBb.Offset(
@@ -35,12 +35,7 @@ public class DirectMove(Vector3 motion) : IMove
             0, 
             0.5 + this.Motion.Z / 2);
 
-        return new BoundingBoxIterator(playerBb)
-            .Iterate()
-            .Select(world.GetBlockAt)
-            .Select(x => CollisionHelper.GetBoundingBoxes(x, data))
-            .SelectMany(x => x)
-            .All(x => !x.Intersects(playerBb));
+        return !CollisionHelper.CollidesWithWord(playerBb, world);
     }
 
     /// <inheritdoc />
@@ -49,6 +44,7 @@ public class DirectMove(Vector3 motion) : IMove
         // TODO: IsMovePossible() ist nicht korrekt
         var player = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
+        var entity  = player.Entity ?? throw new NullReferenceException("Player entity not initialized.");
 
         physics.InputControls.Reset();
         
@@ -69,7 +65,7 @@ public class DirectMove(Vector3 motion) : IMove
         {
             await physics.WaitForTick();
 
-            if (MovementUtils.IsOnSameBlock(player.Self, targetBlock))
+            if (CollisionHelper.IsOnPosition(entity, targetBlock))
                 break;
         }
         
