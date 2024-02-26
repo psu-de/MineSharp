@@ -50,8 +50,6 @@ internal static class MovementUtils
                             .Plus(player.Entity.Velocity)
                             .HorizontalDistanceToSquared(target);
             
-            Console.WriteLine($"Dst = {dst}");
-            
             if (dst < DISTANCE_THRESHOLD)
                 break;
         }
