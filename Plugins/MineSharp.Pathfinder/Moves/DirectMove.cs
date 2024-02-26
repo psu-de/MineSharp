@@ -65,7 +65,7 @@ public class DirectMove(Vector3 motion) : IMove
         {
             await physics.WaitForTick();
 
-            if (CollisionHelper.IsOnPosition(entity, targetBlock))
+            if (CollisionHelper.IsOnPosition(entity.Position, targetBlock))
                 break;
         }
         

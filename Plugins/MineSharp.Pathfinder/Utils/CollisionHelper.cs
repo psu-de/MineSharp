@@ -33,11 +33,17 @@ internal static class CollisionHelper
         return false;
     }
 
-    public static bool IsOnPosition(Entity entity, Position block)
+    public static bool IsOnPositionXZ(double x, double z, Position block)
     {
-        return (int)entity.Position.X == block.X
-            && (int)entity.Position.Y == block.Y
-            && (int)entity.Position.Z == block.Z;
+        return (int)x == block.X
+            && (int)z == block.Z;
+    }
+
+    public static bool IsOnPosition(Vector3 position, Position block)
+    {
+        return (int)position.X == block.X
+            && (int)position.Y == block.Y
+            && (int)position.Z == block.Z;
     }
 
     public static AABB[] GetBoundingBoxes(Block block, MinecraftData data)

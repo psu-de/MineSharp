@@ -28,11 +28,9 @@ public class FallDownMove(Vector3 motion) : IMove
     {
         var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
         playerBb.Offset(
-            this.Motion.X / 2, 
-            -1, 
-            this.Motion.Z / 2);
-        
-        Console.WriteLine($"BB = {playerBb}");   
+            0.5 + this.Motion.X / 2, 
+            0, 
+            0.5 + this.Motion.Z / 2);
 
         return !CollisionHelper.CollidesWithWord(playerBb, world);
     }
@@ -49,18 +47,32 @@ public class FallDownMove(Vector3 motion) : IMove
             .Add(this.Motion)
             .Add(0.5, 0.0, 0.5);
         var targetBlock = (Position)target;
-
-        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
         
-        while (!player.Entity.IsOnGround)
+        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
+
+        var stopNextTick = false;
+        while (player.Entity.IsOnGround)
         {
+            if (!stopNextTick)
+            {
+                var x = player.Entity.Position.X + player.Entity.Velocity.X;
+                var z = player.Entity.Position.Z + player.Entity.Velocity.Z;
+                if (CollisionHelper.IsOnPositionXZ(x, z, targetBlock))
+                {
+                    stopNextTick = true;
+                }
+            }
+            
             await physics.WaitForTick();
+            
+            if (stopNextTick)
+                physics.InputControls.Reset();
         }
         
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
 
-        if (!CollisionHelper.IsOnPosition(entity, targetBlock))
+        if (!CollisionHelper.IsOnPosition(entity.Position, targetBlock))
         {
             throw new Exception("move went wrong."); // TODO: Better exception
         }
