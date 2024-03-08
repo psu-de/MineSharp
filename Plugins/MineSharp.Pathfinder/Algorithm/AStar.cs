@@ -34,6 +34,8 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
 
             if (node.Position == end)
             {
+                sw.Stop();
+                LogManager.GetCurrentClassLogger().Debug($"Checked {nodes.Count} nodes in {sw.ElapsedMilliseconds}ms");
                 return RetracePath(startNode, endNode);
             }
             
@@ -96,12 +98,11 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
         
         foreach (var move in this.Movements.PossibleMoves)
         {
-            if (!move.IsMovePossible(node.Position, world))
+            var pos      = move.Motion.Plus(node.Position);
+            var neighbor = this.GetNode((Position)pos, end, ref nodes);
+            if (!neighbor.Walkable || !move.IsMovePossible(node.Position, world))
                 continue;
 
-            var pos = move.Motion.Plus(node.Position);
-
-            var neighbor = this.GetNode((Position)pos, end, ref nodes);
             neighbors.Add((neighbor, move));
         }
 
