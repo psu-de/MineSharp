@@ -18,9 +18,9 @@ public class JumpOneBlock(Vector3 direction) : IMove
     public bool CanBeLinked => false;
     
     /// <inheritdoc />
-    public bool    IsMovePossible(Position position, IWorld world)
+    public bool IsMovePossible(Position position, IWorld world)
     {
-        var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
+        var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
             0.5 + this.Motion.X / 2, 
             0, 
@@ -54,15 +54,13 @@ public class JumpOneBlock(Vector3 direction) : IMove
         var targetBlock = (Position)target;
 
         await physics.Look(0, 0);
+        await MovementUtils.MoveToBlockCenter(player.Self!, physics);
         
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
 
         while (true)
         {
-            var x = entity.Position.X + entity.Velocity.X;
-            var z = entity.Position.Z + entity.Velocity.Z;
-
-            if (CollisionHelper.IsOnPositionXZ(x, z, jumpBlock))
+            if (CollisionHelper.IsPositionInBlock(entity.Position, jumpBlock))
             {
                 physics.InputControls.JumpingKeyDown = true;
                 await physics.WaitForTick();
@@ -75,10 +73,7 @@ public class JumpOneBlock(Vector3 direction) : IMove
 
         while (true)
         {
-            var x = entity.Position.X + entity.Velocity.X;
-            var z = entity.Position.Z + entity.Velocity.Z;
-
-            if (CollisionHelper.IsOnPositionXZ(x, z, targetBlock))
+            if (CollisionHelper.IsPositionInBlock(entity.Position.Plus(entity.Velocity), jumpBlock))
             {
                 physics.InputControls.Reset();
                 break;
@@ -89,7 +84,7 @@ public class JumpOneBlock(Vector3 direction) : IMove
         
         await physics.WaitForOnGround();
 
-        if (!CollisionHelper.IsOnPosition(entity.Position, targetBlock))
+        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
         {
             throw new Exception("move went wrong."); // TODO: Better exception
         }

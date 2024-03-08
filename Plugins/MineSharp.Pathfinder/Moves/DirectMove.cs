@@ -29,7 +29,7 @@ public class DirectMove(Vector3 motion) : IMove
     /// <inheritdoc />
     public bool IsMovePossible(Position position, IWorld world)
     {
-        var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
+        var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
             0.5 + this.Motion.X / 2, 
             0, 
@@ -42,8 +42,9 @@ public class DirectMove(Vector3 motion) : IMove
     public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     { 
         // TODO: IsMovePossible() ist nicht korrekt
-        var player = bot.GetPlugin<PlayerPlugin>();
+        var player  = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
+        var world   = bot.GetPlugin<WorldPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("Player entity not initialized.");
 
         physics.InputControls.Reset();
@@ -64,12 +65,19 @@ public class DirectMove(Vector3 motion) : IMove
         while (true)
         {
             await physics.WaitForTick();
-
-            if (CollisionHelper.IsOnPosition(entity.Position, targetBlock))
+            
+            if (CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+            {
                 break;
+            }
+        }
+        physics.InputControls.Reset();
+
+        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+        {
+            throw new Exception("move went wrong"); // TODO: Move exception
         }
         
-        physics.InputControls.Reset();
         await MovementUtils.MoveToBlockCenter(player.Self, physics);
     }
 }

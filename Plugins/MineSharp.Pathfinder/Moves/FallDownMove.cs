@@ -26,7 +26,7 @@ public class FallDownMove(Vector3 motion) : IMove
     /// <inheritdoc />
     public bool IsMovePossible(Position position, IWorld world)
     {
-        var playerBb = CollisionHelper.GetPlayerBoundingBox(position);
+        var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
             0.5 + this.Motion.X / 2, 
             0, 
@@ -55,9 +55,8 @@ public class FallDownMove(Vector3 motion) : IMove
         {
             if (!stopNextTick)
             {
-                var x = player.Entity.Position.X + player.Entity.Velocity.X;
-                var z = player.Entity.Position.Z + player.Entity.Velocity.Z;
-                if (CollisionHelper.IsOnPositionXZ(x, z, targetBlock))
+                var vec = MovementUtils.GetXZPositionNextTick(player.Entity);
+                if (CollisionHelper.IsXZPositionInBlock(vec, targetBlock))
                 {
                     stopNextTick = true;
                 }

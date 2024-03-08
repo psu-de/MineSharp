@@ -43,8 +43,6 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         Logger.Debug("Found path with {count} nodes", path.Nodes.Length);
         foreach (var node in path.Nodes)
         {
-            Logger.Debug("Move: {count} * {motion} - {moveType}", node.Count, node.Move.Motion, node.Move.GetType());
-
             await this.PerformMove(node.Move, node.Count);
         }
 
