@@ -150,6 +150,22 @@ public class Vector3(double x, double y, double z)
             this.Y - other.Y,
             this.Z - other.Z);
     }
+    
+    /// <summary>
+    /// Returns a new Vector with <paramref name="x"/> <paramref name="y"/> <paramref name="z"/> subtracted
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    [Pure]
+    public Vector3 Minus(double x, double y, double z)
+    {
+        return new Vector3(
+            this.X - x,
+            this.Y - y,
+            this.Z - z);
+    }
 
     /// <summary>
     /// Component-wise vector multiplication.

@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+
 namespace MineSharp.Core.Common;
 
 /// <summary>
@@ -8,32 +10,32 @@ public class AABB
     /// <summary>
     /// Lower X coordinate
     /// </summary>
-    public double MinX { get; set; }
+    public double MinX => this.Min.X;
 
     /// <summary>
     /// Lower Y coordinate
     /// </summary>
-    public double MinY { get; set; }
+    public double MinY => this.Min.Y;
 
     /// <summary>
     /// Lower Z coordinate
     /// </summary>
-    public double MinZ { get; set; }
+    public double MinZ => this.Min.Z;
 
     /// <summary>
     /// Upper X coordinate
     /// </summary>
-    public double MaxX { get; set; }
+    public double MaxX => this.Max.X;
 
     /// <summary>
     /// Upper Y coordinate
     /// </summary>
-    public double MaxY { get; set; }
+    public double MaxY => this.Max.Y;
 
     /// <summary>
     /// Upper Z coordinate
     /// </summary>
-    public double MaxZ { get; set; }
+    public double MaxZ => this.Max.Z;
 
     /// <summary>
     /// Width of this bounding box (MaxX - MinX)
@@ -50,6 +52,16 @@ public class AABB
     /// </summary>
     public double Depth => this.MaxZ - this.MinZ;
 
+    /// <summary>
+    /// Min X, Y, Z
+    /// </summary>
+    public Vector3 Min { get; }
+
+    /// <summary>
+    /// Max X, Y, Z
+    /// </summary>
+    public Vector3 Max { get; }
+    
     /// <summary>
     /// Creates a new AABB
     /// </summary>
@@ -69,13 +81,9 @@ public class AABB
 
         if (minZ > maxZ)
             (maxZ, minZ) = (minZ, maxZ);
-
-        this.MinX = minX;
-        this.MinY = minY;
-        this.MinZ = minZ;
-        this.MaxX = maxX;
-        this.MaxY = maxY;
-        this.MaxZ = maxZ;
+        
+        this.Min  = new Vector3(minX, minY, minZ);
+        this.Max  = new Vector3(maxX, maxY, maxZ);
     }
 
 
@@ -89,28 +97,25 @@ public class AABB
     /// <returns></returns>
     public AABB Deflate(double x, double y, double z)
     {
-        this.MinX += x;
-        this.MinY += y;
-        this.MinZ += z;
-        this.MaxX -= x;
-        this.MaxY -= y;
-        this.MaxZ -= z;
+        this.Min.Add(x, y, z);
+        this.Max.Add(-x, -y, -z);
+        
         return this;
     }
 
     public AABB Extend(double x, double y, double z)
     {
         if (x > 0)
-            this.MaxX  += x;
-        else this.MinX += x;
+            this.Max.X  += x;
+        else this.Min.X += x;
 
         if (y > 0)
-            this.MaxY  += y;
-        else this.MinY += y;
+            this.Max.Y  += y;
+        else this.Min.Y += y;
 
         if (z > 0)
-            this.MaxZ  += z;
-        else this.MinZ += z;
+            this.Max.Z  += z;
+        else this.Min.Z += z;
 
         return this;
     }
@@ -125,12 +130,9 @@ public class AABB
     /// <returns></returns>
     public AABB Offset(double x, double y, double z)
     {
-        this.MinX += x;
-        this.MinY += y;
-        this.MinZ += z;
-        this.MaxX += x;
-        this.MaxY += y;
-        this.MaxZ += z;
+        this.Min.Add(x, y, z);
+        this.Max.Add(x, y, z);
+        
         return this;
     }
 
@@ -151,6 +153,19 @@ public class AABB
         return this.MaxX > other.MinX && this.MinX < other.MaxX
             && this.MaxY > other.MinY && this.MinY < other.MaxY
             && this.MaxZ > other.MinZ && this.MinZ < other.MaxZ;
+    }
+
+    /// <summary>
+    /// Whether the point <paramref name="point"/> is contained in this bounding box
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    [Pure]
+    public bool Contains(Vector3 point)
+    {
+        return this.MinX <= point.X && this.MaxX > point.X
+            && this.MinY <= point.Y && this.MaxY > point.Y
+            && this.MinZ <= point.Z && this.MaxZ > point.Z;
     }
 
     /// <summary>
@@ -179,5 +194,5 @@ public class AABB
 
     /// <inheritdoc />
     public override string ToString() =>
-        $"AABB (MinX={this.MinX} MaxX={this.MaxX} MinY={this.MinY} MaxY={this.MaxY} MinZ={this.MinZ} MaxZ={this.MaxZ})";
+        $"AABB ({Min} -> {Max})";
 }
