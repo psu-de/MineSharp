@@ -33,25 +33,31 @@ internal static class MovementUtils
             controls.RightKeyDown = true;
     }
 
+    public static Vector3 GetXZPositionNextTick(Entity entity)
+    {
+        return entity.Position.Clone().Add(entity.Velocity.X, 0, entity.Velocity.Z);
+    }
+
     public static async Task MoveToBlockCenter(MinecraftPlayer player, PhysicsPlugin physics)
     {
-        var target = player.Entity!.Position
-                           .Floored()
-                           .Add(0.5, 0.0, 0.5);
-
+        var target   = (Position)player.Entity!.Position;
+        var toTarget = new Vector3(0.5, 0, 0.5).Add(target);
+        
+        var bb = CollisionHelper.SetAABBToPlayerBB(player.Entity!.Position);
+        
         while (true)
         {
-            var vec = target.Minus(player.Entity.Position);
+            var vec = toTarget.Minus(player.Entity.Position);
             SetHorizontalMovementsFromVector(vec, physics.InputControls);
-
             await physics.WaitForTick();
 
-            var dst = player.Entity.Position
-                            .Plus(player.Entity.Velocity)
-                            .HorizontalDistanceToSquared(target);
+            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(player.Entity), ref bb);
             
-            if (dst < DISTANCE_THRESHOLD)
+            if (CollisionHelper.IsPositionInBlock(bb.Min, target) 
+             && CollisionHelper.IsXZPositionInBlock(bb.Max, target))
+            {
                 break;
+            } 
         }
         
         physics.InputControls.Reset();

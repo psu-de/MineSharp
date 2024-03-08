@@ -52,6 +52,6 @@ public class Movements
         moves.AddRange(Directions.Select(x => new FallDownMove(x)));
         moves.AddRange(DiagonalDirections.Select(x => new FallDownMove(x)));
 
-        this.PossibleMoves = moves.ToArray();
+        this.PossibleMoves = moves.OrderBy(x => x.Cost).ToArray();
     }
 }

@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Exceptions;
 using MineSharp.Pathfinder.Moves;
 using MineSharp.World;
+using NLog;
 using Priority_Queue;
 
 namespace MineSharp.Pathfinder.Algorithm;
@@ -11,15 +13,15 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
 {
     public Movements Movements = movements;
 
-    private readonly IDictionary<ulong, Node> nodes = new Dictionary<ulong, Node>();
-
     public Path FindPath(Position start, Position end, int maxNodes = 5000)
     {
-        var openSet = new FastPriorityQueue<Node>(maxNodes);
+        var sw        = Stopwatch.StartNew();
+        var nodes     = new Dictionary<ulong, Node>();
+        var openSet   = new FastPriorityQueue<Node>(maxNodes);
         var closedSet = new HashSet<Node>();
 
-        var startNode = this.GetNode(start, end);
-        var endNode = this.GetNode(end, end);
+        var startNode = this.GetNode(start, end, ref nodes);
+        var endNode   = this.GetNode(end, end, ref nodes);
 
         if (!endNode.Walkable)
             throw new InvalidOperationException("End position is not walkable!");
@@ -37,7 +39,7 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
             
             closedSet.Add(node);
 
-            foreach (var neighbor in this.GetNeighbors(node, end))
+            foreach (var neighbor in this.GetNeighbors(node, end, ref nodes))
             {
                 if (!neighbor.Node.Walkable || closedSet.Contains(neighbor.Node))
                     continue;
@@ -58,6 +60,8 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
             }
         }
 
+        sw.Stop();
+        LogManager.GetCurrentClassLogger().Debug($"Checked {nodes.Count} nodes in {sw.ElapsedMilliseconds}ms");
         throw new PathNotFoundException($"Could not find a path.");
     }
 
@@ -86,7 +90,7 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
         return MathF.Sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 
-    private (Node Node, IMove Move)[] GetNeighbors(Node node, Position end)
+    private (Node Node, IMove Move)[] GetNeighbors(Node node, Position end, ref Dictionary<ulong, Node> nodes)
     {
         var neighbors = new List<(Node, IMove)>();
         
@@ -97,17 +101,17 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
 
             var pos = move.Motion.Plus(node.Position);
 
-            var neighbor = this.GetNode((Position)pos, end);
+            var neighbor = this.GetNode((Position)pos, end, ref nodes);
             neighbors.Add((neighbor, move));
         }
 
         return neighbors.ToArray();
     }
 
-    private Node GetNode(Position position, Position end)
+    private Node GetNode(Position position, Position end, ref Dictionary<ulong, Node> nodes)
     {
         var idx = position.ToULong();
-        if (this.nodes.TryGetValue(idx, out var node))
+        if (nodes.TryGetValue(idx, out var node))
             return node;
         
         var block = world.GetBlockAt(position);
@@ -115,7 +119,7 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
 
         var walkable = blockBelow.IsSolid() && !blockBelow.IsFluid() && !block.IsSolid(); // TODO: Waterlike blocks
         node = new Node(position, walkable, 0, this.Distance(position, end));
-        this.nodes.Add(idx, node);
+        nodes.Add(idx, node);
 
         return node;
     }
