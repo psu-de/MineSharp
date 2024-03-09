@@ -4,7 +4,7 @@ using Priority_Queue;
 
 namespace MineSharp.Pathfinder.Algorithm;
 
-public class Node(Position position, bool walkable, float gCost, float hCost)
+internal class Node(Position position, bool walkable, float gCost, float hCost)
     : FastPriorityQueueNode
 {
     public IMove? Move;
