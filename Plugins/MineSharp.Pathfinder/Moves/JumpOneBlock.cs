@@ -6,13 +6,16 @@ using MineSharp.World;
 
 namespace MineSharp.Pathfinder.Moves;
 
+/// <summary>
+/// Jump over one block
+/// </summary>
 public class JumpOneBlock(Vector3 direction) : IMove
 {
     /// <inheritdoc />
     public Vector3 Motion { get; } = direction.Scaled(2);
 
     /// <inheritdoc />
-    public float Cost => 10;
+    public float Cost => 100;
 
     /// <inheritdoc />
     public bool CanBeLinked => false;
