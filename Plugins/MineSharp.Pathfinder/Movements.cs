@@ -28,14 +28,14 @@ public class Movements
 
     public bool AllowJumping { get; }
 
-    public readonly IMove[] PossibleMoves;
+    public readonly Move[] PossibleMoves;
     
     public Movements(bool allowSprinting, bool allowJumping)
     {
         this.AllowSprinting = allowSprinting;
         this.AllowJumping = allowJumping;
         
-        var moves = new List<IMove>();
+        var moves = new List<Move>();
         
         moves.AddRange(Directions.Select(x => new DirectMove(x)));
         moves.AddRange(DiagonalDirections.Select(x => new DirectMove(x)));

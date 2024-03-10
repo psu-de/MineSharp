@@ -7,7 +7,7 @@ namespace MineSharp.Pathfinder.Algorithm;
 internal class Node(Position position, bool walkable, float gCost, float hCost)
     : FastPriorityQueueNode
 {
-    public IMove? Move;
+    public Move? Move;
     public Node? Parent;
     
     public Position Position { get; } = position;

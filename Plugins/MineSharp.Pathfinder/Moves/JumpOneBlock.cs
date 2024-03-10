@@ -9,19 +9,19 @@ namespace MineSharp.Pathfinder.Moves;
 /// <summary>
 /// Jump over one block
 /// </summary>
-public class JumpOneBlock(Vector3 direction) : IMove
+public class JumpOneBlock(Vector3 direction) : Move
 {
     /// <inheritdoc />
-    public Vector3 Motion { get; } = direction.Scaled(2);
+    public override Vector3 Motion { get; } = direction.Scaled(2);
 
     /// <inheritdoc />
-    public float Cost => 100;
+    public override float Cost => 100;
 
     /// <inheritdoc />
-    public bool CanBeLinked => false;
+    public override bool CanBeLinked => false;
     
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
@@ -38,7 +38,7 @@ public class JumpOneBlock(Vector3 direction) : IMove
     }
     
     /// <inheritdoc />
-    public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
+    protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
         var player  = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
@@ -57,7 +57,7 @@ public class JumpOneBlock(Vector3 direction) : IMove
         var targetBlock = (Position)target;
 
         await physics.Look(0, 0);
-        await MovementUtils.MoveToBlockCenter(player.Self!, physics);
+        await MovementUtils.MoveToBlockCenter(entity, physics);
         
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
 
@@ -92,6 +92,6 @@ public class JumpOneBlock(Vector3 direction) : IMove
             throw new Exception("move went wrong."); // TODO: Better exception
         }
 
-        await MovementUtils.MoveToBlockCenter(player.Self!, physics);
+        await MovementUtils.MoveToBlockCenter(entity, physics);
     }
 }

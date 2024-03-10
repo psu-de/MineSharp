@@ -12,19 +12,19 @@ namespace MineSharp.Pathfinder.Moves;
 /// Jump up to an adjacent block
 /// </summary>
 /// <param name="xzMotion"></param>
-public class JumpUpMove(Vector3 xzMotion) : IMove
+public class JumpUpMove(Vector3 xzMotion) : Move
 {
     /// <inheritdoc />
-    public Vector3 Motion { get; } = Vector3.Up.Plus(xzMotion);
+    public override Vector3 Motion { get; } = Vector3.Up.Plus(xzMotion);
     
     /// <inheritdoc />
-    public float Cost => 20;
+    public override float Cost => 20;
 
     /// <inheritdoc />
-    public bool CanBeLinked => false;
+    public override bool CanBeLinked => false;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
@@ -37,13 +37,14 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
 
 
     /// <inheritdoc />
-    public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
+    protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
         if (count != 1)
             throw new InvalidOperationException();
 
         var physics = bot.GetPlugin<PhysicsPlugin>();
-        var player = bot.GetPlugin<PlayerPlugin>();
+        var player  = bot.GetPlugin<PlayerPlugin>();
+        var entity  = player.Entity ?? throw new NullReferenceException("player is not initialized");
 
         var target = player.Self!.Entity!.Position
             .Floored()
@@ -51,18 +52,16 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
             .Add(0.5, 0.0, 0.5);
 
         var targetBlock = (Position)target;
-
-        await physics.Look(0, 0);
         
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
+        await physics.WaitForTick(); // wait one tick to assure velocity is updated to this moves motion
         physics.InputControls.JumpingKeyDown = true;
         
         while (true)
         {
             await physics.WaitForTick();
 
-            if ((int)player.Entity!.Position.X == targetBlock.X
-             && (int)player.Entity!.Position.Z == targetBlock.Z)
+            if (CollisionHelper.IsXZPositionInBlock(entity.Position, targetBlock))
             {
                 break;
             }
@@ -71,6 +70,6 @@ public class JumpUpMove(Vector3 xzMotion) : IMove
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
 
-        await MovementUtils.MoveToBlockCenter(player.Self, physics);
+        await MovementUtils.MoveToBlockCenter(entity, physics);
     }
 }

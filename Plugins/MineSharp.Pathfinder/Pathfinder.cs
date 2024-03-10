@@ -40,7 +40,6 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         var start = this.playerPlugin!.Self!.Entity!.Position;
         var path = this.astar!.FindPath((Position)start, position);
         
-        Logger.Debug("Found path with {count} nodes", path.Nodes.Length);
         foreach (var node in path.Nodes)
         {
             await this.PerformMove(node.Move, node.Count);
@@ -54,8 +53,8 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
     /// </summary>
     /// <param name="move"></param>
     /// <param name="count"></param>
-    public Task PerformMove(IMove move, int count = 1)
+    public Task PerformMove(Move move, int count = 1)
     {
-        return move.PerformMove(this.Bot, count, this.movements);
+        return move.Perform(this.Bot, count, this.movements);
     }
 }

@@ -21,7 +21,7 @@ public class Path
     /// <param name="start"></param>
     /// <param name="moves"></param>
     /// <returns></returns>
-    public static Path FromMoves(Vector3 start, IMove[] moves)
+    public static Path FromMoves(Vector3 start, Move[] moves)
     {
         var nodes = new List<PathNode>();
         var currentPoint = start.Clone();
@@ -59,10 +59,10 @@ public class Path
     /// <param name="Position">Where this node starts</param>
     /// <param name="Move">The move to perform</param>
     /// <param name="Count">How often the move should be performed</param>
-    public class PathNode(Vector3 position, IMove move, int count)
+    public class PathNode(Vector3 position, Move move, int count)
     {
         public readonly Vector3 Position = position;
-        public readonly IMove Move = move;
+        public readonly Move    Move     = move;
 
         public int Count { get; set; } = count;
     }

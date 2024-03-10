@@ -33,25 +33,34 @@ internal static class MovementUtils
             controls.RightKeyDown = true;
     }
 
+    public static async Task SlowDown(Entity entity, PhysicsPlugin physics)
+    {
+        SetHorizontalMovementsFromVector(
+            entity.Velocity.Scaled(-1), physics.InputControls);
+        
+        await physics.WaitForTick();
+        physics.InputControls.Reset();
+    }
+
     public static Vector3 GetXZPositionNextTick(Entity entity)
     {
         return entity.Position.Clone().Add(entity.Velocity.X, 0, entity.Velocity.Z);
     }
 
-    public static async Task MoveToBlockCenter(MinecraftPlayer player, PhysicsPlugin physics)
+    public static async Task MoveToBlockCenter(Entity entity, PhysicsPlugin physics)
     {
-        var target   = (Position)player.Entity!.Position;
+        var target   = (Position)entity.Position;
         var toTarget = new Vector3(0.5, 0, 0.5).Add(target);
         
-        var bb = CollisionHelper.SetAABBToPlayerBB(player.Entity!.Position);
+        var bb = CollisionHelper.SetAABBToPlayerBB(entity.Position);
         
         while (true)
         {
-            var vec = toTarget.Minus(player.Entity.Position);
+            var vec = toTarget.Minus(entity.Position);
             SetHorizontalMovementsFromVector(vec, physics.InputControls);
             await physics.WaitForTick();
 
-            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(player.Entity), ref bb);
+            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), ref bb);
             
             if (CollisionHelper.IsPositionInBlock(bb.Min, target) 
              && CollisionHelper.IsXZPositionInBlock(bb.Max, target))

@@ -92,9 +92,9 @@ public class AStar(IWorld world, MinecraftData data, Movements movements)
         return MathF.Sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 
-    private (Node Node, IMove Move)[] GetNeighbors(Node node, Position end, ref Dictionary<ulong, Node> nodes)
+    private (Node Node, Move Move)[] GetNeighbors(Node node, Position end, ref Dictionary<ulong, Node> nodes)
     {
-        var neighbors = new List<(Node, IMove)>();
+        var neighbors = new List<(Node, Move)>();
         
         foreach (var move in this.Movements.PossibleMoves)
         {

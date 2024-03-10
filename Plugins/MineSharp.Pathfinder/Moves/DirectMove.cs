@@ -13,21 +13,19 @@ namespace MineSharp.Pathfinder.Moves;
 /// Move to a directly adjacent block
 /// </summary>
 /// <param name="motion"></param>
-public class DirectMove(Vector3 motion) : IMove
+public class DirectMove(Vector3 motion) : Move
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger(); 
+    /// <inheritdoc />
+    public override Vector3 Motion { get; } = motion;
     
     /// <inheritdoc />
-    public Vector3 Motion { get; } = motion;
-    
-    /// <inheritdoc />
-    public float Cost => 1;
+    public override float Cost => 1;
 
     /// <inheritdoc />
-    public bool CanBeLinked => true;
+    public override bool CanBeLinked => true;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
@@ -39,18 +37,12 @@ public class DirectMove(Vector3 motion) : IMove
     }
 
     /// <inheritdoc />
-    public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
+    protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     { 
         // TODO: IsMovePossible() ist nicht korrekt
         var player  = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
-        var world   = bot.GetPlugin<WorldPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("Player entity not initialized.");
-
-        physics.InputControls.Reset();
-        
-        await physics.Look(0, 0);
-        await MovementUtils.MoveToBlockCenter(player.Self!, physics);
         
         var target = player.Self!.Entity!.Position
             .Floored()
@@ -61,6 +53,7 @@ public class DirectMove(Vector3 motion) : IMove
         
         MovementUtils.SetHorizontalMovementsFromVector(
             this.Motion, physics.InputControls);
+        physics.InputControls.SprintingKeyDown = movements.AllowSprinting;
 
         while (true)
         {
@@ -78,6 +71,6 @@ public class DirectMove(Vector3 motion) : IMove
             throw new Exception("move went wrong"); // TODO: Move exception
         }
         
-        await MovementUtils.MoveToBlockCenter(player.Self, physics);
+        await MovementUtils.MoveToBlockCenter(entity, physics);
     }
 }

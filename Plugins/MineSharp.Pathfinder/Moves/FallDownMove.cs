@@ -12,19 +12,19 @@ namespace MineSharp.Pathfinder.Moves;
 /// <summary>
 /// Fall down to an adjacent block 
 /// </summary>
-public class FallDownMove(Vector3 motion) : IMove
+public class FallDownMove(Vector3 motion) : Move
 {
     /// <inheritdoc />
-    public Vector3 Motion { get; } = Vector3.Down.Plus(motion);
+    public override Vector3 Motion { get; } = Vector3.Down.Plus(motion);
     
     /// <inheritdoc />
-    public float Cost => 2;
+    public override float Cost => 2;
     
     /// <inheritdoc />
-    public bool CanBeLinked => false;
+    public override bool CanBeLinked => false;
 
     /// <inheritdoc />
-    public bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world)
     {
         var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
         playerBb.Offset(
@@ -36,7 +36,7 @@ public class FallDownMove(Vector3 motion) : IMove
     }
 
     /// <inheritdoc />
-    public async Task PerformMove(MineSharpBot bot, int count, Movements movements)
+    protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var player  = bot.GetPlugin<PlayerPlugin>();
@@ -71,23 +71,11 @@ public class FallDownMove(Vector3 motion) : IMove
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
 
-        if (!CollisionHelper.IsOnPosition(entity.Position, targetBlock))
+        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
         {
             throw new Exception("move went wrong."); // TODO: Better exception
         }
 
-        await MovementUtils.MoveToBlockCenter(player.Self, physics);
+        await MovementUtils.MoveToBlockCenter(entity, physics);
     }
-
-    private bool ReachedTargetEdge(double edge, double pos, double vel)
-    {
-        var positionNextTick = pos + vel;
-
-        return vel > 0
-            ? positionNextTick > edge || Math.Abs(edge - positionNextTick) <= 0.05
-            : positionNextTick < edge || Math.Abs(edge - positionNextTick) <= 0.05;
-    }
-
-    private double GetBoundingBoxEdge(double axisMotion)
-        => axisMotion > 0 ? 0.3 : 0.7;
 }

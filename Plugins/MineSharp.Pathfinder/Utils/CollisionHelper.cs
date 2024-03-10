@@ -47,19 +47,6 @@ internal static class CollisionHelper
         return BlockBb.Contains(pos);
     }
 
-    public static bool IsOnPositionXZ(double x, double z, Position block)
-    {
-        return (int)Math.Floor(x) == block.X
-            && (int)Math.Floor(z) == block.Z;
-    }
-
-    public static bool IsOnPosition(Vector3 position, Position block)
-    {
-        return (int)Math.Floor(position.X) == block.X
-            && (int)Math.Floor(position.Y) == block.Y
-            && (int)Math.Floor(position.Z) == block.Z;
-    }
-
     public static AABB[] GetBoundingBoxes(Block block, MinecraftData data)
     {
         return data.BlockCollisionShapes.GetForBlock(block)
