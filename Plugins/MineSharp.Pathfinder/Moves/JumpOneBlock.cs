@@ -1,6 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.World;
 
@@ -29,7 +30,7 @@ public class JumpOneBlock(Vector3 direction) : Move
             0, 
             0.5 + this.Motion.Z / 2);
         
-        playerBb.Extend(
+        playerBb.Expand(
             this.Motion.X / 2, 
             1, 
             this.Motion.Z / 2);

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Exceptions;
 using MineSharp.Pathfinder.Moves;

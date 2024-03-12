@@ -2,6 +2,7 @@ using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.World;

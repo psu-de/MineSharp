@@ -2,6 +2,7 @@ using MineSharp.Core.Common;
 using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.Physics.Input;

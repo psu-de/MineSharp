@@ -1,6 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 using MineSharp.Pathfinder.Algorithm;
 using MineSharp.Pathfinder.Moves;
 using NLog;
