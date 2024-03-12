@@ -3,6 +3,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Entities.Attributes;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Physics.Components;
 using MineSharp.Physics.Input;
@@ -377,7 +378,7 @@ public class PlayerPhysics
                 aabb);
             var collidedUp0 = CheckBoundingBoxCollisions(
                 new Vector3(0.0, PhysicsConst.MAX_UP_STEP, 0.0),
-                aabb.ExpandedBoundingBox(vec.X, 0, vec.Z));
+                aabb.Clone().Expand(vec.X, 0, vec.Z));
 
             if (collidedUp0.Y < PhysicsConst.MAX_UP_STEP)
             {
@@ -434,7 +435,7 @@ public class PlayerPhysics
         aabb = aabb.Clone();
 
         var shapes = WorldUtils.GetWorldBoundingBoxes(
-            aabb.ExpandedBoundingBox(direction.X, direction.Y, direction.Z),
+            aabb.Clone().Expand(direction.X, direction.Y, direction.Z),
             this.World,
             this.Data);
 

@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using MineSharp.Bot.Chat;
 using MineSharp.ChatComponent;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 

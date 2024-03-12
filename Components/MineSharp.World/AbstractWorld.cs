@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Exceptions;

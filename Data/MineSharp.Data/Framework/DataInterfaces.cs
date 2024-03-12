@@ -7,6 +7,7 @@ using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Common.Recipes;
+using MineSharp.Core.Geometry;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Windows;
 

@@ -5,6 +5,7 @@ using MineSharp.Core.Common.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using System.Collections.Concurrent;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.Plugins;
 

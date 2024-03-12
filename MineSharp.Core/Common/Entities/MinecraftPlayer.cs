@@ -1,3 +1,5 @@
+using MineSharp.Core.Geometry;
+
 namespace MineSharp.Core.Common.Entities;
 
 /// <summary>

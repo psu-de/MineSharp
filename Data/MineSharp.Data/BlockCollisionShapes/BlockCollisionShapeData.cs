@@ -1,5 +1,6 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Geometry;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;

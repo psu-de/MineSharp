@@ -1,4 +1,5 @@
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 

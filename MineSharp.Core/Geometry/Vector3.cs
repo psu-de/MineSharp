@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Geometry;
 
 /// <summary>
 /// A 3D Vector with double precision floating point coordinates.

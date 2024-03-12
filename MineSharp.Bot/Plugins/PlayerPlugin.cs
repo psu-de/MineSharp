@@ -8,6 +8,7 @@ using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.Plugins;
 

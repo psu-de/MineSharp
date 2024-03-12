@@ -18,10 +18,10 @@ public enum GameMode
     /// <summary>
     /// Adventure game mode
     /// </summary>
-    Adventure = 3,
+    Adventure = 2,
 
     /// <summary>
     /// Spectator game mode
     /// </summary>
-    Spectator = 4
+    Spectator = 3
 }

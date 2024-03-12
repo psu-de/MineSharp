@@ -1,4 +1,4 @@
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Geometry;
 
 /// <summary>
 /// Face of a block
