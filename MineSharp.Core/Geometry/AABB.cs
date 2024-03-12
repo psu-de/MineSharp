@@ -104,7 +104,10 @@ public class AABB
         return this;
     }
 
-    public AABB Extend(double x, double y, double z)
+    /// <summary>
+    /// Expand this bounding box by x, y, z
+    /// </summary>
+    public AABB Expand(double x, double y, double z)
     {
         if (x > 0)
             this.Max.X  += x;
@@ -191,6 +194,60 @@ public class AABB
         var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
 
         return !(tMax < 0 || tMin > tMax);
+    }
+
+    /// <summary>
+    /// Returns the min value of the given axis
+    /// </summary>
+    public double GetMinValue(Axis axis)
+        => axis.Choose(this.Min);
+
+    /// <summary>
+    /// Returns the max value of the given axis
+    /// </summary>
+    public double GetMaxValue(Axis axis)
+        => axis.Choose(this.Max);
+
+    /// <summary>
+    /// Whether <paramref name="other"/> intersects this bounding box in the given axis
+    /// </summary>
+    public bool IntersectsAxis(AABB other, Axis axis)
+    {
+        var minA = this.GetMinValue(axis);
+        var maxA = this.GetMaxValue(axis);
+
+        var minB = other.GetMinValue(axis);
+        var maxB = other.GetMaxValue(axis);
+
+        return minA > minB  && minA < maxB
+            || maxA > minB  && maxA < maxB
+            || minB > minA  && minB < maxA
+            || maxB > minA  && maxB < maxA
+            || minA == minB && maxA == maxB;
+    }
+
+    /// <summary>
+    /// Calculates the offset to the <paramref name="other"/> aabb on the given axis
+    /// </summary>
+    public double CalculateMaxOffset(AABB other, Axis axis, double displacement)
+    {
+        if (!IntersectsAxis(other, axis.Next) || !IntersectsAxis(other, axis.Previous))
+        {
+            return displacement;
+        }
+        
+        var minA = this.GetMinValue(axis);
+        var maxA = this.GetMaxValue(axis);
+        var minB = other.GetMinValue(axis);
+        var maxB = other.GetMaxValue(axis);
+
+        if (displacement > 0 && maxB <= minA && maxB + displacement > minA)
+            return Math.Clamp(minA - maxB, 0.0, displacement);
+
+        if (displacement < 0 && maxA <= minB && minB + displacement < maxA)
+            return Math.Clamp(maxA - minB, displacement, 0.0);
+
+        return displacement;
     }
 
     /// <inheritdoc />
