@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Chunks;
 

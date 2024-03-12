@@ -1,4 +1,6 @@
-namespace MineSharp.Core.Common;
+using MineSharp.Core.Common;
+
+namespace MineSharp.Core.Geometry;
 
 /// <summary>
 /// Represents a 3D-Position

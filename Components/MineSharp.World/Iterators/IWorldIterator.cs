@@ -1,4 +1,5 @@
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Iterators;
 

@@ -9,6 +9,7 @@ using MineSharp.Windows.Clicks;
 using NLog;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Exceptions;
+using MineSharp.Core.Geometry;
 using MineSharp.Windows.Specific;
 using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
 using CBHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;

@@ -1,4 +1,5 @@
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Core.Common.Blocks;
 

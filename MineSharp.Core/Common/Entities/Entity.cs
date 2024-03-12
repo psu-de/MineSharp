@@ -1,5 +1,6 @@
 using MineSharp.Core.Common.Effects;
 using System.Collections.Concurrent;
+using MineSharp.Core.Geometry;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Core.Common.Entities;

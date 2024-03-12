@@ -3,6 +3,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Entities.Attributes;
+using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Physics.Components;
 using MineSharp.Physics.Input;
@@ -692,10 +693,10 @@ public class PlayerPhysics
     private bool CollidesWithSuffocatingBlock(Position position)
     {
         var bb = this.Player.Entity!.GetBoundingBox();
-        bb.MinX = position.X;
-        bb.MinZ = position.Z;
-        bb.MaxX = position.X + 1.0f;
-        bb.MaxZ = position.Z + 1.0f;
+        bb.Min.X = position.X;
+        bb.Min.Z = position.Z;
+        bb.Max.X = position.X + 1.0f;
+        bb.Max.Z = position.Z + 1.0f;
         bb.Deflate(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
         return WorldUtils.CollidesWithWorld(bb, this.World, this.Data);

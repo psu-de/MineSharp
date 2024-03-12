@@ -4,6 +4,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.World.Chunks;
 using MineSharp.World.Iterators;
 using System.Diagnostics.CodeAnalysis;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.World;
 

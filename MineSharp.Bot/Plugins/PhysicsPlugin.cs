@@ -1,6 +1,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Geometry;
 using MineSharp.Physics;
 using MineSharp.Physics.Input;
 using MineSharp.Protocol.Packets.Serverbound.Play;

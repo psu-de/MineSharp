@@ -1,6 +1,7 @@
 using System.Diagnostics.Contracts;
+using MineSharp.Core.Common;
 
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Geometry;
 
 /// <summary>
 /// 3D Axis-Aligned Bounding Box used for all collisions

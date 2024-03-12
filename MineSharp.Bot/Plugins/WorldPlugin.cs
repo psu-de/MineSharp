@@ -2,6 +2,7 @@ using MineSharp.Bot.Blocks;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
+using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;

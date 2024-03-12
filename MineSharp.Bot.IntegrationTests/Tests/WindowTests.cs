@@ -1,5 +1,6 @@
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
