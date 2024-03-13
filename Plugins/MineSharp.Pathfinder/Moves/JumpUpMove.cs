@@ -40,9 +40,6 @@ public class JumpUpMove(Vector3 xzMotion) : Move
     /// <inheritdoc />
     protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
-        if (count != 1)
-            throw new InvalidOperationException();
-
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var player  = bot.GetPlugin<PlayerPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("player is not initialized");
@@ -62,7 +59,7 @@ public class JumpUpMove(Vector3 xzMotion) : Move
         {
             await physics.WaitForTick();
 
-            if (CollisionHelper.IsXzPointInBlockBb(entity.Position, targetBlock))
+            if (CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), targetBlock))
             {
                 break;
             }

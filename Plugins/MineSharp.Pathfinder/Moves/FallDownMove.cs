@@ -52,7 +52,7 @@ public class FallDownMove(Vector3 motion) : Move
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
 
         var stopNextTick = false;
-        while (player.Entity.IsOnGround)
+        while (entity.IsOnGround)
         {
             if (!stopNextTick)
             {
@@ -71,12 +71,5 @@ public class FallDownMove(Vector3 motion) : Move
         
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
-
-        if (!CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), targetBlock))
-        {
-            throw new Exception("move went wrong."); // TODO: Better exception
-        }
-
-        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

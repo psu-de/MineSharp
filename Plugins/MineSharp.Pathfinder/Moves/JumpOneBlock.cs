@@ -84,13 +84,5 @@ public class JumpOneBlock(Vector3 direction) : Move
         }
         
         await physics.WaitForOnGround();
-
-        if (!CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), targetBlock))
-        {
-            throw new Exception("move went wrong."); // TODO: Better exception
-        }
-
-        Console.WriteLine($"target={target}, block={targetBlock}");
-        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

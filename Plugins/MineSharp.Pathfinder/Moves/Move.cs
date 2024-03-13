@@ -4,6 +4,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
+using MineSharp.Pathfinder.Exceptions;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.Physics.Input;
 using MineSharp.World;
@@ -46,7 +47,8 @@ public abstract class Move
         var player  = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("player is not initialized");
-
+        var target  = (Position)this.Motion.Scaled(count).Add(startPosition);
+        
         if (entity.Velocity.HorizontalLengthSquared() > 0.15 * 0.15)
             await MovementUtils.SlowDown(entity, physics); 
         
@@ -54,6 +56,15 @@ public abstract class Move
         await MovementUtils.MoveInsideBlock(entity, startPosition, physics);
 
         await PerformMove(bot, count, movements);
+        
+        physics.InputControls.Reset();
+
+        if (!CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), target))
+        {
+            throw new MoveWentWrongException($"bot is not on expected position (actual={entity.Position}, expected={target})");
+        }
+
+        await MovementUtils.MoveInsideBlock(entity, target, physics);
     }
 
     /// <summary>

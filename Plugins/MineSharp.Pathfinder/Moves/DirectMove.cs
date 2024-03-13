@@ -40,7 +40,6 @@ public class DirectMove(Vector3 motion) : Move
     /// <inheritdoc />
     protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     { 
-        // TODO: IsMovePossible() ist nicht korrekt
         var player  = bot.GetPlugin<PlayerPlugin>();
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("Player entity not initialized.");
@@ -66,12 +65,5 @@ public class DirectMove(Vector3 motion) : Move
             }
         }
         physics.InputControls.Reset();
-
-        if (!CollisionHelper.IsPointInBlockBb(entity.Position, targetBlock))
-        {
-            throw new Exception("move went wrong"); // TODO: Move exception
-        }
-        
-        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }
