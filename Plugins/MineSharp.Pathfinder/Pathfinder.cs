@@ -28,7 +28,7 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         this.worldPlugin = this.Bot.GetPlugin<WorldPlugin>();
         this.playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
 
-        this.astar = new AStar(this.worldPlugin.World, this.Bot.Data, this.movements);
+        this.astar = new AStar(this.worldPlugin.World, this.movements);
 
         return Task.WhenAll(
             this.physics.WaitForInitialization(), 
@@ -43,19 +43,9 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         
         foreach (var node in path.Nodes)
         {
-            await this.PerformMove(node.Move, node.Count);
+            await node.Move.Perform(this.Bot, node.Count, (Position)node.Position, this.movements);
         }
 
         return;
-    }
-
-    /// <summary>
-    /// Do the move
-    /// </summary>
-    /// <param name="move"></param>
-    /// <param name="count"></param>
-    public Task PerformMove(Move move, int count = 1)
-    {
-        return move.Perform(this.Bot, count, this.movements);
     }
 }

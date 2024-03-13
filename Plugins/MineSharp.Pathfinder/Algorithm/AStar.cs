@@ -10,7 +10,7 @@ using Priority_Queue;
 
 namespace MineSharp.Pathfinder.Algorithm;
 
-public class AStar(IWorld world, MinecraftData data, Movements movements)
+public class AStar(IWorld world, Movements movements)
 {
     public Movements Movements = movements;
 
