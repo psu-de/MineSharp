@@ -42,8 +42,9 @@ public class Path
             }
             else
             {
-                var last = nodes[^1];
-                var point = currentPoint.Plus(last.Move.Motion.Scaled(last.Count));
+                var last  = nodes[^1];
+                var delta = last.Move.Motion.Scaled(last.Count);
+                var point = currentPoint.Add(delta).Clone();
                 
                 nodes.Add(new PathNode(point, current, 1));
             }
