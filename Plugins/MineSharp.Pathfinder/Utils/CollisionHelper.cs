@@ -36,16 +36,23 @@ internal static class CollisionHelper
         return false;
     }
 
-    public static bool IsPositionInBlock(Vector3 position, Position block)
+    public static bool IsPointInBlockBb(Vector3 position, Position block)
     {
         var pos = position.Minus(block.X, block.Y, block.Z);
         return BlockBb.Contains(pos);
     }
 
-    public static bool IsXZPositionInBlock(Vector3 position, Position block)
+    public static bool IsXzPointInBlockBb(Vector3 position, Position block)
     {
         var pos = position.Minus(block.X, position.Y, block.Z);
         return BlockBb.Contains(pos);
+    }
+
+    public static bool IntersectsBbWithBlock(AABB bb, Position block)
+    {
+        // TODO: not correct, (min.x, max.z) can be on block, but is not detected
+        // return IsPositionInBlock(bb.Min, block) || IsPositionInBlock(bb.Max, block);
+        return BlockBb.Intersects(bb.Clone().Offset(-block.X, -block.Y, -block.Z));
     }
 
     public static AABB[] GetBoundingBoxes(Block block, MinecraftData data)

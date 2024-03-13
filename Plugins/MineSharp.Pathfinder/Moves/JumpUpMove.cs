@@ -62,7 +62,7 @@ public class JumpUpMove(Vector3 xzMotion) : Move
         {
             await physics.WaitForTick();
 
-            if (CollisionHelper.IsXZPositionInBlock(entity.Position, targetBlock))
+            if (CollisionHelper.IsXzPointInBlockBb(entity.Position, targetBlock))
             {
                 break;
             }
@@ -71,6 +71,6 @@ public class JumpUpMove(Vector3 xzMotion) : Move
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
 
-        await MovementUtils.MoveToBlockCenter(entity, physics);
+        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

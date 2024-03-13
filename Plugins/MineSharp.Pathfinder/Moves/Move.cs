@@ -36,7 +36,7 @@ public abstract class Move
     /// </summary>
     public abstract bool IsMovePossible(Position position, IWorld world);
 
-    internal async Task Perform(MineSharpBot bot, int count, Movements movements)
+    internal async Task Perform(MineSharpBot bot, int count, Position startPosition, Movements movements)
     {
         if (!this.CanBeLinked && count > 1)
         {
@@ -47,20 +47,20 @@ public abstract class Move
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var entity  = player.Entity ?? throw new NullReferenceException("player is not initialized");
 
-        if (entity.Velocity.HorizontalLengthSquared() > 0.03)
+        if (entity.Velocity.HorizontalLengthSquared() > 0.15 * 0.15)
             await MovementUtils.SlowDown(entity, physics); 
         
         await physics.Look(0, 0);
-        await MovementUtils.MoveToBlockCenter(entity, physics);
+        await MovementUtils.MoveInsideBlock(entity, startPosition, physics);
 
         await PerformMove(bot, count, movements);
     }
 
     /// <summary>
-    /// Perform the move. Before PerformMove() is called, it is made sure that:
+    /// Perform the move. Before PerformMove() is called, it is made guaranteed that:
     ///  - The bot is looking at (0, 0)
-    ///  - The bos hitbox is completely on the block
-    ///  - The bots velocity is lower than 0.03
+    ///  - The bots hitbox is completely inside the block
+    ///  - The bots velocity is lower than 0.15^2
     ///  - The input controls are reset
     /// </summary>
     protected abstract Task PerformMove(MineSharpBot bot, int count, Movements movements);

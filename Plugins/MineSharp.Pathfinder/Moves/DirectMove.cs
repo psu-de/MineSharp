@@ -60,18 +60,18 @@ public class DirectMove(Vector3 motion) : Move
         {
             await physics.WaitForTick();
             
-            if (CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+            if (CollisionHelper.IsPointInBlockBb(entity.Position, targetBlock))
             {
                 break;
             }
         }
         physics.InputControls.Reset();
 
-        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+        if (!CollisionHelper.IsPointInBlockBb(entity.Position, targetBlock))
         {
             throw new Exception("move went wrong"); // TODO: Move exception
         }
         
-        await MovementUtils.MoveToBlockCenter(entity, physics);
+        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

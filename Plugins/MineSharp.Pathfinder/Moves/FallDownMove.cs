@@ -57,7 +57,7 @@ public class FallDownMove(Vector3 motion) : Move
             if (!stopNextTick)
             {
                 var vec = MovementUtils.GetXZPositionNextTick(player.Entity);
-                if (CollisionHelper.IsXZPositionInBlock(vec, targetBlock))
+                if (CollisionHelper.IsXzPointInBlockBb(vec, targetBlock))
                 {
                     stopNextTick = true;
                 }
@@ -72,11 +72,11 @@ public class FallDownMove(Vector3 motion) : Move
         physics.InputControls.Reset();
         await physics.WaitForOnGround();
 
-        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+        if (!CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), targetBlock))
         {
             throw new Exception("move went wrong."); // TODO: Better exception
         }
 
-        await MovementUtils.MoveToBlockCenter(entity, physics);
+        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

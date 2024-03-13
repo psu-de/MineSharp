@@ -56,15 +56,12 @@ public class JumpOneBlock(Vector3 direction) : Move
                                              0, 
                                              this.Motion.Z / 2);
         var targetBlock = (Position)target;
-
-        await physics.Look(0, 0);
-        await MovementUtils.MoveToBlockCenter(entity, physics);
         
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
 
         while (true)
         {
-            if (CollisionHelper.IsPositionInBlock(entity.Position, jumpBlock))
+            if (CollisionHelper.IsPointInBlockBb(entity.Position, jumpBlock))
             {
                 physics.InputControls.JumpingKeyDown = true;
                 await physics.WaitForTick();
@@ -77,7 +74,7 @@ public class JumpOneBlock(Vector3 direction) : Move
 
         while (true)
         {
-            if (CollisionHelper.IsPositionInBlock(entity.Position.Plus(entity.Velocity), jumpBlock))
+            if (CollisionHelper.IsPointInBlockBb(entity.Position.Plus(entity.Velocity), jumpBlock))
             {
                 physics.InputControls.Reset();
                 break;
@@ -88,11 +85,12 @@ public class JumpOneBlock(Vector3 direction) : Move
         
         await physics.WaitForOnGround();
 
-        if (!CollisionHelper.IsPositionInBlock(entity.Position, targetBlock))
+        if (!CollisionHelper.IntersectsBbWithBlock(entity.GetBoundingBox(), targetBlock))
         {
             throw new Exception("move went wrong."); // TODO: Better exception
         }
 
-        await MovementUtils.MoveToBlockCenter(entity, physics);
+        Console.WriteLine($"target={target}, block={targetBlock}");
+        await MovementUtils.MoveInsideBlock(entity, targetBlock, physics);
     }
 }

@@ -2,6 +2,7 @@
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Geometry;
+using MineSharp.Pathfinder.Exceptions;
 using MineSharp.Physics.Input;
 
 namespace MineSharp.Pathfinder.Utils;
@@ -48,12 +49,20 @@ internal static class MovementUtils
         return entity.Position.Clone().Add(entity.Velocity.X, 0, entity.Velocity.Z);
     }
 
-    public static async Task MoveToBlockCenter(Entity entity, PhysicsPlugin physics)
+    /// <summary>
+    /// Makes sure the whole xz-hitbox of <paramref name="entity"/> is inside the block at <paramref name="blockPosition"/>
+    /// </summary>
+    public static async Task MoveInsideBlock(Entity entity, Position blockPosition, PhysicsPlugin physics)
     {
-        var target   = (Position)entity.Position;
-        var toTarget = new Vector3(0.5, 0, 0.5).Add(target);
+        // assert entity's bb intersects block position
+        var bb = entity.GetBoundingBox();
         
-        var bb = CollisionHelper.SetAABBToPlayerBB(entity.Position);
+        if (!CollisionHelper.IntersectsBbWithBlock(bb, blockPosition))
+        {
+            throw new MoveWentWrongException($"Cannot move to block center of {blockPosition}, because entity is at {entity.Position}");
+        }
+        
+        var toTarget = new Vector3(0.5, 0, 0.5).Add(blockPosition);
         
         while (true)
         {
@@ -63,8 +72,8 @@ internal static class MovementUtils
 
             CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), ref bb);
             
-            if (CollisionHelper.IsPositionInBlock(bb.Min, target) 
-             && CollisionHelper.IsXZPositionInBlock(bb.Max, target))
+            if (CollisionHelper.IsPointInBlockBb(bb.Min, blockPosition) 
+             && CollisionHelper.IsXzPointInBlockBb(bb.Max, blockPosition))
             {
                 break;
             } 
