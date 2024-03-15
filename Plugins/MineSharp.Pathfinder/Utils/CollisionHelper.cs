@@ -62,7 +62,7 @@ internal static class CollisionHelper
             .ToArray();
     }
 
-    public static AABB SetAABBToPlayerBB(Vector3 pos)
+    public static AABB GetAabbForPlayer(Vector3 pos)
     {
         var bb = new AABB(-0.3, 0, -0.3, 0.3, 1.8, 0.3)
             .Offset(pos.X, pos.Y, pos.Z);

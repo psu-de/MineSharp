@@ -43,7 +43,12 @@ internal static class MovementUtils
         await physics.WaitForTick();
         physics.InputControls.Reset();
     }
-
+    
+    public static Vector3 GetPositionNextTick(Entity entity)
+    {
+        return entity.Position.Plus(entity.Velocity);
+    }
+    
     public static Vector3 GetXZPositionNextTick(Entity entity)
     {
         return entity.Position.Clone().Add(entity.Velocity.X, 0, entity.Velocity.Z);

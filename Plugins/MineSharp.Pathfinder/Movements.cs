@@ -43,11 +43,18 @@ public class Movements
 
         if (this.AllowJumping)
         {
-            moves.AddRange(Directions.Select(x => new JumpUpMove(x)));
-            moves.AddRange(DiagonalDirections.Select(x => new JumpUpMove(x)));
+            var scaled = Directions
+                        .Concat(DiagonalDirections)
+                        .Select(x => x.Scaled(2))
+                        .ToArray();
             
-            moves.AddRange(Directions.Select(x => new JumpOneBlock(x)));
-            moves.AddRange(DiagonalDirections.Select(x => new JumpOneBlock(x)));
+            var above = Directions
+                       .Concat(DiagonalDirections)
+                       .Select(x => x.Clone().Add(0, 1, 0))
+                       .ToArray();
+            
+            moves.AddRange(above.Select(x => new JumpMove(x)));
+            moves.AddRange(scaled.Select(x => new JumpMove(x)));
         }
         
         moves.AddRange(Directions.Select(x => new FallDownMove(x)));

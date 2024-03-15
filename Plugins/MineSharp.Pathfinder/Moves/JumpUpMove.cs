@@ -27,7 +27,7 @@ public class JumpUpMove(Vector3 xzMotion) : Move
     /// <inheritdoc />
     public override bool IsMovePossible(Position position, IWorld world)
     {
-        var playerBb = CollisionHelper.SetAABBToPlayerBB(position);
+        var playerBb = CollisionHelper.GetAabbForPlayer(position);
         playerBb.Offset(
             0.5 + this.Motion.X / 2, 
             1, 
