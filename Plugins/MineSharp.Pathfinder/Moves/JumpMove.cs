@@ -58,9 +58,9 @@ public class JumpMove : Move
     /// <inheritdoc />
     protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
-        if (this.Motion.Y > 0 && this.Motion.LengthSquared() <= 3)
+        if (this.Motion is { Y: > 0, X: <= 1, Z: <= 1 })
         {
-            await JumpUpDirectly(bot, movements);
+            await JumpUpToAdjacentBlock(bot, movements);
             return;
         }
         
@@ -74,11 +74,13 @@ public class JumpMove : Move
                            .Add(0.5, 0.0, 0.5);
 
         var targetBlock = (Position)target;
-        var jumpBlock   = (Position)entity.Position.Subtract(0, -1, 0); // the block below the entity is where we jump from
+        var jumpBlock   = (Position)entity.Position.Minus(0, -1, 0); // the block below the entity is where we jump from
+        Console.WriteLine($"JumpBlock: {jumpBlock}");
         
         MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
         await physics.WaitForTick();
-        physics.InputControls.SprintingKeyDown = movements.AllowSprinting;
+        // TODO: Sprinting only works for walking forward, so the bot has to rotate so that it only needs to walk forward
+        physics.InputControls.SprintingKeyDown = this.Motion.Length() > 2 && movements.AllowSprinting;
         
         var bb     = entity.GetBoundingBox();
         while (true)
@@ -86,7 +88,7 @@ public class JumpMove : Move
             await physics.WaitForTick();
             CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), ref bb);
 
-            if (bb.Min.Y - target.Y < -1)
+            if (bb.Min.Y - target.Y + this.Motion.Y < -1)
             {
                 throw new MoveWentWrongException("jump move went wrong");
             }
@@ -98,34 +100,37 @@ public class JumpMove : Move
 
             // if the entity doesn't collide with the block on the next tick, jump                
             physics.InputControls.JumpingKeyDown = true;
-            Console.WriteLine("Jumping");
             break;
         }
 
         while (entity.IsOnGround)
         {
             await physics.WaitForTick();
-            physics.InputControls.JumpingKeyDown = false;
-            Console.WriteLine("Left ground");
         }
-
+        physics.InputControls.JumpingKeyDown = false;
+        
         while (true)
         {
             await physics.WaitForTick();
             
             CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), ref bb);
-            if (!CollisionHelper.IntersectsBbWithBlock(bb, targetBlock))
+            if (CollisionHelper.IntersectsBbWithBlockXz(bb, targetBlock))
             {
-                continue;
+                break;
             }
-            
-            physics.InputControls.Reset();
-            await physics.WaitForOnGround();
-            break;
         }
+        
+        physics.InputControls.Reset();
+
+        if (entity.Velocity.LengthSquared() > 0.1 * 0.1)
+        {
+            await MovementUtils.SlowDown(entity, physics);
+        }
+        
+        await physics.WaitForOnGround();
     }
     
-    private async Task JumpUpDirectly(MineSharpBot bot, Movements movements)
+    private async Task JumpUpToAdjacentBlock(MineSharpBot bot, Movements movements)
     {
         var physics = bot.GetPlugin<PhysicsPlugin>();
         var player  = bot.GetPlugin<PlayerPlugin>();

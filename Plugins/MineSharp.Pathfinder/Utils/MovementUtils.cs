@@ -37,10 +37,13 @@ internal static class MovementUtils
 
     public static async Task SlowDown(Entity entity, PhysicsPlugin physics)
     {
-        SetHorizontalMovementsFromVector(
-            entity.Velocity.Scaled(-1), physics.InputControls);
+        while (entity.Velocity.LengthSquared() > 0.1 * 0.1)
+        {
+            SetHorizontalMovementsFromVector(
+                entity.Velocity.Scaled(-1), physics.InputControls);
         
-        await physics.WaitForTick();
+            await physics.WaitForTick();   
+        }
         physics.InputControls.Reset();
     }
     

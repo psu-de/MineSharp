@@ -55,6 +55,11 @@ internal static class CollisionHelper
         return BlockBb.Intersects(bb.Clone().Offset(-block.X, -block.Y, -block.Z));
     }
 
+    public static bool IntersectsBbWithBlockXz(AABB bb, Position block)
+    {
+        return BlockBb.Intersects(bb.Clone().Offset(-block.X, -bb.MinY, -block.Z));
+    }
+
     public static AABB[] GetBoundingBoxes(Block block, MinecraftData data)
     {
         return data.BlockCollisionShapes.GetForBlock(block)
