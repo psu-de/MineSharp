@@ -52,7 +52,6 @@ public abstract class Move
         if (entity.Velocity.HorizontalLengthSquared() > 0.15 * 0.15)
             await MovementUtils.SlowDown(entity, physics); 
         
-        await physics.Look(0, 0);
         await MovementUtils.MoveInsideBlock(entity, startPosition, physics);
 
         await PerformMove(bot, count, movements);
@@ -69,7 +68,6 @@ public abstract class Move
 
     /// <summary>
     /// Perform the move. Before PerformMove() is called, it is made guaranteed that:
-    ///  - The bot is looking at (0, 0)
     ///  - The bots hitbox is completely inside the block
     ///  - The bots velocity is lower than 0.15^2
     ///  - The input controls are reset
