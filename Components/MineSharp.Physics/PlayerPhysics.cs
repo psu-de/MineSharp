@@ -151,7 +151,7 @@ public class PlayerPhysics
         this.PushTowardsClosestSpace(x - w * 0.35d, z - w * 0.35d);
         this.PushTowardsClosestSpace(x + w * 0.35d, z - w * 0.35d);
         this.PushTowardsClosestSpace(x + w * 0.35d, z + w * 0.35d);
-
+    
         this.UpdateSprinting();
 
         // ability to fly for creative and spectator
@@ -238,8 +238,8 @@ public class PlayerPhysics
             : this.State.IsSprinting
                 ? PhysicsConst.SPRINTING_FLYING_SPEED
                 : PhysicsConst.FLYING_SPEED;
+        
         this.MoveRelative(moveVector, (float)frictionInfluencedSpeed, this.Player.Entity.Yaw);
-
         this.CheckClimbable();
         this.Move();
 
@@ -309,7 +309,7 @@ public class PlayerPhysics
             waterFactor = 0.96f;
 
         var moveVector = new Vector3(dx, 0, dz);
-        this.MoveRelative(moveVector, speedFactor, this.Player.Entity!.Pitch);
+        this.MoveRelative(moveVector, speedFactor, this.Player.Entity!.Yaw);
         this.Move();
 
         // TODO: Finish water movement
@@ -409,9 +409,9 @@ public class PlayerPhysics
 
     private bool IsCollisionMinor(Vector3 vec)
     {
-        var pitchRadians = this.Player.Entity!.Pitch * (Math.PI / 180.0);
-        var sin          = Math.Sin(pitchRadians);
-        var cos          = Math.Cos(pitchRadians);
+        var yawRadians = this.Player.Entity!.Yaw * (Math.PI / 180.0);
+        var sin        = Math.Sin(yawRadians);
+        var cos        = Math.Cos(yawRadians);
 
         var x = this.movementInput.StrafeImpulse  * cos * 0.98 - this.movementInput.ForwardImpulse * sin * 0.98;
         var z = this.movementInput.ForwardImpulse * cos * 0.98 - this.movementInput.StrafeImpulse  * sin * 0.98;
@@ -544,7 +544,7 @@ public class PlayerPhysics
         vec.Z = z;
     }
 
-    private void MoveRelative(Vector3 vec, float scale, float pitch)
+    private void MoveRelative(Vector3 vec, float scale, float yaw)
     {
         var length = vec.LengthSquared();
         if (length < 1.0E-7D)
@@ -555,8 +555,8 @@ public class PlayerPhysics
 
         vec.Scale(scale);
 
-        var sin = MathF.Sin(pitch * (MathF.PI / 180.0F));
-        var cos = MathF.Cos(pitch * (MathF.PI / 180.0F));
+        var sin = MathF.Sin(yaw * (MathF.PI / 180.0F));
+        var cos = MathF.Cos(yaw * (MathF.PI / 180.0F));
         this.Player.Entity!.Velocity.X += vec.X * cos - vec.Z * sin;
         this.Player.Entity!.Velocity.Y += vec.Y;
         this.Player.Entity!.Velocity.Z += vec.Z * cos + vec.X * sin;
@@ -600,9 +600,9 @@ public class PlayerPhysics
         if (!this.State.IsSprinting)
             return;
 
-        var pitch = this.Player.Entity!.Pitch * (MathF.PI / 180.0f);
-        this.Player.Entity!.Velocity.X -= 0.2F * MathF.Sin(pitch);
-        this.Player.Entity!.Velocity.Z += 0.2F * MathF.Cos(pitch);
+        var yaw = this.Player.Entity!.Yaw * (MathF.PI / 180.0f);
+        this.Player.Entity!.Velocity.X -= 0.2F * MathF.Sin(yaw);
+        this.Player.Entity!.Velocity.Z += 0.2F * MathF.Cos(yaw);
     }
 
     private void JumpInFluid()
