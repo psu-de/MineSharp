@@ -49,7 +49,7 @@ public class FallDownMove(Vector3 motion) : Move
             .Add(0.5, 0.0, 0.5);
         var targetBlock = (Position)target;
         
-        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
+        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, entity.Yaw, physics.InputControls);
 
         var stopNextTick = false;
         while (entity.IsOnGround)

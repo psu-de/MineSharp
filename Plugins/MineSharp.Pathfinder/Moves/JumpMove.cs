@@ -38,18 +38,22 @@ public class JumpMove : Move
     /// <inheritdoc />
     public override bool IsMovePossible(Position position, IWorld world)
     {
-        var motionBelow = this.Motion.Clone().Subtract(
-            this.Motion.X < 0 ? -1 : 1, 
-            0,
-            this.Motion.Z < 0 ? -1 : 1);
+        var x = this.Motion.X == 0 ? 0 : this.Motion.X < 0 ? -1 : 1;
+        var z = this.Motion.Z == 0 ? 0 : this.Motion.Z < 0 ? -1 : 1; 
+        
+        var pos = new Vector3(0.5, 0, 0.5).Add(position);
+        
+        var motionBelow = this.Motion
+                              .Clone()
+                              .Subtract(x, 0, z);
 
-        var bb = CollisionHelper.GetAabbForPlayer(position)
+        var bb = CollisionHelper.GetAabbForPlayer(pos)
                                 .Expand(motionBelow.X, 0, motionBelow.Z);
-
+        
         if (CollisionHelper.CollidesWithWord(bb, world))
             return false;
 
-        bb = CollisionHelper.SetAABBToPlayerBB(position, ref bb)
+        bb = CollisionHelper.SetAABBToPlayerBB(pos, ref bb)
                             .Offset(this.Motion.X, this.Motion.Y, this.Motion.Z);
         
         return !CollisionHelper.CollidesWithWord(bb, world);
@@ -58,7 +62,7 @@ public class JumpMove : Move
     /// <inheritdoc />
     protected override async Task PerformMove(MineSharpBot bot, int count, Movements movements)
     {
-        if (this.Motion is { Y: > 0, X: <= 1, Z: <= 1 })
+        if (this.Motion.Y > 0 && Math.Abs(this.Motion.X) <= 1 && Math.Abs(this.Motion.Z) <= 1)
         {
             await JumpUpToAdjacentBlock(bot, movements);
             return;
@@ -75,12 +79,20 @@ public class JumpMove : Move
 
         var targetBlock = (Position)target;
         var jumpBlock   = (Position)entity.Position.Minus(0, -1, 0); // the block below the entity is where we jump from
-        Console.WriteLine($"JumpBlock: {jumpBlock}");
         
-        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
-        await physics.WaitForTick();
-        // TODO: Sprinting only works for walking forward, so the bot has to rotate so that it only needs to walk forward
         physics.InputControls.SprintingKeyDown = this.Motion.Length() > 2 && movements.AllowSprinting;
+        if (physics.InputControls.SprintingKeyDown)
+        {
+            // if we want to sprint, we have to rotate
+            await MovementUtils.SetRotationForMotion(this.Motion, physics);
+            physics.InputControls.ForwardKeyDown = true;
+        }
+        else
+        {
+            MovementUtils.SetHorizontalMovementsFromVector(this.Motion, entity.Yaw, physics.InputControls);
+        }
+
+        await physics.WaitForTick();
         
         var bb     = entity.GetBoundingBox();
         while (true)
@@ -143,7 +155,7 @@ public class JumpMove : Move
 
         var targetBlock = (Position)target;
         
-        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, physics.InputControls);
+        MovementUtils.SetHorizontalMovementsFromVector(this.Motion, entity.Yaw, physics.InputControls);
         await physics.WaitForTick(); // wait one tick to assure velocity is updated to this moves motion
         physics.InputControls.JumpingKeyDown = true;
         

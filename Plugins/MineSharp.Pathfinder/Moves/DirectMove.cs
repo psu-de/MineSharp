@@ -52,7 +52,7 @@ public class DirectMove(Vector3 motion) : Move
         var targetBlock = (Position)target;
         
         MovementUtils.SetHorizontalMovementsFromVector(
-            this.Motion, physics.InputControls);
+            this.Motion, entity.Yaw, physics.InputControls);
         physics.InputControls.SprintingKeyDown = movements.AllowSprinting;
 
         while (true)

@@ -43,11 +43,17 @@ public class Movements
 
         if (this.AllowJumping)
         {
+            moves.AddRange(Directions
+               .Concat(DiagonalDirections)
+                          .Select(x => x.Clone().Add(0, 1, 0))
+                          .Select(x => new JumpMove(x)));
+            
             for (int i = 0; i < 3; i++)
             {
                 var scaled = Directions
                             .Concat(DiagonalDirections)
                             .Select(x => x.Scaled(i + 2))
+                            .Where(x => x.Length() <= 5)
                             .ToArray();
                 
                 var above = scaled

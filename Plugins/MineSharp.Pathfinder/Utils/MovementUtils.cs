@@ -1,5 +1,4 @@
 ﻿using MineSharp.Bot.Plugins;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Geometry;
 using MineSharp.Pathfinder.Exceptions;
@@ -9,44 +8,69 @@ namespace MineSharp.Pathfinder.Utils;
 
 internal static class MovementUtils
 {
-    private const double DISTANCE_THRESHOLD = 0.15 * 0.15;
-
-    public static bool IsOnSameBlock(MinecraftPlayer player, Position block)
+    public static async Task SetRotationForMotion(Vector3 movement, PhysicsPlugin physics)
     {
-        return (int)player.Entity!.Position.X == block.X
-            && (int)player.Entity!.Position.Y == block.Y
-            && (int)player.Entity!.Position.Z == block.Z;
+        var yaw = -Math.Atan2(movement.X, movement.Z) / Math.PI * 180.0;
+        await physics.Look((float)yaw, physics.Engine!.Player.Entity!.Pitch);
     }
     
-    public static void SetHorizontalMovementsFromVector(Vector3 movement, InputControls controls)
+    public static void SetHorizontalMovementsFromVector(Vector3 movement, double yaw, InputControls controls)
     {
+        var vec = movement.Clone();
+        RotateVector(ref vec, -yaw);
+        
         controls.Reset();
         
-        if (movement.Z > 0)
+        if (vec.Z > 0)
             controls.ForwardKeyDown = true;
 
-        if (movement.Z < 0)
+        if (vec.Z < 0)
             controls.BackwardKeyDown = true;
 
-        if (movement.X > 0)
+        if (vec.X > 0)
             controls.LeftKeyDown = true;
 
-        if (movement.X < 0)
+        if (vec.X < 0)
             controls.RightKeyDown = true;
     }
 
     public static async Task SlowDown(Entity entity, PhysicsPlugin physics)
     {
-        while (entity.Velocity.LengthSquared() > 0.1 * 0.1)
+        physics.InputControls.Reset();
+        for (int i = 0; i < 10; i++)
         {
+            if (entity.Velocity.HorizontalLengthSquared() <= 0.08 * 0.08)
+            {
+                break;
+            }
+            
             SetHorizontalMovementsFromVector(
-                entity.Velocity.Scaled(-1), physics.InputControls);
-        
-            await physics.WaitForTick();   
+                entity.Velocity.Scaled(-1),
+                entity.Yaw,
+                physics.InputControls);
+               
+            await physics.WaitForTick();  
         }
         physics.InputControls.Reset();
     }
-    
+
+    private static void RotateVector(ref Vector3 vec, double yaw)
+    {
+        var sin = Math.Sin(yaw * (Math.PI / 180.0));
+        var cos = Math.Cos(yaw * (Math.PI / 180.0));
+
+        var x = vec.X * cos - vec.Z * sin;
+        var z = vec.Z * cos + vec.X * sin;
+        
+        if (Math.Abs(x) < 0.02)
+            x = 0;
+        if (Math.Abs(z) < 0.02)
+            z = 0;
+        
+        vec.X = x;
+        vec.Z = z;
+    }
+
     public static Vector3 GetPositionNextTick(Entity entity)
     {
         return entity.Position.Plus(entity.Velocity);
@@ -75,7 +99,7 @@ internal static class MovementUtils
         while (true)
         {
             var vec = toTarget.Minus(entity.Position);
-            SetHorizontalMovementsFromVector(vec, physics.InputControls);
+            SetHorizontalMovementsFromVector(vec, entity.Yaw, physics.InputControls);
             await physics.WaitForTick();
 
             CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), ref bb);
