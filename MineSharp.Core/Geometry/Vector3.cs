@@ -149,6 +149,13 @@ public class Vector3(double x, double y, double z)
         => this.X * this.X + this.Y * this.Y + this.Z * this.Z;
 
     /// <summary>
+    /// Calculates the squared horizontal (x, z) length of this vector instance
+    /// </summary>
+    [Pure]
+    public double HorizontalLengthSquared()
+        => this.X * this.X + this.Z * this.Z;
+
+    /// <summary>
     /// Calculates the horizontal squared length of this vector
     /// </summary>
     [Pure]

@@ -201,7 +201,7 @@ public class MutableAABB : AABB
     /// Deflate this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
     /// Mutates this instance.
     /// </summary>
-    public AABB Deflate(double x, double y, double z)
+    public MutableAABB Deflate(double x, double y, double z)
     {
         this.Min.Add(x, y, z);
         this.Max.Add(-x, -y, -z);
@@ -212,7 +212,7 @@ public class MutableAABB : AABB
     /// <summary>
     /// Expand this bounding box by x, y, z
     /// </summary>
-    public AABB Expand(double x, double y, double z)
+    public MutableAABB Expand(double x, double y, double z)
     {
         if (x > 0)
             this.Max.Add(x, 0, 0);
@@ -233,11 +233,7 @@ public class MutableAABB : AABB
     /// Offset this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>.
     /// Mutates this instance.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <returns></returns>
-    public AABB Offset(double x, double y, double z)
+    public MutableAABB Offset(double x, double y, double z)
     {
         this.Min.Add(x, y, z);
         this.Max.Add(x, y, z);
