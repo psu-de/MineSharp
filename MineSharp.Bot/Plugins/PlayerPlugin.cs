@@ -158,10 +158,10 @@ public class PlayerPlugin : Plugin
         var entity = new Entity(
             this.Bot.Data.Entities.ByType(EntityType.Player)!,
             loginPacket.EntityId,
-            new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z),
+            new MutableVector3(positionPacket.X, positionPacket.Y, positionPacket.Z),
             positionPacket.Pitch,
             positionPacket.Yaw,
-            new Vector3(0, 0, 0),
+            new MutableVector3(0, 0, 0),
             false,
             new Dictionary<EffectType, Effect?>());
 
@@ -290,13 +290,13 @@ public class PlayerPlugin : Plugin
         var entity = new Entity(
             this.Bot.Data.Entities.ByType(EntityType.Player)!,
             packet.EntityId,
-            new Vector3(
+            new MutableVector3(
                 packet.X,
                 packet.Y,
                 packet.Z),
             NetUtils.FromAngleByte((sbyte)packet.Pitch),
             NetUtils.FromAngleByte((sbyte)packet.Yaw),
-            Vector3.Zero,
+            new MutableVector3(0, 0, 0),
             true,
             new Dictionary<EffectType, Effect?>());
         player.Entity = entity;

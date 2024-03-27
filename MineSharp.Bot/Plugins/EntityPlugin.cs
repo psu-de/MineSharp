@@ -81,10 +81,10 @@ public class EntityPlugin : Plugin
         var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
 
         var newEntity = new Entity(
-            entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
+            entityInfo, packet.EntityId, new MutableVector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
-            new Vector3(
+            new MutableVector3(
                 NetUtils.ConvertToVelocity(packet.VelocityX),
                 NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
@@ -103,10 +103,10 @@ public class EntityPlugin : Plugin
         var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
 
         var newEntity = new Entity(
-            entityInfo, packet.EntityId, new Vector3(packet.X, packet.Y, packet.Z),
+            entityInfo, packet.EntityId, new MutableVector3(packet.X, packet.Y, packet.Z),
             packet.Pitch,
             packet.Yaw,
-            new Vector3(
+            new MutableVector3(
                 NetUtils.ConvertToVelocity(packet.VelocityX),
                 NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
@@ -143,10 +143,12 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        entity.Velocity.X = NetUtils.ConvertToVelocity(packet.VelocityX);
-        entity.Velocity.Y = NetUtils.ConvertToVelocity(packet.VelocityY);
-        entity.Velocity.Z = NetUtils.ConvertToVelocity(packet.VelocityZ);
-
+        (entity.Position as MutableVector3)!.Set(
+            NetUtils.ConvertToVelocity(packet.VelocityX),
+            NetUtils.ConvertToVelocity(packet.VelocityY),
+            NetUtils.ConvertToVelocity(packet.VelocityZ)
+        );
+        
         return Task.CompletedTask;
     }
 
@@ -158,10 +160,11 @@ public class EntityPlugin : Plugin
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        entity.Position.Add(new Vector3(
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
-            NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
+            NetUtils.ConvertDeltaPosition(packet.DeltaZ)
+            );
 
         entity.IsOnGround = packet.OnGround;
 
@@ -177,10 +180,10 @@ public class EntityPlugin : Plugin
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        entity.Position.Add(new Vector3(
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
-            NetUtils.ConvertDeltaPosition(packet.DeltaZ)));
+            NetUtils.ConvertDeltaPosition(packet.DeltaZ));
 
         entity.Yaw        = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch      = NetUtils.FromAngleByte(packet.Pitch);
@@ -215,9 +218,8 @@ public class EntityPlugin : Plugin
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        entity.Position.X = packet.X;
-        entity.Position.Y = packet.Y;
-        entity.Position.Z = packet.Z;
+        (entity.Position as MutableVector3)!
+           .Set(packet.X, packet.Y, packet.Z);
 
         entity.Yaw   = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
@@ -252,20 +254,22 @@ public class EntityPlugin : Plugin
 
         await this.WaitForInitialization();
 
+        var position = (this._playerPlugin!.Entity!.Position as MutableVector3)!;
+
         if ((packet.Flags & 0x01) == 0x01)
-            this._playerPlugin!.Entity!.Position.X += packet.X;
+            position.Add(packet.X, 0, 0);
         else
-            this._playerPlugin!.Entity!.Position.X = packet.X;
+            position.SetX(packet.X);
 
         if ((packet.Flags & 0x02) == 0x02)
-            this._playerPlugin!.Entity!.Position.Y += packet.Y;
+            position.Add(0, packet.Y, 0);
         else
-            this._playerPlugin!.Entity!.Position.Y = packet.Y;
+            position.SetY(packet.Y);
 
         if ((packet.Flags & 0x04) == 0x04)
-            this._playerPlugin!.Entity!.Position.Z += packet.Z;
+            position.Add(0, 0, packet.Z);
         else
-            this._playerPlugin!.Entity!.Position.Z = packet.Z;
+            position.SetZ(packet.Z);
 
         if ((packet.Flags & 0x08) == 0x08)
             this._playerPlugin!.Entity!.Pitch += packet.Pitch;

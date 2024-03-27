@@ -209,7 +209,7 @@ public class PhysicsPlugin : Plugin
 
                 foreach (var bb in bbs)
                 {
-                    bb.Offset(block.Position.X, block.Position.Y, block.Position.Z);
+                    bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
 
                     if (bb.IntersectsLine(position, lookVector))
                         return block;
