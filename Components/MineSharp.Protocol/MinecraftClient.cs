@@ -208,6 +208,7 @@ public sealed class MinecraftClient : IDisposable
             throw new InvalidOperationException("Client is not connected.");
         }
 
+        Logger.Debug($"Disconnecting: {reason}");
         this._cancellation.Cancel();
         await this._streamLoop!;
 

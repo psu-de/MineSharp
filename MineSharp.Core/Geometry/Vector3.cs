@@ -163,7 +163,7 @@ public class Vector3(double x, double y, double z)
     {
         var dX = this.X - other.X;
         var dZ = this.Z - other.Z;
-        return dX * dX + dZ + dZ;
+        return dX * dX + dZ * dZ;
     }
 
     /// <summary>

@@ -72,7 +72,8 @@ public class PlayerCertificate : ICachedResponse<PlayerCertificate>
             KeyPair =
                 new KeyPairBlob()
                 {
-                    PrivateKey = EncodeKey(this.Keys.PrivateKey, "PRIVATE"), PublicKey = EncodeKey(this.Keys.PublicKey, "PUBLIC"),
+                    PrivateKey = EncodeKey(this.Keys.PrivateKey, "PRIVATE"), 
+                    PublicKey = EncodeKey(this.Keys.PublicKey, "PUBLIC"),
                 },
             PublicKeySignature   = Convert.ToBase64String(this.PublicKeySignature),
             PublicKeySignatureV2 = Convert.ToBase64String(this.PublicKeySignatureV2),
