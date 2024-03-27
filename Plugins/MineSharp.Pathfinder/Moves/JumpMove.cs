@@ -41,7 +41,7 @@ public class JumpMove : Move
         var x = this.Motion.X == 0 ? 0 : this.Motion.X < 0 ? -1 : 1;
         var z = this.Motion.Z == 0 ? 0 : this.Motion.Z < 0 ? -1 : 1; 
         
-        var pos = new Vector3(0.5, 0, 0.5).Add(position);
+        var pos = new MutableVector3(0.5, 0, 0.5).Add(position);
         
         var motionBelow = this.Motion
                               .Clone()
@@ -53,7 +53,7 @@ public class JumpMove : Move
         if (CollisionHelper.CollidesWithWord(bb, world))
             return false;
 
-        bb = CollisionHelper.SetAABBToPlayerBB(pos, ref bb)
+        bb = CollisionHelper.SetAABBToPlayerBB(pos, bb)
                             .Offset(this.Motion.X, this.Motion.Y, this.Motion.Z);
         
         return !CollisionHelper.CollidesWithWord(bb, world);
@@ -98,7 +98,7 @@ public class JumpMove : Move
         while (true)
         {
             await physics.WaitForTick();
-            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), ref bb);
+            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
 
             if (bb.Min.Y - target.Y + this.Motion.Y < -1)
             {
@@ -125,7 +125,7 @@ public class JumpMove : Move
         {
             await physics.WaitForTick();
             
-            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), ref bb);
+            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
             if (CollisionHelper.IntersectsBbWithBlockXz(bb, targetBlock))
             {
                 break;

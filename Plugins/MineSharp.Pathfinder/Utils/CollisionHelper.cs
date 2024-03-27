@@ -24,7 +24,7 @@ internal static class CollisionHelper
 
             foreach (var box in boxes)
             {
-                box.Offset(block.Position.X, block.Position.Y, block.Position.Z);
+                box.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
 
                 if (aabb.Intersects(box))
                 {
@@ -57,31 +57,28 @@ internal static class CollisionHelper
 
     public static bool IntersectsBbWithBlockXz(AABB bb, Position block)
     {
-        return BlockBb.Intersects(bb.Clone().Offset(-block.X, -bb.MinY, -block.Z));
+        return BlockBb.Intersects(bb.Clone().Offset(-block.X, -bb.Min.Y, -block.Z));
     }
 
-    public static AABB[] GetBoundingBoxes(Block block, MinecraftData data)
+    public static MutableAABB[] GetBoundingBoxes(Block block, MinecraftData data)
     {
         return data.BlockCollisionShapes.GetForBlock(block)
-            .Select(x => x.Offset(block.Position.X, block.Position.Y, block.Position.Z))
+            .Select(x => x.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z))
             .ToArray();
     }
 
-    public static AABB GetAabbForPlayer(Vector3 pos)
+    public static MutableAABB GetAabbForPlayer(Vector3 pos)
     {
-        var bb = new AABB(-0.3, 0, -0.3, 0.3, 1.8, 0.3)
+        var bb = new MutableAABB(-0.3, 0, -0.3, 0.3, 1.8, 0.3)
             .Offset(pos.X, pos.Y, pos.Z);
         return bb;
     }
     
-    public static AABB SetAABBToPlayerBB(Vector3 pos, ref AABB aabb)
+    public static MutableAABB SetAABBToPlayerBB(Vector3 pos, MutableAABB aabb)
     {
-        aabb.Min.X = -0.3;
-        aabb.Min.Y = 0;
-        aabb.Min.Z = -0.3;
-        aabb.Max.X = 0.3;
-        aabb.Max.Y = 1.8;
-        aabb.Max.Z = 0.3;
+        aabb.Min.Set(-0.3, 0, -0.3);
+        aabb.Max.Set(0.3, 1.8, 0.3);
+
         return aabb.Offset(pos.X, pos.Y, pos.Z);
     }
 }

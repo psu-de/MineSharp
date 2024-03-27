@@ -17,7 +17,7 @@ internal static class MovementUtils
     public static void SetHorizontalMovementsFromVector(Vector3 movement, double yaw, InputControls controls)
     {
         var vec = movement.Clone();
-        RotateVector(ref vec, -yaw);
+        RotateVector(vec, -yaw);
         
         controls.Reset();
         
@@ -54,7 +54,7 @@ internal static class MovementUtils
         physics.InputControls.Reset();
     }
 
-    private static void RotateVector(ref Vector3 vec, double yaw)
+    private static void RotateVector(MutableVector3 vec, double yaw)
     {
         var sin = Math.Sin(yaw * (Math.PI / 180.0));
         var cos = Math.Cos(yaw * (Math.PI / 180.0));
@@ -66,9 +66,8 @@ internal static class MovementUtils
             x = 0;
         if (Math.Abs(z) < 0.02)
             z = 0;
-        
-        vec.X = x;
-        vec.Z = z;
+
+        vec.Set(x, vec.Y, z);
     }
 
     public static Vector3 GetPositionNextTick(Entity entity)
@@ -94,7 +93,7 @@ internal static class MovementUtils
             throw new MoveWentWrongException($"Cannot move to block center of {blockPosition}, because entity is at {entity.Position}");
         }
         
-        var toTarget = new Vector3(0.5, 0, 0.5).Add(blockPosition);
+        var toTarget = new MutableVector3(0.5, 0, 0.5).Add(blockPosition);
         
         while (true)
         {
@@ -102,7 +101,7 @@ internal static class MovementUtils
             SetHorizontalMovementsFromVector(vec, entity.Yaw, physics.InputControls);
             await physics.WaitForTick();
 
-            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), ref bb);
+            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), bb);
             
             if (CollisionHelper.IsPointInBlockBb(bb.Min, blockPosition) 
              && CollisionHelper.IsXzPointInBlockBb(bb.Max, blockPosition))
