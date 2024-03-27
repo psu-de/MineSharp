@@ -8,70 +8,50 @@ namespace MineSharp.Core.Geometry;
 /// </summary>
 public class AABB
 {
-    /// <summary>
-    /// Lower X coordinate
-    /// </summary>
-    public double MinX => this.Min.X;
-
-    /// <summary>
-    /// Lower Y coordinate
-    /// </summary>
-    public double MinY => this.Min.Y;
-
-    /// <summary>
-    /// Lower Z coordinate
-    /// </summary>
-    public double MinZ => this.Min.Z;
-
-    /// <summary>
-    /// Upper X coordinate
-    /// </summary>
-    public double MaxX => this.Max.X;
-
-    /// <summary>
-    /// Upper Y coordinate
-    /// </summary>
-    public double MaxY => this.Max.Y;
-
-    /// <summary>
-    /// Upper Z coordinate
-    /// </summary>
-    public double MaxZ => this.Max.Z;
 
     /// <summary>
     /// Width of this bounding box (MaxX - MinX)
     /// </summary>
-    public double Width => this.MaxX - this.MinX;
+    public double Width => Math.Abs(this.Max.X - this.Min.X);
 
     /// <summary>
     /// Height of this bounding box (MaxY - MinY)
     /// </summary>
-    public double Height => this.MaxY - this.MinY;
+    public double Height => Math.Abs(this.Max.Y - this.Min.Y);
 
     /// <summary>
     /// Depth of this bounding box (MaxZ - MinZ)
     /// </summary>
-    public double Depth => this.MaxZ - this.MinZ;
+    public double Depth => Math.Abs(this.Max.Z - this.Min.Z);
 
     /// <summary>
     /// Min X, Y, Z
     /// </summary>
-    public Vector3 Min { get; }
+    public virtual Vector3 Min { get; }
 
     /// <summary>
     /// Max X, Y, Z
     /// </summary>
-    public Vector3 Max { get; }
+    public virtual Vector3 Max { get; }
+
+    /// <summary>
+    /// Create a new instance of AABB
+    /// </summary>
+    protected AABB(Vector3 a, Vector3 b)
+    {
+        var min = a.Clone();
+        var max = b.Clone();
+        
+        min.Set(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
+        max.Set(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
+        
+        this.Min = min;
+        this.Max = max;
+    }
     
     /// <summary>
     /// Creates a new AABB
     /// </summary>
-    /// <param name="minX"></param>
-    /// <param name="minY"></param>
-    /// <param name="minZ"></param>
-    /// <param name="maxX"></param>
-    /// <param name="maxY"></param>
-    /// <param name="maxZ"></param>
     public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
     {
         if (minX > maxX)
@@ -83,69 +63,15 @@ public class AABB
         if (minZ > maxZ)
             (maxZ, minZ) = (minZ, maxZ);
         
-        this.Min  = new Vector3(minX, minY, minZ);
-        this.Max  = new Vector3(maxX, maxY, maxZ);
-    }
-
-
-    /// <summary>
-    /// Deflate this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
-    /// Mutates this instance.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <returns></returns>
-    public AABB Deflate(double x, double y, double z)
-    {
-        this.Min.Add(x, y, z);
-        this.Max.Add(-x, -y, -z);
-        
-        return this;
-    }
-
-    /// <summary>
-    /// Expand this bounding box by x, y, z
-    /// </summary>
-    public AABB Expand(double x, double y, double z)
-    {
-        if (x > 0)
-            this.Max.X  += x;
-        else this.Min.X += x;
-
-        if (y > 0)
-            this.Max.Y  += y;
-        else this.Min.Y += y;
-
-        if (z > 0)
-            this.Max.Z  += z;
-        else this.Min.Z += z;
-
-        return this;
-    }
-
-    /// <summary>
-    /// Offset this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>.
-    /// Mutates this instance.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <returns></returns>
-    public AABB Offset(double x, double y, double z)
-    {
-        this.Min.Add(x, y, z);
-        this.Max.Add(x, y, z);
-        
-        return this;
+        this.Min  = new MutableVector3(minX, minY, minZ);
+        this.Max  = new MutableVector3(maxX, maxY, maxZ);
     }
 
     /// <summary>
     /// Returns a clone of this instance.
     /// </summary>
-    /// <returns></returns>
-    public AABB Clone()
-        => new AABB(this.MinX, this.MinY, this.MinZ, this.MaxX, this.MaxY, this.MaxZ);
+    public MutableAABB Clone()
+        => new MutableAABB(this.Min.X, this.Min.Y, this.Min.Z, this.Max.X, this.Max.Y, this.Max.Z);
 
     /// <summary>
     /// Whether this bounding box and the other bounding box intersect.
@@ -154,9 +80,9 @@ public class AABB
     /// <returns></returns>
     public bool Intersects(AABB other)
     {
-        return this.MaxX > other.MinX && this.MinX < other.MaxX
-            && this.MaxY > other.MinY && this.MinY < other.MaxY
-            && this.MaxZ > other.MinZ && this.MinZ < other.MaxZ;
+        return this.Max.X > other.Min.X && this.Min.X < other.Max.X
+            && this.Max.Y > other.Min.Y && this.Min.Y < other.Max.Y
+            && this.Max.Z > other.Min.Z && this.Min.Z < other.Max.Z;
     }
 
     /// <summary>
@@ -167,9 +93,9 @@ public class AABB
     [Pure]
     public bool Contains(Vector3 point)
     {
-        return this.MinX <= point.X && this.MaxX > point.X
-            && this.MinY <= point.Y && this.MaxY > point.Y
-            && this.MinZ <= point.Z && this.MaxZ > point.Z;
+        return this.Min.X <= point.X && this.Max.X > point.X
+            && this.Min.Y <= point.Y && this.Max.Y > point.Y
+            && this.Min.Z <= point.Z && this.Max.Z > point.Z;
     }
 
     /// <summary>
@@ -183,12 +109,12 @@ public class AABB
     {
         direction = direction.Normalized();
 
-        var tMinX = (this.MinX - origin.X) / direction.X;
-        var tMaxX = (this.MaxX - origin.X) / direction.X;
-        var tMinY = (this.MinY - origin.Y) / direction.Y;
-        var tMaxY = (this.MaxY - origin.Y) / direction.Y;
-        var tMinZ = (this.MinZ - origin.Z) / direction.Z;
-        var tMaxZ = (this.MaxZ - origin.Z) / direction.Z;
+        var tMinX = (this.Min.X - origin.X) / direction.X;
+        var tMaxX = (this.Max.X - origin.X) / direction.X;
+        var tMinY = (this.Min.Y - origin.Y) / direction.Y;
+        var tMaxY = (this.Max.Y - origin.Y) / direction.Y;
+        var tMinZ = (this.Min.Z - origin.Z) / direction.Z;
+        var tMaxZ = (this.Max.Z - origin.Z) / direction.Z;
 
         var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
         var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
@@ -253,4 +179,69 @@ public class AABB
     /// <inheritdoc />
     public override string ToString() =>
         $"AABB ({Min} -> {Max})";
+}
+
+public class MutableAABB : AABB
+{
+    /// <inheritdoc />
+    public override MutableVector3 Min { get; }
+    
+    /// <inheritdoc />
+    public override MutableVector3 Max { get; }
+
+
+    /// <inheritdoc />
+    public MutableAABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) : base(minX, minY, minZ, maxX, maxY, maxZ)
+    {
+        this.Min = (MutableVector3)base.Min;
+        this.Max = (MutableVector3)base.Max;
+    }
+    
+    /// <summary>
+    /// Deflate this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
+    /// Mutates this instance.
+    /// </summary>
+    public AABB Deflate(double x, double y, double z)
+    {
+        this.Min.Add(x, y, z);
+        this.Max.Add(-x, -y, -z);
+        
+        return this;
+    }
+
+    /// <summary>
+    /// Expand this bounding box by x, y, z
+    /// </summary>
+    public AABB Expand(double x, double y, double z)
+    {
+        if (x > 0)
+            this.Max.Add(x, 0, 0);
+        else this.Min.Add(x, 0, 0);
+
+        if (y > 0)
+            this.Max.Add(0, y, 0);
+        else this.Min.Add(0, y, 0);
+
+        if (z > 0)
+            this.Max.Add(0, 0, z);
+        else this.Min.Add(0, 0, z);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Offset this bounding box by <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>.
+    /// Mutates this instance.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    public AABB Offset(double x, double y, double z)
+    {
+        this.Min.Add(x, y, z);
+        this.Max.Add(x, y, z);
+        
+        return this;
+    }
 }

@@ -19,7 +19,7 @@ internal static class PoseUtils
         { EntityPose.Dying, CreateAABB(0.2f, 0.2f) },
     };
 
-    public static AABB GetBBForPose(EntityPose pose)
+    public static MutableAABB GetBBForPose(EntityPose pose)
         => PoseDimensions[pose].Clone();
 
     public static bool WouldPlayerCollideWithPose(MinecraftPlayer player, EntityPose pose, IWorld world, MinecraftData data)

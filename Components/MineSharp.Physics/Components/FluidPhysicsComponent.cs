@@ -47,15 +47,15 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
                        .GetBoundingBox()
                        .Deflate(0.001d, 0.001d, 0.001d);
 
-        var fromX  = (int)Math.Floor(aabb.MinX);
-        var toX    = (int)Math.Ceiling(aabb.MaxX);
-        var fromY  = (int)Math.Floor(aabb.MinY);
-        var toY    = (int)Math.Ceiling(aabb.MaxY);
-        var fromZ  = (int)Math.Floor(aabb.MinZ);
-        var toZ    = (int)Math.Ceiling(aabb.MaxZ);
+        var fromX  = (int)Math.Floor(aabb.Min.X);
+        var toX    = (int)Math.Ceiling(aabb.Max.X);
+        var fromY  = (int)Math.Floor(aabb.Min.Y);
+        var toY    = (int)Math.Ceiling(aabb.Max.Y);
+        var fromZ  = (int)Math.Floor(aabb.Min.Z);
+        var toZ    = (int)Math.Ceiling(aabb.Max.Z);
         var d0     = 0.0d;
         var result = false;
-        var vel    = Vector3.Zero;
+        var vel    = Vector3.Zero.Clone();
         var k1     = 0;
 
         var pos = new MutablePosition(0, 0, 0);
@@ -72,11 +72,11 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
                         continue;
 
                     var fHeight = y + this.GetFluidHeight(this.World, block);
-                    if (fHeight < aabb.MinY)
+                    if (fHeight < aabb.Min.Y)
                         continue;
 
                     result = true;
-                    d0     = Math.Max(fHeight - aabb.MinY, d0);
+                    d0     = Math.Max(fHeight - aabb.Min.Y, d0);
                     var flow = this.GetFlow(this.World, block);
 
                     if (d0 < 0.4d)
@@ -107,7 +107,7 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
             vel.Scale(PhysicsConst.VELOCITY_SCALE);
         }
 
-        this.Player.Entity!.Velocity.Add(vel);
+        (this.Player.Entity!.Velocity as MutableVector3)!.Add(vel);
 
         return result;
     }
@@ -123,7 +123,7 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
         return (8 - block.GetProperty<int>("level")) / MAX_FLUID_HEIGHT;
     }
 
-    private Vector3 GetFlow(IWorld world, Block fluid)
+    private MutableVector3 GetFlow(IWorld world, Block fluid)
     {
         var dX     = 0.0d;
         var dZ     = 0.0d;
@@ -165,13 +165,13 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
             dZ += direction.Z * heightDiff;
         }
 
-        var vel = new Vector3(dX, 0, dZ);
+        var vel = new MutableVector3(dX, 0, dZ);
 
         // TODO: FluidUtils.GetFlow() difference with java:
         // Block property falling
         // FlowingFluid.java:85
 
-        return vel.Normalized();
+        return vel.Normalize();
     }
 
     private bool AffectsFlow(Block first, Block second)

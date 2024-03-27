@@ -11,12 +11,15 @@ internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob
     : IndexedData<BlockCollisionShapeDataBlob>(provider), IBlockCollisionShapeData
 {
     private Dictionary<BlockType, int[]> typeToIndices = new();
-    private Dictionary<int, float[][]>   indexToShape  = new();
+    private Dictionary<int, AABB[]>   indexToShape  = new();
 
     protected override void InitializeData(BlockCollisionShapeDataBlob data)
     {
         this.typeToIndices = data.BlockToIndicesMap;
-        this.indexToShape  = data.IndexToShapeMap;
+        this.indexToShape  = data.IndexToShapeMap
+                                 .ToDictionary(
+                                      x => x.Key, 
+                                      x => x.Value.Select(y => new AABB(y[0], y[1], y[2], y[3], y[4], y[5])).ToArray());
     }
 
     public int[] GetShapeIndices(BlockType type)
@@ -28,7 +31,5 @@ internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob
     }
 
     public AABB[] GetShapes(int shapeIndex)
-        => indexToShape[shapeIndex] // TODO: Use pooled AABB's
-          .Select(x => new AABB(x[0], x[1], x[2], x[3], x[4], x[5]))
-          .ToArray();
+        => indexToShape[shapeIndex];
 }

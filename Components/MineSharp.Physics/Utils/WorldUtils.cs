@@ -22,7 +22,7 @@ internal static class WorldUtils
         foreach (var block in blocks)
         {
             var shapes = data.BlockCollisionShapes.GetForBlock(block);
-            bbs.AddRange(shapes.Select(x => x.Offset(block.Position.X, block.Position.Y, block.Position.Z)));
+            bbs.AddRange(shapes.Select(x => x.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z)));
         }
 
         return bbs.ToArray();

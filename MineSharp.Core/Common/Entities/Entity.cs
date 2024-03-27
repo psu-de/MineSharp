@@ -117,12 +117,12 @@ public class Entity(
     /// Return the bounding box for this entity.
     /// </summary>
     /// <returns></returns>
-    public AABB GetBoundingBox()
+    public MutableAABB GetBoundingBox()
     {
         var half   = this.Info.Width / 2.0f;
         var height = this.Info.Height;
 
-        return new AABB(
+        return new MutableAABB(
             this.Position.X - half,
             this.Position.Y,
             this.Position.Z - half,
@@ -139,16 +139,13 @@ public class Entity(
     {
         var pitchRadians = this.Pitch * (MathF.PI / 180.0f);
         var yawRadians   = this.Yaw   * (MathF.PI / 180.0);
-
+        
         var len = Math.Cos(pitchRadians);
         var x   = len * Math.Sin(-yawRadians);
         var y   = -Math.Sin(pitchRadians);
         var z   = len * Math.Cos(yawRadians);
 
-        var vec = new Vector3(x, y, z);
-        vec.Normalize();
-
-        return vec;
+        return new MutableVector3(x, y, z).Normalize();
     }
 
     /// <inheritdoc />
