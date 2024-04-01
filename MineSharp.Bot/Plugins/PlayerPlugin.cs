@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Core.Geometry;
+using MineSharp.Data;
 
 namespace MineSharp.Bot.Plugins;
 

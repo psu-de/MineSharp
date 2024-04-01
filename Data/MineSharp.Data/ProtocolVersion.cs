@@ -1,4 +1,4 @@
-namespace MineSharp.Protocol;
+﻿namespace MineSharp.Data;
 
 /// <summary>
 /// Utility class for Minecraft's protocol versions
