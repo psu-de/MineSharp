@@ -1,6 +1,8 @@
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Items;
 using MineSharp.Core.Geometry;
+using Spectre.Console;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -10,6 +12,7 @@ public static class WindowTests
     {
         await TestInventoryUpdate();
         await TestOpenContainer();
+        await TestCreativeInventory();
     }
 
     public static Task TestInventoryUpdate()
@@ -52,6 +55,45 @@ public static class WindowTests
                 window.SlotCount     == 3 * 9
              && slot.Item?.Info.Name == "soul_sand"
              && slot.Item?.Count     == 48);
+        });
+    }
+
+    public static Task TestCreativeInventory()
+    {
+        return IntegrationTest.RunTest("testCreativeInventory", async (bot, source) =>
+        {
+            var window = bot.GetPlugin<WindowPlugin>();
+            var chat   = bot.GetPlugin<ChatPlugin>();
+
+            await window.WaitForInventory();
+
+            if (window.CreativeInventory.Available)
+            {
+                AnsiConsole.MarkupLine("[red]Expected creative inventory not to be available[/]");
+                source.TrySetResult(false);
+                return;
+            }
+
+            await chat.SendChat("/gamemode creative");
+            await Task.Delay(50);
+
+            if (!window.CreativeInventory.Available)
+            {
+                AnsiConsole.MarkupLine("[red]Expected creative inventory to be available[/]");
+                source.TrySetResult(false);
+                return;
+            }
+
+            await window.CreativeInventory.GetItem(ItemType.NetherStar, 22, 9);
+            await Task.Delay(50);
+
+            var inventoryItem = window.Inventory?.GetSlot(9).Item;
+
+            var result = inventoryItem?.Info.Type != ItemType.NetherStar || inventoryItem.Count != 22;
+
+            await chat.SendChat("/gamemode survival");
+            source.TrySetResult(result);
+            return;
         });
     }
 }

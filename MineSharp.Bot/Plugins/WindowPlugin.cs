@@ -9,6 +9,7 @@ using MineSharp.Windows.Clicks;
 using NLog;
 using System.Collections.Concurrent;
 using MineSharp.Bot.Exceptions;
+using MineSharp.Bot.Windows;
 using MineSharp.Core.Geometry;
 using MineSharp.Windows.Specific;
 using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
@@ -34,6 +35,11 @@ public class WindowPlugin : Plugin
     /// The bots inventory window
     /// </summary>
     public Inventory? Inventory { get; private set; }
+    
+    /// <summary>
+    /// Creative inventory
+    /// </summary>
+    public CreativeInventory CreativeInventory { get; private set; }
 
     /// <summary>
     /// The item the bot is currently holding
@@ -83,6 +89,8 @@ public class WindowPlugin : Plugin
             null,
             this._synchronizeWindowClick);
         this._mainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
+
+        this.CreativeInventory = new CreativeInventory(bot);
     }
 
     /// <inheritdoc />

@@ -167,6 +167,7 @@ internal static class PacketPalette
         RegisterPacket<UseItemPacket>(PacketType.SB_Play_UseItem);
         RegisterPacket<SBSetHeldItemPacket>(PacketType.SB_Play_HeldItemSlot);
         RegisterPacket<ChunkBatchReceivedPacket>(PacketType.SB_Play_ChunkBatchReceived);
+        RegisterPacket<SetCreativeSlotPacket>(PacketType.SB_Play_SetCreativeSlot);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket
