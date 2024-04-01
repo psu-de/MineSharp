@@ -91,6 +91,10 @@ public class WindowPlugin : Plugin
         this._mainInventory.OnSlotChanged += this.MainInventory_SlotUpdated;
 
         this.CreativeInventory = new CreativeInventory(bot);
+        
+        this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
+        this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
+        this.Bot.Client.On<CBHeldItemPacket>(this.HandleHeldItemChange);
     }
 
     /// <inheritdoc />
@@ -98,12 +102,7 @@ public class WindowPlugin : Plugin
     {
         this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
 
-        this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
-        this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
-        this.Bot.Client.On<CBHeldItemPacket>(this.HandleHeldItemChange);
-
         this.CreateInventory();
-
         return base.Init();
     }
 

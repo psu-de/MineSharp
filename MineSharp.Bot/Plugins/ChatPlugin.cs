@@ -31,6 +31,7 @@ public class ChatPlugin : Plugin
     /// </summary>
     public event Events.BotChatMessageEvent? OnChatMessageReceived;
 
+    private Task<DeclareCommandsPacket> initDeclareCommandsPacket;
 
     /// <summary>
     /// Create a new ChatPlugin instance.
@@ -49,6 +50,8 @@ public class ChatPlugin : Plugin
         this.Bot.Client.On<ChatPacket>(this.HandleChat);
         this.Bot.Client.On<SystemChatMessagePacket>(this.HandleSystemChatMessage);
         this.Bot.Client.On<DisguisedChatMessagePacket>(this.HandleDisguisedChatMessage);
+        
+        this.initDeclareCommandsPacket = this.Bot.Client.WaitForPacket<DeclareCommandsPacket>();
     }
 
     /// <inheritdoc />
@@ -65,8 +68,7 @@ public class ChatPlugin : Plugin
                 ));
         }
 
-        var packet = await this.Bot.Client.WaitForPacket<DeclareCommandsPacket>();
-        await HandleDeclareCommandsPacket(packet);
+        await HandleDeclareCommandsPacket(await this.initDeclareCommandsPacket);
     }
 
     /// <summary>

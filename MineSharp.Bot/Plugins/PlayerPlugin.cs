@@ -8,6 +8,7 @@ using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using MineSharp.Bot.Exceptions;
 using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.Plugins;
@@ -120,8 +121,11 @@ public class PlayerPlugin : Plugin
     /// </summary>
     public event Events.BotEvent? OnWeatherChanged;
 
-    private PhysicsPlugin physics;
-    private EntityPlugin? _entities;
+    private PhysicsPlugin? physics;
+    private EntityPlugin?  _entities;
+
+    private Task<LoginPacket>          initLoginPacket;
+    private Task<PlayerPositionPacket> initPositionPacket;
 
     /// <summary>
     /// Create a new PlayerPlugin instance
@@ -141,19 +145,21 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
         this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
         this.Bot.Client.On<EntityStatusPacket>(this.HandleEntityStatus);
+        
+        // already start listening to the packets here, as they sometimes get lost when calling in init() 
+        this.initLoginPacket    = this.Bot.Client.WaitForPacket<LoginPacket>();
+        this.initPositionPacket = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
     }
 
     /// <inheritdoc />
     protected override async Task Init()
     {
         this._entities = this.Bot.GetPlugin<EntityPlugin>();
-        var loginPacketTask    = this.Bot.Client.WaitForPacket<LoginPacket>();
-        var positionPacketTask = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
 
-        await Task.WhenAll(loginPacketTask, positionPacketTask);
+        await Task.WhenAll(this.initLoginPacket, this.initPositionPacket);
 
-        var loginPacket    = await loginPacketTask;
-        var positionPacket = await positionPacketTask;
+        var loginPacket    = await this.initLoginPacket;
+        var positionPacket = await this.initPositionPacket;
 
         var entity = new Entity(
             this.Bot.Data.Entities.ByType(EntityType.Player)!,
@@ -192,7 +198,11 @@ public class PlayerPlugin : Plugin
                 positionPacket.Pitch,
                 this.Entity.IsOnGround));
 
-        this.physics = this.Bot.GetPlugin<PhysicsPlugin>();
+        try
+        { 
+            this.physics = this.Bot.GetPlugin<PhysicsPlugin>();
+        }
+        catch (PluginNotLoadedException) {}
     }
 
     /// <summary>
@@ -231,7 +241,7 @@ public class PlayerPlugin : Plugin
         var packet = new InteractPacket(
             entity.ServerId,
             InteractPacket.InteractionType.Attack,
-            this.physics.Engine!.State.IsCrouching);
+            this.physics?.Engine!.State.IsCrouching ?? false);
 
         return Task.WhenAll(
             this.Bot.Client.SendPacket(packet),

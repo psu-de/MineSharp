@@ -89,11 +89,10 @@ public static class WindowTests
 
             var inventoryItem = window.Inventory?.GetSlot(9).Item;
 
-            var result = inventoryItem?.Info.Type != ItemType.NetherStar || inventoryItem.Count != 22;
+            var result = inventoryItem?.Info.Type == ItemType.NetherStar && inventoryItem.Count == 22;
 
             await chat.SendChat("/gamemode survival");
             source.TrySetResult(result);
-            return;
         });
     }
 }
