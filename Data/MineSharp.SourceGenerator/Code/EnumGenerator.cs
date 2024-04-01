@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace MineSharp.SourceGenerator.Code;
 
 public class EnumGenerator

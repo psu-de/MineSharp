@@ -1,6 +1,3 @@
-using Humanizer;
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Framework.Providers;

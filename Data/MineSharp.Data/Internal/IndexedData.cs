@@ -1,4 +1,3 @@
-using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
 
 namespace MineSharp.Data.Internal;

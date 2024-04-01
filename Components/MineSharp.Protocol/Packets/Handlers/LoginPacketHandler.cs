@@ -1,4 +1,3 @@
-using MineSharp.Auth;
 using MineSharp.Auth.Exceptions;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;

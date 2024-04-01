@@ -4,7 +4,6 @@ using MineSharp.Bot.Proxy;
 using MineSharp.Data;
 using MineSharp.Protocol;
 using NLog;
-using System.Net;
 
 namespace MineSharp.Bot;
 

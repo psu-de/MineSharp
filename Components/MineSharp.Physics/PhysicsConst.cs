@@ -1,4 +1,3 @@
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 

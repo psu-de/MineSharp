@@ -1,4 +1,3 @@
-using MineSharp.Protocol;
 using NLog;
 
 namespace MineSharp.Bot.Plugins;

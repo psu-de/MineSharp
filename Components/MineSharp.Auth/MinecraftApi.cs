@@ -3,7 +3,6 @@ using MineSharp.Auth.Responses;
 using MineSharp.Core.Common;
 using Newtonsoft.Json;
 using NLog;
-using System.Net;
 using System.Net.Http.Headers;
 
 namespace MineSharp.Auth;

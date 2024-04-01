@@ -1,7 +1,6 @@
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
-using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 #pragma warning disable CS1591

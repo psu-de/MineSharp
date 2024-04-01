@@ -1,6 +1,5 @@
 ﻿using MineSharp.Auth.Responses;
 using MineSharp.Core.Common;
-using System.Text;
 
 namespace MineSharp.Auth;
 

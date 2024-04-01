@@ -1,6 +1,5 @@
 using MineSharp.Auth.Json;
 using Newtonsoft.Json;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 

@@ -9,7 +9,6 @@ using MineSharp.Physics.Components;
 using MineSharp.Physics.Input;
 using MineSharp.Physics.Utils;
 using MineSharp.World;
-using NLog;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;

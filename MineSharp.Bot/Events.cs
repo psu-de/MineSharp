@@ -1,5 +1,4 @@
 using MineSharp.Bot.Chat;
-using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;

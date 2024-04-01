@@ -1,6 +1,5 @@
 using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.NetworkTypes;
-using MineSharp.Protocol.Packets.Serverbound.Play;
 
 /*
  * Thanks to https://github.com/MCCTeam/Minecraft-Console-Client

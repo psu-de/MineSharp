@@ -1,5 +1,4 @@
 using MineSharp.Bot.Plugins;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Geometry;
 using Spectre.Console;

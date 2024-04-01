@@ -58,10 +58,6 @@ public static class ProtocolVersion
     /// <summary>
     /// Whether the <paramref name="version"/> is between <paramref name="min"/> and <paramref name="max"/>
     /// </summary>
-    /// <param name="version"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static bool IsBetween(int version, int min, int max)
     {
         return version >= min && version <= max;

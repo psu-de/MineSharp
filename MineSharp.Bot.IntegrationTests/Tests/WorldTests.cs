@@ -1,9 +1,5 @@
 using MineSharp.Bot.Blocks;
 using MineSharp.Bot.Plugins;
-using MineSharp.Core.Common;
-using System.Collections.Concurrent;
-using MineSharp.Bot.Chat;
-using MineSharp.ChatComponent;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 

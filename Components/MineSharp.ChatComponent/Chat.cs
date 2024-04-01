@@ -145,7 +145,7 @@ public class Chat
     /// <returns></returns>
     public static string TranslateString(string ruleName, string[] usings, MinecraftData data)
     {
-        var rule = data.Language.GetTranslation(ruleName);
+        var rule = data.Language.GetTranslation(ruleName)!;
 
         var    usingIndex = 0;
         string result     = Regex.Replace(rule, "%s", match => usings[usingIndex++]);

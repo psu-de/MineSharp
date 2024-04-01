@@ -2,7 +2,6 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
-using Newtonsoft.Json;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591

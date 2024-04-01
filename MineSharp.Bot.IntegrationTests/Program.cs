@@ -1,5 +1,4 @@
-﻿using MineSharp.Bot;
-using MineSharp.Bot.IntegrationTests.Tests;
+﻿using MineSharp.Bot.IntegrationTests.Tests;
 
 await PlayerTests.RunAll();
 await WindowTests.RunAll();

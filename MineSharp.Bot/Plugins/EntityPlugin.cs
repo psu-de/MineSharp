@@ -1,5 +1,4 @@
 using MineSharp.Bot.Utils;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;

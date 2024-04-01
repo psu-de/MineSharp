@@ -1,4 +1,3 @@
-using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
 
 namespace MineSharp.Physics.Utils;

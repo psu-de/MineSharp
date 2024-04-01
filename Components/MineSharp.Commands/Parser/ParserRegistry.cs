@@ -1,5 +1,4 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Data;
+﻿using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
@@ -290,6 +289,7 @@ internal static class ParserRegistry
             "minecraft:range"               => new RangeParser(), // only in 1.18
             "minecraft:nbt_compound_tag"    => new EmptyParser(),
             "minecraft:style"               => new EmptyParser(), // since 1.20.3
+            _ => throw new ArgumentException($"Unknown parser: {name}")
         };
     }
 }

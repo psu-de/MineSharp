@@ -1,5 +1,4 @@
 using System.Diagnostics.Contracts;
-using MineSharp.Core.Common;
 
 namespace MineSharp.Core.Geometry;
 
@@ -181,6 +180,9 @@ public class AABB
         $"AABB ({Min} -> {Max})";
 }
 
+/// <summary>
+/// A mutable AABB
+/// </summary>
 public class MutableAABB : AABB
 {
     /// <inheritdoc />

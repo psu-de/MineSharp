@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using MineSharp.Data;
-using MineSharp.Protocol;
 
 namespace MineSharp.Bot.Chat;
 

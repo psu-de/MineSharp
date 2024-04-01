@@ -1,4 +1,3 @@
-using Humanizer;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Data.Framework.Providers;
