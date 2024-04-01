@@ -1,15 +1,17 @@
+using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class RangeParser : IParser
 {
-    public readonly bool Decimals;
+    public bool Decimals { get; private set; }
+    
+    public string GetName() => "minecraft:range";
+    public int GetArgumentCount() => 1;
 
-    public RangeParser(bool decimals)
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
     {
-        this.Decimals = decimals;
+        this.Decimals = buffer.ReadBool();
     }
-
-
-    public string GetName()          => "minecraft:range";
-    public int    GetArgumentCount() => 1;
 }
