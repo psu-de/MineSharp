@@ -27,7 +27,7 @@ public sealed class MinecraftClient : IDisposable
     /// <summary>
     /// The latest version supported
     /// </summary>
-    public const string LATEST_SUPPORTED_VERSION = "1.20.1";
+    public const string LATEST_SUPPORTED_VERSION = "1.20.4";
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
