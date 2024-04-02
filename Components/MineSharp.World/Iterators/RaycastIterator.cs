@@ -10,10 +10,15 @@ namespace MineSharp.World.Iterators;
 public class RaycastIterator(Vector3 origin, Vector3 direction, double? length = null) : IWorldIterator
 {
     private Vector3 direction = direction.Normalized();
-    private Vector3 current   = origin.Clone();
+    private MutableVector3 current   = origin.Clone();
 
     private double maxLength = length ?? double.MaxValue;
     private double length    = 0;
+    
+    /// <summary>
+    /// The BlockFace the ray hit
+    /// </summary>
+    public BlockFace CurrentFace { get; private set; }
 
     /// <inheritdoc />
     public IEnumerable<Position> Iterate()
@@ -26,27 +31,45 @@ public class RaycastIterator(Vector3 origin, Vector3 direction, double? length =
 
     private Position Step()
     {
-        var nextX  = GetCoordinateOfNextFace(current.X, direction.X);
-        var deltaX = Math.Abs(nextX - current.X);
-        var nX     = deltaX / Math.Abs(direction.X);
-
-        var nextY  = GetCoordinateOfNextFace(current.Y, direction.Y);
-        var deltaY = Math.Abs(nextY - current.Y);
-        var nY     = deltaY / Math.Abs(direction.Y);
-
-        var nextZ  = GetCoordinateOfNextFace(current.Z, direction.Z);
-        var deltaZ = Math.Abs(nextZ - current.Z);
-        var nZ     = deltaZ / Math.Abs(direction.Z);
+        var nX = CalculateOffset(current.X, direction.X);
+        var nY = CalculateOffset(current.Y, direction.Y);
+        var nZ = CalculateOffset(current.Z, direction.Z);
 
         var min = Math.Min(nX, Math.Min(nY, nZ));
+        
+        this.CurrentFace = GetFace(nX, nY, nZ);
 
-        var add = direction.Scaled(min + 1e-5);
-        var pos = current.Plus(direction.Scaled(min + 1e-5));
+        var add = direction.Scaled(min + 1e-7);
+        this.current.Add(add);
 
         this.length  += add.Length();
-        this.current =  pos;
 
-        return (Position)pos;
+        return (Position)this.current;
+    }
+
+    private BlockFace GetFace(double x, double y, double z)
+    {
+        var (face, step) = x < y
+            ? x < z
+                ? (BlockFace.West, direction.X)
+                : (BlockFace.North, direction.Z)
+            : y < z
+                ? (BlockFace.Bottom, direction.Y)
+                : (BlockFace.North, direction.Z);
+
+        if (step < 0)
+        {
+            face += 1;
+        }
+
+        return face;
+    }
+
+    private double CalculateOffset(double position, double step)
+    {
+        var next  = GetCoordinateOfNextFace(position, step);
+        var delta = Math.Abs(next - position);
+        return delta / Math.Abs(step);
     }
 
     private double GetCoordinateOfNextFace(double position, double step)

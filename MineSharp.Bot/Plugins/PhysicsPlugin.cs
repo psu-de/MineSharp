@@ -183,40 +183,42 @@ public class PhysicsPlugin : Plugin
     /// Casts a ray from the players eyes, and returns the first block that is hit.
     /// </summary>
     /// <returns></returns>
-    public Task<Block?> Raycast(double distance = 64)
+    public (Block Block, BlockFace Face)? Raycast(double distance = 64)
     {
         if (distance < 0)
-            return Task.FromResult<Block?>(null);
-
-        return Task.Run(() =>
         {
-            var position   = this.playerPlugin!.Self!.GetHeadPosition();
-            var lookVector = this.playerPlugin!.Self!.Entity!.GetLookVector();
-            var iterator = new RaycastIterator(
-                position,
-                lookVector,
-                length: distance);
+            return null;
+        }
+        
+        var position   = this.playerPlugin!.Self!.GetHeadPosition();
+        var lookVector = this.playerPlugin!.Self!.Entity!.GetLookVector();
+        var iterator = new RaycastIterator(
+            position,
+            lookVector,
+            length: distance);
 
-            foreach (var pos in iterator.Iterate())
+        foreach (var pos in iterator.Iterate())
+        {
+            var block = this.worldPlugin!.World.GetBlockAt(pos);
+            if (!block.IsSolid())
             {
-                var block = this.worldPlugin!.World.GetBlockAt(pos);
-
-                if (!block.IsSolid())
-                    continue;
-
-                var bbs = this.Bot.Data.BlockCollisionShapes.GetShapes(block.Info.Type, block.State);
-
-                foreach (var bb in bbs)
-                {
-                    bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
-
-                    if (bb.IntersectsLine(position, lookVector))
-                        return block;
-                }
+                continue;
             }
 
-            return null;
-        });
+            var bbs = this.Bot.Data.BlockCollisionShapes.GetForBlock(block);
+
+            foreach (var bb in bbs)
+            {
+                var blockBb = bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
+
+                if (blockBb.IntersectsLine(position, lookVector))
+                {
+                    return (block, iterator.CurrentFace);
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <inheritdoc />
