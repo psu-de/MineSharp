@@ -96,10 +96,19 @@ public abstract class Plugin
         if (this.IsLoaded)
             return;
 
-        await this.Init();
-        this._initializationTask.TrySetResult();
-
-        this.IsLoaded = true;
-        Logger.Info("Plugin loaded: {PluginName}", this.GetType().Name);
+        try
+        {
+            await this.Init();
+            
+            this._initializationTask.TrySetResult();
+            
+            this.IsLoaded = true;
+            Logger.Info("Plugin loaded: {PluginName}", this.GetType().Name);
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", this.GetType().Name);
+            throw;
+        }
     }
 }
