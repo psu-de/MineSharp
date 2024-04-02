@@ -200,6 +200,7 @@ public sealed class MinecraftClient : IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
+        Logger.Info($"Disconnecting: {reason}");
         if (this._client is null)
             throw new InvalidOperationException("MinecraftClient is not connected.");
 
@@ -301,7 +302,7 @@ public sealed class MinecraftClient : IDisposable
         {
             Logger.Debug("Processing bundled packets");
             var tasks = this._bundledPackets.Select(
-                                 p => this.HandleIncomingPacket(p.Item1, p.Item2))
+                                 p => this.HandleIncomingPacket(p.Item1, p.Item2, false))
                             .ToArray();
 
             Task.WaitAll(tasks);
@@ -351,7 +352,7 @@ public sealed class MinecraftClient : IDisposable
 
             if (this._bundlePackets)
                 this._bundledPackets.Enqueue((packetType, buffer));
-            else await this.HandleIncomingPacket(packetType, buffer);
+            else await this.HandleIncomingPacket(packetType, buffer, this.gameState == GameState.Login);
 
             if (this.gameState != GameState.Play)
             {
@@ -385,7 +386,7 @@ public sealed class MinecraftClient : IDisposable
         this._stream!.WritePacket(buffer);
     }
 
-    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
+    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer, bool block)
     {
         // Only parse packets that are awaited by an handler.
         // Possible handlers are:
@@ -428,7 +429,7 @@ public sealed class MinecraftClient : IDisposable
             var packet = factory(buffer, this.Data);
             await buffer.DisposeAsync();
 
-            _ = Task.Run(async () =>
+            var handle = Task.Run(async () =>
             {
                 tsc?.TrySetResult(packet);
                 var tasks = handlers
@@ -447,6 +448,11 @@ public sealed class MinecraftClient : IDisposable
                     }
                 }
             });
+
+            if (block)
+            {
+                await handle;
+            }
         }
         catch (EndOfStreamException e)
         {

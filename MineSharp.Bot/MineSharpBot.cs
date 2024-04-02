@@ -129,7 +129,6 @@ public class MineSharpBot
     /// <param name="reason">The reason for disconnecting</param>
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
-        Logger.Info($"Disconnecting: {reason}");
         if (this._tickLoop is { Status: TaskStatus.Running })
         {
             this._cancellation.Cancel();
