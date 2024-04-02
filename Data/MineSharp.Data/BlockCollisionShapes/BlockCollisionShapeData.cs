@@ -30,5 +30,10 @@ internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob
     }
 
     public AABB[] GetShapes(int shapeIndex)
-        => indexToShape[shapeIndex];
+    {
+        if (!this.Loaded)
+            this.Load();
+        
+        return indexToShape[shapeIndex];
+    }
 }

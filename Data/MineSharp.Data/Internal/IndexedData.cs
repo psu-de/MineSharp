@@ -6,17 +6,21 @@ internal abstract class IndexedData<T>(IDataProvider<T> provider)
 {
     protected bool              Loaded { get; private set; } = false;
     private   IDataProvider<T>? provider = provider;
+    private   object            _lock    = new object();
 
     protected abstract void InitializeData(T data);
 
     protected void Load()
     {
-        if (this.Loaded)
-            return;
+        lock (this._lock)
+        {
+            if (this.Loaded)
+                return;
+        
+            this.InitializeData(this.provider!.GetData());
 
-        this.InitializeData(this.provider!.GetData());
-
-        this.provider = null;
-        this.Loaded   = true;
+            this.Loaded   = true;
+            this.provider = null;
+        }
     }
 }
