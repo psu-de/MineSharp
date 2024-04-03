@@ -99,21 +99,21 @@ public sealed class MinecraftClient : IDisposable
     public readonly ushort Port;
 
     /// <summary>
+    /// The clients settings
+    /// </summary>
+    public readonly ClientSettings Settings;
+
+    /// <summary>
     /// Create a new MinecraftClient
     /// </summary>
-    /// <param name="data">The data used by the client</param>
-    /// <param name="session">The session object</param>
-    /// <param name="hostnameOrIp">Hostname or ip of the server</param>
-    /// <param name="port">Port of the server</param>
-    /// <param name="api">Optional: instance of MinecraftApi</param>
-    /// <param name="tcpFactory">Optional: TcpClient factory</param>
     public MinecraftClient(
         MinecraftData      data,
         Session            session,
         string             hostnameOrIp,
         ushort             port       = 25565,
         MinecraftApi?      api        = null,
-        ITcpClientFactory? tcpFactory = null)
+        ITcpClientFactory? tcpFactory = null,
+        ClientSettings?    settings   = null)
     {
         this.Data                   = data;
         this._packetQueue           = new ConcurrentQueue<PacketSendTask>();
@@ -126,7 +126,7 @@ public sealed class MinecraftClient : IDisposable
         this._useAnonymousNbt       = this.Data.Version.Protocol >= ProtocolVersion.V_1_20_2;
         this._tcpTcpFactory         = tcpFactory;
         this.ip                     = IPHelper.ResolveHostname(hostnameOrIp, ref port);
-
+        
         if (session.OnlineSession)
             api ??= new MinecraftApi();
 
@@ -135,6 +135,7 @@ public sealed class MinecraftClient : IDisposable
         this.Port      = port;
         this.Hostname  = hostnameOrIp;
         this.gameState = GameState.Handshaking;
+        this.Settings  = settings ?? ClientSettings.Default;
     }
 
     /// <summary>
@@ -278,15 +279,17 @@ public sealed class MinecraftClient : IDisposable
             this._gameJoinedTsc.TrySetResult();
 
         if (next == GameState.Configuration)
+        {
             this.SendPacket(new ClientInformationPacket(
-                "en_pt",
-                24,
-                0,
-                true,
-                0x7F,
-                1,
-                false,
-                true)); // TODO: Add a settings object #31
+                this.Settings.Locale,
+                this.Settings.ViewDistance,
+                (int)this.Settings.ChatMode,
+                this.Settings.ColoredChat,
+                this.Settings.DisplayedSkinParts,
+                (int)this.Settings.MainHand,
+                this.Settings.EnableTextFiltering,
+                this.Settings.AllowServerListings));
+        }
     }
 
     internal void EnableEncryption(byte[] key)

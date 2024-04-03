@@ -45,6 +45,8 @@ public class BotBuilder
     // proxy
     private ProxyFactory? proxyProvider = null;
 
+    private ClientSettings? settings = null;
+
     private bool autoConnect;
 
     /// <summary>
@@ -110,6 +112,15 @@ public class BotBuilder
     public BotBuilder WithPlugin<T>() where T : Plugin
     {
         this.plugins.Add(typeof(T));
+        return this;
+    }
+
+    /// <summary>
+    /// Set the client settings
+    /// </summary>
+    public BotBuilder WithSettings(ClientSettings settings)
+    {
+        this.settings = settings;
         return this;
     }
 
@@ -229,6 +240,8 @@ public class BotBuilder
         else
             throw new ArgumentNullException(nameof(this.session),
                 "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
+        
+        this.settings ??= ClientSettings.Default;
 
         var client = new MinecraftClient(
             data,
@@ -236,7 +249,8 @@ public class BotBuilder
             this.hostname,
             this.port,
             api,
-            this.proxyProvider);
+            this.proxyProvider,
+            this.settings);
 
         var bot = new MineSharpBot(client);
 
