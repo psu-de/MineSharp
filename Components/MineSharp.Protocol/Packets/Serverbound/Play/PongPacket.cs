@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
 /// </summary>
 /// <param name="id"></param>
-public class PongPacket(long id) : IPacket
+public class PongPacket(int id) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.SB_Play_Pong;
@@ -16,18 +16,18 @@ public class PongPacket(long id) : IPacket
     /// <summary>
     /// Pong id
     /// </summary>
-    public long Id { get; set; } = id;
+    public int Id { get; set; } = id;
     
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteLong(this.Id);
+        buffer.WriteInt(this.Id);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new PongPacket(
-            buffer.ReadLong());
+            buffer.ReadInt());
     }
 }
