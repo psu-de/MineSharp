@@ -20,7 +20,6 @@ using LoginDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Login.Disco
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using CBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
 using SBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.KeepAlivePacket;
-using ConfigurationPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
 using CBPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
 using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.FinishConfigurationPacket;
 using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
@@ -29,6 +28,10 @@ using CBCloseWindowPacket = MineSharp.Protocol.Packets.Clientbound.Play.CloseWin
 using SBCloseWindowPacket = MineSharp.Protocol.Packets.Serverbound.Play.CloseWindowPacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
+using PlayPingPacket = MineSharp.Protocol.Packets.Clientbound.Play.PingPacket;
+using PlayPongPacket = MineSharp.Protocol.Packets.Serverbound.Play.PongPacket;
+using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
+using ConfPongPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PongPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -95,7 +98,7 @@ internal static class PacketPalette
         RegisterPacket<ConfigurationDisconnectPacket>(PacketType.CB_Configuration_Disconnect);
         RegisterPacket<CBFinishConfigurationPacket>(PacketType.CB_Configuration_FinishConfiguration);
         RegisterPacket<CBConfigurationKeepAlivePacket>(PacketType.CB_Configuration_KeepAlive);
-        RegisterPacket<ConfigurationPingPacket>(PacketType.CB_Configuration_Ping);
+        RegisterPacket<ConfPingPacket>(PacketType.CB_Configuration_Ping);
         RegisterPacket<RegistryDataPacket>(PacketType.CB_Configuration_RegistryData);
         RegisterPacket<FeatureFlagsPacket>(PacketType.CB_Configuration_FeatureFlags);
 
@@ -103,7 +106,7 @@ internal static class PacketPalette
         RegisterPacket<SBPluginMessagePacket>(PacketType.SB_Configuration_CustomPayload);
         RegisterPacket<SBFinishConfigurationPacket>(PacketType.SB_Configuration_FinishConfiguration);
         RegisterPacket<SBConfigurationKeepAlivePacket>(PacketType.SB_Configuration_KeepAlive);
-        RegisterPacket<PongPacket>(PacketType.SB_Configuration_Pong);
+        RegisterPacket<ConfPongPacket>(PacketType.SB_Configuration_Pong);
         RegisterPacket<ResourcePackResponsePacket>(PacketType.SB_Configuration_ResourcePackReceive);
 
         // Play
@@ -145,6 +148,7 @@ internal static class PacketPalette
         RegisterPacket<EntityStatusPacket>(PacketType.CB_Play_EntityStatus);
         RegisterPacket<ChunkBatchStartPacket>(PacketType.CB_Play_ChunkBatchStart);
         RegisterPacket<ChunkBatchFinishedPacket>(PacketType.CB_Play_ChunkBatchFinished);
+        RegisterPacket<PlayPingPacket>(PacketType.CB_Play_Ping);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
@@ -168,6 +172,7 @@ internal static class PacketPalette
         RegisterPacket<SBSetHeldItemPacket>(PacketType.SB_Play_HeldItemSlot);
         RegisterPacket<ChunkBatchReceivedPacket>(PacketType.SB_Play_ChunkBatchReceived);
         RegisterPacket<SetCreativeSlotPacket>(PacketType.SB_Play_SetCreativeSlot);
+        RegisterPacket<PlayPongPacket>(PacketType.SB_Play_Pong);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket
