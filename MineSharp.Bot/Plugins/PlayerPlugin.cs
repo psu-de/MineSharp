@@ -1,4 +1,4 @@
-﻿using MineSharp.Bot.Utils;
+using MineSharp.Bot.Utils;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
@@ -145,8 +145,7 @@ public class PlayerPlugin : Plugin
         this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
         this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
         this.Bot.Client.On<EntityStatusPacket>(this.HandleEntityStatus);
-        this.Bot.Client.On<PingPacket>(this.HandlePingPacket);
-
+        
         // already start listening to the packets here, as they sometimes get lost when calling in init() 
         this.initLoginPacket    = this.Bot.Client.WaitForPacket<LoginPacket>();
         this.initPositionPacket = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
@@ -459,13 +458,6 @@ public class PlayerPlugin : Plugin
                 HandlePlayerSetPermission(packet);
                 break;
         }
-
-        return Task.CompletedTask;
-    }
-
-    private Task HandlePingPacket(PingPacket packet)
-    {
-        Bot.Client.SendPacket(new PongPacket(packet.Id));
 
         return Task.CompletedTask;
     }
