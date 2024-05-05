@@ -465,7 +465,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             }
 
             this._buffer.WriteByte((byte)((value & 0x7F) | 0x80));
-            value >>= 7;
+            value >>>= 7;
         }
     }
 
@@ -474,7 +474,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         while ((value & ~0x7F) != 0x00)
         {
             this._buffer.WriteByte((byte)((value & 0xFF) | 0x80));
-            value >>= 7;
+            value >>>= 7;
         }
 
         this._buffer.WriteByte((byte)value);
