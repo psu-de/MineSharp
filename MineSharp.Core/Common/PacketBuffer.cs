@@ -1,4 +1,4 @@
-using fNbt;
+﻿using fNbt;
 using MineSharp.Core.Common.Blocks;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -464,7 +464,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
                 return;
             }
 
-            this._buffer.WriteByte((byte)(value & 0x7F | 0x80));
+            this._buffer.WriteByte((byte)((value & 0x7F) | 0x80));
             value >>= 7;
         }
     }
