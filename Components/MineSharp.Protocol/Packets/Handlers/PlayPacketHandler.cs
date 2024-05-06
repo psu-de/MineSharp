@@ -35,7 +35,7 @@ internal class PlayPacketHandler : IPacketHandler
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping;
+        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping or PacketType.CB_Play_KickDisconnect;
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
