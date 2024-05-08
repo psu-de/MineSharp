@@ -1,4 +1,4 @@
-using MineSharp.Data;
+﻿using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -24,6 +24,7 @@ internal class PlayPacketHandler : IPacketHandler
             KeepAlivePacket keepAlive             => HandleKeepAlive(keepAlive),
             BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             PingPacket ping                       => HandlePing(ping),
+            DisconnectPacket disconnect           => HandleDisconnect(disconnect),
             _                                     => Task.CompletedTask
         };
     }
@@ -34,7 +35,7 @@ internal class PlayPacketHandler : IPacketHandler
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping;
+        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping or PacketType.CB_Play_KickDisconnect;
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
@@ -51,6 +52,12 @@ internal class PlayPacketHandler : IPacketHandler
     private Task HandlePing(PingPacket ping)
     {
         this._client.SendPacket(new PongPacket(ping.Id));
+        return Task.CompletedTask;
+    }
+
+    private Task HandleDisconnect(DisconnectPacket packet)
+    {
+        _ = Task.Run(() => this._client.Disconnect(packet.Reason.Json));
         return Task.CompletedTask;
     }
 }

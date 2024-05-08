@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
@@ -18,6 +18,7 @@ using CBChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
 using SBChatPacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatPacket;
 using LoginDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Login.DisconnectPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
+using PlayDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Play.DisconnectPacket;
 using CBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
 using SBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.KeepAlivePacket;
 using CBPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
@@ -149,7 +150,8 @@ internal static class PacketPalette
         RegisterPacket<ChunkBatchStartPacket>(PacketType.CB_Play_ChunkBatchStart);
         RegisterPacket<ChunkBatchFinishedPacket>(PacketType.CB_Play_ChunkBatchFinished);
         RegisterPacket<PlayPingPacket>(PacketType.CB_Play_Ping);
-
+        RegisterPacket<PlayDisconnectPacket>(PacketType.CB_Play_KickDisconnect);
+        
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
         RegisterPacket<SetPlayerPositionAndRotationPacket>(PacketType.SB_Play_PositionLook);
