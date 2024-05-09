@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Windows;
@@ -95,6 +95,7 @@ public class WindowPlugin : Plugin
         this.Bot.Client.On<WindowItemsPacket>(this.HandleWindowItems);
         this.Bot.Client.On<WindowSetSlotPacket>(this.HandleSetSlot);
         this.Bot.Client.On<CBHeldItemPacket>(this.HandleHeldItemChange);
+        this.Bot.Client.On<OpenWindowPacket>(this.HandleOpenWindow);
     }
 
     /// <inheritdoc />
@@ -423,6 +424,19 @@ public class WindowPlugin : Plugin
     {
         this.SelectedHotbarIndex = (byte)packet.Slot;
         this.OnHeldItemChanged?.Invoke(this.Bot, this.HeldItem);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleOpenWindow(OpenWindowPacket packet)
+    {
+        var windowInfo = Bot.Data.Windows.ById(packet.InventoryType);
+
+        windowInfo = windowInfo with { 
+            Title = packet.WindowTitle
+        };
+        Logger.Info($"window name {windowInfo.Name}");
+        this.OpenWindow(packet.WindowId, windowInfo);
+
         return Task.CompletedTask;
     }
 }
