@@ -434,7 +434,7 @@ public class WindowPlugin : Plugin
         windowInfo = windowInfo with { 
             Title = packet.WindowTitle
         };
-        Logger.Info($"window name {windowInfo.Name}");
+        Logger.Debug($"Received Open Window Packet id={packet.WindowId}");
         this.OpenWindow(packet.WindowId, windowInfo);
 
         return Task.CompletedTask;
