@@ -68,9 +68,10 @@ public class WindowPlugin : Plugin
     private readonly object                   _windowLock;
     private readonly Window                   _mainInventory;
 
-    private PlayerPlugin?      _playerPlugin;
-    private DateTime?          _cacheTimestamp;
-    private WindowItemsPacket? _cachedWindowItemsPacket;
+    private PlayerPlugin?                 _playerPlugin;
+    private DateTime?                     _cacheTimestamp;
+    private WindowItemsPacket?            _cachedWindowItemsPacket;
+    private TaskCompletionSource<Window>? _openContainerTsc;
 
     /// <summary>
     /// Create a new WindowPlugin instance
@@ -127,6 +128,8 @@ public class WindowPlugin : Plugin
         {
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
+        
+        this._openContainerTsc = new TaskCompletionSource<Window>();
 
         PlaceBlockPacket packet = new PlaceBlockPacket(
             (int)PlayerHand.MainHand,
@@ -140,19 +143,11 @@ public class WindowPlugin : Plugin
 
         _ = this.Bot.Client.SendPacket(packet);
         _ = this._playerPlugin?.SwingArm();
-        var receive = this.Bot.Client.WaitForPacket<OpenWindowPacket>();
-
-        var cancellation = new CancellationTokenSource();
-        cancellation.CancelAfter(timeoutMs);
-        await receive.WaitAsync(cancellation.Token);
-
-        var result = await receive;
-
-        var windowInfo = this.Bot.Data.Windows.ById(result.InventoryType);
-        var window     = this.OpenWindow(result.WindowId, windowInfo);
-        this.CurrentlyOpenedWindow = window;
-
-        return window;
+        
+        var result = await this._openContainerTsc.Task;
+        
+        this._openContainerTsc = null;
+        return result;
     }
 
     /// <summary>
@@ -328,6 +323,8 @@ public class WindowPlugin : Plugin
         this._cacheTimestamp          = null;
 
         this.OnWindowOpened?.Invoke(this.Bot, window);
+        this._openContainerTsc?.TrySetResult(window);
+
         return window;
     }
 
