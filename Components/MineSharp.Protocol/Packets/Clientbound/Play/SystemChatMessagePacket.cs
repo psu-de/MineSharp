@@ -1,3 +1,4 @@
+﻿using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -45,11 +46,24 @@ public class SystemChatMessagePacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var content = buffer.ReadString();
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
-            return new SystemChatMessagePacket(content, buffer.ReadBool());
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_3)
+        {
+            var content = buffer.ReadString();
+            if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
+                return new SystemChatMessagePacket(content, buffer.ReadBool());
 
-        return new SystemChatMessagePacket(content, buffer.ReadVarInt());
+            return new SystemChatMessagePacket(content, buffer.ReadVarInt());
+        } else
+        {
+            var content = buffer.ReadNbt();
+            try
+            {
+                return new SystemChatMessagePacket(new Chat(content!, version).Message, buffer.ReadBool());
+            } catch
+            {
+                return new SystemChatMessagePacket(content!.ToString(), buffer.ReadBool());
+            }
+        }
     }
 }
 #pragma warning restore CS1591
