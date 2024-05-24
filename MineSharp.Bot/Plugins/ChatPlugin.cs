@@ -497,8 +497,14 @@ public class ChatPlugin : Plugin
                 ? ChatMessageType.GameInfo
                 : ChatMessageType.SystemMessage;
         }
-
-        this.HandleChatInternal(null, packet.Content, type);
+        if (packet.Message != null)
+        {
+            this.HandleChatInternal(null, packet.Message, type);
+        }
+        else
+        {
+            this.HandleChatInternal(null, packet.Content, type);
+        }
         return Task.CompletedTask;
     }
 
@@ -526,6 +532,11 @@ public class ChatPlugin : Plugin
     private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
     {
         this.OnChatMessageReceived?.Invoke(this.Bot, sender, new ChatComponent.Chat(message, this.Bot.Data), type, senderName);
+    }
+
+    private void HandleChatInternal(UUID? sender, ChatComponent.Chat message, ChatMessageType type, string? senderName = null)
+    {
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type, senderName);
     }
 
     private ChatMessageType GetChatMessageTypeFromRegistry(int index)

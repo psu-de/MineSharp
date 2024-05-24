@@ -23,12 +23,12 @@ public class Chat
     /// <summary>
     /// The raw Json message
     /// </summary>
-    public string? Json { get; }
+    public string? Json { get; private set;  }
 
     /// <summary>
     /// The raw NBT Tag message
     /// </summary>
-    public NbtTag? NbtTag { get; }
+    public NbtTag? NbtTag { get; private set;  }
 
     /// <summary>
     /// The message without any styling
@@ -103,7 +103,7 @@ public class Chat
         return nbt.TagType switch
         {
             NbtTagType.List => ParseArray((NbtList)nbt, styleCode),
-            NbtTagType.Compound => ParseObject((NbtCompound)nbt, styleCode),
+            NbtTagType.Compound => ParseObject((NbtCompound) nbt, styleCode),
             NbtTagType.String => nbt.StringValue,
             NbtTagType.Int => nbt.StringValue,
             _ => throw new Exception($"Type {nbt.TagType} is not supported")
@@ -168,7 +168,7 @@ public class Chat
     private string ParseObject(NbtCompound nbt, string styleCode = "")
     {
         if (nbt.Names.First() == "")
-    {
+        {
             return nbt[""].StringValue;
         }
 
@@ -270,5 +270,5 @@ public class Chat
     }
 
     /// <inheritdoc />
-    public override string ToString() => this.Json;
+    public override string ToString() => this.Json ?? this.NbtTag!.ToString();
 }

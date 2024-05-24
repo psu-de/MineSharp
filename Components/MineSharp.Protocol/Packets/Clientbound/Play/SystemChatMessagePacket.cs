@@ -10,6 +10,7 @@ public class SystemChatMessagePacket : IPacket
     public PacketType Type => PacketType.CB_Play_SystemChat;
 
     public string Content   { get; set; }
+    public Chat? Message { get; set; }
     public int?   ChatType  { get; set; }
     public bool?  IsOverlay { get; set; }
 
@@ -29,9 +30,17 @@ public class SystemChatMessagePacket : IPacket
     /// </summary>
     /// <param name="content"></param>
     /// <param name="isOverlay"></param>
-    public SystemChatMessagePacket(string content, bool isOverlay)
+    /// <param name="message"></param>
+    public SystemChatMessagePacket(string content, bool isOverlay, Chat? message = null)
     {
+        this.Message = message;
         this.Content   = content;
+        this.IsOverlay = isOverlay;
+    }
+    public SystemChatMessagePacket(Chat message, bool isOverlay)
+    {
+        this.Message = message;
+        this.Content = message.StyledMessage;
         this.IsOverlay = isOverlay;
     }
 
@@ -58,7 +67,8 @@ public class SystemChatMessagePacket : IPacket
             var content = buffer.ReadNbt();
             try
             {
-                return new SystemChatMessagePacket(new Chat(content!, version).Message, buffer.ReadBool());
+                var message = new Chat(content!, version);
+                return new SystemChatMessagePacket(message, buffer.ReadBool());
             } catch
             {
                 return new SystemChatMessagePacket(content!.ToString(), buffer.ReadBool());
