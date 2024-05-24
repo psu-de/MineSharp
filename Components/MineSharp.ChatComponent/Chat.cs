@@ -165,8 +165,13 @@ public class Chat
                          + sb.ToString();
     }
 
-    private string ParseObject(NbtTag nbt, string styleCode = "")
+    private string ParseObject(NbtCompound nbt, string styleCode = "")
     {
+        if (nbt.Names.First() == "")
+    {
+            return nbt[""].StringValue;
+        }
+
         var sb = new StringBuilder();
 
         var colorProp = nbt["color"];
