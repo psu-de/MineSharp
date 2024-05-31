@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Effects;
+﻿using MineSharp.Core.Common.Effects;
 using System.Collections.Concurrent;
 using MineSharp.Core.Geometry;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
@@ -76,6 +76,10 @@ public class Entity(
     /// </summary>
     public Entity? Vehicle { get; set; } = null;
 
+    /// <summary>
+    /// The Passengers of an entity (for example a boat can takes 2 passengers)
+    /// </summary>
+    public List<Entity> Passengers = [];
 
     /// <summary>
     /// Returns the attribute with the given name.

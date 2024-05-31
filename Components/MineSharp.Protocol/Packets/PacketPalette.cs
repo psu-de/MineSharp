@@ -151,7 +151,8 @@ internal static class PacketPalette
         RegisterPacket<ChunkBatchFinishedPacket>(PacketType.CB_Play_ChunkBatchFinished);
         RegisterPacket<PlayPingPacket>(PacketType.CB_Play_Ping);
         RegisterPacket<PlayDisconnectPacket>(PacketType.CB_Play_KickDisconnect);
-        
+        RegisterPacket<SetPassengersPacket>(PacketType.CB_Play_SetPassengers);
+
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
         RegisterPacket<SetPlayerPositionAndRotationPacket>(PacketType.SB_Play_PositionLook);

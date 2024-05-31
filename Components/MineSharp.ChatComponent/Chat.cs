@@ -18,7 +18,7 @@ namespace MineSharp.ChatComponent;
 /// <summary>
 /// Represents a Chat Message object
 /// </summary>
-public class Chat
+public partial class Chat
 {
     /// <summary>
     /// The raw Json message
@@ -43,6 +43,9 @@ public class Chat
 
     private readonly MinecraftData data;
 
+    [GeneratedRegex(@"\\§[0-9a-fk-r]")]
+    private static partial Regex FormatTagRegex();
+
     /// <summary>
     /// Create a new ChatComponent
     /// </summary>
@@ -56,7 +59,7 @@ public class Chat
         try
         {
             this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
-            this.Message       = Regex.Replace(this.StyledMessage, "\\§[0-9a-fk-r]", "");
+            this.Message       = FormatTagRegex().Replace(this.StyledMessage, "");
         }
         catch (JsonReaderException)
         {

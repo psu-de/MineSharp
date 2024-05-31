@@ -1,4 +1,4 @@
-using MineSharp.Bot.Utils;
+﻿using MineSharp.Bot.Utils;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -53,6 +53,7 @@ public class EntityPlugin : Plugin
         this.Bot.Client.On<TeleportEntityPacket>(this.HandleTeleportEntityPacket);
         this.Bot.Client.On<UpdateAttributesPacket>(this.HandleUpdateAttributesPacket);
         this.Bot.Client.On<PlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
+        this.Bot.Client.On<SetPassengersPacket>(this.HandleSetPassengersPacket);
     }
 
     /// <inheritdoc />
@@ -69,6 +70,20 @@ public class EntityPlugin : Plugin
         if (null != this.OnEntitySpawned)
         {
             Task.Run(() => this.OnEntitySpawned?.Invoke(this.Bot, entity));
+        }
+    }
+
+    private void MountEntity(Entity? vehicle, Entity passenger)
+    {
+        Entity? originalVehicle = passenger.Vehicle;
+        if (originalVehicle != null)
+        {
+            originalVehicle.Passengers.Remove(passenger);
+        }
+        passenger.Vehicle = vehicle;
+        if (vehicle != null)
+        {
+            vehicle.Passengers.Add(passenger);
         }
     }
 
@@ -142,7 +157,7 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Set(
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertToVelocity(packet.VelocityX),
             NetUtils.ConvertToVelocity(packet.VelocityY),
             NetUtils.ConvertToVelocity(packet.VelocityZ)
@@ -159,7 +174,7 @@ public class EntityPlugin : Plugin
         if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
             return Task.CompletedTask;
 
-        (entity.Position as MutableVector3)!.Add(
+        (entity.Position as MutableVector3)!.Set(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)
@@ -283,5 +298,24 @@ public class EntityPlugin : Plugin
         // TODO: Dismount Vehicle
 
         await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId));
+    }
+
+    private Task HandleSetPassengersPacket(SetPassengersPacket packet)
+    {
+        if (packet.EntityId != -1 || !this.Entities.TryGetValue(packet.EntityId, out var vehicle))
+        {
+            return Task.CompletedTask;
+        }
+        vehicle = packet.EntityId == -1 ? null : vehicle;
+
+        foreach (int passengerId in packet.PassengersId)
+        {
+            if (!this.Entities.TryGetValue(packet.EntityId, out var passenger))
+            {
+                continue;
+            }
+            MountEntity(vehicle, passenger);
+        }
+        return Task.CompletedTask;
     }
 }
