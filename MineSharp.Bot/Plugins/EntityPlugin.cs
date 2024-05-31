@@ -75,16 +75,32 @@ public class EntityPlugin : Plugin
 
     private void MountEntity(Entity? vehicle, Entity passenger)
     {
-        Entity? originalVehicle = passenger.Vehicle;
-        if (originalVehicle != null)
-        {
-            originalVehicle.Passengers.Remove(passenger);
-        }
+        DismountEntity(passenger);
+
         passenger.Vehicle = vehicle;
         if (vehicle != null)
         {
             vehicle.Passengers.Add(passenger);
         }
+    }
+
+    private void DismountEntity(Entity passenger)
+    {
+        Entity? originalVehicle = passenger.Vehicle;
+        if (originalVehicle != null)
+        {
+            originalVehicle.Passengers.Remove(passenger);
+        }
+        passenger.Vehicle = null;
+    }
+    
+    private void DismountPassengers(Entity vehicle)
+    {
+        foreach (var passenger in vehicle.Passengers)
+        {
+            DismountEntity(passenger);
+        }
+        vehicle.Passengers.Clear();
     }
 
     private Task HandleSpawnLivingEntityPacket(SpawnLivingEntityPacket packet)
@@ -141,6 +157,7 @@ public class EntityPlugin : Plugin
             if (!this.Entities.Remove(entityId, out var entity))
                 continue;
 
+            DismountPassengers(entity);
             this.OnEntityDespawned?.Invoke(this.Bot, entity);
         }
 
