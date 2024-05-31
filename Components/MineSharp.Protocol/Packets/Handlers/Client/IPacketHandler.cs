@@ -1,6 +1,6 @@
 using MineSharp.Data.Protocol;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal interface IPacketHandler
 {

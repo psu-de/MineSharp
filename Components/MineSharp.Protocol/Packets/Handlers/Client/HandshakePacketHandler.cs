@@ -2,7 +2,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class HandshakePacketHandler : IPacketHandler
 {
@@ -10,7 +10,7 @@ internal class HandshakePacketHandler : IPacketHandler
 
     public HandshakePacketHandler(MinecraftClient client)
     {
-        this._client = client;
+        _client = client;
     }
 
     public Task HandleIncoming(IPacket packet)
@@ -32,7 +32,7 @@ internal class HandshakePacketHandler : IPacketHandler
 
     private Task HandleHandshake(HandshakePacket packet)
     {
-        this._client.UpdateGameState(packet.NextState);
+        _client.UpdateGameState(packet.NextState);
         return Task.CompletedTask;
     }
 }

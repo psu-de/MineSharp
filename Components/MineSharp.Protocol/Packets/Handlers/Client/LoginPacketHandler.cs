@@ -10,30 +10,30 @@ using NLog;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class LoginPacketHandler : IPacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     private readonly MinecraftClient _client;
-    private readonly MinecraftData   _data;
+    private readonly MinecraftData _data;
 
     public LoginPacketHandler(MinecraftClient client, MinecraftData data)
     {
-        this._client = client;
-        this._data   = data;
+        _client = client;
+        _data = data;
     }
 
     public Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
-            DisconnectPacket disconnect        => HandleDisconnect(disconnect),
+            DisconnectPacket disconnect => HandleDisconnect(disconnect),
             EncryptionRequestPacket encryption => HandleEncryptionRequest(encryption),
-            SetCompressionPacket compression   => HandleSetCompression(compression),
-            LoginSuccessPacket success         => HandleLoginSuccess(success),
-            _                                  => throw new UnreachableException()
+            SetCompressionPacket compression => HandleSetCompression(compression),
+            LoginSuccessPacket success => HandleLoginSuccess(success),
+            _ => throw new UnreachableException()
         };
     }
 
@@ -49,7 +49,7 @@ internal class LoginPacketHandler : IPacketHandler
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.Json));
+        _ = Task.Run(() => _client.Disconnect(packet.Reason.Json));
         return Task.CompletedTask;
     }
 
@@ -62,9 +62,9 @@ internal class LoginPacketHandler : IPacketHandler
         var hex = EncryptionHelper.ComputeHash(packet.ServerId, aes.Key, packet.PublicKey);
 
         // Authenticate
-        if (this._client.Session.OnlineSession)
+        if (_client.Session.OnlineSession)
         {
-            if (!await this._client.Api!.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
+            if (!await _client.Api!.JoinServer(hex, _client.Session.SessionToken, _client.Session.UUID))
             {
                 throw new MineSharpAuthException("Error trying to authenticate with Mojang");
             }
@@ -75,20 +75,20 @@ internal class LoginPacketHandler : IPacketHandler
             throw new Exception("Could not decode public key");
 
         var sharedSecret = rsa.Encrypt(aes.Key, RSAEncryptionPadding.Pkcs1);
-        var encVerToken  = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);
+        var encVerToken = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);
 
         EncryptionResponsePacket response;
-        if (ProtocolVersion.IsBetween(this._data.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2)
-         && this._client.Session.OnlineSession
-         && this._client.Session.Certificate is not null)
+        if (ProtocolVersion.IsBetween(_data.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2)
+         && _client.Session.OnlineSession
+         && _client.Session.Certificate is not null)
         {
             var salt = (long)RandomNumberGenerator.GetInt32(int.MaxValue) << 32 | (uint)RandomNumberGenerator.GetInt32(int.MaxValue);
 
-            var signData = new PacketBuffer(this._data.Version.Protocol >= ProtocolVersion.V_1_20_2);
+            var signData = new PacketBuffer(_data.Version.Protocol >= ProtocolVersion.V_1_20_2);
             signData.WriteBytes(packet.VerifyToken);
             signData.WriteLong(salt);
 
-            var signed = this._client.Session.Certificate.RsaPrivate.SignData(signData.GetBuffer(), HashAlgorithmName.SHA256,
+            var signed = _client.Session.Certificate.RsaPrivate.SignData(signData.GetBuffer(), HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pkcs1);
             var crypto = new EncryptionResponsePacket.CryptoContainer(salt, signed);
 
@@ -97,27 +97,27 @@ internal class LoginPacketHandler : IPacketHandler
         else
             response = new EncryptionResponsePacket(sharedSecret, encVerToken, null);
 
-        _ = this._client.SendPacket(response)
-                .ContinueWith(_ => this._client.EnableEncryption(aes.Key));
+        _ = _client.SendPacket(response)
+                .ContinueWith(_ => _client.EnableEncryption(aes.Key));
     }
 
     private Task HandleSetCompression(SetCompressionPacket packet)
     {
         Logger.Debug($"Enabling compression, threshold = {packet.Threshold}.");
-        this._client.SetCompression(packet.Threshold);
+        _client.SetCompression(packet.Threshold);
         return Task.CompletedTask;
     }
 
     private Task HandleLoginSuccess(LoginSuccessPacket packet)
     {
-        if (this._data.Version.Protocol < ProtocolVersion.V_1_20_2)
+        if (_data.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            this._client.UpdateGameState(GameState.Play);
+            _client.UpdateGameState(GameState.Play);
             return Task.CompletedTask;
         }
 
-        _ = this._client.SendPacket(new AcknowledgeLoginPacket())
-                .ContinueWith(_ => this._client.UpdateGameState(GameState.Configuration));
+        _ = _client.SendPacket(new AcknowledgeLoginPacket())
+                .ContinueWith(_ => _client.UpdateGameState(GameState.Configuration));
         return Task.CompletedTask;
     }
 }

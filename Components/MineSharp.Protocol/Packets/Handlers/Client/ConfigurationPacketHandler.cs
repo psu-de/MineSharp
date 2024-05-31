@@ -4,29 +4,29 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using NLog;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class ConfigurationPacketHandler : IPacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     private readonly MinecraftClient _client;
-    private readonly MinecraftData   _data;
+    private readonly MinecraftData _data;
 
     public ConfigurationPacketHandler(MinecraftClient client, MinecraftData data)
     {
-        this._client = client;
-        this._data   = data;
+        _client = client;
+        _data = data;
     }
 
     public Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
-            DisconnectPacket disconnect                   => HandleDisconnect(disconnect),
+            DisconnectPacket disconnect => HandleDisconnect(disconnect),
             FinishConfigurationPacket finishConfiguration => HandleFinishConfiguration(finishConfiguration),
-            KeepAlivePacket keepAlive                     => HandleKeepAlive(keepAlive),
-            PingPacket ping                               => HandlePing(ping),
+            KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
+            PingPacket ping => HandlePing(ping),
 
             _ => Task.CompletedTask
         };
@@ -36,7 +36,7 @@ internal class ConfigurationPacketHandler : IPacketHandler
     {
         if (packet is Serverbound.Configuration.FinishConfigurationPacket)
         {
-            this._client.UpdateGameState(GameState.Play);
+            _client.UpdateGameState(GameState.Play);
         }
 
         return Task.CompletedTask;
@@ -51,25 +51,25 @@ internal class ConfigurationPacketHandler : IPacketHandler
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.Json));
+        _ = Task.Run(() => _client.Disconnect(packet.Reason.Json));
         return Task.CompletedTask;
     }
 
     private Task HandleFinishConfiguration(FinishConfigurationPacket packet)
     {
-        _ = this._client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
+        _ = _client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
         return Task.CompletedTask;
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
-        this._client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
+        _client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
         return Task.CompletedTask;
     }
 
     private Task HandlePing(PingPacket packet)
     {
-        this._client.SendPacket(new Serverbound.Configuration.PongPacket(packet.Id));
+        _client.SendPacket(new Serverbound.Configuration.PongPacket(packet.Id));
         return Task.CompletedTask;
     }
 }
