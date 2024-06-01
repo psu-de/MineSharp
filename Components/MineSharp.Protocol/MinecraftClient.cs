@@ -7,7 +7,6 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
-using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using NLog;
 using System.Diagnostics;
@@ -215,9 +214,9 @@ public sealed class MinecraftClient : IDisposable
             this.StreamLoop();
             if (!isServerClient)
             {
-            Logger.Info("Connected, starting handshake...");
-            await HandshakeProtocol.PerformHandshake(this, nextState, this.Data);
-        }
+                Logger.Info("Connected, starting handshake...");
+                await HandshakeProtocol.PerformHandshake(this, nextState, this.Data);
+            }
         }
         catch (SocketException ex)
         {
@@ -315,31 +314,31 @@ public sealed class MinecraftClient : IDisposable
 
         if (!this.isServerClient)
         {
-        this._internalPacketHandler = next switch
-        {
+            this._internalPacketHandler = next switch
+            {
                 GameState.Handshaking => new Packets.Handlers.Client.HandshakePacketHandler(this),
                 GameState.Login => new Packets.Handlers.Client.LoginPacketHandler(this, this.Data),
                 GameState.Status => new Packets.Handlers.Client.StatusPacketHandler(this),
                 GameState.Configuration => new Packets.Handlers.Client.ConfigurationPacketHandler(this, this.Data),
                 GameState.Play => new Packets.Handlers.Client.PlayPacketHandler(this, this.Data),
                 _ => throw new UnreachableException()
-        };
+            };
 
-        if (next == GameState.Play)
-            this._gameJoinedTsc.TrySetResult();
+            if (next == GameState.Play)
+                this._gameJoinedTsc.TrySetResult();
 
-        if (next == GameState.Configuration)
-        {
-            this.SendPacket(new ClientInformationPacket(
-                this.Settings.Locale,
-                this.Settings.ViewDistance,
-                (int)this.Settings.ChatMode,
-                this.Settings.ColoredChat,
-                this.Settings.DisplayedSkinParts,
-                (int)this.Settings.MainHand,
-                this.Settings.EnableTextFiltering,
-                this.Settings.AllowServerListings));
-        }
+            if (next == GameState.Configuration)
+            {
+                this.SendPacket(new ClientInformationPacket(
+                    this.Settings.Locale,
+                    this.Settings.ViewDistance,
+                    (int)this.Settings.ChatMode,
+                    this.Settings.ColoredChat,
+                    this.Settings.DisplayedSkinParts,
+                    (int)this.Settings.MainHand,
+                    this.Settings.EnableTextFiltering,
+                    this.Settings.AllowServerListings));
+            }
         } else
         {
             this._internalPacketHandler = next switch
