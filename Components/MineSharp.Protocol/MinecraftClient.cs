@@ -148,6 +148,42 @@ public sealed class MinecraftClient : IDisposable
     }
 
     /// <summary>
+    /// Constructor for MinecraftClient that is used for MinecraftServer
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="ipAddress"></param>
+    /// <param name="data"></param>
+    /// <param name="session"></param>
+    /// <param name="hostname"></param>
+    /// <param name="settings"></param>
+    internal MinecraftClient(
+        TcpClient client,
+        IPAddress ipAddress,
+        MinecraftData data,
+        Session? session = null,
+        string? hostname = null,
+        ClientSettings? settings = null
+        )
+    {
+        this.ip = ipAddress;
+        this.Data = data;
+        this.Session = session;
+        this.Hostname = hostname ?? "";
+        this.Port = 25565;
+        this.Settings = settings ?? ClientSettings.Default;
+        this._client = client;
+
+        this._packetQueue = new ConcurrentQueue<PacketSendTask>();
+        this._cancellation = new CancellationTokenSource();
+        this._internalPacketHandler = new ServerPacketHandlers.HandshakePacketHandler(this);
+        this._packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
+        this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
+        this._gameJoinedTsc = new TaskCompletionSource();
+        this._bundledPackets = new Queue<(PacketType, PacketBuffer)>();
+
+        this.isServerClient = true;
+    }
+    /// <summary>
     /// Connects to the minecraft sever.
     /// </summary>
     /// <param name="nextState">The state to transition to during the handshaking process.</param>
