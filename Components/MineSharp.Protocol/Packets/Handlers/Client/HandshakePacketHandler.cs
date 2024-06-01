@@ -1,8 +1,8 @@
-using MineSharp.Data.Protocol;
+﻿using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class HandshakePacketHandler : IPacketHandler
 {

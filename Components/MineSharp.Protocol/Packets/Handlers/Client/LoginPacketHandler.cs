@@ -1,4 +1,4 @@
-using MineSharp.Auth.Exceptions;
+﻿using MineSharp.Auth.Exceptions;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
@@ -10,7 +10,7 @@ using NLog;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class LoginPacketHandler : IPacketHandler
 {

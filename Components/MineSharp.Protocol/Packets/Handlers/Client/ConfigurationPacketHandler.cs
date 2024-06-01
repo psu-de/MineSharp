@@ -1,10 +1,10 @@
-using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using NLog;
 
-namespace MineSharp.Protocol.Packets.Handlers;
+namespace MineSharp.Protocol.Packets.Handlers.Client;
 
 internal class ConfigurationPacketHandler : IPacketHandler
 {
