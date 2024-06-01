@@ -93,7 +93,7 @@ public sealed class MinecraftClient : IDisposable
     /// <summary>
     /// The Session object for this client
     /// </summary>
-    public readonly Session Session;
+    public readonly Session? Session;
 
     /// <summary>
     /// The Hostname of the minecraft server provided in the constructor
