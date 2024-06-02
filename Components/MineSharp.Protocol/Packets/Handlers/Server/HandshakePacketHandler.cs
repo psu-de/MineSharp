@@ -40,6 +40,12 @@ internal class HandshakePacketHandler : IPacketHandler
 
     private Task HandleHandshake(HandshakePacket packet)
     {
+        if (_client.Data.Version.Protocol != packet.ProtocolVersion)
+        {
+            _client.Disconnect();
+            return Task.CompletedTask;
+        }
+        _client.HandshakeUpdateHostAndPort(packet.Host, packet.Port);
         _client.UpdateGameState(packet.NextState);
         return Task.CompletedTask;
     }

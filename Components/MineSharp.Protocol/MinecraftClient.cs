@@ -87,7 +87,7 @@ public sealed class MinecraftClient : IDisposable
     /// <summary>
     /// The MinecraftData object of this client
     /// </summary>
-    public readonly MinecraftData Data;
+    public MinecraftData Data { get; private set; }
 
     /// <summary>
     /// The Session object for this client
@@ -97,12 +97,12 @@ public sealed class MinecraftClient : IDisposable
     /// <summary>
     /// The Hostname of the minecraft server provided in the constructor
     /// </summary>
-    public readonly string Hostname;
+    public string Hostname { get; private set; }
 
     /// <summary>
     /// The Port of the minecraft server
     /// </summary>
-    public readonly ushort Port;
+    public ushort Port { get; private set; }
 
     /// <summary>
     /// The clients settings
@@ -316,12 +316,12 @@ public sealed class MinecraftClient : IDisposable
         {
             this._internalPacketHandler = next switch
             {
-                GameState.Handshaking => new Packets.Handlers.Client.HandshakePacketHandler(this),
-                GameState.Login => new Packets.Handlers.Client.LoginPacketHandler(this, this.Data),
-                GameState.Status => new Packets.Handlers.Client.StatusPacketHandler(this),
-                GameState.Configuration => new Packets.Handlers.Client.ConfigurationPacketHandler(this, this.Data),
-                GameState.Play => new Packets.Handlers.Client.PlayPacketHandler(this, this.Data),
-                _ => throw new UnreachableException()
+                GameState.Handshaking   => new ClientPacketHandlers.HandshakePacketHandler(this),
+                GameState.Login         => new ClientPacketHandlers.LoginPacketHandler(this, this.Data),
+                GameState.Status        => new ClientPacketHandlers.StatusPacketHandler(this),
+                GameState.Configuration => new ClientPacketHandlers.ConfigurationPacketHandler(this, this.Data),
+                GameState.Play          => new ClientPacketHandlers.PlayPacketHandler(this, this.Data),
+                _                       => throw new UnreachableException()
             };
 
             if (next == GameState.Play)
@@ -343,12 +343,12 @@ public sealed class MinecraftClient : IDisposable
         {
             this._internalPacketHandler = next switch
             {
-                GameState.Handshaking => new Packets.Handlers.Server.HandshakePacketHandler(this),
-                GameState.Login => new Packets.Handlers.Client.LoginPacketHandler(this, this.Data),
-                GameState.Status => new Packets.Handlers.Client.StatusPacketHandler(this),
-                GameState.Configuration => new Packets.Handlers.Client.ConfigurationPacketHandler(this, this.Data),
-                GameState.Play => new Packets.Handlers.Client.PlayPacketHandler(this, this.Data),
-                _ => throw new UnreachableException()
+                GameState.Handshaking   => new ServerPacketHandlers.HandshakePacketHandler(this),
+                GameState.Login         => new ServerPacketHandlers.LoginPacketHandler(this, this.Data),
+                GameState.Status        => new ServerPacketHandlers.StatusPacketHandler(this),
+                GameState.Configuration => new ServerPacketHandlers.ConfigurationPacketHandler(this, this.Data),
+                GameState.Play          => new ServerPacketHandlers.PlayPacketHandler(this, this.Data),
+                _                       => throw new UnreachableException()
             };
 
             if (next == GameState.Play)
@@ -545,6 +545,11 @@ public sealed class MinecraftClient : IDisposable
         });
     }
 
+    internal void HandshakeUpdateHostAndPort(string host, ushort port)
+    {
+        Hostname = host;
+        Port     = port;
+    }
     private Task InvokeReceivePacketAsync(IPacket packet)
     {
         return Task.Run(() => this.OnPacketReceived?.Invoke(this, packet));
