@@ -202,6 +202,10 @@ public sealed class MinecraftClient : IDisposable
     public async Task Disconnect(string reason = "disconnect.quitting")
     {
         Logger.Info($"Disconnecting: {reason}");
+        
+        if (!_gameJoinedTsc.Task.IsCompleted)
+            _gameJoinedTsc.SetException(new DisconnectedException($"Client has been disconnected", reason));
+        
         if (this._client is null)
             throw new InvalidOperationException("MinecraftClient is not connected.");
 
