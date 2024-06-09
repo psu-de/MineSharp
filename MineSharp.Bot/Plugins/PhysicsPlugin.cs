@@ -17,6 +17,7 @@ public class PhysicsPlugin : Plugin
 {
     private const           float   ROTATION_SMOOTHNESS = 0.2f;
     private const           double  POSITION_THRESHOLD  = 0.01d;
+    
     private static readonly ILogger Logger              = LogManager.GetCurrentClassLogger();
 
     /// <summary>
@@ -370,8 +371,8 @@ public class PhysicsPlugin : Plugin
             if (deltaPitch == 0)
                 pitchPerTick = 1;
 
-            var yawTicks   = (int)(deltaYaw   / yawPerTick);
-            var pitchTicks = (int)(deltaPitch / pitchPerTick);
+            var yawTicks   = Math.Abs((int) (deltaYaw   / yawPerTick));
+            var pitchTicks = Math.Abs((int) (deltaPitch / pitchPerTick));
 
             this.task                = new TaskCompletionSource();
             this.remainingYawTicks   = yawTicks;
