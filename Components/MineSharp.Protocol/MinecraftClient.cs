@@ -7,7 +7,6 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
-using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using NLog;
 using System.Diagnostics;
@@ -15,6 +14,9 @@ using System.Net.Sockets;
 using System.Net;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using Newtonsoft.Json.Linq;
+using MineSharp.Protocol.Packets.Handlers;
+using ClientPacketHandlers = MineSharp.Protocol.Packets.Handlers.Client;
+using ServerPacketHandlers = MineSharp.Protocol.Packets.Handlers.Server;
 
 namespace MineSharp.Protocol;
 
@@ -77,26 +79,30 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public event Events.ClientStringEvent? OnDisconnected;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public readonly bool isServerClient;
 
     /// <summary>
     /// The MinecraftData object of this client
     /// </summary>
-    public readonly MinecraftData Data;
+    public MinecraftData Data { get; private set; }
 
     /// <summary>
     /// The Session object for this client
     /// </summary>
-    public readonly Session Session;
+    public readonly Session? Session;
 
     /// <summary>
     /// The Hostname of the minecraft server provided in the constructor
     /// </summary>
-    public readonly string Hostname;
+    public string Hostname { get; private set; }
 
     /// <summary>
     /// The Port of the minecraft server
     /// </summary>
-    public readonly ushort Port;
+    public ushort Port { get; private set; }
 
     /// <summary>
     /// The clients settings
@@ -118,7 +124,7 @@ public sealed class MinecraftClient : IDisposable
         this.Data                   = data;
         this._packetQueue           = new ConcurrentQueue<PacketSendTask>();
         this._cancellation          = new CancellationTokenSource();
-        this._internalPacketHandler = new HandshakePacketHandler(this);
+        this._internalPacketHandler = new ClientPacketHandlers.HandshakePacketHandler(this);
         this._packetHandlers        = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
         this._packetWaiters         = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc         = new TaskCompletionSource();
@@ -136,8 +142,46 @@ public sealed class MinecraftClient : IDisposable
         this.Hostname  = hostnameOrIp;
         this.gameState = GameState.Handshaking;
         this.Settings  = settings ?? ClientSettings.Default;
+
+        this.isServerClient = false;
     }
 
+    /// <summary>
+    /// Constructor for MinecraftClient that is used for MinecraftServer
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="ipAddress"></param>
+    /// <param name="data"></param>
+    /// <param name="session"></param>
+    /// <param name="hostname"></param>
+    /// <param name="settings"></param>
+    internal MinecraftClient(
+        TcpClient client,
+        IPAddress ipAddress,
+        MinecraftData data,
+        Session? session = null,
+        string? hostname = null,
+        ClientSettings? settings = null
+        )
+    {
+        this.ip = ipAddress;
+        this.Data = data;
+        this.Session = session;
+        this.Hostname = hostname ?? "";
+        this.Port = 25565;
+        this.Settings = settings ?? ClientSettings.Default;
+        this._client = client;
+
+        this._packetQueue = new ConcurrentQueue<PacketSendTask>();
+        this._cancellation = new CancellationTokenSource();
+        this._internalPacketHandler = new ServerPacketHandlers.HandshakePacketHandler(this);
+        this._packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
+        this._packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
+        this._gameJoinedTsc = new TaskCompletionSource();
+        this._bundledPackets = new Queue<(PacketType, PacketBuffer)>();
+
+        this.isServerClient = true;
+    }
     /// <summary>
     /// Connects to the minecraft sever.
     /// </summary>
@@ -168,8 +212,11 @@ public sealed class MinecraftClient : IDisposable
             this._stream = new MinecraftStream(this._client.GetStream(), this._useAnonymousNbt);
 
             this.StreamLoop();
-            Logger.Info("Connected, starting handshake...");
-            await HandshakeProtocol.PerformHandshake(this, nextState, this.Data);
+            if (!isServerClient)
+            {
+                Logger.Info("Connected, starting handshake...");
+                await HandshakeProtocol.PerformHandshake(this, nextState, this.Data);
+            }
         }
         catch (SocketException ex)
         {
@@ -269,30 +316,48 @@ public sealed class MinecraftClient : IDisposable
     {
         this.gameState = next;
 
-        this._internalPacketHandler = next switch
+        if (!this.isServerClient)
         {
-            GameState.Handshaking   => new HandshakePacketHandler(this),
-            GameState.Login         => new LoginPacketHandler(this, this.Data),
-            GameState.Status        => new StatusPacketHandler(this),
-            GameState.Configuration => new ConfigurationPacketHandler(this, this.Data),
-            GameState.Play          => new PlayPacketHandler(this, this.Data),
-            _                       => throw new UnreachableException()
-        };
+            this._internalPacketHandler = next switch
+            {
+                GameState.Handshaking   => new ClientPacketHandlers.HandshakePacketHandler(this),
+                GameState.Login         => new ClientPacketHandlers.LoginPacketHandler(this, this.Data),
+                GameState.Status        => new ClientPacketHandlers.StatusPacketHandler(this),
+                GameState.Configuration => new ClientPacketHandlers.ConfigurationPacketHandler(this, this.Data),
+                GameState.Play          => new ClientPacketHandlers.PlayPacketHandler(this, this.Data),
+                _                       => throw new UnreachableException()
+            };
 
-        if (next == GameState.Play)
-            this._gameJoinedTsc.TrySetResult();
+            if (next == GameState.Play)
+                this._gameJoinedTsc.TrySetResult();
 
-        if (next == GameState.Configuration)
+            if (next == GameState.Configuration)
+            {
+                this.SendPacket(new ClientInformationPacket(
+                    this.Settings.Locale,
+                    this.Settings.ViewDistance,
+                    (int)this.Settings.ChatMode,
+                    this.Settings.ColoredChat,
+                    this.Settings.DisplayedSkinParts,
+                    (int)this.Settings.MainHand,
+                    this.Settings.EnableTextFiltering,
+                    this.Settings.AllowServerListings));
+            }
+        } else
         {
-            this.SendPacket(new ClientInformationPacket(
-                this.Settings.Locale,
-                this.Settings.ViewDistance,
-                (int)this.Settings.ChatMode,
-                this.Settings.ColoredChat,
-                this.Settings.DisplayedSkinParts,
-                (int)this.Settings.MainHand,
-                this.Settings.EnableTextFiltering,
-                this.Settings.AllowServerListings));
+            this._internalPacketHandler = next switch
+            {
+                GameState.Handshaking   => new ServerPacketHandlers.HandshakePacketHandler(this),
+                GameState.Login         => new ServerPacketHandlers.LoginPacketHandler(this, this.Data),
+                GameState.Status        => new ServerPacketHandlers.StatusPacketHandler(this),
+                GameState.Configuration => new ServerPacketHandlers.ConfigurationPacketHandler(this, this.Data),
+                GameState.Play          => new ServerPacketHandlers.PlayPacketHandler(this, this.Data),
+                _                       => throw new UnreachableException()
+            };
+
+            if (next == GameState.Play)
+                this._gameJoinedTsc.TrySetResult();
+
         }
     }
 
@@ -355,7 +420,7 @@ public sealed class MinecraftClient : IDisposable
         {
             var buffer     = this._stream!.ReadPacket();
             var packetId   = buffer.ReadVarInt();
-            var packetType = this.Data.Protocol.GetPacketType(PacketFlow.Clientbound, this.gameState, packetId);
+            var packetType = this.Data.Protocol.GetPacketType(isServerClient ? PacketFlow.Serverbound : PacketFlow.Clientbound, this.gameState, packetId);
 
             if (this._bundlePackets)
                 this._bundledPackets.Enqueue((packetType, buffer));
@@ -484,6 +549,11 @@ public sealed class MinecraftClient : IDisposable
         });
     }
 
+    internal void HandshakeUpdateHostAndPort(string host, ushort port)
+    {
+        Hostname = host;
+        Port     = port;
+    }
     private Task InvokeReceivePacketAsync(IPacket packet)
     {
         return Task.Run(() => this.OnPacketReceived?.Invoke(this, packet));
