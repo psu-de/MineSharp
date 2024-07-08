@@ -1,3 +1,4 @@
+﻿using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -9,6 +10,7 @@ public class SystemChatMessagePacket : IPacket
     public PacketType Type => PacketType.CB_Play_SystemChat;
 
     public string Content   { get; set; }
+    public Chat? Message { get; set; }
     public int?   ChatType  { get; set; }
     public bool?  IsOverlay { get; set; }
 
@@ -28,9 +30,17 @@ public class SystemChatMessagePacket : IPacket
     /// </summary>
     /// <param name="content"></param>
     /// <param name="isOverlay"></param>
-    public SystemChatMessagePacket(string content, bool isOverlay)
+    /// <param name="message"></param>
+    public SystemChatMessagePacket(string content, bool isOverlay, Chat? message = null)
     {
+        this.Message = message;
         this.Content   = content;
+        this.IsOverlay = isOverlay;
+    }
+    public SystemChatMessagePacket(Chat message, bool isOverlay)
+    {
+        this.Message = message;
+        this.Content = message.StyledMessage;
         this.IsOverlay = isOverlay;
     }
 
@@ -45,11 +55,25 @@ public class SystemChatMessagePacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var content = buffer.ReadString();
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
-            return new SystemChatMessagePacket(content, buffer.ReadBool());
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_3)
+        {
+            var content = buffer.ReadString();
+            if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
+                return new SystemChatMessagePacket(content, buffer.ReadBool());
 
-        return new SystemChatMessagePacket(content, buffer.ReadVarInt());
+            return new SystemChatMessagePacket(content, buffer.ReadVarInt());
+        } else
+        {
+            var content = buffer.ReadNbt();
+            try
+            {
+                var message = new Chat(content!, version);
+                return new SystemChatMessagePacket(message, buffer.ReadBool());
+            } catch
+            {
+                return new SystemChatMessagePacket(content!.ToString(), buffer.ReadBool());
+            }
+        }
     }
 }
 #pragma warning restore CS1591

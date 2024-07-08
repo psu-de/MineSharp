@@ -1,4 +1,4 @@
-using MineSharp.Bot.Chat;
+﻿using MineSharp.Bot.Chat;
 using MineSharp.Commands;
 using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -469,7 +469,7 @@ public class ChatPlugin : Plugin
             (UUID sender, string message, int type) = packet.Body switch
             {
                 PlayerChatPacket.V1_19Body v19       => (v19.Sender, v19.SignedChat, v19.MessageType),
-                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.PlainMessage, v19_2.Type),
+                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.UnsignedContent ?? v19_2.FormattedMessage ?? v19_2.PlainMessage, v19_2.Type),
                 _                                    => throw new UnreachableException()
             };
 
@@ -497,8 +497,14 @@ public class ChatPlugin : Plugin
                 ? ChatMessageType.GameInfo
                 : ChatMessageType.SystemMessage;
         }
-
-        this.HandleChatInternal(null, packet.Content, type);
+        if (packet.Message != null)
+        {
+            this.HandleChatInternal(null, packet.Message, type);
+        }
+        else
+        {
+            this.HandleChatInternal(null, packet.Content, type);
+        }
         return Task.CompletedTask;
     }
 
@@ -526,6 +532,11 @@ public class ChatPlugin : Plugin
     private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
     {
         this.OnChatMessageReceived?.Invoke(this.Bot, sender, new ChatComponent.Chat(message, this.Bot.Data), type, senderName);
+    }
+
+    private void HandleChatInternal(UUID? sender, ChatComponent.Chat message, ChatMessageType type, string? senderName = null)
+    {
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type, senderName);
     }
 
     private ChatMessageType GetChatMessageTypeFromRegistry(int index)

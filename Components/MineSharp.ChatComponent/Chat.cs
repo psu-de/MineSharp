@@ -3,6 +3,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MineSharp.Data;
 using Newtonsoft.Json;
+using fNbt;
+using System.Diagnostics;
 
 namespace MineSharp.ChatComponent;
 
@@ -16,12 +18,17 @@ namespace MineSharp.ChatComponent;
 /// <summary>
 /// Represents a Chat Message object
 /// </summary>
-public class Chat
+public partial class Chat
 {
     /// <summary>
     /// The raw Json message
     /// </summary>
-    public string Json { get; }
+    public string? Json { get; private set;  }
+
+    /// <summary>
+    /// The raw NBT Tag message
+    /// </summary>
+    public NbtTag? NbtTag { get; private set;  }
 
     /// <summary>
     /// The message without any styling
@@ -36,6 +43,9 @@ public class Chat
 
     private readonly MinecraftData data;
 
+    [GeneratedRegex(@"\\§[0-9a-fk-r]")]
+    private static partial Regex FormatTagRegex();
+
     /// <summary>
     /// Create a new ChatComponent
     /// </summary>
@@ -49,12 +59,33 @@ public class Chat
         try
         {
             this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
-            this.Message       = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
+            this.Message       = FormatTagRegex().Replace(this.StyledMessage, "");
         }
         catch (JsonReaderException)
         {
             this.StyledMessage = this.Json;
             this.Message       = this.StyledMessage;
+        }
+    }
+
+    /// <summary>
+    /// Create a new ChatComponent with nbt tag
+    /// </summary>
+    /// <param name="nbt"></param>
+    /// <param name="data"></param>
+    public Chat(NbtTag nbt, MinecraftData data)
+    {
+        this.NbtTag = nbt;
+        this.data = data;
+        
+        try
+        {
+            this.StyledMessage = this.ParseComponent(nbt);
+            this.Message = Regex.Replace(this.StyledMessage, "\\§[0-9a-fk-r]", "");
+        } catch
+        {
+            this.StyledMessage = this.NbtTag.ToString();
+            this.Message = this.StyledMessage;
         }
     }
 
@@ -68,6 +99,18 @@ public class Chat
             JTokenType.Integer => (string)token!,
             _                  => throw new Exception($"Type {token.Type} is not supported")
         };
+    }
+
+    private string ParseComponent(NbtTag nbt, string styleCode = "")
+    {
+        return nbt.TagType switch
+        {
+            NbtTagType.List => ParseArray((NbtList)nbt, styleCode),
+            NbtTagType.Compound => ParseObject((NbtCompound) nbt, styleCode),
+            NbtTagType.String => nbt.StringValue,
+            NbtTagType.Int => nbt.StringValue,
+            _ => throw new Exception($"Type {nbt.TagType} is not supported")
+        }; ;
     }
 
     private string ParseObject(JObject jObject, string styleCode = "")
@@ -125,10 +168,82 @@ public class Chat
                          + sb.ToString();
     }
 
+    private string ParseObject(NbtCompound nbt, string styleCode = "")
+    {
+        if (nbt.Names.First() == "")
+        {
+            return nbt[""].StringValue;
+        }
+
+        var sb = new StringBuilder();
+
+        var colorProp = nbt["color"];
+        if (colorProp != null)
+        {
+            var color = ParseComponent(colorProp.StringValue);
+            var style = TextStyle.GetTextStyle(color);
+            styleCode = style != null
+                ? style.ToString()
+                : string.Empty;
+        }
+
+        var extraProp = nbt["extra"];
+        if (extraProp != null)
+        {
+            var extras = (NbtList)extraProp!;
+
+            foreach (var item in extras)
+                
+                sb.Append(this.ParseComponent(item, styleCode) + "§r");
+        }
+
+        var textProp = nbt["text"];
+        var translateProp = nbt["translate"];
+
+        if (textProp != null)
+        {
+            return styleCode + ParseComponent(textProp, styleCode) + sb.ToString();
+        }
+
+        if (translateProp == null)
+            return sb.ToString();
+
+        var usingData = new List<string>();
+
+        var usingProp = nbt["using"];
+        var withProp = nbt["with"];
+        if (usingProp != null && withProp == null)
+            withProp = usingProp;
+
+        if (withProp != null)
+        {
+            var array = (NbtList)withProp;
+            for (int i = 0; i < array.Count; i++)
+            {
+                usingData.Add(this.ParseComponent(array[i], styleCode));
+            }
+        }
+
+        var ruleName = this.ParseComponent(translateProp);
+        return styleCode + TranslateString(ruleName, usingData.ToArray(), this.data)
+                         + sb.ToString();
+    }
+
     private string ParseArray(JArray jArray, string styleCode = "")
     {
         var sb = new StringBuilder();
         foreach (var token in jArray)
+        {
+            sb.Append(ParseComponent(token, styleCode));
+        }
+
+        return sb.ToString();
+    }
+
+    private string ParseArray(NbtList nbtList, string styleCode = "")
+    {
+        var sb = new StringBuilder();
+        foreach (var token in nbtList)
         {
             sb.Append(ParseComponent(token, styleCode));
         }
@@ -158,5 +273,5 @@ public class Chat
     }
 
     /// <inheritdoc />
-    public override string ToString() => this.Json;
+    public override string ToString() => this.Json ?? this.NbtTag!.ToString();
 }
