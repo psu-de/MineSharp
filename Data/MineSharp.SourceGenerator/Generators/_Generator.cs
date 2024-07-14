@@ -15,7 +15,12 @@ public class Generator(string dataKey, Func<JToken, string> selector, string cla
             var array = (JArray)await wrapper.Parse(version, dataKey);
             foreach (var token in array)
             {
-                set.Add(selector(token));
+                var name = selector(token);
+                // TODO: add minecraft tags issue #62
+                if (name.ToLower().StartsWith("tagkey"))
+                    continue;
+                
+                set.Add(name);
             }
         }
 

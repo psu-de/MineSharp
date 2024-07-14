@@ -8,12 +8,12 @@ namespace MineSharp.Core.Common.Entities;
 
 public enum EntityCategory
 {
-    Unknown     = 0,
+    Unknown = 0,
     PassiveMobs = 1,
-    Immobile    = 2,
+    Immobile = 2,
     Projectiles = 3,
     HostileMobs = 4,
-    Vehicles    = 5,
+    Vehicles = 5,
 }
 
 #pragma warning restore CS1591

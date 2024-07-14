@@ -8,20 +8,20 @@ namespace MineSharp.Core.Common.Enchantments;
 
 public enum EnchantmentCategory
 {
-    Armor      = 0,
-    ArmorFeet  = 1,
-    ArmorHead  = 2,
+    Armor = 0,
+    ArmorFeet = 1,
+    ArmorHead = 2,
     ArmorChest = 3,
-    Wearable   = 4,
-    Weapon     = 5,
-    Digger     = 6,
-    Breakable  = 7,
-    Bow        = 8,
+    Wearable = 4,
+    Weapon = 5,
+    Digger = 6,
+    Breakable = 7,
+    Bow = 8,
     FishingRod = 9,
-    Trident    = 10,
-    Crossbow   = 11,
+    Trident = 10,
+    Crossbow = 11,
     Vanishable = 12,
-    ArmorLegs  = 13,
+    ArmorLegs = 13,
 }
 
 #pragma warning restore CS1591
