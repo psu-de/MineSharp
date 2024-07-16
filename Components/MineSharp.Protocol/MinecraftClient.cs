@@ -13,6 +13,7 @@ using NLog;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
+using MineSharp.Core;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using Newtonsoft.Json.Linq;
 

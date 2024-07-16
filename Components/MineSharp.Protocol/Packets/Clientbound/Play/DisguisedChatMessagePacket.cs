@@ -1,4 +1,5 @@
 using fNbt;
+using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;

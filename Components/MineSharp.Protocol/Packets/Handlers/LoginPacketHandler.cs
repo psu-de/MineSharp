@@ -9,6 +9,7 @@ using MineSharp.Protocol.Packets.Serverbound.Login;
 using NLog;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using MineSharp.Core;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 

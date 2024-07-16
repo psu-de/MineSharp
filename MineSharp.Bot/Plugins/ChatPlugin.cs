@@ -4,6 +4,7 @@ using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using System.Diagnostics;
+using MineSharp.Core;
 using MineSharp.Data;
 using NLog;
 using ChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
@@ -541,6 +542,8 @@ public class ChatPlugin : Plugin
 
     private ChatMessageType GetChatMessageTypeFromRegistry(int index)
     {
+        Console.WriteLine(this.Bot.Registry);
+        Console.WriteLine(index);
         var val = this.Bot.Registry["minecraft:chat_type"]["value"][index]["name"]!.StringValue!;
         return GetChatMessageType(val);
     }

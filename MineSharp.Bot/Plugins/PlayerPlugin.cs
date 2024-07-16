@@ -8,6 +8,7 @@ using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using MineSharp.Bot.Exceptions;
+using MineSharp.Core;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 

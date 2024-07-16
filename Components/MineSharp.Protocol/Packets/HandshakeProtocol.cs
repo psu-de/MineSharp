@@ -1,4 +1,5 @@
 using MineSharp.Auth;
+using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
