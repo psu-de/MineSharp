@@ -117,7 +117,7 @@ public static class PhysicsTests
 
         chat.OnChatMessageReceived += (sender, player, chatComponent, position, name) =>
         {
-            if (chatComponent.Message.Contains(expectedMessage))
+            if (chatComponent.GetMessage(bot.Data).Contains(expectedMessage))
                 source.TrySetResult(true);
         };
     }

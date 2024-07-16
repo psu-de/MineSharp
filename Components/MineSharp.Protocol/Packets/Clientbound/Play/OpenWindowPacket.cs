@@ -24,10 +24,10 @@ public class OpenWindowPacket : IPacket
     
     public OpenWindowPacket(int windowId, int inventoryType, Chat windowTitle)
     {
-        this.WindowId      = windowId;
-        this.InventoryType = inventoryType;
-        this.WindowTitle   = windowTitle.StyledMessage;
+        this.WindowId        = windowId;
+        this.InventoryType   = inventoryType;
         this.WindowTitleChat = windowTitle;
+        this.WindowTitle     = windowTitle.GetMessage(null);
     }
     
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -44,7 +44,7 @@ public class OpenWindowPacket : IPacket
             return new OpenWindowPacket(
                 buffer.ReadVarInt(),
                 buffer.ReadVarInt(),
-                new Chat(buffer.ReadNbt()!, version)
+                buffer.ReadChatComponent()
             );
         }
         

@@ -57,7 +57,7 @@ internal class PlayPacketHandler : IPacketHandler
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.Json));
+        _ = Task.Run(() => this._client.Disconnect(packet.Reason.GetMessage(this._data)));
         return Task.CompletedTask;
     }
 }

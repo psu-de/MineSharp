@@ -41,7 +41,7 @@ public class SystemChatMessagePacket : IPacket
     public SystemChatMessagePacket(Chat message, bool isOverlay)
     {
         this.Message = message;
-        this.Content = message.StyledMessage;
+        this.Content = message.GetMessage(null); // TODO: check if content should really be set or it should maybe be null instead
         this.IsOverlay = isOverlay;
     }
 
@@ -68,8 +68,7 @@ public class SystemChatMessagePacket : IPacket
             var content = buffer.ReadNbt();
             try
             {
-                var message = new Chat(content!, version);
-                return new SystemChatMessagePacket(message, buffer.ReadBool());
+                return new SystemChatMessagePacket(buffer.ReadChatComponent(), buffer.ReadBool());
             } catch
             {
                 return new SystemChatMessagePacket(content!.ToString(), buffer.ReadBool());

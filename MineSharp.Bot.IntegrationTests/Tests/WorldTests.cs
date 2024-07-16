@@ -69,7 +69,7 @@ public static class WorldTests
 
             bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
-                if (chat.Message.Contains("testMineBlock success"))
+                if (chat.GetMessage(bot.Data).Contains("testMineBlock success"))
                 {
                     source.TrySetResult(true);
                 }
@@ -98,7 +98,7 @@ public static class WorldTests
 
             bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
             {
-                if (chat.Message.Contains("testPlaceBlock success"))
+                if (chat.GetMessage(bot.Data).Contains("testPlaceBlock success"))
                 {
                     source.TrySetResult(true);
                 }

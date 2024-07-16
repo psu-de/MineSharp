@@ -2,6 +2,7 @@ using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
 #pragma warning disable CS1591
@@ -30,14 +31,15 @@ public class DisconnectPacket : IPacket
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Reason.Json);
+        // Disconnect (login) packet is always sent as JSON text component according to wiki.vg
+        buffer.WriteString(this.Reason.ToJson().ToString());
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         string reason = buffer.ReadString();
-        return new DisconnectPacket(new Chat(reason, version));
+        return new DisconnectPacket(Chat.Parse(reason));
     }
 }
 #pragma warning restore CS1591

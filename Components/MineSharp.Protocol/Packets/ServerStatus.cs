@@ -91,7 +91,7 @@ public partial class ServerStatus
             ? sampleToken.Select(x => (string)x.SelectToken("name")!).ToArray()
             : Array.Empty<string>();
 
-        var description = new Chat(token.SelectToken("description")!.ToString(), data).Message;
+        var description = Chat.Parse(token.SelectToken("description")!).GetMessage(data);
         var favIcon     = (string)token.SelectToken("favicon")!;
 
         var enforceSecureChatToken = token.SelectToken("enforcesSecureChat");

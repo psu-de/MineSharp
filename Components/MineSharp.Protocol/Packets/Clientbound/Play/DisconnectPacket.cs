@@ -30,14 +30,13 @@ public class DisconnectPacket : IPacket
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Reason.Json);
+        buffer.WriteChatComponent(this.Reason);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        string reason = buffer.ReadString();
-        return new DisconnectPacket(new Chat(reason, version));
+        return new DisconnectPacket(buffer.ReadChatComponent());
     }
 }
 #pragma warning restore CS1591
