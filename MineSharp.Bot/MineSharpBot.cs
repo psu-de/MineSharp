@@ -42,7 +42,7 @@ public class MineSharpBot
     /// <summary>
     /// NBT Registry sent by the server
     /// </summary>
-    public NbtCompound Registry = [];
+    public NbtCompound Registry { get; private set; } = [];
 
     private readonly IDictionary<Guid, Plugin> _plugins;
     private readonly CancellationTokenSource   _cancellation;

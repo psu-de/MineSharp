@@ -47,7 +47,7 @@ public sealed class Chunk_1_18 : IChunk
     /// <inheritdoc />
     public void LoadData(byte[] data)
     {
-        var buffer = new PacketBuffer(data, this._data.Version.Protocol >= 764);
+        var buffer = new PacketBuffer(data, this._data.Version.Protocol);
         for (int i = 0; i < SECTION_COUNT; i++)
         {
             this._sections[i] = ChunkSection_1_18.FromStream(this._data, buffer);

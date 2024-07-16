@@ -31,27 +31,32 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// Whether to use anonymous nbt compounds. This is used since
     /// Minecraft Java 1.20.2
     /// </summary>
-    public bool UseAnonymousNbt { get; set; } = false;
+    public bool UseAnonymousNbt => this.ProtocolVersion >= Core.ProtocolVersion.V_1_20_2;
+
+    /// <summary>
+    /// The protocol version this packet buffer uses
+    /// </summary>
+    public int ProtocolVersion { get; }
 
     /// <summary>
     /// Create a new empty, writeable PacketBuffer
     /// </summary>
-    /// <param name="useAnonymousNbt"></param>
-    public PacketBuffer(bool useAnonymousNbt)
+    /// <param name="protocolVersion"></param>
+    public PacketBuffer(int protocolVersion)
     {
+        this.ProtocolVersion = protocolVersion;
         this._buffer         = new MemoryStream();
-        this.UseAnonymousNbt = useAnonymousNbt;
     }
 
     /// <summary>
     /// Create a new readable PacketBuffer with <paramref name="bytes"/> as input.
     /// </summary>
+    /// <param name="protocolVersion"></param>
     /// <param name="bytes"></param>
-    /// <param name="useAnonymousNbt"></param>
-    public PacketBuffer(byte[] bytes, bool useAnonymousNbt)
+    public PacketBuffer(byte[] bytes, int protocolVersion)
     {
+        this.ProtocolVersion = protocolVersion;
         this._buffer         = new MemoryStream(bytes);
-        this.UseAnonymousNbt = useAnonymousNbt;
     }
 
     /// <summary>

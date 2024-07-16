@@ -53,7 +53,6 @@ public sealed class MinecraftClient : IDisposable
     private readonly IDictionary<PacketType, IList<AsyncPacketHandler>>    _packetHandlers;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> _packetWaiters;
     private readonly TaskCompletionSource                                  _gameJoinedTsc;
-    private readonly bool                                                  _useAnonymousNbt;
 
     private GameState        gameState;
     private bool             _bundlePackets;
@@ -124,7 +123,6 @@ public sealed class MinecraftClient : IDisposable
         this._packetWaiters         = new Dictionary<PacketType, TaskCompletionSource<object>>();
         this._gameJoinedTsc         = new TaskCompletionSource();
         this._bundledPackets        = new Queue<(PacketType, PacketBuffer)>();
-        this._useAnonymousNbt       = this.Data.Version.Protocol >= ProtocolVersion.V_1_20_2;
         this._tcpTcpFactory         = tcpFactory;
         this.ip                     = IPHelper.ResolveHostname(hostnameOrIp, ref port);
         
@@ -166,7 +164,7 @@ public sealed class MinecraftClient : IDisposable
                 this._client = this._tcpTcpFactory.CreateOpenConnection(this.ip.ToString(), this.Port);
             }
 
-            this._stream = new MinecraftStream(this._client.GetStream(), this._useAnonymousNbt);
+            this._stream = new MinecraftStream(this._client.GetStream(), this.Data.Version.Protocol);
 
             this.StreamLoop();
             Logger.Info("Connected, starting handshake...");
@@ -387,7 +385,7 @@ public sealed class MinecraftClient : IDisposable
     {
         var packetId = this.Data.Protocol.GetPacketId(packet.Type);
 
-        var buffer = new PacketBuffer(this._useAnonymousNbt);
+        var buffer = new PacketBuffer(this.Data.Version.Protocol);
         buffer.WriteVarInt(packetId);
         packet.Write(buffer, this.Data);
 

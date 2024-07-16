@@ -85,7 +85,7 @@ internal class LoginPacketHandler : IPacketHandler
         {
             var salt = (long)RandomNumberGenerator.GetInt32(int.MaxValue) << 32 | (uint)RandomNumberGenerator.GetInt32(int.MaxValue);
 
-            var signData = new PacketBuffer(this._data.Version.Protocol >= ProtocolVersion.V_1_20_2);
+            var signData = new PacketBuffer(this._data.Version.Protocol);
             signData.WriteBytes(packet.VerifyToken);
             signData.WriteLong(salt);
 

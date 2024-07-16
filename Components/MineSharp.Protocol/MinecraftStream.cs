@@ -15,7 +15,7 @@ internal class MinecraftStream
     private readonly Inflater Inflater = new Inflater();
     private readonly Deflater Deflater = new Deflater();
 
-    private readonly bool          _useAnonymousNbt;
+    private readonly int           _protocolVersion;
     private readonly object        _streamLock;
     private readonly NetworkStream _networkStream;
     private          AesStream?    _encryptionStream;
@@ -23,9 +23,9 @@ internal class MinecraftStream
     private Stream _stream;
     private int    _compressionThreshold;
 
-    public MinecraftStream(NetworkStream networkStream, bool useAnonymousNbt)
+    public MinecraftStream(NetworkStream networkStream, int protocolVersion)
     {
-        this._useAnonymousNbt = useAnonymousNbt;
+        this._protocolVersion = protocolVersion;
         this._networkStream   = networkStream;
         this._stream          = this._networkStream;
 
@@ -73,7 +73,7 @@ internal class MinecraftStream
             PacketBuffer packetBuffer = uncompressedLength switch
             {
                 > 0 => this.DecompressBuffer(data, uncompressedLength),
-                _   => new PacketBuffer(data, this._useAnonymousNbt)
+                _   => new PacketBuffer(data, this._protocolVersion)
             };
 
             return packetBuffer;
@@ -98,7 +98,7 @@ internal class MinecraftStream
     {
         if (length == 0)
         {
-            return new PacketBuffer(buffer, this._useAnonymousNbt);
+            return new PacketBuffer(buffer, this._protocolVersion);
         }
 
         var buffer2 = new byte[length];
@@ -106,12 +106,12 @@ internal class MinecraftStream
         Inflater.Inflate(buffer2);
         Inflater.Reset();
 
-        return new PacketBuffer(buffer2, this._useAnonymousNbt);
+        return new PacketBuffer(buffer2, this._protocolVersion);
     }
 
     private PacketBuffer CompressBuffer(PacketBuffer input)
     {
-        var output = new PacketBuffer(this._useAnonymousNbt);
+        var output = new PacketBuffer(this._protocolVersion);
         if (input.Size < this._compressionThreshold)
         {
             output.WriteVarInt(0);

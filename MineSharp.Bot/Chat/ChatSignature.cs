@@ -21,7 +21,7 @@ internal static class ChatSignature
     {
         var messageBytes = Encoding.UTF8.GetBytes(message);
 
-        var signData = new PacketBuffer(data.Version.Protocol >= ProtocolVersion.V_1_20_2);
+        var signData = new PacketBuffer(data.Version.Protocol);
         signData.WriteInt(1);
         signData.WriteUuid(playerUuid);
         signData.WriteUuid(chatSession);
@@ -40,7 +40,7 @@ internal static class ChatSignature
     public static byte[] SignChat1_19_2(RSA                   rsa, string message, UUID playerUuid, DateTimeOffset timestamp, long salt,
                                         AcknowledgedMessage[] messageList, byte[]? precedingSignature)
     {
-        var hashData = new PacketBuffer(false);
+        var hashData = new PacketBuffer(0);
         hashData.WriteLong(salt);
         hashData.WriteLong(timestamp.ToUnixTimeSeconds());
         hashData.WriteBytes(Encoding.UTF8.GetBytes(message));
@@ -55,7 +55,7 @@ internal static class ChatSignature
 
         byte[] hash = SHA256.HashData(hashData.GetBuffer());
 
-        var signData = new PacketBuffer(false);
+        var signData = new PacketBuffer(0);
         if (precedingSignature != null)
             signData.WriteBytes(precedingSignature);
 
@@ -68,7 +68,7 @@ internal static class ChatSignature
     public static byte[] SignChat1_19_1(RSA rsa, string message, UUID uuid, DateTimeOffset timestamp, long salt)
     {
         var json     = new JObject(new JProperty("text", message)).ToString(Formatting.None);
-        var signData = new PacketBuffer(false);
+        var signData = new PacketBuffer(0);
 
         signData.WriteLong(salt);
         signData.WriteUuid(uuid);
