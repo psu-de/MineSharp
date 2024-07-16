@@ -14,6 +14,7 @@ using MineSharp.Data.Recipes;
 using MineSharp.Data.Windows;
 using MineSharp.Data.Windows.Versions;
 using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace MineSharp.Data;
 
@@ -22,6 +23,8 @@ namespace MineSharp.Data;
 /// </summary>
 public class MinecraftData
 {
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    
     private static readonly MinecraftDataRepository MinecraftDataRepository =
         new(
             Path.Combine(
@@ -139,6 +142,7 @@ public class MinecraftData
             return loaded;
 
         var versionToken = await TryGetVersion(version);
+
         if (versionToken is null)
             throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
 
