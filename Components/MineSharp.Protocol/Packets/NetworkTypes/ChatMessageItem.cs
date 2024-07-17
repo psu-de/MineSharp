@@ -88,7 +88,7 @@ public class ChatMessageItem
             var length = buffer.ReadVarInt();
             if (length == 0)
             {
-                signature = new byte[length];
+                signature = new byte[256];
                 buffer.ReadBytes(signature);
             }
         }
