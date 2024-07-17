@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using CmlLib.Core.Auth.Microsoft.Cache;
 
 namespace MineSharp.Auth;
 
@@ -45,7 +46,17 @@ public static class MicrosoftAuth
 
         var cacheFolder = GetCacheForUser(username);
 
-        var cacheSettings = new MsalCacheSettings() { CacheDir = cacheFolder };
+        var cacheSettings = new MsalCacheSettings()
+        {
+            CacheDir               = cacheFolder,
+            CacheFileName          = "MineSharp.Secrets.txt",
+            KeyChainServiceName    = "MineSharp",
+            LinuxKeyRingSchema     = "MineSharp",
+            LinuxKeyRingLabel      = "MSAL tokens for MineSharp",
+            LinuxKeyRingCollection = "default", // default means persistent storage
+            KeyChainAccountName    = username,  // used for mac key identification
+            LinuxKeyRingAttr2      = new KeyValuePair<string, string>("Username", username) // used for linux key identification
+        };
 
         var app = await MsalMinecraftLoginHelper.BuildApplicationWithCache(ClientID, cacheSettings);
         var loginHandler = new LoginHandlerBuilder()
