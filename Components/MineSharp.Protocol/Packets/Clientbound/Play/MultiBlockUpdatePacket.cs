@@ -2,6 +2,7 @@ using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
@@ -41,7 +42,7 @@ public class MultiBlockUpdatePacket : IPacket
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_20 && this.SuppressLightUpdates == null)
-            throw new ArgumentNullException(nameof(this.SuppressLightUpdates));
+            throw new MineSharpPacketVersionException(nameof(this.SuppressLightUpdates), version.Version.Protocol);
 
         buffer.WriteLong(this.ChunkSection);
         if (version.Version.Protocol < ProtocolVersion.V_1_20)

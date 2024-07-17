@@ -204,19 +204,16 @@ public sealed class MinecraftClient : IDisposable
         
         if (!_gameJoinedTsc.Task.IsCompleted)
             _gameJoinedTsc.SetException(new DisconnectedException($"Client has been disconnected", reason));
-        
-        if (this._client is null)
-            throw new InvalidOperationException("MinecraftClient is not connected.");
 
-        if (!this._client.Connected)
+        if (this._client is null || !this._client.Connected)
         {
-            throw new InvalidOperationException("Client is not connected.");
+            Logger.Warn("Disconnect() was called but client is not connected");
         }
 
         this._cancellation.Cancel();
-        await this._streamLoop!;
+        await (this._streamLoop ?? Task.CompletedTask);
 
-        this._client.Close();
+        this._client?.Close();
         this.OnDisconnected?.Invoke(this, reason);
     }
 
@@ -521,7 +518,7 @@ public sealed class MinecraftClient : IDisposable
             tcpFactory);
 
         if (!await client.Connect(GameState.Status))
-            throw new MineSharpHostException("Could not connect to server.");
+            throw new MineSharpHostException("failed to connect to server");
 
         var timeoutCancellation  = new CancellationTokenSource();
         var taskCompletionSource = new TaskCompletionSource<ServerStatus>();

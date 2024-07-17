@@ -38,7 +38,7 @@ public class MessageAcknowledgementPacket : IPacket
         {
             if (Count == null)
             {
-                throw new PacketVersionException($"Expected {nameof(Count)} to be set for versions >= 1.19.3");
+                throw new MineSharpPacketVersionException(nameof(this.Count), version.Version.Protocol);
             }
 
             buffer.WriteVarInt(this.Count.Value);
@@ -47,7 +47,7 @@ public class MessageAcknowledgementPacket : IPacket
 
         if (PreviousMessages == null)
         {
-            throw new PacketVersionException($"Expected {nameof(PreviousMessages)} to be set for versions >= 1.19.3");
+            throw new MineSharpPacketVersionException(nameof(this.PreviousMessages), version.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));

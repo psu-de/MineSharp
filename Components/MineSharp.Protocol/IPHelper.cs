@@ -18,7 +18,7 @@ internal static class IPHelper
             UriHostNameType.Dns  => _ResolveHostname(hostnameOrIp, ref port),
             UriHostNameType.IPv4 => IPAddress.Parse(hostnameOrIp),
 
-            _ => throw new MineSharpHostException("Hostname not supported: " + hostnameOrIp)
+            _ => throw new MineSharpHostException($"unknown hostname: '{hostnameOrIp}'")
         };
     }
 
@@ -52,6 +52,6 @@ internal static class IPHelper
     private static IPAddress DnsLookup(string hostname)
     {
         return Client.GetHostEntry(hostname).AddressList.FirstOrDefault()
-            ?? throw new MineSharpAuthException($"Could not find ip for hostname ('{hostname}')");
+            ?? throw new MineSharpHostException($"ip not found for hostname '{hostname}'");
     }
 }

@@ -77,8 +77,8 @@ public partial class ServerStatus
 
     internal static ServerStatus FromJToken(JToken token, MinecraftData data)
     {
-        var versionToken = token.SelectToken("version") ?? throw new InvalidOperationException();
-        var playersToken = token.SelectToken("players") ?? throw new InvalidOperationException();
+        var versionToken = token.SelectToken("version") ?? throw new ArgumentException("invalid token");
+        var playersToken = token.SelectToken("players") ?? throw new ArgumentException("invalid token");
 
         var versionString = (string)versionToken.SelectToken("name")!;
         var protocol      = (int)versionToken.SelectToken("protocol")!;

@@ -94,10 +94,10 @@ public class PlayerPhysics
             ModifierOp.Multiply);
 
         this.playerVelocity = this.Player.Entity.Velocity as MutableVector3 ??
-                              throw new ArgumentException("entity is not initialized or velocity is not mutable.");
+                              throw new ArgumentException($"player velocity is not a {nameof(MutableVector3)}");
         
         this.playerPosition = this.Player.Entity.Position as MutableVector3 ??
-                              throw new ArgumentException("entity position is not mutable");
+                              throw new ArgumentException($"entity position is not a {nameof(MutableVector3)}");
     }
 
     /// <summary>

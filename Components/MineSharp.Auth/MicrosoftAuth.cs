@@ -87,7 +87,7 @@ public static class MicrosoftAuth
         {
             if (!cached) // If the cached session is invalid, try to get a new session
             {
-                throw new MineSharpAuthException("Could not login to a valid session");
+                throw new MineSharpAuthException("could not obtain a valid session");
             }
 
             var result = await loginHandler.LoginFromOAuth();

@@ -76,14 +76,14 @@ public class ChatMessagePacket : IPacket
             {
                 if (this.Signature!.Length != 256)
                 {
-                    throw new PacketVersionException("Signature must exactly be 256 bytes long.");
+                    throw new ArgumentException("signature must exactly be 256 bytes long.");
                 }
 
                 buffer.WriteBytes(this.Signature);
             }
 
             if (this.MessageCount == null)
-                throw new PacketVersionException($"Expected {nameof(MessageCount)} to be set for versions >= 1.19.3");
+                throw new MineSharpPacketVersionException(nameof(MessageCount), version.Version.Protocol);
 
             buffer.WriteVarInt(this.MessageCount.Value);
             buffer.WriteBytes(this.Acknowledged);
@@ -92,10 +92,10 @@ public class ChatMessagePacket : IPacket
 
         // only 1.19-1.19.2
         if (this.Signature == null)
-            throw new PacketVersionException($"Expected field {this.Signature} to be set for versions 1.19-1.19.2.");
+            throw new MineSharpPacketVersionException(nameof(this.Signature), version.Version.Protocol);
 
         if (this.SignedPreview == null)
-            throw new PacketVersionException($"Expected field {this.SignedPreview} to be set for versions 1.19-1.19.2.");
+            throw new MineSharpPacketVersionException(nameof(this.SignedPreview), version.Version.Protocol);
 
         buffer.WriteVarInt(this.Signature.Length);
         buffer.WriteBytes(this.Signature);
@@ -106,7 +106,7 @@ public class ChatMessagePacket : IPacket
             return;
 
         if (this.PreviousMessages == null)
-            throw new PacketVersionException($"Expected field {this.PreviousMessages} to be set for versions 1.19.2.");
+            throw new MineSharpPacketVersionException(nameof(this.PreviousMessages), version.Version.Protocol);
 
         buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
 

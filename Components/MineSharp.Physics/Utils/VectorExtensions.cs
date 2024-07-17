@@ -18,7 +18,7 @@ internal static class VectorExtensions
         if (axis.Z != 0)
             return axis.Z > 0;
 
-        throw new ArgumentException("null vector as axis");
+        return true;
     }
 
     public static double ChooseValueForAxis(this Vector3 axis, double x, double y, double z)
@@ -30,6 +30,6 @@ internal static class VectorExtensions
         if (axis.Z != 0)
             return z;
 
-        throw new ArgumentException("null vector as axis vector");
+        return x;
     }
 }

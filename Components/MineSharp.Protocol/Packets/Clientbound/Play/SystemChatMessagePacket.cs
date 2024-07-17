@@ -3,6 +3,7 @@ using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
@@ -53,26 +54,26 @@ public class SystemChatMessagePacket : IPacket
         if (version.Version.Protocol <= ProtocolVersion.V_1_20_2)
         {
             buffer.WriteString(this.Content 
-                            ?? throw new InvalidOperationException($"Content must be set for protocol version {version.Version.Protocol}"));
+                            ?? throw new MineSharpPacketVersionException(nameof(Content), version.Version.Protocol));
 
             if (version.Version.Protocol == ProtocolVersion.V_1_19)
             {
                 buffer.WriteVarInt(this.ChatType 
-                                ?? throw new InvalidOperationException($"ChatType must be set for protocol version {version.Version.Protocol}"));
+                                ?? throw new MineSharpPacketVersionException(nameof(ChatType), version.Version.Protocol));
             }
             else
             {
                 buffer.WriteBool(this.IsOverlay 
-                              ?? throw new InvalidOperationException($"IsOverlay must be set for protocol version {version.Version.Protocol}"));
+                              ?? throw new MineSharpPacketVersionException(nameof(IsOverlay), version.Version.Protocol));
             }
 
             return;
         }
         
         buffer.WriteChatComponent(this.Message 
-                               ?? throw new InvalidCastException($"Message must be set for protocol version {version.Version.Protocol}"));
+                               ?? throw new MineSharpPacketVersionException(nameof(Message), version.Version.Protocol));
         buffer.WriteBool(this.IsOverlay 
-                      ?? throw new InvalidOperationException($"IsOverlay must be set for protocol version {version.Version.Protocol}"));
+                      ?? throw new MineSharpPacketVersionException(nameof(IsOverlay), version.Version.Protocol));
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

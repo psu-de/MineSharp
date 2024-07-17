@@ -4,6 +4,7 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
@@ -122,7 +123,7 @@ public class ChunkDataAndUpdateLightPacket : IPacket
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_20 && this.TrustEdges == null)
-            throw new ArgumentNullException(nameof(this.TrustEdges));
+            throw new MineSharpPacketVersionException(nameof(this.TrustEdges), version.Version.Protocol);
 
         buffer.WriteInt(this.X);
         buffer.WriteInt(this.Z);

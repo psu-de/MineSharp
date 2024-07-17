@@ -67,13 +67,13 @@ internal class LoginPacketHandler : IPacketHandler
         {
             if (!await this._client.Api!.JoinServer(hex, this._client.Session.SessionToken, this._client.Session.UUID))
             {
-                throw new MineSharpAuthException("Error trying to authenticate with Mojang");
+                throw new MineSharpAuthException("failed to authenticate with mojang");
             }
         }
 
         var rsa = EncryptionHelper.DecodePublicKey(packet.PublicKey!);
         if (rsa == null)
-            throw new Exception("Could not decode public key");
+            throw new NullReferenceException("failed to decode public key");
 
         var sharedSecret = rsa.Encrypt(aes.Key, RSAEncryptionPadding.Pkcs1);
         var encVerToken  = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);

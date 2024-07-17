@@ -15,7 +15,7 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
     {
         if (token.Type != JTokenType.Array)
         {
-            throw new ArgumentException("Expected token to be an array");
+            throw new ArgumentException($"expected {JTokenType.Array}, got {token.Type}");
         }
 
         this.token = (JArray)token;

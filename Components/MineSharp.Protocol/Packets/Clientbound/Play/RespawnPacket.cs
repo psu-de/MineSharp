@@ -47,7 +47,7 @@ public class RespawnPacket : IPacket
     {
         if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
-            throw new PacketVersionException($"Cannot write {nameof(RespawnPacket)} for versions before 1.19.");
+            throw new NotSupportedException($"{nameof(RespawnPacket)}.Write() is not supported for versions before 1.19.");
         }
 
         buffer.WriteString(this.Dimension);

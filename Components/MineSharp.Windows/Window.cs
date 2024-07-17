@@ -160,7 +160,7 @@ public class Window
     {
         if (this.Inventory == null)
         {
-            throw new NotSupportedException("Inventory is null");
+            throw new InvalidOperationException("inventory is null");
         }
 
         return this.Inventory
@@ -251,7 +251,7 @@ public class Window
     {
         if (slots.Length != this.TotalSlotCount)
         {
-            throw new InvalidOperationException("length of slots must be equal to TotalSlotCount");
+            throw new InvalidOperationException($"{nameof(slots)}.Length must equal {nameof(TotalSlotCount)} (expected {TotalSlotCount}, got {slots.Length})");
         }
 
         for (short i = 0; i < slots.Length; i++)
@@ -379,7 +379,7 @@ public class Window
                 if ((this.GetSelectedSlot().Item?.Count ?? 0) != expectedEndCount)
                 {
                     throw new InvalidOperationException(
-                        $"Expected selected slot to be {expectedEndCount}, but it was {this.GetSelectedSlot().Item?.Count.ToString() ?? "null"}");
+                        $"expected selected slot to be {expectedEndCount}, but it was {this.GetSelectedSlot().Item?.Count.ToString() ?? "null"}");
                 }
 
                 return;

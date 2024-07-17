@@ -83,7 +83,7 @@ public class LoginPacket : IPacket
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
-            throw new PacketVersionException($"Cannot write {nameof(LoginPacket)} for versions before 1.19.");
+            throw new NotSupportedException($"{nameof(LoginPacket)}.Write() is not supported for versions before 1.19.");
         }
 
         buffer.WriteInt(this.EntityId);
@@ -131,7 +131,7 @@ public class LoginPacket : IPacket
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
         {
             if (this.PortalCooldown == null)
-                throw new ArgumentNullException(nameof(PortalCooldown));
+                throw new MineSharpPacketVersionException(nameof(PortalCooldown), version.Version.Protocol);
             buffer.WriteVarInt(this.PortalCooldown.Value);
         }
     }

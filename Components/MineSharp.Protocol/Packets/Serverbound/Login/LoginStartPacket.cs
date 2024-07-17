@@ -2,6 +2,7 @@ using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 #pragma warning disable CS1591
@@ -76,7 +77,7 @@ public class LoginStartPacket : IPacket
         }
 
         if (!this.PlayerUuid.HasValue)
-            throw new ArgumentNullException(nameof(this.PlayerUuid));
+            throw new MineSharpPacketVersionException(nameof(this.PlayerUuid), version.Version.Protocol);
 
         buffer.WriteUuid(this.PlayerUuid.Value);
     }

@@ -35,8 +35,7 @@ public class EncryptionResponsePacket : IPacket
             {
                 if (this.Crypto == null)
                 {
-                    throw new PacketVersionException(
-                        $"{nameof(EncryptionResponsePacket)} expect to have Crypto or VerifyToken set for version 1.19-1.19.2");
+                    throw new MineSharpPacketVersionException(nameof(this.Crypto), version.Version.Protocol);
                 }
 
                 this.Crypto.Write(buffer);
@@ -46,8 +45,7 @@ public class EncryptionResponsePacket : IPacket
 
         if (this.VerifyToken == null)
         {
-            throw new PacketVersionException(
-                $"{nameof(EncryptionResponsePacket)} expects to have VerifyToken set.");
+            throw new MineSharpPacketVersionException(nameof(this.VerifyToken), version.Version.Protocol);
         }
 
         buffer.WriteVarInt(this.VerifyToken.Length);

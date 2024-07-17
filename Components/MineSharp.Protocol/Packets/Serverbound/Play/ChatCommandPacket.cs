@@ -91,7 +91,7 @@ public class ChatCommandPacket : IPacket
         {
             if (!this.SignedPreview.HasValue)
             {
-                throw new PacketVersionException($"{nameof(ChatCommandPacket)} must have SignedPreview set for versions 1.19-1.19.2");
+                throw new MineSharpPacketVersionException(nameof(this.SignedPreview), version.Version.Protocol);
             }
 
             buffer.WriteBool(this.SignedPreview.Value!);
@@ -101,14 +101,12 @@ public class ChatCommandPacket : IPacket
         {
             if (this.Acknowledged == null)
             {
-                throw new PacketVersionException(
-                    $"{nameof(ChatCommandPacket)} must have {nameof(this.Acknowledged)} set for versions >= 1.19.3");
+                throw new MineSharpPacketVersionException(nameof(this.Acknowledged), version.Version.Protocol);
             }
 
             if (!this.MessageCount.HasValue)
             {
-                throw new PacketVersionException(
-                    $"{nameof(ChatCommandPacket)} must have {nameof(this.MessageCount)} set for versions >= 1.19.3");
+                throw new MineSharpPacketVersionException(nameof(this.MessageCount), version.Version.Protocol);
             }
 
             buffer.WriteVarInt(this.MessageCount.Value);
@@ -121,8 +119,7 @@ public class ChatCommandPacket : IPacket
 
         if (this.PreviousMessages == null)
         {
-            throw new PacketVersionException(
-                $"{nameof(ChatCommandPacket)} must have {nameof(this.PreviousMessages)} set for version 1.19.2");
+            throw new MineSharpPacketVersionException(nameof(this.PreviousMessages), version.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));

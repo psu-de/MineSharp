@@ -79,7 +79,7 @@ public class PlayerPositionPacket : IPacket
 
         if (!this.DismountVehicle.HasValue)
         {
-            throw new PacketVersionException($"Expected DismoutVehicle to be set for versions <= 1.19.4");
+            throw new MineSharpPacketVersionException(nameof(this.DismountVehicle), version.Version.Protocol);
         }
 
         buffer.WriteBool(this.DismountVehicle.Value);

@@ -55,7 +55,7 @@ public class LoginSuccessPacket : IPacket
 
         if (this.Properties == null)
         {
-            throw new PacketVersionException("Login Success packets expect to have properties set after version 1.19");
+            throw new MineSharpPacketVersionException(nameof(Properties), version.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(this.Properties, ((buffer, property) => property.Write(buffer)));

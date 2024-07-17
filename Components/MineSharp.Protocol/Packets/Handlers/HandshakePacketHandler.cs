@@ -23,7 +23,7 @@ internal class HandshakePacketHandler : IPacketHandler
         return packet switch
         {
             HandshakePacket handshake => HandleHandshake(handshake),
-            _ => throw new UnexpectedPacketException($"Unexpected outgoing packet during handshaking: {packet.GetType().FullName}")
+            _ => throw new UnexpectedPacketException($"unexpected outgoing packet during handshaking: {packet.GetType().FullName}")
         };
     }
 
