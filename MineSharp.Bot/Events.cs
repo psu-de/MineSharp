@@ -19,8 +19,7 @@ public static class Events
 
     public delegate void BotChatEvent(MineSharpBot sender, ChatComponent.Chat message);
 
-    public delegate void BotChatMessageEvent(MineSharpBot sender, UUID? player, ChatComponent.Chat message, ChatMessageType chatPosition,
-                                             string?      senderName);
+    public delegate void BotChatMessageEvent(MineSharpBot sender, UUID? player, ChatComponent.Chat message, ChatMessageType chatPosition);
 
     public delegate void EntityEvent(MineSharpBot sender, Entity entity);
 

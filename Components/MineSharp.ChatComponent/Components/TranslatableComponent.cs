@@ -43,7 +43,18 @@ public class TranslatableComponent : Chat
     {
         this.With = with;
     }
-
+    /// <summary>
+    /// Create a new translatable component
+    /// </summary>
+    /// <param name="translation"></param>
+    /// <param name="with"></param>
+    /// <param name="style"></param>
+    public TranslatableComponent(string translation, Chat[] with, Style style) : base(style)
+    {
+        this.Translation = translation;
+        this.With        = with;
+    }
+    
     /// <summary>
     /// Create a new translatable component
     /// </summary>
@@ -122,7 +133,7 @@ public class TranslatableComponent : Chat
             with = withToken.Select(Chat.Parse).ToArray();
         }
 
-        return new TranslatableComponent(translate, with, ParseStyle(token), ParseChildren(token));
+        return new TranslatableComponent(translate, with, Style.Parse(token), ParseChildren(token));
     }
 
     internal static new TranslatableComponent Parse(NbtTag tag)
@@ -138,6 +149,6 @@ public class TranslatableComponent : Chat
             with = (withToken as NbtList)!.Select(Chat.Parse).ToArray();
         }
 
-        return new TranslatableComponent(translate, with, ParseStyle(tag), ParseChildren(tag));
+        return new TranslatableComponent(translate, with, Style.Parse(tag), ParseChildren(tag));
     }
 }

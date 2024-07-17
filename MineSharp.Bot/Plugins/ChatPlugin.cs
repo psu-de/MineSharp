@@ -4,6 +4,8 @@ using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using System.Diagnostics;
+using fNbt;
+using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
 using MineSharp.Core;
 using MineSharp.Data;
@@ -468,15 +470,33 @@ public class ChatPlugin : Plugin
                 }
             }
 
-            (UUID sender, string message, int type) = packet.Body switch
+            (UUID uuid,
+                int messageType,
+                ChatComponent.Chat? sender,
+                ChatComponent.Chat? content,
+                ChatComponent.Chat? target) = packet.Body switch
             {
-                PlayerChatPacket.V1_19Body v19       => (v19.Sender, v19.SignedChat, v19.MessageType),
-                PlayerChatPacket.V1_19_2_3Body v19_2 => (v19_2.Sender, v19_2.UnsignedContent ?? v19_2.FormattedMessage ?? v19_2.PlainMessage, v19_2.Type),
-                _                                    => throw new UnreachableException()
+                PlayerChatPacket.V1_19Body v19 => (
+                    v19.Sender,
+                    v19.MessageType,
+                    v19.SenderName,
+                    v19.UnsignedChat ?? v19.SignedChat,
+                    null),
+
+                PlayerChatPacket.V1_19_2_3Body v19_2 => (
+                    v19_2.Sender,
+                    v19_2.Type,
+                    v19_2.NetworkName,
+                    v19_2.FormattedMessage ?? v19_2.UnsignedContent ?? new TextComponent(v19_2.PlainMessage),
+                    v19_2.NetworkTargetName),
+
+                _ => throw new UnreachableException()
             };
 
-            var chatType = GetChatMessageTypeFromRegistry(type);
-            this.HandleChatInternal(sender, message, chatType);
+            (ChatComponent.Chat chat, ChatMessageType type) 
+                = GetChatMessageTypeFromRegistry(messageType, sender, content, target);
+            
+            this.HandleChatInternal(uuid, chat, type);
         }
         catch (Exception e)
         {
@@ -512,11 +532,13 @@ public class ChatPlugin : Plugin
 
     private Task HandleDisguisedChatMessage(DisguisedChatMessagePacket packet)
     {
+        (ChatComponent.Chat chat, ChatMessageType type)
+            = GetChatMessageTypeFromRegistry(packet.ChatType, packet.Name, packet.Message, packet.Target);
+        
         this.HandleChatInternal(
             null,
-            packet.Message,
-            this.GetChatMessageTypeFromRegistry(packet.ChatType),
-            packet.Target ?? packet.Name);
+            chat,
+            type);
         return Task.CompletedTask;
     }
 
@@ -527,24 +549,62 @@ public class ChatPlugin : Plugin
     /// <returns></returns>
     private Task HandleChat(ChatPacket packet)
     {
+        // TODO: packet.Message can be a JSON formatted text component
         this.HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
         return Task.CompletedTask;
     }
 
-    private void HandleChatInternal(UUID? sender, string message, ChatMessageType type, string? senderName = null)
+    private void HandleChatInternal(UUID? sender, string message, ChatMessageType type)
     {
-        this.OnChatMessageReceived?.Invoke(this.Bot, sender, new TextComponent(message), type, senderName);
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, new TextComponent(message), type);
     }
 
-    private void HandleChatInternal(UUID? sender, ChatComponent.Chat message, ChatMessageType type, string? senderName = null)
+    private void HandleChatInternal(UUID? sender, ChatComponent.Chat message, ChatMessageType type)
     {
-        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type, senderName);
+        this.OnChatMessageReceived?.Invoke(this.Bot, sender, message, type);
     }
 
-    private ChatMessageType GetChatMessageTypeFromRegistry(int index)
+    private (ChatComponent.Chat, ChatMessageType) GetChatMessageTypeFromRegistry(
+        int                 index, 
+        ChatComponent.Chat? sender, 
+        ChatComponent.Chat? content, 
+        ChatComponent.Chat? target)
     {
-        var val = this.Bot.Registry["minecraft:chat_type"]["value"][index]["name"]!.StringValue!;
-        return GetChatMessageType(val);
+        var entry         = this.Bot.Registry["minecraft:chat_type"]["value"][index];
+        var name          = entry["name"]!.StringValue!;
+        var element       = entry["element"];
+        var styleCompound = element["chat"]["style"];
+        var translation   = element["chat"]["translation_key"].StringValue;
+        var parameters    = (element["chat"]["parameters"] as NbtList)!.Select(x => x.StringValue).ToArray();
+
+        var with = parameters.Select(paramName =>
+        {
+            var param = paramName switch
+            {
+                "sender" => sender,
+                "content" => content,
+                "target" => target,
+                _ => throw new InvalidOperationException($"Unknown parameter: '{paramName}'") // TODO: There are also team_name, etc...
+            };
+
+            if (param is null)
+            {
+                Logger.Warn("Chat processing: Parameter {name} is null for translation {translation}", paramName, translation);
+            }
+
+            return param ?? new TextComponent("");
+        });
+
+        var style = styleCompound is not null
+            ? Style.Parse(styleCompound)
+            : Style.DefaultStyle;
+        
+        var translatable = new TranslatableComponent(
+            translation,
+            with.ToArray(),
+            style);
+
+        return (translatable, GetChatMessageType(name));
     }
 
     private static ChatMessageType GetChatMessageType(string message)

@@ -80,7 +80,7 @@ public class TextComponent : Chat
         
         // TODO: Parse style codes from raw text and add it to style
         var textToken = token.SelectToken("text")!;
-        return new TextComponent((string)textToken!, ParseStyle(token), ParseChildren(token));
+        return new TextComponent((string)textToken!, Style.Parse(token), ParseChildren(token));
     }
     
     internal static new TextComponent Parse(NbtTag tag)
@@ -96,6 +96,6 @@ public class TextComponent : Chat
 
         // TODO: Parse style codes from raw text and add it to style
         var textToken = tag["text"];
-        return new TextComponent(textToken.StringValue!, ParseStyle(tag), ParseChildren(tag));
+        return new TextComponent(textToken.StringValue!, Style.Parse(tag), ParseChildren(tag));
     }
 }

@@ -115,7 +115,7 @@ public static class PhysicsTests
     {
         var chat = bot.GetPlugin<ChatPlugin>();
 
-        chat.OnChatMessageReceived += (sender, player, chatComponent, position, name) =>
+        chat.OnChatMessageReceived += (sender, player, chatComponent, position) =>
         {
             if (chatComponent.GetMessage(bot.Data).Contains(expectedMessage))
                 source.TrySetResult(true);

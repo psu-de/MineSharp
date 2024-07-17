@@ -49,7 +49,11 @@ public class Style
     public bool?   Obfuscated    { get; set; } = null;
     
     
-    internal JObject? ToJson()
+    /// <summary>
+    /// Encode this style as json
+    /// </summary>
+    /// <returns></returns>
+    public JObject? ToJson()
     {
         JObject? token = null;
 
@@ -98,7 +102,11 @@ public class Style
         return token;
     }
     
-    internal NbtCompound? ToNbt()
+    /// <summary>
+    /// Encode this style as nbt
+    /// </summary>
+    /// <returns></returns>
+    public NbtCompound? ToNbt()
     {
         NbtCompound? nbt = null;
 
@@ -145,5 +153,67 @@ public class Style
         }
         
         return nbt;
+    }
+    
+    /// <summary>
+    /// Parse style from token
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    public static Style Parse(JToken json)
+    {
+        if (json.Type != JTokenType.Object)
+            return Style.DefaultStyle;
+
+        var style = Style.DefaultStyle;
+        var obj   = (json as JObject)!;
+        
+        if (obj.TryGetValue("color", out var color))
+            style.Color = (string)color!;
+        if (obj.TryGetValue("font", out var font))
+            style.Font = (string)font!;
+        if (obj.TryGetValue("bold", out var bold))
+            style.Bold = (bool)bold!;
+        if (obj.TryGetValue("italic", out var italic))
+            style.Italic = (bool)italic!;
+        if (obj.TryGetValue("underlined", out var underlined))
+            style.Underlined = (bool)underlined!;
+        if (obj.TryGetValue("strikethrough", out var strikethrough))
+            style.Strikethrough = (bool)strikethrough!;
+        if (obj.TryGetValue("obfuscated", out var obfuscated))
+            style.Obfuscated = (bool)obfuscated!;
+
+        return style;
+    }
+
+    /// <summary>
+    /// Parse style from nbt
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public static Style Parse(NbtTag tag)
+    {
+        if (tag.TagType != NbtTagType.Compound)
+            return Style.DefaultStyle;
+
+        var style    = Style.DefaultStyle;
+        var compound = (tag as NbtCompound)!;
+
+        if (compound.TryGet("color", out var color))
+            style.Color = color.StringValue;
+        if (compound.TryGet("font", out var font))
+            style.Font = font.StringValue;
+        if (compound.TryGet("bold", out var bold))
+            style.Bold = bold.ByteValue == 1;
+        if (compound.TryGet("italic", out var italic))
+            style.Italic = italic.ByteValue == 1;
+        if (compound.TryGet("underlined", out var underlined))
+            style.Underlined = underlined.ByteValue == 1;
+        if (compound.TryGet("strikethrough", out var strikethrough))
+            style.Strikethrough = strikethrough.ByteValue == 1;
+        if (compound.TryGet("obfuscated", out var obfuscated))
+            style.Obfuscated = obfuscated.ByteValue == 1;
+
+        return style;
     }
 }

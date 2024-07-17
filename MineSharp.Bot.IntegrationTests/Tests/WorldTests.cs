@@ -67,7 +67,7 @@ public static class WorldTests
             var position = new Position(-8, -59, 20);
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
 
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type) =>
             {
                 if (chat.GetMessage(bot.Data).Contains("testMineBlock success"))
                 {
@@ -96,7 +96,7 @@ public static class WorldTests
             await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
             await bot.GetPlugin<ChatPlugin>().SendChat("/give @p dirt");
 
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type) =>
             {
                 if (chat.GetMessage(bot.Data).Contains("testPlaceBlock success"))
                 {
