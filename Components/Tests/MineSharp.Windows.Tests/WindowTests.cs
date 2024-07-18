@@ -82,7 +82,7 @@ public class WindowTests
             Assert.That(inventory.GetInventorySlots().Length, Is.EqualTo(4 * 9));
 
 
-            Assert.Catch<NotSupportedException>(() => mainInventory.GetInventorySlots());
+            Assert.Catch<InvalidOperationException>(() => mainInventory.GetInventorySlots());
         });
     }
 
