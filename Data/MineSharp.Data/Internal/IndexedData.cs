@@ -1,26 +1,28 @@
-using MineSharp.Data.Framework.Providers;
+﻿using MineSharp.Data.Framework.Providers;
 
 namespace MineSharp.Data.Internal;
 
 internal abstract class IndexedData<T>(IDataProvider<T> provider)
 {
-    protected bool              Loaded { get; private set; } = false;
-    private   IDataProvider<T>? provider = provider;
-    private   object            _lock    = new object();
+    private readonly object @lock = new();
+    private IDataProvider<T>? provider = provider;
+    protected bool Loaded { get; private set; }
 
     protected abstract void InitializeData(T data);
 
     protected void Load()
     {
-        lock (this._lock)
+        lock (@lock)
         {
-            if (this.Loaded)
+            if (Loaded)
+            {
                 return;
-        
-            this.InitializeData(this.provider!.GetData());
+            }
 
-            this.Loaded   = true;
-            this.provider = null;
+            InitializeData(provider!.GetData());
+
+            Loaded = true;
+            provider = null;
         }
     }
 }

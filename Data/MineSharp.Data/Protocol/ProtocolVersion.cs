@@ -1,4 +1,4 @@
-namespace MineSharp.Data.Protocol;
+﻿namespace MineSharp.Data.Protocol;
 
 internal abstract class ProtocolVersion
 {

@@ -1,17 +1,17 @@
-using MineSharp.Core.Geometry;
+﻿using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Iterators;
 
 /// <summary>
-/// The Spiral iterator iterates through all positions by incrementing X, then Y and then Z.
+///     The Spiral iterator iterates through all positions by incrementing X, then Y and then Z.
 /// </summary>
-public class XYZIterator : IWorldIterator
+public class XyzIterator : IWorldIterator
 {
+    private readonly int depth;
+    private readonly int end;
+    private readonly int height;
     private readonly Position origin;
-    private readonly int      width;
-    private readonly int      height;
-    private readonly int      depth;
-    private readonly int      end;
+    private readonly int width;
 
     private int index;
     private int x;
@@ -19,41 +19,43 @@ public class XYZIterator : IWorldIterator
     private int z;
 
     /// <summary>
-    /// Create a new instance.
+    ///     Create a new instance.
     /// </summary>
     /// <param name="origin"></param>
     /// <param name="to"></param>
-    public XYZIterator(Position origin, Position to)
+    public XyzIterator(Position origin, Position to)
     {
         this.origin = origin;
-        this.width  = to.X - origin.X;
-        this.height = to.Y - origin.Y;
-        this.depth  = to.Z - origin.Z;
-        this.end    = this.width * this.height * this.depth;
+        width = to.X - origin.X;
+        height = to.Y - origin.Y;
+        depth = to.Z - origin.Z;
+        end = width * height * depth;
     }
 
     /// <inheritdoc />
     public IEnumerable<Position> Iterate()
     {
-        while (this.Advance())
+        while (Advance())
         {
-            yield return new Position(
-                this.origin.X + this.x,
-                this.origin.Y + this.y,
-                this.origin.Z + this.z);
+            yield return new(
+                origin.X + x,
+                origin.Y + y,
+                origin.Z + z);
         }
     }
 
     private bool Advance()
     {
-        if (this.index == this.end)
+        if (index == end)
+        {
             return false;
+        }
 
-        var i = this.index / this.width;
-        this.x = this.index % this.width;
-        this.y = i          % this.height;
-        this.z = i          / this.height;
-        this.index++;
+        var i = index / width;
+        x = index % width;
+        y = i % height;
+        z = i / height;
+        index++;
         return true;
     }
 }

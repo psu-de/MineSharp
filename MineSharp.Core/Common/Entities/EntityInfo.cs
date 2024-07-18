@@ -1,7 +1,7 @@
-namespace MineSharp.Core.Common.Entities;
+﻿namespace MineSharp.Core.Common.Entities;
 
 /// <summary>
-/// Entity descriptor class
+///     Entity descriptor class
 /// </summary>
 /// <param name="Id">The numerical id of the entity (depends on minecraft version)</param>
 /// <param name="Type">The Type of this entity (independent of minecraft version)</param>
@@ -12,11 +12,11 @@ namespace MineSharp.Core.Common.Entities;
 /// <param name="MobType"></param>
 /// <param name="Category"></param>
 public record EntityInfo(
-    int            Id,
-    EntityType     Type,
-    string         Name,
-    string         DisplayName,
-    float          Width,
-    float          Height,
-    MobType        MobType,
+    int Id,
+    EntityType Type,
+    string Name,
+    string DisplayName,
+    float Width,
+    float Height,
+    MobType MobType,
     EntityCategory Category);

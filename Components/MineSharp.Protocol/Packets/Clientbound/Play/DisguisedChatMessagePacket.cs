@@ -1,6 +1,4 @@
-using fNbt;
-using MineSharp.ChatComponent;
-using MineSharp.Core;
+﻿using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -9,30 +7,30 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class DisguisedChatMessagePacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_ProfilelessChat;
-
-    public Chat  Message  { get; set; }
-    public int   ChatType { get; set; }
-    public Chat  Name     { get; set; }
-    public Chat? Target   { get; set; }
-
-
     public DisguisedChatMessagePacket(Chat message, int chatType, Chat name, Chat? target)
     {
-        this.Message  = message;
-        this.ChatType = chatType;
-        this.Name     = name;
-        this.Target   = target;
+        Message = message;
+        ChatType = chatType;
+        Name = name;
+        Target = target;
     }
+
+    public Chat Message { get; set; }
+    public int ChatType { get; set; }
+    public Chat Name { get; set; }
+    public Chat? Target { get; set; }
+    public PacketType Type => PacketType.CB_Play_ProfilelessChat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteChatComponent(this.Message);
-        buffer.WriteVarInt(this.ChatType);
-        buffer.WriteChatComponent(this.Name);
-        buffer.WriteBool(this.Target != null);
-        if (this.Target != null)
-            buffer.WriteChatComponent(this.Target);
+        buffer.WriteChatComponent(Message);
+        buffer.WriteVarInt(ChatType);
+        buffer.WriteChatComponent(Name);
+        buffer.WriteBool(Target != null);
+        if (Target != null)
+        {
+            buffer.WriteChatComponent(Target);
+        }
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

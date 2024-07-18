@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Items;
+﻿using MineSharp.Core.Common.Items;
 using MineSharp.Core.Common.Recipes;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Internal;
@@ -11,14 +11,16 @@ internal class RecipeData(RecipeProvider provider) : IndexedData<RecipeDataBlob>
 
     public Recipe[]? ByItem(ItemType type)
     {
-        if (!this.Loaded)
-            this.Load();
+        if (!Loaded)
+        {
+            Load();
+        }
 
-        return this.recipes!.GetValueOrDefault(type, null);
+        return recipes!.GetValueOrDefault(type, null);
     }
 
     protected override void InitializeData(RecipeDataBlob data)
     {
-        this.recipes = data.Recipes;
+        recipes = data.Recipes;
     }
 }

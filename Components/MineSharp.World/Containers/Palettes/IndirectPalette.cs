@@ -4,47 +4,54 @@ namespace MineSharp.World.Containers.Palettes;
 
 internal class IndirectPalette : IPalette
 {
-    private readonly IList<int> _map;
+    private readonly IList<int> map;
 
     public IndirectPalette(IList<int> map)
     {
-        this._map = map;
+        this.map = map;
     }
 
     public bool ContainsState(int minState, int maxState)
     {
-        for (var i = 0; i < this._map!.Count; i++)
+        for (var i = 0; i < map!.Count; i++)
         {
-            if (minState <= this._map[i] && this._map[i] <= maxState)
+            if (minState <= map[i] && map[i] <= maxState)
+            {
                 return true;
+            }
         }
 
         return false;
     }
 
-    public int Get(int index) => this._map[index];
+    public int Get(int index)
+    {
+        return map[index];
+    }
 
     public IPalette? Set(int index, int state, IPaletteContainer container)
     {
-        if (this.ContainsState(state, state))
+        if (ContainsState(state, state))
         {
-            var stateIndex = this.GetStateIndex(state);
+            var stateIndex = GetStateIndex(state);
             container.Data.Set(index, stateIndex);
             return null;
         }
 
         // add the new state to the palette
-        var newMapSize      = this._map!.Count + 1;
+        var newMapSize = map!.Count + 1;
         var newBitsPerEntry = (byte)Math.Ceiling(Math.Log2(newMapSize));
 
         if (newBitsPerEntry > container.MaxBits)
         {
-            var    bits    = (int)Math.Ceiling(Math.Log2(container.TotalNumberOfStates));
-            long[] data    = new long[bits];
-            var    newData = new IntBitArray(data, newBitsPerEntry);
+            var bits = (int)Math.Ceiling(Math.Log2(container.TotalNumberOfStates));
+            var data = new long[bits];
+            var newData = new IntBitArray(data, newBitsPerEntry);
 
             for (var i = 0; i < container.Capacity; i++)
+            {
                 newData.Set(i, container.GetAt(i));
+            }
 
             newData.Set(index, state);
 
@@ -53,16 +60,16 @@ internal class IndirectPalette : IPalette
         }
 
         container.Data.ChangeBitsPerEntry(newBitsPerEntry);
-        container.Data.Set(index, this._map.Count);
+        container.Data.Set(index, map.Count);
 
-        var newMap = new List<int>(this._map) { state };
+        var newMap = new List<int>(map) { state };
         return new IndirectPalette(newMap);
     }
 
     public static IPalette FromStream(PacketBuffer stream)
     {
         var map = new int[stream.ReadVarInt()];
-        for (int i = 0; i < map.Length; i++)
+        for (var i = 0; i < map.Length; i++)
         {
             map[i] = stream.ReadVarInt();
         }
@@ -70,5 +77,8 @@ internal class IndirectPalette : IPalette
         return new IndirectPalette(map);
     }
 
-    public int GetStateIndex(int state) => this._map.IndexOf(state);
+    public int GetStateIndex(int state)
+    {
+        return map.IndexOf(state);
+    }
 }

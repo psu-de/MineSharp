@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
@@ -9,31 +9,35 @@ namespace MineSharp.Data.BlockCollisionShapes;
 internal class BlockCollisionShapeData(IDataProvider<BlockCollisionShapeDataBlob> provider)
     : IndexedData<BlockCollisionShapeDataBlob>(provider), IBlockCollisionShapeData
 {
+    private Dictionary<int, Aabb[]> indexToShape = new();
     private Dictionary<BlockType, int[]> typeToIndices = new();
-    private Dictionary<int, AABB[]>   indexToShape  = new();
-
-    protected override void InitializeData(BlockCollisionShapeDataBlob data)
-    {
-        this.typeToIndices = data.BlockToIndicesMap;
-        this.indexToShape  = data.IndexToShapeMap
-                                 .ToDictionary(
-                                      x => x.Key, 
-                                      x => x.Value.Select(y => new AABB(y[0], y[1], y[2], y[3], y[4], y[5])).ToArray());
-    }
 
     public int[] GetShapeIndices(BlockType type)
     {
-        if (!this.Loaded)
-            this.Load();
+        if (!Loaded)
+        {
+            Load();
+        }
 
-        return this.typeToIndices[type];
+        return typeToIndices[type];
     }
 
-    public AABB[] GetShapes(int shapeIndex)
+    public Aabb[] GetShapes(int shapeIndex)
     {
-        if (!this.Loaded)
-            this.Load();
-        
+        if (!Loaded)
+        {
+            Load();
+        }
+
         return indexToShape[shapeIndex];
+    }
+
+    protected override void InitializeData(BlockCollisionShapeDataBlob data)
+    {
+        typeToIndices = data.BlockToIndicesMap;
+        indexToShape = data.IndexToShapeMap
+                           .ToDictionary(
+                                x => x.Key,
+                                x => x.Value.Select(y => new Aabb(y[0], y[1], y[2], y[3], y[4], y[5])).ToArray());
     }
 }

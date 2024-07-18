@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Thanks to https://github.com/MCCTeam/Minecraft-Console-Client
  * Some code has been copied and modified from:
  *  - MinecraftClient/Protocol/Handlers/Protocol18.cs
@@ -6,43 +6,47 @@
 
 namespace MineSharp.Bot.Chat;
 
-internal class LastSeenMessageCollector1_19_2 : LastSeenMessageCollector
+internal class LastSeenMessageCollector1192 : LastSeenMessageCollector
 {
-    private const int CAPACITY = 5;
+    private const int Capacity = 5;
 
-    public int PendingAcknowledgements { get; set; } = 0;
-
-    public LastSeenMessageCollector1_19_2() : base(CAPACITY)
+    public LastSeenMessageCollector1192() : base(Capacity)
     { }
+
+    public int PendingAcknowledgements { get; set; }
 
     public override bool Push(AcknowledgedMessage message)
     {
         var last = message;
-        for (int i = 0; i < this.Count; i++)
+        for (var i = 0; i < Count; i++)
         {
-            var entry = this.AcknowledgedMessages[i]!;
-            this.AcknowledgedMessages[i] = last;
-            last                         = entry;
+            var entry = AcknowledgedMessages[i]!;
+            AcknowledgedMessages[i] = last;
+            last = entry;
 
             if (message.Sender != entry.Sender)
+            {
                 continue;
+            }
 
             last = null;
             break;
         }
 
-        if (last != null && this.Count < this.AcknowledgedMessages.Length)
-            this.AcknowledgedMessages[this.Count++] = last;
+        if (last != null && Count < AcknowledgedMessages.Length)
+        {
+            AcknowledgedMessages[Count++] = last;
+        }
 
-        this.LastSeenMessages = new AcknowledgedMessage[Count];
-        Array.Copy(this.AcknowledgedMessages, this.LastSeenMessages, this.Count);
+        LastSeenMessages = new AcknowledgedMessage[Count];
+        Array.Copy(AcknowledgedMessages, LastSeenMessages, Count);
 
         return false;
     }
 
     public AcknowledgedMessage[] AcknowledgeMessages()
     {
-        this.PendingAcknowledgements = 0;
-        return this.LastSeenMessages;
+        PendingAcknowledgements = 0;
+        return LastSeenMessages;
     }
 }

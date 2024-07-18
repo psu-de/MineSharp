@@ -7,44 +7,44 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-/// Packet used to set slots in creative inventory (https://wiki.vg/Protocol#Set_Creative_Mode_Slot)
+///     Packet used to set slots in creative inventory (https://wiki.vg/Protocol#Set_Creative_Mode_Slot)
 /// </summary>
 public class SetCreativeSlotPacket : IPacket
 {
-    /// <inheritdoc />
-    public PacketType Type => PacketType.SB_Play_SetCreativeSlot;
-    
     /// <summary>
-    /// The inventory slot index
-    /// </summary>
-    public short SlotIndex { get; set; }
-    
-    /// <summary>
-    /// The clicked item
-    /// </summary>
-    public Item? Item      { get; set; }
-
-    /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     public SetCreativeSlotPacket(short slotIndex, Item? item)
     {
         SlotIndex = slotIndex;
-        Item      = item;
+        Item = item;
     }
+
+    /// <summary>
+    ///     The inventory slot index
+    /// </summary>
+    public short SlotIndex { get; set; }
+
+    /// <summary>
+    ///     The clicked item
+    /// </summary>
+    public Item? Item { get; set; }
+
+    /// <inheritdoc />
+    public PacketType Type => PacketType.SB_Play_SetCreativeSlot;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteShort(this.SlotIndex);
-        buffer.WriteOptionalItem(this.Item);
+        buffer.WriteShort(SlotIndex);
+        buffer.WriteOptionalItem(Item);
     }
 
     /// <inheritdoc />
-    public static IPacket    Read(PacketBuffer  buffer, MinecraftData version)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var index = buffer.ReadShort();
-        var item  = buffer.ReadOptionalItem(version);
+        var item = buffer.ReadOptionalItem(version);
         return new SetCreativeSlotPacket(index, item);
     }
 }

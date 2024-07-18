@@ -1,4 +1,4 @@
-using MineSharp.ChatComponent;
+﻿using MineSharp.ChatComponent;
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
@@ -9,27 +9,30 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class PlayerChatPacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_PlayerChat;
-
-    public IChatMessageBody Body { get; set; }
-
     public PlayerChatPacket(IChatMessageBody body)
     {
-        this.Body = body;
+        Body = body;
     }
+
+    public IChatMessageBody Body { get; set; }
+    public PacketType Type => PacketType.CB_Play_PlayerChat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        this.Body.Write(buffer, version);
+        Body.Write(buffer, version);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol == ProtocolVersion.V_1_19)
-            return new PlayerChatPacket(V1_19Body.Read(buffer));
+        {
+            return new PlayerChatPacket(V119Body.Read(buffer));
+        }
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
-            return new PlayerChatPacket(V1_19_2_3Body.Read(buffer, version));
+        {
+            return new PlayerChatPacket(V11923Body.Read(buffer, version));
+        }
 
         throw new NotImplementedException();
     }
@@ -39,123 +42,117 @@ public class PlayerChatPacket : IPacket
         void Write(PacketBuffer buffer, MinecraftData version);
     }
 
-    public class V1_19Body : IChatMessageBody
+    public class V119Body : IChatMessageBody
     {
-        public Chat   SignedChat     { get; set; }
-        public Chat?  UnsignedChat   { get; set; }
-        public int    MessageType    { get; set; }
-        public UUID   Sender         { get; set; }
-        public Chat   SenderName     { get; set; }
-        public Chat?  SenderTeamName { get; set; }
-        public long   Timestamp      { get; set; }
-        public long   Salt           { get; set; }
-        public byte[] Signature      { get; set; }
-
-        public V1_19Body(Chat signedChat, Chat? unsignedChat, int    messageType, UUID sender, Chat senderName, Chat? senderTeamName,
-                         long timestamp,  long  salt,         byte[] signature)
+        public V119Body(Chat signedChat, Chat? unsignedChat, int messageType, Uuid sender, Chat senderName,
+                        Chat? senderTeamName,
+                        long timestamp, long salt, byte[] signature)
         {
-            this.SignedChat     = signedChat;
-            this.UnsignedChat   = unsignedChat;
-            this.MessageType    = messageType;
-            this.Sender         = sender;
-            this.SenderName     = senderName;
-            this.SenderTeamName = senderTeamName;
-            this.Timestamp      = timestamp;
-            this.Salt           = salt;
-            this.Signature      = signature;
+            SignedChat = signedChat;
+            UnsignedChat = unsignedChat;
+            MessageType = messageType;
+            Sender = sender;
+            SenderName = senderName;
+            SenderTeamName = senderTeamName;
+            Timestamp = timestamp;
+            Salt = salt;
+            Signature = signature;
         }
+
+        public Chat SignedChat { get; set; }
+        public Chat? UnsignedChat { get; set; }
+        public int MessageType { get; set; }
+        public Uuid Sender { get; set; }
+        public Chat SenderName { get; set; }
+        public Chat? SenderTeamName { get; set; }
+        public long Timestamp { get; set; }
+        public long Salt { get; set; }
+        public byte[] Signature { get; set; }
 
         public void Write(PacketBuffer buffer, MinecraftData version)
         {
-            buffer.WriteChatComponent(this.SignedChat);
+            buffer.WriteChatComponent(SignedChat);
 
-            bool hasUnsignedChat = this.UnsignedChat != null;
+            var hasUnsignedChat = UnsignedChat != null;
             buffer.WriteBool(hasUnsignedChat);
             if (hasUnsignedChat)
-                buffer.WriteChatComponent(this.UnsignedChat!);
+            {
+                buffer.WriteChatComponent(UnsignedChat!);
+            }
 
-            buffer.WriteVarInt(this.MessageType);
-            buffer.WriteUuid(this.Sender);
+            buffer.WriteVarInt(MessageType);
+            buffer.WriteUuid(Sender);
 
-            var hasTeamName = this.SenderTeamName != null;
+            var hasTeamName = SenderTeamName != null;
             if (hasTeamName)
-                buffer.WriteChatComponent(this.SenderTeamName!);
+            {
+                buffer.WriteChatComponent(SenderTeamName!);
+            }
 
-            buffer.WriteLong(this.Timestamp);
-            buffer.WriteLong(this.Salt);
-            buffer.WriteVarInt(this.Signature.Length);
-            buffer.WriteBytes(this.Signature);
+            buffer.WriteLong(Timestamp);
+            buffer.WriteLong(Salt);
+            buffer.WriteVarInt(Signature.Length);
+            buffer.WriteBytes(Signature);
         }
 
-        public static V1_19Body Read(PacketBuffer buffer)
+        public static V119Body Read(PacketBuffer buffer)
         {
             var signedChat = buffer.ReadChatComponent();
 
-            var   hasUnsignedChat = buffer.ReadBool();
-            Chat? unsignedChat    = null;
+            var hasUnsignedChat = buffer.ReadBool();
+            Chat? unsignedChat = null;
             if (hasUnsignedChat)
+            {
                 unsignedChat = buffer.ReadChatComponent();
+            }
 
             var messageType = buffer.ReadVarInt();
-            var sender      = buffer.ReadUuid();
-            var senderName  = buffer.ReadChatComponent();
+            var sender = buffer.ReadUuid();
+            var senderName = buffer.ReadChatComponent();
 
-            var     hasSenderTeamName = buffer.ReadBool();
-            Chat? senderTeamName    = null;
+            var hasSenderTeamName = buffer.ReadBool();
+            Chat? senderTeamName = null;
             if (hasSenderTeamName)
+            {
                 senderTeamName = buffer.ReadChatComponent();
+            }
 
-            var    timestamp = buffer.ReadLong();
-            var    salt      = buffer.ReadLong();
-            byte[] signature = new byte[buffer.ReadVarInt()];
+            var timestamp = buffer.ReadLong();
+            var salt = buffer.ReadLong();
+            var signature = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(signature);
 
-            return new V1_19Body(signedChat, unsignedChat, messageType, sender, senderName, senderTeamName, timestamp, salt, signature);
+            return new(signedChat, unsignedChat, messageType, sender, senderName, senderTeamName, timestamp, salt,
+                       signature);
         }
     }
 
-    public class V1_19_2_3Body : IChatMessageBody
+    public class V11923Body : IChatMessageBody
     {
-        public byte[]?           PreviousSignature { get; set; }
-        public UUID              Sender            { get; set; }
-        public int?              Index             { get; set; }
-        public byte[]?           Signature         { get; set; }
-        public string            PlainMessage      { get; set; }
-        public Chat?             FormattedMessage  { get; set; }
-        public long              Timestamp         { get; set; }
-        public long              Salt              { get; set; }
-        public ChatMessageItem[] PreviousMessages  { get; set; }
-        public Chat?           UnsignedContent   { get; set; }
-        public int               FilterType        { get; set; }
-        public long[]?           FilterTypeMask    { get; set; }
-        public int               Type              { get; set; }
-        public Chat            NetworkName       { get; set; }
-        public Chat?           NetworkTargetName { get; set; }
-
-        private V1_19_2_3Body(byte[]? previousSignature, UUID sender,     int?    index,          byte[]? signature, string plainMessage,
-                              Chat?   formattedMessage,  long timestamp,  long    salt,           ChatMessageItem[] previousMessages,
-                              Chat?   unsignedContent,   int  filterType, long[]? filterTypeMask, int type, Chat networkName,
-                              Chat?   networkTargetName)
+        private V11923Body(byte[]? previousSignature, Uuid sender, int? index, byte[]? signature, string plainMessage,
+                           Chat? formattedMessage, long timestamp, long salt, ChatMessageItem[] previousMessages,
+                           Chat? unsignedContent, int filterType, long[]? filterTypeMask, int type, Chat networkName,
+                           Chat? networkTargetName)
         {
-            this.PreviousSignature = previousSignature;
-            this.Sender            = sender;
-            this.Index             = index;
-            this.Signature         = signature;
-            this.PlainMessage      = plainMessage;
-            this.FormattedMessage  = formattedMessage;
-            this.Timestamp         = timestamp;
-            this.Salt              = salt;
-            this.PreviousMessages  = previousMessages;
-            this.UnsignedContent   = unsignedContent;
-            this.FilterType        = filterType;
-            this.FilterTypeMask    = filterTypeMask;
-            this.Type              = type;
-            this.NetworkName       = networkName;
-            this.NetworkTargetName = networkTargetName;
+            PreviousSignature = previousSignature;
+            Sender = sender;
+            Index = index;
+            Signature = signature;
+            PlainMessage = plainMessage;
+            FormattedMessage = formattedMessage;
+            Timestamp = timestamp;
+            Salt = salt;
+            PreviousMessages = previousMessages;
+            UnsignedContent = unsignedContent;
+            FilterType = filterType;
+            FilterTypeMask = filterTypeMask;
+            Type = type;
+            NetworkName = networkName;
+            NetworkTargetName = networkTargetName;
         }
 
         /// <summary>
-        /// Constructor for 1.19.2
+        ///     Constructor for 1.19.2
         /// </summary>
         /// <param name="previousSignature"></param>
         /// <param name="sender"></param>
@@ -171,28 +168,30 @@ public class PlayerChatPacket : IPacket
         /// <param name="type"></param>
         /// <param name="networkName"></param>
         /// <param name="networkTargetName"></param>
-        public V1_19_2_3Body(byte[]? previousSignature, UUID sender, byte[] signature, string plainMessage, Chat? formattedMessage,
-                             long    timestamp, long salt, ChatMessageItem[] previousMessages, Chat? unsignedContent, int filterType,
-                             long[]? filterTypeMask, int type, Chat networkName, Chat? networkTargetName)
+        public V11923Body(byte[]? previousSignature, Uuid sender, byte[] signature, string plainMessage,
+                          Chat? formattedMessage,
+                          long timestamp, long salt, ChatMessageItem[] previousMessages, Chat? unsignedContent,
+                          int filterType,
+                          long[]? filterTypeMask, int type, Chat networkName, Chat? networkTargetName)
         {
-            this.PreviousSignature = previousSignature;
-            this.Sender            = sender;
-            this.Signature         = signature;
-            this.PlainMessage      = plainMessage;
-            this.FormattedMessage  = formattedMessage;
-            this.Timestamp         = timestamp;
-            this.Salt              = salt;
-            this.PreviousMessages  = previousMessages;
-            this.UnsignedContent   = unsignedContent;
-            this.FilterType        = filterType;
-            this.FilterTypeMask    = filterTypeMask;
-            this.Type              = type;
-            this.NetworkName       = networkName;
-            this.NetworkTargetName = networkTargetName;
+            PreviousSignature = previousSignature;
+            Sender = sender;
+            Signature = signature;
+            PlainMessage = plainMessage;
+            FormattedMessage = formattedMessage;
+            Timestamp = timestamp;
+            Salt = salt;
+            PreviousMessages = previousMessages;
+            UnsignedContent = unsignedContent;
+            FilterType = filterType;
+            FilterTypeMask = filterTypeMask;
+            Type = type;
+            NetworkName = networkName;
+            NetworkTargetName = networkTargetName;
         }
 
         /// <summary>
-        /// Constructor for 1.19.3
+        ///     Constructor for 1.19.3
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="index"></param>
@@ -207,112 +206,139 @@ public class PlayerChatPacket : IPacket
         /// <param name="type"></param>
         /// <param name="networkName"></param>
         /// <param name="networkTargetName"></param>
-        public V1_19_2_3Body(
-            UUID              sender,
-            int               index,
-            byte[]?           signature,
-            string            plainMessage,
-            long              timestamp,
-            long              salt,
+        public V11923Body(
+            Uuid sender,
+            int index,
+            byte[]? signature,
+            string plainMessage,
+            long timestamp,
+            long salt,
             ChatMessageItem[] previousMessages,
-            Chat?             unsignedContent,
-            int               filterType,
-            long[]?           filterTypeMask,
-            int               type,
-            Chat              networkName,
-            Chat?             networkTargetName)
+            Chat? unsignedContent,
+            int filterType,
+            long[]? filterTypeMask,
+            int type,
+            Chat networkName,
+            Chat? networkTargetName)
         {
-            this.Sender            = sender;
-            this.Index             = index;
-            this.Signature         = signature;
-            this.PlainMessage      = plainMessage;
-            this.Timestamp         = timestamp;
-            this.Salt              = salt;
-            this.PreviousMessages  = previousMessages;
-            this.UnsignedContent   = unsignedContent;
-            this.FilterType        = filterType;
-            this.FilterTypeMask    = filterTypeMask;
-            this.Type              = type;
-            this.NetworkName       = networkName;
-            this.NetworkTargetName = networkTargetName;
+            Sender = sender;
+            Index = index;
+            Signature = signature;
+            PlainMessage = plainMessage;
+            Timestamp = timestamp;
+            Salt = salt;
+            PreviousMessages = previousMessages;
+            UnsignedContent = unsignedContent;
+            FilterType = filterType;
+            FilterTypeMask = filterTypeMask;
+            Type = type;
+            NetworkName = networkName;
+            NetworkTargetName = networkTargetName;
         }
+
+        public byte[]? PreviousSignature { get; set; }
+        public Uuid Sender { get; set; }
+        public int? Index { get; set; }
+        public byte[]? Signature { get; set; }
+        public string PlainMessage { get; set; }
+        public Chat? FormattedMessage { get; set; }
+        public long Timestamp { get; set; }
+        public long Salt { get; set; }
+        public ChatMessageItem[] PreviousMessages { get; set; }
+        public Chat? UnsignedContent { get; set; }
+        public int FilterType { get; set; }
+        public long[]? FilterTypeMask { get; set; }
+        public int Type { get; set; }
+        public Chat NetworkName { get; set; }
+        public Chat? NetworkTargetName { get; set; }
 
         public void Write(PacketBuffer buffer, MinecraftData version)
         {
             if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
-                var hasPreviousSignature = this.PreviousSignature != null;
+                var hasPreviousSignature = PreviousSignature != null;
                 buffer.WriteBool(hasPreviousSignature);
                 if (hasPreviousSignature)
                 {
-                    buffer.WriteVarInt(this.PreviousSignature!.Length);
-                    buffer.WriteBytes(this.PreviousSignature);
+                    buffer.WriteVarInt(PreviousSignature!.Length);
+                    buffer.WriteBytes(PreviousSignature);
                 }
             }
 
-            buffer.WriteUuid(this.Sender);
+            buffer.WriteUuid(Sender);
 
             if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
-                buffer.WriteVarInt(this.Signature!.Length);
-                buffer.WriteBytes(this.Signature);
+                buffer.WriteVarInt(Signature!.Length);
+                buffer.WriteBytes(Signature);
             }
             else
             {
-                var hasSignature = this.Signature != null;
+                var hasSignature = Signature != null;
                 buffer.WriteBool(hasSignature);
                 if (hasSignature)
-                    buffer.WriteBytes(this.Signature);
+                {
+                    buffer.WriteBytes(Signature);
+                }
             }
 
-            buffer.WriteString(this.PlainMessage);
+            buffer.WriteString(PlainMessage);
 
             if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
-                var hasFormattedMessage = this.FormattedMessage != null;
+                var hasFormattedMessage = FormattedMessage != null;
                 buffer.WriteBool(hasFormattedMessage);
                 if (hasFormattedMessage)
-                    buffer.WriteChatComponent(this.FormattedMessage!);
+                {
+                    buffer.WriteChatComponent(FormattedMessage!);
+                }
             }
 
-            buffer.WriteLong(this.Timestamp);
-            buffer.WriteLong(this.Salt);
-            buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
+            buffer.WriteLong(Timestamp);
+            buffer.WriteLong(Salt);
+            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
 
-            var hasUnsignedContent = this.UnsignedContent != null;
+            var hasUnsignedContent = UnsignedContent != null;
             buffer.WriteBool(hasUnsignedContent);
             if (hasUnsignedContent)
-                buffer.WriteChatComponent(this.UnsignedContent!);
+            {
+                buffer.WriteChatComponent(UnsignedContent!);
+            }
 
-            buffer.WriteVarInt(this.FilterType);
-            if (this.FilterType == 2)
-                buffer.WriteVarIntArray(this.FilterTypeMask!, (buffer, l) => buffer.WriteLong(l));
-            buffer.WriteVarInt(this.Type);
-            buffer.WriteChatComponent(this.NetworkName);
+            buffer.WriteVarInt(FilterType);
+            if (FilterType == 2)
+            {
+                buffer.WriteVarIntArray(FilterTypeMask!, (buffer, l) => buffer.WriteLong(l));
+            }
 
-            bool hasNetworkTargetName = this.NetworkTargetName != null;
+            buffer.WriteVarInt(Type);
+            buffer.WriteChatComponent(NetworkName);
+
+            var hasNetworkTargetName = NetworkTargetName != null;
             buffer.WriteBool(hasNetworkTargetName);
             if (hasNetworkTargetName)
-                buffer.WriteChatComponent(this.NetworkTargetName!);
+            {
+                buffer.WriteChatComponent(NetworkTargetName!);
+            }
         }
 
-        public static V1_19_2_3Body Read(PacketBuffer buffer, MinecraftData version)
+        public static V11923Body Read(PacketBuffer buffer, MinecraftData version)
         {
-            byte[]?           previousSignature = null;
-            UUID              sender;
-            int?              index     = null;
-            byte[]?           signature = null;
-            string            plainMessage;
-            Chat?             formattedMessage = null;
-            long              timestamp;
-            long              salt;
+            byte[]? previousSignature = null;
+            Uuid sender;
+            int? index = null;
+            byte[]? signature = null;
+            string plainMessage;
+            Chat? formattedMessage = null;
+            long timestamp;
+            long salt;
             ChatMessageItem[] previousMessages;
-            Chat?             unsignedContent;
-            int               filterType;
-            long[]?           filterTypeMask = null;
-            int               type;
-            Chat              networkName;
-            Chat?             networkTargetName = null;
+            Chat? unsignedContent;
+            int filterType;
+            long[]? filterTypeMask = null;
+            int type;
+            Chat networkName;
+            Chat? networkTargetName = null;
 
             if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
             {
@@ -350,32 +376,41 @@ public class PlayerChatPacket : IPacket
                 var hasFormattedMessage = buffer.ReadBool();
                 formattedMessage = null;
                 if (hasFormattedMessage)
+                {
                     formattedMessage = buffer.ReadChatComponent();
+                }
             }
 
-            timestamp        = buffer.ReadLong();
-            salt             = buffer.ReadLong();
+            timestamp = buffer.ReadLong();
+            salt = buffer.ReadLong();
             previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
 
             var hasUnsignedContent = buffer.ReadBool();
             unsignedContent = null;
             if (hasUnsignedContent)
+            {
                 unsignedContent = buffer.ReadChatComponent();
+            }
 
-            filterType     = buffer.ReadVarInt();
+            filterType = buffer.ReadVarInt();
             filterTypeMask = null;
             if (filterType == 2)
+            {
                 buffer.ReadVarIntArray(buffer => buffer.ReadLong());
-            type        = buffer.ReadVarInt();
+            }
+
+            type = buffer.ReadVarInt();
             networkName = buffer.ReadChatComponent();
 
-            bool hasNetworkTargetName = buffer.ReadBool();
+            var hasNetworkTargetName = buffer.ReadBool();
             if (hasNetworkTargetName)
+            {
                 networkTargetName = buffer.ReadChatComponent();
+            }
 
-            return new V1_19_2_3Body(previousSignature, sender, index, signature, plainMessage, formattedMessage, timestamp, salt,
-                previousMessages, unsignedContent, filterType, filterTypeMask, type, networkName,
-                networkTargetName);
+            return new(previousSignature, sender, index, signature, plainMessage, formattedMessage, timestamp, salt,
+                       previousMessages, unsignedContent, filterType, filterTypeMask, type, networkName,
+                       networkTargetName);
         }
     }
 }

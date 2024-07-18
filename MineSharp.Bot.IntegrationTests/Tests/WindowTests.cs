@@ -1,4 +1,4 @@
-using MineSharp.Bot.Plugins;
+﻿using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Geometry;
 using Spectre.Console;
@@ -42,7 +42,7 @@ public static class WindowTests
             await Task.Delay(1000);
 
             var blockPos = new Position(17, -58, 24);
-            var block    = bot.GetPlugin<WorldPlugin>().World.GetBlockAt(blockPos);
+            var block = bot.GetPlugin<WorldPlugin>().World.GetBlockAt(blockPos);
 
             var window = await bot.GetPlugin<WindowPlugin>().OpenContainer(block);
             await Task.Delay(1000);
@@ -51,9 +51,9 @@ public static class WindowTests
             await Task.Delay(1000);
 
             source.TrySetResult(
-                window.SlotCount     == 3 * 9
-             && slot.Item?.Info.Name == "soul_sand"
-             && slot.Item?.Count     == 48);
+                window.SlotCount == 3 * 9
+                && slot.Item?.Info.Name == "soul_sand"
+                && slot.Item?.Count == 48);
         });
     }
 
@@ -62,7 +62,7 @@ public static class WindowTests
         return IntegrationTest.RunTest("testCreativeInventory", async (bot, source) =>
         {
             var window = bot.GetPlugin<WindowPlugin>();
-            var chat   = bot.GetPlugin<ChatPlugin>();
+            var chat = bot.GetPlugin<ChatPlugin>();
 
             await window.WaitForInventory();
 

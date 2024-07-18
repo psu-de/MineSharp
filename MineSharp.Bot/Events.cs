@@ -1,4 +1,4 @@
-using MineSharp.Bot.Chat;
+﻿using MineSharp.Bot.Chat;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
@@ -7,7 +7,7 @@ using MineSharp.Windows;
 namespace MineSharp.Bot;
 
 /// <summary>
-/// Event delegates used by MineSharp.Bot
+///     Event delegates used by MineSharp.Bot
 /// </summary>
 public static class Events
 {
@@ -19,7 +19,8 @@ public static class Events
 
     public delegate void BotChatEvent(MineSharpBot sender, ChatComponent.Chat message);
 
-    public delegate void BotChatMessageEvent(MineSharpBot sender, UUID? player, ChatComponent.Chat message, ChatMessageType chatPosition);
+    public delegate void BotChatMessageEvent(MineSharpBot sender, Uuid? player, ChatComponent.Chat message,
+                                             ChatMessageType chatPosition);
 
     public delegate void EntityEvent(MineSharpBot sender, Entity entity);
 

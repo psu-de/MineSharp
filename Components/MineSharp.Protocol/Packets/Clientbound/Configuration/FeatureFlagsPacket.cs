@@ -1,35 +1,35 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 #pragma warning disable CS1591
 /// <summary>
-/// Feature flags packet
+///     Feature flags packet
 /// </summary>
 public class FeatureFlagsPacket : IPacket
 {
-    /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
-
     /// <summary>
-    /// The enabled feature flags
-    /// </summary>
-    public string[] FeatureFlags { get; set; }
-
-    /// <summary>
-    /// Create a new instance
+    ///     Create a new instance
     /// </summary>
     /// <param name="featureFlags"></param>
     public FeatureFlagsPacket(string[] featureFlags)
     {
-        this.FeatureFlags = featureFlags;
+        FeatureFlags = featureFlags;
     }
+
+    /// <summary>
+    ///     The enabled feature flags
+    /// </summary>
+    public string[] FeatureFlags { get; set; }
+
+    /// <inheritdoc />
+    public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarIntArray(this.FeatureFlags, (buff, str) => buff.WriteString(str));
+        buffer.WriteVarIntArray(FeatureFlags, (buff, str) => buff.WriteString(str));
     }
 
     /// <inheritdoc />

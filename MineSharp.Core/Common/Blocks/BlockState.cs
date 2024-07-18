@@ -1,15 +1,15 @@
-using MineSharp.Core.Common.Blocks.Property;
+﻿using MineSharp.Core.Common.Blocks.Property;
 
 namespace MineSharp.Core.Common.Blocks;
 
 /// <summary>
-/// Represents a block state with multiple properties.
+///     Represents a block state with multiple properties.
 /// </summary>
 /// <param name="properties"></param>
 public class BlockState(params IBlockProperty[] properties)
 {
     /// <summary>
-    /// Returns the value of the property with the given <paramref name="name"/>
+    ///     Returns the value of the property with the given <paramref name="name" />
     /// </summary>
     /// <param name="name">The name of the property</param>
     /// <param name="state">The current block state</param>
@@ -17,7 +17,7 @@ public class BlockState(params IBlockProperty[] properties)
     /// <returns></returns>
     public T GetPropertyValue<T>(string name, int state)
     {
-        for (int i = properties.Length - 1; i >= 0; i--)
+        for (var i = properties.Length - 1; i >= 0; i--)
         {
             var prop = properties[i];
             if (prop.Name == name)
@@ -28,6 +28,6 @@ public class BlockState(params IBlockProperty[] properties)
             state /= prop.StateCount;
         }
 
-        return default(T)!;
+        return default!;
     }
 }

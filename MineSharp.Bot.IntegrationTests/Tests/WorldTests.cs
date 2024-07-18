@@ -1,4 +1,4 @@
-using MineSharp.Bot.Blocks;
+﻿using MineSharp.Bot.Blocks;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
@@ -19,7 +19,7 @@ public static class WorldTests
         return IntegrationTest.RunTest("testBlockUpdate", async (bot, source) =>
         {
             var world = bot.GetPlugin<WorldPlugin>();
-            var chat  = bot.GetPlugin<ChatPlugin>();
+            var chat = bot.GetPlugin<ChatPlugin>();
             await world.WaitForInitialization();
             await chat.WaitForInitialization();
 
@@ -53,7 +53,9 @@ public static class WorldTests
                 expectedBlocks.Remove(block.Position.ToULong());
 
                 if (expectedBlocks.Count == 0)
+                {
                     source.TrySetResult(true);
+                }
             };
         });
     }
@@ -81,7 +83,9 @@ public static class WorldTests
                 bot.GetPlugin<WorldPlugin>().World!.GetBlockAt(position));
 
             if (result != MineBlockStatus.Finished)
+            {
                 source.TrySetResult(false);
+            }
         }, commandDelay: 1000);
     }
 

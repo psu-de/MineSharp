@@ -1,8 +1,11 @@
-using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
+using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using NLog;
+using FinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
+using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
@@ -10,23 +13,23 @@ internal class ConfigurationPacketHandler : IPacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    private readonly MinecraftClient _client;
-    private readonly MinecraftData   _data;
+    private readonly MinecraftClient client;
+    private readonly MinecraftData data;
 
     public ConfigurationPacketHandler(MinecraftClient client, MinecraftData data)
     {
-        this._client = client;
-        this._data   = data;
+        this.client = client;
+        this.data = data;
     }
 
     public Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
-            DisconnectPacket disconnect                   => HandleDisconnect(disconnect),
+            DisconnectPacket disconnect => HandleDisconnect(disconnect),
             FinishConfigurationPacket finishConfiguration => HandleFinishConfiguration(finishConfiguration),
-            KeepAlivePacket keepAlive                     => HandleKeepAlive(keepAlive),
-            PingPacket ping                               => HandlePing(ping),
+            KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
+            PingPacket ping => HandlePing(ping),
 
             _ => Task.CompletedTask
         };
@@ -36,40 +39,42 @@ internal class ConfigurationPacketHandler : IPacketHandler
     {
         if (packet is Serverbound.Configuration.FinishConfigurationPacket)
         {
-            this._client.UpdateGameState(GameState.Play);
+            client.UpdateGameState(GameState.Play);
         }
 
         return Task.CompletedTask;
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Configuration_Disconnect
+    {
+        return type is PacketType.CB_Configuration_Disconnect
             or PacketType.CB_Configuration_FinishConfiguration
             or PacketType.CB_Configuration_KeepAlive
             or PacketType.CB_Configuration_Ping;
+    }
 
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.GetMessage(this._data)));
+        _ = Task.Run(() => client.Disconnect(packet.Reason.GetMessage(data)));
         return Task.CompletedTask;
     }
 
     private Task HandleFinishConfiguration(FinishConfigurationPacket packet)
     {
-        _ = this._client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
+        _ = client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
         return Task.CompletedTask;
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
-        this._client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
+        client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
         return Task.CompletedTask;
     }
 
     private Task HandlePing(PingPacket packet)
     {
-        this._client.SendPacket(new Serverbound.Configuration.PongPacket(packet.Id));
+        client.SendPacket(new PongPacket(packet.Id));
         return Task.CompletedTask;
     }
 }

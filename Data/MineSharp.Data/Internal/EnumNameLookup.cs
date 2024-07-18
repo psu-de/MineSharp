@@ -1,8 +1,8 @@
-namespace MineSharp.Data.Internal;
+﻿namespace MineSharp.Data.Internal;
 
 internal class EnumNameLookup<TEnum> where TEnum : struct, Enum
 {
-    private Dictionary<string, TEnum> lookupTable;
+    private readonly Dictionary<string, TEnum> lookupTable;
 
     public EnumNameLookup()
     {
@@ -11,5 +11,7 @@ internal class EnumNameLookup<TEnum> where TEnum : struct, Enum
     }
 
     public TEnum FromName(string name)
-        => lookupTable[name];
+    {
+        return lookupTable[name];
+    }
 }

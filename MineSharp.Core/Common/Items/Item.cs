@@ -1,9 +1,9 @@
-using fNbt;
+﻿using fNbt;
 
 namespace MineSharp.Core.Common.Items;
 
 /// <summary>
-/// Represents an Item
+///     Represents an Item
 /// </summary>
 /// <param name="info"></param>
 /// <param name="count"></param>
@@ -12,35 +12,37 @@ namespace MineSharp.Core.Common.Items;
 public class Item(ItemInfo info, byte count, int? damage, NbtCompound? metadata)
 {
     /// <summary>
-    /// The item descriptor
+    ///     The item descriptor
     /// </summary>
     public readonly ItemInfo Info = info;
 
     /// <summary>
-    /// The number of items on the stack
+    ///     The number of items on the stack
     /// </summary>
     public byte Count { get; set; } = count;
 
     /// <summary>
-    /// Optional value for the durability of a tool
+    ///     Optional value for the durability of a tool
     /// </summary>
     public int? Damage { get; set; } = damage;
 
     /// <summary>
-    /// Additional metadata of this item
+    ///     Additional metadata of this item
     /// </summary>
     public NbtCompound? Metadata { get; set; } = metadata;
 
     /// <summary>
-    /// Returns a clone of this Item
+    ///     Returns a clone of this Item
     /// </summary>
     /// <returns></returns>
     public Item Clone()
     {
-        return new Item(this.Info, Count, Damage, Metadata);
+        return new(Info, Count, Damage, Metadata);
     }
 
     /// <inheritdoc />
     public override string ToString()
-        => $"Item(Type={Info.Type}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
+    {
+        return $"Item(Type={Info.Type}, Count={Count}, Damage={Damage}, Metadata={Metadata})";
+    }
 }

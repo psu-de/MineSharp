@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        <LangVersion>12</LangVersion>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Humanizer" Version="2.14.1" />
-      <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.7" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Humanizer" Version="2.14.1"/>
+    <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.7"/>
+  </ItemGroup>
 
 </Project>

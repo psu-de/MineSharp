@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -7,33 +7,32 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class UpdateCommandBlock : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_UpdateCommandBlock;
-
-    public Position Location { get; set; }
-    public string   Command  { get; set; }
-    public int      Mode     { get; set; }
-    public byte     Flags    { get; set; }
-
     public UpdateCommandBlock(Position location, string command, int mode, byte flags)
     {
-        this.Location = location;
-        this.Command  = command;
-        this.Mode     = mode;
-        this.Flags    = flags;
+        Location = location;
+        Command = command;
+        Mode = mode;
+        Flags = flags;
     }
+
+    public Position Location { get; set; }
+    public string Command { get; set; }
+    public int Mode { get; set; }
+    public byte Flags { get; set; }
+    public PacketType Type => PacketType.SB_Play_UpdateCommandBlock;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteULong(this.Location.ToULong());
-        buffer.WriteString(this.Command);
-        buffer.WriteVarInt(this.Mode);
-        buffer.WriteByte(this.Flags);
+        buffer.WriteULong(Location.ToULong());
+        buffer.WriteString(Command);
+        buffer.WriteVarInt(Mode);
+        buffer.WriteByte(Flags);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new UpdateCommandBlock(
-            new Position(buffer.ReadULong()),
+            new(buffer.ReadULong()),
             buffer.ReadString(),
             buffer.ReadVarInt(),
             buffer.ReadByte());

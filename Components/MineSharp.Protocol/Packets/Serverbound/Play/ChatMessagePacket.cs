@@ -1,4 +1,4 @@
-using MineSharp.Core;
+﻿using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -9,38 +9,26 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class ChatMessagePacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_ChatMessage;
-
-    public string             Message             { get; set; }
-    public long               Timestamp           { get; set; }
-    public long               Salt                { get; set; }
-    public byte[]?            Signature           { get; set; }
-    public bool?              SignedPreview       { get; set; }
-    public ChatMessageItem[]? PreviousMessages    { get; set; }
-    public ChatMessageItem?   LastRejectedMessage { get; set; }
-    public int?               MessageCount        { get; set; }
-    public byte[]?            Acknowledged        { get; set; }
-
     public ChatMessagePacket(
-        string             message,
-        long               timestamp,
-        long               salt,
-        byte[]?            signature,
-        bool?              signedPreview,
+        string message,
+        long timestamp,
+        long salt,
+        byte[]? signature,
+        bool? signedPreview,
         ChatMessageItem[]? previousMessages,
-        ChatMessageItem?   lastRejectedMessage,
-        int?               messageCount,
-        byte[]?            acknowledged)
+        ChatMessageItem? lastRejectedMessage,
+        int? messageCount,
+        byte[]? acknowledged)
     {
-        this.Message             = message;
-        this.Timestamp           = timestamp;
-        this.Salt                = salt;
-        this.Signature           = signature;
-        this.SignedPreview       = signedPreview;
-        this.PreviousMessages    = previousMessages;
-        this.LastRejectedMessage = lastRejectedMessage;
-        this.MessageCount        = messageCount;
-        this.Acknowledged        = acknowledged;
+        Message = message;
+        Timestamp = timestamp;
+        Salt = salt;
+        Signature = signature;
+        SignedPreview = signedPreview;
+        PreviousMessages = previousMessages;
+        LastRejectedMessage = lastRejectedMessage;
+        MessageCount = messageCount;
+        Acknowledged = acknowledged;
 
         if (acknowledged != null && acknowledged.Length != 3)
         {
@@ -52,95 +40,122 @@ public class ChatMessagePacket : IPacket
         : this(message, timestamp, salt, signature, signedPreview, null, null, null, null)
     { }
 
-    public ChatMessagePacket(string            message,          long timestamp, long salt, byte[] signature, bool signedPreview,
+    public ChatMessagePacket(string message, long timestamp, long salt, byte[] signature, bool signedPreview,
                              ChatMessageItem[] previousMessages, ChatMessageItem? lastRejectedMessage)
         : this(message, timestamp, salt, signature, signedPreview, previousMessages, lastRejectedMessage, null, null)
     { }
 
-    public ChatMessagePacket(string message, long timestamp, long salt, byte[]? signature, int messageCount, byte[] acknowledged)
+    public ChatMessagePacket(string message, long timestamp, long salt, byte[]? signature, int messageCount,
+                             byte[] acknowledged)
         : this(message, timestamp, salt, signature, null, null, null, messageCount, acknowledged)
     { }
 
+    public string Message { get; set; }
+    public long Timestamp { get; set; }
+    public long Salt { get; set; }
+    public byte[]? Signature { get; set; }
+    public bool? SignedPreview { get; set; }
+    public ChatMessageItem[]? PreviousMessages { get; set; }
+    public ChatMessageItem? LastRejectedMessage { get; set; }
+    public int? MessageCount { get; set; }
+    public byte[]? Acknowledged { get; set; }
+    public PacketType Type => PacketType.SB_Play_ChatMessage;
+
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Message);
-        buffer.WriteLong(this.Timestamp);
-        buffer.WriteLong(this.Salt);
+        buffer.WriteString(Message);
+        buffer.WriteLong(Timestamp);
+        buffer.WriteLong(Salt);
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
-            bool hasSignature = this.Signature != null;
+            var hasSignature = Signature != null;
             buffer.WriteBool(hasSignature);
 
             if (hasSignature)
             {
-                if (this.Signature!.Length != 256)
+                if (Signature!.Length != 256)
                 {
                     throw new ArgumentException("signature must exactly be 256 bytes long.");
                 }
 
-                buffer.WriteBytes(this.Signature);
+                buffer.WriteBytes(Signature);
             }
 
-            if (this.MessageCount == null)
+            if (MessageCount == null)
+            {
                 throw new MineSharpPacketVersionException(nameof(MessageCount), version.Version.Protocol);
+            }
 
-            buffer.WriteVarInt(this.MessageCount.Value);
-            buffer.WriteBytes(this.Acknowledged);
+            buffer.WriteVarInt(MessageCount.Value);
+            buffer.WriteBytes(Acknowledged);
             return;
         }
 
         // only 1.19-1.19.2
-        if (this.Signature == null)
-            throw new MineSharpPacketVersionException(nameof(this.Signature), version.Version.Protocol);
+        if (Signature == null)
+        {
+            throw new MineSharpPacketVersionException(nameof(Signature), version.Version.Protocol);
+        }
 
-        if (this.SignedPreview == null)
-            throw new MineSharpPacketVersionException(nameof(this.SignedPreview), version.Version.Protocol);
+        if (SignedPreview == null)
+        {
+            throw new MineSharpPacketVersionException(nameof(SignedPreview), version.Version.Protocol);
+        }
 
-        buffer.WriteVarInt(this.Signature.Length);
-        buffer.WriteBytes(this.Signature);
+        buffer.WriteVarInt(Signature.Length);
+        buffer.WriteBytes(Signature);
 
-        buffer.WriteBool(this.SignedPreview.Value);
+        buffer.WriteBool(SignedPreview.Value);
 
         if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        {
             return;
+        }
 
-        if (this.PreviousMessages == null)
-            throw new MineSharpPacketVersionException(nameof(this.PreviousMessages), version.Version.Protocol);
+        if (PreviousMessages == null)
+        {
+            throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
+        }
 
-        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
 
-        var hasLastRejectedMessage = this.LastRejectedMessage != null;
+        var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
 
         if (!hasLastRejectedMessage)
+        {
             return;
+        }
 
-        this.LastRejectedMessage!.Write(buffer, version);
+        LastRejectedMessage!.Write(buffer, version);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var                message   = buffer.ReadString();
-        var                timestamp = buffer.ReadLong();
-        var                salt      = buffer.ReadLong();
-        byte[]?            signature;
-        bool?              signedPreview;
+        var message = buffer.ReadString();
+        var timestamp = buffer.ReadLong();
+        var salt = buffer.ReadLong();
+        byte[]? signature;
+        bool? signedPreview;
         ChatMessageItem[]? previousMessages;
-        ChatMessageItem?   lastRejectedMessage;
-        int?               messageCount;
-        byte[]?            acknowledged;
+        ChatMessageItem? lastRejectedMessage;
+        int? messageCount;
+        byte[]? acknowledged;
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
-            bool hasSignature = buffer.ReadBool();
+            var hasSignature = buffer.ReadBool();
 
             if (hasSignature)
             {
                 signature = new byte[256];
                 buffer.ReadBytes(signature);
             }
-            else signature = null;
+            else
+            {
+                signature = null;
+            }
 
             messageCount = buffer.ReadVarInt();
             acknowledged = new byte[3];
@@ -168,9 +183,13 @@ public class ChatMessagePacket : IPacket
         {
             lastRejectedMessage = ChatMessageItem.Read(buffer, version);
         }
-        else lastRejectedMessage = null;
+        else
+        {
+            lastRejectedMessage = null;
+        }
 
-        return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value, previousMessages, lastRejectedMessage);
+        return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value, previousMessages,
+                                     lastRejectedMessage);
     }
 }
 #pragma warning restore CS1591

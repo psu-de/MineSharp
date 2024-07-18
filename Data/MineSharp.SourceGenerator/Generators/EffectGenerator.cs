@@ -1,12 +1,11 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class EffectGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("effects", GetName, "EffectType", "Effects");
+    private readonly Generator typeGenerator = new("effects", GetName, "EffectType", "Effects");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

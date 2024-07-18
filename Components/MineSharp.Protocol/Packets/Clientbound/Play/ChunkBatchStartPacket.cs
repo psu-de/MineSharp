@@ -1,12 +1,12 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 /// <summary>
-/// The ChunkBatchStart Packet, used since 1.20.2
-/// https://wiki.vg/Protocol#Chunk_Batch_Start
+///     The ChunkBatchStart Packet, used since 1.20.2
+///     https://wiki.vg/Protocol#Chunk_Batch_Start
 /// </summary>
 public class ChunkBatchStartPacket : IPacket
 {
@@ -19,5 +19,7 @@ public class ChunkBatchStartPacket : IPacket
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
-        => new ChunkBatchStartPacket();
+    {
+        return new ChunkBatchStartPacket();
+    }
 }

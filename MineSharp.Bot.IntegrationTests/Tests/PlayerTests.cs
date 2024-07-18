@@ -1,4 +1,4 @@
-using MineSharp.Bot.Plugins;
+﻿using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Entities;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
@@ -73,7 +73,7 @@ public static class PlayerTests
         return IntegrationTest.RunTest("testPlayerJoin", async (bot, source) =>
         {
             const string secondBotName = "MineSharpBot2";
-            var          player        = bot.GetPlugin<PlayerPlugin>();
+            var player = bot.GetPlugin<PlayerPlugin>();
 
             player.OnPlayerJoined += (sender, player) =>
             {
@@ -103,7 +103,7 @@ public static class PlayerTests
         return IntegrationTest.RunTest("testPlayerLeave", async (bot, source) =>
         {
             const string secondBotName = "MineSharpBot2";
-            var          player        = bot.GetPlugin<PlayerPlugin>();
+            var player = bot.GetPlugin<PlayerPlugin>();
 
             player.OnPlayerLeft += (sender, player) =>
             {
@@ -150,7 +150,7 @@ public static class PlayerTests
     {
         return IntegrationTest.RunTest("testAttack", async (bot, source) =>
         {
-            var player   = bot.GetPlugin<PlayerPlugin>();
+            var player = bot.GetPlugin<PlayerPlugin>();
             var entities = bot.GetPlugin<EntityPlugin>();
 
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p 16 -60 21");
@@ -160,7 +160,9 @@ public static class PlayerTests
             entities.OnEntitySpawned += async (sender, entity) =>
             {
                 if (entity.Info.Type != EntityType.Chicken)
+                {
                     return;
+                }
 
                 chicken = entity;
                 await player.Attack(entity);

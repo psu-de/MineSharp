@@ -1,4 +1,4 @@
-using MineSharp.Core;
+﻿using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -9,18 +9,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class MessageAcknowledgementPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
-
-    public int?               Count               { get; set; }
-    public ChatMessageItem[]? PreviousMessages    { get; set; }
-    public ChatMessageItem?   LastRejectedMessage { get; set; }
-
     /**
      * Constructor for >= 1.19.3
      */
     public MessageAcknowledgementPacket(int count)
     {
-        this.Count = count;
+        Count = count;
     }
 
     /**
@@ -28,9 +22,14 @@ public class MessageAcknowledgementPacket : IPacket
      */
     public MessageAcknowledgementPacket(ChatMessageItem[]? previousMessages, ChatMessageItem? lastRejectedMessage)
     {
-        this.PreviousMessages    = previousMessages;
-        this.LastRejectedMessage = lastRejectedMessage;
+        PreviousMessages = previousMessages;
+        LastRejectedMessage = lastRejectedMessage;
     }
+
+    public int? Count { get; set; }
+    public ChatMessageItem[]? PreviousMessages { get; set; }
+    public ChatMessageItem? LastRejectedMessage { get; set; }
+    public PacketType Type => PacketType.SB_Play_MessageAcknowledgement;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -38,27 +37,33 @@ public class MessageAcknowledgementPacket : IPacket
         {
             if (Count == null)
             {
-                throw new MineSharpPacketVersionException(nameof(this.Count), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(Count), version.Version.Protocol);
             }
 
-            buffer.WriteVarInt(this.Count.Value);
+            buffer.WriteVarInt(Count.Value);
             return;
         }
 
         if (PreviousMessages == null)
         {
-            throw new MineSharpPacketVersionException(nameof(this.PreviousMessages), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(this.PreviousMessages, (buf, val) => val.Write(buf, version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
 
-        var hasLastRejectedMessage = this.LastRejectedMessage != null;
+        var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
         if (!hasLastRejectedMessage)
+        {
             return;
-        this.LastRejectedMessage!.Write(buffer, version);
+        }
+
+        LastRejectedMessage!.Write(buffer, version);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version) => throw new NotImplementedException();
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    {
+        throw new NotImplementedException();
+    }
 }
 #pragma warning restore CS1591

@@ -1,6 +1,5 @@
-using MineSharp.Bot.Plugins;
+﻿using MineSharp.Bot.Plugins;
 using MineSharp.Core.Common.Items;
-using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -15,10 +14,10 @@ public static class CraftingTests
     {
         return IntegrationTest.RunTest("testCrafting", async (bot, source) =>
         {
-            var chat     = bot.GetPlugin<ChatPlugin>();
+            var chat = bot.GetPlugin<ChatPlugin>();
             var crafting = bot.GetPlugin<CraftingPlugin>();
-            var world    = bot.GetPlugin<WorldPlugin>();
-            var window   = bot.GetPlugin<WindowPlugin>();
+            var world = bot.GetPlugin<WorldPlugin>();
+            var window = bot.GetPlugin<WindowPlugin>();
             await chat.WaitForInitialization();
             await crafting.WaitForInitialization();
             await world.WaitForChunks();
@@ -31,7 +30,7 @@ public static class CraftingTests
             await chat.SendChat("/give @p ender_eye 7");
             await Task.Delay(1000);
 
-            var block  = world.World.GetBlockAt(new Position(15, -59, 24));
+            var block = world.World.GetBlockAt(new(15, -59, 24));
             var recipe = crafting.FindRecipe(ItemType.EndCrystal);
             await crafting.Craft(recipe!, block, 7);
 

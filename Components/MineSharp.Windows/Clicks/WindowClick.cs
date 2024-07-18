@@ -1,58 +1,58 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 
 namespace MineSharp.Windows.Clicks;
 
 /// <summary>
-/// Base class for implementing Window clicks
+///     Base class for implementing Window clicks
 /// </summary>
 public abstract class WindowClick
 {
     /// <summary>
-    /// Slot index when clicking outside of the window
+    ///     Slot index when clicking outside of the window
     /// </summary>
-    public const int OUTSIDE_CLICK = -999;
+    public const int OutsideClick = -999;
 
     /// <summary>
-    /// The clicked window
-    /// </summary>
-    public Window Window { get; }
-
-    /// <summary>
-    /// Number identifying the clicked button
-    /// </summary>
-    public byte Button { get; }
-
-    /// <summary>
-    /// Slot index of clicked slot
-    /// </summary>
-    public short Slot { get; }
-
-    /// <summary>
-    /// The click mode
-    /// </summary>
-    public abstract ClickMode ClickMode { get; }
-
-    /// <summary>
-    /// Create a new instance
+    ///     Create a new instance
     /// </summary>
     /// <param name="window"></param>
     /// <param name="slot"></param>
     /// <param name="button"></param>
     protected WindowClick(Window window, short slot, byte button)
     {
-        this.Window = window;
-        this.Slot   = slot;
-        this.Button = button;
+        Window = window;
+        Slot = slot;
+        Button = button;
     }
 
     /// <summary>
-    /// The slots affected by the click
+    ///     The clicked window
+    /// </summary>
+    public Window Window { get; }
+
+    /// <summary>
+    ///     Number identifying the clicked button
+    /// </summary>
+    public byte Button { get; }
+
+    /// <summary>
+    ///     Slot index of clicked slot
+    /// </summary>
+    public short Slot { get; }
+
+    /// <summary>
+    ///     The click mode
+    /// </summary>
+    public abstract ClickMode ClickMode { get; }
+
+    /// <summary>
+    ///     The slots affected by the click
     /// </summary>
     /// <returns></returns>
     public abstract Slot[] GetChangedSlots();
 
     /// <summary>
-    /// Performs the click on <see cref="Window"/>
+    ///     Performs the click on <see cref="Window" />
     /// </summary>
     public abstract void PerformClick();
 }

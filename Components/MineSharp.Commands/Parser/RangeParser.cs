@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
@@ -6,12 +6,19 @@ namespace MineSharp.Commands.Parser;
 public class RangeParser : IParser
 {
     public bool Decimals { get; private set; }
-    
-    public string GetName() => "minecraft:range";
-    public int GetArgumentCount() => 1;
+
+    public string GetName()
+    {
+        return "minecraft:range";
+    }
+
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
 
     public void ReadProperties(PacketBuffer buffer, MinecraftData data)
     {
-        this.Decimals = buffer.ReadBool();
+        Decimals = buffer.ReadBool();
     }
 }

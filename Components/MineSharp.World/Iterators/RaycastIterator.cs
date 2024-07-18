@@ -1,22 +1,22 @@
-using MineSharp.Core.Geometry;
+﻿using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Iterators;
 
 /// <summary>
-/// Iterate through all block positions that are on a straight line.
-/// Note: Does not check whether the ray actually intersects with the
-/// bounding box of the block of the yielded block positions
+///     Iterate through all block positions that are on a straight line.
+///     Note: Does not check whether the ray actually intersects with the
+///     bounding box of the block of the yielded block positions
 /// </summary>
 public class RaycastIterator(Vector3 origin, Vector3 direction, double? length = null) : IWorldIterator
 {
-    private Vector3 direction = direction.Normalized();
-    private MutableVector3 current   = origin.Clone();
+    private readonly MutableVector3 current = origin.Clone();
+    private readonly Vector3 direction = direction.Normalized();
 
-    private double maxLength = length ?? double.MaxValue;
-    private double length    = 0;
-    
+    private readonly double maxLength = length ?? double.MaxValue;
+    private double length;
+
     /// <summary>
-    /// The BlockFace the ray hit
+    ///     The BlockFace the ray hit
     /// </summary>
     public BlockFace CurrentFace { get; private set; }
 
@@ -36,20 +36,20 @@ public class RaycastIterator(Vector3 origin, Vector3 direction, double? length =
         var nZ = CalculateOffset(current.Z, direction.Z);
 
         var min = Math.Min(nX, Math.Min(nY, nZ));
-        
-        this.CurrentFace = GetFace(nX, nY, nZ);
+
+        CurrentFace = GetFace(nX, nY, nZ);
 
         var add = direction.Scaled(min + 1e-7);
-        this.current.Add(add);
+        current.Add(add);
 
-        this.length  += add.Length();
+        length += add.Length();
 
-        return (Position)this.current;
+        return (Position)current;
     }
 
     private BlockFace GetFace(double x, double y, double z)
     {
-        var (face, step) = x < y
+        (var face, var step) = x < y
             ? x < z
                 ? (BlockFace.West, direction.X)
                 : (BlockFace.North, direction.Z)
@@ -67,7 +67,7 @@ public class RaycastIterator(Vector3 origin, Vector3 direction, double? length =
 
     private double CalculateOffset(double position, double step)
     {
-        var next  = GetCoordinateOfNextFace(position, step);
+        var next = GetCoordinateOfNextFace(position, step);
         var delta = Math.Abs(next - position);
         return delta / Math.Abs(step);
     }
@@ -75,7 +75,7 @@ public class RaycastIterator(Vector3 origin, Vector3 direction, double? length =
     private double GetCoordinateOfNextFace(double position, double step)
     {
         return step >= 0
-            ? Math.Floor(position   + 1)
+            ? Math.Floor(position + 1)
             : Math.Ceiling(position - 1);
     }
 }

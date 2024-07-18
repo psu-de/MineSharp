@@ -1,4 +1,4 @@
-using MineSharp.Auth;
+﻿using MineSharp.Auth;
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
@@ -35,7 +35,7 @@ internal static class HandshakeProtocol
 
         if (data.Version.Protocol >= ProtocolVersion.V_1_19_3 && session.Certificate != null)
         {
-            signature = new LoginStartPacket.SignatureContainer(
+            signature = new(
                 new DateTimeOffset(session.Certificate.ExpiresAt).ToUnixTimeMilliseconds(),
                 session.Certificate.Keys.PublicKey,
                 data.Version.Protocol >= ProtocolVersion.V_1_19_2
@@ -44,10 +44,10 @@ internal static class HandshakeProtocol
             );
         }
 
-        UUID? uuid = session.OnlineSession || data.Version.Protocol >= ProtocolVersion.V_1_20_2
-            ? session.UUID
+        Uuid? uuid = session.OnlineSession || data.Version.Protocol >= ProtocolVersion.V_1_20_2
+            ? session.Uuid
             : null;
 
-        return new LoginStartPacket(session.Username, signature, uuid);
+        return new(session.Username, signature, uuid);
     }
 }

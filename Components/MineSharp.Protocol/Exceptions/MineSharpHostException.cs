@@ -1,4 +1,4 @@
-using MineSharp.Core.Exceptions;
+﻿using MineSharp.Core.Exceptions;
 
 namespace MineSharp.Protocol.Exceptions;
 

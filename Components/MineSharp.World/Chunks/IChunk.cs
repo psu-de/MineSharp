@@ -1,52 +1,50 @@
-using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Chunks;
 
 /// <summary>
-/// Interface for implementing a chunk.
-/// A chunk is an 16x16xWorldHeight area in the world.
+///     Interface for implementing a chunk.
+///     A chunk is an 16x16xWorldHeight area in the world.
 /// </summary>
 public interface IChunk
 {
     /// <summary>
-    /// The size (X, Z direction) of a chunk
+    ///     The size (X, Z direction) of a chunk
     /// </summary>
-    public const int SIZE = 16;
+    public const int Size = 16;
 
     /// <summary>
-    /// Fired whenever a block in the chunk was updated
-    /// </summary>
-    public event Events.ChunkBlockEvent OnBlockUpdated;
-
-    /// <summary>
-    /// The XZ Coordinates of this chunk.
+    ///     The XZ Coordinates of this chunk.
     /// </summary>
     public ChunkCoordinates Coordinates { get; }
 
     /// <summary>
-    /// Loads the chunk data from raw bytes.
+    ///     Fired whenever a block in the chunk was updated
+    /// </summary>
+    public event Events.ChunkBlockEvent OnBlockUpdated;
+
+    /// <summary>
+    ///     Loads the chunk data from raw bytes.
     /// </summary>
     /// <param name="data"></param>
     public void LoadData(byte[] data);
 
     /// <summary>
-    /// Returns the block entity at the given position or null if no
-    /// block entity exists at the position.
-    ///
-    /// Position is considered to be a relative position in the chunk,
-    /// not absolute in the world.
+    ///     Returns the block entity at the given position or null if no
+    ///     block entity exists at the position.
+    ///     Position is considered to be a relative position in the chunk,
+    ///     not absolute in the world.
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
     public BlockEntity? GetBlockEntity(Position position);
 
     /// <summary>
-    /// Returns the block state at the given position.
-    /// 
-    /// Position is considered to be a relative position in the chunk,
-    /// not absolute in the world.
+    ///     Returns the block state at the given position.
+    ///     Position is considered to be a relative position in the chunk,
+    ///     not absolute in the world.
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
@@ -54,36 +52,33 @@ public interface IChunk
 
 
     /// <summary>
-    /// Sets the block state at the given position.
-    ///
-    /// Position is expected to be relative to the chunk.
+    ///     Sets the block state at the given position.
+    ///     Position is expected to be relative to the chunk.
     /// </summary>
     /// <param name="state"></param>
     /// <param name="position"></param>
     public void SetBlockAt(int state, Position position);
 
     /// <summary>
-    /// Returns the biome of the given position.
-    ///
-    /// Position is considered to be a relative position in the chunk,
-    /// not absolute in the world.
+    ///     Returns the biome of the given position.
+    ///     Position is considered to be a relative position in the chunk,
+    ///     not absolute in the world.
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
     public Biome GetBiomeAt(Position position);
 
     /// <summary>
-    /// Sets the biome of the at the given position
-    ///
-    /// Position is considered to be a relative position in the chunk,
-    /// not absolute in the world.
+    ///     Sets the biome of the at the given position
+    ///     Position is considered to be a relative position in the chunk,
+    ///     not absolute in the world.
     /// </summary>
     /// <param name="position"></param>
     /// <param name="biome"></param>
     public void SetBiomeAt(Position position, Biome biome);
 
     /// <summary>
-    /// Search through the chunk for the given block type
+    ///     Search through the chunk for the given block type
     /// </summary>
     /// <param name="type"></param>
     /// <param name="maxCount"></param>
@@ -92,10 +87,13 @@ public interface IChunk
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null);
 
     /// <summary>
-    /// Search through the chunk for the given block type and return the first block.
+    ///     Search through the chunk for the given block type and return the first block.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     [Obsolete]
-    public Block? FindBlock(BlockType type) => FindBlocks(type).FirstOrDefault();
+    public Block? FindBlock(BlockType type)
+    {
+        return FindBlocks(type).FirstOrDefault();
+    }
 }

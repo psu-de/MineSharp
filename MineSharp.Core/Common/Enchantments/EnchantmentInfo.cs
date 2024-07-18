@@ -1,10 +1,10 @@
-namespace MineSharp.Core.Common.Enchantments;
+﻿namespace MineSharp.Core.Common.Enchantments;
 
 /// <summary>
-/// Descriptor for enchantments
+///     Descriptor for enchantments
 /// </summary>
 /// <param name="Id">The numerical id of the enchantment (depends on minecraft version)</param>
-/// <param name="Type">The <see cref="EnchantmentType"/> of this enchantment (independent on minecraft version)</param>
+/// <param name="Type">The <see cref="EnchantmentType" /> of this enchantment (independent on minecraft version)</param>
 /// <param name="Name">The text id of this enchantment</param>
 /// <param name="DisplayName">Minecraft's display name of this enchantment</param>
 /// <param name="MaxLevel">The highest possible level of this enchantment</param>
@@ -18,23 +18,23 @@ namespace MineSharp.Core.Common.Enchantments;
 /// <param name="Tradeable"></param>
 /// <param name="Discoverable"></param>
 public record EnchantmentInfo(
-    int                 Id,
-    EnchantmentType     Type,
-    string              Name,
-    string              DisplayName,
-    int                 MaxLevel,
-    EnchantCost         MinCost,
-    EnchantCost         MaxCost,
-    bool                TreasureOnly,
-    bool                Curse,
-    EnchantmentType[]   Exclude,
+    int Id,
+    EnchantmentType Type,
+    string Name,
+    string DisplayName,
+    int MaxLevel,
+    EnchantCost MinCost,
+    EnchantCost MaxCost,
+    bool TreasureOnly,
+    bool Curse,
+    EnchantmentType[] Exclude,
     EnchantmentCategory Category,
-    int                 Weight,
-    bool                Tradeable,
-    bool                Discoverable);
+    int Weight,
+    bool Tradeable,
+    bool Discoverable);
 
 /// <summary>
-/// Enchantment cost
+///     Enchantment cost
 /// </summary>
 /// <param name="A"></param>
 /// <param name="B"></param>

@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -8,27 +8,26 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class WindowItemsPacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_WindowItems;
-
-    public byte    WindowId     { get; set; }
-    public int     StateId      { get; set; }
-    public Item?[] Items        { get; set; }
-    public Item?   SelectedItem { get; set; }
-
     public WindowItemsPacket(byte windowId, int stateId, Item?[] items, Item? selectedItem)
     {
-        this.WindowId     = windowId;
-        this.StateId      = stateId;
-        this.Items        = items;
-        this.SelectedItem = selectedItem;
+        WindowId = windowId;
+        StateId = stateId;
+        Items = items;
+        SelectedItem = selectedItem;
     }
+
+    public byte WindowId { get; set; }
+    public int StateId { get; set; }
+    public Item?[] Items { get; set; }
+    public Item? SelectedItem { get; set; }
+    public PacketType Type => PacketType.CB_Play_WindowItems;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteByte(this.WindowId);
-        buffer.WriteVarInt(this.StateId);
-        buffer.WriteVarIntArray(this.Items, (buff, item) => buff.WriteOptionalItem(item));
-        buffer.WriteOptionalItem(this.SelectedItem);
+        buffer.WriteByte(WindowId);
+        buffer.WriteVarInt(StateId);
+        buffer.WriteVarIntArray(Items, (buff, item) => buff.WriteOptionalItem(item));
+        buffer.WriteOptionalItem(SelectedItem);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

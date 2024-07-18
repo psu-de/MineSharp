@@ -1,9 +1,9 @@
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace MineSharp.Core.Geometry;
 
 /// <summary>
-/// A 3D Vector with double precision floating point coordinates.
+///     A 3D Vector with double precision floating point coordinates.
 /// </summary>
 /// <param name="x"></param>
 /// <param name="y"></param>
@@ -11,196 +11,230 @@ namespace MineSharp.Core.Geometry;
 public class Vector3(double x, double y, double z)
 {
     /// <summary>
-    /// (1, 1, 1)
+    ///     (1, 1, 1)
     /// </summary>
-    public static Vector3 One => new Vector3(1, 1, 1);
+    public static Vector3 One => new(1, 1, 1);
 
     /// <summary>
-    /// Zero Vector
+    ///     Zero Vector
     /// </summary>
-    public static Vector3 Zero => new Vector3(0, 0, 0);
+    public static Vector3 Zero => new(0, 0, 0);
 
     /// <summary>
-    /// Unit vector pointing up
+    ///     Unit vector pointing up
     /// </summary>
-    public static Vector3 Up => new Vector3(0, 1, 0);
+    public static Vector3 Up => new(0, 1, 0);
 
     /// <summary>
-    /// Unit vector pointing down
+    ///     Unit vector pointing down
     /// </summary>
-    public static Vector3 Down => new Vector3(0, -1, 0);
+    public static Vector3 Down => new(0, -1, 0);
 
     /// <summary>
-    /// Unit vector pointing north
+    ///     Unit vector pointing north
     /// </summary>
-    public static Vector3 North => new Vector3(0, 0, -1);
+    public static Vector3 North => new(0, 0, -1);
 
     /// <summary>
-    /// Unit vector pointing south
+    ///     Unit vector pointing south
     /// </summary>
-    public static Vector3 South => new Vector3(0, 0, 1);
+    public static Vector3 South => new(0, 0, 1);
 
     /// <summary>
-    /// Unit vector pointing west
+    ///     Unit vector pointing west
     /// </summary>
-    public static Vector3 West => new Vector3(-1, 0, 0);
+    public static Vector3 West => new(-1, 0, 0);
 
     /// <summary>
-    /// Unit vector pointing east
+    ///     Unit vector pointing east
     /// </summary>
-    public static Vector3 East => new Vector3(1, 0, 0);
+    public static Vector3 East => new(1, 0, 0);
 
     /// <summary>
-    /// The X coordinate
+    ///     The X coordinate
     /// </summary>
     public double X { get; protected set; } = x;
 
     /// <summary>
-    /// The Y coordinate
+    ///     The Y coordinate
     /// </summary>
     public double Y { get; protected set; } = y;
 
     /// <summary>
-    /// The Z coordinate
+    ///     The Z coordinate
     /// </summary>
     public double Z { get; protected set; } = z;
 
     /// <summary>
-    /// Returns a new Vector with the <paramref name="other"/> added
+    ///     Returns a new Vector with the <paramref name="other" /> added
     /// </summary>
     [Pure]
     public MutableVector3 Plus(Vector3 other)
-        => this.Clone().Add(other);
+    {
+        return Clone().Add(other);
+    }
 
     /// <summary>
-    /// Returns a new Vector with the <paramref name="x"/> <paramref name="y"/> <paramref name="z"/> added
+    ///     Returns a new Vector with the <paramref name="x" /> <paramref name="y" /> <paramref name="z" /> added
     /// </summary>
     public MutableVector3 Plus(double x, double y, double z)
-        => this.Clone().Add(x, y, z);
+    {
+        return Clone().Add(x, y, z);
+    }
 
     /// <summary>
-    /// Returns a new Vector with <paramref name="other"/> subtracted
+    ///     Returns a new Vector with <paramref name="other" /> subtracted
     /// </summary>
     [Pure]
     public MutableVector3 Minus(Vector3 other)
-        => this.Clone().Subtract(other);
+    {
+        return Clone().Subtract(other);
+    }
 
     /// <summary>
-    /// Returns a new Vector with <paramref name="x"/> <paramref name="y"/> <paramref name="z"/> subtracted
+    ///     Returns a new Vector with <paramref name="x" /> <paramref name="y" /> <paramref name="z" /> subtracted
     /// </summary>
     [Pure]
     public MutableVector3 Minus(double x, double y, double z)
-        => this.Clone().Subtract(x, y, z);
+    {
+        return Clone().Subtract(x, y, z);
+    }
 
     /// <summary>
-    /// Returns a new Vector3 multiplied by <paramref name="other"/>
+    ///     Returns a new Vector3 multiplied by <paramref name="other" />
     /// </summary>
     /// <param name="other"></param>
     [Pure]
     public MutableVector3 Multiplied(Vector3 other)
-        => this.Clone().Multiply(other);
+    {
+        return Clone().Multiply(other);
+    }
 
     /// <summary>
-    /// Returns a new Vector3 divided by <paramref name="other"/>
+    ///     Returns a new Vector3 divided by <paramref name="other" />
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
     [Pure]
     public MutableVector3 Divided(Vector3 other)
-        => this.Clone().Divide(other);
+    {
+        return Clone().Divide(other);
+    }
 
     /// <summary>
-    /// Returns a new Vector which was scaled by <paramref name="scalar"/>
+    ///     Returns a new Vector which was scaled by <paramref name="scalar" />
     /// </summary>
     /// <param name="scalar"></param>
     /// <returns></returns>
     [Pure]
     public MutableVector3 Scaled(double scalar)
-        => this.Clone().Scale(scalar);
+    {
+        return Clone().Scale(scalar);
+    }
 
     /// <summary>
-    /// Return a new Vector3 with all values floored
+    ///     Return a new Vector3 with all values floored
     /// </summary>
     [Pure]
     public MutableVector3 Floored()
-        => this.Clone().Floor();
-    
+    {
+        return Clone().Floor();
+    }
+
     /// <summary>
-    /// Returns a new normalized instance of this vector
+    ///     Returns a new normalized instance of this vector
     /// </summary>
     /// <returns></returns>
     [Pure]
     public MutableVector3 Normalized()
-        => this.Clone().Normalize();
+    {
+        return Clone().Normalize();
+    }
 
     /// <summary>
-    /// Calculates the length of this vector.
+    ///     Calculates the length of this vector.
     /// </summary>
     [Pure]
     public double Length()
-        => Math.Sqrt(this.LengthSquared());
+    {
+        return Math.Sqrt(LengthSquared());
+    }
 
 
     /// <summary>
-    /// Calculates the squared length of this vector instance
+    ///     Calculates the squared length of this vector instance
     /// </summary>
     [Pure]
     public double LengthSquared()
-        => this.X * this.X + this.Y * this.Y + this.Z * this.Z;
+    {
+        return (X * X) + (Y * Y) + (Z * Z);
+    }
 
     /// <summary>
-    /// Calculates the squared horizontal (x, z) length of this vector instance
+    ///     Calculates the squared horizontal (x, z) length of this vector instance
     /// </summary>
     [Pure]
     public double HorizontalLengthSquared()
-        => this.X * this.X + this.Z * this.Z;
+    {
+        return (X * X) + (Z * Z);
+    }
 
     /// <summary>
-    /// Calculates the horizontal squared length of this vector
+    ///     Calculates the horizontal squared length of this vector
     /// </summary>
     [Pure]
     public double HorizontalDistanceToSquared(Vector3 other)
     {
-        var dX = this.X - other.X;
-        var dZ = this.Z - other.Z;
-        return dX * dX + dZ + dZ;
+        var dX = X - other.X;
+        var dZ = Z - other.Z;
+        return (dX * dX) + dZ + dZ;
     }
 
     /// <summary>
-    /// Calculates the distance to the <paramref name="other"/> vector.
+    ///     Calculates the distance to the <paramref name="other" /> vector.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
     [Pure]
     public double DistanceTo(Vector3 other)
-        => this.Minus(other).Length();
+    {
+        return Minus(other).Length();
+    }
 
     /// <summary>
-    /// Returns the squared distance to the <paramref name="other"/> vector
+    ///     Returns the squared distance to the <paramref name="other" /> vector
     /// </summary>
     /// <param name="other"></param>
     /// <returns>The distance squared.</returns>
     [Pure]
     public double DistanceToSquared(Vector3 other)
-        => this.Minus(other).LengthSquared();
+    {
+        return Minus(other).LengthSquared();
+    }
 
     /// <summary>
-    /// Returns this vector cloned
+    ///     Returns this vector cloned
     /// </summary>
     /// <returns></returns>
     [Pure]
     public MutableVector3 Clone()
-        => new MutableVector3(this.X, this.Y, this.Z);
+    {
+        return new(X, Y, Z);
+    }
 
     /// <inheritdoc />
     public override string ToString()
-        => $"({this.X:0.#####} / {this.Y:0.#####} / {this.Z:0.#####})";
+    {
+        return $"({X:0.#####} / {Y:0.#####} / {Z:0.#####})";
+    }
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is not Vector3 vec)
+        {
             return false;
+        }
 
         return this == vec;
     }
@@ -208,25 +242,31 @@ public class Vector3(double x, double y, double z)
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return this.X.GetHashCode()
-             ^ this.Y.GetHashCode() << 2
-             ^ this.Z.GetHashCode() >> 2;
+        return X.GetHashCode()
+            ^ (Y.GetHashCode() << 2)
+            ^ (Z.GetHashCode() >> 2);
     }
 
     /// <summary>
-    /// Returns a new Position from this vector
+    ///     Returns a new Position from this vector
     /// </summary>
-    public static explicit operator Position(Vector3 x) => new Position(x.X, x.Y, x.Z);
+    public static explicit operator Position(Vector3 x)
+    {
+        return new(x.X, x.Y, x.Z);
+    }
 
     /// <summary>
-    /// Returns a new Vector from a Position
+    ///     Returns a new Vector from a Position
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static implicit operator Vector3(Position x) => new Vector3(x.X, x.Y, x.Z);
+    public static implicit operator Vector3(Position x)
+    {
+        return new(x.X, x.Y, x.Z);
+    }
 
     /// <summary>
-    /// Checks if the two vectors are equal
+    ///     Checks if the two vectors are equal
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -239,7 +279,7 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
-    /// Checks if the two vectors are different.
+    ///     Checks if the two vectors are different.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -252,187 +292,211 @@ public class Vector3(double x, double y, double z)
     }
 
     /// <summary>
-    /// Component-wise vector addition
+    ///     Component-wise vector addition
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
     public static Vector3 operator +(Vector3 a, Vector3 b)
-        => a.Plus(b);
+    {
+        return a.Plus(b);
+    }
 
     /// <summary>
-    /// Component-wise vector subtraction
+    ///     Component-wise vector subtraction
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
     public static Vector3 operator -(Vector3 a, Vector3 b)
-        => a.Minus(b);
+    {
+        return a.Minus(b);
+    }
 
     /// <summary>
-    /// Component-wise vector multiplication
+    ///     Component-wise vector multiplication
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
     public static Vector3 operator *(Vector3 a, Vector3 b)
-        => a.Multiplied(b);
+    {
+        return a.Multiplied(b);
+    }
 
     /// <summary>
-    /// Component-wise vector division
+    ///     Component-wise vector division
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
     public static Vector3 operator /(Vector3 a, Vector3 b)
-        => a.Divided(b);
+    {
+        return a.Divided(b);
+    }
 }
 
 /// <summary>
-/// A mutable Vector3
+///     A mutable Vector3
 /// </summary>
 public class MutableVector3 : Vector3
 {
     /// <summary>
-    /// Create a new instance of MutableVector3
+    ///     Create a new instance of MutableVector3
     /// </summary>
-    public MutableVector3(double x, double y, double z) : base(x, y, z) 
+    public MutableVector3(double x, double y, double z) : base(x, y, z)
     { }
 
     /// <summary>
-    /// Set x y z coordinates
+    ///     Set x y z coordinates
     /// </summary>
     public MutableVector3 Set(double x, double y, double z)
     {
-        this.X = x;
-        this.Y = y;
-        this.Z = z;
+        X = x;
+        Y = y;
+        Z = z;
 
         return this;
     }
-    
+
     /// <summary>
-    /// Set x z coordinates
+    ///     Set x z coordinates
     /// </summary>
     public MutableVector3 Set(double x, double z)
     {
-        this.X = x;
-        this.Z = z;
+        X = x;
+        Z = z;
 
         return this;
     }
 
     /// <summary>
-    /// Set x coordinate
+    ///     Set x coordinate
     /// </summary>
     public MutableVector3 SetX(double x)
-        => this.Set(x, this.Y, this.Z);
+    {
+        return Set(x, Y, Z);
+    }
 
     /// <summary>
-    /// Set y coordinate
+    ///     Set y coordinate
     /// </summary>
     public MutableVector3 SetY(double y)
-        => this.Set(this.X, y, this.Z);
+    {
+        return Set(X, y, Z);
+    }
 
     /// <summary>
-    /// Set z coordinate
+    ///     Set z coordinate
     /// </summary>
     public MutableVector3 SetZ(double z)
-        => this.Set(this.X, this.Y, z);
-    
+    {
+        return Set(X, Y, z);
+    }
+
     /// <summary>
-    /// Component-wise vector addition
+    ///     Component-wise vector addition
     /// </summary>
     public MutableVector3 Add(double x, double y, double z)
     {
-        this.X += x;
-        this.Y += y;
-        this.Z += z;
+        X += x;
+        Y += y;
+        Z += z;
 
         return this;
     }
-    
-    /// <inheritdoc cref="Add(double, double, double)"/>
+
+    /// <inheritdoc cref="Add(double, double, double)" />
     public MutableVector3 Add(Vector3 other)
-        => this.Add(other.X, other.Y, other.Z);
+    {
+        return Add(other.X, other.Y, other.Z);
+    }
 
     /// <summary>
-    /// Component-wise vector subtraction.
+    ///     Component-wise vector subtraction.
     /// </summary>
     public MutableVector3 Subtract(double x, double y, double z)
     {
-        this.X -= x;
-        this.Y -= y;
-        this.Z -= z;
+        X -= x;
+        Y -= y;
+        Z -= z;
 
         return this;
     }
-    
-    /// <inheritdoc cref="Subtract(double, double, double)"/>
+
+    /// <inheritdoc cref="Subtract(double, double, double)" />
     public MutableVector3 Subtract(Vector3 other)
-        => this.Subtract(other.X, other.Y, other.Z);
+    {
+        return Subtract(other.X, other.Y, other.Z);
+    }
 
     /// <summary>
-    /// Component-wise vector multiplication.
+    ///     Component-wise vector multiplication.
     /// </summary>
     public MutableVector3 Multiply(double x, double y, double z)
     {
-        this.X *= x;
-        this.Y *= y;
-        this.Z *= z;
+        X *= x;
+        Y *= y;
+        Z *= z;
 
         return this;
     }
 
-    /// <inheritdoc cref="Multiply(double, double, double)"/>
+    /// <inheritdoc cref="Multiply(double, double, double)" />
     public MutableVector3 Multiply(Vector3 other)
-        => this.Multiply(other.X, other.Y, other.Z);
-    
+    {
+        return Multiply(other.X, other.Y, other.Z);
+    }
+
     /// <summary>
-    /// Component-wise vector division.
+    ///     Component-wise vector division.
     /// </summary>
     public MutableVector3 Divide(double x, double y, double z)
     {
-        this.X /= x;
-        this.Y /= y;
-        this.Z /= z;
+        X /= x;
+        Y /= y;
+        Z /= z;
 
         return this;
     }
 
-    /// <inheritdoc cref="Divide(double, double, double)"/>
+    /// <inheritdoc cref="Divide(double, double, double)" />
     public MutableVector3 Divide(Vector3 other)
-        => this.Divide(other.X, other.Y, other.Z);
+    {
+        return Divide(other.X, other.Y, other.Z);
+    }
 
     /// <summary>
-    /// Scale this vector by a scalar
+    ///     Scale this vector by a scalar
     /// </summary>
     public MutableVector3 Scale(double scalar)
-        => this.Multiply(scalar, scalar, scalar);
-    
+    {
+        return Multiply(scalar, scalar, scalar);
+    }
+
     /// <summary>
-    /// Floor all values of this vector
+    ///     Floor all values of this vector
     /// </summary>
     public MutableVector3 Floor()
     {
-        this.X = Math.Floor(this.X);
-        this.Y = Math.Floor(this.Y);
-        this.Z = Math.Floor(this.Z);
+        X = Math.Floor(X);
+        Y = Math.Floor(Y);
+        Z = Math.Floor(Z);
 
         return this;
     }
-    
+
     /// <summary>
-    /// Normalizes this vector instance
+    ///     Normalizes this vector instance
     /// </summary>
     public MutableVector3 Normalize()
     {
-        var length = this.Length();
+        var length = Length();
 
         var scale = length == 0
             ? 0
             : 1 / length;
 
-        return this.Scale(scale);
+        return Scale(scale);
     }
 }

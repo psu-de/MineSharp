@@ -1,5 +1,4 @@
-using MineSharp.Core;
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -7,21 +6,20 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 #pragma warning disable CS1591
 public class PluginMessagePacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Configuration_CustomPayload;
-
-    public string       ChannelName { get; set; }
-    public PacketBuffer Data        { get; set; }
-
     public PluginMessagePacket(string channelName, PacketBuffer data)
     {
-        this.ChannelName = channelName;
-        this.Data        = data;
+        ChannelName = channelName;
+        Data = data;
     }
+
+    public string ChannelName { get; set; }
+    public PacketBuffer Data { get; set; }
+    public PacketType Type => PacketType.SB_Configuration_CustomPayload;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.ChannelName);
-        buffer.WriteBytes(this.Data.GetBuffer());
+        buffer.WriteString(ChannelName);
+        buffer.WriteBytes(Data.GetBuffer());
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

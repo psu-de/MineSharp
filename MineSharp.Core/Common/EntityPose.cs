@@ -1,7 +1,7 @@
-namespace MineSharp.Core.Common;
+﻿namespace MineSharp.Core.Common;
 
 /// <summary>
-/// Specifies the pose of an entity
+///     Specifies the pose of an entity
 /// </summary>
 public enum EntityPose
 {

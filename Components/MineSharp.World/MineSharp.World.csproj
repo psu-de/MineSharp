@@ -1,42 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        <LangVersion>12</LangVersion>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
-        <Title>MineSharp.World</Title>
-        <Authors>psu-de</Authors>
-        <Description>Implementation of the minecraft world system in C#.</Description>
-        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
-        <PackageIcon>icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>minecraft, world</PackageTags>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    </PropertyGroup>
+    <Title>MineSharp.World</Title>
+    <Authors>psu-de</Authors>
+    <Description>Implementation of the minecraft world system in C#.</Description>
+    <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>minecraft, world</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
-      <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
-        
-        <None Include="README.md" Pack="true" PackagePath="\" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj"/>
+    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
 
-        <None Include="LICENSE" Pack="true" PackagePath="\" />
-        <None Include="icon.png">
-          <Pack>True</Pack>
-          <PackagePath></PackagePath>
-        </None>
-    </ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
 
-    <ItemGroup>
-      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-    </ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="\"/>
+    <None Include="icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>

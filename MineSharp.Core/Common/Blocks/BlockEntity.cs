@@ -1,9 +1,9 @@
-using fNbt;
+﻿using fNbt;
 
 namespace MineSharp.Core.Common.Blocks;
 
 /// <summary>
-/// A Block entity
+///     A Block entity
 /// </summary>
 /// <param name="x"></param>
 /// <param name="y"></param>
@@ -13,27 +13,27 @@ namespace MineSharp.Core.Common.Blocks;
 public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
 {
     /// <summary>
-    /// X coordinate
+    ///     X coordinate
     /// </summary>
     public byte X { get; } = x;
 
     /// <summary>
-    /// Y coordinate
+    ///     Y coordinate
     /// </summary>
     public short Y { get; } = y;
 
     /// <summary>
-    /// Z coordinate
+    ///     Z coordinate
     /// </summary>
     public byte Z { get; } = z;
 
     /// <summary>
-    /// Type
+    ///     Type
     /// </summary>
     public int Type { get; set; } = type;
 
     /// <summary>
-    /// NBT data
+    ///     NBT data
     /// </summary>
     public NbtCompound Data { get; set; } = data;
 }

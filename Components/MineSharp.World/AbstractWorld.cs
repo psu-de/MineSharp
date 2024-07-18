@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using MineSharp.Core.Common.Biomes;
@@ -13,12 +13,24 @@ using NLog;
 namespace MineSharp.World;
 
 /// <summary>
-/// Base class for other implementations of the IWorld interface
+///     Base class for other implementations of the IWorld interface
 /// </summary>
 /// <param name="data"></param>
 public abstract class AbstractWorld(MinecraftData data) : IWorld
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
+    /// <summary>
+    ///     The MinecraftData instance used for this world
+    /// </summary>
+    public readonly MinecraftData Data = data;
+
+    private readonly BlockInfo outOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
+
+    /// <summary>
+    ///     A dictionary with all loaded chunks
+    /// </summary>
+    protected ConcurrentDictionary<ChunkCoordinates, IChunk> Chunks = new();
 
     /// <inheritdoc />
     public abstract int MaxY { get; }
@@ -36,65 +48,40 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     public event Events.BlockEvent? OnBlockUpdated;
 
-    /// <summary>
-    /// A dictionary with all loaded chunks
-    /// </summary>
-    protected ConcurrentDictionary<ChunkCoordinates, IChunk> Chunks
-        = new ConcurrentDictionary<ChunkCoordinates, IChunk>();
-
-    /// <summary>
-    /// The MinecraftData instance used for this world
-    /// </summary>
-    public readonly MinecraftData Data = data;
-
-    private readonly BlockInfo OutOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
-
     /// <inheritdoc />
     [Pure]
     public ChunkCoordinates ToChunkCoordinates(Position position)
     {
-        var chunkX = (int)Math.Floor((float)position.X / IChunk.SIZE);
-        var chunkZ = (int)Math.Floor((float)position.Z / IChunk.SIZE);
+        var chunkX = (int)Math.Floor((float)position.X / IChunk.Size);
+        var chunkZ = (int)Math.Floor((float)position.Z / IChunk.Size);
 
-        return new ChunkCoordinates(chunkX, chunkZ);
+        return new(chunkX, chunkZ);
     }
 
     /// <inheritdoc />
     [Pure]
     public Position ToChunkPosition(Position position)
     {
-        return new Position(
-            NonNegativeMod(position.X, IChunk.SIZE),
+        return new(
+            NonNegativeMod(position.X, IChunk.Size),
             position.Y,
-            NonNegativeMod(position.Z, IChunk.SIZE));
+            NonNegativeMod(position.Z, IChunk.Size));
     }
 
     /// <inheritdoc />
     [Pure]
     public Position ToWorldPosition(ChunkCoordinates coordinates, Position position)
     {
-        var dx = coordinates.X * IChunk.SIZE;
-        var dz = coordinates.Z * IChunk.SIZE;
+        var dx = coordinates.X * IChunk.Size;
+        var dz = coordinates.Z * IChunk.Size;
 
-        return new Position(position.X + dx, position.Y, position.Z + dz);
-    }
-
-    /// <summary>
-    /// Mutate <paramref name="position"/> to a world position
-    /// </summary>
-    /// <param name="coordinates"></param>
-    /// <param name="position"></param>
-    protected void MutateToWorldPosition(ChunkCoordinates coordinates, MutablePosition position)
-    {
-        var dx = coordinates.X * IChunk.SIZE;
-        var dz = coordinates.Z * IChunk.SIZE;
-        position.Set(position.X + dx, position.Y, position.Z + dz);
+        return new(position.X + dx, position.Y, position.Z + dz);
     }
 
     /// <inheritdoc />
     public IChunk GetChunkAt(ChunkCoordinates coordinates)
     {
-        if (!this.Chunks.TryGetValue(coordinates, out var chunk))
+        if (!Chunks.TryGetValue(coordinates, out var chunk))
         {
             throw new ChunkNotLoadedException($"The chunk at {coordinates} is not loaded.");
         }
@@ -105,37 +92,37 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     [Pure]
     public bool IsChunkLoaded(ChunkCoordinates coordinates)
-        => this.IsChunkLoaded(coordinates, out _);
-
-    /// <inheritdoc />
-    [Pure]
-    protected bool IsChunkLoaded(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk)
-        => this.Chunks.TryGetValue(coordinates, out chunk);
+    {
+        return IsChunkLoaded(coordinates, out _);
+    }
 
     /// <inheritdoc />
     public void LoadChunk(IChunk chunk)
     {
-        if (this.IsChunkLoaded(chunk.Coordinates, out var oldChunk))
+        if (IsChunkLoaded(chunk.Coordinates, out var oldChunk))
         {
-            oldChunk.OnBlockUpdated        -= this.OnChunkBlockUpdate;
-            this.Chunks[chunk.Coordinates] =  chunk;
+            oldChunk.OnBlockUpdated -= OnChunkBlockUpdate;
+            Chunks[chunk.Coordinates] = chunk;
         }
-        else this.Chunks.TryAdd(chunk.Coordinates, chunk);
+        else
+        {
+            Chunks.TryAdd(chunk.Coordinates, chunk);
+        }
 
-        chunk.OnBlockUpdated += this.OnChunkBlockUpdate;
-        this.OnChunkLoaded?.Invoke(this, chunk);
+        chunk.OnBlockUpdated += OnChunkBlockUpdate;
+        OnChunkLoaded?.Invoke(this, chunk);
     }
 
     /// <inheritdoc />
     public void UnloadChunk(ChunkCoordinates coordinates)
     {
-        if (!this.Chunks.TryRemove(coordinates, out var chunk))
+        if (!Chunks.TryRemove(coordinates, out var chunk))
         {
             Logger.Warn($"Trying to unload chunk which was not loaded {coordinates}.");
             return;
         }
 
-        this.OnChunkUnloaded?.Invoke(this, chunk);
+        OnChunkUnloaded?.Invoke(this, chunk);
     }
 
     /// <inheritdoc />
@@ -146,23 +133,27 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
 
     /// <inheritdoc />
     public bool IsBlockLoaded(Position position, [NotNullWhen(true)] out IChunk? chunk)
-        => this.Chunks.TryGetValue(ToChunkCoordinates(position), out chunk);
+    {
+        return Chunks.TryGetValue(ToChunkCoordinates(position), out chunk);
+    }
 
     /// <inheritdoc />
     public Block GetBlockAt(Position position)
     {
         if (IsOutOfMap(position))
-            return new Block(OutOfMapBlock, OutOfMapBlock.DefaultState, position);
+        {
+            return new(outOfMapBlock, outOfMapBlock.DefaultState, position);
+        }
 
         if (!IsBlockLoaded(position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Block at {position} is not loaded.");
         }
 
-        var relative   = this.ToChunkPosition(position);
+        var relative = ToChunkPosition(position);
         var blockState = chunk.GetBlockAt(relative);
         var block = new Block(
-            this.Data.Blocks.ByState(blockState)!,
+            Data.Blocks.ByState(blockState)!,
             blockState,
             position);
         return block;
@@ -171,36 +162,36 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     public void SetBlock(Block block)
     {
-        if (!this.IsBlockLoaded(block.Position, out var chunk))
+        if (!IsBlockLoaded(block.Position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Block at {block.Position} is not loaded.");
         }
 
-        var relative = this.ToChunkPosition(block.Position);
+        var relative = ToChunkPosition(block.Position);
         chunk.SetBlockAt(block.State, relative);
     }
 
     /// <inheritdoc />
     public Biome GetBiomeAt(Position position)
     {
-        if (!this.IsBlockLoaded(position, out var chunk))
+        if (!IsBlockLoaded(position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Position {position} is not loaded.");
         }
 
-        var relative = this.ToChunkPosition(position);
+        var relative = ToChunkPosition(position);
         return chunk.GetBiomeAt(relative);
     }
 
     /// <inheritdoc />
     public void SetBiomeAt(Position position, Biome biome)
     {
-        if (!this.IsBlockLoaded(position, out var chunk))
+        if (!IsBlockLoaded(position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Position {position} is not loaded.");
         }
 
-        var relative = this.ToChunkPosition(position);
+        var relative = ToChunkPosition(position);
         chunk.SetBiomeAt(relative, biome);
     }
 
@@ -213,12 +204,12 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     public IEnumerable<Block> FindBlocks(BlockType type, int? maxCount = null)
     {
-        int found = 0;
-        foreach (var chunk in this.Chunks.Values)
+        var found = 0;
+        foreach (var chunk in Chunks.Values)
         {
             foreach (var block in chunk.FindBlocks(type, maxCount - found))
             {
-                block.Position = this.ToWorldPosition(chunk.Coordinates, block.Position);
+                block.Position = ToWorldPosition(chunk.Coordinates, block.Position);
                 yield return block;
 
                 found++;
@@ -230,18 +221,39 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
         }
     }
 
+    /// <summary>
+    ///     Mutate <paramref name="position" /> to a world position
+    /// </summary>
+    /// <param name="coordinates"></param>
+    /// <param name="position"></param>
+    protected void MutateToWorldPosition(ChunkCoordinates coordinates, MutablePosition position)
+    {
+        var dx = coordinates.X * IChunk.Size;
+        var dz = coordinates.Z * IChunk.Size;
+        position.Set(position.X + dx, position.Y, position.Z + dz);
+    }
+
+    /// <inheritdoc />
+    [Pure]
+    protected bool IsChunkLoaded(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk)
+    {
+        return Chunks.TryGetValue(coordinates, out chunk);
+    }
+
     private void OnChunkBlockUpdate(IChunk chunk, int state, Position position)
     {
-        var worldPosition = this.ToWorldPosition(chunk.Coordinates, position);
-        this.OnBlockUpdated?.Invoke(this, new Block( // TODO: Hier jedes mal ein neuen block zu erstellen ist quatsch
-            this.Data.Blocks.ByState(state)!, state, worldPosition));
+        var worldPosition = ToWorldPosition(chunk.Coordinates, position);
+        OnBlockUpdated?.Invoke(this, new( // TODO: Hier jedes mal ein neuen block zu erstellen ist quatsch
+                                   Data.Blocks.ByState(state)!, state, worldPosition));
     }
 
     private int NonNegativeMod(int x, int m)
     {
         var v = x % m;
         if (v < 0)
+        {
             v += m;
+        }
 
         return v;
     }

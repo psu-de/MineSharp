@@ -1,46 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        <LangVersion>12</LangVersion>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
-        <Title>MineSharp.Bot</Title>
-        <Authors>psu-de</Authors>
-        <Description>Create minecraft bots with ease using C#.</Description>
-        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
-        <PackageIcon>icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>minecraft, minecraft-bot, bot-api, minecraft-api, bot-framework</PackageTags>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    </PropertyGroup>
+    <Title>MineSharp.Bot</Title>
+    <Authors>psu-de</Authors>
+    <Description>Create minecraft bots with ease using C#.</Description>
+    <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>minecraft, minecraft-bot, bot-api, minecraft-api, bot-framework</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Components\MineSharp.Commands\MineSharp.Commands.csproj" />
-      <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj" />
-      <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj" />
-      <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj" />
-      <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj" />
+  <ItemGroup>
+    <ProjectReference Include="..\Components\MineSharp.Commands\MineSharp.Commands.csproj"/>
+    <ProjectReference Include="..\Components\MineSharp.Physics\MineSharp.Physics.csproj"/>
+    <ProjectReference Include="..\Components\MineSharp.Protocol\MineSharp.Protocol.csproj"/>
+    <ProjectReference Include="..\Components\MineSharp.Windows\MineSharp.Windows.csproj"/>
+    <ProjectReference Include="..\Components\MineSharp.World\MineSharp.World.csproj"/>
 
-      <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\"/>
 
-        <None Include="LICENSE" Pack="true" PackagePath="\" />
-      <None Include="icon.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-      </None>
-    </ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="\"/>
+    <None Include="icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="starksoft.aspen" Version="1.1.8" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="starksoft.aspen" Version="1.1.8"/>
+  </ItemGroup>
 
 </Project>

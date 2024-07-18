@@ -8,24 +8,24 @@ namespace MineSharp.Protocol.Packets.Handlers;
 
 internal class PlayPacketHandler : IPacketHandler
 {
-    private MinecraftClient _client;
-    private MinecraftData   _data;
+    private readonly MinecraftClient client;
+    private readonly MinecraftData data;
 
     public PlayPacketHandler(MinecraftClient client, MinecraftData data)
     {
-        this._client = client;
-        this._data   = data;
+        this.client = client;
+        this.data = data;
     }
 
     public Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
-            KeepAlivePacket keepAlive             => HandleKeepAlive(keepAlive),
+            KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
             BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
-            PingPacket ping                       => HandlePing(ping),
-            DisconnectPacket disconnect           => HandleDisconnect(disconnect),
-            _                                     => Task.CompletedTask
+            PingPacket ping => HandlePing(ping),
+            DisconnectPacket disconnect => HandleDisconnect(disconnect),
+            _ => Task.CompletedTask
         };
     }
 
@@ -35,29 +35,32 @@ internal class PlayPacketHandler : IPacketHandler
     }
 
     public bool HandlesIncoming(PacketType type)
-        => type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping or PacketType.CB_Play_KickDisconnect;
+    {
+        return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping
+            or PacketType.CB_Play_KickDisconnect;
+    }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
-        this._client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
+        client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
         return Task.CompletedTask;
     }
 
     private Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
     {
-        this._client.HandleBundleDelimiter();
+        client.HandleBundleDelimiter();
         return Task.CompletedTask;
     }
 
     private Task HandlePing(PingPacket ping)
     {
-        this._client.SendPacket(new PongPacket(ping.Id));
+        client.SendPacket(new PongPacket(ping.Id));
         return Task.CompletedTask;
     }
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => this._client.Disconnect(packet.Reason.GetMessage(this._data)));
+        _ = Task.Run(() => client.Disconnect(packet.Reason.GetMessage(data)));
         return Task.CompletedTask;
     }
 }

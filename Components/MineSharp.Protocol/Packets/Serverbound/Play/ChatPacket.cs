@@ -1,26 +1,25 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 /// <summary>
-/// ChatPacket used before 1.19 to send a Chat message
+///     ChatPacket used before 1.19 to send a Chat message
 /// </summary>
 public class ChatPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_Chat;
-
-    public string Message { get; set; }
-
     public ChatPacket(string message)
     {
-        this.Message = message;
+        Message = message;
     }
+
+    public string Message { get; set; }
+    public PacketType Type => PacketType.SB_Play_Chat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(this.Message);
+        buffer.WriteString(Message);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

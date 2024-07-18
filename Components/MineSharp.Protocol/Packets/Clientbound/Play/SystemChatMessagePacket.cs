@@ -9,71 +9,73 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class SystemChatMessagePacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_SystemChat;
-
-    public string? Content   { get; set; }
-    public Chat?   Message   { get; set; }
-    public int?    ChatType  { get; set; }
-    public bool?   IsOverlay { get; set; }
-
     /// <summary>
-    /// Constructor for 1.19.1
+    ///     Constructor for 1.19.1
     /// </summary>
     /// <param name="content"></param>
     /// <param name="chatType"></param>
     public SystemChatMessagePacket(string content, int chatType)
     {
-        this.Content  = content;
-        this.ChatType = chatType;
+        Content = content;
+        ChatType = chatType;
     }
 
     /// <summary>
-    /// Constructor for >= 1.19.2
+    ///     Constructor for >= 1.19.2
     /// </summary>
     /// <param name="content"></param>
     /// <param name="isOverlay"></param>
     public SystemChatMessagePacket(string content, bool isOverlay)
     {
-        this.Content   = content;
-        this.IsOverlay = isOverlay;
+        Content = content;
+        IsOverlay = isOverlay;
     }
-    
+
     /// <summary>
-    /// Constructor for >= 1.20.3
+    ///     Constructor for >= 1.20.3
     /// </summary>
     /// <param name="message"></param>
     /// <param name="isOverlay"></param>
     public SystemChatMessagePacket(Chat message, bool isOverlay)
     {
-        this.Message = message;
-        this.IsOverlay = isOverlay;
+        Message = message;
+        IsOverlay = isOverlay;
     }
+
+    public string? Content { get; set; }
+    public Chat? Message { get; set; }
+    public int? ChatType { get; set; }
+    public bool? IsOverlay { get; set; }
+    public PacketType Type => PacketType.CB_Play_SystemChat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol <= ProtocolVersion.V_1_20_2)
         {
-            buffer.WriteString(this.Content 
-                            ?? throw new MineSharpPacketVersionException(nameof(Content), version.Version.Protocol));
+            buffer.WriteString(Content
+                               ?? throw new MineSharpPacketVersionException(nameof(Content), version.Version.Protocol));
 
             if (version.Version.Protocol == ProtocolVersion.V_1_19)
             {
-                buffer.WriteVarInt(this.ChatType 
-                                ?? throw new MineSharpPacketVersionException(nameof(ChatType), version.Version.Protocol));
+                buffer.WriteVarInt(ChatType
+                                   ?? throw new MineSharpPacketVersionException(
+                                       nameof(ChatType), version.Version.Protocol));
             }
             else
             {
-                buffer.WriteBool(this.IsOverlay 
-                              ?? throw new MineSharpPacketVersionException(nameof(IsOverlay), version.Version.Protocol));
+                buffer.WriteBool(IsOverlay
+                                 ?? throw new MineSharpPacketVersionException(
+                                     nameof(IsOverlay), version.Version.Protocol));
             }
 
             return;
         }
-        
-        buffer.WriteChatComponent(this.Message 
-                               ?? throw new MineSharpPacketVersionException(nameof(Message), version.Version.Protocol));
-        buffer.WriteBool(this.IsOverlay 
-                      ?? throw new MineSharpPacketVersionException(nameof(IsOverlay), version.Version.Protocol));
+
+        buffer.WriteChatComponent(Message
+                                  ?? throw new MineSharpPacketVersionException(
+                                      nameof(Message), version.Version.Protocol));
+        buffer.WriteBool(IsOverlay
+                         ?? throw new MineSharpPacketVersionException(nameof(IsOverlay), version.Version.Protocol));
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -82,12 +84,11 @@ public class SystemChatMessagePacket : IPacket
         {
             return new SystemChatMessagePacket(buffer.ReadChatComponent(), buffer.ReadBool());
         }
-        
-        var content = buffer.ReadString();
-        return version.Version.Protocol >= ProtocolVersion.V_1_19_2 
-            ? new SystemChatMessagePacket(content, buffer.ReadBool()) 
-            : new SystemChatMessagePacket(content, buffer.ReadVarInt());
 
+        var content = buffer.ReadString();
+        return version.Version.Protocol >= ProtocolVersion.V_1_19_2
+            ? new(content, buffer.ReadBool())
+            : new SystemChatMessagePacket(content, buffer.ReadVarInt());
     }
 }
 #pragma warning restore CS1591

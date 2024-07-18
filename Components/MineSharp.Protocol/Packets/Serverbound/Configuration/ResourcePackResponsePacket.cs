@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -6,18 +6,17 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 #pragma warning disable CS1591
 public class ResourcePackResponsePacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Configuration_ResourcePackReceive;
-
-    public int Result { get; set; }
-
     public ResourcePackResponsePacket(int result)
     {
-        this.Result = result;
+        Result = result;
     }
+
+    public int Result { get; set; }
+    public PacketType Type => PacketType.SB_Configuration_ResourcePackReceive;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.Result);
+        buffer.WriteVarInt(Result);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Common.Recipes;
 using MineSharp.Windows;
@@ -7,8 +7,8 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// Crafting plugin provides methods to craft items using the player's inventory
-/// crafting menu or a crafting table.
+///     Crafting plugin provides methods to craft items using the player's inventory
+///     crafting menu or a crafting table.
 /// </summary>
 /// <param name="bot"></param>
 public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
@@ -20,49 +20,49 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     /// <inheritdoc />
     protected override async Task Init()
     {
-        this.windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
+        windowPlugin = Bot.GetPlugin<WindowPlugin>();
 
-        await this.windowPlugin.WaitForInventory();
+        await windowPlugin.WaitForInventory();
     }
 
     /// <summary>
-    /// Find all recipes containing only resources the bot has currently in the inventory.
+    ///     Find all recipes containing only resources the bot has currently in the inventory.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public IEnumerable<Recipe> FindRecipes(ItemType type)
     {
-        return this.Bot.Data.Recipes.ByItem(type)!
-                   .Where(recipe =>
-                        recipe.IngredientsCount.All(
-                            kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) > kvp.Value));
+        return Bot.Data.Recipes.ByItem(type)!
+                  .Where(recipe =>
+                             recipe.IngredientsCount.All(
+                                 kvp => windowPlugin!.Inventory!.CountItems(kvp.Key) > kvp.Value));
     }
 
     /// <summary>
-    /// Get the first recipe that can currently be crafted by the bot
+    ///     Get the first recipe that can currently be crafted by the bot
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public Recipe? FindRecipe(ItemType type)
     {
-        return this.FindRecipes(type).FirstOrDefault();
+        return FindRecipes(type).FirstOrDefault();
     }
 
     /// <summary>
-    /// Returns how often this recipe can be crafted with the bots current inventory.
+    ///     Returns how often this recipe can be crafted with the bots current inventory.
     /// </summary>
     /// <param name="recipe"></param>
     /// <returns></returns>
     public int CraftableAmount(Recipe recipe)
     {
         return recipe.IngredientsCount
-                     .Select(kvp => this.windowPlugin!.Inventory!.CountItems(kvp.Key) / kvp.Value)
+                     .Select(kvp => windowPlugin!.Inventory!.CountItems(kvp.Key) / kvp.Value)
                      .Min();
     }
 
     /// <summary>
-    /// Craft the given recipe <paramref name="amount"/> of times.
-    /// If the recipe requires a crafting table, <paramref name="craftingTable"/> is used.
+    ///     Craft the given recipe <paramref name="amount" /> of times.
+    ///     If the recipe requires a crafting table, <paramref name="craftingTable" /> is used.
     /// </summary>
     /// <param name="recipe"></param>
     /// <param name="craftingTable"></param>
@@ -70,7 +70,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     /// <exception cref="InvalidOperationException"></exception>
     public async Task Craft(Recipe recipe, Block? craftingTable = null, int amount = 1)
     {
-        if (amount > this.CraftableAmount(recipe))
+        if (amount > CraftableAmount(recipe))
         {
             throw new InvalidOperationException($"The bot cannot craft this recipe {amount} times.");
         }
@@ -83,25 +83,28 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
                 throw new InvalidOperationException("The recipe requires a crafting table but none was provided.");
             }
 
-            craftingWindow = await this.windowPlugin!.OpenContainer(craftingTable);
+            craftingWindow = await windowPlugin!.OpenContainer(craftingTable);
         }
-        else craftingWindow = this.windowPlugin!.Inventory!;
+        else
+        {
+            craftingWindow = windowPlugin!.Inventory!;
+        }
 
-        var resultType = this.Bot.Data.Items.ByType(recipe.Result)!;
+        var resultType = Bot.Data.Items.ByType(recipe.Result)!;
 
         var perIteration = resultType.StackSize / recipe.ResultCount;
         perIteration = recipe.IngredientsCount.Keys
-                             .Select(x => this.Bot.Data.Items.ByType(x)!)
+                             .Select(x => Bot.Data.Items.ByType(x)!)
                              .Select(x => x.StackSize)
                              .Prepend(perIteration)
                              .Min();
 
         var iterations = (int)Math.Ceiling(amount / (float)perIteration);
-        var done       = 0;
-        for (int i = 0; i < iterations; i++)
+        var done = 0;
+        for (var i = 0; i < iterations; i++)
         {
             var count = Math.Min(perIteration, amount - done);
-            await this._Craft(recipe, craftingWindow, count);
+            await _Craft(recipe, craftingWindow, count);
             done += count;
         }
 
@@ -135,23 +138,32 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
                         .GetEnumerator();
 
         if (!stackSlots.MoveNext())
+        {
             throw new InvalidOperationException("Could not find any slot to put result item");
+        }
 
         var currentStackSlot = stackSlots.Current;
-        var done             = 0;
+        var done = 0;
+
         // pickup from result slot
         for (; done < count; done++)
         {
             while (craftingWindow.GetSlot(0).Item?.Info.Type != recipe.Result && !timeout.IsCancellationRequested)
+            {
                 await Task.Delay(10, timeout.Token);
+            }
 
             if (timeout.IsCancellationRequested)
+            {
                 break;
+            }
 
             if (craftingWindow.GetSlot(currentStackSlot.SlotIndex).IsFull())
             {
                 if (!stackSlots.MoveNext())
+                {
                     throw new InvalidOperationException("Could not find any slot to put result item");
+                }
 
                 currentStackSlot = stackSlots.Current;
             }

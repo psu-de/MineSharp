@@ -1,20 +1,20 @@
-using MineSharp.Core.Geometry;
+﻿using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Iterators;
 
 /// <summary>
-/// The Bounding Box iterator returns all Positions that may
-/// collide with the bounding box.
+///     The Bounding Box iterator returns all Positions that may
+///     collide with the bounding box.
 /// </summary>
 public class BoundingBoxIterator : IWorldIterator
 {
-    private XYZIterator _iterator;
+    private readonly XyzIterator iterator;
 
     /// <summary>
-    /// Create a new instance
+    ///     Create a new instance
     /// </summary>
     /// <param name="aabb"></param>
-    public BoundingBoxIterator(AABB aabb)
+    public BoundingBoxIterator(Aabb aabb)
     {
         var minX = (int)Math.Floor(aabb.Min.X - 1.0E-7D) - 1;
         var maxX = (int)Math.Floor(aabb.Max.X + 1.0E-7D) + 1;
@@ -23,11 +23,14 @@ public class BoundingBoxIterator : IWorldIterator
         var minZ = (int)Math.Floor(aabb.Min.Z - 1.0E-7D) - 1;
         var maxZ = (int)Math.Floor(aabb.Max.Z + 1.0E-7D) + 1;
 
-        this._iterator = new XYZIterator(
-            new Position(minX, minY, minZ),
-            new Position(maxX, maxY, maxZ));
+        iterator = new(
+            new(minX, minY, minZ),
+            new(maxX, maxY, maxZ));
     }
 
     /// <inheritdoc />
-    public IEnumerable<Position> Iterate() => this._iterator.Iterate();
+    public IEnumerable<Position> Iterate()
+    {
+        return iterator.Iterate();
+    }
 }

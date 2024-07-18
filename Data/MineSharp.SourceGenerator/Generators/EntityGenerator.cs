@@ -1,15 +1,13 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class EntityGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("entities", GetName, "EntityType", "Entities");
+    private readonly Generator categoryGenerator = new("entities", GetCategoryName, "EntityCategory", "Entities");
 
-    private readonly Generator categoryGenerator =
-        new Generator("entities", GetCategoryName, "EntityCategory", "Entities");
+    private readonly Generator typeGenerator = new("entities", GetName, "EntityType", "Entities");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

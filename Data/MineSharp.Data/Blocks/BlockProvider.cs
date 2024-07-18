@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Blocks.Property;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Framework;
@@ -11,10 +11,10 @@ namespace MineSharp.Data.Blocks;
 internal class BlockProvider : IDataProvider<BlockInfo[]>
 {
     private static readonly EnumNameLookup<BlockType> BlockTypeLookup = new();
-    private static readonly EnumNameLookup<Material>  MaterialLookup  = new();
-
-    private readonly JArray    token;
+    private static readonly EnumNameLookup<Material> MaterialLookup = new();
     private readonly IItemData items;
+
+    private readonly JArray token;
 
     public BlockProvider(JToken token, IItemData items)
     {
@@ -30,9 +30,9 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
     public BlockInfo[] GetData()
     {
         var length = token.Count;
-        var data   = new BlockInfo[length];
+        var data = new BlockInfo[length];
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             data[i] = FromToken(token[i], items);
         }
@@ -42,23 +42,23 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
 
     private static BlockInfo FromToken(JToken dataToken, IItemData items)
     {
-        var id           = (int)dataToken.SelectToken("id")!;
-        var name         = (string)dataToken.SelectToken("name")!;
-        var displayName  = (string)dataToken.SelectToken("displayToken")!;
-        var hardness     = (float?)dataToken.SelectToken("hardness") ?? float.MaxValue;
-        var resistance   = (float)dataToken.SelectToken("resistance")!;
-        var minState     = (int)dataToken.SelectToken("minStateId")!;
-        var maxState     = (int)dataToken.SelectToken("maxStateId")!;
-        var unbreakable  = !(bool)dataToken.SelectToken("diggable")!;
-        var transparent  = (bool)dataToken.SelectToken("transparent")!;
-        var filterLight  = (byte)dataToken.SelectToken("filterLight")!;
-        var emitLight    = (byte)dataToken.SelectToken("emitLight")!;
-        var materials    = (string)dataToken.SelectToken("material")!;
+        var id = (int)dataToken.SelectToken("id")!;
+        var name = (string)dataToken.SelectToken("name")!;
+        var displayName = (string)dataToken.SelectToken("displayToken")!;
+        var hardness = (float?)dataToken.SelectToken("hardness") ?? float.MaxValue;
+        var resistance = (float)dataToken.SelectToken("resistance")!;
+        var minState = (int)dataToken.SelectToken("minStateId")!;
+        var maxState = (int)dataToken.SelectToken("maxStateId")!;
+        var unbreakable = !(bool)dataToken.SelectToken("diggable")!;
+        var transparent = (bool)dataToken.SelectToken("transparent")!;
+        var filterLight = (byte)dataToken.SelectToken("filterLight")!;
+        var emitLight = (byte)dataToken.SelectToken("emitLight")!;
+        var materials = (string)dataToken.SelectToken("material")!;
         var harvestTools = (JObject?)dataToken.SelectToken("harvestTools");
-        var states       = (JArray)dataToken.SelectToken("states")!;
+        var states = (JArray)dataToken.SelectToken("states")!;
         var defaultState = (int)dataToken.SelectToken("defaultState")!;
 
-        return new BlockInfo(
+        return new(
             id,
             BlockTypeLookup.FromName(NameUtils.GetBiomeName(name)),
             name,
@@ -89,7 +89,9 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
     private static ItemType[] GetHarvestTools(JObject? array, IItemData items)
     {
         if (array == null)
+        {
             return Array.Empty<ItemType>();
+        }
 
         return array.Properties()
                     .Select(x => x.Name)
@@ -102,27 +104,29 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
     private static BlockState GetBlockState(JArray states)
     {
         if (states.Count == 0)
-            return new BlockState(Array.Empty<IBlockProperty>());
+        {
+            return new(Array.Empty<IBlockProperty>());
+        }
 
         var properties = states
                         .Select(x => GetBlockProperty((JObject)x))
                         .ToArray();
 
-        return new BlockState(properties);
+        return new(properties);
     }
 
     private static IBlockProperty GetBlockProperty(JObject obj)
     {
-        var name      = (string)obj.SelectToken("name")!;
-        var type      = (string)obj.SelectToken("type")!;
+        var name = (string)obj.SelectToken("name")!;
+        var type = (string)obj.SelectToken("type")!;
         var numValues = (int)obj.SelectToken("num_values")!;
 
         return type switch
         {
             "bool" => new BoolProperty(name),
-            "int"  => new IntProperty(name, numValues),
+            "int" => new IntProperty(name, numValues),
             "enum" => new EnumProperty(name, obj.SelectToken("values")!.ToObject<string[]>()!),
-            _      => throw new NotSupportedException($"Property of type '{type}' is not supported.")
+            _ => throw new NotSupportedException($"Property of type '{type}' is not supported.")
         };
     }
 }

@@ -5,7 +5,7 @@ namespace MineSharp.Commands.Parser;
 
 internal static class ParserRegistry
 {
-    private static IDictionary<int, string> Mapping_119 = new Dictionary<int, string>()
+    private static readonly IDictionary<int, string> Mapping119 = new Dictionary<int, string>
     {
         { 0, "brigadier:bool" },
         { 1, "brigadier:float" },
@@ -57,7 +57,7 @@ internal static class ParserRegistry
         { 47, "minecraft:uuid" }
     };
 
-    private static IDictionary<int, string> Mapping_1193 = new Dictionary<int, string>()
+    private static readonly IDictionary<int, string> Mapping1193 = new Dictionary<int, string>
     {
         { 0, "brigadier:bool" },
         { 1, "brigadier:float" },
@@ -106,10 +106,10 @@ internal static class ParserRegistry
         { 44, "minecraft:resource_key" },
         { 45, "minecraft:template_mirror" },
         { 46, "minecraft:template_rotation" },
-        { 47, "minecraft:uuid" },
+        { 47, "minecraft:uuid" }
     };
 
-    private static IDictionary<int, string> Mapping_1194 = new Dictionary<int, string>()
+    private static readonly IDictionary<int, string> Mapping1194 = new Dictionary<int, string>
     {
         { 0, "brigadier:bool" },
         { 1, "brigadier:float" },
@@ -159,10 +159,10 @@ internal static class ParserRegistry
         { 45, "minecraft:template_mirror" },
         { 46, "minecraft:template_rotation" },
         { 47, "minecraft:heightmap" },
-        { 48, "minecraft:uuid" },
+        { 48, "minecraft:uuid" }
     };
 
-    private static IDictionary<int, string> Mapping_1203 = new Dictionary<int, string>()
+    private static readonly IDictionary<int, string> Mapping1203 = new Dictionary<int, string>
     {
         { 0, "brigadier:bool" },
         { 1, "brigadier:float" },
@@ -213,18 +213,18 @@ internal static class ParserRegistry
         { 46, "minecraft:template_mirror" },
         { 47, "minecraft:template_rotation" },
         { 48, "minecraft:heightmap" },
-        { 49, "minecraft:uuid" },
+        { 49, "minecraft:uuid" }
     };
 
     public static string GetParserNameById(int parserId, MinecraftData data)
     {
         var mapping = data.Version.Protocol switch
         {
-            ProtocolVersion.V_1_19      => Mapping_119,
-            ProtocolVersion.V_1_19_2    => Mapping_119,
-            ProtocolVersion.V_1_19_3    => Mapping_1193,
-            >= ProtocolVersion.V_1_19_4 and < ProtocolVersion.V_1_20_3 => Mapping_1194,
-            >= ProtocolVersion.V_1_20_3 => Mapping_1203,
+            ProtocolVersion.V_1_19 => Mapping119,
+            ProtocolVersion.V_1_19_2 => Mapping119,
+            ProtocolVersion.V_1_19_3 => Mapping1193,
+            >= ProtocolVersion.V_1_19_4 and < ProtocolVersion.V_1_20_3 => Mapping1194,
+            >= ProtocolVersion.V_1_20_3 => Mapping1203,
             _ => throw new NotSupportedException()
         };
 
@@ -235,61 +235,61 @@ internal static class ParserRegistry
     {
         return name switch
         {
-            "brigadier:bool"                => new EmptyParser(),
-            "brigadier:float"               => new FloatParser(),
-            "brigadier:double"              => new DoubleParser(),
-            "brigadier:integer"             => new IntegerParser(),
-            "brigadier:long"                => new LongParser(),
-            "brigadier:string"              => new StringParser(),
-            "minecraft:entity"              => new EntityParser(),
-            "minecraft:game_profile"        => new EmptyParser(),
-            "minecraft:block_pos"           => new BlockPositionParser(),
-            "minecraft:column_pos"          => new ColumnPosParser(),
-            "minecraft:vec3"                => new Vec3Parser(),
-            "minecraft:vec2"                => new Vec2Parser(),
-            "minecraft:block_state"         => new EmptyParser(),
-            "minecraft:block_predicate"     => new EmptyParser(),
-            "minecraft:item_stack"          => new EmptyParser(),
-            "minecraft:item_predicate"      => new EmptyParser(),
-            "minecraft:color"               => new EmptyParser(),
-            "minecraft:component"           => new EmptyParser(),
-            "minecraft:message"             => new MessageParser(),
-            "minecraft:nbt"                 => new EmptyParser(),
-            "minecraft:nbt_tag"             => new EmptyParser(),
-            "minecraft:nbt_path"            => new EmptyParser(),
-            "minecraft:objective"           => new EmptyParser(),
-            "minecraft:objective_criteria"  => new EmptyParser(),
-            "minecraft:operation"           => new EmptyParser(),
-            "minecraft:particle"            => new EmptyParser(),
-            "minecraft:angle"               => new EmptyParser(),
-            "minecraft:rotation"            => new RotationParser(),
-            "minecraft:scoreboard_slot"     => new EmptyParser(),
-            "minecraft:score_holder"        => new ScoreHolderParser(),
-            "minecraft:swizzle"             => new EmptyParser(),
-            "minecraft:team"                => new EmptyParser(),
-            "minecraft:item_slot"           => new EmptyParser(),
-            "minecraft:resource_location"   => new EmptyParser(),
-            "minecraft:mob_effect"          => new EmptyParser(),
-            "minecraft:function"            => new EmptyParser(),
-            "minecraft:entity_anchor"       => new EmptyParser(),
-            "minecraft:int_range"           => new EmptyParser(),
-            "minecraft:float_range"         => new EmptyParser(),
-            "minecraft:item_enchantment"    => new EmptyParser(),
-            "minecraft:entity_summon"       => new EmptyParser(),
-            "minecraft:dimension"           => new EmptyParser(),
-            "minecraft:time"                => new TimeParser(),
-            "minecraft:resource_or_tag"     => new ResourceOrTagParser(),
-            "minecraft:resource"            => new ResourceParser(),
-            "minecraft:template_mirror"     => new EmptyParser(),
-            "minecraft:template_rotation"   => new EmptyParser(),
-            "minecraft:uuid"                => new EmptyParser(),
-            "minecraft:gamemode"            => new EmptyParser(),
+            "brigadier:bool" => new EmptyParser(),
+            "brigadier:float" => new FloatParser(),
+            "brigadier:double" => new DoubleParser(),
+            "brigadier:integer" => new IntegerParser(),
+            "brigadier:long" => new LongParser(),
+            "brigadier:string" => new StringParser(),
+            "minecraft:entity" => new EntityParser(),
+            "minecraft:game_profile" => new EmptyParser(),
+            "minecraft:block_pos" => new BlockPositionParser(),
+            "minecraft:column_pos" => new ColumnPosParser(),
+            "minecraft:vec3" => new Vec3Parser(),
+            "minecraft:vec2" => new Vec2Parser(),
+            "minecraft:block_state" => new EmptyParser(),
+            "minecraft:block_predicate" => new EmptyParser(),
+            "minecraft:item_stack" => new EmptyParser(),
+            "minecraft:item_predicate" => new EmptyParser(),
+            "minecraft:color" => new EmptyParser(),
+            "minecraft:component" => new EmptyParser(),
+            "minecraft:message" => new MessageParser(),
+            "minecraft:nbt" => new EmptyParser(),
+            "minecraft:nbt_tag" => new EmptyParser(),
+            "minecraft:nbt_path" => new EmptyParser(),
+            "minecraft:objective" => new EmptyParser(),
+            "minecraft:objective_criteria" => new EmptyParser(),
+            "minecraft:operation" => new EmptyParser(),
+            "minecraft:particle" => new EmptyParser(),
+            "minecraft:angle" => new EmptyParser(),
+            "minecraft:rotation" => new RotationParser(),
+            "minecraft:scoreboard_slot" => new EmptyParser(),
+            "minecraft:score_holder" => new ScoreHolderParser(),
+            "minecraft:swizzle" => new EmptyParser(),
+            "minecraft:team" => new EmptyParser(),
+            "minecraft:item_slot" => new EmptyParser(),
+            "minecraft:resource_location" => new EmptyParser(),
+            "minecraft:mob_effect" => new EmptyParser(),
+            "minecraft:function" => new EmptyParser(),
+            "minecraft:entity_anchor" => new EmptyParser(),
+            "minecraft:int_range" => new EmptyParser(),
+            "minecraft:float_range" => new EmptyParser(),
+            "minecraft:item_enchantment" => new EmptyParser(),
+            "minecraft:entity_summon" => new EmptyParser(),
+            "minecraft:dimension" => new EmptyParser(),
+            "minecraft:time" => new TimeParser(),
+            "minecraft:resource_or_tag" => new ResourceOrTagParser(),
+            "minecraft:resource" => new ResourceParser(),
+            "minecraft:template_mirror" => new EmptyParser(),
+            "minecraft:template_rotation" => new EmptyParser(),
+            "minecraft:uuid" => new EmptyParser(),
+            "minecraft:gamemode" => new EmptyParser(),
             "minecraft:resource_or_tag_key" => new ResourceOrTagParser(),
-            "minecraft:resource_key"        => new ResourceParser(),
-            "minecraft:heightmap"           => new EmptyParser(),
-            "minecraft:range"               => new RangeParser(), // only in 1.18
-            "minecraft:nbt_compound_tag"    => new EmptyParser(),
-            "minecraft:style"               => new EmptyParser(), // since 1.20.3
+            "minecraft:resource_key" => new ResourceParser(),
+            "minecraft:heightmap" => new EmptyParser(),
+            "minecraft:range" => new RangeParser(), // only in 1.18
+            "minecraft:nbt_compound_tag" => new EmptyParser(),
+            "minecraft:style" => new EmptyParser(), // since 1.20.3
             _ => throw new ArgumentException($"Unknown parser: {name}")
         };
     }

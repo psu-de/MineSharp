@@ -1,11 +1,15 @@
-namespace MineSharp.World.Tests.Containers;
+﻿using MineSharp.World.Containers;
 
-using MineSharp.World.Containers;
+namespace MineSharp.World.Tests.Containers;
 
 public class IntBitArrayTests
 {
-    private static readonly long[] Data     = { 0x0020863148418841, 0x01018A7260F68C87 };
-    private static readonly int[]  Expected = { 1, 2, 2, 3, 4, 4, 5, 6, 6, 4, 8, 0, 7, 4, 3, 13, 15, 16, 9, 14, 10, 12, 0, 2 };
+    private static readonly long[] Data = { 0x0020863148418841, 0x01018A7260F68C87 };
+
+    private static readonly int[] Expected =
+    {
+        1, 2, 2, 3, 4, 4, 5, 6, 6, 4, 8, 0, 7, 4, 3, 13, 15, 16, 9, 14, 10, 12, 0, 2
+    };
 
     [SetUp]
     public void Setup()
@@ -23,7 +27,7 @@ public class IntBitArrayTests
     {
         var array = new IntBitArray(Data, 5);
 
-        for (int i = 0; i < array.Capacity; i++)
+        for (var i = 0; i < array.Capacity; i++)
         {
             Assert.That(array.Get(i), Is.EqualTo(Expected[i]));
         }
@@ -50,7 +54,7 @@ public class IntBitArrayTests
         Assert.That(array.Data.Length, Is.EqualTo(3));
         Assert.That(array.Capacity, Is.EqualTo(30));
 
-        for (int i = 0; i < array.Capacity; i++)
+        for (var i = 0; i < array.Capacity; i++)
         {
             var expected = i >= Expected.Length ? 0 : Expected[i];
             Assert.That(array.Get(i), Is.EqualTo(expected));

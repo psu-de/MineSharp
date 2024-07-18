@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Enchantments;
+﻿using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
@@ -8,7 +8,7 @@ namespace MineSharp.Data.Items;
 
 internal class ItemProvider : IDataProvider<ItemInfo[]>
 {
-    private static readonly EnumNameLookup<ItemType>            ItemTypeLookup            = new();
+    private static readonly EnumNameLookup<ItemType> ItemTypeLookup = new();
     private static readonly EnumNameLookup<EnchantmentCategory> EnchantmentCategoryLookup = new();
 
     private readonly JArray token;
@@ -26,9 +26,9 @@ internal class ItemProvider : IDataProvider<ItemInfo[]>
     public ItemInfo[] GetData()
     {
         var length = token.Count;
-        var data   = new ItemInfo[length];
+        var data = new ItemInfo[length];
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             data[i] = FromToken(token[i]!);
         }
@@ -38,15 +38,15 @@ internal class ItemProvider : IDataProvider<ItemInfo[]>
 
     private static ItemInfo FromToken(JToken dataToken)
     {
-        var id           = (int)dataToken.SelectToken("id")!;
-        var name         = (string)dataToken.SelectToken("name")!;
-        var displayName  = (string)dataToken.SelectToken("displayToken")!;
-        var stackSize    = (int)dataToken.SelectToken("stackSize")!;
-        var durability   = (int?)dataToken.SelectToken("maxDurability")!;
+        var id = (int)dataToken.SelectToken("id")!;
+        var name = (string)dataToken.SelectToken("name")!;
+        var displayName = (string)dataToken.SelectToken("displayToken")!;
+        var stackSize = (int)dataToken.SelectToken("stackSize")!;
+        var durability = (int?)dataToken.SelectToken("maxDurability")!;
         var enchantments = (JArray?)dataToken.SelectToken("enchantCategories");
-        var repairWith   = (JArray?)dataToken.SelectToken("repairWith")!;
+        var repairWith = (JArray?)dataToken.SelectToken("repairWith")!;
 
-        return new ItemInfo(
+        return new(
             id,
             ItemTypeLookup.FromName(NameUtils.GetItemName(name)),
             name,
@@ -61,7 +61,9 @@ internal class ItemProvider : IDataProvider<ItemInfo[]>
     private static EnchantmentCategory[] GetEnchantments(JArray? enchantments)
     {
         if (enchantments == null)
+        {
             return Array.Empty<EnchantmentCategory>();
+        }
 
         return enchantments
               .ToObject<string[]>()!
@@ -73,7 +75,9 @@ internal class ItemProvider : IDataProvider<ItemInfo[]>
     private static ItemType[] GetRepairItems(JArray? repairWith)
     {
         if (repairWith == null)
+        {
             return Array.Empty<ItemType>();
+        }
 
         return repairWith
               .ToObject<string[]>()!

@@ -1,15 +1,21 @@
-namespace MineSharp.Bot.Utils;
+﻿namespace MineSharp.Bot.Utils;
 
 internal static class NetUtils
 {
-    private const double VELOCITY_CONVERSION = 8000d;
+    private const double VelocityConversion = 8000d;
 
     public static double ConvertToVelocity(double value)
-        => value / VELOCITY_CONVERSION;
+    {
+        return value / VelocityConversion;
+    }
 
     public static double ConvertDeltaPosition(short delta)
-        => delta / (128 * 32d);
+    {
+        return delta / (128 * 32d);
+    }
 
     public static float FromAngleByte(sbyte angle)
-        => angle * 360.0f / 256.0f;
+    {
+        return angle * 360.0f / 256.0f;
+    }
 }

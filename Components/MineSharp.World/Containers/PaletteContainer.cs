@@ -1,51 +1,61 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.World.Containers.Palettes;
 
 namespace MineSharp.World.Containers;
 
 internal abstract class PaletteContainer : IPaletteContainer
 {
-    public          IPalette    Palette             { get; set; }
-    public          IntBitArray Data                { get; set; }
-    public abstract int         Capacity            { get; }
-    public abstract int         TotalNumberOfStates { get; }
-    public abstract byte        MinBits             { get; }
-    public abstract byte        MaxBits             { get; }
-
     protected PaletteContainer(IPalette palette, IntBitArray data)
     {
-        this.Palette = palette;
-        this.Data    = data;
+        Palette = palette;
+        Data = data;
     }
+
+    public IPalette Palette { get; set; }
+    public IntBitArray Data { get; set; }
+    public abstract int Capacity { get; }
+    public abstract int TotalNumberOfStates { get; }
+    public abstract byte MinBits { get; }
+    public abstract byte MaxBits { get; }
 
     public int GetAt(int index)
     {
         if (index < 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(index));
+        }
 
-        if (index >= this.Capacity)
+        if (index >= Capacity)
+        {
             throw new ArgumentOutOfRangeException(nameof(index));
+        }
 
-        if (this.Palette is SingleValuePalette)
-            return this.Palette.Get(0);
+        if (Palette is SingleValuePalette)
+        {
+            return Palette.Get(0);
+        }
 
-        var value = this.Data.Get(index);
-        return this.Palette.Get(value);
+        var value = Data.Get(index);
+        return Palette.Get(value);
     }
 
     public void SetAt(int index, int state)
     {
-        if (index < 0 || index >= this.Capacity)
+        if (index < 0 || index >= Capacity)
+        {
             throw new ArgumentOutOfRangeException(nameof(index));
+        }
 
-        var newPalette = this.Palette.Set(index, state, this);
+        var newPalette = Palette.Set(index, state, this);
         if (newPalette != null)
-            this.Palette = newPalette;
+        {
+            Palette = newPalette;
+        }
     }
 
     protected static (IPalette palette, IntBitArray data) FromStream(PacketBuffer buffer, byte maxBitsPerEntry)
     {
-        var      bitsPerEntry = buffer.ReadByte();
+        var bitsPerEntry = buffer.ReadByte();
         IPalette palette;
 
         if (bitsPerEntry == 0)
@@ -62,9 +72,11 @@ internal abstract class PaletteContainer : IPaletteContainer
         }
 
         var data = new long[buffer.ReadVarInt()];
-        for (int i = 0; i < data.Length; i++)
+        for (var i = 0; i < data.Length; i++)
+        {
             data[i] = buffer.ReadLong();
+        }
 
-        return (palette, new IntBitArray(data, (byte)bitsPerEntry));
+        return (palette, new(data, bitsPerEntry));
     }
 }

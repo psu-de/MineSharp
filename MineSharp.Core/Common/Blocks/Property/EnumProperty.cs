@@ -1,29 +1,29 @@
-namespace MineSharp.Core.Common.Blocks.Property;
+﻿namespace MineSharp.Core.Common.Blocks.Property;
 
 /// <summary>
-/// A string block property.
+///     A string block property.
 /// </summary>
 public class EnumProperty : IBlockProperty
 {
-    private readonly string[] _acceptedValues;
+    private readonly string[] acceptedValues;
+
+    /// <summary>
+    ///     Create a new EnumProperty
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="acceptedValues"></param>
+    public EnumProperty(string name, string[] acceptedValues)
+    {
+        this.acceptedValues = acceptedValues;
+        Name = name;
+        StateCount = this.acceptedValues.Length;
+    }
 
     /// <inheritdoc />
     public string Name { get; }
 
     /// <inheritdoc />
     public int StateCount { get; }
-
-    /// <summary>
-    /// Create a new EnumProperty
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="acceptedValues"></param>
-    public EnumProperty(string name, string[] acceptedValues)
-    {
-        this._acceptedValues = acceptedValues;
-        this.Name            = name;
-        this.StateCount      = this._acceptedValues.Length;
-    }
 
     /// <inheritdoc />
     public T GetValue<T>(int state)
@@ -33,11 +33,12 @@ public class EnumProperty : IBlockProperty
             throw new NotSupportedException("This is property can only be an enum.");
         }
 
-        if (state >= this.StateCount)
+        if (state >= StateCount)
         {
-            throw new IndexOutOfRangeException($"State {state} is out of range for property with {this.StateCount} entries.");
+            throw new IndexOutOfRangeException(
+                $"State {state} is out of range for property with {StateCount} entries.");
         }
 
-        return (T)(object)this._acceptedValues[state];
+        return (T)(object)acceptedValues[state];
     }
 }

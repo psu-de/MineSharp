@@ -1,4 +1,4 @@
-using MineSharp.Core;
+﻿using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -8,60 +8,59 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 #pragma warning disable CS1591
 public class EncryptionResponsePacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Login_EncryptionBegin;
-
-    public byte[]           SharedSecret { get; set; }
-    public byte[]?          VerifyToken  { get; set; }
-    public CryptoContainer? Crypto       { get; set; }
-
     public EncryptionResponsePacket(byte[] sharedSecret, byte[]? verifyToken, CryptoContainer? crypto)
     {
-        this.SharedSecret = sharedSecret;
-        this.VerifyToken  = verifyToken;
-        this.Crypto       = crypto;
+        SharedSecret = sharedSecret;
+        VerifyToken = verifyToken;
+        Crypto = crypto;
     }
+
+    public byte[] SharedSecret { get; set; }
+    public byte[]? VerifyToken { get; set; }
+    public CryptoContainer? Crypto { get; set; }
+    public PacketType Type => PacketType.SB_Login_EncryptionBegin;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.SharedSecret.Length);
-        buffer.WriteBytes(this.SharedSecret);
+        buffer.WriteVarInt(SharedSecret.Length);
+        buffer.WriteBytes(SharedSecret);
 
         if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
-            bool hasVerifyToken = this.VerifyToken != null;
+            var hasVerifyToken = VerifyToken != null;
             buffer.WriteBool(hasVerifyToken);
 
             if (!hasVerifyToken)
             {
-                if (this.Crypto == null)
+                if (Crypto == null)
                 {
-                    throw new MineSharpPacketVersionException(nameof(this.Crypto), version.Version.Protocol);
+                    throw new MineSharpPacketVersionException(nameof(Crypto), version.Version.Protocol);
                 }
 
-                this.Crypto.Write(buffer);
+                Crypto.Write(buffer);
                 return;
             }
         }
 
-        if (this.VerifyToken == null)
+        if (VerifyToken == null)
         {
-            throw new MineSharpPacketVersionException(nameof(this.VerifyToken), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(VerifyToken), version.Version.Protocol);
         }
 
-        buffer.WriteVarInt(this.VerifyToken.Length);
-        buffer.WriteBytes(this.VerifyToken);
+        buffer.WriteVarInt(VerifyToken.Length);
+        buffer.WriteBytes(VerifyToken);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var              sharedSecretLength = buffer.ReadVarInt();
-        var              sharedSecret       = buffer.ReadBytes(sharedSecretLength);
-        CryptoContainer? crypto             = null;
-        byte[]?          verifyToken        = null;
+        var sharedSecretLength = buffer.ReadVarInt();
+        var sharedSecret = buffer.ReadBytes(sharedSecretLength);
+        CryptoContainer? crypto = null;
+        byte[]? verifyToken = null;
 
         if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
-            bool hasVerifyToken = buffer.ReadBool();
+            var hasVerifyToken = buffer.ReadBool();
             buffer.WriteBool(hasVerifyToken);
 
             if (!hasVerifyToken)
@@ -80,29 +79,29 @@ public class EncryptionResponsePacket : IPacket
 
     public class CryptoContainer : ISerializable<CryptoContainer>
     {
-        public long   Salt             { get; set; }
-        public byte[] MessageSignature { get; set; }
-
         public CryptoContainer(long salt, byte[] messageSignature)
         {
-            this.Salt             = salt;
-            this.MessageSignature = messageSignature;
+            Salt = salt;
+            MessageSignature = messageSignature;
         }
+
+        public long Salt { get; set; }
+        public byte[] MessageSignature { get; set; }
 
         public void Write(PacketBuffer buffer)
         {
-            buffer.WriteLong(this.Salt);
-            buffer.WriteVarInt(this.MessageSignature.Length);
-            buffer.WriteBytes(this.MessageSignature.AsSpan());
+            buffer.WriteLong(Salt);
+            buffer.WriteVarInt(MessageSignature.Length);
+            buffer.WriteBytes(MessageSignature.AsSpan());
         }
 
         public static CryptoContainer Read(PacketBuffer buffer)
         {
-            var salt        = buffer.ReadLong();
-            var length      = buffer.ReadVarInt();
+            var salt = buffer.ReadLong();
+            var length = buffer.ReadVarInt();
             var verifyToken = buffer.ReadBytes(length);
 
-            return new CryptoContainer(salt, verifyToken);
+            return new(salt, verifyToken);
         }
     }
 }

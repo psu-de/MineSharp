@@ -7,66 +7,72 @@ using Org.BouncyCastle.Crypto.Parameters;
 namespace MineSharp.Protocol.Cryptography;
 
 /// <summary>
-/// Encryption stream
+///     Encryption stream
 /// </summary>
 public class AesStream : Stream
 {
-    private readonly Stream              _baseStream;
-    private readonly BufferedBlockCipher _decryptCipher;
-    private readonly BufferedBlockCipher _encryptCipher;
+    private readonly Stream baseStream;
+    private readonly BufferedBlockCipher decryptCipher;
+    private readonly BufferedBlockCipher encryptCipher;
 
     /// <summary>
-    /// Create a new instance of AesStream
+    ///     Create a new instance of AesStream
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="key"></param>
     public AesStream(Stream stream, byte[] key)
     {
-        this._encryptCipher = new BufferedBlockCipher(new CfbBlockCipher(new AesEngine(), 8));
-        this._encryptCipher.Init(true, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
+        encryptCipher = new(new CfbBlockCipher(new AesEngine(), 8));
+        encryptCipher.Init(true, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
 
-        this._decryptCipher = new BufferedBlockCipher(new CfbBlockCipher(new AesEngine(), 8));
-        this._decryptCipher.Init(false, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
+        decryptCipher = new(new CfbBlockCipher(new AesEngine(), 8));
+        decryptCipher.Init(false, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
 
-        this._baseStream = new CipherStream(stream, this._decryptCipher, this._encryptCipher);
+        baseStream = new CipherStream(stream, decryptCipher, encryptCipher);
     }
 
     /// <inheritdoc />
-    public override bool CanRead => this._baseStream.CanRead;
+    public override bool CanRead => baseStream.CanRead;
 
     /// <inheritdoc />
-    public override bool CanSeek => this._baseStream.CanSeek;
+    public override bool CanSeek => baseStream.CanSeek;
 
     /// <inheritdoc />
-    public override bool CanWrite => this._baseStream.CanWrite;
+    public override bool CanWrite => baseStream.CanWrite;
 
     /// <inheritdoc />
-    public override long Length => this._baseStream.Length;
+    public override long Length => baseStream.Length;
 
     /// <inheritdoc />
-    public override long Position { get => this._baseStream.Position; set => throw new NotSupportedException(); }
+    public override long Position { get => baseStream.Position; set => throw new NotSupportedException(); }
 
     /// <inheritdoc />
     public override void Flush()
     {
-        this._baseStream.Flush();
+        baseStream.Flush();
     }
 
     /// <inheritdoc />
-    public override int Read(byte[] buffer, int offset, int count) => this._baseStream.Read(buffer, offset, count);
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        return baseStream.Read(buffer, offset, count);
+    }
 
     /// <inheritdoc />
-    public override long Seek(long offset, SeekOrigin origin) => this._baseStream.Seek(offset, origin);
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        return baseStream.Seek(offset, origin);
+    }
 
     /// <inheritdoc />
     public override void SetLength(long value)
     {
-        this._baseStream.SetLength(value);
+        baseStream.SetLength(value);
     }
 
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
-        this._baseStream.Write(buffer, offset, count);
+        baseStream.Write(buffer, offset, count);
     }
 }

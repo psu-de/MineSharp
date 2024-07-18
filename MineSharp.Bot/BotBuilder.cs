@@ -1,4 +1,4 @@
-using MineSharp.Auth;
+﻿using MineSharp.Auth;
 using MineSharp.Bot.Plugins;
 using MineSharp.Bot.Proxy;
 using MineSharp.Data;
@@ -8,7 +8,7 @@ using NLog;
 namespace MineSharp.Bot;
 
 /// <summary>
-/// Builder for <see cref="MineSharpBot"/>
+///     Builder for <see cref="MineSharpBot" />
 /// </summary>
 public class BotBuilder
 {
@@ -25,43 +25,43 @@ public class BotBuilder
         typeof(PhysicsPlugin)
     ];
 
-    private string? hostname;
-    private ushort  port = 25565;
-
-    // MinecraftData variables
-    private string?        versionStr;
-    private MinecraftData? data;
-    private bool           autoDetect = true;
-
     // Plugins 
-    private List<Type> plugins               = [];
-    private bool       excludeDefaultPlugins = false;
-
-    // Session variables
-    private Session?                         session;
-    private string?                          microsoftLoginUsername = null;
-    private MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler      = null;
-
-    // proxy
-    private ProxyFactory? proxyProvider = null;
-
-    private ClientSettings? settings = null;
+    private readonly List<Type> plugins = [];
 
     private bool autoConnect;
+    private bool autoDetect = true;
+    private MinecraftData? data;
+    private MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler;
+    private bool excludeDefaultPlugins;
+
+    private string? hostname;
+    private string? microsoftLoginUsername;
+    private ushort port = 25565;
+
+    // proxy
+    private ProxyFactory? proxyProvider;
+
+    // Session variables
+    private Session? session;
+
+    private ClientSettings? settings;
+
+    // MinecraftData variables
+    private string? versionStr;
 
     /// <summary>
-    /// Specify the hostname
+    ///     Specify the hostname
     /// </summary>
     /// <param name="hostnameOrIpAddress"></param>
     /// <returns></returns>
     public BotBuilder Host(string hostnameOrIpAddress)
     {
-        this.hostname = hostnameOrIpAddress;
+        hostname = hostnameOrIpAddress;
         return this;
     }
 
     /// <summary>
-    /// Specify the port. Defaults to 25565
+    ///     Specify the port. Defaults to 25565
     /// </summary>
     /// <param name="port"></param>
     /// <returns></returns>
@@ -72,18 +72,18 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Set MinecraftData by version string
+    ///     Set MinecraftData by version string
     /// </summary>
     /// <param name="version"></param>
     /// <returns></returns>
     public BotBuilder Data(string version)
     {
-        this.versionStr = version;
+        versionStr = version;
         return this;
     }
 
     /// <summary>
-    /// Set MinecraftData
+    ///     Set MinecraftData
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
@@ -94,7 +94,7 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Specify to auto detect MinecraftData from the server
+    ///     Specify to auto detect MinecraftData from the server
     /// </summary>
     /// <param name="autoDetect"></param>
     /// <returns></returns>
@@ -105,18 +105,18 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Add a plugin to the bot
+    ///     Add a plugin to the bot
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public BotBuilder WithPlugin<T>() where T : Plugin
     {
-        this.plugins.Add(typeof(T));
+        plugins.Add(typeof(T));
         return this;
     }
 
     /// <summary>
-    /// Set the client settings
+    ///     Set the client settings
     /// </summary>
     public BotBuilder WithSettings(ClientSettings settings)
     {
@@ -125,17 +125,17 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Do not load the default plugins
+    ///     Do not load the default plugins
     /// </summary>
     /// <returns></returns>
     public BotBuilder ExcludeDefaultPlugins()
     {
-        this.excludeDefaultPlugins = true;
+        excludeDefaultPlugins = true;
         return this;
     }
 
     /// <summary>
-    /// Set the Session
+    ///     Set the Session
     /// </summary>
     /// <param name="session"></param>
     /// <returns></returns>
@@ -146,31 +146,31 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Create a new offline session
+    ///     Create a new offline session
     /// </summary>
     /// <param name="username"></param>
     /// <returns></returns>
     public BotBuilder OfflineSession(string username)
     {
-        this.session = Auth.Session.OfflineSession(username);
+        session = Auth.Session.OfflineSession(username);
         return this;
     }
 
     /// <summary>
-    /// Create a new online session
+    ///     Create a new online session
     /// </summary>
     /// <param name="usernameOrEmail"></param>
     /// <param name="deviceCodeHandler"></param>
     /// <returns></returns>
     public BotBuilder OnlineSession(string usernameOrEmail, MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler = null)
     {
-        this.microsoftLoginUsername = usernameOrEmail;
-        this.deviceCodeHandler      = deviceCodeHandler;
+        microsoftLoginUsername = usernameOrEmail;
+        this.deviceCodeHandler = deviceCodeHandler;
         return this;
     }
 
     /// <summary>
-    /// Specify whether to automatically connect when creating the bot
+    ///     Specify whether to automatically connect when creating the bot
     /// </summary>
     /// <param name="autoConnect"></param>
     /// <returns></returns>
@@ -181,7 +181,7 @@ public class BotBuilder
     }
 
     /// <summary>
-    /// Use a proxy for minecraft services and Minecraft client
+    ///     Use a proxy for minecraft services and Minecraft client
     /// </summary>
     /// <param name="type"></param>
     /// <param name="hostname"></param>
@@ -189,12 +189,12 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port)
     {
-        this.proxyProvider = new ProxyFactory(type, hostname, port);
+        proxyProvider = new(type, hostname, port);
         return this;
     }
 
     /// <summary>
-    /// Use a proxy for minecraft services and Minecraft client
+    ///     Use a proxy for minecraft services and Minecraft client
     /// </summary>
     /// <param name="type"></param>
     /// <param name="hostname"></param>
@@ -202,85 +202,110 @@ public class BotBuilder
     /// <param name="username"></param>
     /// <param name="password"></param>
     /// <returns></returns>
-    public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port, string username, string password)
+    public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port, string username,
+                                string password)
     {
-        this.proxyProvider = new ProxyFactory(type, hostname, port, username, password);
+        proxyProvider = new(type, hostname, port, username, password);
         return this;
     }
 
     /// <summary>
-    /// Create the <see cref="MineSharpBot"/>
+    ///     Create the <see cref="MineSharpBot" />
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="Exception"></exception>
     public async Task<MineSharpBot> CreateAsync()
     {
-        if (this.hostname is null)
-            throw new ArgumentNullException(nameof(this.hostname));
+        if (hostname is null)
+        {
+            throw new ArgumentNullException(nameof(hostname));
+        }
 
-        this.proxyProvider ??= new ProxyFactory();
+        proxyProvider ??= new();
 
-        MinecraftApi api = new MinecraftApi(this.proxyProvider.CreateHttpClient());
+        var api = new MinecraftApi(proxyProvider.CreateHttpClient());
 
         MinecraftData? data;
         if (this.data is not null)
+        {
             data = this.data;
-        else if (this.versionStr is not null)
-            data = await MinecraftData.FromVersion(this.versionStr);
-        else if (this.autoDetect)
-            data = await TryAutoDetectVersion(this.proxyProvider, this.hostname, this.port);
-        else throw new ArgumentNullException(nameof(this.data), "No data provided. Set either Data() or AutoDetectVersion(true)");
+        }
+        else if (versionStr is not null)
+        {
+            data = await MinecraftData.FromVersion(versionStr);
+        }
+        else if (autoDetect)
+        {
+            data = await TryAutoDetectVersion(proxyProvider, hostname, port);
+        }
+        else
+        {
+            throw new ArgumentNullException(nameof(this.data),
+                                            "No data provided. Set either Data() or AutoDetectVersion(true)");
+        }
 
         Session? session;
         if (this.session is not null)
+        {
             session = this.session;
-        else if (this.microsoftLoginUsername is not null)
-            session = await MicrosoftAuth.Login(this.microsoftLoginUsername, this.deviceCodeHandler);
+        }
+        else if (microsoftLoginUsername is not null)
+        {
+            session = await MicrosoftAuth.Login(microsoftLoginUsername, deviceCodeHandler);
+        }
         else
+        {
             throw new ArgumentNullException(nameof(this.session),
-                "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
-        
-        this.settings ??= ClientSettings.Default;
+                                            "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
+        }
+
+        settings ??= ClientSettings.Default;
 
         var client = new MinecraftClient(
             data,
             session,
-            this.hostname,
-            this.port,
+            hostname,
+            port,
             api,
-            this.proxyProvider,
-            this.settings);
+            proxyProvider,
+            settings);
 
         var bot = new MineSharpBot(client);
 
-        if (!this.excludeDefaultPlugins)
-            this.plugins.AddRange(DefaultPlugins);
+        if (!excludeDefaultPlugins)
+        {
+            plugins.AddRange(DefaultPlugins);
+        }
 
-        foreach (var type in this.plugins)
+        foreach (var type in plugins)
         {
             var plugin = (Plugin?)Activator.CreateInstance(type, bot);
             if (plugin is null)
             {
-                throw new Exception($"Could not create plugin of type {type.Name}");
+                throw new($"Could not create plugin of type {type.Name}");
             }
 
             await bot.LoadPlugin(plugin);
         }
 
-        if (this.autoConnect)
+        if (autoConnect)
+        {
             await bot.Connect();
+        }
 
         return bot;
     }
 
     /// <summary>
-    /// Create the <see cref="MineSharpBot"/> synchronously.
-    /// Note: May block for some time.
+    ///     Create the <see cref="MineSharpBot" /> synchronously.
+    ///     Note: May block for some time.
     /// </summary>
     /// <returns></returns>
     public MineSharpBot Create()
-        => this.CreateAsync().Result;
+    {
+        return CreateAsync().Result;
+    }
 
     private static async Task<MinecraftData> TryAutoDetectVersion(ProxyFactory factory, string hostname, ushort port)
     {

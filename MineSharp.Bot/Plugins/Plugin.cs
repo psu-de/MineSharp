@@ -1,113 +1,129 @@
-using NLog;
+﻿using NLog;
 
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// Plugin for <see cref="MineSharpBot"/>. 
+///     Plugin for <see cref="MineSharpBot" />.
 /// </summary>
 public abstract class Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    /// <summary>
-    /// The bot
-    /// </summary>
-    protected MineSharpBot Bot { get; }
+    private readonly TaskCompletionSource initializationTask;
 
     /// <summary>
-    /// Whether this plugin is currently enabled
-    /// </summary>
-    public bool IsEnabled { get; private set; }
-
-    /// <summary>
-    /// Whether this plugin is loaded and functional
-    /// </summary>
-    public bool IsLoaded { get; private set; }
-
-    private readonly TaskCompletionSource _initializationTask;
-
-    /// <summary>
-    /// Create a new Plugin instance
+    ///     Create a new Plugin instance
     /// </summary>
     /// <param name="bot"></param>
     protected Plugin(MineSharpBot bot)
     {
-        this.Bot                 = bot;
-        this.IsEnabled           = true;
-        this._initializationTask = new TaskCompletionSource();
+        Bot = bot;
+        IsEnabled = true;
+        initializationTask = new();
     }
 
     /// <summary>
-    /// This method is called once when the plugin starts.
+    ///     The bot
+    /// </summary>
+    protected MineSharpBot Bot { get; }
+
+    /// <summary>
+    ///     Whether this plugin is currently enabled
+    /// </summary>
+    public bool IsEnabled { get; private set; }
+
+    /// <summary>
+    ///     Whether this plugin is loaded and functional
+    /// </summary>
+    public bool IsLoaded { get; private set; }
+
+    /// <summary>
+    ///     This method is called once when the plugin starts.
     /// </summary>
     /// <returns></returns>
     protected virtual Task Init()
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// This method is called each minecraft tick. (About 20 times a second.)
+    ///     This method is called each minecraft tick. (About 20 times a second.)
     /// </summary>
     /// <returns></returns>
     public virtual Task OnTick()
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// This method is called when the plugin gets enabled.
+    ///     This method is called when the plugin gets enabled.
     /// </summary>
     /// <returns></returns>
     protected virtual Task OnEnable()
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// This method is called when the plugin gets disabled.
+    ///     This method is called when the plugin gets disabled.
     /// </summary>
     /// <returns></returns>
     protected virtual Task OnDisable()
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// Enable or disable the plugin.
+    ///     Enable or disable the plugin.
     /// </summary>
     /// <param name="enabled"></param>
     public async Task SetEnabled(bool enabled)
     {
-        if (this.IsEnabled == enabled)
+        if (IsEnabled == enabled)
+        {
             return;
+        }
 
         if (enabled)
-            await this.OnEnable();
+        {
+            await OnEnable();
+        }
         else
-            await this.OnDisable();
+        {
+            await OnDisable();
+        }
 
-        this.IsEnabled = enabled;
+        IsEnabled = enabled;
     }
 
     /// <summary>
-    /// Returns a task that resolves once this module has been initialized.
+    ///     Returns a task that resolves once this module has been initialized.
     /// </summary>
     /// <returns></returns>
     public Task WaitForInitialization()
     {
-        return this._initializationTask.Task;
+        return initializationTask.Task;
     }
 
     internal async Task Initialize()
     {
-        if (this.IsLoaded)
+        if (IsLoaded)
+        {
             return;
+        }
 
         try
         {
-            await this.Init();
-            
-            this._initializationTask.TrySetResult();
-            
-            this.IsLoaded = true;
-            Logger.Info("Plugin loaded: {PluginName}", this.GetType().Name);
+            await Init();
+
+            initializationTask.TrySetResult();
+
+            IsLoaded = true;
+            Logger.Info("Plugin loaded: {PluginName}", GetType().Name);
         }
         catch (Exception e)
         {
-            Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", this.GetType().Name);
+            Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", GetType().Name);
             throw;
         }
     }

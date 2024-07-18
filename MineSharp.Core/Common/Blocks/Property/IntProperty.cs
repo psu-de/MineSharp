@@ -1,7 +1,7 @@
-namespace MineSharp.Core.Common.Blocks.Property;
+﻿namespace MineSharp.Core.Common.Blocks.Property;
 
 /// <summary>
-/// An integer block state property.
+///     An integer block state property.
 /// </summary>
 /// <param name="name"></param>
 /// <param name="stateCount"></param>

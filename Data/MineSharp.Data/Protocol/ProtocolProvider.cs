@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
 using Newtonsoft.Json.Linq;
@@ -7,10 +7,10 @@ namespace MineSharp.Data.Protocol;
 
 internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
 {
-    private static readonly EnumNameLookup<GameState>  StateLookup = new();
-    private static readonly EnumNameLookup<PacketType> TypeLookup  = new();
+    private static readonly EnumNameLookup<GameState> StateLookup = new();
+    private static readonly EnumNameLookup<PacketType> TypeLookup = new();
 
-    private JObject token;
+    private readonly JObject token;
 
     public ProtocolProvider(JToken token)
     {
@@ -30,10 +30,12 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
             { PacketFlow.Serverbound, new Dictionary<GameState, Dictionary<int, PacketType>>() }
         };
 
-        foreach (var ns in this.token.Properties())
+        foreach (var ns in token.Properties())
         {
             if (ns.Name == "types")
+            {
                 continue;
+            }
 
             var state = StateLookup.FromName(NameUtils.GetGameState(ns.Name));
 
@@ -44,7 +46,7 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
             byFlow[PacketFlow.Serverbound].Add(state, sbPackets);
         }
 
-        return new ProtocolDataBlob(byFlow);
+        return new(byFlow);
     }
 
     private Dictionary<int, PacketType> CollectPackets(string ns, string direction)
