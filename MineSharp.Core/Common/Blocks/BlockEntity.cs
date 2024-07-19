@@ -10,7 +10,7 @@ namespace MineSharp.Core.Common.Blocks;
 /// <param name="z"></param>
 /// <param name="type"></param>
 /// <param name="data"></param>
-public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
+public class BlockEntity(byte x, short y, byte z, int type, NbtCompound? data)
 {
     /// <summary>
     ///     X coordinate
@@ -35,5 +35,5 @@ public class BlockEntity(byte x, short y, byte z, int type, NbtCompound data)
     /// <summary>
     ///     NBT data
     /// </summary>
-    public NbtCompound Data { get; set; } = data;
+    public NbtCompound? Data { get; set; } = data;
 }

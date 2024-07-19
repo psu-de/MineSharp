@@ -376,7 +376,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         var z = (byte)(packedXz & 0xF);
         var y = ReadShort();
         var type = ReadVarInt();
-        var nbt = ReadNbtCompound();
+        var nbt = ReadOptionalNbtCompound();
 
         return new(x, y, z, type, nbt);
     }
@@ -589,16 +589,21 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
 
-    public void WriteNbt(NbtTag? tag)
+    public void WriteNbt(NbtTag tag)
     {
+        var f = new NbtFile(tag) { BigEndian = true, Anonymous = UseAnonymousNbt };
+        f.SaveToStream(buffer, NbtCompression.None);
+    }
+
+    public void WriteOptionalNbt(NbtTag? tag)
+    {        
         if (tag is null or NbtCompound { Count: 0 })
         {
             buffer.WriteByte((byte)NbtTagType.End);
             return;
         }
-
-        var f = new NbtFile(tag) { BigEndian = true, Anonymous = UseAnonymousNbt };
-        f.SaveToStream(buffer, NbtCompression.None);
+        
+        WriteNbt(tag);
     }
 
     public void WriteBlockEntity(BlockEntity entity)
@@ -607,7 +612,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         WriteByte(packedXz);
         WriteShort(entity.Y);
         WriteVarInt(entity.Type);
-        WriteNbt(entity.Data);
+        WriteOptionalNbt(entity.Data);
     }
 
     #endregion
