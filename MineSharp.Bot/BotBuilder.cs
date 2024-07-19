@@ -26,30 +26,8 @@ public class BotBuilder
         typeof(PhysicsPlugin)
     ];
 
-    // Plugins 
-    private readonly List<Type> plugins = [];
-
-    private bool autoConnect;
-    private bool autoDetect = true;
-    private MinecraftData? data;
-    private MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler;
-    private bool excludeDefaultPlugins;
-
-    private string? hostname;
-    private string? microsoftLoginUsername;
-    private ushort port = 25565;
-
-    // proxy
-    private IConnectionFactory proxyProvider = DefaultTcpFactory.Instance;
-
-    // Session variables
-    private Session? session;
-
-    private ClientSettings? settings;
-
-    // MinecraftData variables
-    private string? versionStr;
-
+    private Context ctx = new();
+    
     /// <summary>
     ///     Specify the hostname
     /// </summary>
@@ -57,7 +35,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder Host(string hostnameOrIpAddress)
     {
-        hostname = hostnameOrIpAddress;
+        ctx.Connection.Hostname = hostnameOrIpAddress;
         return this;
     }
 
@@ -68,7 +46,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder Port(ushort port)
     {
-        this.port = port;
+        ctx.Connection.Port = port;
         return this;
     }
 
@@ -79,7 +57,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder Data(string version)
     {
-        versionStr = version;
+        ctx.Data.Version = version;
         return this;
     }
 
@@ -90,7 +68,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder Data(MinecraftData data)
     {
-        this.data = data;
+        ctx.Data.Data = data;
         return this;
     }
 
@@ -101,7 +79,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder AutoDetectData(bool autoDetect)
     {
-        this.autoDetect = autoDetect;
+        ctx.Data.AutoDetect = autoDetect;
         return this;
     }
 
@@ -112,7 +90,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder WithPlugin<T>() where T : Plugin
     {
-        plugins.Add(typeof(T));
+        ctx.Settings.Plugins.Add(typeof(T));
         return this;
     }
 
@@ -121,7 +99,7 @@ public class BotBuilder
     /// </summary>
     public BotBuilder WithSettings(ClientSettings settings)
     {
-        this.settings = settings;
+        ctx.Settings.Settings = settings;
         return this;
     }
 
@@ -131,7 +109,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder ExcludeDefaultPlugins()
     {
-        excludeDefaultPlugins = true;
+        ctx.Settings.ExcludeDefaultPlugins = true;
         return this;
     }
 
@@ -142,7 +120,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder Session(Session session)
     {
-        this.session = session;
+        ctx.Session.Session = session;
         return this;
     }
 
@@ -153,7 +131,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder OfflineSession(string username)
     {
-        session = Auth.Session.OfflineSession(username);
+        ctx.Session.Session = Auth.Session.OfflineSession(username);
         return this;
     }
 
@@ -165,8 +143,8 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder OnlineSession(string usernameOrEmail, MicrosoftAuth.DeviceCodeHandler? deviceCodeHandler = null)
     {
-        microsoftLoginUsername = usernameOrEmail;
-        this.deviceCodeHandler = deviceCodeHandler;
+        ctx.Session.Username          = usernameOrEmail;
+        ctx.Session.DeviceCodeHandler = deviceCodeHandler;
         return this;
     }
 
@@ -177,7 +155,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder AutoConnect(bool autoConnect = true)
     {
-        this.autoConnect = autoConnect;
+        ctx.Connection.AutoConnect = autoConnect;
         return this;
     }
 
@@ -190,7 +168,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port)
     {
-        proxyProvider = new ProxyFactory(type, hostname, port);
+        ctx.Connection.ProxyProvider = new ProxyFactory(type, hostname, port);
         return this;
     }
 
@@ -206,7 +184,7 @@ public class BotBuilder
     public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port, string username,
                                 string password)
     {
-        proxyProvider = new ProxyFactory(type, hostname, port, username, password);
+        ctx.Connection.ProxyProvider = new ProxyFactory(type, hostname, port, username, password);
         return this;
     }
 
@@ -218,77 +196,34 @@ public class BotBuilder
     /// <exception cref="Exception"></exception>
     public async Task<MineSharpBot> CreateAsync()
     {
-        if (hostname is null)
-        {
-            throw new ArgumentNullException(nameof(hostname));
-        }
-
-        var api = new MinecraftApi(proxyProvider.CreateHttpClient());
-
-        MinecraftData? data;
-        if (this.data is not null)
-        {
-            data = this.data;
-        }
-        else if (versionStr is not null)
-        {
-            data = await MinecraftData.FromVersion(versionStr);
-        }
-        else if (autoDetect)
-        {
-            data = await TryAutoDetectVersion(proxyProvider, hostname, port);
-        }
-        else
-        {
-            throw new ArgumentNullException(nameof(this.data),
-                                            "No data provided. Set either Data() or AutoDetectVersion(true)");
-        }
-
-        Session? session;
-        if (this.session is not null)
-        {
-            session = this.session;
-        }
-        else if (microsoftLoginUsername is not null)
-        {
-            session = await MicrosoftAuth.Login(microsoftLoginUsername, deviceCodeHandler);
-        }
-        else
-        {
-            throw new ArgumentNullException(nameof(this.session),
-                                            "No session provided. Set either Session(), OfflineSession() or OnlineSession()");
-        }
-
-        settings ??= ClientSettings.Default;
-
         var client = new MinecraftClient(
-            data,
-            session,
-            hostname,
-            port,
-            api,
-            proxyProvider,
-            settings);
+            await ctx.Data.Resolve(ctx.Connection),
+            await ctx.Session.Resolve(ctx.Connection),
+            ctx.Connection.Hostname,
+            ctx.Connection.Port,
+            ctx.Connection.Api,
+            ctx.Connection.ProxyProvider,
+            ctx.Settings.Settings);
 
         var bot = new MineSharpBot(client);
 
-        if (!excludeDefaultPlugins)
+        if (!ctx.Settings.ExcludeDefaultPlugins)
         {
-            plugins.AddRange(DefaultPlugins);
+            ctx.Settings.Plugins.AddRange(DefaultPlugins);
         }
 
-        foreach (var type in plugins)
+        foreach (var type in ctx.Settings.Plugins)
         {
             var plugin = (Plugin?)Activator.CreateInstance(type, bot);
             if (plugin is null)
             {
-                throw new($"Could not create plugin of type {type.Name}");
+                throw new NullReferenceException($"failed to create instance of plugin {type.Name}");
             }
 
             await bot.LoadPlugin(plugin);
         }
 
-        if (autoConnect)
+        if (ctx.Connection.AutoConnect)
         {
             await bot.Connect();
         }
@@ -316,5 +251,102 @@ public class BotBuilder
         }
 
         return await MinecraftData.FromVersion(status.Version);
+    }
+
+    private class Context
+    {
+        public readonly ConnectionCtx Connection = new();
+        public readonly SessionCtx    Session    = new();
+        public readonly DataCtx       Data       = new();
+        public readonly SettingsCtx   Settings   = new();
+        
+        public class ConnectionCtx
+        {
+            public string             Hostname      { get; set; } = "localhost";
+            public ushort             Port          { get; set; } = 25565;
+            public bool               AutoConnect   { get; set; } = false;
+            public MinecraftApi       Api           { get; set; } = MinecraftApi.Instance;
+
+            public IConnectionFactory ProxyProvider
+            {
+                get => connectionFactory;
+                set
+                {
+                    connectionFactory = value;
+                    Api               = new (connectionFactory.CreateHttpClient());
+                }
+            }
+            
+            private IConnectionFactory connectionFactory = DefaultTcpFactory.Instance;
+        }
+
+        public class SessionCtx
+        {
+            public Session?                         Session           { get; set; } = null;
+            public string?                          Username          { get; set; } = null;
+            public MicrosoftAuth.DeviceCodeHandler? DeviceCodeHandler { get; set; } = null;
+
+            public Task<Session> Resolve(ConnectionCtx ctx)
+            {
+                if (Session is not null)
+                {
+                    return Task.FromResult(Session);
+                }
+
+                if (Username is null)
+                {
+                    throw new ArgumentException("no session or username provided");
+                }
+
+                return MicrosoftAuth.Login(Username, DeviceCodeHandler, ctx.Api);
+            }
+        }
+        
+        public class DataCtx
+        {
+            public bool           AutoDetect  { get; set; } = true;
+            public string?        Version     { get; set; } = null; 
+            public MinecraftData? Data        { get; set; } = null;
+
+            public Task<MinecraftData> Resolve(ConnectionCtx connCtx)
+            {
+                if (Data is not null)
+                {
+                    return Task.FromResult(Data);
+                }
+
+                if (Version is not null)
+                {
+                    return MinecraftData.FromVersion(Version);
+                }
+
+                if (!AutoDetect)
+                {
+                    throw new ArgumentException(
+                        $"{nameof(AutoDetect)} is false and neither {nameof(Data)} nor {nameof(Version)} is specified.");
+                }
+
+                return TryAutoDetectVersion(connCtx);
+            }
+
+            private static async Task<MinecraftData> TryAutoDetectVersion(ConnectionCtx ctx)
+            {
+                var status = await MinecraftClient.RequestServerStatus(ctx.Hostname, ctx.Port, tcpFactory: ctx.ProxyProvider);
+
+                if (status.Brand != "Vanilla")
+                {
+                    Logger.Warn($"MineSharp was not tested on server brand '{status.Brand}'");
+                }
+
+                return await MinecraftData.FromVersion(status.Version);
+            }
+        }
+
+        public class SettingsCtx
+        {
+            public ClientSettings Settings              { get; set; } = ClientSettings.Default;
+            public bool           ExcludeDefaultPlugins { get; set; } = false;
+            public List<Type>     Plugins               { get; set; } = [];
+        }
     }
 }
