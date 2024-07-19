@@ -26,7 +26,7 @@ public class BotBuilder
         typeof(PhysicsPlugin)
     ];
 
-    private Context ctx = new();
+    private readonly Context ctx = new();
     
     /// <summary>
     ///     Specify the hostname
