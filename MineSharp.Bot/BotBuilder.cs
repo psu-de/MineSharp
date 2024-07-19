@@ -3,6 +3,7 @@ using MineSharp.Bot.Plugins;
 using MineSharp.Bot.Proxy;
 using MineSharp.Data;
 using MineSharp.Protocol;
+using MineSharp.Protocol.Connection;
 using NLog;
 
 namespace MineSharp.Bot;
@@ -39,7 +40,7 @@ public class BotBuilder
     private ushort port = 25565;
 
     // proxy
-    private ProxyFactory? proxyProvider;
+    private IConnectionFactory proxyProvider = DefaultTcpFactory.Instance;
 
     // Session variables
     private Session? session;
@@ -189,7 +190,7 @@ public class BotBuilder
     /// <returns></returns>
     public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port)
     {
-        proxyProvider = new(type, hostname, port);
+        proxyProvider = new ProxyFactory(type, hostname, port);
         return this;
     }
 
@@ -205,7 +206,7 @@ public class BotBuilder
     public BotBuilder WithProxy(ProxyFactory.ProxyType type, string hostname, int port, string username,
                                 string password)
     {
-        proxyProvider = new(type, hostname, port, username, password);
+        proxyProvider = new ProxyFactory(type, hostname, port, username, password);
         return this;
     }
 
@@ -221,8 +222,6 @@ public class BotBuilder
         {
             throw new ArgumentNullException(nameof(hostname));
         }
-
-        proxyProvider ??= new();
 
         var api = new MinecraftApi(proxyProvider.CreateHttpClient());
 
@@ -307,7 +306,7 @@ public class BotBuilder
         return CreateAsync().Result;
     }
 
-    private static async Task<MinecraftData> TryAutoDetectVersion(ProxyFactory factory, string hostname, ushort port)
+    private static async Task<MinecraftData> TryAutoDetectVersion(IConnectionFactory factory, string hostname, ushort port)
     {
         var status = await MinecraftClient.RequestServerStatus(hostname, port, tcpFactory: factory);
 

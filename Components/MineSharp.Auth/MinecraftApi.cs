@@ -11,6 +11,11 @@ namespace MineSharp.Auth;
 /// </summary>
 public class MinecraftApi
 {
+    /// <summary>
+    /// Default instance
+    /// </summary>
+    public static readonly MinecraftApi Instance = new();
+    
     private const string ServiceUrl = "https://api.minecraftservices.com";
     private const string SessionUrl = "https://sessionserver.mojang.com";
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();

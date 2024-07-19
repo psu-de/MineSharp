@@ -7,6 +7,7 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Connection;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
@@ -78,7 +79,7 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public readonly ClientSettings Settings;
 
-    private readonly ITcpClientFactory? tcpTcpFactory;
+    private readonly IConnectionFactory tcpTcpFactory;
 
     private bool bundlePackets;
     private TcpClient? client;
@@ -95,10 +96,10 @@ public sealed class MinecraftClient : IDisposable
         MinecraftData data,
         Session session,
         string hostnameOrIp,
-        ushort port = 25565,
-        MinecraftApi? api = null,
-        ITcpClientFactory? tcpFactory = null,
-        ClientSettings? settings = null)
+        ushort port,
+        MinecraftApi api,
+        IConnectionFactory tcpFactory,
+        ClientSettings settings)
     {
         Data = data;
         packetQueue = new();
@@ -121,7 +122,7 @@ public sealed class MinecraftClient : IDisposable
         Port = port;
         Hostname = hostnameOrIp;
         gameState = GameState.Handshaking;
-        Settings = settings ?? ClientSettings.Default;
+        Settings = settings;
     }
 
     /// <inheritdoc />
@@ -159,23 +160,14 @@ public sealed class MinecraftClient : IDisposable
         if (client is not null && client.Connected)
         {
             Logger.Warn("Client is already connected!");
-            return false;
+            return true;
         }
 
         Logger.Debug($"Connecting to {ip}:{Port}.");
 
         try
         {
-            if (tcpTcpFactory == null)
-            {
-                client = new();
-                await client.ConnectAsync(ip, Port, cancellationTokenSource.Token);
-            }
-            else
-            {
-                client = tcpTcpFactory.CreateOpenConnection(ip.ToString(), Port);
-            }
-
+            client = await tcpTcpFactory.CreateOpenConnection(ip, Port);
             stream = new(client.GetStream(), Data.Version.Protocol);
 
             StreamLoop();
@@ -533,7 +525,7 @@ public sealed class MinecraftClient : IDisposable
         string hostnameOrIp,
         ushort port = 25565,
         int timeout = 10000,
-        ITcpClientFactory? tcpFactory = null)
+        IConnectionFactory? tcpFactory = null)
     {
         var latest = await MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
         var client = new MinecraftClient(
@@ -541,8 +533,9 @@ public sealed class MinecraftClient : IDisposable
             Session.OfflineSession("RequestStatus"),
             hostnameOrIp,
             port,
-            null, // api is not used for requesting server status
-            tcpFactory);
+            MinecraftApi.Instance,
+            tcpFactory ?? DefaultTcpFactory.Instance,
+            ClientSettings.Default);
 
         if (!await client.Connect(GameState.Status))
         {
@@ -564,8 +557,8 @@ public sealed class MinecraftClient : IDisposable
             client.Dispose();
         });
 
-        await client.SendPacket(new StatusRequestPacket());
-        await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()));
+        await client.SendPacket(new StatusRequestPacket(), timeoutCancellation.Token);
+        await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), timeoutCancellation.Token);
 
         timeoutCancellation.Token.Register(
             () => taskCompletionSource.TrySetCanceled(timeoutCancellation.Token));

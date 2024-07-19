@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using MineSharp.Protocol;
+using MineSharp.Protocol.Connection;
 using Starksoft.Aspen.Proxy;
 
 namespace MineSharp.Bot.Proxy;
@@ -9,13 +9,13 @@ namespace MineSharp.Bot.Proxy;
 /// <summary>
 ///     A Proxy provider
 /// </summary>
-public class ProxyFactory : ITcpClientFactory
+public class ProxyFactory : IConnectionFactory
 {
     /// <summary>
     ///     Specifies the type of a proxy
     /// </summary>
 #pragma warning disable CS1591
-    public enum ProxyType { None, Http, Socks4, Socks4A, Socks5 }
+    public enum ProxyType { Http, Socks4, Socks4A, Socks5 }
 #pragma warning restore CS1591
     private static readonly ProxyClientFactory Factory = new();
 
@@ -34,7 +34,7 @@ public class ProxyFactory : ITcpClientFactory
     /// </summary>
     public readonly int Port;
 
-    private readonly IProxyClient? proxyClient;
+    private readonly IProxyClient proxyClient;
 
     /// <summary>
     ///     If authentication is required, the username for the proxy
@@ -47,13 +47,6 @@ public class ProxyFactory : ITcpClientFactory
     ///     The type of the proxy
     /// </summary>
     public ProxyType Type;
-
-    /// <summary>
-    ///     Create an empty ProxyProvider
-    /// </summary>
-    public ProxyFactory()
-        : this(ProxyType.None, string.Empty, 0)
-    { }
 
     /// <summary>
     ///     Create a new ProxyProvider with authentication
@@ -82,11 +75,6 @@ public class ProxyFactory : ITcpClientFactory
         Hostname = hostname;
         Port = port;
 
-        if (Type == ProxyType.None)
-        {
-            return;
-        }
-
         var socketType = Type switch
         {
             ProxyType.Http => Starksoft.Aspen.Proxy.ProxyType.Http,
@@ -104,14 +92,13 @@ public class ProxyFactory : ITcpClientFactory
     /// <summary>
     ///     Create a new TcpClient instance and connect to the given hostname and port
     /// </summary>
-    /// <param name="hostname"></param>
+    /// <param name="address"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public TcpClient CreateOpenConnection(string hostname, ushort port)
+    public Task<TcpClient> CreateOpenConnection(IPAddress address, ushort port)
     {
-        return proxyClient is null
-            ? new(hostname, port)
-            : proxyClient.CreateConnection(hostname, port);
+        var ip = address.ToString();
+        return Task.FromResult(proxyClient.CreateConnection(ip, port));
     }
 
     /// <summary>
@@ -121,11 +108,6 @@ public class ProxyFactory : ITcpClientFactory
     /// <exception cref="UnreachableException"></exception>
     public HttpClient CreateHttpClient()
     {
-        if (Type == ProxyType.None)
-        {
-            return new();
-        }
-
         if (httpClientHandler is not null)
         {
             return new(httpClientHandler);
