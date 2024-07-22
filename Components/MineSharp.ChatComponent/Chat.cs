@@ -212,7 +212,7 @@ public abstract partial class Chat
     /// <exception cref="NotSupportedException"></exception>
     public static Chat Parse(NbtTag tag)
     {
-        if (tag.TagType == NbtTagType.String || tag.TagType == NbtTagType.List)
+        if (tag.TagType is NbtTagType.String or NbtTagType.List)
         {
             return TextComponent.Parse(tag);
         }
@@ -236,6 +236,12 @@ public abstract partial class Chat
         if (obj.Contains("keybind"))
         {
             return KeybindComponent.Parse(tag);
+        }
+
+        var empty = obj.Tags.FirstOrDefault(x => string.IsNullOrEmpty(x.Name));
+        if (empty is not null)
+        {
+            return Parse(empty);
         }
 
         throw new NotSupportedException($"This object is not supported: {tag}");
