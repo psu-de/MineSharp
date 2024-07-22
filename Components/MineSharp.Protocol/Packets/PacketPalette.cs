@@ -33,6 +33,8 @@ using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Confi
 using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAlivePacket;
 using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
+using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
+using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -102,7 +104,7 @@ internal static class PacketPalette
         RegisterPacket<RegistryDataPacket>(PacketType.CB_Configuration_RegistryData);
         RegisterPacket<FeatureFlagsPacket>(PacketType.CB_Configuration_FeatureFlags);
 
-        RegisterPacket<ClientInformationPacket>(PacketType.SB_Configuration_Settings);
+        RegisterPacket<ConfClientInformation>(PacketType.SB_Configuration_Settings);
         RegisterPacket<SBPluginMessagePacket>(PacketType.SB_Configuration_CustomPayload);
         RegisterPacket<SBFinishConfigurationPacket>(PacketType.SB_Configuration_FinishConfiguration);
         RegisterPacket<SBConfigurationKeepAlivePacket>(PacketType.SB_Configuration_KeepAlive);
@@ -175,6 +177,7 @@ internal static class PacketPalette
         RegisterPacket<ChunkBatchReceivedPacket>(PacketType.SB_Play_ChunkBatchReceived);
         RegisterPacket<SetCreativeSlotPacket>(PacketType.SB_Play_SetCreativeSlot);
         RegisterPacket<PlayPongPacket>(PacketType.SB_Play_Pong);
+        RegisterPacket<PlayClientInformation>(PacketType.SB_Play_Settings);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket

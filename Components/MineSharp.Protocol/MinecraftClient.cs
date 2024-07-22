@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using MineSharp.Auth;
+using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Data;
@@ -284,8 +285,20 @@ public sealed class MinecraftClient : IDisposable
             _ => throw new UnreachableException()
         };
 
-        if (next == GameState.Play)
+        if (next == GameState.Play && !gameJoinedTsc.Task.IsCompleted)
         {
+            if (Data.Version.Protocol <= ProtocolVersion.V_1_20)
+            {
+                SendPacket(new Packets.Serverbound.Play.ClientInformationPacket(
+                               Settings.Locale,
+                               Settings.ViewDistance,
+                               (int)Settings.ChatMode,
+                               Settings.ColoredChat,
+                               Settings.DisplayedSkinParts,
+                               (int)Settings.MainHand,
+                               Settings.EnableTextFiltering,
+                               Settings.AllowServerListings));
+            }
             gameJoinedTsc.TrySetResult();
         }
 

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Common;
+using NLog;
 
 namespace MineSharp.Protocol;
 
@@ -10,7 +11,7 @@ public record ClientSettings
     /// <summary>
     ///     Default client settings
     /// </summary>
-    public static readonly ClientSettings Default = new(
+    public static ClientSettings Default { get; } = new(
         "en_GB",
         24,
         ChatMode.Enabled,
