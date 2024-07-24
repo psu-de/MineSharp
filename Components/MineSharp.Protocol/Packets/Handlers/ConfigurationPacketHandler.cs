@@ -6,6 +6,7 @@ using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using NLog;
 using FinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
 using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
+using PluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
@@ -30,6 +31,7 @@ internal class ConfigurationPacketHandler : IPacketHandler
             FinishConfigurationPacket finishConfiguration => HandleFinishConfiguration(finishConfiguration),
             KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
             PingPacket ping => HandlePing(ping),
+            PluginMessagePacket pluginMessage => HandlePluginMessage(pluginMessage),
 
             _ => Task.CompletedTask
         };
@@ -50,7 +52,8 @@ internal class ConfigurationPacketHandler : IPacketHandler
         return type is PacketType.CB_Configuration_Disconnect
             or PacketType.CB_Configuration_FinishConfiguration
             or PacketType.CB_Configuration_KeepAlive
-            or PacketType.CB_Configuration_Ping;
+            or PacketType.CB_Configuration_Ping
+            or PacketType.CB_Configuration_CustomPayload;
     }
 
 
@@ -75,6 +78,12 @@ internal class ConfigurationPacketHandler : IPacketHandler
     private Task HandlePing(PingPacket packet)
     {
         client.SendPacket(new PongPacket(packet.Id));
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePluginMessage(PluginMessagePacket packet)
+    {
+        client.Channels.Handle(packet.ChannelName, packet.Data);
         return Task.CompletedTask;
     }
 }

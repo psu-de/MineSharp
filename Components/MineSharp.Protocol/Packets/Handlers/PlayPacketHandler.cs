@@ -3,6 +3,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePacket;
+using PluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
@@ -25,6 +26,7 @@ internal class PlayPacketHandler : IPacketHandler
             BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             PingPacket ping => HandlePing(ping),
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
+            PluginMessagePacket pluginMessage => HandlePluginMessage(pluginMessage),
             _ => Task.CompletedTask
         };
     }
@@ -61,6 +63,12 @@ internal class PlayPacketHandler : IPacketHandler
     private Task HandleDisconnect(DisconnectPacket packet)
     {
         _ = Task.Run(() => client.Disconnect(packet.Reason.GetMessage(data)));
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePluginMessage(PluginMessagePacket packet)
+    {
+        client.Channels.Handle(packet.ChannelName, packet.Data);
         return Task.CompletedTask;
     }
 }
