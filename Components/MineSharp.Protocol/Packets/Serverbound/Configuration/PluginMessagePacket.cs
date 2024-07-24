@@ -3,30 +3,43 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-#pragma warning disable CS1591
+
+/// <summary>
+/// Plugin message during configuration phase
+/// See https://wiki.vg/Protocol#Serverbound_Plugin_Message_.28configuration.29
+/// </summary>
 public class PluginMessagePacket : IPacket
 {
-    public PluginMessagePacket(string channelName, PacketBuffer data)
-    {
-        ChannelName = channelName;
-        Data = data;
-    }
-
-    public string ChannelName { get; set; }
-    public PacketBuffer Data { get; set; }
+    /// <inheritdoc />
     public PacketType Type => PacketType.SB_Configuration_CustomPayload;
+    
+    /// <summary>
+    /// The channel of this message
+    /// </summary>
+    public required string ChannelName { get; init; }
+    
+    /// <summary>
+    /// The data of this message
+    /// </summary>
+    public required byte[] Data { get; init; }
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(ChannelName);
-        buffer.WriteBytes(Data.GetBuffer());
+        buffer.WriteBytes(Data);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var channelName = buffer.ReadString();
-        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), version.Version.Protocol);
-        return new PluginMessagePacket(channelName, clone);
+        var data        = buffer.RestBuffer();
+        
+        return new PluginMessagePacket
+        {
+            ChannelName = channelName,
+            Data = data
+        };
     }
 }
-#pragma warning restore CS1591
