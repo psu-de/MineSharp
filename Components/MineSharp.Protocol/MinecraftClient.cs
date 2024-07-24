@@ -561,7 +561,7 @@ public sealed class MinecraftClient : IDisposable
         client.On<StatusResponsePacket>(async packet =>
         {
             var json = packet.Response;
-            var response = ServerStatus.FromJToken(JToken.Parse(json), client.Data);
+            var response = ServerStatus.Parse(JToken.Parse(json), client.Data);
             taskCompletionSource.TrySetResult(response);
 
             // the server closes the connection 
