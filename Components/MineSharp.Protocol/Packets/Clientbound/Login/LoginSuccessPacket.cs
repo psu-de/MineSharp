@@ -5,42 +5,29 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Login success packet
 /// </summary>
 public class LoginSuccessPacket : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="uuid"></param>
-    /// <param name="username"></param>
-    /// <param name="properties"></param>
-    public LoginSuccessPacket(Uuid uuid, string username, Property[]? properties = null)
-    {
-        Uuid = uuid;
-        Username = username;
-        Properties = properties;
-    }
-
+    /// <inheritdoc />
+    public PacketType Type => PacketType.CB_Login_Success;
+    
     /// <summary>
     ///     Uuid
     /// </summary>
-    public Uuid Uuid { get; set; }
+    public required Uuid Uuid { get; init; }
 
     /// <summary>
     ///     Username of the client
     /// </summary>
-    public string Username { get; set; }
+    public required string Username { get; init; }
 
     /// <summary>
     ///     A list of properties sent for versions &gt;= 1.19
     /// </summary>
-    public Property[]? Properties { get; set; }
-
-    /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_Success;
+    public Property[]? Properties { get; init; } = null;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -73,7 +60,12 @@ public class LoginSuccessPacket : IPacket
             properties = buffer.ReadVarIntArray(Property.Read);
         }
 
-        return new LoginSuccessPacket(uuid, username, properties);
+        return new LoginSuccessPacket()
+        {
+            Uuid = uuid,
+            Username = username,
+            Properties = properties
+        };
     }
 
     /// <summary>
@@ -82,32 +74,19 @@ public class LoginSuccessPacket : IPacket
     public class Property : ISerializable<Property>
     {
         /// <summary>
-        ///     Create a new instance
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="signature"></param>
-        public Property(string name, string value, string? signature)
-        {
-            Name = name;
-            Value = value;
-            Signature = signature;
-        }
-
-        /// <summary>
         ///     Name of this property
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; init; }
 
         /// <summary>
         ///     Value of this property
         /// </summary>
-        public string Value { get; set; }
+        public required string Value { get; init; }
 
         /// <summary>
         ///     Signature
         /// </summary>
-        public string? Signature { get; set; }
+        public required string? Signature { get; init; }
 
         /// <inheritdoc />
         public void Write(PacketBuffer buffer)
@@ -134,8 +113,7 @@ public class LoginSuccessPacket : IPacket
                 signature = buffer.ReadString();
             }
 
-            return new(name, value, signature);
+            return new() { Name = name, Value = value, Signature = signature };
         }
     }
 }
-#pragma warning restore CS1591

@@ -3,28 +3,20 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Ping packet
+///     See https://wiki.vg/Protocol#Ping_.28configuration.29
 /// </summary>
 public class PingPacket : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="id"></param>
-    public PingPacket(int id)
-    {
-        Id = id;
-    }
-
+    /// <inheritdoc />
+    public PacketType Type => PacketType.CB_Configuration_Ping;
+    
     /// <summary>
     ///     The id of the ping
     /// </summary>
-    public int Id { get; set; }
-
-    /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_Ping;
+    public required int Id { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -35,8 +27,6 @@ public class PingPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new PingPacket(
-            buffer.ReadInt());
+        return new PingPacket() { Id = buffer.ReadInt() };
     }
 }
-#pragma warning restore CS1591

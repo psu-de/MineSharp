@@ -3,28 +3,20 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Feature flags packet
+///     See https://wiki.vg/Protocol#Feature_Flags
 /// </summary>
 public class FeatureFlagsPacket : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="featureFlags"></param>
-    public FeatureFlagsPacket(string[] featureFlags)
-    {
-        FeatureFlags = featureFlags;
-    }
-
+    /// <inheritdoc />
+    public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
+    
     /// <summary>
     ///     The enabled feature flags
     /// </summary>
-    public string[] FeatureFlags { get; set; }
-
-    /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
+    public required string[] FeatureFlags { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -35,8 +27,7 @@ public class FeatureFlagsPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new FeatureFlagsPacket(
-            buffer.ReadVarIntArray(buff => buff.ReadString()));
+        return new FeatureFlagsPacket { FeatureFlags = buffer.ReadVarIntArray(buff => buff.ReadString()) };
     }
 }
 #pragma warning restore CS1591

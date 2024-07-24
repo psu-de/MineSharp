@@ -4,39 +4,30 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Configuration Disconnect packet
+///     See https://wiki.vg/Protocol#Disconnect_.28configuration.29
 /// </summary>
 public class DisconnectPacket : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="reason"></param>
-    public DisconnectPacket(Chat reason)
-    {
-        Reason = reason;
-    }
-
+    /// <inheritdoc />
+    public PacketType Type => PacketType.CB_Configuration_Disconnect;
+    
     /// <summary>
     ///     Reason for disconnect
     /// </summary>
-    public Chat Reason { get; set; }
-
-    /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_Disconnect;
+    public required Chat Reason { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(Reason.ToJson().ToString());
+        buffer.WriteChatComponent(Reason);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new DisconnectPacket(buffer.ReadChatComponent());
+        return new DisconnectPacket { Reason = buffer.ReadChatComponent() };
     }
 }
-#pragma warning restore CS1591

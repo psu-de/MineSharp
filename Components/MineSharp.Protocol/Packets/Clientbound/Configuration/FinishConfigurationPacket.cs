@@ -3,9 +3,10 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Finish configuration packet
+///     See https://wiki.vg/Protocol#Finish_Configuration
 /// </summary>
 public class FinishConfigurationPacket : IPacket
 {
@@ -22,4 +23,3 @@ public class FinishConfigurationPacket : IPacket
         return new FinishConfigurationPacket();
     }
 }
-#pragma warning restore CS1591
