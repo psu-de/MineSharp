@@ -91,7 +91,7 @@ public partial class ServerStatus
         return status;
     }
     
-        /// <summary>
+    /// <summary>
     /// Parse properties from json
     /// </summary>
     protected virtual void Parse(JObject token, MinecraftData data)
@@ -187,39 +187,6 @@ public partial class ServerStatus
         /// </summary>
         public Dictionary<string, Channel> Channels { get; set; } = [];
 
-
-        /// <inheritdoc cref="ServerStatus.Brand"/>
-        public new string Brand { get => status.Brand; set => status.Brand = value; }
-
-        /// <inheritdoc cref="ServerStatus.MaxPlayers"/>
-        public new int MaxPlayers { get => status.MaxPlayers; set => status.MaxPlayers = value; }
-
-        /// <inheritdoc cref="ServerStatus.Online"/>
-        public new int Online { get => status.Online; set => status.Online = value; }
-
-        /// <inheritdoc cref="ServerStatus.Motd"/>
-        public new string Motd { get => status.Motd; set => status.Motd = value; }
-        
-        /// <inheritdoc cref="ServerStatus.Version"/>
-        public new string Version { get => status.Version; set => status.Version = value; }
-
-        /// <inheritdoc cref="ServerStatus.FavIcon"/>
-        public new string FavIcon { get => status.FavIcon; set => status.FavIcon = value; }
-        
-        /// <inheritdoc cref="ServerStatus.ProtocolVersion"/>
-        public new int ProtocolVersion { get => status.ProtocolVersion; set => status.ProtocolVersion = value; }
-        
-        /// <inheritdoc cref="ServerStatus.PlayerSample"/>
-        public new string[] PlayerSample { get => status.PlayerSample; set => status.PlayerSample = value; }
-        
-        /// <inheritdoc cref="ServerStatus.EnforceSecureChat"/>
-        public new bool EnforceSecureChat { get => status.EnforceSecureChat; set => status.EnforceSecureChat = value; }
-
-        /// <inheritdoc cref="ServerStatus.PreviewsChat"/>
-        public new bool PreviewsChat { get => status.PreviewsChat; set => status.PreviewsChat = value; }
-
-        private readonly ServerStatus status = new();
-
         /// <inheritdoc />
         protected override void Parse(JObject token, MinecraftData minecraftData)
         {
@@ -265,7 +232,7 @@ public partial class ServerStatus
             Channels   = channels;
             FmlVersion = fmlVersion;
             
-            status.Parse(token, minecraftData);
+            base.Parse(token, minecraftData);
         }
 
         private static (ModInfo Mod, Channel[] channels) ReadMod(PacketBuffer buffer)
