@@ -528,29 +528,18 @@ public class ChatPlugin : Plugin
 
     private Task HandleSystemChatMessage(SystemChatMessagePacket packet)
     {
-        ChatMessageType type;
-        if (packet.ChatType.HasValue)
+        switch (packet)
         {
-            type = (ChatMessageType)packet.ChatType;
-        }
-        else
-        {
-            type = packet.IsOverlay!.Value
-                ? ChatMessageType.GameInfo
-                : ChatMessageType.SystemMessage;
-        }
-
-        if (packet.Message != null)
-        {
-            HandleChatInternal(null, packet.Message, type);
-        }
-        else
-        {
-            HandleChatInternal(
-                null,
-                packet.Content ??
-                throw new NullReferenceException($"{nameof(SystemChatMessagePacket)}: message and content are null"),
-                type);
+            case SystemChatMessagePacket.Before192 before192:
+                HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType);
+                break;
+            
+            case SystemChatMessagePacket.Since192 since192:
+                HandleChatInternal(
+                    null, 
+                    since192.Message,
+                    since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage);
+                break;
         }
 
         return Task.CompletedTask;
