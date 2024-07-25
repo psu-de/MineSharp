@@ -289,15 +289,17 @@ public sealed class MinecraftClient : IDisposable
         {
             if (Data.Version.Protocol <= ProtocolVersion.V_1_20)
             {
-                SendPacket(new Packets.Serverbound.Play.ClientInformationPacket(
-                               Settings.Locale,
-                               Settings.ViewDistance,
-                               (int)Settings.ChatMode,
-                               Settings.ColoredChat,
-                               Settings.DisplayedSkinParts,
-                               (int)Settings.MainHand,
-                               Settings.EnableTextFiltering,
-                               Settings.AllowServerListings));
+                Task.Delay(10)
+                    .ContinueWith(x =>
+                                      SendPacket(new Packets.Serverbound.Play.ClientInformationPacket(
+                                                     Settings.Locale,
+                                                     Settings.ViewDistance,
+                                                     (int)Settings.ChatMode,
+                                                     Settings.ColoredChat,
+                                                     Settings.DisplayedSkinParts,
+                                                     (int)Settings.MainHand,
+                                                     Settings.EnableTextFiltering,
+                                                     Settings.AllowServerListings)));
             }
             gameJoinedTsc.TrySetResult();
         }
