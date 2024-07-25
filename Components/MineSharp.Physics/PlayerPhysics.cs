@@ -3,6 +3,7 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Entities.Attributes;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Physics.Components;
@@ -18,11 +19,6 @@ namespace MineSharp.Physics;
 /// </summary>
 public class PlayerPhysics
 {
-    /// <summary>
-    ///     Event with PlayerPhysics and a boolean value
-    /// </summary>
-    public delegate void PlayerPhysicsBooleanEvent(PlayerPhysics sender, bool value);
-
     private static readonly Vector3[] XzAxisVectors = { Vector3.West, Vector3.East, Vector3.North, Vector3.South };
 
     /// <summary>
@@ -97,12 +93,12 @@ public class PlayerPhysics
     /// <summary>
     ///     Fired when the player starts or stops crouching
     /// </summary>
-    public event PlayerPhysicsBooleanEvent? OnCrouchingChanged;
+    public AsyncEvent<PlayerPhysics, bool> OnCrouchingChanged = new();
 
     /// <summary>
     ///     Fired when the player starts or stops sprinting
     /// </summary>
-    public event PlayerPhysicsBooleanEvent? OnSprintingChanged;
+    public AsyncEvent<PlayerPhysics, bool> OnSprintingChanged = new();
 
     /// <summary>
     ///     Simulate a single tick
@@ -149,7 +145,7 @@ public class PlayerPhysics
 
         if (State.IsCrouching != crouchedBefore)
         {
-            Task.Run(() => OnCrouchingChanged?.Invoke(this, State.IsCrouching));
+            OnCrouchingChanged.Dispatch(this, State.IsCrouching);
         }
 
         var crouchSpeedFactor = (float)Math.Clamp(0.3f + 0.0, 0.0f, 1.0f); // Enchantment Soul Speed factor
@@ -704,7 +700,7 @@ public class PlayerPhysics
             // TODO: Prob add sprinting attribute
             speedAttribute.AddModifier(sprintingModifier);
             State.IsSprinting = true;
-            Task.Run(() => OnSprintingChanged?.Invoke(this, State.IsSprinting));
+            OnSprintingChanged.Dispatch(this, State.IsSprinting);
         }
 
         if (State.IsSprinting)
@@ -720,7 +716,7 @@ public class PlayerPhysics
             {
                 speedAttribute.RemoveModifier(sprintingModifier.Uuid);
                 State.IsSprinting = false;
-                Task.Run(() => OnSprintingChanged?.Invoke(this, State.IsSprinting));
+                OnSprintingChanged.Dispatch(this, State.IsSprinting);
             }
         }
     }

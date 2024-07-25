@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Events;
 using MineSharp.Windows.Clicks;
 using NLog;
 
@@ -109,7 +110,7 @@ public class Window
     /// <summary>
     ///     Fired when a slot changed
     /// </summary>
-    public event SlotChanged? OnSlotChanged;
+    public AsyncEvent<Window, short> OnSlotChanged = new();
 
     private IDictionary<short, Item?> InitializeSlots(int count)
     {
@@ -276,7 +277,7 @@ public class Window
             }
         }
 
-        OnSlotChanged?.Invoke(this, slotIndex);
+        OnSlotChanged.Dispatch(this, slotIndex);
     }
 
     /// <summary>

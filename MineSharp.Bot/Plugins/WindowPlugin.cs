@@ -4,6 +4,7 @@ using MineSharp.Bot.Windows;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data.Windows;
 using MineSharp.Protocol.Packets.Clientbound.Play;
@@ -93,12 +94,12 @@ public class WindowPlugin : Plugin
     /// <summary>
     ///     Fires whenever a window is opened (fe: Chest opened)
     /// </summary>
-    public event Events.WindowEvent? OnWindowOpened;
+    public AsyncEvent<MineSharpBot, Window> OnWindowOpened = new();
 
     /// <summary>
     ///     Fires whenever the bots held item changed.
     /// </summary>
-    public event Events.ItemEvent? OnHeldItemChanged;
+    public AsyncEvent<MineSharpBot, Item?> OnHeldItemChanged = new();
 
     /// <inheritdoc />
     protected override Task Init()
@@ -206,7 +207,8 @@ public class WindowPlugin : Plugin
         await Bot.Client.SendPacket(packet);
 
         SelectedHotbarIndex = hotbarIndex;
-        OnHeldItemChanged?.Invoke(Bot, HeldItem);
+        
+        await OnHeldItemChanged.Dispatch(Bot, HeldItem);
     }
 
     /// <summary>
@@ -295,7 +297,7 @@ public class WindowPlugin : Plugin
         }
 
         Inventory = inventory;
-        OnWindowOpened?.Invoke(Bot, inventory);
+        OnWindowOpened.Dispatch(Bot, inventory);
     }
 
     private Window OpenWindow(int id, WindowInfo windowInfo)
@@ -339,7 +341,7 @@ public class WindowPlugin : Plugin
         cachedWindowItemsPacket = null;
         cacheTimestamp = null;
 
-        OnWindowOpened?.Invoke(Bot, window);
+        OnWindowOpened.Dispatch(Bot, window);
         openContainerTsc?.TrySetResult(window);
 
         return window;
@@ -370,7 +372,7 @@ public class WindowPlugin : Plugin
     {
         if (index == (3 * 9) + 1 + SelectedHotbarIndex)
         {
-            OnHeldItemChanged?.Invoke(Bot, window.GetSlot(index).Item);
+            OnHeldItemChanged.Dispatch(Bot, window.GetSlot(index).Item);
         }
     }
 
@@ -438,7 +440,7 @@ public class WindowPlugin : Plugin
     private Task HandleHeldItemChange(CBHeldItemPacket packet)
     {
         SelectedHotbarIndex = (byte)packet.Slot;
-        OnHeldItemChanged?.Invoke(Bot, HeldItem);
+        OnHeldItemChanged.Dispatch(Bot, HeldItem);
         return Task.CompletedTask;
     }
 

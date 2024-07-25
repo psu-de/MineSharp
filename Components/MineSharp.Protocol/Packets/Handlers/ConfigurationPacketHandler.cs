@@ -56,7 +56,7 @@ internal class ConfigurationPacketHandler : IPacketHandler
 
     private Task HandleDisconnect(DisconnectPacket packet)
     {
-        _ = Task.Run(() => client.Disconnect(packet.Reason.GetMessage(data)));
+        _ = Task.Run(() => client.Disconnect(packet.Reason));
         return Task.CompletedTask;
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using MineSharp.Bot.Utils;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -43,17 +44,17 @@ public class EntityPlugin : Plugin
     /// <summary>
     ///     Fires whenever an entity spawns in the bots visible range.
     /// </summary>
-    public event Events.EntityEvent? OnEntitySpawned;
+    public AsyncEvent<MineSharpBot, Entity> OnEntitySpawned = new();
 
     /// <summary>
     ///     Fires whenever an entity despawned in the bots visible range.
     /// </summary>
-    public event Events.EntityEvent? OnEntityDespawned;
+    public AsyncEvent<MineSharpBot, Entity> OnEntityDespawned = new();
 
     /// <summary>
     ///     Fires whenever an entity moved in the bots visible range.
     /// </summary>
-    public event Events.EntityEvent? OnEntityMoved;
+    public AsyncEvent<MineSharpBot, Entity> OnEntityMoved = new();
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -65,11 +66,7 @@ public class EntityPlugin : Plugin
     internal void AddEntity(Entity entity)
     {
         Entities.TryAdd(entity.ServerId, entity);
-
-        if (null != OnEntitySpawned)
-        {
-            Task.Run(() => OnEntitySpawned?.Invoke(Bot, entity));
-        }
+        OnEntitySpawned.Dispatch(Bot, entity);
     }
 
     private void MountEntity(Entity? vehicle, Entity passenger)
@@ -167,7 +164,8 @@ public class EntityPlugin : Plugin
             }
 
             DismountPassengers(entity);
-            OnEntityDespawned?.Invoke(Bot, entity);
+
+            OnEntityDespawned.Dispatch(Bot, entity);
         }
 
         return Task.CompletedTask;
@@ -214,8 +212,7 @@ public class EntityPlugin : Plugin
 
         entity.IsOnGround = packet.OnGround;
 
-        OnEntityMoved?.Invoke(Bot, entity);
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
@@ -239,8 +236,7 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        OnEntityMoved?.Invoke(Bot, entity);
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
@@ -259,9 +255,7 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        OnEntityMoved?.Invoke(Bot, entity);
-
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleTeleportEntityPacket(TeleportEntityPacket packet)
@@ -281,9 +275,8 @@ public class EntityPlugin : Plugin
 
         entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
-        OnEntityMoved?.Invoke(Bot, entity);
-
-        return Task.CompletedTask;
+        
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateAttributesPacket(UpdateAttributesPacket packet)

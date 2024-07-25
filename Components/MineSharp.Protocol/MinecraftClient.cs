@@ -3,9 +3,12 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using MineSharp.Auth;
+using MineSharp.ChatComponent;
+using MineSharp.ChatComponent.Components;
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Events;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Connection;
@@ -79,6 +82,11 @@ public sealed class MinecraftClient : IDisposable
     ///     The clients settings
     /// </summary>
     public readonly ClientSettings Settings;
+    
+    /// <summary>
+    ///     Fires when the client disconnected from the server
+    /// </summary>
+    public AsyncEvent<MinecraftClient, Chat> OnDisconnected = new();
 
     private readonly IConnectionFactory tcpTcpFactory;
 
@@ -137,21 +145,6 @@ public sealed class MinecraftClient : IDisposable
     }
 
     /// <summary>
-    ///     Fires whenever the client received a known Packet
-    /// </summary>
-    public event Events.ClientPacketEvent? OnPacketReceived;
-
-    /// <summary>
-    ///     Fires whenever the client has sent a packet
-    /// </summary>
-    public event Events.ClientPacketEvent? OnPacketSent;
-
-    /// <summary>
-    ///     Fires when the client disconnected from the server
-    /// </summary>
-    public event Events.ClientStringEvent? OnDisconnected;
-
-    /// <summary>
     ///     Connects to the minecraft sever.
     /// </summary>
     /// <param name="nextState">The state to transition to during the handshaking process.</param>
@@ -203,13 +196,15 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     /// <param name="reason">The reason the client disconnected. Only used for the <see cref="OnDisconnected" /> event.</param>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task Disconnect(string reason = "disconnect.quitting")
+    public async Task Disconnect(Chat? reason = null)
     {
-        Logger.Info($"Disconnecting: {reason}");
+        reason ??= new TranslatableComponent("disconnect.quitting");
+        
+        Logger.Info($"Disconnecting: {reason.GetMessage(this.Data)}");
 
         if (!gameJoinedTsc.Task.IsCompleted)
         {
-            gameJoinedTsc.SetException(new DisconnectedException("Client has been disconnected", reason));
+            gameJoinedTsc.SetException(new DisconnectedException("Client has been disconnected", reason.GetMessage(this.Data)));
         }
 
         if (client is null || !client.Connected)
@@ -221,7 +216,7 @@ public sealed class MinecraftClient : IDisposable
         await (streamLoop ?? Task.CompletedTask);
 
         client?.Close();
-        OnDisconnected?.Invoke(this, reason);
+        await OnDisconnected.Dispatch(this, reason);
     }
 
     /// <summary>
@@ -458,12 +453,6 @@ public sealed class MinecraftClient : IDisposable
             handlers.AddRange(customHandlers);
         }
 
-        // Forces all packets to be read
-        if (null != OnPacketReceived)
-        {
-            handlers.Add(InvokeReceivePacketAsync);
-        }
-
         packetWaiters.TryGetValue(packetType, out var tsc);
 
         if (handlers.Count == 0 && tsc == null)
@@ -512,23 +501,6 @@ public sealed class MinecraftClient : IDisposable
     private async Task HandleOutgoingPacket(IPacket packet)
     {
         await internalPacketHandler.HandleOutgoing(packet);
-
-        _ = Task.Run(() =>
-        {
-            try
-            {
-                OnPacketSent?.Invoke(this, packet);
-            }
-            catch (Exception e)
-            {
-                Logger.Warn($"Error in custom packet handling: {e}");
-            }
-        });
-    }
-
-    private Task InvokeReceivePacketAsync(IPacket packet)
-    {
-        return Task.Run(() => OnPacketReceived?.Invoke(this, packet));
     }
 
     /// <summary>

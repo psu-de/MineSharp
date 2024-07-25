@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Physics;
 using MineSharp.Physics.Input;
@@ -53,12 +54,12 @@ public class PhysicsPlugin : Plugin
     /// <summary>
     ///     Fired when the Bot moves
     /// </summary>
-    public event Events.BotEvent? BotMoved;
+    public AsyncEvent<MineSharpBot> BotMoved = new();
 
     /// <summary>
     ///     Fires just before executing a physics tick
     /// </summary>
-    public event Events.BotEvent? PhysicsTick;
+    public AsyncEvent<MineSharpBot> PhysicsTick = new();
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -249,7 +250,7 @@ public class PhysicsPlugin : Plugin
                 Engine!.Tick();
                 await UpdateServerPositionIfNeeded();
 
-                PhysicsTick?.Invoke(Bot);
+                await PhysicsTick.Dispatch(Bot);
             }
             catch (Exception e)
             {
@@ -306,7 +307,7 @@ public class PhysicsPlugin : Plugin
 
         await Bot.Client.SendPacket(packet);
 
-        BotMoved?.Invoke(Bot);
+        await BotMoved.Dispatch(Bot);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)

@@ -5,6 +5,7 @@ using MineSharp.Bot.Utils;
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -118,37 +119,37 @@ public class PlayerPlugin : Plugin
     /// <summary>
     ///     This event fires when the health, food or saturation has been updated.
     /// </summary>
-    public event Events.BotEvent? OnHealthChanged;
+    public AsyncEvent<MineSharpBot> OnHealthChanged = new();
 
     /// <summary>
     ///     This event fires when the bot respawned or joined another dimension.
     /// </summary>
-    public event Events.BotEvent? OnRespawned;
+    public AsyncEvent<MineSharpBot> OnRespawned = new();
 
     /// <summary>
     ///     This event fires when a the bot has died.
     /// </summary>
-    public event Events.BotEvent? OnDied;
+    public AsyncEvent<MineSharpBot> OnDied = new();
 
     /// <summary>
     ///     This event fires when a player joined the server.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerJoined;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerJoined = new();
 
     /// <summary>
     ///     This event fires when a player left the server.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerLeft;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerLeft = new();
 
     /// <summary>
     ///     This event fires when a player has come into visible range and their entity has been loaded.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerLoaded;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerLoaded = new();
 
     /// <summary>
     ///     This event fires when the weather in the world changes.
     /// </summary>
-    public event Events.BotEvent? OnWeatherChanged;
+    public AsyncEvent<MineSharpBot> OnWeatherChanged = new();
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -261,10 +262,10 @@ public class PlayerPlugin : Plugin
         Food = packet.Food;
         Saturation = packet.Saturation;
 
-        OnHealthChanged?.Invoke(Bot);
+        OnHealthChanged.Dispatch(Bot);
         if (Health == 0)
         {
-            OnDied?.Invoke(Bot);
+            OnDied.Dispatch(Bot);
         }
 
         return Task.CompletedTask;
@@ -292,7 +293,7 @@ public class PlayerPlugin : Plugin
 
         Self!.Dimension = ParseDimension(packet.Dimension);
 
-        OnRespawned?.Invoke(Bot);
+        OnRespawned.Dispatch(Bot);
         return Task.CompletedTask;
     }
 
@@ -326,7 +327,7 @@ public class PlayerPlugin : Plugin
         entities!.AddEntity(entity);
         PlayerMap.TryAdd(player.Entity!.ServerId, player);
 
-        OnPlayerLoaded?.Invoke(Bot, player);
+        OnPlayerLoaded.Dispatch(Bot, player);
         return Task.CompletedTask;
     }
 
@@ -350,7 +351,7 @@ public class PlayerPlugin : Plugin
                         var newPlayer = new MinecraftPlayer(addAction.Name, entry.Player, -1, GameMode.Survival, null,
                                                             Core.Common.Dimension.Overworld);
                         Players.TryAdd(entry.Player, newPlayer);
-                        OnPlayerJoined?.Invoke(Bot, newPlayer);
+                        OnPlayerJoined.Dispatch(Bot, newPlayer);
                         break;
 
                     case PlayerInfoUpdatePacket.UpdateGameModeAction gameModeAction:
@@ -372,7 +373,7 @@ public class PlayerPlugin : Plugin
 
                         if (!updateListedAction.Listed && Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_2)
                         {
-                            OnPlayerLeft?.Invoke(Bot, player);
+                            OnPlayerLeft.Dispatch(Bot, player);
                         }
 
                         break;
@@ -417,7 +418,7 @@ public class PlayerPlugin : Plugin
                 continue;
             }
 
-            OnPlayerLeft?.Invoke(Bot, player);
+            OnPlayerLeft.Dispatch(Bot, player);
         }
 
         return Task.CompletedTask;
@@ -429,22 +430,22 @@ public class PlayerPlugin : Plugin
         {
             case 1: // End Raining
                 IsRaining = false;
-                OnWeatherChanged?.Invoke(Bot);
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 2: // Begin Raining
                 IsRaining = true;
-                OnWeatherChanged?.Invoke(Bot);
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 7: // Rain Level Changed
                 RainLevel = packet.Value;
-                OnWeatherChanged?.Invoke(Bot);
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 8: // Thunder Level Changed
                 ThunderLevel = packet.Value;
-                OnWeatherChanged?.Invoke(Bot);
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 3: // GameMode Change

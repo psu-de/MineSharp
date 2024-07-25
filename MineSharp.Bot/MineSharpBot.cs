@@ -2,7 +2,9 @@
 using MineSharp.Auth;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Plugins;
+using MineSharp.ChatComponent.Components;
 using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Events;
 using MineSharp.Data;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
@@ -36,6 +38,16 @@ public class MineSharpBot
     ///     The <see cref="Session" /> object used by this bot
     /// </summary>
     public readonly Session Session;
+    
+    /// <summary>
+    ///     NBT Registry sent by the server
+    /// </summary>
+    public NbtCompound Registry { get; private set; } = [];
+
+    /// <summary>
+    ///     Fired when the bot disconnects
+    /// </summary>
+    public AsyncEvent<MineSharpBot, ChatComponent.Chat> OnBotDisconnected = new();
 
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
@@ -60,16 +72,6 @@ public class MineSharpBot
         Client.On<LoginPacket>(
             packet => Task.FromResult(packet.RegistryCodec != null ? Registry = packet.RegistryCodec : null));
     }
-
-    /// <summary>
-    ///     NBT Registry sent by the server
-    /// </summary>
-    public NbtCompound Registry { get; private set; } = [];
-
-    /// <summary>
-    ///     Fired when the bot disconnects
-    /// </summary>
-    public event Events.BotStringEvent? OnBotDisconnected;
 
     /// <summary>
     ///     Load the given plugin and initialize it when the bot is already connected
@@ -130,8 +132,10 @@ public class MineSharpBot
     ///     Disconnect from the Minecraft server
     /// </summary>
     /// <param name="reason">The reason for disconnecting</param>
-    public async Task Disconnect(string reason = "disconnect.quitting")
+    public async Task Disconnect(ChatComponent.Chat? reason = null)
     {
+        reason ??= new TranslatableComponent("disconnect.quitting");
+        
         if (tickLoop is { Status: TaskStatus.Running })
         {
             cancellation.Cancel();
@@ -172,8 +176,8 @@ public class MineSharpBot
         }
     }
 
-    private void OnClientDisconnected(MinecraftClient sender, string reason)
+    private Task OnClientDisconnected(MinecraftClient sender, ChatComponent.Chat reason)
     {
-        OnBotDisconnected?.Invoke(this, reason);
+        return OnBotDisconnected.Dispatch(this, reason);
     }
 }
