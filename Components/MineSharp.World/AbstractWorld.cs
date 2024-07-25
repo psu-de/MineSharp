@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
@@ -40,13 +41,13 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
 
 
     /// <inheritdoc />
-    public event Events.ChunkEvent? OnChunkLoaded;
+    public AsyncEvent<IWorld, IChunk> OnChunkLoaded { get; set; } = new();
 
     /// <inheritdoc />
-    public event Events.ChunkEvent? OnChunkUnloaded;
+    public AsyncEvent<IWorld, IChunk> OnChunkUnloaded { get; set; } = new();
 
     /// <inheritdoc />
-    public event Events.BlockEvent? OnBlockUpdated;
+    public AsyncEvent<IWorld, Block> OnBlockUpdated { get; set; } = new();
 
     /// <inheritdoc />
     [Pure]
@@ -110,7 +111,7 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
         }
 
         chunk.OnBlockUpdated += OnChunkBlockUpdate;
-        OnChunkLoaded?.Invoke(this, chunk);
+        OnChunkLoaded.Dispatch(this, chunk);
     }
 
     /// <inheritdoc />
@@ -122,7 +123,7 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
             return;
         }
 
-        OnChunkUnloaded?.Invoke(this, chunk);
+        OnChunkUnloaded.Dispatch(this, chunk);
     }
 
     /// <inheritdoc />
@@ -243,8 +244,8 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     private void OnChunkBlockUpdate(IChunk chunk, int state, Position position)
     {
         var worldPosition = ToWorldPosition(chunk.Coordinates, position);
-        OnBlockUpdated?.Invoke(this, new( // TODO: Hier jedes mal ein neuen block zu erstellen ist quatsch
-                                   Data.Blocks.ByState(state)!, state, worldPosition));
+        OnBlockUpdated.Dispatch(this, new( // TODO: Hier jedes mal ein neuen block zu erstellen ist quatsch
+                                     Data.Blocks.ByState(state)!, state, worldPosition));
     }
 
     private int NonNegativeMod(int x, int m)

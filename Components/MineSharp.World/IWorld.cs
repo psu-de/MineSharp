@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.World.Chunks;
 using MineSharp.World.Iterators;
@@ -30,17 +31,17 @@ public interface IWorld
     /// <summary>
     ///     Event fired when a chunk loaded
     /// </summary>
-    public event Events.ChunkEvent OnChunkLoaded;
+    public AsyncEvent<IWorld, IChunk> OnChunkLoaded { get; set; }
 
     /// <summary>
     ///     Fired when a was unloaded
     /// </summary>
-    public event Events.ChunkEvent OnChunkUnloaded;
+    public AsyncEvent<IWorld, IChunk> OnChunkUnloaded { get; set; }
 
     /// <summary>
     ///     Fired when a block was updated
     /// </summary>
-    public event Events.BlockEvent OnBlockUpdated;
+    public AsyncEvent<IWorld, Block> OnBlockUpdated { get; set; }
 
     /// <summary>
     ///     Converts a World position to chunk coordinates

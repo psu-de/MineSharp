@@ -6,6 +6,7 @@ using MineSharp.ChatComponent.Components;
 using MineSharp.Commands;
 using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Events;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
@@ -55,7 +56,7 @@ public class ChatPlugin : Plugin
     /// <summary>
     ///     Fired when a chat message is received
     /// </summary>
-    public event Events.BotChatMessageEvent? OnChatMessageReceived;
+    public AsyncEvent<MineSharpBot, Uuid?, MineSharp.ChatComponent.Chat, ChatMessageType> OnChatMessageReceived = new();
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -528,21 +529,18 @@ public class ChatPlugin : Plugin
 
     private Task HandleSystemChatMessage(SystemChatMessagePacket packet)
     {
-        switch (packet)
+        return packet switch
         {
-            case SystemChatMessagePacket.Before192 before192:
-                HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType);
-                break;
-            
-            case SystemChatMessagePacket.Since192 since192:
-                HandleChatInternal(
-                    null, 
-                    since192.Message,
-                    since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage);
-                break;
-        }
+            SystemChatMessagePacket.Before192 before192 
+                => HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType),
 
-        return Task.CompletedTask;
+            SystemChatMessagePacket.Since192 since192 
+                => HandleChatInternal(null,
+                                      since192.Message,
+                                      since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage),
+                
+            _ => throw new UnreachableException()
+        };
     }
 
     private Task HandleDisguisedChatMessage(DisguisedChatMessagePacket packet)
@@ -550,11 +548,10 @@ public class ChatPlugin : Plugin
         (var chat, var type)
             = GetChatMessageTypeFromRegistry(packet.ChatType, packet.Name, packet.Message, packet.Target);
 
-        HandleChatInternal(
+        return HandleChatInternal(
             null,
             chat,
             type);
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -565,18 +562,17 @@ public class ChatPlugin : Plugin
     private Task HandleChat(ChatPacket packet)
     {
         // TODO: packet.Message can be a JSON formatted text component
-        HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
-        return Task.CompletedTask;
+        return HandleChatInternal(packet.Sender, packet.Message, (ChatMessageType)packet.Position);
     }
 
-    private void HandleChatInternal(Uuid? sender, string message, ChatMessageType type)
+    private Task HandleChatInternal(Uuid? sender, string message, ChatMessageType type)
     {
-        OnChatMessageReceived?.Invoke(Bot, sender, new TextComponent(message), type);
+        return OnChatMessageReceived.Dispatch(Bot, sender, new TextComponent(message), type);
     }
 
-    private void HandleChatInternal(Uuid? sender, ChatComponent.Chat message, ChatMessageType type)
+    private Task HandleChatInternal(Uuid? sender, ChatComponent.Chat message, ChatMessageType type)
     {
-        OnChatMessageReceived?.Invoke(Bot, sender, message, type);
+        return OnChatMessageReceived.Dispatch(Bot, sender, message, type);
     }
 
     private (ChatComponent.Chat, ChatMessageType) GetChatMessageTypeFromRegistry(
