@@ -11,6 +11,7 @@ using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Events;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Channels;
 using MineSharp.Protocol.Connection;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
@@ -88,15 +89,22 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public AsyncEvent<MinecraftClient, Chat> OnDisconnected = new();
 
+    /// <summary>
+    ///     The plugin channels
+    ///     See https://wiki.vg/Plugin_channels#Definitions
+    /// </summary>
+    public readonly PluginChannels Channels;
+
     private readonly IConnectionFactory tcpTcpFactory;
 
     private bool bundlePackets;
     private TcpClient? client;
 
-    private GameState gameState;
     private IPacketHandler internalPacketHandler;
     private MinecraftStream? stream;
     private Task? streamLoop;
+    
+    internal GameState GameState;
 
     /// <summary>
     ///     Create a new MinecraftClient
@@ -121,17 +129,13 @@ public sealed class MinecraftClient : IDisposable
         tcpTcpFactory = tcpFactory;
         ip = IpHelper.ResolveHostname(hostnameOrIp, ref port);
 
-        if (session.OnlineSession)
-        {
-            api ??= new();
-        }
-
-        Api = api;
-        Session = session;
-        Port = port;
-        Hostname = hostnameOrIp;
-        gameState = GameState.Handshaking;
-        Settings = settings;
+        Api       = api;
+        Session   = session;
+        Port      = port;
+        Hostname  = hostnameOrIp;
+        GameState = GameState.Handshaking;
+        Settings  = settings;
+        Channels  = new (this);
     }
 
     /// <inheritdoc />
@@ -258,7 +262,7 @@ public sealed class MinecraftClient : IDisposable
     }
 
     /// <summary>
-    ///     Waits until the client jumps into the Play <see cref="gameState" />
+    ///     Waits until the client jumps into the Play <see cref="GameState" />
     /// </summary>
     /// <returns></returns>
     public Task WaitForGame()
@@ -268,7 +272,7 @@ public sealed class MinecraftClient : IDisposable
 
     internal void UpdateGameState(GameState next)
     {
-        gameState = next;
+        GameState = next;
 
         internalPacketHandler = next switch
         {
@@ -376,7 +380,7 @@ public sealed class MinecraftClient : IDisposable
         {
             var buffer = stream!.ReadPacket();
             var packetId = buffer.ReadVarInt();
-            var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
+            var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, GameState, packetId);
 
             if (bundlePackets)
             {
@@ -384,10 +388,10 @@ public sealed class MinecraftClient : IDisposable
             }
             else
             {
-                await HandleIncomingPacket(packetType, buffer, gameState == GameState.Login);
+                await HandleIncomingPacket(packetType, buffer, GameState == GameState.Login);
             }
 
-            if (gameState != GameState.Play)
+            if (GameState != GameState.Play)
             {
                 await Task.Delay(1);
             }
@@ -505,7 +509,7 @@ public sealed class MinecraftClient : IDisposable
 
     /// <summary>
     ///     Requests the server status and closes the connection.
-    ///     Works only when <see cref="gameState" /> is <see cref="Core.Common.Protocol.GameState.Status" />.
+    ///     Works only when <see cref="GameState" /> is <see cref="Core.Common.Protocol.GameState.Status" />.
     /// </summary>
     /// <returns></returns>
     public static async Task<ServerStatus> RequestServerStatus(
@@ -535,7 +539,7 @@ public sealed class MinecraftClient : IDisposable
         client.On<StatusResponsePacket>(async packet =>
         {
             var json = packet.Response;
-            var response = ServerStatus.FromJToken(JToken.Parse(json), client.Data);
+            var response = ServerStatus.Parse(JToken.Parse(json), client.Data);
             taskCompletionSource.TrySetResult(response);
 
             // the server closes the connection 

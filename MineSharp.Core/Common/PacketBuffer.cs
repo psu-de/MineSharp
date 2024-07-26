@@ -60,6 +60,15 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public int ProtocolVersion { get; }
 
     /// <summary>
+    /// Set the internal buffer position
+    /// </summary>
+    /// <param name="position"></param>
+    public void SetPosition(int position)
+    {
+        buffer.Position = position;
+    }
+
+    /// <summary>
     ///     Disposes the underlying <see cref="MemoryStream" />
     /// </summary>
     public async ValueTask DisposeAsync()

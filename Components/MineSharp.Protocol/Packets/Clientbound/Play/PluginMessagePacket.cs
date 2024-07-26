@@ -2,16 +2,16 @@
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
-namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
+namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 /// <summary>
-/// Plugin message during configuration phase
-/// See https://wiki.vg/Protocol#Clientbound_Plugin_Message_.28configuration.29
+/// Plugin message during play phase
+/// See https://wiki.vg/Protocol#Clientbound_Plugin_Message_.28play.29
 /// </summary>
 public class PluginMessagePacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_CustomPayload;
+    public PacketType Type => PacketType.CB_Play_CustomPayload;
     
     /// <summary>
     /// The channel of this message
@@ -22,7 +22,6 @@ public class PluginMessagePacket : IPacket
     /// The data of this message
     /// </summary>
     public required byte[] Data { get; init; }
-    
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -44,3 +43,4 @@ public class PluginMessagePacket : IPacket
         };
     }
 }
+

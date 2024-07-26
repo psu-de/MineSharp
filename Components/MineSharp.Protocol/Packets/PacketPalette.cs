@@ -16,7 +16,6 @@ using CBCloseWindowPacket = MineSharp.Protocol.Packets.Clientbound.Play.CloseWin
 using CBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
 using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
 using CBKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePacket;
-using CBPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
@@ -31,7 +30,10 @@ using SBCloseWindowPacket = MineSharp.Protocol.Packets.Serverbound.Play.CloseWin
 using SBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.KeepAlivePacket;
 using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.FinishConfigurationPacket;
 using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAlivePacket;
-using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
+using SBConfPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
+using CBConfPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
+using SBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.PluginMessagePacket;
+using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
 using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
@@ -96,7 +98,7 @@ internal static class PacketPalette
         RegisterPacket<PingRequestPacket>(PacketType.SB_Status_Ping);
 
         // Configuration
-        RegisterPacket<CBPluginMessagePacket>(PacketType.CB_Configuration_CustomPayload);
+        RegisterPacket<CBConfPluginMessagePacket>(PacketType.CB_Configuration_CustomPayload);
         RegisterPacket<ConfigurationDisconnectPacket>(PacketType.CB_Configuration_Disconnect);
         RegisterPacket<CBFinishConfigurationPacket>(PacketType.CB_Configuration_FinishConfiguration);
         RegisterPacket<CBConfigurationKeepAlivePacket>(PacketType.CB_Configuration_KeepAlive);
@@ -105,7 +107,7 @@ internal static class PacketPalette
         RegisterPacket<FeatureFlagsPacket>(PacketType.CB_Configuration_FeatureFlags);
 
         RegisterPacket<ConfClientInformation>(PacketType.SB_Configuration_Settings);
-        RegisterPacket<SBPluginMessagePacket>(PacketType.SB_Configuration_CustomPayload);
+        RegisterPacket<SBConfPluginMessagePacket>(PacketType.SB_Configuration_CustomPayload);
         RegisterPacket<SBFinishConfigurationPacket>(PacketType.SB_Configuration_FinishConfiguration);
         RegisterPacket<SBConfigurationKeepAlivePacket>(PacketType.SB_Configuration_KeepAlive);
         RegisterPacket<ConfPongPacket>(PacketType.SB_Configuration_Pong);
@@ -153,6 +155,7 @@ internal static class PacketPalette
         RegisterPacket<PlayPingPacket>(PacketType.CB_Play_Ping);
         RegisterPacket<PlayDisconnectPacket>(PacketType.CB_Play_KickDisconnect);
         RegisterPacket<SetPassengersPacket>(PacketType.CB_Play_SetPassengers);
+        RegisterPacket<CBPlayPluginMessagePacket>(PacketType.CB_Play_CustomPayload);
 
         RegisterPacket<SBKeepAlivePacket>(PacketType.SB_Play_KeepAlive);
         RegisterPacket<SetPlayerPositionPacket>(PacketType.SB_Play_Position);
@@ -178,6 +181,7 @@ internal static class PacketPalette
         RegisterPacket<SetCreativeSlotPacket>(PacketType.SB_Play_SetCreativeSlot);
         RegisterPacket<PlayPongPacket>(PacketType.SB_Play_Pong);
         RegisterPacket<PlayClientInformation>(PacketType.SB_Play_Settings);
+        RegisterPacket<SBPlayPluginMessagePacket>(PacketType.SB_Play_CustomPayload);
     }
 
     private static void RegisterPacket<TPacket>(PacketType type) where TPacket : IPacket
