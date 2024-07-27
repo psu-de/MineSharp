@@ -6,6 +6,11 @@ using NLog;
 
 namespace MineSharp.Protocol;
 
+/// <summary>
+/// Handles reading and writing packets.
+/// Also handles encryption and compression.
+/// This class is not thread-safe.
+/// </summary>
 internal class MinecraftStream
 {
     private const int CompressionDisabled = -1;
@@ -17,7 +22,6 @@ internal class MinecraftStream
     private readonly NetworkStream networkStream;
 
     private readonly int protocolVersion;
-    private readonly object streamLock;
     private int compressionThreshold;
     private AesStream? encryptionStream;
 
@@ -28,72 +32,59 @@ internal class MinecraftStream
         this.protocolVersion = protocolVersion;
         this.networkStream = networkStream;
         stream = this.networkStream;
-
-        streamLock = new();
+        
         compressionThreshold = CompressionDisabled;
     }
 
     public void EnableEncryption(byte[] sharedSecret)
     {
         Logger.Debug("Enabling encryption.");
-
-        lock (streamLock)
-        {
-            encryptionStream = new(networkStream, sharedSecret);
-            stream = encryptionStream;
-        }
+        encryptionStream = new(networkStream, sharedSecret);
+        stream           = encryptionStream;
     }
 
     public void SetCompression(int threshold)
     {
-        lock (streamLock)
-        {
-            compressionThreshold = threshold;
-        }
+        compressionThreshold = threshold;
     }
 
     public PacketBuffer ReadPacket()
     {
-        lock (streamLock)
+        var    uncompressedLength = 0;
+        var    length = ReadVarInt(out _);
+
+        if (compressionThreshold != CompressionDisabled)
         {
-            var length = ReadVarInt(out _);
-            var uncompressedLength = 0;
-
-            if (compressionThreshold != CompressionDisabled)
-            {
-                uncompressedLength = ReadVarInt(out var r);
-                length -= r;
-            }
-
-            var read = 0;
-            var data = new byte[length];
-            while (read < length)
-            {
-                read += stream.Read(data, read, length - read);
-            }
-
-            var packetBuffer = uncompressedLength switch
-            {
-                > 0 => DecompressBuffer(data, uncompressedLength),
-                _ => new(data, protocolVersion)
-            };
-
-            return packetBuffer;
+            uncompressedLength =  ReadVarInt(out var r);
+            length             -= r;
         }
+
+        var data = new byte[length];
+            
+        var read = 0;
+        while (read < length)
+        {
+            read += stream.Read(data, read, length - read);
+        }
+        
+        var packetBuffer = uncompressedLength switch
+        {
+            > 0 => DecompressBuffer(data, uncompressedLength),
+            _   => new(data, protocolVersion)
+        };
+
+        return packetBuffer;
     }
 
     public void WritePacket(PacketBuffer buffer)
     {
-        lock (streamLock)
+        if (compressionThreshold > 0)
         {
-            if (compressionThreshold > 0)
-            {
-                buffer = CompressBuffer(buffer);
-            }
-
-            WriteVarInt((int)buffer.Size);
-            stream.Write(buffer.GetBuffer().AsSpan());
+            buffer = CompressBuffer(buffer);
         }
+        
+        WriteVarInt((int)buffer.Size);
+        stream.Write(buffer.GetBuffer().AsSpan());
     }
 
     private PacketBuffer DecompressBuffer(byte[] buffer, int length)

@@ -48,8 +48,6 @@ public sealed class MinecraftClient : IDisposable
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     internal readonly MinecraftApi? Api;
-    private readonly Queue<(PacketType, PacketBuffer)> bundledPackets;
-    private readonly CancellationTokenSource cancellationTokenSource;
 
     /// <summary>
     ///     The MinecraftData object of this client
@@ -63,10 +61,12 @@ public sealed class MinecraftClient : IDisposable
     /// </summary>
     public readonly string Hostname;
 
-    private readonly IPAddress ip;
-    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> packetHandlers;
-    private readonly ConcurrentQueue<PacketSendTask> packetQueue;
+    private readonly IPAddress                                             ip;
+    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>>    packetHandlers;
+    private readonly ConcurrentQueue<PacketSendTask>                       packetQueue;
+    private readonly ConcurrentQueue<(PacketType, PacketBuffer)>           bundledPackets;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
+    private readonly CancellationTokenSource                               cancellationTokenSource;
 
     /// <summary>
     ///     The Port of the minecraft server
@@ -90,13 +90,13 @@ public sealed class MinecraftClient : IDisposable
 
     private readonly IConnectionFactory tcpTcpFactory;
 
-    private bool bundlePackets;
-    private TcpClient? client;
-
-    private GameState gameState;
-    private IPacketHandler internalPacketHandler;
+    private TcpClient?       client;
     private MinecraftStream? stream;
-    private Task? streamLoop;
+    private Task?            streamLoop;
+    private GameState        gameState;
+    private IPacketHandler   internalPacketHandler;
+    private object           streamLock = new();
+    private bool             bundlePackets;
 
     /// <summary>
     ///     Create a new MinecraftClient
@@ -120,11 +120,6 @@ public sealed class MinecraftClient : IDisposable
         bundledPackets = new();
         tcpTcpFactory = tcpFactory;
         ip = IpHelper.ResolveHostname(hostnameOrIp, ref port);
-
-        if (session.OnlineSession)
-        {
-            api ??= new();
-        }
 
         Api = api;
         Session = session;
@@ -268,17 +263,20 @@ public sealed class MinecraftClient : IDisposable
 
     internal void UpdateGameState(GameState next)
     {
-        gameState = next;
-
-        internalPacketHandler = next switch
+        lock (streamLock)
         {
-            GameState.Handshaking => new HandshakePacketHandler(this),
-            GameState.Login => new LoginPacketHandler(this, Data),
-            GameState.Status => new StatusPacketHandler(this),
-            GameState.Configuration => new ConfigurationPacketHandler(this, Data),
-            GameState.Play => new PlayPacketHandler(this, Data),
-            _ => throw new UnreachableException()
-        };
+            gameState = next;
+
+            internalPacketHandler = next switch
+            {
+                GameState.Handshaking   => new HandshakePacketHandler(this),
+                GameState.Login         => new LoginPacketHandler(this, Data),
+                GameState.Status        => new StatusPacketHandler(this),
+                GameState.Configuration => new ConfigurationPacketHandler(this, Data),
+                GameState.Play          => new PlayPacketHandler(this, Data),
+                _                       => throw new UnreachableException()
+            };   
+        }
 
         if (next == GameState.Play && !gameJoinedTsc.Task.IsCompleted)
         {
@@ -315,12 +313,18 @@ public sealed class MinecraftClient : IDisposable
 
     internal void EnableEncryption(byte[] key)
     {
-        stream!.EnableEncryption(key);
+        lock (streamLock)
+        {
+            stream!.EnableEncryption(key);
+        }
     }
 
     internal void SetCompression(int threshold)
     {
-        stream!.SetCompression(threshold);
+        lock (streamLock)
+        {
+            stream!.SetCompression(threshold);
+        }
     }
 
     internal void HandleBundleDelimiter()
@@ -330,7 +334,7 @@ public sealed class MinecraftClient : IDisposable
         {
             Logger.Debug("Processing bundled packets");
             var tasks = bundledPackets.Select(
-                                           p => HandleIncomingPacket(p.Item1, p.Item2, false))
+                                           p => HandleIncomingPacket(p.Item1, p.Item2))
                                       .ToArray();
 
             Task.WaitAll(tasks);
@@ -374,19 +378,31 @@ public sealed class MinecraftClient : IDisposable
     {
         while (client!.Available > 0 && !cancellationTokenSource.IsCancellationRequested)
         {
-            var buffer = stream!.ReadPacket();
+            PacketBuffer buffer;
+            lock (streamLock)
+            {
+                buffer = stream!.ReadPacket();
+            }
+            
             var packetId = buffer.ReadVarInt();
             var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
 
-            if (bundlePackets)
+            if (gameState == GameState.Login)
             {
-                bundledPackets.Enqueue((packetType, buffer));
+                await HandleIncomingPacket(packetType, buffer);
             }
             else
             {
-                await HandleIncomingPacket(packetType, buffer, gameState == GameState.Login);
+                if (bundlePackets)
+                {
+                    bundledPackets.Enqueue((packetType, buffer));
+                }
+                else
+                {
+                    _ = Task.Run(() => HandleIncomingPacket(packetType, buffer));
+                }
             }
-
+            
             if (gameState != GameState.Play)
             {
                 await Task.Delay(1);
@@ -394,22 +410,25 @@ public sealed class MinecraftClient : IDisposable
         }
     }
 
-    private async Task SendPackets()
+    private Task SendPackets()
     {
         if (!packetQueue.TryDequeue(out var task))
         {
-            return;
+            return Task.CompletedTask;
         }
 
         if (task.Token is { IsCancellationRequested: true })
         {
-            return;
+            return Task.CompletedTask;
         }
 
         DispatchPacket(task.Packet);
+        
+        task.Task.TrySetResult();
+        
+        _ = Task.Run(() => HandleOutgoingPacket(task.Packet));
 
-        _ = Task.Run(() => task.Task.TrySetResult());
-        await HandleOutgoingPacket(task.Packet);
+        return Task.CompletedTask;
     }
 
     private void DispatchPacket(IPacket packet)
@@ -420,10 +439,13 @@ public sealed class MinecraftClient : IDisposable
         buffer.WriteVarInt(packetId);
         packet.Write(buffer, Data);
 
-        stream!.WritePacket(buffer);
+        lock (streamLock)
+        {
+            stream!.WritePacket(buffer);
+        }
     }
 
-    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer, bool block)
+    private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
     {
         // Only parse packets that are awaited by an handler.
         // Possible handlers are:
@@ -467,29 +489,21 @@ public sealed class MinecraftClient : IDisposable
             var packet = factory(buffer, Data);
             await buffer.DisposeAsync();
 
-            var handle = Task.Run(async () =>
-            {
-                tsc?.TrySetResult(packet);
-                var tasks = handlers
-                           .Select(task => task(packet))
-                           .ToArray();
+            tsc?.TrySetResult(packet);
+            var tasks = handlers
+                       .Select(task => task(packet))
+                       .ToArray();
 
-                try
-                {
-                    await Task.WhenAll(tasks);
-                }
-                catch (Exception)
-                {
-                    foreach (var exception in tasks.Where(x => x.Exception != null))
-                    {
-                        Logger.Warn($"Error in custom packet handling: {exception.Exception}");
-                    }
-                }
-            });
-
-            if (block)
+            try
             {
-                await handle;
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception)
+            {
+                foreach (var exception in tasks.Where(x => x.Exception != null))
+                {
+                    Logger.Warn($"Error in custom packet handling: {exception.Exception}");
+                }
             }
         }
         catch (EndOfStreamException e)
@@ -500,7 +514,14 @@ public sealed class MinecraftClient : IDisposable
 
     private async Task HandleOutgoingPacket(IPacket packet)
     {
-        await internalPacketHandler.HandleOutgoing(packet);
+        try
+        {
+            await internalPacketHandler.HandleOutgoing(packet);
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, $"error in outgoing packet handler. Packet={packet.Type}");
+        }
     }
 
     /// <summary>
