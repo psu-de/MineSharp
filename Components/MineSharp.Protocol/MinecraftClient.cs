@@ -159,7 +159,7 @@ public sealed class MinecraftClient : IDisposable
             client = await tcpTcpFactory.CreateOpenConnection(ip, Port);
             stream = new(client.GetStream(), Data.Version.Protocol);
 
-            StreamLoop();
+            streamLoop = Task.Run(StreamLoop);
             Logger.Info("Connected, starting handshake...");
             await HandshakeProtocol.PerformHandshake(this, nextState, Data);
         }
@@ -352,26 +352,23 @@ public sealed class MinecraftClient : IDisposable
             Logger.Debug("Bundling packets!");
         }
     }
-
-    private void StreamLoop()
+    
+    private async Task StreamLoop()
     {
-        streamLoop = Task.Run(async () =>
+        while (!cancellationTokenSource.Token.IsCancellationRequested)
         {
-            while (!cancellationTokenSource.Token.IsCancellationRequested)
+            try
             {
-                try
-                {
-                    await ReceivePackets();
-                    await SendPackets();
+                await ReceivePackets();
+                await SendPackets();
 
-                    await Task.Delay(1);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, "Encountered error in stream loop");
-                }
+                await Task.Delay(1);
             }
-        }, cancellationTokenSource.Token);
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Encountered error in stream loop");
+            }
+        }
     }
 
     private async Task ReceivePackets()
@@ -424,9 +421,12 @@ public sealed class MinecraftClient : IDisposable
 
         DispatchPacket(task.Packet);
         
-        task.Task.TrySetResult();
         
-        _ = Task.Run(() => HandleOutgoingPacket(task.Packet));
+        _ = Task.Run(async () =>
+        {
+            task.Task.TrySetResult();
+            await HandleOutgoingPacket(task.Packet);
+        });
 
         return Task.CompletedTask;
     }
