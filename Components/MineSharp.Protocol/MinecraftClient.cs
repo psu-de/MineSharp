@@ -441,6 +441,7 @@ public sealed class MinecraftClient : IDisposable
 
         lock (streamLock)
         {
+            Logger.Trace("Sending packet {packetType}", packet.Type);
             stream!.WritePacket(buffer);
         }
     }
@@ -453,7 +454,8 @@ public sealed class MinecraftClient : IDisposable
         //  - MinecraftClient.WaitForPacket<T>()
         //  - MinecraftClient.OnPacketReceived     <-- Forces all packets to be parsed
         //  - The internal IPacketHandler
-
+        
+        Logger.Trace("Received packet {packetType}", packetType);
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
         {
