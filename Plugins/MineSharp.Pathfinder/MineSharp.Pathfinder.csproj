@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
+        <LangVersion>12</LangVersion>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <Title>MineSharp.Pathfinder</Title>
+        <Authors>psu-de</Authors>
+        <Description>Navigate through minecraft world using this pathfinder plugin</Description>
+        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>minecraft, minecraft-bot, pathfinder, navigation</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\MineSharp.Bot\MineSharp.Bot.csproj" />
+        
+      <None Include="README.md" Pack="true" PackagePath="\" />
+      <None Include="LICENSE" Pack="true" PackagePath="\" />
+      <None Include="icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OptimizedPriorityQueue" Version="5.1.0" />
+    </ItemGroup>
+
+</Project>

@@ -8,11 +8,22 @@
     <LangVersion>12</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj"/>
+    <PackageReference Include="Humanizer" Version="2.14.1"/>
+    <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.7"/>
   </ItemGroup>
-
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\MineSharp.Bot\MineSharp.Bot.csproj" />
+      <ProjectReference Include="..\Plugins\MineSharp.Pathfinder\MineSharp.Pathfinder.csproj" />
+    </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="2.14.1"/>
     <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.7"/>
