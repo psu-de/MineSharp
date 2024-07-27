@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Chunks;
@@ -23,7 +24,7 @@ public interface IChunk
     /// <summary>
     ///     Fired whenever a block in the chunk was updated
     /// </summary>
-    public event Events.ChunkBlockEvent OnBlockUpdated;
+    public AsyncEvent<IChunk, int, Position> OnBlockUpdated { get; set; }
 
     /// <summary>
     ///     Loads the chunk data from raw bytes.

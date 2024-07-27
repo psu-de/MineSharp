@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
@@ -42,7 +43,7 @@ public sealed class Chunk118 : IChunk
     public ChunkCoordinates Coordinates { get; }
 
     /// <inheritdoc />
-    public event Events.ChunkBlockEvent? OnBlockUpdated;
+    public AsyncEvent<IChunk, int, Position> OnBlockUpdated { get; set; } = new();
 
     /// <inheritdoc />
     public void LoadData(byte[] buf)
@@ -76,7 +77,7 @@ public sealed class Chunk118 : IChunk
         (var y, var section) = GetChunkSectionAndNewYFromPosition(position);
         section.SetBlockAt(state, new(position.X, y, position.Z));
 
-        OnBlockUpdated?.Invoke(this, state, position);
+        OnBlockUpdated.Dispatch(this, state, position);
     }
 
     /// <inheritdoc />
