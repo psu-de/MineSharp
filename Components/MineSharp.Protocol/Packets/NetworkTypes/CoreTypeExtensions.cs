@@ -18,7 +18,7 @@ internal static class CoreTypeExtensions
 
         buffer.WriteVarInt(item!.Info.Id);
         buffer.WriteByte(item!.Count);
-        buffer.WriteNbt(item!.Metadata);
+        buffer.WriteOptionalNbt(item!.Metadata);
     }
 
     public static Item? ReadOptionalItem(this PacketBuffer buffer, MinecraftData data)
