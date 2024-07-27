@@ -34,6 +34,7 @@ public static class IntegrationTest
         // 'Reset' player state
         await chat.SendChat("/clear");
         await chat.SendChat("/kill");
+        await chat.SendChat("/gamemode survival");
         await Task.Delay(1000);
         await bot.GetPlugin<PlayerPlugin>().Respawn();
 
