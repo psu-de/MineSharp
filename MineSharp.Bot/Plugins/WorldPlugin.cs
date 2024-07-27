@@ -1,4 +1,4 @@
-using MineSharp.Bot.Blocks;
+﻿using MineSharp.Bot.Blocks;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
@@ -12,73 +12,77 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// World plugin handles all kind of packets regarding the minecraft world,
-/// and provides methods to interact with it, like mining and digging.
+///     World plugin handles all kind of packets regarding the minecraft world,
+///     and provides methods to interact with it, like mining and digging.
 /// </summary>
 public class WorldPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    /// <summary>
-    /// The world of the Minecraft server
-    /// </summary>
-    public IWorld World { get; private set; }
-
-    private PlayerPlugin? _playerPlugin;
-    private WindowPlugin? _windowPlugin;
-
     private DateTime? chunkBatchStart;
 
+    private PlayerPlugin? playerPlugin;
+    private WindowPlugin? windowPlugin;
+
     /// <summary>
-    /// Create a new WorldPlugin instance
+    ///     Create a new WorldPlugin instance
     /// </summary>
     /// <param name="bot"></param>
     public WorldPlugin(MineSharpBot bot) : base(bot)
     {
-        this.World = WorldVersion.CreateWorld(this.Bot.Data);
+        World = WorldVersion.CreateWorld(Bot.Data);
 
-        this.Bot.Client.On<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
-        this.Bot.Client.On<UnloadChunkPacket>(this.HandleUnloadChunkPacket);
-        this.Bot.Client.On<BlockUpdatePacket>(this.HandleBlockUpdatePacket);
-        this.Bot.Client.On<MultiBlockUpdatePacket>(this.HandleMultiBlockUpdatePacket);
-        this.Bot.Client.On<ChunkBatchStartPacket>(this.HandleChunkBatchStartPacket);
-        this.Bot.Client.On<ChunkBatchFinishedPacket>(this.HandleChunkBatchFinishedPacket);
+        Bot.Client.On<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
+        Bot.Client.On<UnloadChunkPacket>(HandleUnloadChunkPacket);
+        Bot.Client.On<BlockUpdatePacket>(HandleBlockUpdatePacket);
+        Bot.Client.On<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket);
+        Bot.Client.On<ChunkBatchStartPacket>(HandleChunkBatchStartPacket);
+        Bot.Client.On<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket);
     }
+
+    /// <summary>
+    ///     The world of the Minecraft server
+    /// </summary>
+    public IWorld World { get; }
 
     /// <inheritdoc />
     protected override Task Init()
     {
-        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
-        this._windowPlugin = this.Bot.GetPlugin<WindowPlugin>();
+        playerPlugin = Bot.GetPlugin<PlayerPlugin>();
+        windowPlugin = Bot.GetPlugin<WindowPlugin>();
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Waits until all chunks in (radius * radius) are loaded around the bot.
+    ///     Waits until all chunks in (radius * radius) are loaded around the bot.
     /// </summary>
     /// <param name="radius"></param>
     public async Task WaitForChunks(int radius = 5)
     {
         if (radius < 0)
+        {
             throw new ArgumentException($"{nameof(radius)} must be positive.");
+        }
 
-        var player = this.Bot.GetPlugin<PlayerPlugin>();
+        var player = Bot.GetPlugin<PlayerPlugin>();
         await player.WaitForInitialization();
 
-        var chunkCoords = this.World!.ToChunkCoordinates((Position)player.Entity!.Position);
-        for (int x = chunkCoords.X - radius; x <= chunkCoords.X + radius; x++)
+        var chunkCoords = World!.ToChunkCoordinates((Position)player.Entity!.Position);
+        for (var x = chunkCoords.X - radius; x <= chunkCoords.X + radius; x++)
         {
-            for (int z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
+            for (var z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
             {
                 var coords = new ChunkCoordinates(x, z);
-                while (!this.World.IsChunkLoaded(coords))
+                while (!World.IsChunkLoaded(coords))
+                {
                     await Task.Delay(10);
+                }
             }
         }
     }
 
     /// <summary>
-    /// Update the Command block at the given position
+    ///     Update the Command block at the given position
     /// </summary>
     /// <param name="location"></param>
     /// <param name="command"></param>
@@ -88,49 +92,57 @@ public class WorldPlugin : Plugin
     /// <exception cref="Exception"></exception>
     public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
     {
-        if (this._playerPlugin?.Self?.GameMode != GameMode.Creative)
+        if (playerPlugin?.Self?.GameMode != GameMode.Creative)
         {
-            throw new Exception("Player must be in creative mode.");
+            throw new("Player must be in creative mode.");
         }
 
         var packet = new UpdateCommandBlock(location, command, mode, flags);
-        return this.Bot.Client.SendPacket(packet);
+        return Bot.Client.SendPacket(packet);
     }
 
     /// <summary>
-    /// Mine the given block
+    ///     Mine the given block
     /// </summary>
     /// <param name="block">The block to mine</param>
     /// <param name="face">The block face the bot is facing</param>
     /// <param name="cancellation"></param>
     /// <returns></returns>
-    public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null, CancellationToken? cancellation = null)
+    public async Task<MineBlockStatus> MineBlock(Block block, BlockFace? face = null,
+                                                 CancellationToken cancellation = default)
     {
-        if (this._playerPlugin?.Self == null)
-            await this._playerPlugin?.WaitForInitialization()!;
+        if (playerPlugin?.Self == null)
+        {
+            await playerPlugin?.WaitForInitialization()!;
+        }
 
-        await this.WaitForChunks();
+        await WaitForChunks();
 
         if (block.Info.Unbreakable)
+        {
             return MineBlockStatus.NotDiggable;
+        }
 
-        if (6.0 < this._playerPlugin.Entity!.Position.DistanceTo(block.Position))
+        if (6.0 < playerPlugin.Entity!.Position.DistanceTo(block.Position))
+        {
             return MineBlockStatus.TooFar;
+        }
 
-        if (!this.World!.IsBlockLoaded(block.Position))
+        if (!World!.IsBlockLoaded(block.Position))
+        {
             return MineBlockStatus.BlockNotLoaded;
+        }
 
-        cancellation ??= CancellationToken.None;
-        face         ??= BlockFace.Top; // TODO: Figure out how to calculate BlockFace
+        face ??= BlockFace.Top; // TODO: Figure out how to calculate BlockFace
 
-        var time = this.CalculateBreakingTime(block);
+        var time = CalculateBreakingTime(block);
 
         // first packet: Start digging
         var startPacket = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
             (int)PlayerActionStatus.StartedDigging,
             block.Position,
             face.Value,
-            ++this.Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
+            ++Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
 
         var animationCts = new CancellationTokenSource();
         animationCts.CancelAfter(time);
@@ -139,17 +151,19 @@ public class WorldPlugin : Plugin
         {
             while (true)
             {
-                _ = this._playerPlugin.SwingArm();
+                _ = playerPlugin.SwingArm();
                 await Task.Delay(350, animationCts.Token);
 
                 if (animationCts.IsCancellationRequested)
+                {
                     break;
+                }
             }
         }, animationCts.Token);
 
         try
         {
-            await this.Bot.Client.SendPacket(startPacket, cancellation);
+            await Bot.Client.SendPacket(startPacket, cancellation);
 
             // after waiting until the block has broken, another packet must be sent
             var sendAgain = Task.Run(async () =>
@@ -160,28 +174,30 @@ public class WorldPlugin : Plugin
                     (int)PlayerActionStatus.FinishedDigging,
                     block.Position,
                     face.Value,
-                    ++this.Bot.SequenceId);
+                    ++Bot.SequenceId);
 
-                var send    = this.Bot.Client.SendPacket(finishPacket);
-                var receive = this.Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>();
+                var send = Bot.Client.SendPacket(finishPacket, cancellation);
+                var receive = Bot.Client.WaitForPacket<AcknowledgeBlockChangePacket>();
 
                 await Task.WhenAll(send, receive);
                 return receive.Result;
-            }, cancellation.Value);
+            }, cancellation);
 
-            var ack = await this.Bot.Client
-                                .WaitForPacket<AcknowledgeBlockChangePacket>()
-                                .WaitAsync(cancellation.Value);
+            var ack = await Bot.Client
+                               .WaitForPacket<AcknowledgeBlockChangePacket>()
+                               .WaitAsync(cancellation);
 
-            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 p118)
+            if (ack.Body is AcknowledgeBlockChangePacket.PacketBody118 p118)
             {
                 if ((PlayerActionStatus)p118.Status != PlayerActionStatus.StartedDigging)
+                {
                     return MineBlockStatus.Failed;
+                }
             } // TODO: MineBlock: What happens in 1.19?
 
             ack = await sendAgain;
 
-            return ack.Body is AcknowledgeBlockChangePacket.PacketBody_1_18 { Successful: false }
+            return ack.Body is AcknowledgeBlockChangePacket.PacketBody118 { Successful: false }
                 ? MineBlockStatus.Failed
                 : MineBlockStatus.Finished;
         }
@@ -191,22 +207,23 @@ public class WorldPlugin : Plugin
                 (int)PlayerActionStatus.CancelledDigging,
                 block.Position,
                 face.Value,
-                ++this.Bot.SequenceId);
+                ++Bot.SequenceId);
 
             animationCts.Cancel();
-            await this.Bot.Client.SendPacket(cancelPacket);
+            await Bot.Client.SendPacket(cancelPacket);
 
             return MineBlockStatus.Cancelled;
         }
     }
 
     /// <summary>
-    /// Place the block the bot is currently holding at the given position
+    ///     Place the block the bot is currently holding at the given position
     /// </summary>
     /// <param name="position"></param>
     /// <param name="hand"></param>
     /// <param name="face"></param>
-    public async Task PlaceBlock(Position position, PlayerHand hand = PlayerHand.MainHand, BlockFace face = BlockFace.Top)
+    public async Task PlaceBlock(Position position, PlayerHand hand = PlayerHand.MainHand,
+                                 BlockFace face = BlockFace.Top)
     {
         // TODO: PlaceBlock: Hardcoded values
         var packet = new PlaceBlockPacket(
@@ -217,31 +234,33 @@ public class WorldPlugin : Plugin
             0.5f,
             0.5f,
             false,
-            ++this.Bot.SequenceId);
+            ++Bot.SequenceId);
 
         await Task.WhenAll(
-            this.Bot.Client.SendPacket(packet),
-            this._playerPlugin!.SwingArm());
+            Bot.Client.SendPacket(packet),
+            playerPlugin!.SwingArm());
     }
 
     private int CalculateBreakingTime(Block block)
     {
-        if (this._playerPlugin?.Self?.GameMode == GameMode.Creative)
+        if (playerPlugin?.Self?.GameMode == GameMode.Creative)
+        {
             return 0;
+        }
 
-        var   heldItem       = this._windowPlugin?.HeldItem;
+        var heldItem = windowPlugin?.HeldItem;
         float toolMultiplier = 1;
 
         if (heldItem != null)
         {
             toolMultiplier = block.Info.Materials
-                                  .Select(x => this.Bot.Data.Materials.GetMultiplier(x, heldItem.Info.Type))
+                                  .Select(x => Bot.Data.Materials.GetMultiplier(x, heldItem.Info.Type))
                                   .Max();
         }
 
-        float efficiencyLevel    = 0; // TODO: Efficiency level
-        float hasteLevel         = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.Haste)         ?? 0;
-        float miningFatigueLevel = this._playerPlugin?.Entity?.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
+        float efficiencyLevel = 0; // TODO: Efficiency level
+        float hasteLevel = playerPlugin?.Entity?.GetEffectLevel(EffectType.Haste) ?? 0;
+        float miningFatigueLevel = playerPlugin?.Entity?.GetEffectLevel(EffectType.MiningFatigue) ?? 0;
 
         toolMultiplier /= MathF.Pow(1.3f, efficiencyLevel);
         toolMultiplier /= MathF.Pow(1.2f, hasteLevel);
@@ -252,7 +271,10 @@ public class WorldPlugin : Plugin
         var canHarvest = block.CanBeHarvestedBy(heldItem?.Info.Type);
         damage /= canHarvest ? 30.0f : 100.0f;
 
-        if (damage > 1) return 0;
+        if (damage > 1)
+        {
+            return 0;
+        }
 
         var ticks = MathF.Ceiling(1 / damage);
         return (int)(ticks / 20 * 1000);
@@ -260,70 +282,84 @@ public class WorldPlugin : Plugin
 
     private Task HandleChunkDataAndLightUpdatePacket(ChunkDataAndUpdateLightPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        var chunk  = this.World.CreateChunk(coords, packet.BlockEntities);
+        var chunk = World.CreateChunk(coords, packet.BlockEntities);
         chunk.LoadData(packet.ChunkData);
 
-        this.World!.LoadChunk(chunk);
+        World!.LoadChunk(chunk);
 
         return Task.CompletedTask;
     }
 
     private Task HandleUnloadChunkPacket(UnloadChunkPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
         var coords = new ChunkCoordinates(packet.X, packet.Z);
 
-        this.World!.UnloadChunk(coords);
+        World!.UnloadChunk(coords);
         return Task.CompletedTask;
     }
 
     private Task HandleBlockUpdatePacket(BlockUpdatePacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        var blockInfo = this.Bot.Data.Blocks.ByState(packet.StateId)!;
-        var block     = new Block(blockInfo, packet.StateId, packet.Location);
+        var blockInfo = Bot.Data.Blocks.ByState(packet.StateId)!;
+        var block = new Block(blockInfo, packet.StateId, packet.Location);
 
-        this.World!.SetBlock(block);
+        World!.SetBlock(block);
         return Task.CompletedTask;
     }
 
     private Task HandleMultiBlockUpdatePacket(MultiBlockUpdatePacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        var sectionX = packet.ChunkSection       >> 42;
-        var sectionY = packet.ChunkSection << 44 >> 44;
-        var sectionZ = packet.ChunkSection << 22 >> 42;
+        var sectionX = packet.ChunkSection >> 42;
+        var sectionY = (packet.ChunkSection << 44) >> 44;
+        var sectionZ = (packet.ChunkSection << 22) >> 42;
 
         if (sectionX > Math.Pow(2, 21))
+        {
             sectionX -= (int)Math.Pow(2, 22);
+        }
 
         if (sectionY > Math.Pow(2, 19))
+        {
             sectionY -= (int)Math.Pow(2, 20);
+        }
 
         if (sectionZ > Math.Pow(2, 21))
+        {
             sectionZ -= (int)Math.Pow(2, 22);
+        }
 
         var coords = new ChunkCoordinates((int)sectionX, (int)sectionZ);
-        var chunk  = this.World!.GetChunkAt(coords);
+        var chunk = World!.GetChunkAt(coords);
 
         foreach (var l in packet.Blocks)
         {
-            var blockZ  = (int)(l >> 4 & 0x0F);
-            var blockX  = (int)(l >> 8 & 0x0F);
-            var blockY  = (int)(l & 0x0F) + (int)sectionY * IChunk.SIZE;
+            var blockZ = (int)((l >> 4) & 0x0F);
+            var blockX = (int)((l >> 8) & 0x0F);
+            var blockY = (int)(l & 0x0F) + ((int)sectionY * IChunk.Size);
             var stateId = (int)(l >> 12);
 
-            chunk.SetBlockAt(stateId, new Position(blockX, blockY, blockZ));
+            chunk.SetBlockAt(stateId, new(blockX, blockY, blockZ));
         }
 
         return Task.CompletedTask;
@@ -331,31 +367,33 @@ public class WorldPlugin : Plugin
 
     private Task HandleChunkBatchStartPacket(ChunkBatchStartPacket packet)
     {
-        if (this.chunkBatchStart != null)
+        if (chunkBatchStart != null)
         {
             Logger.Warn("Received ChunkBatchStartPacket, but last chunk batch was not cleared yet.");
         }
 
-        this.chunkBatchStart = DateTime.Now;
+        chunkBatchStart = DateTime.Now;
         return Task.CompletedTask;
     }
 
     private async Task HandleChunkBatchFinishedPacket(ChunkBatchFinishedPacket packet)
     {
-        if (!this.chunkBatchStart.HasValue)
+        if (!chunkBatchStart.HasValue)
         {
             Logger.Warn("Received ChunkBatchFinishedPacket, but no chunk batch was started.");
             return;
         }
 
-        var timeSpan = DateTime.Now - this.chunkBatchStart!.Value;
-        this.chunkBatchStart = null;
+        var timeSpan = DateTime.Now - chunkBatchStart!.Value;
+        chunkBatchStart = null;
 
         var cps = 25_000.0f / timeSpan.Microseconds;
 
         if (float.IsNaN(cps) || float.IsInfinity(cps))
+        {
             cps = 5;
+        }
 
-        await this.Bot.Client.SendPacket(new ChunkBatchReceivedPacket(cps));
+        await Bot.Client.SendPacket(new ChunkBatchReceivedPacket(cps));
     }
 }

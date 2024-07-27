@@ -1,3 +1,7 @@
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using CmlLib.Core.Auth;
 using CmlLib.Core.Auth.Microsoft;
 using CmlLib.Core.Auth.Microsoft.MsalClient;
@@ -7,47 +11,54 @@ using MineSharp.Auth.Exceptions;
 using MineSharp.Auth.Responses;
 using MineSharp.Core.Common;
 using NLog;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace MineSharp.Auth;
 
 /// <summary>
-/// Login to Microsoft services.
+///     Login to Microsoft services.
 /// </summary>
 public static class MicrosoftAuth
 {
-    private static readonly string  ClientID = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
-    private static readonly ILogger Logger   = LogManager.GetCurrentClassLogger();
-
-
     /// <summary>
-    /// How to handle microsoft msal authentication.
+    ///     How to handle microsoft msal authentication.
     /// </summary>
     public delegate void DeviceCodeHandler(DeviceCodeResult deviceCode);
 
+    private static readonly string ClientId = "3dff3eb7-2830-4d92-b2cb-033c3f47dce0";
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
     /// <summary>
-    /// Obtain a valid minecraft session using a Microsoft Account
+    ///     Obtain a valid minecraft session using a Microsoft Account
     /// </summary>
     /// <param name="username">The username, only used for caching.</param>
     /// <param name="handler">
-    /// When the user has to login in the browser, handler() is called. It should open up a browser window and show the user the deviceCode.UserCode
-    /// If none is provided, the link will open up in the default browser and the device code is written to the console
+    ///     When the user has to login in the browser, handler() is called. It should open up a browser window and show the
+    ///     user the deviceCode.UserCode
+    ///     If none is provided, the link will open up in the default browser and the device code is written to the console
     /// </param>
     /// <param name="api"></param>
     /// <returns>A Session instance</returns>
-    public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null, MinecraftApi? api = null)
+    public static async Task<Session> Login(string username, DeviceCodeHandler? handler = null,
+                                            MinecraftApi? api = null)
     {
         handler ??= DefaultDeviceCodeHandler;
-        api     ??= new MinecraftApi();
+        api ??= new();
 
         var cacheFolder = GetCacheForUser(username);
 
-        var cacheSettings = new MsalCacheSettings() { CacheDir = cacheFolder };
+        var cacheSettings = new MsalCacheSettings
+        {
+            CacheDir = cacheFolder,
+            CacheFileName = "MineSharp.Secrets.txt",
+            KeyChainServiceName = "MineSharp",
+            LinuxKeyRingSchema = "MineSharp",
+            LinuxKeyRingLabel = "MSAL tokens for MineSharp",
+            LinuxKeyRingCollection = "default",                // default means persistent storage
+            KeyChainAccountName = username,                 // used for mac key identification
+            LinuxKeyRingAttr2 = new("Username", username) // used for linux key identification
+        };
 
-        var app = await MsalMinecraftLoginHelper.BuildApplicationWithCache(ClientID, cacheSettings);
+        var app = await MsalMinecraftLoginHelper.BuildApplicationWithCache(ClientId, cacheSettings);
         var loginHandler = new LoginHandlerBuilder()
                           .WithCachePath(Path.Join(cacheFolder, "session.json"))
                           .ForJavaEdition()
@@ -59,12 +70,12 @@ public static class MicrosoftAuth
                           .Build();
 
         MSession mSession;
-        bool     cached = false;
+        var cached = false;
         try
         {
             var result = await loginHandler.LoginFromCache();
             mSession = result.GameSession;
-            cached   = true;
+            cached = true;
         }
         catch (Exception)
         {
@@ -76,7 +87,7 @@ public static class MicrosoftAuth
         {
             if (!cached) // If the cached session is invalid, try to get a new session
             {
-                throw new MineSharpAuthException("Could not login to a valid session");
+                throw new MineSharpAuthException("could not obtain a valid session");
             }
 
             var result = await loginHandler.LoginFromOAuth();
@@ -86,14 +97,14 @@ public static class MicrosoftAuth
         var certificates = PlayerCertificate.Deserialize(cacheFolder);
         if (certificates == null || certificates.RequiresRefresh())
         {
-            Logger.Debug($"Fetching new certificates.");
+            Logger.Debug("Fetching new certificates.");
             certificates = await api.FetchCertificates(mSession.AccessToken!);
             certificates.Serialize(cacheFolder);
         }
 
-        return new Session(
+        return new(
             mSession.Username!,
-            UUID.Parse(mSession.UUID!),
+            Uuid.Parse(mSession.UUID!),
             mSession.ClientToken!,
             mSession.AccessToken!,
             true,
@@ -103,8 +114,8 @@ public static class MicrosoftAuth
     private static string GetCacheForUser(string username)
     {
         var filename = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(username)));
-        var cache    = CacheManager.Get("Sessions");
-        var path     = Path.Join(cache, filename);
+        var cache = CacheManager.Get("Sessions");
+        var path = Path.Join(cache, filename);
 
         if (!Directory.Exists(path))
         {
@@ -122,9 +133,10 @@ public static class MicrosoftAuth
     }
 
     /// <summary>
-    /// Open URL
+    ///     Open URL
     /// </summary>
     /// <param name="url">Url to open</param>
+
     // https://stackoverflow.com/a/43232486/13228835
     private static void OpenUrl(string url)
     {

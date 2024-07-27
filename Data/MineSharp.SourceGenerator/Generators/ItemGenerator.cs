@@ -1,12 +1,11 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class ItemGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("items", GetName, "ItemType", "Items");
+    private readonly Generator typeGenerator = new("items", GetName, "ItemType", "Items");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

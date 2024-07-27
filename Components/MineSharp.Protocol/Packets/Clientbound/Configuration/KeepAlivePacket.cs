@@ -1,41 +1,32 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
-/// Keep alive packet in Configuration
+///     Keep alive packet in Configuration
+///     See https://wiki.vg/Protocol#Clientbound_Keep_Alive_.28configuration.29
 /// </summary>
 public class KeepAlivePacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => PacketType.CB_Configuration_KeepAlive;
-
+    
     /// <summary>
-    /// The keep alive id
+    ///     The keep alive id
     /// </summary>
-    public long KeepAliveId { get; set; }
-
-    /// <summary>
-    /// Create a new instance
-    /// </summary>
-    /// <param name="keepAliveId"></param>
-    public KeepAlivePacket(long keepAliveId)
-    {
-        this.KeepAliveId = keepAliveId;
-    }
+    public required long KeepAliveId { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteLong(this.KeepAliveId);
+        buffer.WriteLong(KeepAliveId);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new KeepAlivePacket(buffer.ReadLong());
+        return new KeepAlivePacket() { KeepAliveId = buffer.ReadLong() };
     }
 }
-#pragma warning restore CS1591

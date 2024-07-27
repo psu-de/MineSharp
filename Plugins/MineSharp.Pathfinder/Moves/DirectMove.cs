@@ -26,7 +26,7 @@ public class DirectMove(Vector3 motion) : Move
     public override bool CanBeLinked => true;
 
     /// <inheritdoc />
-    public override bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world, MinecraftData data)
     {
         var playerBb = CollisionHelper.GetAabbForPlayer(position);
         playerBb.Offset(
@@ -34,7 +34,7 @@ public class DirectMove(Vector3 motion) : Move
             0, 
             0.5 + this.Motion.Z / 2);
 
-        return !CollisionHelper.CollidesWithWord(playerBb, world);
+        return !CollisionHelper.CollidesWithWord(playerBb, world, data);
     }
 
     /// <inheritdoc />

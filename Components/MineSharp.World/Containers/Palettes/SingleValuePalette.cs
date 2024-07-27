@@ -4,29 +4,35 @@ namespace MineSharp.World.Containers.Palettes;
 
 internal class SingleValuePalette : IPalette
 {
-    public int Value { get; }
-
     public SingleValuePalette(int value)
     {
-        this.Value = value;
+        Value = value;
     }
 
-    public bool ContainsState(int minState, int maxState) => this.Value >= minState && this.Value <= maxState;
+    public int Value { get; }
 
-    public int Get(int index) => this.Value;
+    public bool ContainsState(int minState, int maxState)
+    {
+        return Value >= minState && Value <= maxState;
+    }
+
+    public int Get(int index)
+    {
+        return Value;
+    }
 
     public IPalette? Set(int index, int state, IPaletteContainer container)
     {
-        if (this.Value == state)
+        if (Value == state)
         {
             return null;
         }
 
-        var map = new[] { this.Value, state };
+        var map = new[] { Value, state };
 
         var count = (int)Math.Ceiling(container.Capacity / (64.0F / container.MinBits));
         var lData = new long[count];
-        container.Data = new IntBitArray(lData, container.MaxBits);
+        container.Data = new(lData, container.MaxBits);
         container.Data.Set(index, 1);
 
         return new IndirectPalette(map);

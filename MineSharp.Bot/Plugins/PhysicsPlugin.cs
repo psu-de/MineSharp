@@ -1,6 +1,6 @@
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Physics;
 using MineSharp.Physics.Input;
@@ -11,238 +11,253 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// Physics plugin simulates the player entity in the world.
-/// It also allows for walking, jumping and crouching.
+///     Physics plugin simulates the player entity in the world.
+///     It also allows for walking, jumping and crouching.
 /// </summary>
 public class PhysicsPlugin : Plugin
 {
-    private const           float   ROTATION_SMOOTHNESS = 0.2f;
-    private const           double  POSITION_THRESHOLD  = 0.01d;
-    private static readonly ILogger Logger              = LogManager.GetCurrentClassLogger();
+    private const float RotationSmoothness = 0.2f;
+    private const double PositionThreshold = 0.01d;
+
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
-    /// Fired when the Bot moves
-    /// </summary>
-    public event Events.BotEvent? BotMoved;
-
-    /// <summary>
-    ///     Fires just before executing a physics tick
-    /// </summary>
-    public event Events.BotEvent? PhysicsTick;
-
-    /// <summary>
-    /// The input controls used to control movement.
+    ///     The input controls used to control movement.
     /// </summary>
     public readonly InputControls InputControls;
 
-    /// <summary>
-    /// The Physics engine for this plugin
-    /// </summary>
-    public PlayerPhysics? Engine { get; private set; }
-
-    private PlayerState   lastPlayerState;
-    private PlayerPlugin? playerPlugin;
-    private WorldPlugin?  worldPlugin;
-
-    private MinecraftPlayer? Self;
+    private readonly PlayerState lastPlayerState;
 
     private LerpRotation? lerpRotation;
+    private PlayerPlugin? playerPlugin;
 
-    private uint tickCounter = 0;
+    private MinecraftPlayer? self;
+
+    private uint tickCounter;
+    private WorldPlugin? worldPlugin;
 
     /// <summary>
-    /// Create a new PhysicsPlugin instance
+    ///     Create a new PhysicsPlugin instance
     /// </summary>
     /// <param name="bot"></param>
     public PhysicsPlugin(MineSharpBot bot) : base(bot)
     {
-        this.lastPlayerState = new PlayerState(0, 0, 0, 0, 0, false);
-        this.InputControls   = new InputControls();
+        lastPlayerState = new(0, 0, 0, 0, 0, false);
+        InputControls = new();
     }
+
+    /// <summary>
+    ///     The Physics engine for this plugin
+    /// </summary>
+    public PlayerPhysics? Engine { get; private set; }
+
+    /// <summary>
+    ///     Fired when the Bot moves
+    /// </summary>
+    public AsyncEvent<MineSharpBot> BotMoved = new();
+
+    /// <summary>
+    ///     Fires just before executing a physics tick
+    /// </summary>
+    public AsyncEvent<MineSharpBot> PhysicsTick = new();
 
     /// <inheritdoc />
     protected override async Task Init()
     {
-        this.playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
-        this.worldPlugin  = this.Bot.GetPlugin<WorldPlugin>();
+        playerPlugin = Bot.GetPlugin<PlayerPlugin>();
+        worldPlugin = Bot.GetPlugin<WorldPlugin>();
 
-        await this.playerPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization();
 
-        this.Self = this.playerPlugin.Self;
-        await this.UpdateServerPos();
+        self = playerPlugin.Self;
+        await UpdateServerPos();
 
-        this.Engine                    =  new PlayerPhysics(this.Bot.Data, this.Self!, this.worldPlugin.World, this.InputControls);
-        this.Engine.OnCrouchingChanged += OnSneakingChanged;
-        this.Engine.OnSprintingChanged += OnSprintingChanged;
+        Engine = new(Bot.Data, self!, worldPlugin.World, InputControls);
+        Engine.OnCrouchingChanged += OnSneakingChanged;
+        Engine.OnSprintingChanged += OnSprintingChanged;
     }
 
     /// <summary>
-    /// Wait for <paramref name="count"/> physics ticks
+    ///     Wait for <paramref name="count" /> physics ticks
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
     public async Task WaitForTick(int count = 1)
     {
-        var before   = this.tickCounter;
+        var before = tickCounter;
         var expected = before + count;
 
-        while (this.tickCounter < expected)
+        while (tickCounter < expected)
         {
             await Task.Delay(1);
         }
     }
 
     /// <summary>
-    /// Wait until the entity hit the ground
+    ///     Wait until the entity hit the ground
     /// </summary>
     public async Task WaitForOnGround()
     {
-        while (!this.playerPlugin?.Entity!.IsOnGround ?? false)
+        while (!playerPlugin?.Entity!.IsOnGround ?? false)
         {
-            await this.WaitForTick();
+            await WaitForTick();
         }
     }
 
     /// <summary>
-    /// Forces the bots rotation to the given yaw and pitch (in degrees)
+    ///     Forces the bots rotation to the given yaw and pitch (in degrees)
     /// </summary>
     /// <param name="yaw"></param>
     /// <param name="pitch"></param>
     public void ForceSetRotation(float yaw, float pitch)
     {
-        this.Self!.Entity!.Yaw   = yaw;
-        this.Self!.Entity!.Pitch = pitch;
+        self!.Entity!.Yaw = yaw;
+        self!.Entity!.Pitch = pitch;
     }
 
     /// <summary>
-    /// Forces the bot to look at given position
+    ///     Forces the bot to look at given position
     /// </summary>
     /// <param name="position"></param>
     public void ForceLookAt(Vector3 position)
     {
-        (var yaw, var pitch) = this.CalculateRotation(position);
-        this.ForceSetRotation(yaw, pitch);
+        (var yaw, var pitch) = CalculateRotation(position);
+        ForceSetRotation(yaw, pitch);
     }
 
     /// <summary>
-    /// Forces the bot to look at the center of the given block
+    ///     Forces the bot to look at the center of the given block
     /// </summary>
     /// <param name="block"></param>
     public void ForceLookAt(Block block)
-        => this.ForceLookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position));
+    {
+        ForceLookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position));
+    }
 
     /// <summary>
-    /// Slowly look at the given yaw and pitch.
-    /// Use a higher smoothness value for faster rotation,
-    /// lower value for slower rotation.
+    ///     Slowly look at the given yaw and pitch.
+    ///     Use a higher smoothness value for faster rotation,
+    ///     lower value for slower rotation.
     /// </summary>
     /// <param name="yaw"></param>
     /// <param name="pitch"></param>
     /// <param name="smoothness"></param>
-    public async Task Look(float yaw, float pitch, float smoothness = ROTATION_SMOOTHNESS)
+    public async Task Look(float yaw, float pitch, float smoothness = RotationSmoothness)
     {
-        var dYaw   = yaw   - this.Self!.Entity!.Yaw;
-        var dPitch = pitch - this.Self!.Entity!.Pitch;
+        var dYaw = yaw - self!.Entity!.Yaw;
+        var dPitch = pitch - self!.Entity!.Pitch;
 
         if (Math.Abs(dYaw) < 0.1 && Math.Abs(dPitch) < 0.1)
+        {
             return;
+        }
 
-        this.lerpRotation?.Cancel();
-        this.lerpRotation = new LerpRotation(this.playerPlugin!.Self!, yaw, pitch, smoothness);
+        lerpRotation?.Cancel();
+        lerpRotation = new(playerPlugin!.Self!, yaw, pitch, smoothness);
 
-        await this.lerpRotation.GetTask();
+        await lerpRotation.GetTask();
 
-        this.lerpRotation = null;
+        lerpRotation = null;
     }
 
     /// <summary>
-    /// Slowly look at the given position.
-    /// Use a higher smoothness value for faster rotation,
-    /// a lower value for slower rotation.
+    ///     Slowly look at the given position.
+    ///     Use a higher smoothness value for faster rotation,
+    ///     a lower value for slower rotation.
     /// </summary>
     /// <param name="position"></param>
     /// <param name="smoothness"></param>
     /// <returns></returns>
-    public Task LookAt(Vector3 position, float smoothness = ROTATION_SMOOTHNESS)
+    public Task LookAt(Vector3 position, float smoothness = RotationSmoothness)
     {
-        var rotation = this.CalculateRotation(position);
-        return this.Look(rotation.Yaw, rotation.Pitch);
+        var rotation = CalculateRotation(position);
+        return Look(rotation.Yaw, rotation.Pitch);
     }
 
     /// <summary>
-    /// Slowly look at the center of the given block.
-    /// Use a higher smoothness value for faster rotation,
-    /// a lower value for slower rotation.
+    ///     Slowly look at the center of the given block.
+    ///     Use a higher smoothness value for faster rotation,
+    ///     a lower value for slower rotation.
     /// </summary>
     /// <param name="block"></param>
     /// <param name="smoothness"></param>
     /// <returns></returns>
-    public Task LookAt(Block block, float smoothness = ROTATION_SMOOTHNESS)
-        => this.LookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position), smoothness);
+    public Task LookAt(Block block, float smoothness = RotationSmoothness)
+    {
+        return LookAt(new Vector3(0.5, 0.5, 0.5).Plus(block.Position), smoothness);
+    }
 
     /// <summary>
-    /// Casts a ray from the players eyes, and returns the first block that is hit.
+    ///     Casts a ray from the players eyes, and returns the first block that is hit.
     /// </summary>
     /// <returns></returns>
-    public Task<Block?> Raycast(double distance = 64)
+    public (Block Block, BlockFace Face)? Raycast(double distance = 64)
     {
         if (distance < 0)
-            return Task.FromResult<Block?>(null);
-
-        return Task.Run(() =>
         {
-            var position   = this.playerPlugin!.Self!.GetHeadPosition();
-            var lookVector = this.playerPlugin!.Self!.Entity!.GetLookVector();
-            var iterator = new RaycastIterator(
-                position,
-                lookVector,
-                length: distance);
+            return null;
+        }
 
-            foreach (var pos in iterator.Iterate())
+        var position = playerPlugin!.Self!.GetHeadPosition();
+        var lookVector = playerPlugin!.Self!.Entity!.GetLookVector();
+        var iterator = new RaycastIterator(
+            position,
+            lookVector,
+            distance);
+
+        foreach (var pos in iterator.Iterate())
+        {
+            var block = worldPlugin!.World.GetBlockAt(pos);
+            if (!block.IsSolid())
             {
-                var block = this.worldPlugin!.World.GetBlockAt(pos);
-
-                if (!block.IsSolid())
-                    continue;
-
-                var bbs = this.Bot.Data.BlockCollisionShapes.GetShapes(block.Info.Type, block.State);
-
-                foreach (var bb in bbs)
-                {
-                    bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
-
-                    if (bb.IntersectsLine(position, lookVector))
-                        return block;
-                }
+                continue;
             }
 
-            return null;
-        });
+            var bbs = Bot.Data.BlockCollisionShapes.GetForBlock(block);
+
+            foreach (var bb in bbs)
+            {
+                var blockBb = bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
+
+                if (blockBb.IntersectsLine(position, lookVector))
+                {
+                    return (block, iterator.CurrentFace);
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <inheritdoc />
     public override Task OnTick()
     {
-        if (!this.IsLoaded)
+        if (!IsLoaded)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.playerPlugin!.IsAlive!.Value)
+        if (!playerPlugin!.IsAlive!.Value)
+        {
             return Task.CompletedTask;
+        }
 
         _ = Task.Run(async () =>
         {
             try
             {
-                this.lerpRotation?.Tick();
-                this.Engine!.Tick();
-                await this.UpdateServerPositionIfNeeded();
+                lerpRotation?.Tick();
+                Engine!.Tick();
+                await UpdateServerPositionIfNeeded();
+
+                await PhysicsTick.Dispatch(Bot);
             }
             catch (Exception e)
             {
                 Logger.Error(e.ToString());
             }
-
-            Interlocked.Increment(ref this.tickCounter);
+            
+            tickCounter++;
         });
 
         return Task.CompletedTask;
@@ -250,162 +265,167 @@ public class PhysicsPlugin : Plugin
 
     private (float Yaw, float Pitch) CalculateRotation(Vector3 position)
     {
-        const double deg2rad = 180 / Math.PI;
-        var          delta   = position.Minus(this.Self!.GetHeadPosition());
+        const double deg2_rad = 180 / Math.PI;
+        var delta = position.Minus(self!.GetHeadPosition());
         delta.Normalize();
 
-        var yaw   = deg2rad * Math.Atan2(-delta.X, delta.Z);
-        var pitch = deg2rad * -Math.Asin(delta.Y / delta.Length());
+        var yaw = deg2_rad * Math.Atan2(-delta.X, delta.Z);
+        var pitch = deg2_rad * -Math.Asin(delta.Y / delta.Length());
 
         return ((float)yaw, (float)pitch);
     }
 
     private async Task UpdateServerPositionIfNeeded()
     {
-        if (Math.Abs(this.lastPlayerState.X     - this.Self!.Entity!.Position.X) > POSITION_THRESHOLD
-         || Math.Abs(this.lastPlayerState.Y     - this.Self!.Entity!.Position.Y) > POSITION_THRESHOLD
-         || Math.Abs(this.lastPlayerState.Z     - this.Self!.Entity!.Position.Z) > POSITION_THRESHOLD
-         || Math.Abs(this.lastPlayerState.Yaw   - this.Self!.Entity!.Yaw)        > POSITION_THRESHOLD
-         || Math.Abs(this.lastPlayerState.Pitch - this.Self!.Entity!.Pitch)      > POSITION_THRESHOLD
-         || this.lastPlayerState.OnGround                                        != this.Self!.Entity!.IsOnGround)
-        {
-            await this.UpdateServerPos();
-        }
+        await UpdateServerPos();
     }
 
     private async Task UpdateServerPos()
     {
         var packet = new SetPlayerPositionAndRotationPacket(
-            this.Self!.Entity!.Position.X,
-            this.Self!.Entity!.Position.Y,
-            this.Self!.Entity!.Position.Z,
-            this.Self!.Entity!.Yaw,
-            this.Self!.Entity!.Pitch,
-            this.Self!.Entity!.IsOnGround);
+            self!.Entity!.Position.X,
+            self!.Entity!.Position.Y,
+            self!.Entity!.Position.Z,
+            self!.Entity!.Yaw,
+            self!.Entity!.Pitch,
+            self!.Entity!.IsOnGround);
 
-        this.lastPlayerState.X        = this.Self!.Entity!.Position.X;
-        this.lastPlayerState.Y        = this.Self!.Entity!.Position.Y;
-        this.lastPlayerState.Z        = this.Self!.Entity!.Position.Z;
-        this.lastPlayerState.Yaw      = this.Self!.Entity!.Yaw;
-        this.lastPlayerState.Pitch    = this.Self!.Entity!.Pitch;
-        this.lastPlayerState.OnGround = this.Self!.Entity!.IsOnGround;
+        lastPlayerState.X = self!.Entity!.Position.X;
+        lastPlayerState.Y = self!.Entity!.Position.Y;
+        lastPlayerState.Z = self!.Entity!.Position.Z;
+        lastPlayerState.Yaw = self!.Entity!.Yaw;
+        lastPlayerState.Pitch = self!.Entity!.Pitch;
+        lastPlayerState.OnGround = self!.Entity!.IsOnGround;
 
-        await this.Bot.Client.SendPacket(packet);
+        await Bot.Client.SendPacket(packet);
 
-        this.BotMoved?.Invoke(this.Bot);
+        await BotMoved.Dispatch(Bot);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)
     {
         var packet = new EntityActionPacket(
-            this.playerPlugin!.Self!.Entity!.ServerId,
+            playerPlugin!.Self!.Entity!.ServerId,
             isSneaking
                 ? EntityActionPacket.EntityAction.StartSneaking
                 : EntityActionPacket.EntityAction.StopSneaking,
             0);
 
-        this.Bot.Client.SendPacket(packet);
+        Bot.Client.SendPacket(packet);
     }
 
     private void OnSprintingChanged(PlayerPhysics sender, bool isSprinting)
     {
         var packet = new EntityActionPacket(
-            this.playerPlugin!.Self!.Entity!.ServerId,
+            playerPlugin!.Self!.Entity!.ServerId,
             isSprinting
                 ? EntityActionPacket.EntityAction.StartSprinting
                 : EntityActionPacket.EntityAction.StopSprinting,
             0);
 
-        this.Bot.Client.SendPacket(packet);
+        Bot.Client.SendPacket(packet);
     }
 
     private record PlayerState
     {
-        public double X        { get; set; }
-        public double Y        { get; set; }
-        public double Z        { get; set; }
-        public float  Yaw      { get; set; }
-        public float  Pitch    { get; set; }
-        public bool   OnGround { get; set; }
-
         public PlayerState(double x, double y, double z, float yaw, float pitch, bool ground)
         {
-            this.X        = x;
-            this.Y        = y;
-            this.Z        = z;
-            this.Yaw      = yaw;
-            this.Pitch    = pitch;
-            this.OnGround = ground;
+            X = x;
+            Y = y;
+            Z = z;
+            Yaw = yaw;
+            Pitch = pitch;
+            OnGround = ground;
         }
 
-        public override string ToString() =>
-            $"X={this.X} Y={this.Y} Z={this.Z} Yaw={this.Yaw} Pitch={this.Pitch} IsOnGround={this.OnGround}";
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+        public float Yaw { get; set; }
+        public float Pitch { get; set; }
+        public bool OnGround { get; set; }
+
+        public override string ToString()
+        {
+            return $"X={X} Y={Y} Z={Z} Yaw={Yaw} Pitch={Pitch} IsOnGround={OnGround}";
+        }
     }
 
     private class LerpRotation
     {
-        private MinecraftPlayer      player;
-        private float                yawPerTick;
-        private float                pitchPerTick;
-        private int                  remainingYawTicks;
-        private int                  remainingPitchTicks;
-        private bool                 completed;
-        private TaskCompletionSource task;
+        private readonly float pitchPerTick;
+        private readonly MinecraftPlayer player;
+        private readonly TaskCompletionSource task;
+        private readonly float yawPerTick;
+        private bool completed;
+        private int remainingPitchTicks;
+        private int remainingYawTicks;
 
-        public LerpRotation(MinecraftPlayer player, float toYaw, float toPitch, float smoothness = ROTATION_SMOOTHNESS)
+        public LerpRotation(MinecraftPlayer player, float toYaw, float toPitch, float smoothness = RotationSmoothness)
         {
             this.player = player;
 
-            var deltaYaw   = toYaw   - player.Entity!.Yaw;
+            var deltaYaw = toYaw - player.Entity!.Yaw;
             var deltaPitch = toPitch - player.Entity!.Pitch;
 
-            this.yawPerTick   = deltaYaw   * smoothness;
-            this.pitchPerTick = deltaPitch * smoothness;
+            yawPerTick = deltaYaw * smoothness;
+            pitchPerTick = deltaPitch * smoothness;
 
             if (deltaYaw == 0)
+            {
                 yawPerTick = 1;
+            }
+
             if (deltaPitch == 0)
+            {
                 pitchPerTick = 1;
+            }
 
-            var yawTicks   = (int)(deltaYaw   / yawPerTick);
-            var pitchTicks = (int)(deltaPitch / pitchPerTick);
+            var yawTicks = Math.Abs((int)(deltaYaw / yawPerTick));
+            var pitchTicks = Math.Abs((int)(deltaPitch / pitchPerTick));
 
-            this.task                = new TaskCompletionSource();
-            this.remainingYawTicks   = yawTicks;
-            this.remainingPitchTicks = pitchTicks;
+            task = new();
+            remainingYawTicks = yawTicks;
+            remainingPitchTicks = pitchTicks;
         }
 
         public void Tick()
         {
-            if (this.completed)
-                return;
-
-            if (this.remainingPitchTicks > 0)
+            if (completed)
             {
-                this.remainingPitchTicks--;
-                this.player.Entity!.Pitch += this.pitchPerTick;
+                return;
             }
 
-            if (this.remainingYawTicks > 0)
+            if (remainingPitchTicks > 0)
             {
-                this.remainingYawTicks--;
-                this.player.Entity!.Yaw += this.yawPerTick;
+                remainingPitchTicks--;
+                player.Entity!.Pitch += pitchPerTick;
             }
 
-            if (this.remainingPitchTicks != 0 || this.remainingYawTicks != 0)
-                return;
+            if (remainingYawTicks > 0)
+            {
+                remainingYawTicks--;
+                player.Entity!.Yaw += yawPerTick;
+            }
 
-            this.completed = true;
-            this.task.TrySetResult();
+            if (remainingPitchTicks != 0 || remainingYawTicks != 0)
+            {
+                return;
+            }
+
+            completed = true;
+            task.TrySetResult();
         }
 
         public void Cancel()
         {
-            this.completed = true;
-            this.task.TrySetCanceled();
+            completed = true;
+            task.TrySetCanceled();
         }
 
         public Task GetTask()
-            => this.task.Task;
+        {
+            return task.Task;
+        }
     }
 }

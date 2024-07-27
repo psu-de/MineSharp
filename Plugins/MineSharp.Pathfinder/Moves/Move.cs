@@ -35,7 +35,7 @@ public abstract class Move
     /// <summary>
     /// Checks if the move is possible
     /// </summary>
-    public abstract bool IsMovePossible(Position position, IWorld world);
+    public abstract bool IsMovePossible(Position position, IWorld world, MinecraftData data);
 
     internal async Task Perform(MineSharpBot bot, int count, Position startPosition, Movements movements)
     {

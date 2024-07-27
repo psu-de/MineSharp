@@ -1,4 +1,4 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
@@ -21,7 +21,9 @@ public class ProtocolGenerator
         foreach (var ns in protocol.Properties())
         {
             if (ns.Name == "types")
+            {
                 continue;
+            }
 
             foreach (var packet in CollectPackets(protocol, ns.Name, "toClient"))
             {

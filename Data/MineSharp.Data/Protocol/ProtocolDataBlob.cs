@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
 
 namespace MineSharp.Data.Protocol;
 

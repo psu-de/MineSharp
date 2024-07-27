@@ -1,38 +1,37 @@
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Items;
+﻿using MineSharp.Core.Common.Items;
 using MineSharp.Data;
 
 namespace MineSharp.Windows.Tests;
 
 public class WindowTests
 {
-    private Window        _mainInventory;
-    private Window        _inventory;
-    private MinecraftData _data;
+    private MinecraftData data;
+    private ItemInfo diamond;
+    private Window inventory;
+    private Window mainInventory;
+    private ItemInfo netherStar;
 
-    private ItemInfo _oakLog;
-    private ItemInfo _netherStar;
-    private ItemInfo _diamond;
+    private ItemInfo oakLog;
 
     [SetUp]
     public void Setup()
     {
-        this._data          = MinecraftData.FromVersion("1.19.3").Result;
-        this._mainInventory = new Window(255, "", 4 * 9, null, null);
-        this._inventory     = new Window(0, "Inventory", 9, this._mainInventory, null);
+        data = MinecraftData.FromVersion("1.19.3").Result;
+        mainInventory = new(255, "", 4 * 9);
+        inventory = new(0, "Inventory", 9, mainInventory);
 
-        this._oakLog     = this._data.Items.ByName("oak_log")!;
-        this._netherStar = this._data.Items.ByName("nether_star")!;
-        this._diamond    = this._data.Items.ByName("diamond")!;
+        oakLog = data.Items.ByName("oak_log")!;
+        netherStar = data.Items.ByName("nether_star")!;
+        diamond = data.Items.ByName("diamond")!;
     }
 
     [Test]
     public void Create()
     {
         var w1 = new Window(
-            255, "TestInventory", 4 * 9, null, null);
+            255, "TestInventory", 4 * 9);
         var w2 = new Window(
-            0, "inventory", 9, w1, null);
+            0, "inventory", 9, w1);
     }
 
     [Test]
@@ -40,130 +39,130 @@ public class WindowTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(this._mainInventory.TotalSlotCount, Is.EqualTo(4 * 9));
-            Assert.That(this._mainInventory.SlotCount, Is.EqualTo(4      * 9));
-            Assert.That(this._inventory.SlotCount, Is.EqualTo(9));
-            Assert.That(this._inventory.TotalSlotCount, Is.EqualTo(5 * 9 + 1));
-            Assert.That(this._inventory.GetSlot(45), Is.Not.Null);
+            Assert.That(mainInventory.TotalSlotCount, Is.EqualTo(4 * 9));
+            Assert.That(mainInventory.SlotCount, Is.EqualTo(4 * 9));
+            Assert.That(inventory.SlotCount, Is.EqualTo(9));
+            Assert.That(inventory.TotalSlotCount, Is.EqualTo((5 * 9) + 1));
+            Assert.That(inventory.GetSlot(45), Is.Not.Null);
 
-            Assert.That(this._inventory.GetSelectedSlot().Item, Is.EqualTo(this._mainInventory.GetSelectedSlot().Item));
+            Assert.That(inventory.GetSelectedSlot().Item, Is.EqualTo(mainInventory.GetSelectedSlot().Item));
 
-            Assert.That(this._inventory.IsContainerSlotIndex(1), Is.EqualTo(true));
-            Assert.That(this._inventory.IsContainerSlotIndex(9), Is.EqualTo(false));
+            Assert.That(inventory.IsContainerSlotIndex(1), Is.EqualTo(true));
+            Assert.That(inventory.IsContainerSlotIndex(9), Is.EqualTo(false));
         });
     }
 
     [Test]
     public void GetSetSlots()
     {
-        this._inventory.SetSlot(new Slot(
-            new Item(this._oakLog, 16, null, null), 9));
+        inventory.SetSlot(new(
+                              new(oakLog, 16, null, null), 9));
 
-        this._inventory.SetSlot(new Slot(
-            new Item(this._netherStar, 2, null, null), -1));
+        inventory.SetSlot(new(
+                              new(netherStar, 2, null, null), -1));
 
-        Assert.That(this._inventory.GetSlot(9).Item?.Info.Id, Is.EqualTo(this._oakLog.Id));
-        Assert.That(this._mainInventory.GetSlot(0).Item?.Info.Id, Is.EqualTo(this._oakLog.Id));
+        Assert.That(inventory.GetSlot(9).Item?.Info.Id, Is.EqualTo(oakLog.Id));
+        Assert.That(mainInventory.GetSlot(0).Item?.Info.Id, Is.EqualTo(oakLog.Id));
 
-        this._inventory.SetSlot(new Slot(
-            new Item(this._diamond, 4, null, null), 1));
+        inventory.SetSlot(new(
+                              new(diamond, 4, null, null), 1));
 
         Assert.Multiple(() =>
         {
-            Assert.That(this._inventory.GetSlot(1).Item?.Info.Id, Is.EqualTo(this._diamond.Id));
-            Assert.That(this._inventory.GetSlot(-1).Item?.Info.Id, Is.EqualTo(this._netherStar.Id));
+            Assert.That(inventory.GetSlot(1).Item?.Info.Id, Is.EqualTo(diamond.Id));
+            Assert.That(inventory.GetSlot(-1).Item?.Info.Id, Is.EqualTo(netherStar.Id));
 
-            Assert.That(this._inventory.GetSlot(-1).Item?.Info.Id, Is.EqualTo(this._inventory.GetSelectedSlot().Item?.Info.Id));
-            Assert.That(this._mainInventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(this._netherStar.Id));
+            Assert.That(inventory.GetSlot(-1).Item?.Info.Id, Is.EqualTo(inventory.GetSelectedSlot().Item?.Info.Id));
+            Assert.That(mainInventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(netherStar.Id));
 
-            Assert.Catch<IndexOutOfRangeException>(() => this._inventory.GetSlot(46));
+            Assert.Catch<IndexOutOfRangeException>(() => inventory.GetSlot(46));
 
-            Assert.That(this._inventory.GetAllSlots().Length, Is.EqualTo(10 + 4 * 9));
-            Assert.That(this._inventory.GetContainerSlots().Length, Is.EqualTo(10));
-            Assert.That(this._inventory.GetInventorySlots().Length, Is.EqualTo(4 * 9));
+            Assert.That(inventory.GetAllSlots().Length, Is.EqualTo(10 + (4 * 9)));
+            Assert.That(inventory.GetContainerSlots().Length, Is.EqualTo(10));
+            Assert.That(inventory.GetInventorySlots().Length, Is.EqualTo(4 * 9));
 
 
-            Assert.Catch<NotSupportedException>(() => this._mainInventory.GetInventorySlots());
+            Assert.Catch<InvalidOperationException>(() => mainInventory.GetInventorySlots());
         });
     }
 
     [Test]
     public void SimpleClickTest()
     {
-        this._inventory.SetSlot(new Slot(
-            new Item(this._diamond, 16, null, null), 9));
+        inventory.SetSlot(new(
+                              new(diamond, 16, null, null), 9));
 
-        this._inventory.SetSlot(new Slot(
-            new Item(this._netherStar, 6, null, null), 17));
+        inventory.SetSlot(new(
+                              new(netherStar, 6, null, null), 17));
 
-        this._inventory.SetSlot(new Slot(
-            new Item(this._diamond, 54, null, null), 18));
+        inventory.SetSlot(new(
+                              new(diamond, 54, null, null), 18));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseRight, 9);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(8));
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(8));
+        inventory.DoSimpleClick(WindowMouseButton.MouseRight, 9);
+        Assert.That(inventory.GetSlot(9).Item?.Count, Is.EqualTo(8));
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(8));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseRight, 9);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(9));
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(7));
+        inventory.DoSimpleClick(WindowMouseButton.MouseRight, 9);
+        Assert.That(inventory.GetSlot(9).Item?.Count, Is.EqualTo(9));
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(7));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 10);
-        Assert.That(this._inventory.GetSelectedSlot().Item, Is.Null);
-        Assert.That(this._inventory.GetSlot(10).Item?.Count, Is.EqualTo(7));
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 10);
+        Assert.That(inventory.GetSelectedSlot().Item, Is.Null);
+        Assert.That(inventory.GetSlot(10).Item?.Count, Is.EqualTo(7));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 10);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(7));
-        Assert.That(this._inventory.GetSlot(10).Item, Is.Null);
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 10);
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(7));
+        Assert.That(inventory.GetSlot(10).Item, Is.Null);
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 9);
-        Assert.That(this._inventory.GetSelectedSlot().Item, Is.Null);
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(16));
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 9);
+        Assert.That(inventory.GetSelectedSlot().Item, Is.Null);
+        Assert.That(inventory.GetSlot(9).Item?.Count, Is.EqualTo(16));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 9);
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 18);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(6));
-        Assert.That(this._inventory.GetSlot(18).Item?.Count, Is.EqualTo(64));
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 9);
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 18);
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(6));
+        Assert.That(inventory.GetSlot(18).Item?.Count, Is.EqualTo(64));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseRight, -999);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(5));
+        inventory.DoSimpleClick(WindowMouseButton.MouseRight, -999);
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(5));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, -999);
-        Assert.That(this._inventory.GetSelectedSlot().Item, Is.Null);
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, -999);
+        Assert.That(inventory.GetSelectedSlot().Item, Is.Null);
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 17);
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 18);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(this._diamond.Id));
-        Assert.That(this._inventory.GetSlot(18).Item?.Info.Id, Is.EqualTo(this._netherStar.Id));
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 17);
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 18);
+        Assert.That(inventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(diamond.Id));
+        Assert.That(inventory.GetSlot(18).Item?.Info.Id, Is.EqualTo(netherStar.Id));
 
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseRight, 18);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(this._netherStar.Id));
-        Assert.That(this._inventory.GetSlot(18).Item?.Info.Id, Is.EqualTo(this._diamond.Id));
+        inventory.DoSimpleClick(WindowMouseButton.MouseRight, 18);
+        Assert.That(inventory.GetSelectedSlot().Item?.Info.Id, Is.EqualTo(netherStar.Id));
+        Assert.That(inventory.GetSlot(18).Item?.Info.Id, Is.EqualTo(diamond.Id));
     }
 
     [Test]
     public void PickupTest()
     {
-        this._inventory.SetSlot(new Slot(
-            new Item(this._diamond, 16, null, null), 9));
-        this._inventory.SetSlot(new Slot(
-            new Item(this._netherStar, 31, null, null), 10));
-        this._inventory.SetSlot(new Slot(
-            new Item(this._netherStar, 16, null, null), 11));
+        inventory.SetSlot(new(
+                              new(diamond, 16, null, null), 9));
+        inventory.SetSlot(new(
+                              new(netherStar, 31, null, null), 10));
+        inventory.SetSlot(new(
+                              new(netherStar, 16, null, null), 11));
 
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(16));
+        Assert.That(inventory.GetSlot(9).Item?.Count, Is.EqualTo(16));
 
-        this._inventory.PickupItems(9, 6);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(6));
-        Assert.That(this._inventory.GetSlot(9).Item?.Count, Is.EqualTo(10));
+        inventory.PickupItems(9, 6);
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(6));
+        Assert.That(inventory.GetSlot(9).Item?.Count, Is.EqualTo(10));
 
-        this._inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 12);
-        Assert.That(this._inventory.GetSelectedSlot().Item, Is.EqualTo(null));
+        inventory.DoSimpleClick(WindowMouseButton.MouseLeft, 12);
+        Assert.That(inventory.GetSelectedSlot().Item, Is.EqualTo(null));
 
-        this._inventory.PickupInventoryItems(ItemType.NetherStar, 47);
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(47));
-        Assert.That(this._inventory.GetSelectedSlot().Item?.Info.Type, Is.EqualTo(ItemType.NetherStar));
+        inventory.PickupInventoryItems(ItemType.NetherStar, 47);
+        Assert.That(inventory.GetSelectedSlot().Item?.Count, Is.EqualTo(47));
+        Assert.That(inventory.GetSelectedSlot().Item?.Info.Type, Is.EqualTo(ItemType.NetherStar));
 
-        Assert.Catch(() => this._inventory.PickupItems(9, 5));
+        Assert.Catch(() => inventory.PickupItems(9, 5));
     }
 }

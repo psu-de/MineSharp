@@ -2,22 +2,25 @@
 
 Logic to simulate a Minecraft Player in a minecraft world.
 The following things are supported:
- - Gravity
- - Walking in all directions
- - Sprinting
- - Crouching (Can't crouch under a slap yet)
- - Water current pushing (Still a bit buggy)
+
+- Gravity
+- Walking in all directions
+- Sprinting
+- Crouching (Can't crouch under a slap yet)
+- Water current pushing (Still a bit buggy)
 
 The following things should be implemented at some point:
- - Swimming
- - Elytra?
- - Riding vehicles
- - Climbing must be tested
+
+- Swimming
+- Elytra?
+- Riding vehicles
+- Climbing must be tested
 
 The code follows the same checks the vanilla minecraft client does. \
 Only client side checks are done.
 
 ### Example
+
 ```csharp
     var input = new InputControls();
     var physics = new PlayerPhysics(data, player, world, input);

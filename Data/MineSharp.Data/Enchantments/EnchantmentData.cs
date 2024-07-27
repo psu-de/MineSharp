@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Enchantments;
+﻿using MineSharp.Core.Common.Enchantments;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;

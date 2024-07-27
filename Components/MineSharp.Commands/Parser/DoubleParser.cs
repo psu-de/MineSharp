@@ -1,16 +1,27 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class DoubleParser : IParser
 {
-    public readonly double Min;
-    public readonly double Max;
+    public double Min { get; private set; }
+    public double Max { get; private set; }
 
-    public DoubleParser(double min = double.MinValue, double max = double.MaxValue)
+    public string GetName()
     {
-        this.Min = min;
-        this.Max = max;
+        return "brigadier:double";
     }
 
-    public string GetName()          => "brigadier:double";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        var flags = buffer.ReadByte();
+        Min = (flags & 0x01) > 0 ? buffer.ReadDouble() : double.MinValue;
+        Max = (flags & 0x02) > 0 ? buffer.ReadDouble() : double.MaxValue;
+    }
 }

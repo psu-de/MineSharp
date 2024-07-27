@@ -1,25 +1,31 @@
-namespace MineSharp.World.Chunks;
+﻿namespace MineSharp.World.Chunks;
 
 /// <summary>
-/// Represents a Chunk coordinate 
+///     Represents a Chunk coordinate
 /// </summary>
 /// <param name="x"></param>
 /// <param name="z"></param>
 public readonly struct ChunkCoordinates(int x, int z)
 {
     /// <summary>
-    /// The X coordinate
+    ///     The X coordinate
     /// </summary>
     public int X { get; } = x;
 
     /// <summary>
-    /// The Z coordinate
+    ///     The Z coordinate
     /// </summary>
     public int Z { get; } = z;
 
     /// <inheritdoc />
-    public override string ToString() => $"({this.X} / {this.Z})";
+    public override string ToString()
+    {
+        return $"({X} / {Z})";
+    }
 
     /// <inheritdoc />
-    public override int GetHashCode() => this.X << 16 | this.Z & 0xFFFF;
+    public override int GetHashCode()
+    {
+        return (X << 16) | (Z & 0xFFFF);
+    }
 }

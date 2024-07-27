@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
@@ -12,9 +12,19 @@ public class Tests
 {
     private static readonly string[] Versions =
     [
-        "1.18", "1.18.1", "1.18.2",
-        "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
-        "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4"
+        "1.18",
+        "1.18.1",
+        "1.18.2",
+        "1.19",
+        "1.19.1",
+        "1.19.2",
+        "1.19.3",
+        "1.19.4",
+        "1.20",
+        "1.20.1",
+        "1.20.2",
+        "1.20.3",
+        "1.20.4"
     ];
 
     [Test]

@@ -1,3 +1,10 @@
+MineSharp 0.1.5:
+ - fixed bugs in MineSharp.Physics
+ - dynamically download and load data
+ - a lot of under the hood changes, improving minesharp
+ - fixed command parsing
+ - hopefully fixed stuck in connect() method
+
 MineSharp 0.1.4:
  - Upgrade MineSharp.fNbt to 1.0.3
  - Support Minecraft Java 1.20.3 & 1.20.4

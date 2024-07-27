@@ -1,55 +1,59 @@
-namespace MineSharp.ChatComponent;
+﻿namespace MineSharp.ChatComponent;
 
 /// <summary>
-/// Represents a Minecraft Text style
+///     Represents a Minecraft Text style
 /// </summary>
 public class TextStyle(char code, string name)
 {
+    private const char Prefix = '$';
+
     /// <summary>
-    /// All known text styles
+    ///     All known text styles
     /// </summary>
-    public static TextStyle[] KnownStyles = new[]
+    public static TextStyle[] KnownStyles =
     {
-        new TextStyle('0', "black"), new TextStyle('1', "dark_blue"), new TextStyle('2', "dark_green"), new TextStyle('4', "dark_red"),
-        new TextStyle('3', "dark_aqua") { Aliases = new[] { "dark_cyan" } },
-        new TextStyle('5', "dark_purple") { Aliases = new[] { "dark_magenta" } },
-        new TextStyle('6', "gold") { Aliases = new[] { "dark_yellow" } }, new TextStyle('7', "gray"), new TextStyle('8', "dark_gray"),
-        new TextStyle('9', "blue"), new TextStyle('a', "green"), new TextStyle('b', "aqua") { Aliases = new[] { "cyan" } },
-        new TextStyle('c', "red"), new TextStyle('d', "light_purple") { Aliases = new[] { "magenta" } }, new TextStyle('e', "yellow"),
-        new TextStyle('f', "white"), new TextStyle('k', "magic"), new TextStyle('l', "bold"), new TextStyle('m', "strikethrough"),
-        new TextStyle('n', "underline"), new TextStyle('o', "italic"), new TextStyle('r', "reset"),
+        new('0', "black"), new('1', "dark_blue"), new('2', "dark_green"), new('4', "dark_red"),
+        new('3', "dark_aqua") { Aliases = new[] { "dark_cyan" } },
+        new('5', "dark_purple") { Aliases = new[] { "dark_magenta" } },
+        new('6', "gold") { Aliases = new[] { "dark_yellow" } }, new('7', "gray"), new('8', "dark_gray"),
+        new('9', "blue"), new('a', "green"), new('b', "aqua") { Aliases = new[] { "cyan" } }, new('c', "red"),
+        new('d', "light_purple") { Aliases = new[] { "magenta" } }, new('e', "yellow"), new('f', "white"),
+        new('k', "magic"), new('l', "bold"), new('m', "strikethrough"), new('n', "underline"), new('o', "italic"),
+        new('r', "reset")
     };
 
-    private const char PREFIX = '$';
-
     /// <summary>
-    /// The character for this style
+    ///     The character for this style
     /// </summary>
-    public char Code { get; private set; } = code;
+    public char Code { get; } = code;
 
     /// <summary>
-    /// The name of this text style
+    ///     The name of this text style
     /// </summary>
-    public string Name { get; private set; } = name;
+    public string Name { get; } = name;
 
     /// <summary>
-    /// An array of alias names for this text style
+    ///     An array of alias names for this text style
     /// </summary>
     public string[] Aliases { get; set; } = Array.Empty<string>();
 
 
     /// <summary>
-    /// Parse text style from string
+    ///     Parse text style from string
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     public static TextStyle? GetTextStyle(string name)
     {
         return KnownStyles.FirstOrDefault(x =>
-            string.Equals(name, x.Name, StringComparison.OrdinalIgnoreCase) ||
-            x.Aliases.Any(y => string.Equals(name, y, StringComparison.OrdinalIgnoreCase)));
+                                              string.Equals(name, x.Name, StringComparison.OrdinalIgnoreCase) ||
+                                              x.Aliases.Any(
+                                                  y => string.Equals(name, y, StringComparison.OrdinalIgnoreCase)));
     }
 
     /// <inheritdoc />
-    public override string ToString() => $"{PREFIX}{this.Code}";
+    public override string ToString()
+    {
+        return $"{Prefix}{Code}";
+    }
 }

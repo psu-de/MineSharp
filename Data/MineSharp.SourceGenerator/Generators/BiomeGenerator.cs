@@ -1,15 +1,13 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class BiomeGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("biomes", GetName, "BiomeType", "Biomes");
+    private readonly Generator categoryGenerator = new("biomes", GetCategoryName, "BiomeCategory", "Biomes");
 
-    private readonly Generator categoryGenerator =
-        new Generator("biomes", GetCategoryName, "BiomeCategory", "Biomes");
+    private readonly Generator typeGenerator = new("biomes", GetName, "BiomeType", "Biomes");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

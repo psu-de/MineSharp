@@ -1,16 +1,27 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class LongParser : IParser
 {
-    public readonly long Min;
-    public readonly long Max;
+    public long Min { get; private set; }
+    public long Max { get; private set; }
 
-    public LongParser(long min = long.MinValue, long max = long.MaxValue)
+    public string GetName()
     {
-        this.Min = min;
-        this.Max = max;
+        return "brigadier:long";
     }
 
-    public string GetName()          => "brigadier:long";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        var flags = buffer.ReadByte();
+        Min = (flags & 0x01) > 0 ? buffer.ReadLong() : long.MinValue;
+        Max = (flags & 0x02) > 0 ? buffer.ReadLong() : long.MaxValue;
+    }
 }

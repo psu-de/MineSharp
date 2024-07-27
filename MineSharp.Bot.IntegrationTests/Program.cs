@@ -13,6 +13,8 @@ using MineSharp.Physics.Input;
 using MineSharp.World;
 using MineSharp.World.Chunks;
 
+MineSharpBot.EnableDebugLogs(true);
+
 var bot = await new BotBuilder()
     .Host("localhost")
     .OfflineSession("MineSharpBot")
@@ -21,27 +23,38 @@ var bot = await new BotBuilder()
     .AutoConnect()
     .CreateAsync();
 
-await bot.Connect();
-
 var chat = bot.GetPlugin<ChatPlugin>();
 var physics = bot.GetPlugin<PhysicsPlugin>();
 var pathfinder = bot.GetPlugin<Pathfinder>();
-var player = bot.GetPlugin<PlayerPlugin>();
+var player = bot.GetPlugin<PlayerPlugin>(); 
 var world = bot.GetPlugin<WorldPlugin>();
 
 if (!player.IsAlive!.Value)
     await player.Respawn();
 
-chat.OnChatMessageReceived += (sender, playerUuid, message, position, name) =>
+chat.OnChatMessageReceived += async (sender, playerUuid, message, position) =>
 {
-    var splits = message.Message.Split(' ');
+    Console.WriteLine(message.GetMessage(bot.Data));
+    var splits = message.GetMessage(bot.Data).Split(' ').Skip(1).ToArray();
     
     if (splits.Length != 3)
         return;
-
+    
     var ints = splits.Select(x => Convert.ToInt32(x)).ToArray();
-    pathfinder.Goto(new Position(ints[0], ints[1], ints[2])).Wait();
+    await pathfinder.Goto(new Position(ints[0], ints[1], ints[2]));
 };
+
+while (true)
+{
+    var input = Console.ReadLine();
+    
+    if (string.IsNullOrEmpty(input))
+    {
+        continue;
+    }
+
+    await chat.SendChat(input);
+}
 
 Console.ReadKey();
 //

@@ -101,7 +101,7 @@ internal static class MovementUtils
             SetHorizontalMovementsFromVector(vec, entity.Yaw, physics.InputControls);
             await physics.WaitForTick();
 
-            CollisionHelper.SetAABBToPlayerBB(GetXZPositionNextTick(entity), bb);
+            CollisionHelper.SetAabbToPlayerBB(GetXZPositionNextTick(entity), bb);
             
             if (CollisionHelper.IsPointInBlockBb(bb.Min, blockPosition) 
              && CollisionHelper.IsXzPointInBlockBb(bb.Max, blockPosition))

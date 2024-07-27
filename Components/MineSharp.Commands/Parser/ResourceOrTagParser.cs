@@ -1,14 +1,24 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class ResourceOrTagParser : IParser
 {
-    private readonly string Registry;
+    public string Registry { get; private set; } = string.Empty;
 
-    public ResourceOrTagParser(string registry)
+    public string GetName()
     {
-        this.Registry = registry;
+        return "minecraft:resource_or_tag";
     }
 
-    public string GetName()          => "minecraft:resource_or_tag";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        Registry = buffer.ReadString();
+    }
 }

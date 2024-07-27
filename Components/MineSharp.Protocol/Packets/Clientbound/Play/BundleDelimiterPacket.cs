@@ -1,11 +1,11 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 /// <summary>
-/// Bundle delimiter packet
+///     Bundle delimiter packet
 /// </summary>
 public class BundleDelimiterPacket : IPacket
 {
@@ -18,6 +18,8 @@ public class BundleDelimiterPacket : IPacket
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
-        => new BundleDelimiterPacket();
+    {
+        return new BundleDelimiterPacket();
+    }
 }
 #pragma warning restore CS1591

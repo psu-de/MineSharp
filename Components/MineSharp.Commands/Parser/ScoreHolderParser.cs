@@ -1,14 +1,24 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class ScoreHolderParser : IParser
 {
-    public readonly byte Flags;
+    public byte Flags { get; private set; }
 
-    public ScoreHolderParser(byte flags)
+    public string GetName()
     {
-        this.Flags = flags;
+        return "minecraft:score_holder";
     }
 
-    public string GetName()          => "minecraft:score_holder";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        Flags = buffer.ReadByte();
+    }
 }

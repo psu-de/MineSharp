@@ -1,50 +1,50 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        <LangVersion>12</LangVersion>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
-        <Title>MineSharp.Protocol</Title>
-        <Authors>psu-de</Authors>
-        <Description>Implementation of the Minecraft protocol.</Description>
-        <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
-        <PackageIcon>icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>minecraft, protocol, minecraft-protocol</PackageTags>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    </PropertyGroup>
+    <Title>MineSharp.Protocol</Title>
+    <Authors>psu-de</Authors>
+    <Description>Implementation of the Minecraft protocol.</Description>
+    <PackageProjectUrl>https://minesharp.io</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/psu-de/MineSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>minecraft, protocol, minecraft-protocol</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
-      <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
-      <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj" />
-      <ProjectReference Include="..\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj"/>
+    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
+    <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj"/>
+    <ProjectReference Include="..\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj"/>
 
-        <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\"/>
 
-        <None Include="LICENSE" Pack="true" PackagePath="\" />
-        <None Include="icon.png">
-          <Pack>True</Pack>
-          <PackagePath></PackagePath>
-        </None>
-    </ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="\"/>
+    <None Include="icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="DnsClient" Version="1.7.0" />
-      <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DnsClient" Version="1.7.0"/>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SharpZipLib" Version="1.4.2"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Packets\Clientbound\Handshaking\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Packets\Clientbound\Handshaking\"/>
+  </ItemGroup>
 
 </Project>

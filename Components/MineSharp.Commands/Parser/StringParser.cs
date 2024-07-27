@@ -1,21 +1,31 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class StringParser : IParser
 {
-    public readonly StringType Type;
+    public StringType Type { get; private set; }
 
-    public StringParser(StringType type)
+    public string GetName()
     {
-        this.Type = type;
+        return "brigadier:string";
     }
 
-    public string GetName()          => "brigadier:string";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        Type = (StringType)buffer.ReadVarInt();
+    }
 }
 
 public enum StringType
 {
-    SINGLE_WORD,
-    QUOTABLE_PHRASE,
-    GREEDY_PHRASE
+    SingleWord = 0,
+    QuotablePhrase = 1,
+    GreedyPhrase = 2
 }

@@ -1,4 +1,4 @@
-using Humanizer;
+﻿using Humanizer;
 using MineSharp.Bot.Plugins;
 using Spectre.Console;
 
@@ -6,18 +6,18 @@ namespace MineSharp.Bot.IntegrationTests;
 
 public static class IntegrationTest
 {
-    private const string HOST = "localhost";
-    private const ushort PORT = 25565;
-
     public delegate Task TestFunction(MineSharpBot bot, TaskCompletionSource<bool> source);
+    private const string Host = "localhost";
+    private const ushort Port = 25565;
 
-    public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000, int? commandDelay = null)
+    public static async Task RunTest(string testName, TestFunction callback, int timeout = 10 * 1000,
+                                     int? commandDelay = null)
     {
         AnsiConsole.MarkupLine($"[cyan]Running test {testName}...[/]");
 
         var bot = await new BotBuilder()
-                       .Host(HOST)
-                       .Port(PORT)
+                       .Host(Host)
+                       .Port(Port)
                        .OfflineSession("MineSharpBot")
                        .CreateAsync();
 
@@ -34,16 +34,19 @@ public static class IntegrationTest
         // 'Reset' player state
         await chat.SendChat("/clear");
         await chat.SendChat("/kill");
+        await chat.SendChat("/gamemode survival");
         await Task.Delay(1000);
         await bot.GetPlugin<PlayerPlugin>().Respawn();
 
         await Task.Delay(3 * 1000);
 
-        var tsc  = new TaskCompletionSource<bool>();
+        var tsc = new TaskCompletionSource<bool>();
         var test = callback(bot, tsc);
 
         if (commandDelay.HasValue)
+        {
             await Task.Delay(commandDelay.Value);
+        }
 
         await chat.SendChat($"/trigger {testName}");
         await Task.WhenAny(tsc.Task, Task.Delay(timeout));

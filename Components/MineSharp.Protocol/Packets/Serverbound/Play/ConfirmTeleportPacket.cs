@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -6,18 +6,17 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class ConfirmTeleportPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_TeleportConfirm;
-
-    public int TeleportId { get; set; }
-
     public ConfirmTeleportPacket(int teleportId)
     {
-        this.TeleportId = teleportId;
+        TeleportId = teleportId;
     }
+
+    public int TeleportId { get; set; }
+    public PacketType Type => PacketType.SB_Play_TeleportConfirm;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.TeleportId);
+        buffer.WriteVarInt(TeleportId);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

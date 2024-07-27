@@ -1,5 +1,4 @@
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
@@ -14,22 +13,22 @@ using MineSharp.Data.Windows;
 namespace MineSharp.Data.Framework;
 
 /// <summary>
-/// Interface for implementing indexed biome data
+///     Interface for implementing indexed biome data
 /// </summary>
 public interface IBiomeData : ITypeIdNameIndexedData<BiomeType, BiomeInfo>;
 
 /// <summary>
-/// Interface for implementing indexed block data
+///     Interface for implementing indexed block data
 /// </summary>
 public interface IBlockData : ITypeIdNameIndexedData<BlockType, BlockInfo>
 {
     /// <summary>
-    /// The total number of block states
+    ///     The total number of block states
     /// </summary>
     public int TotalBlockStateCount { get; }
 
     /// <summary>
-    /// Get a block info by state
+    ///     Get a block info by state
     /// </summary>
     /// <param name="state"></param>
     /// <returns></returns>
@@ -37,73 +36,75 @@ public interface IBlockData : ITypeIdNameIndexedData<BlockType, BlockInfo>
 }
 
 /// <summary>
-/// Interface for implementing indexed effect data
+///     Interface for implementing indexed effect data
 /// </summary>
 public interface IEffectData : ITypeIdNameIndexedData<EffectType, EffectInfo>;
 
 /// <summary>
-/// Interface for implementing indexed enchantment data
+///     Interface for implementing indexed enchantment data
 /// </summary>
 public interface IEnchantmentData : ITypeIdNameIndexedData<EnchantmentType, EnchantmentInfo>;
 
 /// <summary>
-/// Interface for implementing indexed entity data
+///     Interface for implementing indexed entity data
 /// </summary>
 public interface IEntityData : ITypeIdNameIndexedData<EntityType, EntityInfo>;
 
 /// <summary>
-/// Interface for implementing indexed item data
+///     Interface for implementing indexed item data
 /// </summary>
 public interface IItemData : ITypeIdNameIndexedData<ItemType, ItemInfo>;
 
 /// <summary>
-/// Interface for implementing indexed block collision shape data
+///     Interface for implementing indexed block collision shape data
 /// </summary>
 public interface IBlockCollisionShapeData
 {
     /// <summary>
-    /// Returns indices of collision shapes
+    ///     Returns indices of collision shapes
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public int[] GetShapeIndices(BlockType type);
 
     /// <summary>
-    /// Returns the bounding boxes for a collision shape
+    ///     Returns the bounding boxes for a collision shape
     /// </summary>
     /// <param name="shapeIndex"></param>
     /// <returns></returns>
-    public AABB[] GetShapes(int shapeIndex);
+    public Aabb[] GetShapes(int shapeIndex);
 
     /// <summary>
-    /// Return the bounding boxes for a block type and index
+    ///     Return the bounding boxes for a block type and index
     /// </summary>
     /// <param name="type"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public AABB[] GetShapes(BlockType type, int index)
+    public Aabb[] GetShapes(BlockType type, int index)
     {
         var indices = GetShapeIndices(type);
-        var entry   = indices.Length > 1 ? indices[index] : indices[0];
+        var entry = indices.Length > 1 ? indices[index] : indices[0];
         return GetShapes(entry);
     }
 
     /// <summary>
-    /// Return the bounding boxes for a block
+    ///     Return the bounding boxes for a block
     /// </summary>
     /// <param name="block"></param>
     /// <returns></returns>
-    public AABB[] GetForBlock(Block block)
-        => GetShapes(block.Info.Type, block.Metadata);
+    public Aabb[] GetForBlock(Block block)
+    {
+        return GetShapes(block.Info.Type, block.Metadata);
+    }
 }
 
 /// <summary>
-/// Interface for implementing language data
+///     Interface for implementing language data
 /// </summary>
 public interface ILanguageData
 {
     /// <summary>
-    /// Get the format string for a rule
+    ///     Get the format string for a rule
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -111,12 +112,12 @@ public interface ILanguageData
 }
 
 /// <summary>
-/// Interface for implementing material data
+///     Interface for implementing material data
 /// </summary>
 public interface IMaterialData
 {
     /// <summary>
-    /// Returns a multiplier a given material and item type
+    ///     Returns a multiplier a given material and item type
     /// </summary>
     /// <param name="material"></param>
     /// <param name="type"></param>
@@ -125,19 +126,19 @@ public interface IMaterialData
 }
 
 /// <summary>
-/// Interface for implementing protocol data
+///     Interface for implementing protocol data
 /// </summary>
 public interface IProtocolData
 {
     /// <summary>
-    /// Get the packet id for a <see cref="PacketType"/>
+    ///     Get the packet id for a <see cref="PacketType" />
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public int GetPacketId(PacketType type);
 
     /// <summary>
-    /// Return the <see cref="PacketType"/> for a packet id
+    ///     Return the <see cref="PacketType" /> for a packet id
     /// </summary>
     /// <param name="flow"></param>
     /// <param name="state"></param>
@@ -147,12 +148,12 @@ public interface IProtocolData
 }
 
 /// <summary>
-/// Interface for implementing recipe data
+///     Interface for implementing recipe data
 /// </summary>
 public interface IRecipeData
 {
     /// <summary>
-    /// Get a list of recipes for an <see cref="ItemType"/>
+    ///     Get a list of recipes for an <see cref="ItemType" />
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -160,24 +161,24 @@ public interface IRecipeData
 }
 
 /// <summary>
-/// Inteface for implementing window data
+///     Inteface for implementing window data
 /// </summary>
 public interface IWindowData
 {
     /// <summary>
-    /// A list of blocks that can be opened
+    ///     A list of blocks that can be opened
     /// </summary>
     public IList<BlockType> AllowedBlocksToOpen { get; }
 
     /// <summary>
-    /// Get a window info by id
+    ///     Get a window info by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     public WindowInfo ById(int id);
 
     /// <summary>
-    /// Get a window info by name
+    ///     Get a window info by name
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>

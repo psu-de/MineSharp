@@ -1,11 +1,12 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
-#pragma warning disable CS1591
+
 /// <summary>
-/// Finish configuration packet
+///     Finish configuration packet
+///     See https://wiki.vg/Protocol#Finish_Configuration
 /// </summary>
 public class FinishConfigurationPacket : IPacket
 {
@@ -17,6 +18,8 @@ public class FinishConfigurationPacket : IPacket
     { }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version) => new FinishConfigurationPacket();
+    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    {
+        return new FinishConfigurationPacket();
+    }
 }
-#pragma warning restore CS1591

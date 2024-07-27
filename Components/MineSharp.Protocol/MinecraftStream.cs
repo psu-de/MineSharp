@@ -1,119 +1,111 @@
+﻿using System.Net.Sockets;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using MineSharp.Core.Common;
 using MineSharp.Protocol.Cryptography;
-using MineSharp.Protocol.Packets;
 using NLog;
-using System.Net.Sockets;
 
 namespace MineSharp.Protocol;
 
+/// <summary>
+/// Handles reading and writing packets.
+/// Also handles encryption and compression.
+/// This class is not thread-safe.
+/// </summary>
 internal class MinecraftStream
 {
-    private const int COMPRESSION_DISABLED = -1;
+    private const int CompressionDisabled = -1;
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+    private readonly Deflater deflater = new();
 
-    private readonly Inflater Inflater = new Inflater();
-    private readonly Deflater Deflater = new Deflater();
+    private readonly Inflater inflater = new();
+    private readonly NetworkStream networkStream;
 
-    private readonly bool          _useAnonymousNbt;
-    private readonly object        _streamLock;
-    private readonly NetworkStream _networkStream;
-    private          AesStream?    _encryptionStream;
+    private readonly int protocolVersion;
+    private int compressionThreshold;
+    private AesStream? encryptionStream;
 
-    private Stream _stream;
-    private int    _compressionThreshold;
+    private Stream stream;
 
-    public MinecraftStream(NetworkStream networkStream, bool useAnonymousNbt)
+    public MinecraftStream(NetworkStream networkStream, int protocolVersion)
     {
-        this._useAnonymousNbt = useAnonymousNbt;
-        this._networkStream   = networkStream;
-        this._stream          = this._networkStream;
-
-        this._streamLock           = new object();
-        this._compressionThreshold = COMPRESSION_DISABLED;
+        this.protocolVersion = protocolVersion;
+        this.networkStream = networkStream;
+        stream = this.networkStream;
+        
+        compressionThreshold = CompressionDisabled;
     }
 
     public void EnableEncryption(byte[] sharedSecret)
     {
         Logger.Debug("Enabling encryption.");
-
-        lock (this._streamLock)
-        {
-            this._encryptionStream = new AesStream(this._networkStream, sharedSecret);
-            this._stream           = this._encryptionStream;
-        }
+        encryptionStream = new(networkStream, sharedSecret);
+        stream           = encryptionStream;
     }
 
     public void SetCompression(int threshold)
     {
-        lock (this._streamLock)
-        {
-            this._compressionThreshold = threshold;
-        }
+        compressionThreshold = threshold;
     }
 
     public PacketBuffer ReadPacket()
     {
-        lock (this._streamLock)
+        var    uncompressedLength = 0;
+        var    length = ReadVarInt(out _);
+
+        if (compressionThreshold != CompressionDisabled)
         {
-            var length             = this.ReadVarInt(out _);
-            var uncompressedLength = 0;
-
-            if (this._compressionThreshold != COMPRESSION_DISABLED)
-            {
-                uncompressedLength =  this.ReadVarInt(out var r);
-                length             -= r;
-            }
-
-            int    read = 0;
-            byte[] data = new byte[length];
-            while (read < length)
-                read += this._stream.Read(data, read, length - read);
-
-            PacketBuffer packetBuffer = uncompressedLength switch
-            {
-                > 0 => this.DecompressBuffer(data, uncompressedLength),
-                _   => new PacketBuffer(data, this._useAnonymousNbt)
-            };
-
-            return packetBuffer;
+            uncompressedLength =  ReadVarInt(out var r);
+            length             -= r;
         }
+
+        var data = new byte[length];
+            
+        var read = 0;
+        while (read < length)
+        {
+            read += stream.Read(data, read, length - read);
+        }
+        
+        var packetBuffer = uncompressedLength switch
+        {
+            > 0 => DecompressBuffer(data, uncompressedLength),
+            _   => new(data, protocolVersion)
+        };
+
+        return packetBuffer;
     }
 
     public void WritePacket(PacketBuffer buffer)
     {
-        lock (this._streamLock)
+        if (compressionThreshold > 0)
         {
-            if (this._compressionThreshold > 0)
-            {
-                buffer = this.CompressBuffer(buffer);
-            }
-
-            this.WriteVarInt((int)buffer.Size);
-            this._stream.Write(buffer.GetBuffer().AsSpan());
+            buffer = CompressBuffer(buffer);
         }
+        
+        WriteVarInt((int)buffer.Size);
+        stream.Write(buffer.GetBuffer().AsSpan());
     }
 
     private PacketBuffer DecompressBuffer(byte[] buffer, int length)
     {
         if (length == 0)
         {
-            return new PacketBuffer(buffer, this._useAnonymousNbt);
+            return new(buffer, protocolVersion);
         }
 
         var buffer2 = new byte[length];
-        Inflater.SetInput(buffer);
-        Inflater.Inflate(buffer2);
-        Inflater.Reset();
+        inflater.SetInput(buffer);
+        inflater.Inflate(buffer2);
+        inflater.Reset();
 
-        return new PacketBuffer(buffer2, this._useAnonymousNbt);
+        return new(buffer2, protocolVersion);
     }
 
     private PacketBuffer CompressBuffer(PacketBuffer input)
     {
-        var output = new PacketBuffer(this._useAnonymousNbt);
-        if (input.Size < this._compressionThreshold)
+        var output = new PacketBuffer(protocolVersion);
+        if (input.Size < compressionThreshold)
         {
             output.WriteVarInt(0);
             output.WriteBytes(input.GetBuffer().AsSpan());
@@ -123,33 +115,36 @@ internal class MinecraftStream
         var buffer = input.GetBuffer();
         output.WriteVarInt(buffer.Length);
 
-        Deflater.SetInput(buffer);
-        Deflater.Finish();
+        deflater.SetInput(buffer);
+        deflater.Finish();
 
         var deflateBuf = new byte[8192];
-        while (!Deflater.IsFinished)
+        while (!deflater.IsFinished)
         {
-            var j = Deflater.Deflate(deflateBuf);
+            var j = deflater.Deflate(deflateBuf);
             output.WriteBytes(deflateBuf.AsSpan(0, j));
         }
 
-        Deflater.Reset();
+        deflater.Reset();
         return output;
     }
 
     private int ReadVarInt(out int read)
     {
-        var  value  = 0;
-        var  length = 0;
+        var value = 0;
+        var length = 0;
         byte currentByte;
 
         while (true)
         {
-            currentByte =  (byte)this._stream.ReadByte();
-            value       |= (currentByte & 0x7F) << length * 7;
+            currentByte = (byte)stream.ReadByte();
+            value |= (currentByte & 0x7F) << (length * 7);
 
             length++;
-            if (length > 5) throw new Exception("VarInt too big");
+            if (length > 5)
+            {
+                throw new("VarInt too big");
+            }
 
             if ((currentByte & 0x80) != 0x80)
             {
@@ -167,11 +162,11 @@ internal class MinecraftStream
         {
             if ((value & ~0x7F) == 0)
             {
-                this._stream.WriteByte((byte)value);
+                stream.WriteByte((byte)value);
                 return;
             }
 
-            this._stream.WriteByte((byte)(value & 0x7F | 0x80));
+            stream.WriteByte((byte)((value & 0x7F) | 0x80));
             value >>= 7;
         }
     }
@@ -179,7 +174,7 @@ internal class MinecraftStream
 
     public void Close()
     {
-        this._networkStream.Close();
-        this._encryptionStream?.Close();
+        networkStream.Close();
+        encryptionStream?.Close();
     }
 }

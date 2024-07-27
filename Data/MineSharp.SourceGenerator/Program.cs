@@ -14,19 +14,21 @@ var generators = new[]
 };
 
 if (Directory.Exists(DirectoryUtils.GetSourceDirectory()))
+{
     Directory.Delete(DirectoryUtils.GetSourceDirectory(), true);
+}
 
 await Task.WhenAll(generators);
 
 
 void RecursiveCopy(string source, string target)
 {
-    foreach (string dirPath in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
+    foreach (var dirPath in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
     {
         Directory.CreateDirectory(dirPath.Replace(source, target));
     }
 
-    foreach (string newPath in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories))
+    foreach (var newPath in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories))
     {
         File.Copy(newPath, newPath.Replace(source, target), true);
     }

@@ -1,12 +1,11 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class BlockGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("blocks", GetName, "BlockType", "Blocks");
+    private readonly Generator typeGenerator = new("blocks", GetName, "BlockType", "Blocks");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

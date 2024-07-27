@@ -1,229 +1,241 @@
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Utils;
+using MineSharp.Core;
 using MineSharp.Core.Common;
-using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
-using MineSharp.Protocol;
+using MineSharp.Core.Events;
+using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using NLog;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// This Plugins provides basic functionality for the minecraft player.
-/// It keeps track of things like Health and initializes the Bot entity,
-/// which is required for many other plugins.
+///     This Plugins provides basic functionality for the minecraft player.
+///     It keeps track of things like Health and initializes the Bot entity,
+///     which is required for many other plugins.
 /// </summary>
 public class PlayerPlugin : Plugin
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
+    private readonly Task<LoginPacket> initLoginPacket;
+    private readonly Task<PlayerPositionPacket> initPositionPacket;
+    private EntityPlugin? entities;
+
+    private PhysicsPlugin? physics;
+
     /// <summary>
-    /// The MinecraftPlayer representing the Minecraft Bot itself.
+    ///     Create a new PlayerPlugin instance
+    /// </summary>
+    /// <param name="bot"></param>
+    public PlayerPlugin(MineSharpBot bot) : base(bot)
+    {
+        Players = new ConcurrentDictionary<Uuid, MinecraftPlayer>();
+        PlayerMap = new ConcurrentDictionary<int, MinecraftPlayer>();
+
+        Bot.Client.On<SetHealthPacket>(HandleSetHealthPacket);
+        Bot.Client.On<CombatDeathPacket>(HandleCombatDeathPacket);
+        Bot.Client.On<RespawnPacket>(HandleRespawnPacket);
+        Bot.Client.On<SpawnPlayerPacket>(HandleSpawnPlayer);
+        Bot.Client.On<PlayerInfoUpdatePacket>(HandlePlayerInfoUpdate);
+        Bot.Client.On<PlayerInfoRemovePacket>(HandlePlayerInfoRemove);
+        Bot.Client.On<GameEventPacket>(HandleGameEvent);
+        Bot.Client.On<AcknowledgeBlockChangePacket>(HandleAcknowledgeBlockChange);
+        Bot.Client.On<EntityStatusPacket>(HandleEntityStatus);
+
+        // already start listening to the packets here, as they sometimes get lost when calling in init() 
+        initLoginPacket = Bot.Client.WaitForPacket<LoginPacket>();
+        initPositionPacket = Bot.Client.WaitForPacket<PlayerPositionPacket>();
+    }
+
+    /// <summary>
+    ///     The MinecraftPlayer representing the Minecraft Bot itself.
     /// </summary>
     public MinecraftPlayer? Self { get; private set; }
 
     /// <summary>
-    /// The Entity representing the Minecraft Bot itself.
+    ///     The Entity representing the Minecraft Bot itself.
     /// </summary>
-    public Entity? Entity => this.Self?.Entity;
+    public Entity? Entity => Self?.Entity;
 
     /// <summary>
-    /// All players on the server.
+    ///     All players on the server.
     /// </summary>
-    public IDictionary<UUID, MinecraftPlayer> Players { get; }
+    public IDictionary<Uuid, MinecraftPlayer> Players { get; }
 
     /// <summary>
-    /// Minecraft players indexed by <see cref="MineSharp.Core.Common.Entities.Entity.ServerId"/>.
-    /// Contains only loaded players (Players in the Bots visible range)
+    ///     Minecraft players indexed by <see cref="MineSharp.Core.Common.Entities.Entity.ServerId" />.
+    ///     Contains only loaded players (Players in the Bots visible range)
     /// </summary>
     public IDictionary<int, MinecraftPlayer> PlayerMap { get; }
 
     /// <summary>
-    /// The Bots health (between 0.0 - 20.0)
+    ///     The Bots health (between 0.0 - 20.0)
     /// </summary>
     public float? Health { get; private set; }
 
     /// <summary>
-    /// The Bots saturation level
+    ///     The Bots saturation level
     /// </summary>
     public float? Saturation { get; private set; }
 
     /// <summary>
-    /// The Bots food level
+    ///     The Bots food level
     /// </summary>
     public float? Food { get; private set; }
 
     /// <summary>
-    /// The Name of the dimension the bot is currently in.
+    ///     The Name of the dimension the bot is currently in.
     /// </summary>
     public string? Dimension { get; private set; }
 
     /// <summary>
-    /// Whether the bot is alive or dead.
+    ///     Whether the bot is alive or dead.
     /// </summary>
-    public bool? IsAlive => this.Health > 0;
+    public bool? IsAlive => Health > 0;
 
     // TODO: Maybe move weather related stuff to world?
 
     /// <summary>
-    /// Whether it is raining
+    ///     Whether it is raining
     /// </summary>
     public bool IsRaining { get; set; }
 
     /// <summary>
-    /// The rain level
+    ///     The rain level
     /// </summary>
     public float RainLevel { get; set; }
 
     /// <summary>
-    /// The thunder level
+    ///     The thunder level
     /// </summary>
     public float ThunderLevel { get; set; }
 
 
     /// <summary>
-    /// This event fires when the health, food or saturation has been updated.
+    ///     This event fires when the health, food or saturation has been updated.
     /// </summary>
-    public event Events.BotEvent? OnHealthChanged;
+    public AsyncEvent<MineSharpBot> OnHealthChanged = new();
 
     /// <summary>
-    /// This event fires when the bot respawned or joined another dimension.
+    ///     This event fires when the bot respawned or joined another dimension.
     /// </summary>
-    public event Events.BotEvent? OnRespawned;
+    public AsyncEvent<MineSharpBot> OnRespawned = new();
 
     /// <summary>
-    /// This event fires when a the bot has died.
+    ///     This event fires when a the bot has died.
     /// </summary>
-    public event Events.BotEvent? OnDied;
+    public AsyncEvent<MineSharpBot> OnDied = new();
 
     /// <summary>
-    /// This event fires when a player joined the server. 
+    ///     This event fires when a player joined the server.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerJoined;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerJoined = new();
 
     /// <summary>
-    /// This event fires when a player left the server.
+    ///     This event fires when a player left the server.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerLeft;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerLeft = new();
 
     /// <summary>
-    /// This event fires when a player has come into visible range and their entity has been loaded.
+    ///     This event fires when a player has come into visible range and their entity has been loaded.
     /// </summary>
-    public event Events.PlayerEvent? OnPlayerLoaded;
+    public AsyncEvent<MineSharpBot, MinecraftPlayer> OnPlayerLoaded = new();
 
     /// <summary>
-    /// This event fires when the weather in the world changes.
+    ///     This event fires when the weather in the world changes.
     /// </summary>
-    public event Events.BotEvent? OnWeatherChanged;
-
-    private PhysicsPlugin physics;
-    private EntityPlugin? _entities;
-
-    /// <summary>
-    /// Create a new PlayerPlugin instance
-    /// </summary>
-    /// <param name="bot"></param>
-    public PlayerPlugin(MineSharpBot bot) : base(bot)
-    {
-        this.Players   = new ConcurrentDictionary<UUID, MinecraftPlayer>();
-        this.PlayerMap = new ConcurrentDictionary<int, MinecraftPlayer>();
-
-        this.Bot.Client.On<SetHealthPacket>(this.HandleSetHealthPacket);
-        this.Bot.Client.On<CombatDeathPacket>(this.HandleCombatDeathPacket);
-        this.Bot.Client.On<RespawnPacket>(this.HandleRespawnPacket);
-        this.Bot.Client.On<SpawnPlayerPacket>(this.HandleSpawnPlayer);
-        this.Bot.Client.On<PlayerInfoUpdatePacket>(this.HandlePlayerInfoUpdate);
-        this.Bot.Client.On<PlayerInfoRemovePacket>(this.HandlePlayerInfoRemove);
-        this.Bot.Client.On<GameEventPacket>(this.HandleGameEvent);
-        this.Bot.Client.On<AcknowledgeBlockChangePacket>(this.HandleAcknowledgeBlockChange);
-        this.Bot.Client.On<EntityStatusPacket>(this.HandleEntityStatus);
-    }
+    public AsyncEvent<MineSharpBot> OnWeatherChanged = new();
 
     /// <inheritdoc />
     protected override async Task Init()
     {
-        this._entities = this.Bot.GetPlugin<EntityPlugin>();
-        var loginPacketTask    = this.Bot.Client.WaitForPacket<LoginPacket>();
-        var positionPacketTask = this.Bot.Client.WaitForPacket<PlayerPositionPacket>();
+        entities = Bot.GetPlugin<EntityPlugin>();
 
-        await Task.WhenAll(loginPacketTask, positionPacketTask);
+        await Task.WhenAll(initLoginPacket, initPositionPacket);
 
-        var loginPacket    = await loginPacketTask;
-        var positionPacket = await positionPacketTask;
+        var loginPacket = await initLoginPacket;
+        var positionPacket = await initPositionPacket;
 
         var entity = new Entity(
-            this.Bot.Data.Entities.ByType(EntityType.Player)!,
+            Bot.Data.Entities.ByType(EntityType.Player)!,
             loginPacket.EntityId,
             new MutableVector3(positionPacket.X, positionPacket.Y, positionPacket.Z),
             positionPacket.Pitch,
             positionPacket.Yaw,
             new MutableVector3(0, 0, 0),
             false,
-            new Dictionary<EffectType, Effect?>());
+            new());
 
-        this.Self = new MinecraftPlayer(
-            this.Bot.Session.Username,
-            this.Bot.Session.UUID,
+        Self = new(
+            Bot.Session.Username,
+            Bot.Session.Uuid,
             0,
             (GameMode)loginPacket.GameMode,
             entity,
-            this.ParseDimension(loginPacket.DimensionName));
+            ParseDimension(loginPacket.DimensionName));
 
-        this.PlayerMap.TryAdd(entity.ServerId, this.Self);
+        PlayerMap.TryAdd(entity.ServerId, Self);
 
-        this.Health     = 20.0f;
-        this.Food       = 20.0f;
-        this.Saturation = 20.0f;
-        this.Dimension  = loginPacket.DimensionName;
+        Health = 20.0f;
+        Food = 20.0f;
+        Saturation = 20.0f;
+        Dimension = loginPacket.DimensionName;
 
         Logger.Info(
-            $"Initialized Bot Entity: Position=({this.Entity!.Position}), GameMode={this.Self.GameMode}, Dimension={this.Dimension}.");
+            $"Initialized Bot Entity: Position=({Entity!.Position}), GameMode={Self.GameMode}, Dimension={Dimension}.");
 
-        await this.Bot.Client.SendPacket(
+        await Bot.Client.SendPacket(
             new SetPlayerPositionAndRotationPacket(
                 positionPacket.X,
                 positionPacket.Y,
                 positionPacket.Z,
                 positionPacket.Yaw,
                 positionPacket.Pitch,
-                this.Entity.IsOnGround));
+                Entity.IsOnGround));
 
-        this.physics = this.Bot.GetPlugin<PhysicsPlugin>();
+        try
+        {
+            physics = Bot.GetPlugin<PhysicsPlugin>();
+        }
+        catch (PluginNotLoadedException) { }
     }
 
     /// <summary>
-    /// Respawns the bot when its dead.
+    ///     Respawns the bot when its dead.
     /// </summary>
     /// <returns></returns>
     public Task Respawn()
-        => this.Bot.Client.SendPacket(new ClientCommandPacket(0));
+    {
+        return Bot.Client.SendPacket(new ClientCommandPacket(0));
+    }
 
 
     /// <summary>
-    /// Plays a swinging arm animation for other players.
+    ///     Plays a swinging arm animation for other players.
     /// </summary>
     /// <param name="hand">The hand to swing</param>
     /// <param name="token">optional cancellation token</param>
     /// <returns></returns>
-    public Task SwingArm(PlayerHand hand = PlayerHand.MainHand, CancellationToken? token = null)
+    public Task SwingArm(PlayerHand hand = PlayerHand.MainHand, CancellationToken token = default)
     {
         var packet = new SwingArmPacket(hand);
-        return this.Bot.Client.SendPacket(packet, token);
+        return Bot.Client.SendPacket(packet, token);
     }
 
     /// <summary>
-    /// Attacks the given entity with the currently equipped item
+    ///     Attacks the given entity with the currently equipped item
     /// </summary>
     /// <param name="entity">The entity to attack</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException">Thrown when the entity is too far away.</exception>
     public Task Attack(Entity entity)
     {
-        if (36 < this.Entity?.Position.DistanceToSquared(entity.Position))
+        if (36 < Entity?.Position.DistanceToSquared(entity.Position))
         {
             throw new InvalidOperationException("Entity is too far away");
         }
@@ -231,64 +243,75 @@ public class PlayerPlugin : Plugin
         var packet = new InteractPacket(
             entity.ServerId,
             InteractPacket.InteractionType.Attack,
-            this.physics.Engine!.State.IsCrouching);
+            physics?.Engine!.State.IsCrouching ?? false);
 
         return Task.WhenAll(
-            this.Bot.Client.SendPacket(packet),
-            this.SwingArm());
+            Bot.Client.SendPacket(packet),
+            SwingArm());
     }
 
 
     private Task HandleSetHealthPacket(SetHealthPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        this.Health     = packet.Health;
-        this.Food       = packet.Food;
-        this.Saturation = packet.Saturation;
+        Health = packet.Health;
+        Food = packet.Food;
+        Saturation = packet.Saturation;
 
-        this.OnHealthChanged?.Invoke(this.Bot);
-        if (this.Health == 0)
-            this.OnDied?.Invoke(this.Bot);
+        OnHealthChanged.Dispatch(Bot);
+        if (Health == 0)
+        {
+            OnDied.Dispatch(Bot);
+        }
 
         return Task.CompletedTask;
     }
 
     private Task HandleCombatDeathPacket(CombatDeathPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        this.Health = 0;
+        Health = 0;
+
         // this.OnDied?.Invoke(this.Bot);
         return Task.CompletedTask;
     }
 
     private Task HandleRespawnPacket(RespawnPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        this.Self!.Dimension = this.ParseDimension(packet.Dimension);
+        Self!.Dimension = ParseDimension(packet.Dimension);
 
-        this.OnRespawned?.Invoke(this.Bot);
+        OnRespawned.Dispatch(Bot);
         return Task.CompletedTask;
     }
 
     private Task HandleSpawnPlayer(SpawnPlayerPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Players.TryGetValue(packet.PlayerUuid, out var player))
+        if (!Players.TryGetValue(packet.PlayerUuid, out var player))
         {
             Logger.Warn($"Received SpawnPlayer packet for unknown player: {packet.PlayerUuid}");
             return Task.CompletedTask;
         }
 
         var entity = new Entity(
-            this.Bot.Data.Entities.ByType(EntityType.Player)!,
+            Bot.Data.Entities.ByType(EntityType.Player)!,
             packet.EntityId,
             new MutableVector3(
                 packet.X,
@@ -298,13 +321,13 @@ public class PlayerPlugin : Plugin
             NetUtils.FromAngleByte((sbyte)packet.Yaw),
             new MutableVector3(0, 0, 0),
             true,
-            new Dictionary<EffectType, Effect?>());
+            new());
         player.Entity = entity;
 
-        this._entities!.AddEntity(entity);
-        this.PlayerMap.TryAdd(player.Entity!.ServerId, player);
+        entities!.AddEntity(entity);
+        PlayerMap.TryAdd(player.Entity!.ServerId, player);
 
-        this.OnPlayerLoaded?.Invoke(this.Bot, player);
+        OnPlayerLoaded.Dispatch(Bot, player);
         return Task.CompletedTask;
     }
 
@@ -314,7 +337,7 @@ public class PlayerPlugin : Plugin
         {
             foreach (var action in entry.Actions)
             {
-                this.Players.TryGetValue(entry.Player, out var player);
+                Players.TryGetValue(entry.Player, out var player);
 
                 switch (action)
                 {
@@ -326,9 +349,9 @@ public class PlayerPlugin : Plugin
                         }
 
                         var newPlayer = new MinecraftPlayer(addAction.Name, entry.Player, -1, GameMode.Survival, null,
-                            Core.Common.Dimension.Overworld);
-                        this.Players.TryAdd(entry.Player, newPlayer);
-                        this.OnPlayerJoined?.Invoke(this.Bot, newPlayer);
+                                                            Core.Common.Dimension.Overworld);
+                        Players.TryAdd(entry.Player, newPlayer);
+                        OnPlayerJoined.Dispatch(Bot, newPlayer);
                         break;
 
                     case PlayerInfoUpdatePacket.UpdateGameModeAction gameModeAction:
@@ -348,9 +371,9 @@ public class PlayerPlugin : Plugin
                             break;
                         }
 
-                        if (!updateListedAction.Listed && this.Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_2)
+                        if (!updateListedAction.Listed && Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_2)
                         {
-                            this.OnPlayerLeft?.Invoke(this.Bot, player);
+                            OnPlayerLeft.Dispatch(Bot, player);
                         }
 
                         break;
@@ -373,7 +396,9 @@ public class PlayerPlugin : Plugin
                         }
 
                         if (updateDisplayName.DisplayName == null)
+                        {
                             break;
+                        }
 
                         player.Username = updateDisplayName.DisplayName!;
                         break;
@@ -388,10 +413,12 @@ public class PlayerPlugin : Plugin
     {
         foreach (var uuid in packet.Players)
         {
-            if (!this.Players.Remove(uuid, out var player))
+            if (!Players.Remove(uuid, out var player))
+            {
                 continue;
+            }
 
-            this.OnPlayerLeft?.Invoke(this.Bot, player);
+            OnPlayerLeft.Dispatch(Bot, player);
         }
 
         return Task.CompletedTask;
@@ -402,28 +429,28 @@ public class PlayerPlugin : Plugin
         switch (packet.Event)
         {
             case 1: // End Raining
-                this.IsRaining = false;
-                this.OnWeatherChanged?.Invoke(this.Bot);
+                IsRaining = false;
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 2: // Begin Raining
-                this.IsRaining = true;
-                this.OnWeatherChanged?.Invoke(this.Bot);
+                IsRaining = true;
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 7: // Rain Level Changed
-                this.RainLevel = packet.Value;
-                this.OnWeatherChanged?.Invoke(this.Bot);
+                RainLevel = packet.Value;
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 8: // Thunder Level Changed
-                this.ThunderLevel = packet.Value;
-                this.OnWeatherChanged?.Invoke(this.Bot);
+                ThunderLevel = packet.Value;
+                OnWeatherChanged.Dispatch(Bot);
                 break;
 
             case 3: // GameMode Change
                 var gameMode = (GameMode)packet.Value;
-                this.Self!.GameMode = gameMode;
+                Self!.GameMode = gameMode;
                 break;
         }
 
@@ -432,9 +459,9 @@ public class PlayerPlugin : Plugin
 
     private Task HandleAcknowledgeBlockChange(AcknowledgeBlockChangePacket packet)
     {
-        if (packet.Body is AcknowledgeBlockChangePacket.PacketBody_1_19 v1_19)
+        if (packet.Body is AcknowledgeBlockChangePacket.PacketBody119 v119)
         {
-            this.Bot.SequenceId = v1_19.SequenceId;
+            Bot.SequenceId = v119.SequenceId;
         }
 
         return Task.CompletedTask;
@@ -454,7 +481,7 @@ public class PlayerPlugin : Plugin
 
     private void HandlePlayerSetPermission(EntityStatusPacket packet)
     {
-        if (!this.PlayerMap.TryGetValue(packet.EntityId, out var player))
+        if (!PlayerMap.TryGetValue(packet.EntityId, out var player))
         {
             return;
         }
@@ -468,10 +495,10 @@ public class PlayerPlugin : Plugin
     {
         return dimensionName switch
         {
-            "minecraft:overworld"  => Core.Common.Dimension.Overworld,
+            "minecraft:overworld" => Core.Common.Dimension.Overworld,
             "minecraft:the_nether" => Core.Common.Dimension.Nether,
-            "minecraft:the_end"    => Core.Common.Dimension.End,
-            _                      => throw new UnreachableException()
+            "minecraft:the_end" => Core.Common.Dimension.End,
+            _ => throw new UnreachableException()
         };
     }
 }

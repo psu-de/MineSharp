@@ -1,19 +1,19 @@
-namespace MineSharp.Bot.Plugins;
+﻿namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// Auto Respawn Plugin
+///     Auto Respawn Plugin
 /// </summary>
 public class AutoRespawn : Plugin
 {
     private PlayerPlugin? player;
 
     /// <summary>
-    /// The time waited before respawning
+    ///     The time waited before respawning
     /// </summary>
     public TimeSpan RespawnDelay = TimeSpan.Zero;
 
     /// <summary>
-    /// Create a new AutoRespawn instance
+    ///     Create a new AutoRespawn instance
     /// </summary>
     /// <param name="bot"></param>
     public AutoRespawn(MineSharpBot bot) : base(bot)
@@ -22,8 +22,8 @@ public class AutoRespawn : Plugin
     /// <inheritdoc />
     protected override Task Init()
     {
-        this.player        =  this.Bot.GetPlugin<PlayerPlugin>();
-        this.player.OnDied += this.OnBotDied;
+        player = Bot.GetPlugin<PlayerPlugin>();
+        player.OnDied += OnBotDied;
 
         return Task.CompletedTask;
     }
@@ -35,11 +35,11 @@ public class AutoRespawn : Plugin
 
     private async Task Respawn()
     {
-        if (this.RespawnDelay.TotalMilliseconds > 0)
+        if (RespawnDelay.TotalMilliseconds > 0)
         {
-            await Task.Delay(this.RespawnDelay);
+            await Task.Delay(RespawnDelay);
         }
 
-        await this.player!.Respawn();
+        await player!.Respawn();
     }
 }

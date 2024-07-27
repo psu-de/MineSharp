@@ -1,162 +1,310 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
+using fNbt;
+using MineSharp.ChatComponent.Components;
 using MineSharp.Data;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace MineSharp.ChatComponent;
 
-/*
- * Thanks to Minecraft-Console-Client
- * https://github.com/MCCTeam/Minecraft-Console-Client
- *
- * This Class uses a lot of code from Protocol/Message/ChatParser.cs from MCC.
- */
-
 /// <summary>
-/// Represents a Chat Message object
+///     Represents a chat component
 /// </summary>
-public class Chat
+public abstract partial class Chat
 {
-    /// <summary>
-    /// The raw Json message
-    /// </summary>
-    public string Json { get; }
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
-    /// The message without any styling
+    ///     Create a new empty chat component
     /// </summary>
-    public string Message { get; private set; }
+    protected Chat() : this(Style.DefaultStyle)
+    { }
 
     /// <summary>
-    /// The styled message containing style codes
+    ///     Create a new empty chat component with a style
     /// </summary>
-    public string StyledMessage { get; private set; }
-
-
-    private readonly MinecraftData data;
+    /// <param name="style"></param>
+    protected Chat(Style style) : this(style, [])
+    { }
 
     /// <summary>
-    /// Create a new ChatComponent
+    ///     Create a new chat component with style and children
     /// </summary>
-    /// <param name="json"></param>
-    /// <param name="data"></param>
-    public Chat(string json, MinecraftData data)
+    /// <param name="style"></param>
+    /// <param name="children"></param>
+    protected Chat(Style style, Chat[] children)
     {
-        this.Json = json;
-        this.data = data;
-
-        try
-        {
-            this.StyledMessage = this.ParseComponent(JToken.Parse(this.Json));
-            this.Message       = Regex.Replace(this.StyledMessage, "\\$[0-9a-fk-r]", "");
-        }
-        catch (JsonReaderException)
-        {
-            this.StyledMessage = this.Json;
-            this.Message       = this.StyledMessage;
-        }
-    }
-
-    private string ParseComponent(JToken token, string styleCode = "")
-    {
-        return token.Type switch
-        {
-            JTokenType.Array   => ParseArray((JArray)token, styleCode),
-            JTokenType.Object  => ParseObject((JObject)token, styleCode),
-            JTokenType.String  => (string)token!,
-            JTokenType.Integer => (string)token!,
-            _                  => throw new Exception($"Type {token.Type} is not supported")
-        };
-    }
-
-    private string ParseObject(JObject jObject, string styleCode = "")
-    {
-        var sb = new StringBuilder();
-
-        var colorProp = jObject.GetValue("color");
-        if (colorProp != null)
-        {
-            var color = ParseComponent(colorProp);
-            var style = TextStyle.GetTextStyle(color);
-            styleCode = style != null
-                ? style.ToString()
-                : string.Empty;
-        }
-
-        var extraProp = jObject.GetValue("extra");
-        if (extraProp != null)
-        {
-            var extras = (JArray)extraProp!;
-
-            foreach (var item in extras)
-                sb.Append(this.ParseComponent(item, styleCode) + "§r");
-        }
-
-        var textProp      = jObject.GetValue("text");
-        var translateProp = jObject.GetValue("translate");
-
-        if (textProp != null)
-        {
-            return styleCode + ParseComponent(textProp, styleCode) + sb.ToString();
-        }
-
-        if (translateProp == null)
-            return sb.ToString();
-
-        var usingData = new List<string>();
-
-        var usingProp = jObject.GetValue("using");
-        var withProp  = jObject.GetValue("with");
-        if (usingProp != null && withProp == null)
-            withProp = usingProp;
-
-        if (withProp != null)
-        {
-            var array = (JArray)withProp;
-            for (int i = 0; i < array.Count; i++)
-            {
-                usingData.Add(this.ParseComponent(array[i], styleCode));
-            }
-        }
-
-        var ruleName = this.ParseComponent(translateProp);
-        return styleCode + TranslateString(ruleName, usingData.ToArray(), this.data)
-                         + sb.ToString();
-    }
-
-    private string ParseArray(JArray jArray, string styleCode = "")
-    {
-        var sb = new StringBuilder();
-        foreach (var token in jArray)
-        {
-            sb.Append(ParseComponent(token, styleCode));
-        }
-
-        return sb.ToString();
+        Style = style;
+        Children = children;
     }
 
     /// <summary>
-    /// Translate a string using the given rule and format strings.
+    ///     The styling applied to this component
     /// </summary>
-    /// <param name="ruleName"></param>
-    /// <param name="usings"></param>
+    public Style Style { get; }
+
+    /// <summary>
+    ///     The children
+    /// </summary>
+    public Chat[] Children { get; }
+
+    [GeneratedRegex("§[0-9a-fk-r]")]
+    private static partial Regex FormatTagRegex();
+
+    /// <summary>
+    ///     Return the message without stylecodes of this component without its children
+    /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static string TranslateString(string ruleName, string[] usings, MinecraftData data)
-    {
-        var rule = data.Language.GetTranslation(ruleName);
+    protected abstract string GetRawMessage(MinecraftData? data);
 
-        var    usingIndex = 0;
-        string result     = Regex.Replace(rule, "%s", match => usings[usingIndex++]);
-        result = Regex.Replace(result, "%(\\d)\\$s", match =>
-        {
-            var idx = match.Groups[1].Value[0] - '1';
-            return usings[idx];
-        });
-        return result;
+    /// <summary>
+    ///     Return the message of this component
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public string GetMessage(MinecraftData? data)
+    {
+        return new StringBuilder(GetRawMessage(data))
+              .AppendJoin(string.Empty, Children.Select(x => x.GetRawMessage(data)))
+              .ToString();
     }
 
-    /// <inheritdoc />
-    public override string ToString() => this.Json;
+    /// <summary>
+    ///     Encode the text component as json
+    /// </summary>
+    /// <returns></returns>
+    protected abstract JToken EncodeJson();
+
+    /// <summary>
+    ///     Encode the text component as nbt
+    /// </summary>
+    /// <returns></returns>
+    protected abstract NbtTag EncodeNbt();
+
+    /// <summary>
+    ///     Encode the text component as json
+    /// </summary>
+    /// <returns></returns>
+    public JToken ToJson()
+    {
+        var token = EncodeJson();
+        var style = Style.ToJson();
+
+        if (token.Type != JTokenType.Object)
+        {
+            if (style is not null || Children.Length > 0)
+            {
+                Logger.Warn($"Cannot apply style or add children because encoded token is of type {token.Type}");
+            }
+
+            return token;
+        }
+
+        if (Children.Length > 0)
+        {
+            token["extra"] = new JArray(Children.Select(x => x.ToJson()));
+        }
+
+        if (style is null)
+        {
+            return token;
+        }
+
+        style.Merge(token);
+        return style;
+    }
+
+    /// <summary>
+    ///     Encode the text component as nbt
+    /// </summary>
+    /// <returns></returns>
+    public NbtTag ToNbt()
+    {
+        var nbt = EncodeNbt();
+        var style = Style.ToNbt();
+
+        if (nbt.TagType != NbtTagType.Compound)
+        {
+            if (style is not null || Children.Length > 0)
+            {
+                Logger.Warn($"Cannot apply style or add children because encoded nbt is of type {nbt.TagType}");
+            }
+
+            return nbt;
+        }
+
+        if (Children.Length > 0)
+        {
+            nbt["extra"] = new NbtList("extra", Children.Select(x => x.ToNbt()));
+        }
+
+        if (style is null)
+        {
+            return nbt;
+        }
+
+        foreach (var tag in (nbt as NbtCompound)!.Tags)
+        {
+            style.Add(tag);
+        }
+
+        return style;
+    }
+
+    /// <summary>
+    ///     Parse a chat component from json
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
+    public static Chat Parse(string json)
+    {
+        return Parse(JToken.Parse(json));
+    }
+
+    /// <summary>
+    ///     Parse a chat component from json
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
+    public static Chat Parse(JToken token)
+    {
+        if (token.Type == JTokenType.String || token.Type == JTokenType.Array)
+        {
+            return TextComponent.Parse(token);
+        }
+
+        if (token.Type != JTokenType.Object)
+        {
+            throw new ArgumentException("Expected a string, array or object");
+        }
+
+        var obj = (token as JObject)!;
+        if (obj.ContainsKey("text"))
+        {
+            return TextComponent.Parse(token);
+        }
+
+        if (obj.ContainsKey("translate"))
+        {
+            return TranslatableComponent.Parse(token);
+        }
+
+        if (obj.ContainsKey("keybind"))
+        {
+            return KeybindComponent.Parse(token);
+        }
+
+        throw new NotSupportedException($"This object is not supported: {token}");
+    }
+
+    /// <summary>
+    ///     Parse a chat component from nbt
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
+    public static Chat Parse(NbtTag tag)
+    {
+        if (tag.TagType is NbtTagType.String or NbtTagType.List)
+        {
+            return TextComponent.Parse(tag);
+        }
+
+        if (tag.TagType != NbtTagType.Compound)
+        {
+            throw new ArgumentException("Expected a string, array or object");
+        }
+
+        var obj = (tag as NbtCompound)!;
+        if (obj.Contains("text"))
+        {
+            return TextComponent.Parse(tag);
+        }
+
+        if (obj.Contains("translate"))
+        {
+            return TranslatableComponent.Parse(tag);
+        }
+
+        if (obj.Contains("keybind"))
+        {
+            return KeybindComponent.Parse(tag);
+        }
+
+        var empty = obj.Tags.FirstOrDefault(x => string.IsNullOrEmpty(x.Name));
+        if (empty is not null)
+        {
+            return Parse(empty);
+        }
+
+        throw new NotSupportedException($"This object is not supported: {tag}");
+    }
+
+    /// <summary>
+    ///     Parse children components from token
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    protected static Chat[] ParseChildren(JToken json)
+    {
+        JArray array;
+        if (json.Type == JTokenType.Object)
+        {
+            var extras = json.SelectToken("extra");
+            if (extras is null)
+            {
+                return [];
+            }
+
+            array = (extras as JArray)!;
+        }
+        else
+        {
+            if (json.Type != JTokenType.Array)
+            {
+                return [];
+            }
+
+            array = (json as JArray)!;
+        }
+
+        return array.Select(Parse).ToArray();
+    }
+
+    /// <summary>
+    ///     Parse children components from nbt
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    protected static Chat[] ParseChildren(NbtTag tag)
+    {
+        NbtList array;
+        if (tag.TagType == NbtTagType.Compound)
+        {
+            if (!(tag as NbtCompound)!.TryGet("extra", out var extras))
+            {
+                return [];
+            }
+
+            array = (extras as NbtList)!;
+        }
+        else
+        {
+            if (tag.TagType != NbtTagType.List)
+            {
+                return [];
+            }
+
+            array = (tag as NbtList)!;
+        }
+
+        return array.Select(Parse).ToArray();
+    }
 }

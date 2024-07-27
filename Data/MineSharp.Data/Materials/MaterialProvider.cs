@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
@@ -10,9 +10,9 @@ namespace MineSharp.Data.Materials;
 internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
 {
     private static readonly EnumNameLookup<Material> MaterialLookup = new();
+    private readonly IItemData items;
 
-    private JObject   token;
-    private IItemData items;
+    private readonly JObject token;
 
     public MaterialsProvider(JToken token, IItemData items)
     {
@@ -32,21 +32,23 @@ internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
         foreach (var property in token.Properties())
         {
             if (property.Name.Contains(';'))
+            {
                 continue;
+            }
 
-            var material    = MaterialLookup.FromName(NameUtils.GetMaterial(property.Name));
+            var material = MaterialLookup.FromName(NameUtils.GetMaterial(property.Name));
             var multipliers = CollectItemMultipliers((JObject)property.Value);
             data.Add(material, multipliers);
         }
 
-        return new MaterialDataBlob(data);
+        return new(data);
     }
 
     private Dictionary<ItemType, float> CollectItemMultipliers(JObject obj)
     {
         return obj.Properties()
                   .ToDictionary(
-                       x => this.items.ById(Convert.ToInt32(x.Name))!.Type,
+                       x => items.ById(Convert.ToInt32(x.Name))!.Type,
                        x => (float)x.Value);
     }
 }

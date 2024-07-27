@@ -1,7 +1,7 @@
-namespace MineSharp.Core.Common.Blocks.Property;
+﻿namespace MineSharp.Core.Common.Blocks.Property;
 
 /// <summary>
-/// A boolean block property
+///     A boolean block property
 /// </summary>
 /// <param name="name"></param>
 public class BoolProperty(string name) : IBlockProperty

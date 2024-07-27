@@ -1,97 +1,104 @@
-using MineSharp.Auth.Json;
+﻿using MineSharp.Auth.Json;
 using MineSharp.Auth.Responses;
 using MineSharp.Core.Common;
 using Newtonsoft.Json;
 using NLog;
-using System.Net;
-using System.Net.Http.Headers;
 
 namespace MineSharp.Auth;
 
 /// <summary>
-/// Wrapper for the minecraft services
+///     Wrapper for the minecraft services
 /// </summary>
 public class MinecraftApi
 {
+    /// <summary>
+    /// Default instance
+    /// </summary>
+    public static readonly MinecraftApi Instance = new();
+    
+    private const string ServiceUrl = "https://api.minecraftservices.com";
+    private const string SessionUrl = "https://sessionserver.mojang.com";
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
-    private const string SERVICE_URL = "https://api.minecraftservices.com";
-    private const string SESSION_URL = "https://sessionserver.mojang.com";
-
     private readonly HttpClient client;
-    private readonly string     ServiceUrl;
-    private readonly string     SessionUrl;
+
+    private readonly string serviceUrl;
+    private readonly string sessionUrl;
 
     /// <summary>
-    /// Create a new MinecraftApi instance
+    ///     Create a new MinecraftApi instance
     /// </summary>
     public MinecraftApi()
-        : this(new HttpClient())
+        : this(new())
     { }
 
     /// <summary>
-    /// Create a new MinecraftApi with custom minecraft and session services
+    ///     Create a new MinecraftApi with custom minecraft and session services
     /// </summary>
     /// <param name="minecraftService"></param>
     /// <param name="sessionService"></param>
     public MinecraftApi(string minecraftService, string sessionService)
-        : this(new HttpClient(), minecraftService, sessionService)
+        : this(new(), minecraftService, sessionService)
     { }
 
     /// <summary>
-    /// Create a new MinecraftApi with a custom http client, minecraft and session service
+    ///     Create a new MinecraftApi with a custom http client, minecraft and session service
     /// </summary>
     /// <param name="client"></param>
     /// <param name="minecraftService"></param>
     /// <param name="sessionService"></param>
-    public MinecraftApi(HttpClient client, string minecraftService = SERVICE_URL, string sessionService = SESSION_URL)
+    public MinecraftApi(HttpClient client, string minecraftService = ServiceUrl, string sessionService = SessionUrl)
     {
-        this.client     = client;
-        this.ServiceUrl = minecraftService;
-        this.SessionUrl = sessionService;
+        this.client = client;
+        serviceUrl = minecraftService;
+        sessionUrl = sessionService;
     }
 
     /// <summary>
-    /// Send a Join server request to the mojang session servers
+    ///     Send a Join server request to the mojang session servers
     /// </summary>
     /// <param name="hash"></param>
     /// <param name="sessionToken"></param>
     /// <param name="uuid"></param>
     /// <returns></returns>
-    public async Task<bool> JoinServer(string hash, string sessionToken, UUID uuid)
+    public async Task<bool> JoinServer(string hash, string sessionToken, Uuid uuid)
     {
-        Logger.Debug($"Sending join server request to mojang.");
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{this.SessionUrl}/session/minecraft/join");
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        var content = new JoinServerBlob()
+        Logger.Debug("Sending join server request to mojang.");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{sessionUrl}/session/minecraft/join");
+        request.Headers.Accept.Add(new("application/json"));
+        var content = new JoinServerBlob
         {
-            ServerId = hash, AccessToken = sessionToken, SelectedProfile = uuid.ToString().Replace("-", "").ToLower()
+            ServerId = hash,
+            AccessToken = sessionToken,
+            SelectedProfile = uuid.ToString().Replace("-", "").ToLower()
         };
 
         HttpContent body = new StringContent(JsonConvert.SerializeObject(content));
-        body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        body.Headers.ContentType = new("application/json");
 
         request.Content = body;
-        var response = await this.client.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
+        {
             return true;
+        }
 
-        Logger.Error("Session server returned error code: " + response.StatusCode + "  " + await response.Content.ReadAsStringAsync());
+        Logger.Error("Session server returned error code: " + response.StatusCode + "  " +
+                     await response.Content.ReadAsStringAsync());
         return false;
     }
 
     /// <summary>
-    /// Fetch user certificates from minecraft services
+    ///     Fetch user certificates from minecraft services
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
     public async Task<PlayerCertificate> FetchCertificates(string token)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{this.ServiceUrl}/player/certificates");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{serviceUrl}/player/certificates");
+        request.Headers.Authorization = new("Bearer", token);
 
-        var response = await this.client.SendAsync(request);
+        var response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         var body = await response.Content.ReadAsStringAsync();

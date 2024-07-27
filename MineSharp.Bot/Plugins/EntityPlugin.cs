@@ -1,84 +1,114 @@
+﻿using System.Collections.Concurrent;
 using MineSharp.Bot.Utils;
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Events;
+using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
-using System.Collections.Concurrent;
-using MineSharp.Core.Geometry;
 
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-/// This Plugin handles all kinds of packets regarding entities.
+///     This Plugin handles all kinds of packets regarding entities.
 /// </summary>
 public class EntityPlugin : Plugin
 {
     /// <summary>
-    /// All Entities loaded by the client.
+    ///     All Entities loaded by the client.
     /// </summary>
     public readonly IDictionary<int, Entity> Entities;
 
-    /// <summary>
-    /// Fires whenever an entity spawns in the bots visible range.
-    /// </summary>
-    public event Events.EntityEvent? OnEntitySpawned;
+    private PlayerPlugin? playerPlugin;
 
     /// <summary>
-    /// Fires whenever an entity despawned in the bots visible range.
-    /// </summary>
-    public event Events.EntityEvent? OnEntityDespawned;
-
-    /// <summary>
-    /// Fires whenever an entity moved in the bots visible range.
-    /// </summary>
-    public event Events.EntityEvent? OnEntityMoved;
-
-    private PlayerPlugin? _playerPlugin;
-
-    /// <summary>
-    /// Create a new EntityPlugin instance
+    ///     Create a new EntityPlugin instance
     /// </summary>
     /// <param name="bot"></param>
     public EntityPlugin(MineSharpBot bot) : base(bot)
     {
-        this.Entities = new ConcurrentDictionary<int, Entity>();
+        Entities = new ConcurrentDictionary<int, Entity>();
 
-        this.Bot.Client.On<SpawnEntityPacket>(this.HandleSpawnEntityPacket);
-        this.Bot.Client.On<SpawnLivingEntityPacket>(this.HandleSpawnLivingEntityPacket);
-        this.Bot.Client.On<RemoveEntitiesPacket>(this.HandleRemoveEntitiesPacket);
-        this.Bot.Client.On<SetEntityVelocityPacket>(this.HandleSetEntityVelocityPacket);
-        this.Bot.Client.On<EntityPositionPacket>(this.HandleUpdateEntityPositionPacket);
-        this.Bot.Client.On<EntityPositionAndRotationPacket>(this.HandleUpdateEntityPositionAndRotationPacket);
-        this.Bot.Client.On<EntityRotationPacket>(this.HandleUpdateEntityRotationPacket);
-        this.Bot.Client.On<TeleportEntityPacket>(this.HandleTeleportEntityPacket);
-        this.Bot.Client.On<UpdateAttributesPacket>(this.HandleUpdateAttributesPacket);
-        this.Bot.Client.On<PlayerPositionPacket>(this.HandleSynchronizePlayerPosition);
+        Bot.Client.On<SpawnEntityPacket>(HandleSpawnEntityPacket);
+        Bot.Client.On<SpawnLivingEntityPacket>(HandleSpawnLivingEntityPacket);
+        Bot.Client.On<RemoveEntitiesPacket>(HandleRemoveEntitiesPacket);
+        Bot.Client.On<SetEntityVelocityPacket>(HandleSetEntityVelocityPacket);
+        Bot.Client.On<EntityPositionPacket>(HandleUpdateEntityPositionPacket);
+        Bot.Client.On<EntityPositionAndRotationPacket>(HandleUpdateEntityPositionAndRotationPacket);
+        Bot.Client.On<EntityRotationPacket>(HandleUpdateEntityRotationPacket);
+        Bot.Client.On<TeleportEntityPacket>(HandleTeleportEntityPacket);
+        Bot.Client.On<UpdateAttributesPacket>(HandleUpdateAttributesPacket);
+        Bot.Client.On<PlayerPositionPacket>(HandleSynchronizePlayerPosition);
+        Bot.Client.On<SetPassengersPacket>(HandleSetPassengersPacket);
     }
+
+    /// <summary>
+    ///     Fires whenever an entity spawns in the bots visible range.
+    /// </summary>
+    public AsyncEvent<MineSharpBot, Entity> OnEntitySpawned = new();
+
+    /// <summary>
+    ///     Fires whenever an entity despawned in the bots visible range.
+    /// </summary>
+    public AsyncEvent<MineSharpBot, Entity> OnEntityDespawned = new();
+
+    /// <summary>
+    ///     Fires whenever an entity moved in the bots visible range.
+    /// </summary>
+    public AsyncEvent<MineSharpBot, Entity> OnEntityMoved = new();
 
     /// <inheritdoc />
     protected override async Task Init()
     {
-        this._playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
-        await this._playerPlugin.WaitForInitialization();
+        playerPlugin = Bot.GetPlugin<PlayerPlugin>();
+        await playerPlugin.WaitForInitialization();
     }
 
     internal void AddEntity(Entity entity)
     {
-        this.Entities.TryAdd(entity.ServerId, entity);
+        Entities.TryAdd(entity.ServerId, entity);
+        OnEntitySpawned.Dispatch(Bot, entity);
+    }
 
-        if (null != this.OnEntitySpawned)
+    private void MountEntity(Entity? vehicle, Entity passenger)
+    {
+        DismountEntity(passenger);
+
+        passenger.Vehicle = vehicle;
+        if (vehicle != null)
         {
-            Task.Run(() => this.OnEntitySpawned?.Invoke(this.Bot, entity));
+            vehicle.Passengers.Add(passenger);
         }
+    }
+
+    private void DismountEntity(Entity passenger)
+    {
+        var originalVehicle = passenger.Vehicle;
+        if (originalVehicle != null)
+        {
+            originalVehicle.Passengers.Remove(passenger);
+        }
+
+        passenger.Vehicle = null;
+    }
+
+    private void DismountPassengers(Entity vehicle)
+    {
+        foreach (var passenger in vehicle.Passengers)
+        {
+            DismountEntity(passenger);
+        }
+
+        vehicle.Passengers.Clear();
     }
 
     private Task HandleSpawnLivingEntityPacket(SpawnLivingEntityPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
+        var entityInfo = Bot.Data.Entities.ById(packet.EntityType)!;
 
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new MutableVector3(packet.X, packet.Y, packet.Z),
@@ -89,18 +119,20 @@ public class EntityPlugin : Plugin
                 NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
             true,
-            new Dictionary<EffectType, Effect?>());
+            new());
 
-        this.AddEntity(newEntity);
+        AddEntity(newEntity);
         return Task.CompletedTask;
     }
 
     private Task HandleSpawnEntityPacket(SpawnEntityPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        var entityInfo = this.Bot.Data.Entities.ById(packet.EntityType)!;
+        var entityInfo = Bot.Data.Entities.ById(packet.EntityType)!;
 
         var newEntity = new Entity(
             entityInfo, packet.EntityId, new MutableVector3(packet.X, packet.Y, packet.Z),
@@ -111,23 +143,29 @@ public class EntityPlugin : Plugin
                 NetUtils.ConvertToVelocity(packet.VelocityY),
                 NetUtils.ConvertToVelocity(packet.VelocityZ)),
             true,
-            new Dictionary<EffectType, Effect?>());
+            new());
 
-        this.AddEntity(newEntity);
+        AddEntity(newEntity);
         return Task.CompletedTask;
     }
 
     private Task HandleRemoveEntitiesPacket(RemoveEntitiesPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
         foreach (var entityId in packet.EntityIds)
         {
-            if (!this.Entities.Remove(entityId, out var entity))
+            if (!Entities.Remove(entityId, out var entity))
+            {
                 continue;
+            }
 
-            this.OnEntityDespawned?.Invoke(this.Bot, entity);
+            DismountPassengers(entity);
+
+            OnEntityDespawned.Dispatch(Bot, entity);
         }
 
         return Task.CompletedTask;
@@ -135,106 +173,123 @@ public class EntityPlugin : Plugin
 
     private Task HandleSetEntityVelocityPacket(SetEntityVelocityPacket packet)
     {
-        if (!this.IsEnabled)
-            return Task.CompletedTask;
-
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!IsEnabled)
         {
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Set(
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
+            return Task.CompletedTask;
+        }
+
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertToVelocity(packet.VelocityX),
             NetUtils.ConvertToVelocity(packet.VelocityY),
             NetUtils.ConvertToVelocity(packet.VelocityZ)
         );
-        
+
         return Task.CompletedTask;
     }
 
     private Task HandleUpdateEntityPositionPacket(EntityPositionPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
             return Task.CompletedTask;
+        }
 
-        (entity.Position as MutableVector3)!.Add(
+        (entity.Position as MutableVector3)!.Set(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)
-            );
+        );
 
         entity.IsOnGround = packet.OnGround;
 
-        this.OnEntityMoved?.Invoke(this.Bot, entity);
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
             return Task.CompletedTask;
+        }
 
         (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ));
 
-        entity.Yaw        = NetUtils.FromAngleByte(packet.Yaw);
-        entity.Pitch      = NetUtils.FromAngleByte(packet.Pitch);
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        this.OnEntityMoved?.Invoke(this.Bot, entity);
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
             return Task.CompletedTask;
+        }
 
-        entity.Yaw        = NetUtils.FromAngleByte(packet.Yaw);
-        entity.Pitch      = NetUtils.FromAngleByte(packet.Pitch);
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        this.OnEntityMoved?.Invoke(this.Bot, entity);
-
-        return Task.CompletedTask;
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleTeleportEntityPacket(TeleportEntityPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
             return Task.CompletedTask;
+        }
 
         (entity.Position as MutableVector3)!
            .Set(packet.X, packet.Y, packet.Z);
 
-        entity.Yaw   = NetUtils.FromAngleByte(packet.Yaw);
+        entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
-        this.OnEntityMoved?.Invoke(this.Bot, entity);
-
-        return Task.CompletedTask;
+        
+        return OnEntityMoved.Dispatch(Bot, entity);
     }
 
     private Task HandleUpdateAttributesPacket(UpdateAttributesPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return Task.CompletedTask;
+        }
 
-        if (!this.Entities.TryGetValue(packet.EntityId, out var entity))
+        if (!Entities.TryGetValue(packet.EntityId, out var entity))
+        {
             return Task.CompletedTask;
+        }
 
         foreach (var attribute in packet.Attributes)
         {
@@ -249,40 +304,84 @@ public class EntityPlugin : Plugin
 
     private async Task HandleSynchronizePlayerPosition(PlayerPositionPacket packet)
     {
-        if (!this.IsEnabled)
+        if (!IsEnabled)
+        {
             return;
+        }
 
-        await this.WaitForInitialization();
+        await WaitForInitialization();
 
-        var position = (this._playerPlugin!.Entity!.Position as MutableVector3)!;
+        var position = (playerPlugin!.Entity!.Position as MutableVector3)!;
 
         if ((packet.Flags & 0x01) == 0x01)
+        {
             position.Add(packet.X, 0, 0);
+        }
         else
+        {
             position.SetX(packet.X);
+        }
 
         if ((packet.Flags & 0x02) == 0x02)
+        {
             position.Add(0, packet.Y, 0);
+        }
         else
+        {
             position.SetY(packet.Y);
+        }
 
         if ((packet.Flags & 0x04) == 0x04)
+        {
             position.Add(0, 0, packet.Z);
+        }
         else
+        {
             position.SetZ(packet.Z);
+        }
 
         if ((packet.Flags & 0x08) == 0x08)
-            this._playerPlugin!.Entity!.Pitch += packet.Pitch;
+        {
+            playerPlugin!.Entity!.Pitch += packet.Pitch;
+        }
         else
-            this._playerPlugin!.Entity!.Pitch = packet.Pitch;
+        {
+            playerPlugin!.Entity!.Pitch = packet.Pitch;
+        }
 
         if ((packet.Flags & 0x10) == 0x10)
-            this._playerPlugin!.Entity!.Yaw += packet.Yaw;
+        {
+            playerPlugin!.Entity!.Yaw += packet.Yaw;
+        }
         else
-            this._playerPlugin!.Entity!.Yaw = packet.Yaw;
+        {
+            playerPlugin!.Entity!.Yaw = packet.Yaw;
+        }
 
         // TODO: Dismount Vehicle
 
-        await this.Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId));
+        await Bot.Client.SendPacket(new ConfirmTeleportPacket(packet.TeleportId));
+    }
+
+    private Task HandleSetPassengersPacket(SetPassengersPacket packet)
+    {
+        if (packet.EntityId != -1 || !Entities.TryGetValue(packet.EntityId, out var vehicle))
+        {
+            return Task.CompletedTask;
+        }
+
+        vehicle = packet.EntityId == -1 ? null : vehicle;
+
+        foreach (var passengerId in packet.PassengersId)
+        {
+            if (!Entities.TryGetValue(packet.EntityId, out var passenger))
+            {
+                continue;
+            }
+
+            MountEntity(vehicle, passenger);
+        }
+
+        return Task.CompletedTask;
     }
 }

@@ -1,11 +1,11 @@
-using MineSharp.Data.Framework.Providers;
+﻿using MineSharp.Data.Framework.Providers;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.Data.Language;
 
 internal class LanguageProvider : IDataProvider<LanguageDataBlob>
 {
-    private JObject token;
+    private readonly JObject token;
 
     public LanguageProvider(JToken token)
     {
@@ -19,6 +19,6 @@ internal class LanguageProvider : IDataProvider<LanguageDataBlob>
 
     public LanguageDataBlob GetData()
     {
-        return new LanguageDataBlob(token.ToObject<Dictionary<string, string>>()!);
+        return new(token.ToObject<Dictionary<string, string>>()!);
     }
 }

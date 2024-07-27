@@ -1,4 +1,4 @@
-using Humanizer;
+﻿using Humanizer;
 
 namespace MineSharp.SourceGenerator.Utils;
 
@@ -6,14 +6,21 @@ namespace MineSharp.SourceGenerator.Utils;
 public static class NameUtils
 {
     private static string CommonGetName(string x)
-        => x.Pascalize();
+    {
+        return x.Pascalize();
+    }
 
     public static string GetMaterial(string x)
     {
         if (x == "coweb")
+        {
             return "Cobweb";
+        }
+
         if (x.StartsWith("mineable/"))
+        {
             return x.Substring("mineable/".Length).Pascalize();
+        }
 
         return CommonGetName(x);
     }
@@ -25,55 +32,77 @@ public static class NameUtils
         return name switch
         {
             "PotteryShardArcher" => "ArcherPotterySherd",
-            "PotteryShardPrize"  => "PrizePotterySherd",
+            "PotteryShardPrize" => "PrizePotterySherd",
             "PotteryShardArmsUp" => "ArmsUpPotterySherd",
-            "PotteryShardSkull"  => "SkullPotterySherd",
-            _                    => name
+            "PotteryShardSkull" => "SkullPotterySherd",
+            _ => name
         };
     }
 
     public static string GetBiomeName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetBiomeCategory(string name)
     {
         if (name == "icy")
+        {
             name = "ice";
+        }
+
         return CommonGetName(name);
     }
 
     public static string GetBlockName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetEffectName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetEnchantmentName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetEnchantmentCategory(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetEntityName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetEntityCategory(string name)
     {
         if (name == "UNKNOWN")
+        {
             name = name.ToLower();
+        }
+
         return CommonGetName(name);
     }
 
     public static string GetDimensionName(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetGameState(string name)
-        => CommonGetName(name);
+    {
+        return CommonGetName(name);
+    }
 
     public static string GetPacketName(string name, string direction, string ns)
     {
         direction = direction == "toClient" ? "CB" : "SB";
-        ns        = ns        == "handshaking" ? "Handshake" : ns.Pascalize();
+        ns = ns == "handshaking" ? "Handshake" : ns.Pascalize();
         name = name.Pascalize()
                    .Replace("Packet", "")
                    .Replace("ConfiguationAcknowledged", "ConfigurationAcknowledged");

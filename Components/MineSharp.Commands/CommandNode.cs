@@ -1,4 +1,4 @@
-using MineSharp.Commands.Parser;
+﻿using MineSharp.Commands.Parser;
 
 namespace MineSharp.Commands;
 
@@ -10,21 +10,21 @@ namespace MineSharp.Commands;
  */
 public class CommandNode
 {
-    public byte     Flags           { get; }
-    public int[]    Children        { get; }
-    public int      RedirectNode    { get; }
-    public string?  Name            { get; }
-    public IParser? Parser          { get; }
-    public string?  SuggestionsType { get; }
-
-    public CommandNode(byte    flags, int[] children, int redirectNode = -1, string? name = null, IParser? parser = null,
+    public CommandNode(byte flags, int[] children, int redirectNode = -1, string? name = null, IParser? parser = null,
                        string? suggestionsType = null)
     {
-        this.Flags           = flags;
-        this.Children        = children;
-        this.RedirectNode    = redirectNode;
-        this.Name            = name;
-        this.Parser          = parser;
-        this.SuggestionsType = suggestionsType;
+        Flags = flags;
+        Children = children;
+        RedirectNode = redirectNode;
+        Name = name;
+        Parser = parser;
+        SuggestionsType = suggestionsType;
     }
+
+    public byte Flags { get; }
+    public int[] Children { get; }
+    public int RedirectNode { get; }
+    public string? Name { get; }
+    public IParser? Parser { get; }
+    public string? SuggestionsType { get; }
 }

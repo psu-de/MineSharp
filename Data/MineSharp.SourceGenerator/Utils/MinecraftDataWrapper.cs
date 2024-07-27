@@ -1,56 +1,78 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Utils;
 
 public class MinecraftDataWrapper
 {
-    private readonly string  _path;
-    private readonly JObject _dataPaths;
+    private readonly JObject dataPaths;
+    private readonly string path;
 
     public MinecraftDataWrapper(string path)
     {
-        this._path = Path.Join(path, "data");
-        var dataPath = Path.Join(this._path, "dataPaths.json");
-        this._dataPaths = (JObject)JToken.Parse(File.ReadAllText(dataPath)).SelectToken("pc")!;
+        this.path = Path.Join(path, "data");
+        var dataPath = Path.Join(this.path, "dataPaths.json");
+        dataPaths = (JObject)JToken.Parse(File.ReadAllText(dataPath)).SelectToken("pc")!;
     }
 
     public string GetPath(string version, string key)
-        => (string)this._dataPaths.Property(version)!.Value.SelectToken(key)!;
+    {
+        return (string)dataPaths.Property(version)!.Value.SelectToken(key)!;
+    }
 
     public async Task<JToken> Parse(string version, string key)
     {
-        var rel  = GetPath(version, key);
-        var path = Path.Join(this._path, rel, $"{key}.json");
+        var rel = GetPath(version, key);
+        var path = Path.Join(this.path, rel, $"{key}.json");
         return JToken.Parse(await File.ReadAllTextAsync(path));
     }
 
     public Task<JToken> GetBiomes(string version)
-        => this.Parse(version, "biomes");
+    {
+        return Parse(version, "biomes");
+    }
 
     public Task<JToken> GetBlocks(string version)
-        => this.Parse(version, "blocks");
+    {
+        return Parse(version, "blocks");
+    }
 
     public Task<JToken> GetEffects(string version)
-        => this.Parse(version, "effects");
+    {
+        return Parse(version, "effects");
+    }
 
     public Task<JToken> GetEnchantments(string version)
-        => this.Parse(version, "enchantments");
+    {
+        return Parse(version, "enchantments");
+    }
 
     public Task<JToken> GetEntities(string version)
-        => this.Parse(version, "entities");
+    {
+        return Parse(version, "entities");
+    }
 
     public Task<JToken> GetItems(string version)
-        => this.Parse(version, "items");
+    {
+        return Parse(version, "items");
+    }
 
     public Task<JToken> GetBlockCollisionShapes(string version)
-        => this.Parse(version, "blockCollisionShapes");
+    {
+        return Parse(version, "blockCollisionShapes");
+    }
 
     public Task<JToken> GetProtocol(string version)
-        => this.Parse(version, "protocol");
+    {
+        return Parse(version, "protocol");
+    }
 
     public Task<JToken> GetVersion(string version)
-        => this.Parse(version, "version");
+    {
+        return Parse(version, "version");
+    }
 
     public Task<JToken> GetMaterials(string version)
-        => this.Parse(version, "materials");
+    {
+        return Parse(version, "materials");
+    }
 }

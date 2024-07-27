@@ -1,9 +1,5 @@
-using MineSharp.Bot.Blocks;
+﻿using MineSharp.Bot.Blocks;
 using MineSharp.Bot.Plugins;
-using MineSharp.Core.Common;
-using System.Collections.Concurrent;
-using MineSharp.Bot.Chat;
-using MineSharp.ChatComponent;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 
@@ -23,7 +19,7 @@ public static class WorldTests
         return IntegrationTest.RunTest("testBlockUpdate", async (bot, source) =>
         {
             var world = bot.GetPlugin<WorldPlugin>();
-            var chat  = bot.GetPlugin<ChatPlugin>();
+            var chat = bot.GetPlugin<ChatPlugin>();
             await world.WaitForInitialization();
             await chat.WaitForInitialization();
 
@@ -57,7 +53,9 @@ public static class WorldTests
                 expectedBlocks.Remove(block.Position.ToULong());
 
                 if (expectedBlocks.Count == 0)
+                {
                     source.TrySetResult(true);
+                }
             };
         });
     }
@@ -71,9 +69,9 @@ public static class WorldTests
             var position = new Position(-8, -59, 20);
             await bot.GetPlugin<ChatPlugin>().SendChat("/tp @p -5 -60 20");
 
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type) =>
             {
-                if (chat.Message.Contains("testMineBlock success"))
+                if (chat.GetMessage(bot.Data).Contains("testMineBlock success"))
                 {
                     source.TrySetResult(true);
                 }
@@ -85,7 +83,9 @@ public static class WorldTests
                 bot.GetPlugin<WorldPlugin>().World!.GetBlockAt(position));
 
             if (result != MineBlockStatus.Finished)
+            {
                 source.TrySetResult(false);
+            }
         }, commandDelay: 1000);
     }
 
@@ -100,9 +100,9 @@ public static class WorldTests
             await bot.GetPlugin<ChatPlugin>().SendChat("/clear");
             await bot.GetPlugin<ChatPlugin>().SendChat("/give @p dirt");
 
-            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type, senderName) =>
+            bot.GetPlugin<ChatPlugin>().OnChatMessageReceived += (sender, player, chat, type) =>
             {
-                if (chat.Message.Contains("testPlaceBlock success"))
+                if (chat.GetMessage(bot.Data).Contains("testPlaceBlock success"))
                 {
                     source.TrySetResult(true);
                 }

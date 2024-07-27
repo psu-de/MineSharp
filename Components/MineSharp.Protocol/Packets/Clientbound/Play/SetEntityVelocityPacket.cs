@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -6,32 +6,31 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class SetEntityVelocityPacket : IPacket
 {
-    public PacketType Type => PacketType.CB_Play_EntityVelocity;
+    public SetEntityVelocityPacket(int entityId, short velocityX, short velocityY, short velocityZ)
+    {
+        EntityId = entityId;
+        VelocityX = velocityX;
+        VelocityY = velocityY;
+        VelocityZ = velocityZ;
+    }
 
-    public int   EntityId  { get; set; }
+    public int EntityId { get; set; }
     public short VelocityX { get; set; }
     public short VelocityY { get; set; }
     public short VelocityZ { get; set; }
-
-    public SetEntityVelocityPacket(int entityId, short velocityX, short velocityY, short velocityZ)
-    {
-        this.EntityId  = entityId;
-        this.VelocityX = velocityX;
-        this.VelocityY = velocityY;
-        this.VelocityZ = velocityZ;
-    }
+    public PacketType Type => PacketType.CB_Play_EntityVelocity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.EntityId);
-        buffer.WriteShort(this.VelocityX);
-        buffer.WriteShort(this.VelocityY);
-        buffer.WriteShort(this.VelocityZ);
+        buffer.WriteVarInt(EntityId);
+        buffer.WriteShort(VelocityX);
+        buffer.WriteShort(VelocityY);
+        buffer.WriteShort(VelocityZ);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var entityId  = buffer.ReadVarInt();
+        var entityId = buffer.ReadVarInt();
         var velocityX = buffer.ReadShort();
         var velocityY = buffer.ReadShort();
         var velocityZ = buffer.ReadShort();

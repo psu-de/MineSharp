@@ -1,5 +1,4 @@
-using MineSharp.Core.Common.Blocks;
-using MineSharp.Data.Framework;
+﻿using MineSharp.Core.Common.Blocks;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
 using Newtonsoft.Json.Linq;
@@ -25,7 +24,7 @@ internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockC
                                     x => Convert.ToInt32(x.Name),
                                     x => ToFloatArray(x.Value));
 
-        return new BlockCollisionShapeDataBlob(
+        return new(
             blockDict,
             shapesDict);
     }
@@ -33,7 +32,9 @@ internal class BlockCollisionShapesProvider(JToken token) : IDataProvider<BlockC
     private int[] ToIntArray(JToken value)
     {
         if (value.Type == JTokenType.Integer)
+        {
             return [(int)value];
+        }
 
         return value.ToObject<int[]>()!;
     }

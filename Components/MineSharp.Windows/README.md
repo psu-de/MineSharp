@@ -1,8 +1,9 @@
 ## MineSharp.Windows
 
-Provides a Window Api. Create windows and modify them using `WindowClicks`. 
+Provides a Window Api. Create windows and modify them using `WindowClicks`.
 
 ### Example:
+
 ```csharp
     var window = new Window(0, "Inventory", 3 * 9);
     window.SetSlot(new Slot(diamond_item, 9)); // set window slot 9 to diamond_item

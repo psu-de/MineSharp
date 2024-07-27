@@ -1,4 +1,4 @@
-using MineSharp.Core.Common.Effects;
+﻿using MineSharp.Core.Common.Effects;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
 using Newtonsoft.Json.Linq;
@@ -9,13 +9,13 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
 {
     private static readonly EnumNameLookup<EffectType> EffectTypeLookup = new();
 
-    private JArray token;
+    private readonly JArray token;
 
     public EffectProvider(JToken token)
     {
         if (token.Type != JTokenType.Array)
         {
-            throw new ArgumentException("Expected token to be an array");
+            throw new ArgumentException($"expected {JTokenType.Array}, got {token.Type}");
         }
 
         this.token = (JArray)token;
@@ -23,11 +23,11 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
 
     public EffectInfo[] GetData()
     {
-        var data = new EffectInfo[this.token.Count];
+        var data = new EffectInfo[token.Count];
 
-        for (int i = 0; i < token.Count; i++)
+        for (var i = 0; i < token.Count; i++)
         {
-            data[i] = FromToken(this.token[i]);
+            data[i] = FromToken(token[i]);
         }
 
         return data;
@@ -35,12 +35,12 @@ internal class EffectProvider : IDataProvider<EffectInfo[]>
 
     private static EffectInfo FromToken(JToken token)
     {
-        var id          = (int)token.SelectToken("id")!;
-        var name        = (string)token.SelectToken("name")!;
+        var id = (int)token.SelectToken("id")!;
+        var name = (string)token.SelectToken("name")!;
         var displayName = (string)token.SelectToken("displayName")!;
-        var isGood      = (string)token.SelectToken("type")! == "good";
+        var isGood = (string)token.SelectToken("type")! == "good";
 
-        return new EffectInfo(
+        return new(
             id,
             EffectTypeLookup.FromName(NameUtils.GetEffectName(name)),
             name,

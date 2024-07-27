@@ -1,4 +1,4 @@
-using MineSharp.Data.Protocol;
+﻿using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 

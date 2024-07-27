@@ -1,16 +1,27 @@
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
+
 namespace MineSharp.Commands.Parser;
 
 public class FloatParser : IParser
 {
-    public readonly float Min;
-    public readonly float Max;
+    public float Min { get; private set; }
+    public float Max { get; private set; }
 
-    public FloatParser(float min = float.MinValue, float max = float.MaxValue)
+    public string GetName()
     {
-        this.Min = min;
-        this.Max = max;
+        return "brigadier:float";
     }
 
-    public string GetName()          => "brigadier:float";
-    public int    GetArgumentCount() => 1;
+    public int GetArgumentCount()
+    {
+        return 1;
+    }
+
+    public void ReadProperties(PacketBuffer buffer, MinecraftData data)
+    {
+        var flags = buffer.ReadByte();
+        Min = (flags & 0x01) > 0 ? buffer.ReadFloat() : float.MinValue;
+        Max = (flags & 0x02) > 0 ? buffer.ReadFloat() : float.MaxValue;
+    }
 }

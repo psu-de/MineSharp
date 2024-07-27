@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
 using MineSharp.Data;
 
@@ -12,11 +12,13 @@ internal static class CoreTypeExtensions
         buffer.WriteBool(present);
 
         if (!present)
+        {
             return;
+        }
 
         buffer.WriteVarInt(item!.Info.Id);
         buffer.WriteByte(item!.Count);
-        buffer.WriteNbt(item!.Metadata);
+        buffer.WriteOptionalNbt(item!.Metadata);
     }
 
     public static Item? ReadOptionalItem(this PacketBuffer buffer, MinecraftData data)
@@ -24,13 +26,15 @@ internal static class CoreTypeExtensions
         var present = buffer.ReadBool();
 
         if (!present)
+        {
             return null;
+        }
 
-        return new Item(
+        return new(
             data.Items.ById(buffer.ReadVarInt())!,
             buffer.ReadByte(),
             null,
-            buffer.ReadNbtCompound());
+            buffer.ReadOptionalNbtCompound());
     }
 
     public static void WriteSlot(this PacketBuffer buffer, Slot slot)
@@ -41,9 +45,9 @@ internal static class CoreTypeExtensions
 
     public static Slot ReadSlot(this PacketBuffer buffer, MinecraftData data)
     {
-        var   slotIndex = buffer.ReadShort();
-        Item? item      = buffer.ReadOptionalItem(data);
+        var slotIndex = buffer.ReadShort();
+        var item = buffer.ReadOptionalItem(data);
 
-        return new Slot(item, slotIndex);
+        return new(item, slotIndex);
     }
 }

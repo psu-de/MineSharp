@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -6,18 +6,17 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class ClientCommandPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_ClientCommand;
-
-    public int ActionId { get; set; }
-
     public ClientCommandPacket(int actionId)
     {
-        this.ActionId = actionId;
+        ActionId = actionId;
     }
+
+    public int ActionId { get; set; }
+    public PacketType Type => PacketType.SB_Play_ClientCommand;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.ActionId);
+        buffer.WriteVarInt(ActionId);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

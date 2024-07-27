@@ -1,15 +1,14 @@
-using MineSharp.SourceGenerator.Utils;
+﻿using MineSharp.SourceGenerator.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MineSharp.SourceGenerator.Generators;
 
 public class EnchantmentGenerator
 {
-    private readonly Generator typeGenerator =
-        new Generator("enchantments", GetName, "EnchantmentType", "Enchantments");
-
     private readonly Generator categoryGenerator =
-        new Generator("enchantments", GetCategoryName, "EnchantmentCategory", "Enchantments");
+        new("enchantments", GetCategoryName, "EnchantmentCategory", "Enchantments");
+
+    private readonly Generator typeGenerator = new("enchantments", GetName, "EnchantmentType", "Enchantments");
 
     public Task Run(MinecraftDataWrapper wrapper)
     {

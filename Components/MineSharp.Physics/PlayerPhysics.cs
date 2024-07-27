@@ -1,70 +1,56 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Entities.Attributes;
+using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data;
 using MineSharp.Physics.Components;
 using MineSharp.Physics.Input;
 using MineSharp.Physics.Utils;
 using MineSharp.World;
-using NLog;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Physics;
 
 /// <summary>
-/// Simulate a Minecraft player in a minecraft world
+///     Simulate a Minecraft player in a minecraft world
 /// </summary>
 public class PlayerPhysics
 {
-    /// <summary>
-    /// Event with PlayerPhysics and a boolean value
-    /// </summary>
-    public delegate void PlayerPhysicsBooleanEvent(PlayerPhysics sender, bool value);
+    private static readonly Vector3[] XzAxisVectors = { Vector3.West, Vector3.East, Vector3.North, Vector3.South };
 
     /// <summary>
-    /// Fired when the player starts or stops crouching
-    /// </summary>
-    public event PlayerPhysicsBooleanEvent? OnCrouchingChanged;
-
-    /// <summary>
-    /// Fired when the player starts or stops sprinting
-    /// </summary>
-    public event PlayerPhysicsBooleanEvent? OnSprintingChanged;
-
-    /// <summary>
-    /// The minecraft data used for this instance
+    ///     The minecraft data used for this instance
     /// </summary>
     public readonly MinecraftData Data;
 
+    private readonly FluidPhysicsComponent fluidPhysics;
+    private readonly MovementInput movementInput;
+
     /// <summary>
-    /// The player to simulate
+    ///     The player to simulate
     /// </summary>
     public readonly MinecraftPlayer Player;
 
+    private readonly MutableVector3 playerPosition;
+    private readonly MutableVector3 playerVelocity;
+    private readonly Attribute speedAttribute;
+    private readonly Modifier sprintingModifier;
+
     /// <summary>
-    /// The world
+    ///     The physics state of this PlayerPhysics instance
+    /// </summary>
+    public readonly PlayerState State = new();
+
+    /// <summary>
+    ///     The world
     /// </summary>
     public readonly IWorld World;
 
     /// <summary>
-    /// The physics state of this PlayerPhysics instance
-    /// </summary>
-    public readonly PlayerState State = new PlayerState();
-
-    private readonly MutableVector3        playerPosition;
-    private readonly MutableVector3        playerVelocity;
-    private readonly FluidPhysicsComponent fluidPhysics;
-    private readonly MovementInput         movementInput;
-    private readonly Attribute             speedAttribute;
-    private readonly Modifier              sprintingModifier;
-
-    private static readonly Vector3[] XZAxisVectors = new[] { Vector3.West, Vector3.East, Vector3.North, Vector3.South };
-
-    /// <summary>
-    /// Create a new PlayerPhysics instance
+    ///     Create a new PlayerPhysics instance
     /// </summary>
     /// <param name="data"></param>
     /// <param name="player"></param>
@@ -72,48 +58,61 @@ public class PlayerPhysics
     /// <param name="inputControls"></param>
     public PlayerPhysics(MinecraftData data, MinecraftPlayer player, IWorld world, InputControls inputControls)
     {
-        this.Data          = data;
-        this.Player        = player;
-        this.World         = world;
-        this.movementInput = new MovementInput(inputControls);
-        this.fluidPhysics  = new FluidPhysicsComponent(player, world, this.movementInput, this.State);
+        Data = data;
+        Player = player;
+        World = world;
+        movementInput = new(inputControls);
+        fluidPhysics = new(player, world, movementInput, State);
 
-        if (!this.Player.Entity!.Attributes.ContainsKey(PhysicsConst.ATTR_MOVEMENT_SPEED))
+        if (!Player.Entity!.Attributes.ContainsKey(PhysicsConst.AttrMovementSpeed))
         {
-            this.speedAttribute = new Attribute(
-                PhysicsConst.ATTR_MOVEMENT_SPEED,
-                PhysicsConst.DEFAULT_PLAYER_SPEED,
+            speedAttribute = new(
+                PhysicsConst.AttrMovementSpeed,
+                PhysicsConst.DefaultPlayerSpeed,
                 Array.Empty<Modifier>());
 
-            this.Player.Entity!.AddAttribute(this.speedAttribute);
+            Player.Entity!.AddAttribute(speedAttribute);
         }
-        else this.speedAttribute = this.Player.Entity!.GetAttribute(PhysicsConst.ATTR_MOVEMENT_SPEED)!;
+        else
+        {
+            speedAttribute = Player.Entity!.GetAttribute(PhysicsConst.AttrMovementSpeed)!;
+        }
 
-        this.sprintingModifier = new Modifier(
-            UUID.Parse(PhysicsConst.SPRINTING_UUID),
-            PhysicsConst.PLAYER_SPRINT_SPEED,
+        sprintingModifier = new(
+            Uuid.Parse(PhysicsConst.SprintingUuid),
+            PhysicsConst.PlayerSprintSpeed,
             ModifierOp.Multiply);
 
-        this.playerVelocity = this.Player.Entity.Velocity as MutableVector3 ??
-                              throw new ArgumentException("entity is not initialized or velocity is not mutable.");
-        
-        this.playerPosition = this.Player.Entity.Position as MutableVector3 ??
-                              throw new ArgumentException("entity position is not mutable");
+        playerVelocity = Player.Entity.Velocity as MutableVector3 ??
+            throw new ArgumentException($"player velocity is not a {nameof(MutableVector3)}");
+
+        playerPosition = Player.Entity.Position as MutableVector3 ??
+            throw new ArgumentException($"entity position is not a {nameof(MutableVector3)}");
     }
 
     /// <summary>
-    /// Simulate a single tick
+    ///     Fired when the player starts or stops crouching
+    /// </summary>
+    public AsyncEvent<PlayerPhysics, bool> OnCrouchingChanged = new();
+
+    /// <summary>
+    ///     Fired when the player starts or stops sprinting
+    /// </summary>
+    public AsyncEvent<PlayerPhysics, bool> OnSprintingChanged = new();
+
+    /// <summary>
+    ///     Simulate a single tick
     /// </summary>
     public void Tick()
     {
-        if (GameMode.Spectator == this.Player.GameMode)
+        if (GameMode.Spectator == Player.GameMode)
         {
-            this.Player.Entity!.IsOnGround = false;
+            Player.Entity!.IsOnGround = false;
         }
 
         // TODO: The Vanilla client does some things even when the Chunk is not loaded
-        if (!this.World.IsChunkLoaded(
-                this.World.ToChunkCoordinates((Position)this.Player.Entity!.Position)))
+        if (!World.IsChunkLoaded(
+            World.ToChunkCoordinates((Position)Player.Entity!.Position)))
         {
             return;
         }
@@ -122,45 +121,49 @@ public class PlayerPhysics
         // Player.java:216 takeXpDelay
         //            :220 isSleeping()
 
-        this.fluidPhysics.Tick();
+        fluidPhysics.Tick();
+
         // updateSwimming()
 
         // updateUsingItem() LivingEntity.java:2241
 
-        this.MovementTick();
+        MovementTick();
     }
 
     private void MovementTick()
     {
         // TODO: Fix differences with java: MovementTick()
 
-        var crouchedBefore = this.State.IsCrouching;
+        var crouchedBefore = State.IsCrouching;
 
-        var collidesCrouching = PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Crouching, this.World, this.Data);
-        var collidesStanding  = PoseUtils.WouldPlayerCollideWithPose(this.Player, EntityPose.Standing, this.World, this.Data);
+        var collidesCrouching = PoseUtils.WouldPlayerCollideWithPose(Player, EntityPose.Crouching, World, Data);
+        var collidesStanding = PoseUtils.WouldPlayerCollideWithPose(Player, EntityPose.Standing, World, Data);
+
         // Swimming, Sleeping, Vehicle, Flying ; LocalPlayer.java:631
-        this.State.IsCrouching = !collidesCrouching
-         && this.movementInput.Controls.SneakingKeyDown || collidesStanding;
+        State.IsCrouching = (!collidesCrouching
+            && movementInput.Controls.SneakingKeyDown) || collidesStanding;
 
-        if (this.State.IsCrouching != crouchedBefore)
-            Task.Run(() => this.OnCrouchingChanged?.Invoke(this, this.State.IsCrouching));
+        if (State.IsCrouching != crouchedBefore)
+        {
+            OnCrouchingChanged.Dispatch(this, State.IsCrouching);
+        }
 
         var crouchSpeedFactor = (float)Math.Clamp(0.3f + 0.0, 0.0f, 1.0f); // Enchantment Soul Speed factor
-        this.movementInput.Tick(this.State.IsCrouching,
-            crouchSpeedFactor); // not only forceCrouching, but also swimming LocalPlayer.java:633
+        movementInput.Tick(State.IsCrouching,
+                           crouchSpeedFactor); // not only forceCrouching, but also swimming LocalPlayer.java:633
 
         // Is using item LocalPlayer.java:635
 
-        var bb = this.Player.Entity!.GetBoundingBox();
-        var x  = this.Player.Entity.Position.X;
-        var z  = this.Player.Entity.Position.Z;
-        var w  = bb.Width;
-        this.PushTowardsClosestSpace(x - w * 0.35d, z + w * 0.35d);
-        this.PushTowardsClosestSpace(x - w * 0.35d, z - w * 0.35d);
-        this.PushTowardsClosestSpace(x + w * 0.35d, z - w * 0.35d);
-        this.PushTowardsClosestSpace(x + w * 0.35d, z + w * 0.35d);
-    
-        this.UpdateSprinting();
+        var bb = Player.Entity!.GetBoundingBox();
+        var x = Player.Entity.Position.X;
+        var z = Player.Entity.Position.Z;
+        var w = bb.Width;
+        PushTowardsClosestSpace(x - (w * 0.35d), z + (w * 0.35d));
+        PushTowardsClosestSpace(x - (w * 0.35d), z - (w * 0.35d));
+        PushTowardsClosestSpace(x + (w * 0.35d), z - (w * 0.35d));
+        PushTowardsClosestSpace(x + (w * 0.35d), z + (w * 0.35d));
+
+        UpdateSprinting();
 
         // ability to fly for creative and spectator
         // var startedFlying = false;
@@ -174,9 +177,9 @@ public class PlayerPhysics
         // }
 
         // && !this.Player.IsFlying
-        if (this.State.WasTouchingWater && this.movementInput.Controls.SneakingKeyDown)
+        if (State.WasTouchingWater && movementInput.Controls.SneakingKeyDown)
         {
-            this.playerVelocity.Add(PhysicsConst.WaterDrag);
+            playerVelocity.Add(PhysicsConst.WaterDrag);
         }
 
         // water vision
@@ -185,24 +188,30 @@ public class PlayerPhysics
 
         // jumping with vehicle
 
-        if (this.State.NoJumpDelay > 0)
-            this.State.NoJumpDelay--;
+        if (State.NoJumpDelay > 0)
+        {
+            State.NoJumpDelay--;
+        }
 
-        this.TruncateVelocity(this.playerVelocity);
+        TruncateVelocity(playerVelocity);
 
         // && !this.Player.IsFlying
-        if (this.movementInput.Controls.JumpingKeyDown)
+        if (movementInput.Controls.JumpingKeyDown)
         {
-            this.TryJumping();
+            TryJumping();
         }
-        else this.State.NoJumpDelay = 0;
+        else
+        {
+            State.NoJumpDelay = 0;
+        }
 
         // UpdateFallFlying() (Elytra)
-        var aabb = this.Player.Entity!.GetBoundingBox();
+        var aabb = Player.Entity!.GetBoundingBox();
+
         // reset fall distance?
 
         // travelRidden() if player 
-        this.Travel();
+        Travel();
     }
 
     private void Travel()
@@ -210,202 +219,222 @@ public class PlayerPhysics
         // TODO: Swimming && !isPassenger()
         // TODO: Ability to fly
 
-        var gravity   = PhysicsConst.GRAVITY;
-        var isFalling = this.Player.Entity!.Velocity.Y <= 0.0;
-        if (isFalling && this.Player.Entity!.GetEffectLevel(EffectType.SlowFalling).HasValue)
-            gravity = PhysicsConst.SLOW_FALLING_GRAVITY;
+        var gravity = PhysicsConst.Gravity;
+        var isFalling = Player.Entity!.Velocity.Y <= 0.0;
+        if (isFalling && Player.Entity!.GetEffectLevel(EffectType.SlowFalling).HasValue)
+        {
+            gravity = PhysicsConst.SlowFallingGravity;
+        }
 
-        var dx    = this.movementInput.StrafeImpulse  * 0.98f;
-        var dz    = this.movementInput.ForwardImpulse * 0.98f;
-        var block = this.World.GetBlockAt((Position)this.Player.Entity!.Position);
+        var dx = movementInput.StrafeImpulse * 0.98f;
+        var dz = movementInput.ForwardImpulse * 0.98f;
+        var block = World.GetBlockAt((Position)Player.Entity!.Position);
+
         // LivingEntity.java:2015
         // && !abilities.canFly
-        if (this.State.WasTouchingWater)
+        if (State.WasTouchingWater)
         {
-            this.TravelWater(isFalling, dx, dz);
+            TravelWater(isFalling, dx, dz);
         } // else if in laval
+
         // else if fall flying (elytra)
         else
         {
-            this.TravelNormally(gravity, dx, dz);
+            TravelNormally(gravity, dx, dz);
         }
     }
 
     private void TravelNormally(double gravity, double dx, double dz)
     {
-        var blockBelow = this.World.GetBlockAt(new Position(
-            this.Player.Entity!.Position.X,
-            this.Player.Entity!.Position.Y - 0.5f,
-            this.Player.Entity!.Position.Z));
-        var friction    = PhysicsConst.GetBlockFriction(blockBelow.Info.Type);
-        var speedFactor = this.Player.Entity.IsOnGround ? friction * 0.91f : 0.91f;
+        var blockBelow = World.GetBlockAt(new(
+                                              Player.Entity!.Position.X,
+                                              Player.Entity!.Position.Y - 0.5f,
+                                              Player.Entity!.Position.Z));
+        var friction = PhysicsConst.GetBlockFriction(blockBelow.Info.Type);
+        var speedFactor = Player.Entity.IsOnGround ? friction * 0.91f : 0.91f;
 
-        var frictionInfluencedSpeed = this.Player.Entity.IsOnGround
-            ? this.speedAttribute.Value * (0.21600002f / Math.Pow(speedFactor, 3))
-            : this.State.IsSprinting
-                ? PhysicsConst.SPRINTING_FLYING_SPEED
-                : PhysicsConst.FLYING_SPEED;
-        
-        this.MoveRelative(dx, 0, dz, (float)frictionInfluencedSpeed, this.Player.Entity.Yaw);
-        this.CheckClimbable();
-        this.Move();
+        var frictionInfluencedSpeed = Player.Entity.IsOnGround
+            ? speedAttribute.Value * (0.21600002f / Math.Pow(speedFactor, 3))
+            : State.IsSprinting
+                ? PhysicsConst.SprintingFlyingSpeed
+                : PhysicsConst.FlyingSpeed;
 
-        var vel = (Vector3)this.Player.Entity.Velocity.Clone();
+        MoveRelative(dx, 0, dz, (float)frictionInfluencedSpeed, Player.Entity.Yaw);
+        CheckClimbable();
+        Move();
 
-        var blockAtFeet = this.World.GetBlockAt((Position)this.Player.Entity.Position);
-        if ((this.State.HorizontalCollision || this.movementInput.Controls.JumpingKeyDown)
-         && (WorldUtils.IsOnClimbable(this.Player, this.World, ref this.State.LastClimbablePosition) ||
-             blockAtFeet.Info.Type == BlockType.PowderSnow))
+        var vel = (Vector3)Player.Entity.Velocity.Clone();
+
+        var blockAtFeet = World.GetBlockAt((Position)Player.Entity.Position);
+        if ((State.HorizontalCollision || movementInput.Controls.JumpingKeyDown)
+            && (WorldUtils.IsOnClimbable(Player, World, ref State.LastClimbablePosition) ||
+                blockAtFeet.Info.Type == BlockType.PowderSnow))
         {
-            vel = new Vector3(vel.X, 0.2, vel.Z);
+            vel = new(vel.X, 0.2, vel.Z);
         }
 
-        var velY       = vel.Y;
-        var levitation = this.Player.Entity!.GetEffectLevel(EffectType.Levitation);
+        var velY = vel.Y;
+        var levitation = Player.Entity!.GetEffectLevel(EffectType.Levitation);
         if (levitation.HasValue)
-            velY += (0.05d * (levitation.Value + 1) - velY) * 0.2d;
-        else if (!this.World.IsChunkLoaded(this.World.ToChunkCoordinates((Position)this.Player.Entity.Position)))
         {
-            velY = this.Player.Entity.Position.Y > this.World.MinY ? 0.1d : 0.0;
+            velY += ((0.05d * (levitation.Value + 1)) - velY) * 0.2d;
+        }
+        else if (!World.IsChunkLoaded(World.ToChunkCoordinates((Position)Player.Entity.Position)))
+        {
+            velY = Player.Entity.Position.Y > World.MinY ? 0.1d : 0.0;
         }
         else
+        {
             velY -= gravity;
+        }
 
-        this.playerVelocity.Set(vel.X * speedFactor, velY * 0.98f, vel.Z * speedFactor);
+        playerVelocity.Set(vel.X * speedFactor, velY * 0.98f, vel.Z * speedFactor);
     }
 
     private void CheckClimbable()
     {
-        if (!WorldUtils.IsOnClimbable(this.Player, this.World, ref this.State.LastClimbablePosition))
+        if (!WorldUtils.IsOnClimbable(Player, World, ref State.LastClimbablePosition))
+        {
             return;
+        }
 
-        var x = Math.Clamp(this.Player.Entity!.Velocity.X, -PhysicsConst.CLIMBING_SPEED, PhysicsConst.CLIMBING_SPEED);
-        var z = Math.Clamp(this.Player.Entity!.Velocity.Z, -PhysicsConst.CLIMBING_SPEED, PhysicsConst.CLIMBING_SPEED);
-        var y = Math.Max(this.Player.Entity!.Velocity.Y, -PhysicsConst.CLIMBING_SPEED);
+        var x = Math.Clamp(Player.Entity!.Velocity.X, -PhysicsConst.ClimbingSpeed, PhysicsConst.ClimbingSpeed);
+        var z = Math.Clamp(Player.Entity!.Velocity.Z, -PhysicsConst.ClimbingSpeed, PhysicsConst.ClimbingSpeed);
+        var y = Math.Max(Player.Entity!.Velocity.Y, -PhysicsConst.ClimbingSpeed);
 
-        var blockAtFeet = this.World.GetBlockAt((Position)this.Player.Entity.Position);
+        var blockAtFeet = World.GetBlockAt((Position)Player.Entity.Position);
+
         // && !abilities.flying
-        if (y < 0.0 && blockAtFeet.Info.Type != BlockType.Scaffolding && this.movementInput.Controls.SneakingKeyDown)
+        if (y < 0.0 && blockAtFeet.Info.Type != BlockType.Scaffolding && movementInput.Controls.SneakingKeyDown)
+        {
             y = 0.0;
+        }
 
-        this.playerVelocity.Set(x, y, z);
+        playerVelocity.Set(x, y, z);
     }
 
     private void TravelWater(bool isFalling, double dx, double dz)
     {
-        var lastY        = this.Player.Entity!.Position.Y;
-        var waterFactor  = this.State.IsSprinting ? 0.9f : 0.8f;
-        var speedFactor  = 0.02f;
+        var lastY = Player.Entity!.Position.Y;
+        var waterFactor = State.IsSprinting ? 0.9f : 0.8f;
+        var speedFactor = 0.02f;
         var depthStrider = 0.0f; // TODO: get Depth strider level
         depthStrider = MathF.Max(3.0f, depthStrider);
 
-        if (!this.Player.Entity!.IsOnGround)
+        if (!Player.Entity!.IsOnGround)
+        {
             depthStrider *= 0.5f;
+        }
 
         if (depthStrider > 0.0)
         {
-            waterFactor += (0.54600006F                      - waterFactor) * depthStrider / 3.0F;
-            speedFactor += ((float)this.speedAttribute.Value - speedFactor) * depthStrider / 3.0F;
+            waterFactor += (0.54600006F - waterFactor) * depthStrider / 3.0F;
+            speedFactor += ((float)speedAttribute.Value - speedFactor) * depthStrider / 3.0F;
         }
 
-        if (this.Player.Entity!.GetEffectLevel(EffectType.DolphinsGrace).HasValue)
+        if (Player.Entity!.GetEffectLevel(EffectType.DolphinsGrace).HasValue)
+        {
             waterFactor = 0.96f;
-        
-        this.MoveRelative(dx, 0, dz, speedFactor, this.Player.Entity!.Yaw);
-        this.Move();
+        }
+
+        MoveRelative(dx, 0, dz, speedFactor, Player.Entity!.Yaw);
+        Move();
 
         // TODO: Finish water movement
     }
 
     private void Move()
     {
-        var vec = this.Player.Entity!.Velocity.Clone();
+        var vec = Player.Entity!.Velocity.Clone();
 
-        if (this.State.StuckSpeedMultiplier.LengthSquared() > 1.0E-7D)
+        if (State.StuckSpeedMultiplier.LengthSquared() > 1.0E-7D)
         {
-            vec.Multiply(this.State.StuckSpeedMultiplier);
-            this.State.StuckSpeedMultiplier = Vector3.Zero;
-            
-            this.playerVelocity.Set(0, 0, 0);
+            vec.Multiply(State.StuckSpeedMultiplier);
+            State.StuckSpeedMultiplier = Vector3.Zero;
+
+            playerVelocity.Set(0, 0, 0);
         }
 
-        this.MaybeBackOffFromEdge(vec);
-        var vec3 = this.Collide(vec);
+        MaybeBackOffFromEdge(vec);
+        var vec3 = Collide(vec);
 
         var length = vec3.LengthSquared();
         if (length > 1.0E-7D)
         {
             // reset fall distance
-            this.playerPosition.Add(vec3);
+            playerPosition.Add(vec3);
         }
 
         var collidedX = Math.Abs(vec.X - vec3.X) > 1.0E-5F;
         var collidedZ = Math.Abs(vec.Z - vec3.Z) > 1.0E-5F;
-        this.State.HorizontalCollision      = collidedX || collidedZ;
-        this.State.VerticalCollision        = Math.Abs(vec.Y - vec3.Y) > 1.0E-5F;
-        this.State.MinorHorizontalCollision = IsCollisionMinor(vec3);
+        State.HorizontalCollision = collidedX || collidedZ;
+        State.VerticalCollision = Math.Abs(vec.Y - vec3.Y) > 1.0E-5F;
+        State.MinorHorizontalCollision = IsCollisionMinor(vec3);
 
-        this.Player.Entity!.IsOnGround = this.State.VerticalCollision && vec.Y < 0;
+        Player.Entity!.IsOnGround = State.VerticalCollision && vec.Y < 0;
 
-        if (this.State.HorizontalCollision)
+        if (State.HorizontalCollision)
         {
             if (collidedX)
             {
-                this.playerVelocity.SetX(0.0);
+                playerVelocity.SetX(0.0);
             }
             else
             {
-                this.playerVelocity.SetZ(0.0);
+                playerVelocity.SetZ(0.0);
             }
         }
-        else this.State.MinorHorizontalCollision = false;
-
-        if (this.State.VerticalCollision)
+        else
         {
-            this.playerVelocity.SetY(0.0);
+            State.MinorHorizontalCollision = false;
+        }
+
+        if (State.VerticalCollision)
+        {
+            playerVelocity.SetY(0.0);
         }
     }
 
     private Vector3 Collide(Vector3 vec)
     {
-        var aabb        = this.Player.Entity!.GetBoundingBox();
+        var aabb = Player.Entity!.GetBoundingBox();
         var collidedVec = vec.LengthSquared() == 0.0 ? vec : CheckBoundingBoxCollisions(vec.X, vec.Y, vec.Z, aabb);
 
         var collidedX = Math.Abs(vec.X - collidedVec.X) > 1.0E-5;
         var collidedY = Math.Abs(vec.Y - collidedVec.Y) > 1.0E-5;
         var collidedZ = Math.Abs(vec.Z - collidedVec.Z) > 1.0E-5;
-        var hitGround = this.Player.Entity!.IsOnGround || collidedY && vec.Y < 0.0;
+        var hitGround = Player.Entity!.IsOnGround || (collidedY && vec.Y < 0.0);
 
         if (hitGround && (collidedX || collidedZ))
         {
-            var collidedUpXZ = CheckBoundingBoxCollisions(
-                vec.X, PhysicsConst.MAX_UP_STEP, vec.Z, aabb);
-            
+            var collidedUpXz = CheckBoundingBoxCollisions(
+                vec.X, PhysicsConst.MaxUpStep, vec.Z, aabb);
+
             var collidedUp0 = CheckBoundingBoxCollisions(
-                0, PhysicsConst.MAX_UP_STEP, 0,
+                0, PhysicsConst.MaxUpStep, 0,
                 aabb.Clone().Expand(vec.X, 0, vec.Z));
 
-            if (collidedUp0.Y < PhysicsConst.MAX_UP_STEP)
+            if (collidedUp0.Y < PhysicsConst.MaxUpStep)
             {
                 var collidedAbove = CheckBoundingBoxCollisions(
                         vec.X, 0.0, vec.Z,
                         aabb.Clone().Offset(collidedUp0.X, collidedUp0.Y, collidedUp0.Z))
                    .Plus(collidedUp0);
 
-                if (collidedAbove.HorizontalLengthSquared() > collidedUpXZ.HorizontalLengthSquared())
+                if (collidedAbove.HorizontalLengthSquared() > collidedUpXz.HorizontalLengthSquared())
                 {
-                    collidedUpXZ = collidedAbove;
+                    collidedUpXz = collidedAbove;
                 }
             }
 
-            if (collidedUpXZ.HorizontalLengthSquared() > collidedVec.HorizontalLengthSquared())
+            if (collidedUpXz.HorizontalLengthSquared() > collidedVec.HorizontalLengthSquared())
             {
-                collidedUpXZ.Add(
+                collidedUpXz.Add(
                     CheckBoundingBoxCollisions(
-                        0.0, -collidedUpXZ.Y + vec.Y, 0.0,
-                        aabb.Clone().Offset(collidedUpXZ.X, collidedUpXZ.Y, collidedUpXZ.Z)));
+                        0.0, -collidedUpXz.Y + vec.Y, 0.0,
+                        aabb.Clone().Offset(collidedUpXz.X, collidedUpXz.Y, collidedUpXz.Z)));
 
-                return collidedUpXZ;
+                return collidedUpXz;
             }
         }
 
@@ -414,25 +443,27 @@ public class PlayerPhysics
 
     private bool IsCollisionMinor(Vector3 vec)
     {
-        var yawRadians = this.Player.Entity!.Yaw * (Math.PI / 180.0);
-        var sin        = Math.Sin(yawRadians);
-        var cos        = Math.Cos(yawRadians);
+        var yawRadians = Player.Entity!.Yaw * (Math.PI / 180.0);
+        var sin = Math.Sin(yawRadians);
+        var cos = Math.Cos(yawRadians);
 
-        var x = this.movementInput.StrafeImpulse  * cos * 0.98 - this.movementInput.ForwardImpulse * sin * 0.98;
-        var z = this.movementInput.ForwardImpulse * cos * 0.98 - this.movementInput.StrafeImpulse  * sin * 0.98;
+        var x = (movementInput.StrafeImpulse * cos * 0.98) - (movementInput.ForwardImpulse * sin * 0.98);
+        var z = (movementInput.ForwardImpulse * cos * 0.98) - (movementInput.StrafeImpulse * sin * 0.98);
 
-        var s1 = Math.Pow(x, 2)     + Math.Pow(z, 2);
+        var s1 = Math.Pow(x, 2) + Math.Pow(z, 2);
         var s2 = Math.Pow(vec.X, 2) + Math.Pow(vec.Z, 2);
 
         if (s1 < 1.0E-5F || s2 < 1.0E-5F)
+        {
             return false;
+        }
 
-        double d6 = x * vec.X + z * vec.Z;
-        double d7 = Math.Acos(d6 / Math.Sqrt(s1 * s2));
+        var d6 = (x * vec.X) + (z * vec.Z);
+        var d7 = Math.Acos(d6 / Math.Sqrt(s1 * s2));
         return d7 < 0.13962634F;
     }
 
-    private MutableVector3 CheckBoundingBoxCollisions(double dx, double dy, double dz, AABB aabb)
+    private MutableVector3 CheckBoundingBoxCollisions(double dx, double dy, double dz, Aabb aabb)
     {
         // TODO: Entity collision boxes
         // TODO: World border collision
@@ -441,11 +472,13 @@ public class PlayerPhysics
 
         var shapes = WorldUtils.GetWorldBoundingBoxes(
             aabb.Clone().Expand(dx, dy, dz),
-            this.World,
-            this.Data);
+            World,
+            Data);
 
         if (shapes.Length == 0)
-            return new MutableVector3(dx, dy, dz);
+        {
+            return new(dx, dy, dz);
+        }
 
         // check for collisions
         var mX = dx;
@@ -456,7 +489,9 @@ public class PlayerPhysics
         {
             mY = CalculateAxisOffset(Axis.Y, mutableAabb, shapes, mY);
             if (mY != 0.0)
+            {
                 mutableAabb.Offset(0, mY, 0);
+            }
         }
 
         var zDominant = Math.Abs(mX) < Math.Abs(mZ);
@@ -464,14 +499,18 @@ public class PlayerPhysics
         {
             mZ = CalculateAxisOffset(Axis.Z, mutableAabb, shapes, mZ);
             if (mZ != 0.0)
+            {
                 mutableAabb.Offset(0, 0, mZ);
+            }
         }
 
         if (mX != 0.0)
         {
             mX = CalculateAxisOffset(Axis.X, mutableAabb, shapes, mX);
             if (mX != 0.0)
+            {
                 mutableAabb.Offset(mX, 0, 0);
+            }
         }
 
         if (!zDominant && mZ != 0.0)
@@ -479,17 +518,21 @@ public class PlayerPhysics
             mZ = CalculateAxisOffset(Axis.Z, aabb, shapes, mZ);
         }
 
-        return new MutableVector3(mX, mY, mZ);
+        return new(mX, mY, mZ);
     }
 
-    private double CalculateAxisOffset(Axis axis, AABB aabb, AABB[] shapes, double displacement)
+    private double CalculateAxisOffset(Axis axis, Aabb aabb, Aabb[] shapes, double displacement)
     {
         var value = displacement;
         if (value == 0.0 || Math.Abs(displacement) < 1.0E-7)
+        {
             return 0.0;
+        }
 
         foreach (var shape in shapes)
+        {
             value = shape.CalculateMaxOffset(aabb, axis, value);
+        }
 
         return value;
     }
@@ -499,49 +542,52 @@ public class PlayerPhysics
         // TODO Fix differences with java
         // Player.java:1054
         // && this.IsAboveGround()
-        if (vec.Y > 0 || !this.movementInput.Controls.SneakingKeyDown)
+        if (vec.Y > 0 || !movementInput.Controls.SneakingKeyDown)
+        {
             return;
+        }
 
-        var x      = vec.X;
-        var z      = vec.Z;
-        var entity = this.Player.Entity!;
+        var x = vec.X;
+        var z = vec.Z;
+        var entity = Player.Entity!;
 
         // TODO: Check for entity collisions, not only block collisions
         const double increment = 0.05d;
-        while (x != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, 0.0), this.World, this.Data))
+        while (x != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, 0.0), World, Data))
         {
             x = x switch
             {
                 < increment and >= -increment => 0.0,
-                > 0.0                         => x - increment,
-                _                             => x + increment
+                > 0.0 => x - increment,
+                _ => x + increment
             };
         }
 
-        while (z != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(0.0, -1.0, z), this.World, this.Data))
+        while (z != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(0.0, -1.0, z), World, Data))
         {
             z = z switch
             {
                 < increment and >= -increment => 0.0,
-                > 0.0                         => z - increment,
-                _                             => z + increment
+                > 0.0 => z - increment,
+                _ => z + increment
             };
         }
 
-        while (x != 0.0D && z != 0.0D && !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, z), this.World, this.Data))
+        while (x != 0.0D && z != 0.0D &&
+            !WorldUtils.CollidesWithWorld(entity.GetBoundingBox().Offset(x, -1.0, z), World, Data))
         {
             x = x switch
             {
                 < increment and >= -increment => 0.0,
-                > 0.0                         => x - increment,
-                _                             => x + increment
+                > 0.0 => x - increment,
+                _ => x + increment
             };
 
             z = z switch
             {
                 < increment and >= -increment => 0.0,
-                > 0.0                         => z - increment,
-                _                             => z + increment
+                > 0.0 => z - increment,
+                _ => z + increment
             };
         }
 
@@ -551,9 +597,11 @@ public class PlayerPhysics
 
     private void MoveRelative(double dx, double dy, double dz, float scale, float yaw)
     {
-        var length = dx * dx + dy * dy + dz * dz;
+        var length = (dx * dx) + (dy * dy) + (dz * dz);
         if (length < 1.0E-7D)
+        {
             return;
+        }
 
         if (length > 1.0)
         {
@@ -570,70 +618,74 @@ public class PlayerPhysics
         var sin = MathF.Sin(yaw * (MathF.PI / 180.0F));
         var cos = MathF.Cos(yaw * (MathF.PI / 180.0F));
 
-        this.playerVelocity.Add(
-            dx * cos - dz * sin, 
-            dy, 
-            dz * cos + dx * sin);
+        playerVelocity.Add(
+            (dx * cos) - (dz * sin),
+            dy,
+            (dz * cos) + (dx * sin));
     }
 
     private void TryJumping()
     {
-        var fluidHeight = this.State.LavaHeight > 0.0
-            ? this.State.LavaHeight
-            : this.State.WaterHeight;
+        var fluidHeight = State.LavaHeight > 0.0
+            ? State.LavaHeight
+            : State.WaterHeight;
 
-        var isInWater = this.State.WasTouchingWater && fluidHeight > 0.0;
-        if (!isInWater || this.Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD)
+        var isInWater = State.WasTouchingWater && fluidHeight > 0.0;
+        if (!isInWater || (Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FluidJumpThreshold))
         {
-            if (this.State.LavaHeight <= 0.0 || this.Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD)
+            if (State.LavaHeight <= 0.0 ||
+                (Player.Entity!.IsOnGround && fluidHeight <= PhysicsConst.FluidJumpThreshold))
             {
-                if ((this.Player.Entity!.IsOnGround || isInWater && fluidHeight <= PhysicsConst.FLUID_JUMP_THRESHOLD) &&
-                    this.State.NoJumpDelay == 0)
+                if ((Player.Entity!.IsOnGround || (isInWater && fluidHeight <= PhysicsConst.FluidJumpThreshold)) &&
+                    State.NoJumpDelay == 0)
                 {
-                    this.JumpFromGround();
-                    this.State.NoJumpDelay = PhysicsConst.JUMP_DELAY;
+                    JumpFromGround();
+                    State.NoJumpDelay = PhysicsConst.JumpDelay;
                 }
             }
             else
             {
-                this.JumpInFluid();
+                JumpInFluid();
             }
         }
         else
         {
-            this.JumpInFluid();
+            JumpInFluid();
         }
     }
 
     private void JumpFromGround()
     {
-        var jumpBoostFactor = 0.1d * (this.Player.Entity!.GetEffectLevel(EffectType.JumpBoost) + 1) ?? 0;
+        var jumpBoostFactor = 0.1d * (Player.Entity!.GetEffectLevel(EffectType.JumpBoost) + 1) ?? 0;
 
-        this.playerVelocity.SetY(
-            0.42 * WorldUtils.GetBlockJumpFactor((Position)this.Player.Entity.Position, this.World) + jumpBoostFactor);
-        
-        if (!this.State.IsSprinting)
+        playerVelocity.SetY(
+            (0.42 * WorldUtils.GetBlockJumpFactor((Position)Player.Entity.Position, World)) + jumpBoostFactor);
+
+        if (!State.IsSprinting)
+        {
             return;
+        }
 
-        var yaw = this.Player.Entity!.Yaw * (MathF.PI / 180.0f);
+        var yaw = Player.Entity!.Yaw * (MathF.PI / 180.0f);
 
-        this.playerVelocity.Add(-0.2 * Math.Sin(yaw), 0, 0.2 * Math.Cos(yaw));
+        playerVelocity.Add(-0.2 * Math.Sin(yaw), 0, 0.2 * Math.Cos(yaw));
     }
 
     private void JumpInFluid()
     {
-        this.playerVelocity.Add(0.0, PhysicsConst.FLUID_JUMP_FACTOR, 0.0);
+        playerVelocity.Add(0.0, PhysicsConst.FluidJumpFactor, 0.0);
     }
 
     private void UpdateSprinting()
     {
-        var hasSprintingImpulse = this.movementInput.HasSprintingImpulse(this.State.WasUnderwater);
+        var hasSprintingImpulse = movementInput.HasSprintingImpulse(State.WasUnderwater);
 
         // TODO: fix differences with java
         // LocalPlayer.java:975 canStartSprinting()
         // hasEnoughFoodToStartSprinting() && !isUsingItem()
         // + effects + vehicle
-        var canStartSprinting = !this.State.IsSprinting && hasSprintingImpulse;
+        var canStartSprinting = !State.IsSprinting && hasSprintingImpulse;
+
         // var onGround = this.Player.Entity!.IsOnGround; // isPassenger() -> getVehicle.IsOnGround
         // var flag = !this.input.Controls.SneakingKeyDown && !hasSprintingImpulse;
         //
@@ -642,90 +694,103 @@ public class PlayerPhysics
         //     
         // }
 
-        if ((!this.State.WasTouchingWater || this.State.WasUnderwater) && canStartSprinting && this.movementInput.Controls.SprintingKeyDown)
+        if ((!State.WasTouchingWater || State.WasUnderwater) && canStartSprinting &&
+            movementInput.Controls.SprintingKeyDown)
         {
             // TODO: Prob add sprinting attribute
-            this.speedAttribute.AddModifier(this.sprintingModifier);
-            this.State.IsSprinting = true;
-            Task.Run(() => this.OnSprintingChanged?.Invoke(this, this.State.IsSprinting));
+            speedAttribute.AddModifier(sprintingModifier);
+            State.IsSprinting = true;
+            OnSprintingChanged.Dispatch(this, State.IsSprinting);
         }
 
-        if (this.State.IsSprinting)
+        if (State.IsSprinting)
         {
-            var cannotSprint = !this.movementInput.HasForwardImpulse(); // || hasEnoughFoodToStartSprinting()
+            var cannotSprint = !movementInput.HasForwardImpulse(); // || hasEnoughFoodToStartSprinting()
             var stopSprinting = cannotSprint
-                             || this.State.HorizontalCollision && !this.State.MinorHorizontalCollision
-                             || this.State.WasTouchingWater    && !this.State.WasUnderwater;
+                || (State.HorizontalCollision && !State.MinorHorizontalCollision)
+                || (State.WasTouchingWater && !State.WasUnderwater);
 
             // isSwimming() LocalPlayer.java:676
             // else
             if (stopSprinting)
             {
-                this.speedAttribute.RemoveModifier(this.sprintingModifier.UUID);
-                this.State.IsSprinting = false;
-                Task.Run(() => this.OnSprintingChanged?.Invoke(this, this.State.IsSprinting));
+                speedAttribute.RemoveModifier(sprintingModifier.Uuid);
+                State.IsSprinting = false;
+                OnSprintingChanged.Dispatch(this, State.IsSprinting);
             }
         }
     }
 
     private void PushTowardsClosestSpace(double x, double z)
     {
-        var pos = new Position(x, this.Player.Entity!.Position.Y, z);
+        var pos = new Position(x, Player.Entity!.Position.Y, z);
 
-        if (!this.CollidesWithSuffocatingBlock(pos))
+        if (!CollidesWithSuffocatingBlock(pos))
         {
             return;
         }
 
-        var      nX        = x - pos.X;
-        var      nZ        = z - pos.Z;
-        var      diff      = double.MaxValue;
+        var nX = x - pos.X;
+        var nZ = z - pos.Z;
+        var diff = double.MaxValue;
         Vector3? direction = null;
 
-        foreach (var axis in XZAxisVectors)
+        foreach (var axis in XzAxisVectors)
         {
             var coord = axis.ChooseValueForAxis(nX, 0.0, nZ);
             coord = axis.IsPositiveAxisVector()
                 ? 1.0 - coord
                 : coord;
 
-            if (coord >= diff || this.CollidesWithSuffocatingBlock((Position)axis.Plus(pos)))
+            if (coord >= diff || CollidesWithSuffocatingBlock((Position)axis.Plus(pos)))
+            {
                 continue;
+            }
 
             direction = axis;
-            diff      = coord;
+            diff = coord;
         }
 
         if (direction is null)
+        {
             return;
+        }
 
         if (direction.X != 0.0)
         {
-            this.playerVelocity.SetX(0.1d * direction.X);
+            playerVelocity.SetX(0.1d * direction.X);
         }
         else
         {
-            this.playerVelocity.SetZ(0.1 * direction.Z);
+            playerVelocity.SetZ(0.1 * direction.Z);
         }
     }
 
     private bool CollidesWithSuffocatingBlock(Position position)
     {
-        var bb = this.Player.Entity!.GetBoundingBox();
+        var bb = Player.Entity!.GetBoundingBox();
         bb.Min.Set(position.X, 0, position.Z);
         bb.Max.Set(position.X + 1.0, 0, position.Z + 1.0);
         bb.Deflate(1.0E-7D, 1.0E-7D, 1.0E-7D);
 
-        return WorldUtils.CollidesWithWorld(bb, this.World, this.Data);
+        return WorldUtils.CollidesWithWorld(bb, World, Data);
     }
 
     private void TruncateVelocity(MutableVector3 vec)
     {
-        if (Math.Abs(vec.X) < PhysicsConst.VELOCITY_THRESHOLD)
+        if (Math.Abs(vec.X) < PhysicsConst.VelocityThreshold)
+        {
             vec.SetX(0);
-        if (Math.Abs(vec.Y) < PhysicsConst.VELOCITY_THRESHOLD)
+        }
+
+        if (Math.Abs(vec.Y) < PhysicsConst.VelocityThreshold)
+        {
             vec.SetY(0);
-        if (Math.Abs(vec.Z) < PhysicsConst.VELOCITY_THRESHOLD)
+        }
+
+        if (Math.Abs(vec.Z) < PhysicsConst.VelocityThreshold)
+        {
             vec.SetZ(0);
+        }
     }
 }

@@ -28,7 +28,7 @@ public class Pathfinder(MineSharpBot bot) : Plugin(bot)
         this.worldPlugin = this.Bot.GetPlugin<WorldPlugin>();
         this.playerPlugin = this.Bot.GetPlugin<PlayerPlugin>();
 
-        this.astar = new AStar(this.worldPlugin.World, this.movements);
+        this.astar = new AStar(this.worldPlugin.World, this.movements, this.Bot.Data);
 
         return Task.WhenAll(
             this.physics.WaitForInitialization(), 

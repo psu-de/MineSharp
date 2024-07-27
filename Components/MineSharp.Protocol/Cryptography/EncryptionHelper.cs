@@ -1,9 +1,9 @@
-﻿using NLog;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace MineSharp.Protocol.Cryptography;
 
@@ -13,14 +13,14 @@ internal class EncryptionHelper
 
     public static RSA? DecodePublicKey(byte[] publicKeyBytes)
     {
-        var    ms     = new MemoryStream(publicKeyBytes);
-        var    rd     = new BinaryReader(ms);
+        var ms = new MemoryStream(publicKeyBytes);
+        var rd = new BinaryReader(ms);
         byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
-        var    seq    = new byte[15];
+        var seq = new byte[15];
 
         try
         {
-            byte   byteValue;
+            byte byteValue;
             ushort shortValue;
 
             shortValue = rd.ReadUInt16();
@@ -45,13 +45,21 @@ internal class EncryptionHelper
 
             seq = rd.ReadBytes(15);
 
-            if (!CompareBytearrays(seq, seqOid)) return null;
+            if (!CompareBytearrays(seq, seqOid))
+            {
+                return null;
+            }
 
             shortValue = rd.ReadUInt16();
 
-            if (shortValue      == 0x8103) rd.ReadByte();
+            if (shortValue == 0x8103)
+            {
+                rd.ReadByte();
+            }
             else if (shortValue == 0x8203)
+            {
                 rd.ReadInt16();
+            }
             else
             {
                 Logger.Warn("PublicKey Decode Returning null! (shortvalue 1)");
@@ -70,9 +78,14 @@ internal class EncryptionHelper
 
             shortValue = rd.ReadUInt16();
 
-            if (shortValue      == 0x8130) rd.ReadByte();
+            if (shortValue == 0x8130)
+            {
+                rd.ReadByte();
+            }
             else if (shortValue == 0x8230)
+            {
                 rd.ReadInt16();
+            }
             else
             {
                 Logger.Warn("PublicKey Decode Returning null! (Shortvalue 2)");
@@ -81,6 +94,7 @@ internal class EncryptionHelper
             }
 
             var rsa = RSA.Create();
+
             //RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(parms);
             var rsAparams = new RSAParameters();
 
@@ -88,7 +102,7 @@ internal class EncryptionHelper
 
             GetTraits(rsAparams.Modulus.Length * 8, out var sizeMod, out var sizeExp);
 
-            rsAparams.Modulus  = AlignBytes(rsAparams.Modulus, sizeMod);
+            rsAparams.Modulus = AlignBytes(rsAparams.Modulus, sizeMod);
             rsAparams.Exponent = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), sizeExp);
 
             rsa.ImportParameters(rsAparams);
@@ -110,14 +124,18 @@ internal class EncryptionHelper
     private static bool CompareBytearrays(byte[] a, byte[] b)
     {
         if (a.Length != b.Length)
+        {
             return false;
+        }
 
         var i = 0;
 
         foreach (var c in a)
         {
             if (c != b[i])
+            {
                 return false;
+            }
 
             i++;
         }
@@ -147,11 +165,14 @@ internal class EncryptionHelper
     private static int DecodeIntegerSize(BinaryReader rd)
     {
         byte byteValue;
-        int  count;
+        int count;
 
         byteValue = rd.ReadByte();
 
-        if (byteValue != 0x02) return 0;
+        if (byteValue != 0x02)
+        {
+            return 0;
+        }
 
         byteValue = rd.ReadByte();
 
@@ -183,7 +204,7 @@ internal class EncryptionHelper
     private static void GetTraits(int modulusLengthInBits, out int sizeMod, out int sizeExp)
     {
         var assumedLength = -1;
-        var logbase       = Math.Log(modulusLengthInBits, 2);
+        var logbase = Math.Log(modulusLengthInBits, 2);
 
         if (logbase == (int)logbase)
         {
@@ -243,10 +264,10 @@ internal class EncryptionHelper
 
     public static string ComputeHash(string serverId, byte[] key, byte[] publicKey)
     {
-        byte[] bytes = Encoding.ASCII.GetBytes(serverId)
-                               .Concat(key)
-                               .Concat(publicKey)
-                               .ToArray();
+        var bytes = Encoding.ASCII.GetBytes(serverId)
+                            .Concat(key)
+                            .Concat(publicKey)
+                            .ToArray();
 
         var hash = SHA1.HashData(bytes);
         Array.Reverse(hash);

@@ -1,6 +1,5 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Protocol.Packets.NetworkTypes;
-using MineSharp.Protocol.Packets.Serverbound.Play;
 
 /*
  * Thanks to https://github.com/MCCTeam/Minecraft-Console-Client
@@ -11,20 +10,20 @@ namespace MineSharp.Bot.Chat;
 
 internal class AcknowledgedMessage
 {
-    public bool   Pending   { get; set; }
-    public UUID   Sender    { get; set; }
-    public byte[] Signature { get; set; }
-
-    public AcknowledgedMessage(bool pending, UUID sender, byte[] signature)
+    public AcknowledgedMessage(bool pending, Uuid sender, byte[] signature)
     {
-        this.Pending   = pending;
-        this.Sender    = sender;
-        this.Signature = signature;
+        Pending = pending;
+        Sender = sender;
+        Signature = signature;
     }
+
+    public bool Pending { get; set; }
+    public Uuid Sender { get; set; }
+    public byte[] Signature { get; set; }
 
     public ChatMessageItem ToProtocolMessage()
     {
-        return new ChatMessageItem(
-            this.Sender, this.Signature);
+        return new(
+            Sender, Signature);
     }
 }

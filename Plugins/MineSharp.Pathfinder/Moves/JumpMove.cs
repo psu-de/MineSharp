@@ -1,6 +1,7 @@
 ﻿using MineSharp.Bot;
 using MineSharp.Bot.Plugins;
 using MineSharp.Core.Geometry;
+using MineSharp.Data;
 using MineSharp.Pathfinder.Exceptions;
 using MineSharp.Pathfinder.Utils;
 using MineSharp.World;
@@ -36,7 +37,7 @@ public class JumpMove : Move
     }
     
     /// <inheritdoc />
-    public override bool IsMovePossible(Position position, IWorld world)
+    public override bool IsMovePossible(Position position, IWorld world, MinecraftData data)
     {
         var x = this.Motion.X == 0 ? 0 : this.Motion.X < 0 ? -1 : 1;
         var z = this.Motion.Z == 0 ? 0 : this.Motion.Z < 0 ? -1 : 1; 
@@ -50,13 +51,13 @@ public class JumpMove : Move
         var bb = CollisionHelper.GetAabbForPlayer(pos)
                                 .Expand(motionBelow.X, 0, motionBelow.Z);
         
-        if (CollisionHelper.CollidesWithWord(bb, world))
+        if (CollisionHelper.CollidesWithWord(bb, world, data))
             return false;
 
-        bb = CollisionHelper.SetAABBToPlayerBB(pos, bb)
+        bb = CollisionHelper.SetAabbToPlayerBB(pos, bb)
                             .Offset(this.Motion.X, this.Motion.Y, this.Motion.Z);
         
-        return !CollisionHelper.CollidesWithWord(bb, world);
+        return !CollisionHelper.CollidesWithWord(bb, world, data);
     }
     
     /// <inheritdoc />
@@ -98,7 +99,7 @@ public class JumpMove : Move
         while (true)
         {
             await physics.WaitForTick();
-            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
+            CollisionHelper.SetAabbToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
 
             if (bb.Min.Y - target.Y + this.Motion.Y < -1)
             {
@@ -125,7 +126,7 @@ public class JumpMove : Move
         {
             await physics.WaitForTick();
             
-            CollisionHelper.SetAABBToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
+            CollisionHelper.SetAabbToPlayerBB(MovementUtils.GetPositionNextTick(entity), bb);
             if (CollisionHelper.IntersectsBbWithBlockXz(bb, targetBlock))
             {
                 break;

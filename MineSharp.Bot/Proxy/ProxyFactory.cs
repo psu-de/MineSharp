@@ -1,62 +1,55 @@
-using MineSharp.Protocol;
-using System.Net.Sockets;
-using Starksoft.Aspen.Proxy;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
+using MineSharp.Protocol.Connection;
+using Starksoft.Aspen.Proxy;
 
 namespace MineSharp.Bot.Proxy;
 
 /// <summary>
-/// A Proxy provider
+///     A Proxy provider
 /// </summary>
-public class ProxyFactory : ITcpClientFactory
+public class ProxyFactory : IConnectionFactory
 {
-    private static readonly ProxyClientFactory Factory = new ProxyClientFactory();
-
     /// <summary>
-    /// Specifies the type of a proxy
+    ///     Specifies the type of a proxy
     /// </summary>
 #pragma warning disable CS1591
-    public enum ProxyType { None, Http, Socks4, Socks4A, Socks5, }
+    public enum ProxyType { Http, Socks4, Socks4A, Socks5 }
 #pragma warning restore CS1591
+    private static readonly ProxyClientFactory Factory = new();
 
     /// <summary>
-    /// The type of the proxy
-    /// </summary>
-    public ProxyType Type;
-
-    /// <summary>
-    /// Hostname of the proxy
+    ///     Hostname of the proxy
     /// </summary>
     public readonly string Hostname;
 
     /// <summary>
-    /// Port of the Proxy
-    /// </summary>
-    public readonly int Port;
-
-    /// <summary>
-    /// If authentication is required, the username for the proxy
-    /// </summary>
-    public readonly string? Username;
-
-    /// <summary>
-    /// If authentication is required, the password for the proxy
+    ///     If authentication is required, the password for the proxy
     /// </summary>
     public readonly string? Password;
 
-    private IProxyClient?      proxyClient;
+    /// <summary>
+    ///     Port of the Proxy
+    /// </summary>
+    public readonly int Port;
+
+    private readonly IProxyClient proxyClient;
+
+    /// <summary>
+    ///     If authentication is required, the username for the proxy
+    /// </summary>
+    public readonly string? Username;
+
     private HttpClientHandler? httpClientHandler;
 
     /// <summary>
-    /// Create an empty ProxyProvider
+    ///     The type of the proxy
     /// </summary>
-    public ProxyFactory()
-        : this(ProxyType.None, string.Empty, 0)
-    { }
+    public ProxyType Type;
 
     /// <summary>
-    /// Create a new ProxyProvider with authentication
+    ///     Create a new ProxyProvider with authentication
     /// </summary>
     /// <param name="type"></param>
     /// <param name="hostname"></param>
@@ -66,81 +59,78 @@ public class ProxyFactory : ITcpClientFactory
     public ProxyFactory(ProxyType type, string hostname, int port, string username, string password)
         : this(type, hostname, port)
     {
-        this.Username = username;
-        this.Password = password;
+        Username = username;
+        Password = password;
     }
 
     /// <summary>
-    /// Create a new ProxyProvider without authentication 
+    ///     Create a new ProxyProvider without authentication
     /// </summary>
     /// <param name="type"></param>
     /// <param name="hostname"></param>
     /// <param name="port"></param>
     public ProxyFactory(ProxyType type, string hostname, int port)
     {
-        this.Type     = type;
-        this.Hostname = hostname;
-        this.Port     = port;
+        Type = type;
+        Hostname = hostname;
+        Port = port;
 
-        if (this.Type == ProxyType.None)
-            return;
-
-        var socketType = this.Type switch
+        var socketType = Type switch
         {
-            ProxyType.Http    => Starksoft.Aspen.Proxy.ProxyType.Http,
-            ProxyType.Socks4  => Starksoft.Aspen.Proxy.ProxyType.Socks4,
+            ProxyType.Http => Starksoft.Aspen.Proxy.ProxyType.Http,
+            ProxyType.Socks4 => Starksoft.Aspen.Proxy.ProxyType.Socks4,
             ProxyType.Socks4A => Starksoft.Aspen.Proxy.ProxyType.Socks4a,
-            ProxyType.Socks5  => Starksoft.Aspen.Proxy.ProxyType.Socks5,
-            _                 => throw new UnreachableException()
+            ProxyType.Socks5 => Starksoft.Aspen.Proxy.ProxyType.Socks5,
+            _ => throw new UnreachableException()
         };
 
-        this.proxyClient = this.Username is null
-            ? Factory.CreateProxyClient(socketType, this.Hostname, this.Port)
-            : Factory.CreateProxyClient(socketType, this.Hostname, this.Port, this.Username, this.Password);
+        proxyClient = Username is null
+            ? Factory.CreateProxyClient(socketType, Hostname, Port)
+            : Factory.CreateProxyClient(socketType, Hostname, Port, Username, Password);
     }
 
     /// <summary>
-    /// Create a new TcpClient instance and connect to the given hostname and port
+    ///     Create a new TcpClient instance and connect to the given hostname and port
     /// </summary>
-    /// <param name="hostname"></param>
+    /// <param name="address"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public TcpClient CreateOpenConnection(string hostname, ushort port)
+    public Task<TcpClient> CreateOpenConnection(IPAddress address, ushort port)
     {
-        return this.proxyClient is null
-            ? new TcpClient(hostname, port)
-            : this.proxyClient.CreateConnection(hostname, port);
+        var ip = address.ToString();
+        return Task.FromResult(proxyClient.CreateConnection(ip, port));
     }
 
     /// <summary>
-    /// Create a proxied http client
+    ///     Create a proxied http client
     /// </summary>
     /// <returns></returns>
     /// <exception cref="UnreachableException"></exception>
     public HttpClient CreateHttpClient()
     {
-        if (this.Type == ProxyType.None)
-            return new HttpClient();
-
-        if (this.httpClientHandler is not null)
-            return new HttpClient(this.httpClientHandler);
-
-        var protocol = this.Type switch
+        if (httpClientHandler is not null)
         {
-            ProxyType.Http    => "http://",
-            ProxyType.Socks4  => "socks://",
+            return new(httpClientHandler);
+        }
+
+        var protocol = Type switch
+        {
+            ProxyType.Http => "http://",
+            ProxyType.Socks4 => "socks://",
             ProxyType.Socks4A => "socks4a://",
-            ProxyType.Socks5  => "socks5://",
-            _                 => throw new UnreachableException()
+            ProxyType.Socks5 => "socks5://",
+            _ => throw new UnreachableException()
         };
 
-        var proxyUrl = $"{protocol}{this.Hostname}:{this.Port}";
-        var proxy    = new WebProxy(proxyUrl);
+        var proxyUrl = $"{protocol}{Hostname}:{Port}";
+        var proxy = new WebProxy(proxyUrl);
 
-        if (this.Username is not null && this.Password is not null)
-            proxy.Credentials = new NetworkCredential(this.Username, this.Password);
+        if (Username is not null && Password is not null)
+        {
+            proxy.Credentials = new NetworkCredential(Username, Password);
+        }
 
-        this.httpClientHandler = new HttpClientHandler() { Proxy = proxy };
-        return new HttpClient(this.httpClientHandler);
+        httpClientHandler = new() { Proxy = proxy };
+        return new(httpClientHandler);
     }
 }

@@ -1,27 +1,26 @@
-using MineSharp.Core.Common;
-using MineSharp.Core.Common.Items;
+﻿using MineSharp.Core.Common;
 
 namespace MineSharp.Windows.Clicks;
 
 internal class SimpleWindowClick : WindowClick
 {
-    public override ClickMode ClickMode => ClickMode.SimpleClick;
-
-    private IList<Slot> _changedSlots = new List<Slot>();
+    private readonly IList<Slot> changedSlots = new List<Slot>();
 
     internal SimpleWindowClick(Window window, short slot, byte button) : base(window, slot, button)
     { }
 
+    public override ClickMode ClickMode => ClickMode.SimpleClick;
+
     private void PerformOutsideClick()
     {
         // Clicked outside, drop item stack
-        if (this.Window.GetSelectedSlot().IsEmpty())
+        if (Window.GetSelectedSlot().IsEmpty())
         {
             return;
         }
 
-        var selectedItem = this.Window.GetSelectedSlot();
-        if (this.Button == 0) // Drop entire stack
+        var selectedItem = Window.GetSelectedSlot();
+        if (Button == 0) // Drop entire stack
         {
             selectedItem.Item = null;
         }
@@ -35,63 +34,71 @@ internal class SimpleWindowClick : WindowClick
             }
         }
 
-        this.Window.UpdateSlot(selectedItem.Item, Window.SELECTED_SLOT);
+        Window.UpdateSlot(selectedItem.Item, Window.SelectedSlot);
     }
 
     private void PerformLeftClick()
     {
         // Swap selected slot and clicked slot
-        var selectedSlot = this.Window.GetSelectedSlot();
-        var clickedSlot  = this.Window.GetSlot(this.Slot);
+        var selectedSlot = Window.GetSelectedSlot();
+        var clickedSlot = Window.GetSlot(Slot);
 
         if (selectedSlot.IsEmpty() && clickedSlot.IsEmpty())
+        {
             return;
+        }
 
-        this._changedSlots.Add(clickedSlot);
+        changedSlots.Add(clickedSlot);
 
         if (selectedSlot.Item?.Info.Id == clickedSlot.Item?.Info.Id)
         {
             // stack items, both items cannot be null
-            int left = selectedSlot.Item!.Count - clickedSlot.LeftToStack;
+            var left = selectedSlot.Item!.Count - clickedSlot.LeftToStack;
             if (left < 0)
+            {
                 left = 0;
+            }
 
-            clickedSlot.Item!.Count  += (byte)(selectedSlot.Item!.Count - left);
-            selectedSlot.Item!.Count =  (byte)left;
+            clickedSlot.Item!.Count += (byte)(selectedSlot.Item!.Count - left);
+            selectedSlot.Item!.Count = (byte)left;
 
             if (selectedSlot.Item!.Count == 0)
+            {
                 selectedSlot.Item = null;
+            }
 
-            this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
-            this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
+            Window.UpdateSlot(clickedSlot.Item, Slot);
+            Window.UpdateSlot(selectedSlot.Item, Window.SelectedSlot);
             return;
         }
 
         //swap items
         (clickedSlot.Item, selectedSlot.Item) = (selectedSlot.Item, clickedSlot.Item);
-        this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
-        this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
+        Window.UpdateSlot(clickedSlot.Item, Slot);
+        Window.UpdateSlot(selectedSlot.Item, Window.SelectedSlot);
     }
 
     private void PerformRightClick()
     {
-        var clickedSlot  = this.Window.GetSlot(this.Slot);
-        var selectedSlot = this.Window.GetSelectedSlot();
+        var clickedSlot = Window.GetSlot(Slot);
+        var selectedSlot = Window.GetSelectedSlot();
         if (selectedSlot.IsEmpty() && clickedSlot.IsEmpty())
+        {
             return;
+        }
 
         if (selectedSlot.IsEmpty())
         {
             // Pickup half stack
-            var count           = (byte)Math.Ceiling(clickedSlot.Item!.Count / 2.0F);
+            var count = (byte)Math.Ceiling(clickedSlot.Item!.Count / 2.0F);
             var newSelectedItem = clickedSlot.Item.Clone();
             newSelectedItem.Count = count;
 
             clickedSlot.Item.Count -= count;
-            this._changedSlots.Add(clickedSlot);
+            changedSlots.Add(clickedSlot);
 
-            this.Window.UpdateSlot(newSelectedItem, Window.SELECTED_SLOT);
-            this.Window.UpdateSlot(clickedSlot.Item, clickedSlot.SlotIndex);
+            Window.UpdateSlot(newSelectedItem, Window.SelectedSlot);
+            Window.UpdateSlot(clickedSlot.Item, clickedSlot.SlotIndex);
             return;
         }
 
@@ -102,7 +109,7 @@ internal class SimpleWindowClick : WindowClick
 
             if (clickedSlot.IsEmpty())
             {
-                clickedSlot.Item = new Item(
+                clickedSlot.Item = new(
                     selectedSlot.Item.Info,
                     1,
                     selectedSlot.Item.Damage,
@@ -113,41 +120,43 @@ internal class SimpleWindowClick : WindowClick
                 clickedSlot.Item!.Count += 1;
             }
 
-            this.Window.UpdateSlot(selectedSlot.Item, Window.SELECTED_SLOT);
-            this.Window.UpdateSlot(clickedSlot.Item, this.Slot);
-            this._changedSlots.Add(clickedSlot);
+            Window.UpdateSlot(selectedSlot.Item, Window.SelectedSlot);
+            Window.UpdateSlot(clickedSlot.Item, Slot);
+            changedSlots.Add(clickedSlot);
         }
         else
         {
             // just swap selected slot and clicked swap, like a left click
-            this.PerformLeftClick();
+            PerformLeftClick();
         }
     }
 
     public override void PerformClick()
     {
-        this._changedSlots.Clear();
-        if (!(this.Button == 0 || this.Button == 1))
-            throw new NotSupportedException();
-
-        if (this.Slot == OUTSIDE_CLICK)
+        changedSlots.Clear();
+        if (!(Button == 0 || Button == 1))
         {
-            this.PerformOutsideClick();
+            throw new NotSupportedException();
+        }
+
+        if (Slot == OutsideClick)
+        {
+            PerformOutsideClick();
             return;
         }
 
-        if (this.Button == 0)
+        if (Button == 0)
         {
             // Swap selected slot and clicked slot
-            this.PerformLeftClick();
+            PerformLeftClick();
             return;
         }
 
-        this.PerformRightClick();
+        PerformRightClick();
     }
 
     public override Slot[] GetChangedSlots()
     {
-        return this._changedSlots.ToArray();
+        return changedSlots.ToArray();
     }
 }

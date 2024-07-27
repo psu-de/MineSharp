@@ -1,7 +1,7 @@
-namespace MineSharp.Core.Common.Effects;
+﻿namespace MineSharp.Core.Common.Effects;
 
 /// <summary>
-/// An effect
+///     An effect
 /// </summary>
 /// <param name="info"></param>
 /// <param name="amplifier"></param>
@@ -10,26 +10,28 @@ namespace MineSharp.Core.Common.Effects;
 public class Effect(EffectInfo info, int amplifier, DateTime startTime, int duration)
 {
     /// <summary>
-    /// Descriptor of this Effect
+    ///     Descriptor of this Effect
     /// </summary>
     public readonly EffectInfo Info = info;
 
     /// <summary>
-    /// When this effect has started
+    ///     When this effect has started
     /// </summary>
     public DateTime StartTime { get; set; } = startTime;
 
     /// <summary>
-    /// Amplifier of this effect
+    ///     Amplifier of this effect
     /// </summary>
     public int Amplifier { get; set; } = amplifier;
 
     /// <summary>
-    /// Duration of this effect in Ticks
+    ///     Duration of this effect in Ticks
     /// </summary>
     public int Duration { get; set; } = duration;
 
     /// <inheritdoc />
-    public override string ToString() =>
-        $"Effect (Name={this.Info.Name} Id={this.Info.Id} Amplifier={this.Amplifier} Duration={this.Duration})";
+    public override string ToString()
+    {
+        return $"Effect (Name={Info.Name} Id={Info.Id} Amplifier={Amplifier} Duration={Duration})";
+    }
 }

@@ -1,4 +1,4 @@
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -6,31 +6,28 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
 public class InteractPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Play_UseEntity;
-
-    public int             EntityId    { get; set; }
-    public InteractionType Interaction { get; set; }
-    public float?          TargetX     { get; set; }
-    public float?          TargetY     { get; set; }
-    public float?          TargetZ     { get; set; }
-    public PlayerHand?     Hand        { get; set; }
-    public bool            Sneaking    { get; set; }
+    public enum InteractionType
+    {
+        Interact = 0,
+        Attack = 1,
+        InteractAt = 2
+    }
 
     /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     /// <param name="entityId"></param>
     /// <param name="interaction"></param>
     /// <param name="sneaking"></param>
     public InteractPacket(int entityId, InteractionType interaction, bool sneaking)
     {
-        this.EntityId    = entityId;
-        this.Interaction = interaction;
-        this.Sneaking    = sneaking;
+        EntityId = entityId;
+        Interaction = interaction;
+        Sneaking = sneaking;
     }
 
     /// <summary>
-    /// Constructor for <see cref="InteractionType.InteractAt"/>
+    ///     Constructor for <see cref="InteractionType.InteractAt" />
     /// </summary>
     /// <param name="entityId"></param>
     /// <param name="targetX"></param>
@@ -40,33 +37,42 @@ public class InteractPacket : IPacket
     /// <param name="sneaking"></param>
     public InteractPacket(int entityId, float targetX, float targetY, float targetZ, PlayerHand hand, bool sneaking)
     {
-        this.EntityId    = entityId;
-        this.Interaction = InteractionType.InteractAt;
-        this.TargetX     = targetX;
-        this.TargetY     = targetY;
-        this.TargetZ     = targetZ;
-        this.Hand        = hand;
-        this.Sneaking    = sneaking;
+        EntityId = entityId;
+        Interaction = InteractionType.InteractAt;
+        TargetX = targetX;
+        TargetY = targetY;
+        TargetZ = targetZ;
+        Hand = hand;
+        Sneaking = sneaking;
     }
+
+    public int EntityId { get; set; }
+    public InteractionType Interaction { get; set; }
+    public float? TargetX { get; set; }
+    public float? TargetY { get; set; }
+    public float? TargetZ { get; set; }
+    public PlayerHand? Hand { get; set; }
+    public bool Sneaking { get; set; }
+    public PacketType Type => PacketType.SB_Play_UseEntity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(this.EntityId);
-        buffer.WriteVarInt((int)this.Interaction);
-        if (InteractionType.InteractAt == this.Interaction)
+        buffer.WriteVarInt(EntityId);
+        buffer.WriteVarInt((int)Interaction);
+        if (InteractionType.InteractAt == Interaction)
         {
-            buffer.WriteFloat(this.TargetX!.Value);
-            buffer.WriteFloat(this.TargetY!.Value);
-            buffer.WriteFloat(this.TargetZ!.Value);
-            buffer.WriteVarInt((int)this.Hand!.Value);
+            buffer.WriteFloat(TargetX!.Value);
+            buffer.WriteFloat(TargetY!.Value);
+            buffer.WriteFloat(TargetZ!.Value);
+            buffer.WriteVarInt((int)Hand!.Value);
         }
 
-        buffer.WriteBool(this.Sneaking);
+        buffer.WriteBool(Sneaking);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var entityId    = buffer.ReadVarInt();
+        var entityId = buffer.ReadVarInt();
         var interaction = (InteractionType)buffer.ReadVarInt();
 
         if (InteractionType.InteractAt == interaction)
@@ -84,14 +90,6 @@ public class InteractPacket : IPacket
             entityId,
             interaction,
             buffer.ReadBool());
-    }
-
-
-    public enum InteractionType
-    {
-        Interact   = 0,
-        Attack     = 1,
-        InteractAt = 2
     }
 }
 #pragma warning restore CS1591

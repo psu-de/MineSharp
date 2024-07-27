@@ -1,15 +1,14 @@
-using MineSharp.Core.Common;
-using MineSharp.Core.Geometry;
+﻿using MineSharp.Core.Geometry;
 
 namespace MineSharp.World.Iterators;
 
 /// <summary>
-/// A World iterator.
+///     A World iterator.
 /// </summary>
 public interface IWorldIterator
 {
     /// <summary>
-    /// Yields an IEnumerable of positions.
+    ///     Yields an IEnumerable of positions.
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Position> Iterate();

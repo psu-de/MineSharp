@@ -10,7 +10,7 @@ using Priority_Queue;
 
 namespace MineSharp.Pathfinder.Algorithm;
 
-public class AStar(IWorld world, Movements movements)
+public class AStar(IWorld world, Movements movements, MinecraftData data)
 {
     public Movements Movements = movements;
 
@@ -101,7 +101,7 @@ public class AStar(IWorld world, Movements movements)
         {
             var pos      = move.Motion.Plus(node.Position);
             var neighbor = this.GetNode((Position)pos, end, ref nodes);
-            if (!neighbor.Walkable || !move.IsMovePossible(node.Position, world))
+            if (!neighbor.Walkable || !move.IsMovePossible(node.Position, world, data))
                 continue;
 
             neighbors.Add((neighbor, move));

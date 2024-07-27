@@ -1,5 +1,4 @@
-using MineSharp.Bot.Plugins;
-using MineSharp.ChatComponent;
+﻿using MineSharp.Bot.Plugins;
 
 namespace MineSharp.Bot.IntegrationTests.Tests;
 
@@ -107,7 +106,7 @@ public static class PhysicsTests
 
             await Task.Delay(1000);
 
-            physics.InputControls.ForwardKeyDown  = true;
+            physics.InputControls.ForwardKeyDown = true;
             physics.InputControls.SneakingKeyDown = true;
         });
     }
@@ -116,10 +115,12 @@ public static class PhysicsTests
     {
         var chat = bot.GetPlugin<ChatPlugin>();
 
-        chat.OnChatMessageReceived += (sender, player, chatComponent, position, name) =>
+        chat.OnChatMessageReceived += (sender, player, chatComponent, position) =>
         {
-            if (chatComponent.Message.Contains(expectedMessage))
+            if (chatComponent.GetMessage(bot.Data).Contains(expectedMessage))
+            {
                 source.TrySetResult(true);
+            }
         };
     }
 }

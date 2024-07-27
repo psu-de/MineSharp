@@ -1,22 +1,22 @@
-namespace MineSharp.Core.Common;
+﻿namespace MineSharp.Core.Common;
 
 /// <summary>
-/// Specifies the Dimension
+///     Specifies the Dimension
 /// </summary>
 public enum Dimension
 {
     /// <summary>
-    /// Overworld
+    ///     Overworld
     /// </summary>
     Overworld,
 
     /// <summary>
-    /// The nether dimension
+    ///     The nether dimension
     /// </summary>
     Nether,
 
     /// <summary>
-    /// The End dimension
+    ///     The End dimension
     /// </summary>
     End
 }
