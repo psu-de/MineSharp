@@ -9,7 +9,7 @@ using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.Kee
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class ConfigurationPacketHandler : IPacketHandler
+internal class ConfigurationPacketHandler : GameStatePacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -17,12 +17,13 @@ internal class ConfigurationPacketHandler : IPacketHandler
     private readonly MinecraftData data;
 
     public ConfigurationPacketHandler(MinecraftClient client, MinecraftData data)
+        : base(GameState.Configuration)
     {
         this.client = client;
         this.data = data;
     }
 
-    public Task HandleIncoming(IPacket packet)
+    public override Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
@@ -35,7 +36,7 @@ internal class ConfigurationPacketHandler : IPacketHandler
         };
     }
 
-    public Task HandleOutgoing(IPacket packet)
+    public override Task HandleOutgoing(IPacket packet)
     {
         if (packet is Serverbound.Configuration.FinishConfigurationPacket)
         {
@@ -45,7 +46,7 @@ internal class ConfigurationPacketHandler : IPacketHandler
         return Task.CompletedTask;
     }
 
-    public bool HandlesIncoming(PacketType type)
+    public override bool HandlesIncoming(PacketType type)
     {
         return type is PacketType.CB_Configuration_Disconnect
             or PacketType.CB_Configuration_FinishConfiguration

@@ -13,7 +13,7 @@ using NLog;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class LoginPacketHandler : IPacketHandler
+internal class LoginPacketHandler : GameStatePacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -21,12 +21,13 @@ internal class LoginPacketHandler : IPacketHandler
     private readonly MinecraftData data;
 
     public LoginPacketHandler(MinecraftClient client, MinecraftData data)
+        : base(GameState.Login)
     {
         this.client = client;
         this.data = data;
     }
 
-    public Task HandleIncoming(IPacket packet)
+    public override Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
@@ -38,12 +39,12 @@ internal class LoginPacketHandler : IPacketHandler
         };
     }
 
-    public Task HandleOutgoing(IPacket packet)
+    public override Task HandleOutgoing(IPacket packet)
     {
         return Task.CompletedTask;
     }
 
-    public bool HandlesIncoming(PacketType type)
+    public override bool HandlesIncoming(PacketType type)
     {
         return type is PacketType.CB_Login_Disconnect
             or PacketType.CB_Login_EncryptionBegin

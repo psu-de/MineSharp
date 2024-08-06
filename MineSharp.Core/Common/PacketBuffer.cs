@@ -253,16 +253,22 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return BitConverter.ToDouble(bytes);
     }
 
-    public int ReadVarInt()
+    private const int VarIntSegmentBits = 0x7F;
+    private const int VarIntContinueBit = 0x80;
+
+    // This method is also used by MinecraftStream
+    public static int ReadVarInt(Stream stream, out int byteCount)
     {
         var value = 0;
         var shift = 0;
+        byteCount = 0;
 
         while (true)
         {
-            var b = ReadByte();
-            value |= (b & 0x7f) << shift;
-            if ((b & 0x80) == 0x00)
+            var b = stream.ReadByte();
+            byteCount++;
+            value |= (b & VarIntSegmentBits) << shift;
+            if ((b & VarIntContinueBit) == 0x00)
             {
                 break;
             }
@@ -270,11 +276,16 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             shift += 7;
             if (shift >= 32)
             {
-                throw new("varint is too big");
+                throw new("VarInt is too big");
             }
         }
 
         return value;
+    }
+
+    public int ReadVarInt()
+    {
+        return ReadVarInt(buffer, out _);
     }
 
     public long ReadVarLong()
@@ -285,8 +296,8 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         while (true)
         {
             var b = ReadByte();
-            value |= (b & (long)0x7f) << shift;
-            if ((b & 0x80) == 0x00)
+            value |= (long)(b & VarIntSegmentBits) << shift;
+            if ((b & VarIntContinueBit) == 0x00)
             {
                 break;
             }
@@ -294,7 +305,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             shift += 7;
             if (shift >= 64)
             {
-                throw new("varlong is too big");
+                throw new("VarLong is too big");
             }
         }
 
@@ -549,19 +560,25 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         WriteULong(val);
     }
 
-    public void WriteVarInt(int value)
+    // Is also used by MinecraftStream
+    public static void WriteVarInt(Stream stream, int value)
     {
         while (true)
         {
             if ((value & ~0x7F) == 0)
             {
-                buffer.WriteByte((byte)value);
+                stream.WriteByte((byte)value);
                 return;
             }
 
-            buffer.WriteByte((byte)((value & 0x7F) | 0x80));
+            stream.WriteByte((byte)((value & 0x7F) | 0x80));
             value >>>= 7;
         }
+    }
+
+    public void WriteVarInt(int value)
+    {
+        WriteVarInt(buffer, value);
     }
 
     public void WriteVarLong(int value)

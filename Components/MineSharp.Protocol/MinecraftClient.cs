@@ -2,12 +2,14 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks.Dataflow;
 using MineSharp.Auth;
 using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Concurrency;
 using MineSharp.Core.Events;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -25,9 +27,9 @@ namespace MineSharp.Protocol;
 
 /// <summary>
 ///     A Minecraft client.
-///     Connect to a minecraft server.
+///     Connect to a Minecraft server.
 /// </summary>
-public sealed class MinecraftClient : IDisposable
+public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 {
     /// <summary>
     ///     Delegate for handling packets async
@@ -57,16 +59,22 @@ public sealed class MinecraftClient : IDisposable
     private readonly TaskCompletionSource gameJoinedTsc;
 
     /// <summary>
-    ///     The Hostname of the minecraft server provided in the constructor
+    ///     The Hostname of the Minecraft server provided in the constructor
     /// </summary>
     public readonly string Hostname;
 
-    private readonly IPAddress                                             ip;
-    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>>    packetHandlers;
-    private readonly ConcurrentQueue<PacketSendTask>                       packetQueue;
-    private readonly ConcurrentQueue<(PacketType, PacketBuffer)>           bundledPackets;
+    private readonly IPAddress ip;
+    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> packetHandlers;
+    private readonly BufferBlock<PacketSendTask> packetQueue;
+    private readonly ConcurrentQueue<(PacketType, PacketBuffer)> bundledPackets;
     private readonly IDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
-    private readonly CancellationTokenSource                               cancellationTokenSource;
+    private readonly CancellationTokenSource cancellationTokenSource;
+
+    /// <summary>
+    ///     Is cancelled once the client needs to stop. Usually because the connection was lost.
+    /// </summary>
+    // This variable exists (and is not a property) to prevent the possible problem when getting the token from the source when it's already disposed.
+    public readonly CancellationToken CancellationToken;
 
     /// <summary>
     ///     The Port of the minecraft server
@@ -82,21 +90,29 @@ public sealed class MinecraftClient : IDisposable
     ///     The clients settings
     /// </summary>
     public readonly ClientSettings Settings;
-    
+
     /// <summary>
     ///     Fires when the client disconnected from the server
     /// </summary>
     public AsyncEvent<MinecraftClient, Chat> OnDisconnected = new();
 
+    /// <summary>
+    ///     Fired when the TCP connection to the server is lost.
+    ///     This is called after <see cref="OnDisconnected"/> but also in cases where <see cref="OnDisconnected"/> is not called before.
+    ///     
+    ///     If you want to be notified when the client is no longer functional, register to <see cref="CancellationToken"/> instead.
+    ///     <see cref="CancellationToken"/> is also cancelled when the connection is lost.
+    /// </summary>
+    public AsyncEvent<MinecraftClient> OnConnectionLost = new();
+
     private readonly IConnectionFactory tcpTcpFactory;
 
-    private TcpClient?       client;
+    private TcpClient? client;
     private MinecraftStream? stream;
-    private Task?            streamLoop;
-    private GameState        gameState;
-    private IPacketHandler   internalPacketHandler;
-    private object           streamLock = new();
-    private bool             bundlePackets;
+    private int onConnectionLostFired;
+    private Task? streamLoop;
+    private GameStatePacketHandler gameStatePacketHandler;
+    private bool bundlePackets;
 
     /// <summary>
     ///     Create a new MinecraftClient
@@ -111,9 +127,13 @@ public sealed class MinecraftClient : IDisposable
         ClientSettings settings)
     {
         Data = data;
-        packetQueue = new();
         cancellationTokenSource = new();
-        internalPacketHandler = new HandshakePacketHandler(this);
+        CancellationToken = cancellationTokenSource.Token;
+        packetQueue = new(new DataflowBlockOptions()
+        {
+            CancellationToken = CancellationToken
+        });
+        gameStatePacketHandler = new HandshakePacketHandler(this);
         packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
         packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
         gameJoinedTsc = new();
@@ -125,18 +145,58 @@ public sealed class MinecraftClient : IDisposable
         Session = session;
         Port = port;
         Hostname = hostnameOrIp;
-        gameState = GameState.Handshaking;
         Settings = settings;
     }
+
+    /// <summary>
+    ///     Must only be called after the <see cref="packetQueue"/> was completed (this happens when <see cref="CancellationToken"/> was cancelled).
+    ///     Otherwise race conditions can occur where there are still uncancelled tasks in the queue.
+    /// </summary>
+    private void CancelAllSendPendingPacketTasks()
+    {
+        // we need to cancel all tasks in the queue otherwise we might get a deadlock
+        // when some task is waiting for the packet task
+        if (packetQueue.TryReceiveAll(out var queuedPackets))
+        {
+            foreach (var task in queuedPackets)
+            {
+                task.Task.TrySetCanceled(CancellationToken);
+            }
+        }
+    }
+
+    private async Task DisposeInternal(bool calledFromStreamLoop)
+    {
+        cancellationTokenSource.Cancel();
+        // wait for the packetQueue to complete
+        await packetQueue.Completion;
+        CancelAllSendPendingPacketTasks();
+
+        // prevent waiting on ourselves (when called from the streamLoop task)
+        if (!calledFromStreamLoop)
+        {
+            await (streamLoop ?? Task.CompletedTask);
+        }
+
+        client?.Dispose();
+        stream?.Close();
+
+        if (Interlocked.Exchange(ref onConnectionLostFired, 1) == 0)
+        {
+            await OnConnectionLost.Dispatch(this);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeInternal(false);
+    }
+
 
     /// <inheritdoc />
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
-        streamLoop?.Wait();
-
-        client?.Dispose();
-        stream?.Close();
+        DisposeAsync().AsTask().Wait();
     }
 
     /// <summary>
@@ -178,40 +238,60 @@ public sealed class MinecraftClient : IDisposable
     /// <param name="packet">The packet to send.</param>
     /// <param name="cancellation">Optional cancellation token.</param>
     /// <returns>A task that resolves once the packet was actually sent.</returns>
-    public Task SendPacket(IPacket packet, CancellationToken cancellation = default)
+    public async Task SendPacket(IPacket packet, CancellationToken cancellation = default)
     {
         var sendingTask = new PacketSendTask(packet, cancellation, new());
-        packetQueue.Enqueue(sendingTask);
+        try
+        {
+            if (!await packetQueue.SendAsync(sendingTask, cancellation))
+            {
+                // if the packetQueue is completed we can not send any more packets
+                // so we need to cancel the task here
+                // this must have happened because the CancellationToken was cancelled
+                sendingTask.Task.TrySetCanceled(CancellationToken);
+            }
+        }
+        catch (OperationCanceledException e)
+        {
+            sendingTask.Task.TrySetCanceled(e.CancellationToken);
+            throw;
+        }
 
-        return sendingTask.Task.Task;
+        await sendingTask.Task.Task;
     }
+
+    private Task? disconnectTask;
 
     /// <summary>
     ///     Disconnects the client from the server.
     /// </summary>
     /// <param name="reason">The reason the client disconnected. Only used for the <see cref="OnDisconnected" /> event.</param>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task Disconnect(Chat? reason = null)
+    public EnsureOnlyRunOnceAsyncResult Disconnect(Chat? reason = null)
+    {
+        return ConcurrencyHelper.EnsureOnlyRunOnceAsync(() => DisconnectInternal(reason), ref disconnectTask);
+    }
+
+    private async Task DisconnectInternal(Chat? reason = null)
     {
         reason ??= new TranslatableComponent("disconnect.quitting");
-        
-        Logger.Info($"Disconnecting: {reason.GetMessage(this.Data)}");
 
-        if (!gameJoinedTsc.Task.IsCompleted)
-        {
-            gameJoinedTsc.SetException(new DisconnectedException("Client has been disconnected", reason.GetMessage(this.Data)));
-        }
+        var message = reason.GetMessage(Data);
+        Logger.Info($"Disconnecting: {message}");
+
+        gameJoinedTsc.TrySetException(new DisconnectedException("Client has been disconnected", message));
 
         if (client is null || !client.Connected)
         {
             Logger.Warn("Disconnect() was called but client is not connected");
         }
 
-        cancellationTokenSource.Cancel();
+        await cancellationTokenSource.CancelAsync();
         await (streamLoop ?? Task.CompletedTask);
 
         client?.Close();
         await OnDisconnected.Dispatch(this, reason);
+        await OnConnectionLost.Dispatch(this);
     }
 
     /// <summary>
@@ -241,19 +321,17 @@ public sealed class MinecraftClient : IDisposable
     public Task<T> WaitForPacket<T>() where T : IPacket
     {
         var packetType = PacketPalette.GetPacketType<T>();
-        if (!packetWaiters.TryGetValue(packetType, out var task))
+        if (!packetWaiters.TryGetValue(packetType, out var tsc))
         {
-            var tsc = new TaskCompletionSource<object>();
+            tsc = new TaskCompletionSource<object>();
             packetWaiters.Add(packetType, tsc);
-
-            return tsc.Task.ContinueWith(prev => (T)prev.Result);
         }
 
-        return task.Task.ContinueWith(prev => (T)prev.Result);
+        return tsc.Task.ContinueWith(prev => (T)prev.Result);
     }
 
     /// <summary>
-    ///     Waits until the client jumps into the Play <see cref="gameState" />
+    ///     Waits until the client jumps into the <see cref="GameState.Play" /> state.
     /// </summary>
     /// <returns></returns>
     public Task WaitForGame()
@@ -263,20 +341,15 @@ public sealed class MinecraftClient : IDisposable
 
     internal void UpdateGameState(GameState next)
     {
-        lock (streamLock)
+        gameStatePacketHandler = next switch
         {
-            gameState = next;
-
-            internalPacketHandler = next switch
-            {
-                GameState.Handshaking   => new HandshakePacketHandler(this),
-                GameState.Login         => new LoginPacketHandler(this, Data),
-                GameState.Status        => new StatusPacketHandler(this),
-                GameState.Configuration => new ConfigurationPacketHandler(this, Data),
-                GameState.Play          => new PlayPacketHandler(this, Data),
-                _                       => throw new UnreachableException()
-            };   
-        }
+            GameState.Handshaking => new HandshakePacketHandler(this),
+            GameState.Login => new LoginPacketHandler(this, Data),
+            GameState.Status => new StatusPacketHandler(this),
+            GameState.Configuration => new ConfigurationPacketHandler(this, Data),
+            GameState.Play => new PlayPacketHandler(this, Data),
+            _ => throw new UnreachableException()
+        };
 
         if (next == GameState.Play && !gameJoinedTsc.Task.IsCompleted)
         {
@@ -299,7 +372,7 @@ public sealed class MinecraftClient : IDisposable
 
         if (next == GameState.Configuration)
         {
-            SendPacket(new ClientInformationPacket(
+            _ = SendPacket(new ClientInformationPacket(
                            Settings.Locale,
                            Settings.ViewDistance,
                            (int)Settings.ChatMode,
@@ -313,18 +386,12 @@ public sealed class MinecraftClient : IDisposable
 
     internal void EnableEncryption(byte[] key)
     {
-        lock (streamLock)
-        {
-            stream!.EnableEncryption(key);
-        }
+        stream!.EnableEncryption(key);
     }
 
     internal void SetCompression(int threshold)
     {
-        lock (streamLock)
-        {
-            stream!.SetCompression(threshold);
-        }
+        stream!.SetCompression(threshold);
     }
 
     internal void HandleBundleDelimiter()
@@ -352,36 +419,51 @@ public sealed class MinecraftClient : IDisposable
             Logger.Debug("Bundling packets!");
         }
     }
-    
+
     private async Task StreamLoop()
     {
-        while (!cancellationTokenSource.Token.IsCancellationRequested)
+        try
         {
-            try
+            while (!CancellationToken.IsCancellationRequested)
             {
-                await ReceivePackets();
-                await SendPackets();
+                try
+                {
+                    // run both tasks in parallel
+                    var receiveTask = Task.Run(ReceivePackets);
+                    var sendTask = Task.Run(SendPackets);
 
-                await Task.Delay(1);
+                    // extract the exception from the task that finished first
+                    await await Task.WhenAny(receiveTask, sendTask);
+                    // DisposeInternal in the catch block will then stop the other task
+                }
+                catch (Exception ex)
+                {
+                    if (ex is SocketException or IOException)
+                    {
+                        // we probably can not continue after this
+                        throw;
+                    }
+                    Logger.Error(ex, "Encountered error in stream loop");
+                }
             }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Encountered error in stream loop");
-            }
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, "Encountered exception in outer stream loop. Connection will be terminated.");
+            await DisposeInternal(true);
         }
     }
 
     private async Task ReceivePackets()
     {
-        while (client!.Available > 0 && !cancellationTokenSource.IsCancellationRequested)
+        while (true)
         {
-            PacketBuffer buffer;
-            lock (streamLock)
-            {
-                buffer = stream!.ReadPacket();
-            }
-            
+            CancellationToken.ThrowIfCancellationRequested();
+
+            var buffer = stream!.ReadPacket();
+
             var packetId = buffer.ReadVarInt();
+            var gameState = gameStatePacketHandler.GameState;
             var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
 
             if (gameState == GameState.Login)
@@ -399,36 +481,41 @@ public sealed class MinecraftClient : IDisposable
                     _ = Task.Run(() => HandleIncomingPacket(packetType, buffer));
                 }
             }
-            
-            if (gameState != GameState.Play)
-            {
-                await Task.Delay(1);
-            }
         }
     }
 
-    private Task SendPackets()
+    private async Task SendPackets()
     {
-        if (!packetQueue.TryDequeue(out var task))
+        await foreach (var task in packetQueue.ReceiveAllAsync())
         {
-            return Task.CompletedTask;
+            if (task.Token.IsCancellationRequested)
+            {
+                task.Task.TrySetCanceled();
+                continue;
+            }
+
+            try
+            {
+                DispatchPacket(task.Packet);
+                task.Task.TrySetResult();
+
+                // TODO: this feels wrong
+                // we probably should ask outgoing packet listeners before sending the packet
+                await HandleOutgoingPacket(task.Packet);
+            }
+            catch (SocketException e)
+            {
+                Logger.Error(e, "Encountered exception while dispatching packet {packetType}", task.Packet.Type);
+                task.Task.TrySetException(e);
+                // break the loop to prevent further packets from being sent
+                // because the connection is probably dead
+                throw;
+            }
+            catch (Exception e)
+            {
+                task.Task.TrySetException(e);
+            }
         }
-
-        if (task.Token is { IsCancellationRequested: true })
-        {
-            return Task.CompletedTask;
-        }
-
-        DispatchPacket(task.Packet);
-        
-        
-        _ = Task.Run(async () =>
-        {
-            task.Task.TrySetResult();
-            await HandleOutgoingPacket(task.Packet);
-        });
-
-        return Task.CompletedTask;
     }
 
     private void DispatchPacket(IPacket packet)
@@ -439,10 +526,15 @@ public sealed class MinecraftClient : IDisposable
         buffer.WriteVarInt(packetId);
         packet.Write(buffer, Data);
 
-        lock (streamLock)
+        try
         {
             Logger.Trace("Sending packet {packetType}", packet.Type);
             stream!.WritePacket(buffer);
+        }
+        catch (SocketException e)
+        {
+            Logger.Error(e, "Encountered exception while dispatching packet {packetType}", packet.Type);
+            throw;
         }
     }
 
@@ -454,7 +546,7 @@ public sealed class MinecraftClient : IDisposable
         //  - MinecraftClient.WaitForPacket<T>()
         //  - MinecraftClient.OnPacketReceived     <-- Forces all packets to be parsed
         //  - The internal IPacketHandler
-        
+
         Logger.Trace("Received packet {packetType}", packetType);
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
@@ -466,9 +558,9 @@ public sealed class MinecraftClient : IDisposable
         var handlers = new List<AsyncPacketHandler>();
 
         // Internal packet handler
-        if (internalPacketHandler.HandlesIncoming(packetType))
+        if (gameStatePacketHandler.HandlesIncoming(packetType))
         {
-            handlers.Add(internalPacketHandler.HandleIncoming);
+            handlers.Add(gameStatePacketHandler.HandleIncoming);
         }
 
         // Custom packet handlers
@@ -518,7 +610,7 @@ public sealed class MinecraftClient : IDisposable
     {
         try
         {
-            await internalPacketHandler.HandleOutgoing(packet);
+            await gameStatePacketHandler.HandleOutgoing(packet);
         }
         catch (Exception e)
         {
@@ -592,5 +684,5 @@ public sealed class MinecraftClient : IDisposable
         return await MinecraftData.FromVersion(status.Version);
     }
 
-    private record PacketSendTask(IPacket Packet, CancellationToken? Token, TaskCompletionSource Task);
+    private record PacketSendTask(IPacket Packet, CancellationToken Token, TaskCompletionSource Task);
 }

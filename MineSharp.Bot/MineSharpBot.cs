@@ -2,9 +2,8 @@
 using MineSharp.Auth;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Plugins;
-using MineSharp.ChatComponent.Components;
 using MineSharp.Core.Common.Protocol;
-using MineSharp.Core.Events;
+using MineSharp.Core.Concurrency;
 using MineSharp.Data;
 using MineSharp.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
@@ -17,15 +16,19 @@ namespace MineSharp.Bot;
 ///     A Minecraft Bot.
 ///     The Minecraft Bot uses Plugins that contain helper methods to handle and send minecraft packets.
 /// </summary>
-public class MineSharpBot
+public sealed class MineSharpBot : IAsyncDisposable, IDisposable
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    private readonly CancellationTokenSource cancellation;
 
     /// <summary>
     ///     The underlying <see cref="MinecraftClient" /> used by this bot
     /// </summary>
     public readonly MinecraftClient Client;
+
+    /// <summary>
+    ///     Is cancelled once the client needs to stop. Usually because the connection was lost.
+    /// </summary>
+    public CancellationToken CancellationToken => Client!.CancellationToken;
 
     /// <summary>
     ///     The <see cref="MinecraftData" /> instance used by this bot
@@ -44,11 +47,6 @@ public class MineSharpBot
     /// </summary>
     public NbtCompound Registry { get; private set; } = [];
 
-    /// <summary>
-    ///     Fired when the bot disconnects
-    /// </summary>
-    public AsyncEvent<MineSharpBot, ChatComponent.Chat> OnBotDisconnected = new();
-
     // This field is used for syncing block updates since 1.19.
     internal int SequenceId = 0;
 
@@ -64,10 +62,8 @@ public class MineSharpBot
         Data = Client.Data;
         Session = Client.Session;
 
-        cancellation = new();
         plugins = new Dictionary<Guid, Plugin>();
 
-        Client.OnDisconnected += OnClientDisconnected;
         Client.On<RegistryDataPacket>(packet => Task.FromResult(Registry = packet.RegistryData));
         Client.On<LoginPacket>(
             packet => Task.FromResult(packet.RegistryCodec != null ? Registry = packet.RegistryCodec : null));
@@ -123,7 +119,7 @@ public class MineSharpBot
             plugins.Values
                    .Select(pl => pl.Initialize()));
 
-        tickLoop = TickLoop();
+        tickLoop = Task.Run(TickLoop);
 
         return true;
     }
@@ -132,22 +128,17 @@ public class MineSharpBot
     ///     Disconnect from the Minecraft server
     /// </summary>
     /// <param name="reason">The reason for disconnecting</param>
-    public async Task Disconnect(ChatComponent.Chat? reason = null)
+    public EnsureOnlyRunOnceAsyncResult Disconnect(ChatComponent.Chat? reason = null)
     {
-        reason ??= new TranslatableComponent("disconnect.quitting");
+        // there is no point in waiting for the tickLoop
+        // it wil be cancelled when the bot disconnects
 
-        if (tickLoop is { Status: TaskStatus.Running })
-        {
-            cancellation.Cancel();
-            await tickLoop!;
-        }
-
-        await Client.Disconnect(reason);
+        return Client.Disconnect(reason);
     }
 
     private async Task TickLoop()
     {
-        while (!cancellation.Token.IsCancellationRequested)
+        while (!CancellationToken.IsCancellationRequested)
         {
             var start = DateTime.Now;
 
@@ -176,8 +167,14 @@ public class MineSharpBot
         }
     }
 
-    private Task OnClientDisconnected(MinecraftClient sender, ChatComponent.Chat reason)
+    public void Dispose()
     {
-        return OnBotDisconnected.Dispatch(this, reason);
+        // TODO: improve packet callback registrations to be able to remove them here
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
     }
 }
