@@ -181,7 +181,7 @@ public class PlayerPlugin : Plugin
 
         PlayerMap.TryAdd(entity.ServerId, Self);
 
-        Health = 20.0f;
+        Health = loginPacket.HasDeathLocation ? 0f : 20.0f;
         Food = 20.0f;
         Saturation = 20.0f;
         Dimension = loginPacket.DimensionName;
@@ -189,14 +189,17 @@ public class PlayerPlugin : Plugin
         Logger.Info(
             $"Initialized Bot Entity: Position=({Entity!.Position}), GameMode={Self.GameMode}, Dimension={Dimension}.");
 
-        await Bot.Client.SendPacket(
-            new SetPlayerPositionAndRotationPacket(
-                positionPacket.X,
-                positionPacket.Y,
-                positionPacket.Z,
-                positionPacket.Yaw,
-                positionPacket.Pitch,
-                Entity.IsOnGround));
+        if (!loginPacket.HasDeathLocation)
+        {
+            await Bot.Client.SendPacket(
+                new SetPlayerPositionAndRotationPacket(
+                    positionPacket.X,
+                    positionPacket.Y,
+                    positionPacket.Z,
+                    positionPacket.Yaw,
+                    positionPacket.Pitch,
+                    Entity.IsOnGround));
+        }
 
         try
         {
