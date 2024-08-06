@@ -189,10 +189,19 @@ public class PhysicsPlugin : Plugin
     }
 
     /// <summary>
+    ///     Represents the result of a ray casting operation.
+    /// </summary>
+    /// <param name="Block">The block that was hit by the ray.</param>
+    /// <param name="Face">The face of the block that was hit.</param>
+    /// <param name="BlockCollisionShapeIndex">The index for the collision shape of the block that was hit. You can get the <see cref="Aabb"/> with: <c>MineSharp.Bot.Data.BlockCollisionShapes.GetForBlock(block)</c>.</param>
+    /// <param name="Distance">The distance from the ray origin to the hit point.</param>
+    public record RaycastBlockResult(Block Block, BlockFace Face, int BlockCollisionShapeIndex, double Distance);
+
+    /// <summary>
     ///     Casts a ray from the players eyes, and returns the first block that is hit.
     /// </summary>
     /// <returns></returns>
-    public (Block Block, BlockFace Face, Aabb BlockCollisionShape, double Distance)? Raycast(double distance = 64)
+    public RaycastBlockResult? Raycast(double distance = 64)
     {
         if (distance < 0)
         {
@@ -216,14 +225,15 @@ public class PhysicsPlugin : Plugin
 
             var bbs = Bot.Data.BlockCollisionShapes.GetForBlock(block);
 
-            foreach (var bb in bbs)
+            for (int bbIndex = 0; bbIndex < bbs.Length; bbIndex++)
             {
+                var bb = bbs[bbIndex];
                 var blockBb = bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
 
                 var intersectionDistance = blockBb.IntersectsLine(position, lookVector);
                 if (intersectionDistance is not null)
                 {
-                    return (block, iterator.CurrentFace, bb, intersectionDistance.Value);
+                    return new(block, iterator.CurrentFace, bbIndex, intersectionDistance.Value);
                 }
             }
         }
