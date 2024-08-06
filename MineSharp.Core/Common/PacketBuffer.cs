@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using fNbt;
 using MineSharp.Core.Common.Blocks;
@@ -107,6 +109,23 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     #region Reading
 
+    public T Read<T>()
+        where T : unmanaged
+    {
+        Unsafe.SkipInit(out T value);
+        var typedSpan = MemoryMarshal.CreateSpan(ref value, 1);
+        var byteSpan = MemoryMarshal.AsBytes(typedSpan);
+
+        ReadBytes(byteSpan);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            byteSpan.Reverse();
+        }
+
+        return value;
+    }
+
     public int ReadBytes(Span<byte> bytes)
     {
         EnsureEnoughReadableBytes(bytes.Length);
@@ -144,113 +163,66 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return (byte)buffer.ReadByte();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public sbyte ReadSByte()
     {
         return (sbyte)ReadByte();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool ReadBool()
     {
         return ReadByte() == 1;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ushort ReadUShort()
     {
-        EnsureEnoughReadableBytes(2);
-
-        var b0 = buffer.ReadByte();
-        var b1 = buffer.ReadByte();
-
-        if (BitConverter.IsLittleEndian)
-        {
-            return (ushort)((b0 << 8) | b1);
-        }
-
-        return (ushort)(b0 | (b1 << 8));
+        return Read<ushort>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public short ReadShort()
     {
-        return (short)ReadUShort();
+        return Read<short>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint ReadUInt()
     {
-        EnsureEnoughReadableBytes(4);
-
-        var b0 = buffer.ReadByte();
-        var b1 = buffer.ReadByte();
-        var b2 = buffer.ReadByte();
-        var b3 = buffer.ReadByte();
-
-        if (BitConverter.IsLittleEndian)
-        {
-            return (uint)((b0 << 24) | (b1 << 16) | (b2 << 8) | b3);
-        }
-
-        return (uint)(b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
+        return Read<uint>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadInt()
     {
-        return (int)ReadUInt();
+        return Read<int>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong ReadULong()
     {
-        EnsureEnoughReadableBytes(8);
-
-        long b0 = buffer.ReadByte();
-        long b1 = buffer.ReadByte();
-        long b2 = buffer.ReadByte();
-        long b3 = buffer.ReadByte();
-        long b4 = buffer.ReadByte();
-        long b5 = buffer.ReadByte();
-        long b6 = buffer.ReadByte();
-        long b7 = buffer.ReadByte();
-
-        if (BitConverter.IsLittleEndian)
-        {
-            return (ulong)((b0 << 56) | (b1 << 48) | (b2 << 40) | (b3 << 32) | (b4 << 24) | (b5 << 16) | (b6 << 8) |
-                b7);
-        }
-
-        return (ulong)(b0 | (b1 << 8) | (b2 << 16) | (b3 << 24) | (b4 << 32) | (b5 << 40) | (b6 << 48) | (b7 << 56));
+        return Read<ulong>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public long ReadLong()
     {
-        return (long)ReadULong();
+        return Read<long>();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float ReadFloat()
     {
-        EnsureEnoughReadableBytes(4);
-
-        Span<byte> bytes = stackalloc byte[sizeof(float)];
-        ReadBytes(bytes);
-
-        if (BitConverter.IsLittleEndian)
-        {
-            bytes.Reverse();
-        }
-
-        return BitConverter.ToSingle(bytes);
+        var bits = Read<uint>();
+        return BitConverter.UInt32BitsToSingle(bits);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double ReadDouble()
     {
-        EnsureEnoughReadableBytes(8);
-
-        Span<byte> bytes = stackalloc byte[sizeof(double)];
-        ReadBytes(bytes);
-
-        if (BitConverter.IsLittleEndian)
-        {
-            bytes.Reverse();
-        }
-
-        return BitConverter.ToDouble(bytes);
+        var bits = Read<ulong>();
+        return BitConverter.UInt64BitsToDouble(bits);
     }
 
     private const int VarIntSegmentBits = 0x7F;
@@ -283,6 +255,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return value;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadVarInt()
     {
         return ReadVarInt(buffer, out _);
@@ -323,10 +296,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return encoding.GetString(bytes);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Uuid ReadUuid()
     {
-        var l1 = ReadLong();
-        var l2 = ReadLong();
+        var l1 = Read<long>();
+        var l2 = Read<long>();
         return new(l1, l2);
     }
 
@@ -349,7 +323,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         for (var i = 0; i < array.Length; i++)
         {
-            array[i] = ReadLong();
+            array[i] = Read<long>();
         }
 
         return array;
@@ -405,7 +379,20 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return new(x, y, z, type, nbt);
     }
 
-    public T? ReadOptional<T>() where T : class
+    public T? ReadOptional<T>()
+        where T : class
+    {
+        var available = ReadBool();
+        if (!available)
+        {
+            return null;
+        }
+
+        return ReadObject<T>();
+    }
+
+    public T? ReadOptional<T>(bool _ = false)
+        where T : unmanaged
     {
         var available = ReadBool();
         if (!available)
@@ -416,38 +403,14 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return Read<T>();
     }
 
-    public T? ReadOptional<T>(bool _ = false) where T : struct
-    {
-        var available = ReadBool();
-        if (!available)
-        {
-            return null;
-        }
-
-        return Read<T>();
-    }
-
-
-    public T Read<T>()
+    public T ReadObject<T>()
+        where T : class
     {
         var type = Type.GetTypeCode(typeof(T));
 
         object value = type switch
         {
-            TypeCode.Boolean => ReadBool(),
-            TypeCode.SByte => ReadSByte(),
-            TypeCode.Byte => ReadByte(),
-            TypeCode.Int16 => ReadShort(),
-            TypeCode.Int32 => ReadInt(),
-            TypeCode.Int64 => ReadLong(),
-
-            TypeCode.UInt16 => ReadUShort(),
-            TypeCode.UInt32 => ReadUInt(),
-            TypeCode.UInt64 => ReadULong(),
-
             TypeCode.String => ReadString(),
-            TypeCode.Single => ReadFloat(),
-            TypeCode.Double => ReadBool(),
             _ => throw new NotSupportedException()
         };
         return (T)value;
@@ -458,106 +421,92 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     #region Writing
 
-    public void WriteBytes(Span<byte> bytes)
+    public void Write<T>(T value)
+        where T : unmanaged
+    {
+        var typedSpan = MemoryMarshal.CreateSpan(ref value, 1);
+        var byteSpan = MemoryMarshal.AsBytes(typedSpan);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            byteSpan.Reverse();
+        }
+
+        WriteBytes(byteSpan);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteBytes(ReadOnlySpan<byte> bytes)
     {
         buffer.Write(bytes);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteBool(bool value)
     {
         WriteByte((byte)(value ? 1 : 0));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteByte(byte b)
     {
         buffer.WriteByte(b);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteSByte(sbyte b)
     {
         WriteByte((byte)b);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteUShort(ushort value)
     {
-        if (BitConverter.IsLittleEndian)
-        {
-            WriteByte((byte)((value >> 8) & 0xFF));
-            WriteByte((byte)(value & 0xFF));
-            return;
-        }
-
-        WriteByte((byte)(value & 0xFF));
-        WriteByte((byte)((value >> 8) & 0xFF));
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteShort(short value)
     {
-        WriteUShort((ushort)value);
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteUInt(uint value)
     {
-        if (BitConverter.IsLittleEndian)
-        {
-            WriteByte((byte)((value >> 24) & 0xFF));
-            WriteByte((byte)((value >> 16) & 0xFF));
-            WriteByte((byte)((value >> 8) & 0xFF));
-            WriteByte((byte)(value & 0xFF));
-            return;
-        }
-
-        WriteByte((byte)(value & 0xFF));
-        WriteByte((byte)((value >> 8) & 0xFF));
-        WriteByte((byte)((value >> 16) & 0xFF));
-        WriteByte((byte)((value >> 24) & 0xFF));
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteInt(int value)
     {
-        WriteUInt((uint)value);
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteULong(ulong value)
     {
-        if (BitConverter.IsLittleEndian)
-        {
-            WriteByte((byte)((value >> 56) & 0xFF));
-            WriteByte((byte)((value >> 48) & 0xFF));
-            WriteByte((byte)((value >> 40) & 0xFF));
-            WriteByte((byte)((value >> 32) & 0xFF));
-            WriteByte((byte)((value >> 24) & 0xFF));
-            WriteByte((byte)((value >> 16) & 0xFF));
-            WriteByte((byte)((value >> 8) & 0xFF));
-            WriteByte((byte)(value & 0xFF));
-            return;
-        }
-
-        WriteByte((byte)(value & 0xFF));
-        WriteByte((byte)((value >> 8) & 0xFF));
-        WriteByte((byte)((value >> 16) & 0xFF));
-        WriteByte((byte)((value >> 24) & 0xFF));
-        WriteByte((byte)((value >> 32) & 0xFF));
-        WriteByte((byte)((value >> 40) & 0xFF));
-        WriteByte((byte)((value >> 48) & 0xFF));
-        WriteByte((byte)((value >> 56) & 0xFF));
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteLong(long value)
     {
-        WriteULong((ulong)value);
+        Write(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteFloat(float value)
     {
         var val = BitConverter.SingleToUInt32Bits(value);
-        WriteUInt(val);
+        Write(val);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteDouble(double value)
     {
         var val = BitConverter.DoubleToUInt64Bits(value);
-        WriteULong(val);
+        Write(val);
     }
 
     // Is also used by MinecraftStream
@@ -605,8 +554,8 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public void WriteUuid(Uuid value)
     {
-        WriteLong(value.MostSignificantBits);
-        WriteLong(value.LeastSignificantBits);
+        Write(value.MostSignificantBits);
+        Write(value.LeastSignificantBits);
     }
 
     public void WriteVarIntArray<T>(ICollection<T> collection, Action<PacketBuffer, T> writer)
