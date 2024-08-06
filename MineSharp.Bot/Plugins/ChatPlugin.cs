@@ -531,14 +531,14 @@ public class ChatPlugin : Plugin
     {
         return packet switch
         {
-            SystemChatMessagePacket.Before192 before192 
+            SystemChatMessagePacket.Before192 before192
                 => HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType),
 
-            SystemChatMessagePacket.Since192 since192 
+            SystemChatMessagePacket.Since192 since192
                 => HandleChatInternal(null,
                                       since192.Message,
                                       since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage),
-                
+
             _ => throw new UnreachableException()
         };
     }
@@ -581,7 +581,7 @@ public class ChatPlugin : Plugin
         ChatComponent.Chat? content,
         ChatComponent.Chat? target)
     {
-        var entry = Bot.Registry["minecraft:chat_type"]["value"][index];
+        var entry = Bot.Registry["chat_type"]["value"][index];
         var name = entry["name"]!.StringValue!;
         var element = entry["element"];
         var styleCompound = element["chat"]["style"];
