@@ -56,19 +56,12 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// </summary>
     public readonly MinecraftData Data;
 
-    private readonly TaskCompletionSource gameJoinedTsc;
-
     /// <summary>
     ///     The Hostname of the Minecraft server provided in the constructor
     /// </summary>
     public readonly string Hostname;
 
     private readonly IPAddress ip;
-    private readonly IDictionary<PacketType, IList<AsyncPacketHandler>> packetHandlers;
-    private readonly BufferBlock<PacketSendTask> packetQueue;
-    private readonly ConcurrentQueue<(PacketType, PacketBuffer)> bundledPackets;
-    private readonly IDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
-    private readonly CancellationTokenSource cancellationTokenSource;
 
     /// <summary>
     ///     Is cancelled once the client needs to stop. Usually because the connection was lost.
@@ -109,10 +102,20 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     private TcpClient? client;
     private MinecraftStream? stream;
-    private int onConnectionLostFired;
     private Task? streamLoop;
+    private int onConnectionLostFired;
+
+    private readonly ConcurrentDictionary<PacketType, ConcurrentBag<AsyncPacketHandler>> packetHandlers;
+    private readonly ConcurrentDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
     private GameStatePacketHandler gameStatePacketHandler;
+    private readonly BufferBlock<PacketSendTask> packetQueue;
     private bool bundlePackets;
+    private readonly ConcurrentQueue<(PacketType, PacketBuffer)> bundledPackets;
+
+    private readonly CancellationTokenSource cancellationTokenSource;
+
+    private readonly TaskCompletionSource gameJoinedTcs;
+
 
     /// <summary>
     ///    The current <see cref="GameState"/> of the client.
@@ -141,9 +144,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             CancellationToken = CancellationToken
         });
         gameStatePacketHandler = new HandshakePacketHandler(this);
-        packetHandlers = new Dictionary<PacketType, IList<AsyncPacketHandler>>();
-        packetWaiters = new Dictionary<PacketType, TaskCompletionSource<object>>();
-        gameJoinedTsc = new();
+        packetHandlers = new();
+        packetWaiters = new();
+        gameJoinedTcs = new();
         bundledPackets = new();
         tcpTcpFactory = tcpFactory;
         ip = IpHelper.ResolveHostname(hostnameOrIp, ref port);
@@ -194,6 +197,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         await DisposeInternal(false);
@@ -286,7 +290,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         var message = reason.GetMessage(Data);
         Logger.Info($"Disconnecting: {message}");
 
-        gameJoinedTsc.TrySetException(new DisconnectedException("Client has been disconnected", message));
+        gameJoinedTcs.TrySetException(new DisconnectedException("Client has been disconnected", message));
 
         if (client is null || !client.Connected)
         {
@@ -311,13 +315,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     {
         var key = PacketPalette.GetPacketType<T>();
 
-        if (!packetHandlers.TryGetValue(key, out var handlers))
-        {
-            handlers = new List<AsyncPacketHandler>();
-            packetHandlers.Add(key, handlers);
-        }
-
-        handlers.Add(p => handler((T)p));
+        packetHandlers.GetOrAdd(key, _ => new ConcurrentBag<AsyncPacketHandler>())
+                      .Add(p => handler((T)p));
     }
 
     /// <summary>
@@ -328,13 +327,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     public Task<T> WaitForPacket<T>() where T : IPacket
     {
         var packetType = PacketPalette.GetPacketType<T>();
-        if (!packetWaiters.TryGetValue(packetType, out var tsc))
-        {
-            tsc = new TaskCompletionSource<object>();
-            packetWaiters.Add(packetType, tsc);
-        }
-
-        return tsc.Task.ContinueWith(prev => (T)prev.Result);
+        var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>());
+        return tcs.Task.ContinueWith(prev => (T)prev.Result);
     }
 
     /// <summary>
@@ -343,7 +337,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <returns></returns>
     public Task WaitForGame()
     {
-        return gameJoinedTsc.Task;
+        return gameJoinedTcs.Task;
     }
 
     internal void UpdateGameState(GameState next)
@@ -358,7 +352,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             _ => throw new UnreachableException()
         };
 
-        if (next == GameState.Play && !gameJoinedTsc.Task.IsCompleted)
+        if (next == GameState.Play && !gameJoinedTcs.Task.IsCompleted)
         {
             if (Data.Version.Protocol <= ProtocolVersion.V_1_20)
             {
@@ -374,7 +368,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                                                      Settings.EnableTextFiltering,
                                                      Settings.AllowServerListings)));
             }
-            gameJoinedTsc.TrySetResult();
+            gameJoinedTcs.TrySetResult();
         }
 
         if (next == GameState.Configuration)
@@ -554,7 +548,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         //  - MinecraftClient.OnPacketReceived     <-- Forces all packets to be parsed
         //  - The internal IPacketHandler
 
-        Logger.Trace("Received packet {packetType}", packetType);
+        Logger.Trace("Received packet {PacketType}", packetType);
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
         {
@@ -576,9 +570,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             handlers.AddRange(customHandlers);
         }
 
-        packetWaiters.TryGetValue(packetType, out var tsc);
+        packetWaiters.TryGetValue(packetType, out var tcs);
 
-        if (handlers.Count == 0 && tsc == null)
+        if (handlers.Count == 0 && tcs == null)
         {
             await buffer.DisposeAsync();
             return;
@@ -590,7 +584,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             var packet = factory(buffer, Data);
             await buffer.DisposeAsync();
 
-            tsc?.TrySetResult(packet);
+            tcs?.TrySetResult(packet);
 
             var packetHandlersTasks = new List<Task>();
             try
