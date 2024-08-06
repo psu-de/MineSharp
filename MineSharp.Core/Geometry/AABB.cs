@@ -125,7 +125,7 @@ public class Aabb
         var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
         var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
 
-        if (!(tMax < 0 || tMin > tMax))
+        if (tMax < 0 || tMin > tMax)
         {
             return null;
         }
