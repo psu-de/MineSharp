@@ -331,7 +331,7 @@ public class PhysicsPlugin : Plugin
                 : EntityActionPacket.EntityAction.StopSneaking,
             0);
 
-        Bot.Client.SendPacket(packet);
+        _ = Bot.Client.SendPacket(packet);
     }
 
     private void OnSprintingChanged(PlayerPhysics sender, bool isSprinting)
@@ -343,7 +343,7 @@ public class PhysicsPlugin : Plugin
                 : EntityActionPacket.EntityAction.StopSprinting,
             0);
 
-        Bot.Client.SendPacket(packet);
+        _ = Bot.Client.SendPacket(packet);
     }
 
     private record PlayerState

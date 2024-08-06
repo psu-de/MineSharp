@@ -77,7 +77,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     public readonly CancellationToken CancellationToken;
 
     /// <summary>
-    ///     The Port of the minecraft server
+    ///     The Port of the Minecraft server
     /// </summary>
     public readonly ushort Port;
 
@@ -113,6 +113,13 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     private Task? streamLoop;
     private GameStatePacketHandler gameStatePacketHandler;
     private bool bundlePackets;
+
+    /// <summary>
+    ///    The current <see cref="GameState"/> of the client.
+    ///    
+    ///    Internal note: This property should not be used to determine the next <see cref="GameStatePacketHandler"/> because that is not thread safe.
+    /// </summary>
+    public GameState GameState => gameStatePacketHandler.GameState;
 
     /// <summary>
     ///     Create a new MinecraftClient
@@ -505,7 +512,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             }
             catch (SocketException e)
             {
-                Logger.Error(e, "Encountered exception while dispatching packet {packetType}", task.Packet.Type);
+                Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", task.Packet.Type);
                 task.Task.TrySetException(e);
                 // break the loop to prevent further packets from being sent
                 // because the connection is probably dead
@@ -528,12 +535,12 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
         try
         {
-            Logger.Trace("Sending packet {packetType}", packet.Type);
+            Logger.Trace("Sending packet {PacketType}", packet.Type);
             stream!.WritePacket(buffer);
         }
         catch (SocketException e)
         {
-            Logger.Error(e, "Encountered exception while dispatching packet {packetType}", packet.Type);
+            Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", packet.Type);
             throw;
         }
     }
@@ -557,7 +564,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
         var handlers = new List<AsyncPacketHandler>();
 
-        // Internal packet handler
+        // GameState packet handler
         if (gameStatePacketHandler.HandlesIncoming(packetType))
         {
             handlers.Add(gameStatePacketHandler.HandleIncoming);
@@ -584,19 +591,32 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             await buffer.DisposeAsync();
 
             tsc?.TrySetResult(packet);
-            var tasks = handlers
-                       .Select(task => task(packet))
-                       .ToArray();
 
+            var packetHandlersTasks = new List<Task>();
             try
             {
-                await Task.WhenAll(tasks);
+                // Run all handlers in parallel:
+                foreach (var handler in handlers)
+                {
+                    // The synchronous part of the handlers might throw an exception
+                    // So we also do this in a try-catch block
+                    try
+                    {
+                        packetHandlersTasks.Add(handler(packet));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Warn(e, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
+                    }
+                }
+
+                await Task.WhenAll(packetHandlersTasks);
             }
             catch (Exception)
             {
-                foreach (var exception in tasks.Where(x => x.Exception != null))
+                foreach (var faultedTask in packetHandlersTasks.Where(task => task.Status == TaskStatus.Faulted))
                 {
-                    Logger.Warn($"Error in custom packet handling: {exception.Exception}");
+                    Logger.Warn(faultedTask.Exception, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
                 }
             }
         }
@@ -620,13 +640,17 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     /// <summary>
     ///     Requests the server status and closes the connection.
-    ///     Works only when <see cref="gameState" /> is <see cref="Core.Common.Protocol.GameState.Status" />.
+    ///     Works only when <see cref="GameState"/> is <see cref="Core.Common.Protocol.GameState.Status" />.
     /// </summary>
+    /// <param name="hostnameOrIp">The hostname or IP of the server.</param>
+    /// <param name="port">The port of the server.</param>
+    /// <param name="responseTimeout">The time in milliseconds to wait for a response.</param>
+    /// <param name="tcpFactory">The factory to create the TCP connection.</param>
     /// <returns></returns>
     public static async Task<ServerStatus> RequestServerStatus(
         string hostnameOrIp,
         ushort port = 25565,
-        int timeout = 10000,
+        int responseTimeout = 10000,
         IConnectionFactory? tcpFactory = null)
     {
         var latest = await MinecraftData.FromVersion(LATEST_SUPPORTED_VERSION);
@@ -644,7 +668,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             throw new MineSharpHostException("failed to connect to server");
         }
 
-        var timeoutCancellation = new CancellationTokenSource();
+        var responseTimeoutCts = new CancellationTokenSource();
+        var responseTimeoutCancellationToken = responseTimeoutCts.Token;
         var taskCompletionSource = new TaskCompletionSource<ServerStatus>();
 
         client.On<StatusResponsePacket>(async packet =>
@@ -659,13 +684,17 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             client.Dispose();
         });
 
-        await client.SendPacket(new StatusRequestPacket(), timeoutCancellation.Token);
-        await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), timeoutCancellation.Token);
+        await client.SendPacket(new StatusRequestPacket(), responseTimeoutCancellationToken);
+        await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), responseTimeoutCancellationToken);
 
-        timeoutCancellation.Token.Register(
-            () => taskCompletionSource.TrySetCanceled(timeoutCancellation.Token));
+        responseTimeoutCancellationToken.Register(
+            () =>
+            {
+                taskCompletionSource.TrySetCanceled(responseTimeoutCancellationToken);
+                responseTimeoutCts.Dispose();
+            });
 
-        timeoutCancellation.CancelAfter(timeout);
+        responseTimeoutCts.CancelAfter(responseTimeout);
 
         return await taskCompletionSource.Task;
     }
