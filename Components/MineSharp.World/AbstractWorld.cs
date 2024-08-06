@@ -17,7 +17,8 @@ namespace MineSharp.World;
 ///     Base class for other implementations of the IWorld interface
 /// </summary>
 /// <param name="data"></param>
-public abstract class AbstractWorld(MinecraftData data) : IWorld
+/// <param name="dimensionInfo"></param>
+public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionInfo) : IWorld
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -25,6 +26,11 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     ///     The MinecraftData instance used for this world
     /// </summary>
     public readonly MinecraftData Data = data;
+
+    /// <summary>
+    ///     The Dimension that this world represents
+    /// </summary>
+    public readonly DimensionInfo DimensionInfo = dimensionInfo;
 
     private readonly BlockInfo outOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
 
@@ -34,10 +40,10 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     protected ConcurrentDictionary<ChunkCoordinates, IChunk> Chunks = new();
 
     /// <inheritdoc />
-    public abstract int MaxY { get; }
+    public int MaxY => DimensionInfo.WorldMaxY;
 
     /// <inheritdoc />
-    public abstract int MinY { get; }
+    public int MinY => DimensionInfo.WorldMinY;
 
 
     /// <inheritdoc />
