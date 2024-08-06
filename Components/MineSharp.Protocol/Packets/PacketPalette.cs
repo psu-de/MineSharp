@@ -18,10 +18,12 @@ using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Confi
 using CBKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePacket;
 using CBPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
+using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
 using ConfPongPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PongPacket;
 using LoginDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Login.DisconnectPacket;
+using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 using PlayDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Play.DisconnectPacket;
 using PlayPingPacket = MineSharp.Protocol.Packets.Clientbound.Play.PingPacket;
 using PlayPongPacket = MineSharp.Protocol.Packets.Serverbound.Play.PongPacket;
@@ -33,8 +35,6 @@ using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Confi
 using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAlivePacket;
 using SBPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
-using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
-using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -117,6 +117,7 @@ internal static class PacketPalette
         RegisterPacket<SpawnEntityPacket>(PacketType.CB_Play_SpawnEntity);
         RegisterPacket<CBKeepAlivePacket>(PacketType.CB_Play_KeepAlive);
         RegisterPacket<ChunkDataAndUpdateLightPacket>(PacketType.CB_Play_MapChunk);
+        RegisterPacket<ParticlePacket>(PacketType.CB_Play_WorldParticles);
         RegisterPacket<UnloadChunkPacket>(PacketType.CB_Play_UnloadChunk);
         RegisterPacket<BlockUpdatePacket>(PacketType.CB_Play_BlockChange);
         RegisterPacket<MultiBlockUpdatePacket>(PacketType.CB_Play_MultiBlockChange);
@@ -145,6 +146,8 @@ internal static class PacketPalette
         RegisterPacket<OpenWindowPacket>(PacketType.CB_Play_OpenWindow);
         RegisterPacket<CBCloseWindowPacket>(PacketType.CB_Play_CloseWindow);
         RegisterPacket<CBSetHeldItemPacket>(PacketType.CB_Play_HeldItemSlot);
+        RegisterPacket<EntitySoundEffectPacket>(PacketType.CB_Play_EntitySoundEffect);
+        RegisterPacket<SoundEffectPacket>(PacketType.CB_Play_SoundEffect);
         RegisterPacket<SystemChatMessagePacket>(PacketType.CB_Play_SystemChat);
         RegisterPacket<DisguisedChatMessagePacket>(PacketType.CB_Play_ProfilelessChat);
         RegisterPacket<EntityStatusPacket>(PacketType.CB_Play_EntityStatus);
