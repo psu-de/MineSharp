@@ -6,19 +6,37 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public class GameEventPacket : IPacket
 {
-    public GameEventPacket(byte @event, float value)
+    public enum GameEvent : byte
+    {
+        NoRespawnBlockAvailable,
+        EndRaining,
+        BeginRaining,
+        ChangeGameMode,
+        WinGame,
+        DemoEvent,
+        ArrowHitPlayer,
+        RainLevelChange,
+        ThunderLevelChange,
+        PlayPufferfishStingSound,
+        PlayElderGuardianMobAppearance,
+        EnableRespawnScreen,
+        LimitedCrafting,
+        StartWaitingForLevelChunks
+    }
+
+    public GameEventPacket(GameEvent @event, float value)
     {
         Event = @event;
         Value = value;
     }
 
-    public byte Event { get; set; }
+    public GameEvent Event { get; set; }
     public float Value { get; set; }
     public PacketType Type => PacketType.CB_Play_GameStateChange;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteByte(Event);
+        buffer.WriteByte((byte)Event);
         buffer.WriteFloat(Value);
     }
 
@@ -26,7 +44,7 @@ public class GameEventPacket : IPacket
     {
         var @event = buffer.ReadByte();
         var value = buffer.ReadFloat();
-        return new GameEventPacket(@event, value);
+        return new GameEventPacket((GameEvent)@event, value);
     }
 }
 #pragma warning restore CS1591

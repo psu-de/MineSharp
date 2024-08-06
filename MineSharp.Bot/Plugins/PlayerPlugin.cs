@@ -428,27 +428,27 @@ public class PlayerPlugin : Plugin
     {
         switch (packet.Event)
         {
-            case 1: // End Raining
+            case GameEventPacket.GameEvent.EndRaining:
                 IsRaining = false;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 2: // Begin Raining
+            case GameEventPacket.GameEvent.BeginRaining:
                 IsRaining = true;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 7: // Rain Level Changed
+            case GameEventPacket.GameEvent.RainLevelChange:
                 RainLevel = packet.Value;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 8: // Thunder Level Changed
+            case GameEventPacket.GameEvent.ThunderLevelChange:
                 ThunderLevel = packet.Value;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 3: // GameMode Change
+            case GameEventPacket.GameEvent.ChangeGameMode:
                 var gameMode = (GameMode)packet.Value;
                 Self!.GameMode = gameMode;
                 break;
