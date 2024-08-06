@@ -1,4 +1,6 @@
-﻿using NLog;
+﻿using MineSharp.Protocol.Packets;
+using NLog;
+using static MineSharp.Protocol.MinecraftClient;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -48,6 +50,7 @@ public abstract class Plugin
 
     /// <summary>
     ///     This method is called each minecraft tick. (About 20 times a second.)
+    ///     It should stop (cancel) when the <see cref="MineSharpBot.CancellationToken"/> is cancelled.
     /// </summary>
     /// <returns></returns>
     public virtual Task OnTick()
@@ -103,6 +106,22 @@ public abstract class Plugin
     public Task WaitForInitialization()
     {
         return initializationTask.Task;
+    }
+
+    private AsyncPacketHandler<TPacket> CreateAfterInitializationPacketHandlerWrapper<TPacket>(AsyncPacketHandler<TPacket> packetHandler)
+        where TPacket : IPacket
+    {
+        return async param =>
+        {
+            await WaitForInitialization();
+            await packetHandler(param);
+        };
+    }
+
+    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler)
+        where TPacket : IPacket
+    {
+        Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler));
     }
 
     internal async Task Initialize()
