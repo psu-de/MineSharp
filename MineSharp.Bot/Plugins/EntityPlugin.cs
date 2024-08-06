@@ -183,7 +183,7 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Add(
+        (entity.Velocity as MutableVector3)!.Set(
             NetUtils.ConvertToVelocity(packet.VelocityX),
             NetUtils.ConvertToVelocity(packet.VelocityY),
             NetUtils.ConvertToVelocity(packet.VelocityZ)
@@ -204,7 +204,7 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Set(
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)
@@ -275,7 +275,7 @@ public class EntityPlugin : Plugin
 
         entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
-        
+
         return OnEntityMoved.Dispatch(Bot, entity);
     }
 
