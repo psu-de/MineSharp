@@ -38,7 +38,7 @@ public class MineSharpBot
     ///     The <see cref="Session" /> object used by this bot
     /// </summary>
     public readonly Session Session;
-    
+
     /// <summary>
     ///     NBT Registry sent by the server
     /// </summary>
@@ -135,7 +135,7 @@ public class MineSharpBot
     public async Task Disconnect(ChatComponent.Chat? reason = null)
     {
         reason ??= new TranslatableComponent("disconnect.quitting");
-        
+
         if (tickLoop is { Status: TaskStatus.Running })
         {
             cancellation.Cancel();
@@ -179,24 +179,5 @@ public class MineSharpBot
     private Task OnClientDisconnected(MinecraftClient sender, ChatComponent.Chat reason)
     {
         return OnBotDisconnected.Dispatch(this, reason);
-    }
-
-    /// <summary>
-    /// Enable debug logs of minesharp to be written to the console and a log file.
-    /// Trace logs are only written to the logfile.
-    /// </summary>
-    /// <param name="trace">if true, also log trace messages.</param>
-    public static void EnableDebugLogs(bool trace = false)
-    {
-        var configuration = new NLog.Config.LoggingConfiguration();
-
-        var logfile = new NLog.Targets.FileTarget("customfile") { FileName = $"{DateTime.Now:dd.MM.yyyy hh:mm:ss}.log" };
-        var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
-
-        var level = trace ? LogLevel.Trace : LogLevel.Debug;
-        configuration.AddRule(level,          LogLevel.Fatal, logfile);
-        configuration.AddRule(LogLevel.Debug, LogLevel.Fatal, logconsole);
-        
-        LogManager.Configuration = configuration;
     }
 }
