@@ -68,6 +68,7 @@ public class PhysicsPlugin : Plugin
         worldPlugin = Bot.GetPlugin<WorldPlugin>();
 
         await playerPlugin.WaitForInitialization();
+        await worldPlugin.WaitForInitialization();
 
         self = playerPlugin.Self;
         await UpdateServerPos();
@@ -191,7 +192,7 @@ public class PhysicsPlugin : Plugin
     ///     Casts a ray from the players eyes, and returns the first block that is hit.
     /// </summary>
     /// <returns></returns>
-    public (Block Block, BlockFace Face)? Raycast(double distance = 64)
+    public (Block Block, BlockFace Face, Aabb BlockCollisionShape, double Distance)? Raycast(double distance = 64)
     {
         if (distance < 0)
         {
@@ -219,9 +220,10 @@ public class PhysicsPlugin : Plugin
             {
                 var blockBb = bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
 
-                if (blockBb.IntersectsLine(position, lookVector))
+                var intersectionDistance = blockBb.IntersectsLine(position, lookVector);
+                if (intersectionDistance is not null)
                 {
-                    return (block, iterator.CurrentFace);
+                    return (block, iterator.CurrentFace, bb, intersectionDistance.Value);
                 }
             }
         }
