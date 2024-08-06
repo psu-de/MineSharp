@@ -331,6 +331,19 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return array;
     }
 
+    public long[] ReadLongArray()
+    {
+        var length = ReadVarInt();
+        var array = new long[length];
+
+        for (var i = 0; i < array.Length; i++)
+        {
+            array[i] = ReadLong();
+        }
+
+        return array;
+    }
+
     public byte[] RestBuffer()
     {
         var bytes = new byte[ReadableBytes];
@@ -589,6 +602,15 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
 
+    public void WriteLongArray(long[] array)
+    {
+        WriteVarInt(array.Length);
+        foreach (var l in array)
+        {
+            WriteLong(l);
+        }
+    }
+
     public void WriteNbt(NbtTag tag)
     {
         var f = new NbtFile(tag) { BigEndian = true, Anonymous = UseAnonymousNbt };
@@ -596,13 +618,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     }
 
     public void WriteOptionalNbt(NbtTag? tag)
-    {        
+    {
         if (tag is null or NbtCompound { Count: 0 })
         {
             buffer.WriteByte((byte)NbtTagType.End);
             return;
         }
-        
+
         WriteNbt(tag);
     }
 

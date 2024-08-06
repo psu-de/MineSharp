@@ -71,11 +71,7 @@ internal abstract class PaletteContainer : IPaletteContainer
             palette = DirectPalette.FromStream(buffer);
         }
 
-        var data = new long[buffer.ReadVarInt()];
-        for (var i = 0; i < data.Length; i++)
-        {
-            data[i] = buffer.ReadLong();
-        }
+        var data = buffer.ReadLongArray();
 
         return (palette, new(data, bitsPerEntry));
     }

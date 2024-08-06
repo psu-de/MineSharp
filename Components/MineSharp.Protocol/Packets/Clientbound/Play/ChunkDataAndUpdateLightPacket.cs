@@ -138,10 +138,10 @@ public class ChunkDataAndUpdateLightPacket : IPacket
             buffer.WriteBool(TrustEdges!.Value);
         }
 
-        WriteLongArray(SkyLightMask, buffer);
-        WriteLongArray(BlockLightMask, buffer);
-        WriteLongArray(EmptySkyLightMask, buffer);
-        WriteLongArray(EmptyBlockLightMask, buffer);
+        buffer.WriteLongArray(SkyLightMask);
+        buffer.WriteLongArray(BlockLightMask);
+        buffer.WriteLongArray(EmptySkyLightMask);
+        buffer.WriteLongArray(EmptyBlockLightMask);
 
         buffer.WriteVarInt(SkyLight.Length);
         foreach (var array in SkyLight)
@@ -180,10 +180,10 @@ public class ChunkDataAndUpdateLightPacket : IPacket
             trustEdges = buffer.ReadBool();
         }
 
-        var skyLightMask = ReadLongArray(buffer);
-        var blockLightMask = ReadLongArray(buffer);
-        var emptySkyLightMask = ReadLongArray(buffer);
-        var emptyBlockLightMask = ReadLongArray(buffer);
+        var skyLightMask = buffer.ReadLongArray();
+        var blockLightMask = buffer.ReadLongArray();
+        var emptySkyLightMask = buffer.ReadLongArray();
+        var emptyBlockLightMask = buffer.ReadLongArray();
         var skyLight = new byte[buffer.ReadVarInt()][];
         for (var i = 0; i < skyLight.Length; i++)
         {
@@ -211,28 +211,6 @@ public class ChunkDataAndUpdateLightPacket : IPacket
             emptyBlockLightMask,
             skyLight,
             blockLight);
-    }
-
-    private static void WriteLongArray(long[] array, PacketBuffer buffer)
-    {
-        buffer.WriteVarInt(array.Length);
-        foreach (var l in array)
-        {
-            buffer.WriteLong(l);
-        }
-    }
-
-    private static long[] ReadLongArray(PacketBuffer buffer)
-    {
-        var length = buffer.ReadVarInt();
-        var array = new long[length];
-
-        for (var i = 0; i < array.Length; i++)
-        {
-            array[i] = buffer.ReadLong();
-        }
-
-        return array;
     }
 }
 #pragma warning restore CS1591
