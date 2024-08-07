@@ -12,7 +12,7 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-///     World plugin handles all kind of packets regarding the minecraft world,
+///     World plugin handles all kind of packets regarding the Minecraft world,
 ///     and provides methods to interact with it, like mining and digging.
 /// </summary>
 public class WorldPlugin : Plugin
@@ -30,18 +30,19 @@ public class WorldPlugin : Plugin
     /// <param name="bot"></param>
     public WorldPlugin(MineSharpBot bot) : base(bot)
     {
-        OnPacketAfterInitialization<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
-        OnPacketAfterInitialization<UnloadChunkPacket>(HandleUnloadChunkPacket);
-        OnPacketAfterInitialization<BlockUpdatePacket>(HandleBlockUpdatePacket);
-        OnPacketAfterInitialization<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket);
-        OnPacketAfterInitialization<ChunkBatchStartPacket>(HandleChunkBatchStartPacket);
-        OnPacketAfterInitialization<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket);
+        // we want all the packets. Even those that are sent before the plugin is initialized.
+        OnPacketAfterInitialization<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket, true);
+        OnPacketAfterInitialization<UnloadChunkPacket>(HandleUnloadChunkPacket, true);
+        OnPacketAfterInitialization<BlockUpdatePacket>(HandleBlockUpdatePacket, true);
+        OnPacketAfterInitialization<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket, true);
+        OnPacketAfterInitialization<ChunkBatchStartPacket>(HandleChunkBatchStartPacket, true);
+        OnPacketAfterInitialization<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket, true);
     }
 
     /// <summary>
     ///     The world of the Minecraft server
     /// </summary>
-    public IWorld World { get; private set; }
+    public IWorld? World { get; private set; }
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -74,7 +75,7 @@ public class WorldPlugin : Plugin
             for (var z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
             {
                 var coords = new ChunkCoordinates(x, z);
-                while (!World.IsChunkLoaded(coords))
+                while (!World!.IsChunkLoaded(coords))
                 {
                     await Task.Delay(10);
                 }
@@ -289,7 +290,7 @@ public class WorldPlugin : Plugin
         }
 
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        var chunk = World.CreateChunk(coords, packet.BlockEntities);
+        var chunk = World!.CreateChunk(coords, packet.BlockEntities);
         chunk.LoadData(packet.ChunkData);
 
         World!.LoadChunk(chunk);

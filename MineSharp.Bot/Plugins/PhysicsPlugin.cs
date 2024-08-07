@@ -73,7 +73,7 @@ public class PhysicsPlugin : Plugin
         self = playerPlugin.Self;
         await UpdateServerPos();
 
-        Engine = new(Bot.Data, self!, worldPlugin.World, InputControls);
+        Engine = new(Bot.Data, self!, worldPlugin.World!, InputControls);
         Engine.OnCrouchingChanged += OnSneakingChanged;
         Engine.OnSprintingChanged += OnSprintingChanged;
     }
@@ -217,7 +217,7 @@ public class PhysicsPlugin : Plugin
 
         foreach (var pos in iterator.Iterate())
         {
-            var block = worldPlugin!.World.GetBlockAt(pos);
+            var block = worldPlugin!.World!.GetBlockAt(pos);
             if (!block.IsSolid())
             {
                 continue;
@@ -242,7 +242,7 @@ public class PhysicsPlugin : Plugin
     }
 
     /// <inheritdoc />
-    public override Task OnTick()
+    protected internal override Task OnTick()
     {
         if (!IsLoaded)
         {

@@ -14,6 +14,11 @@ public abstract class Plugin
     private readonly TaskCompletionSource initializationTask;
 
     /// <summary>
+    ///     The bot
+    /// </summary>
+    protected readonly MineSharpBot Bot;
+
+    /// <summary>
     ///     Create a new Plugin instance
     /// </summary>
     /// <param name="bot"></param>
@@ -25,19 +30,16 @@ public abstract class Plugin
     }
 
     /// <summary>
-    ///     The bot
-    /// </summary>
-    protected MineSharpBot Bot { get; }
-
-    /// <summary>
     ///     Whether this plugin is currently enabled
     /// </summary>
     public bool IsEnabled { get; private set; }
 
     /// <summary>
     ///     Whether this plugin is loaded and functional
+    ///     
+    /// <seealso cref="WaitForInitialization"/>
     /// </summary>
-    public bool IsLoaded { get; private set; }
+    public bool IsLoaded => initializationTask.Task.IsCompleted;
 
     /// <summary>
     ///     This method is called once when the plugin starts.
@@ -53,7 +55,7 @@ public abstract class Plugin
     ///     It should stop (cancel) when the <see cref="MineSharpBot.CancellationToken"/> is cancelled.
     /// </summary>
     /// <returns></returns>
-    public virtual Task OnTick()
+    protected internal virtual Task OnTick()
     {
         return Task.CompletedTask;
     }
@@ -108,20 +110,36 @@ public abstract class Plugin
         return initializationTask.Task;
     }
 
-    private AsyncPacketHandler<TPacket> CreateAfterInitializationPacketHandlerWrapper<TPacket>(AsyncPacketHandler<TPacket> packetHandler)
+    private AsyncPacketHandler<TPacket> CreateAfterInitializationPacketHandlerWrapper<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
         where TPacket : IPacket
     {
         return async param =>
         {
-            await WaitForInitialization();
+            if (queuePacketsSentBeforeInitializationCompleted)
+            {
+                await WaitForInitialization();
+            }
+            else
+            {
+                if (!IsLoaded)
+                {
+                    return;
+                }
+            }
             await packetHandler(param);
         };
     }
 
-    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler)
+    /// <summary>
+    ///     Registers a packet handler that is only invoked after the plugin has been initialized.
+    /// </summary>
+    /// <typeparam name="TPacket">The type of the packet.</typeparam>
+    /// <param name="packetHandler">The packet handler to be called.</param>
+    /// <param name="queuePacketsSentBeforeInitializationCompleted">Whether packets sent before the plugin has been initialized should be queued and processed after initialization.</param>
+    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
         where TPacket : IPacket
     {
-        Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler));
+        Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler, queuePacketsSentBeforeInitializationCompleted));
     }
 
     internal async Task Initialize()
@@ -137,7 +155,6 @@ public abstract class Plugin
 
             initializationTask.TrySetResult();
 
-            IsLoaded = true;
             Logger.Info("Plugin loaded: {PluginName}", GetType().Name);
         }
         catch (Exception e)
