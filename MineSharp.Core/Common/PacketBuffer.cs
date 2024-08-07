@@ -302,6 +302,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return encoding.GetString(bytes);
     }
 
+    public Identifier ReadIdentifier()
+    {
+        var str = ReadString();
+        // if the string is not a valid identifier, it will throw an exception
+        return Identifier.Parse(str);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Uuid ReadUuid()
     {
@@ -556,6 +563,12 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
         WriteVarInt(length);
         WriteBytes(bytes);
+    }
+
+    public void WriteIdentifier(Identifier identifier)
+    {
+        var str = identifier.ToString();
+        WriteString(str);
     }
 
     public void WriteUuid(Uuid value)
