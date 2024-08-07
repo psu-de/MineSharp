@@ -58,10 +58,12 @@ public class WindowPlugin : Plugin
 
         CreativeInventory = new(bot);
 
-        Bot.Client.On<WindowItemsPacket>(HandleWindowItems);
-        Bot.Client.On<WindowSetSlotPacket>(HandleSetSlot);
-        Bot.Client.On<CBHeldItemPacket>(HandleHeldItemChange);
-        Bot.Client.On<OpenWindowPacket>(HandleOpenWindow);
+        // OnPacketAfterInitialization is required to ensure that the plugin is initialized
+        // before handling packets. Otherwise we have race conditions that might cause errors
+        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems, true);
+        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot, true);
+        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange, true);
+        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow, true);
     }
 
     /// <summary>
