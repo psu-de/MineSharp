@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using ConcurrentCollections;
+using NLog;
 
 namespace MineSharp.Core.Events;
 
@@ -12,43 +13,43 @@ public abstract class AsyncEventBase<TSync, TAsync> where TSync : Delegate where
     /// <summary>
     /// List of synchronous handlers subscribed to this event
     /// </summary>
-    protected readonly HashSet<TSync> Handlers = [];
+    protected readonly ConcurrentHashSet<TSync> Handlers = [];
 
     /// <summary>
     /// List of asynchronous handlers subscribed to this event
     /// </summary>
-    protected readonly HashSet<TAsync> AsyncHandlers = [];
+    protected readonly ConcurrentHashSet<TAsync> AsyncHandlers = [];
 
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
-    public void Subscribe(TSync handler)
+    public bool Subscribe(TSync handler)
     {
-        Handlers.Add(handler);
+        return Handlers.Add(handler);
     }
 
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
-    public void Unsubscribe(TSync handler)
+    public bool Unsubscribe(TSync handler)
     {
-        Handlers.Remove(handler);
+        return Handlers.TryRemove(handler);
     }
 
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
-    public void Subscribe(TAsync handler)
+    public bool Subscribe(TAsync handler)
     {
-        AsyncHandlers.Add(handler);
+        return AsyncHandlers.Add(handler);
     }
 
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
-    public void Unsubscribe(TAsync handler)
+    public bool Unsubscribe(TAsync handler)
     {
-        AsyncHandlers.Remove(handler);
+        return AsyncHandlers.TryRemove(handler);
     }
 
     /// <summary>
