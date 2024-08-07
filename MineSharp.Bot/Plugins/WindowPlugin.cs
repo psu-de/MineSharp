@@ -207,8 +207,8 @@ public class WindowPlugin : Plugin
         await Bot.Client.SendPacket(packet);
 
         SelectedHotbarIndex = hotbarIndex;
-        
-        await OnHeldItemChanged.Dispatch(Bot, HeldItem);
+
+        _ = OnHeldItemChanged.Dispatch(Bot, HeldItem);
     }
 
     /// <summary>

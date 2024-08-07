@@ -319,7 +319,7 @@ public class PhysicsPlugin : Plugin
 
         await Bot.Client.SendPacket(packet);
 
-        await BotMoved.Dispatch(Bot);
+        _ = BotMoved.Dispatch(Bot);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)

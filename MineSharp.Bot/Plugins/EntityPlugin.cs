@@ -212,7 +212,8 @@ public class EntityPlugin : Plugin
 
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
@@ -236,7 +237,8 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
@@ -255,7 +257,8 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleTeleportEntityPacket(TeleportEntityPacket packet)
@@ -276,7 +279,8 @@ public class EntityPlugin : Plugin
         entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateAttributesPacket(UpdateAttributesPacket packet)

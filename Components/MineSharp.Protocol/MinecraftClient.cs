@@ -479,6 +479,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 }
                 else
                 {
+                    // handle the packet in a new task to prevent blocking the stream loop
                     _ = Task.Run(() => HandleIncomingPacket(packetType, buffer));
                 }
             }
