@@ -297,10 +297,8 @@ public class EntityPlugin : Plugin
 
         foreach (var attribute in packet.Attributes)
         {
-            if (!entity.Attributes.TryAdd(attribute.Key, attribute))
-            {
-                entity.Attributes[attribute.Key] = attribute;
-            }
+            // must not be Attributes[Key] = attribute because this might cause an exception
+            entity.Attributes.AddOrUpdate(attribute.Key, attribute, (key, oldvalue) => attribute);
         }
 
         return Task.CompletedTask;
