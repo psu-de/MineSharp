@@ -10,7 +10,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 public class SetCompressionPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_Compress;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Login_Compress;
     
     /// <summary>
     ///     Threshold for when to use compression

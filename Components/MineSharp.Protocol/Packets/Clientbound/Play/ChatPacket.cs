@@ -39,7 +39,8 @@ public class ChatPacket : IPacket
     public Uuid Sender { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_Chat;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_Chat;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

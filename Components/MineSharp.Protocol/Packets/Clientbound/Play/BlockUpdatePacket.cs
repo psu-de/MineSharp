@@ -32,7 +32,8 @@ public class BlockUpdatePacket : IPacket
     public int StateId { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_BlockChange;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_BlockChange;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

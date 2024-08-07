@@ -16,7 +16,8 @@ public class SetHealthPacket : IPacket
     public float Health { get; set; }
     public int Food { get; set; }
     public float Saturation { get; set; }
-    public PacketType Type => PacketType.CB_Play_UpdateHealth;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_UpdateHealth;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

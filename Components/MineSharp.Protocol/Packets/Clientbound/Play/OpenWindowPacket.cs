@@ -28,7 +28,8 @@ public class OpenWindowPacket : IPacket
     public string WindowTitle { get; set; }
 
     public Chat? WindowTitleChat { get; set; }
-    public PacketType Type => PacketType.CB_Play_OpenWindow;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_OpenWindow;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

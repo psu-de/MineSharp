@@ -12,7 +12,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 public class LoginSuccessPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_Success;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Login_Success;
     
     /// <summary>
     ///     Uuid

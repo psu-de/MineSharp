@@ -18,7 +18,8 @@ public class SetEntityVelocityPacket : IPacket
     public short VelocityX { get; set; }
     public short VelocityY { get; set; }
     public short VelocityZ { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityVelocity;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntityVelocity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

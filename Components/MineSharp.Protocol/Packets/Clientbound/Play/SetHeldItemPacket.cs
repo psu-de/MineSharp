@@ -12,7 +12,8 @@ public class SetHeldItemPacket : IPacket
     }
 
     public sbyte Slot { get; set; }
-    public PacketType Type => PacketType.CB_Play_HeldItemSlot;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_HeldItemSlot;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

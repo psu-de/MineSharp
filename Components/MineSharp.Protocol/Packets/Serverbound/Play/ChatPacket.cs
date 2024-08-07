@@ -15,7 +15,8 @@ public class ChatPacket : IPacket
     }
 
     public string Message { get; set; }
-    public PacketType Type => PacketType.SB_Play_Chat;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_Chat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

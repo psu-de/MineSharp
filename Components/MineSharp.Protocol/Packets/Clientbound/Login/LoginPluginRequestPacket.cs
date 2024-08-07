@@ -38,7 +38,8 @@ public class LoginPluginRequestPacket : IPacket
     public byte[] Data { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_LoginPluginRequest;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Login_LoginPluginRequest;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

@@ -62,7 +62,8 @@ public class PlayerPositionPacket : IPacket
     public sbyte Flags { get; set; }
     public int TeleportId { get; set; }
     public bool? DismountVehicle { get; set; }
-    public PacketType Type => PacketType.CB_Play_Position;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_Position;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

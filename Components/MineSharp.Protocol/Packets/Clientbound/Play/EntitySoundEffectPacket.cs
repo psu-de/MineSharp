@@ -28,7 +28,8 @@ public class EntitySoundEffectPacket : IPacket
     public float Volume { get; set; }
     public float Pitch { get; set; }
     public long Seed { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntitySoundEffect;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntitySoundEffect;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

@@ -12,7 +12,8 @@ public class PongPacket : IPacket
     }
 
     public int Id { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_Pong;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_Pong;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

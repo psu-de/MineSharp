@@ -20,7 +20,8 @@ public class EntityPositionPacket : IPacket
     public short DeltaY { get; set; }
     public short DeltaZ { get; set; }
     public bool OnGround { get; set; }
-    public PacketType Type => PacketType.CB_Play_RelEntityMove;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_RelEntityMove;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

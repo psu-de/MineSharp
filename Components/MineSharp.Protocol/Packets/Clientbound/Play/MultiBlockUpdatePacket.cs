@@ -36,7 +36,8 @@ public class MultiBlockUpdatePacket : IPacket
     public long ChunkSection { get; set; }
     public bool? SuppressLightUpdates { get; set; }
     public long[] Blocks { get; set; }
-    public PacketType Type => PacketType.CB_Play_MultiBlockChange;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_MultiBlockChange;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

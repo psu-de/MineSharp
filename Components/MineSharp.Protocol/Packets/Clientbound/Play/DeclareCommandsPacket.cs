@@ -24,7 +24,8 @@ public class DeclareCommandsPacket : IPacket
     public PacketBuffer RawBuffer { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_DeclareCommands;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_DeclareCommands;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

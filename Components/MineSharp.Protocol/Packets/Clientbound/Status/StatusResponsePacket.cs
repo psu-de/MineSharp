@@ -12,7 +12,8 @@ public class StatusResponsePacket : IPacket
     }
 
     public string Response { get; set; }
-    public PacketType Type => PacketType.CB_Status_ServerInfo;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Status_ServerInfo;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

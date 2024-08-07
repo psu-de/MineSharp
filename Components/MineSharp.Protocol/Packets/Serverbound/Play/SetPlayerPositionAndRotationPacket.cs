@@ -22,7 +22,8 @@ public class SetPlayerPositionAndRotationPacket : IPacket
     public float Yaw { get; set; }
     public float Pitch { get; set; }
     public bool IsOnGround { get; set; }
-    public PacketType Type => PacketType.SB_Play_PositionLook;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_PositionLook;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

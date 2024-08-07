@@ -14,7 +14,8 @@ public class PluginMessagePacket : IPacket
 
     public string ChannelName { get; set; }
     public PacketBuffer Data { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_CustomPayload;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_CustomPayload;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

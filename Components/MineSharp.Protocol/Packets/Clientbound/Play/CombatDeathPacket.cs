@@ -57,7 +57,8 @@ public class CombatDeathPacket : IPacket
     public string Message { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_DeathCombatEvent;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_DeathCombatEvent;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

@@ -12,7 +12,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class DisconnectPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_Disconnect;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Configuration_Disconnect;
     
     /// <summary>
     ///     Reason for disconnect

@@ -41,7 +41,8 @@ public class UseItemPacket : IPacket
     public int? SequenceId { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.SB_Play_UseItem;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_UseItem;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

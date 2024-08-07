@@ -313,7 +313,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <typeparam name="T">The type of the packet</typeparam>
     public void On<T>(AsyncPacketHandler<T> handler) where T : IPacket
     {
-        var key = PacketPalette.GetPacketType<T>();
+        var key = T.StaticType;
 
         packetHandlers.GetOrAdd(key, _ => new ConcurrentBag<AsyncPacketHandler>())
                       .Add(p => handler((T)p));
@@ -326,7 +326,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <returns>A task that completes once the packet is received</returns>
     public Task<T> WaitForPacket<T>() where T : IPacket
     {
-        var packetType = PacketPalette.GetPacketType<T>();
+        var packetType = T.StaticType;
         var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>());
         return tcs.Task.ContinueWith(prev => (T)prev.Result);
     }

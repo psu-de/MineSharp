@@ -25,7 +25,8 @@ public class ChunkBatchReceivedPacket : IPacket
     public float ChunksPerTick { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.SB_Play_ChunkBatchReceived;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_ChunkBatchReceived;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

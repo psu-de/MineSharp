@@ -24,7 +24,8 @@ public class SetHeldItemPacket : IPacket
     public short Slot { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.SB_Play_HeldItemSlot;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_HeldItemSlot;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

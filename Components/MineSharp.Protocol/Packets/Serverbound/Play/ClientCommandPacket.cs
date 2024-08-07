@@ -12,7 +12,8 @@ public class ClientCommandPacket : IPacket
     }
 
     public int ActionId { get; set; }
-    public PacketType Type => PacketType.SB_Play_ClientCommand;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_ClientCommand;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

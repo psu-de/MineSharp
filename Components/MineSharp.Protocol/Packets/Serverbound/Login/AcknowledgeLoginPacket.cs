@@ -6,7 +6,8 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 #pragma warning disable CS1591
 public class AcknowledgeLoginPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Login_LoginAcknowledged;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Login_LoginAcknowledged;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }

@@ -11,7 +11,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class FinishConfigurationPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_FinishConfiguration;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Configuration_FinishConfiguration;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

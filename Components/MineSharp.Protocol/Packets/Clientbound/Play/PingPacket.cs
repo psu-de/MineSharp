@@ -24,7 +24,8 @@ public class PingPacket : IPacket
     public int Id { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_Ping;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_Ping;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

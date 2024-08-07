@@ -18,7 +18,8 @@ public class EncryptionResponsePacket : IPacket
     public byte[] SharedSecret { get; set; }
     public byte[]? VerifyToken { get; set; }
     public CryptoContainer? Crypto { get; set; }
-    public PacketType Type => PacketType.SB_Login_EncryptionBegin;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

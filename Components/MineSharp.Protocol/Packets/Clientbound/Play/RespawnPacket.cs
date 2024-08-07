@@ -41,7 +41,8 @@ public class RespawnPacket : IPacket
     public string? DeathDimensionName { get; set; }
     public Position? DeathLocation { get; set; }
     public int? PortalCooldown { get; set; }
-    public PacketType Type => PacketType.CB_Play_Respawn;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_Respawn;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

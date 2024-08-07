@@ -11,7 +11,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class FeatureFlagsPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_FeatureFlags;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Configuration_FeatureFlags;
     
     /// <summary>
     ///     The enabled feature flags

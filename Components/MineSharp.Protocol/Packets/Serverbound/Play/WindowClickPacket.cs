@@ -27,7 +27,8 @@ public class WindowClickPacket : IPacket
     public int Mode { get; set; }
     public Slot[] ChangedSlots { get; set; }
     public Item? SelectedItem { get; set; }
-    public PacketType Type => PacketType.SB_Play_WindowClick;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_WindowClick;
 
 
     public void Write(PacketBuffer buffer, MinecraftData version)

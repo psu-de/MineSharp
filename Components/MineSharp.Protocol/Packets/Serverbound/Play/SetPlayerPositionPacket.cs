@@ -18,7 +18,8 @@ public class SetPlayerPositionPacket : IPacket
     public double Y { get; set; }
     public double Z { get; set; }
     public bool IsOnGround { get; set; }
-    public PacketType Type => PacketType.SB_Play_Position;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_Position;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

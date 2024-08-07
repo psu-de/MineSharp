@@ -31,7 +31,8 @@ public class SetCreativeSlotPacket : IPacket
     public Item? Item { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.SB_Play_SetCreativeSlot;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_SetCreativeSlot;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

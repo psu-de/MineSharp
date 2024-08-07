@@ -29,7 +29,8 @@ public class EntityActionPacket : IPacket
     public int EntityId { get; set; }
     public EntityAction Action { get; set; }
     public int JumpBoost { get; set; }
-    public PacketType Type => PacketType.SB_Play_EntityAction;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_EntityAction;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

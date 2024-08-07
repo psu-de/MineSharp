@@ -32,7 +32,8 @@ public class GameEventPacket : IPacket
 
     public GameEvent Event { get; set; }
     public float Value { get; set; }
-    public PacketType Type => PacketType.CB_Play_GameStateChange;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_GameStateChange;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

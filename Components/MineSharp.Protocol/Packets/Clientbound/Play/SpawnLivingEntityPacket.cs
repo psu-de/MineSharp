@@ -40,7 +40,8 @@ public class SpawnLivingEntityPacket : IPacket
     public short VelocityX { get; set; }
     public short VelocityY { get; set; }
     public short VelocityZ { get; set; }
-    public PacketType Type => PacketType.CB_Play_SpawnEntityLiving;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_SpawnEntityLiving;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

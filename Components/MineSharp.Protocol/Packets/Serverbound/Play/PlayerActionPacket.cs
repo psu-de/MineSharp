@@ -41,7 +41,8 @@ public class PlayerActionPacket : IPacket
     public Position Location { get; set; }
     public BlockFace Face { get; set; }
     public int? SequenceId { get; set; }
-    public PacketType Type => PacketType.SB_Play_BlockDig;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_BlockDig;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

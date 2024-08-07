@@ -12,7 +12,8 @@ public class PlayerInfoRemovePacket : IPacket
     }
 
     public Uuid[] Players { get; set; }
-    public PacketType Type => PacketType.CB_Play_PlayerRemove;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_PlayerRemove;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

@@ -12,7 +12,8 @@ public class PingRequestPacket : IPacket
     }
 
     public long Payload { get; set; }
-    public PacketType Type => PacketType.SB_Status_Ping;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Status_Ping;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

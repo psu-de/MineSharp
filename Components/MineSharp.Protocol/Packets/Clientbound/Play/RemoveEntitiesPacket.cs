@@ -12,7 +12,8 @@ public class RemoveEntitiesPacket : IPacket
     }
 
     public int[] EntityIds { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityDestroy;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntityDestroy;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

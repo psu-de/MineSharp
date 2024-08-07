@@ -80,7 +80,8 @@ public class ChatCommandPacket : IPacket
     public ChatMessageItem? LastRejectedMessage { get; set; }
     public int? MessageCount { get; set; }
     public byte[]? Acknowledged { get; set; }
-    public PacketType Type => PacketType.SB_Play_ChatCommand;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_ChatCommand;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

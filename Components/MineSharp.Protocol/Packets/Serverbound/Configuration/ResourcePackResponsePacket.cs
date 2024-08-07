@@ -12,7 +12,8 @@ public class ResourcePackResponsePacket : IPacket
     }
 
     public int Result { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_ResourcePackReceive;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_ResourcePackReceive;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

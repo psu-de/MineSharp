@@ -32,7 +32,8 @@ public class SoundEffectPacket : IPacket
     public float Volume { get; set; }
     public float Pitch { get; set; }
     public long Seed { get; set; }
-    public PacketType Type => PacketType.CB_Play_SoundEffect;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_SoundEffect;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

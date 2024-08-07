@@ -14,7 +14,8 @@ public class UnloadChunkPacket : IPacket
 
     public int X { get; set; }
     public int Z { get; set; }
-    public PacketType Type => PacketType.CB_Play_UnloadChunk;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_UnloadChunk;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

@@ -17,7 +17,8 @@ public class PlayerInfoUpdatePacket : IPacket
     public int Action { get; set; }
 
     public ActionEntry[] Data { get; set; }
-    public PacketType Type => PacketType.CB_Play_PlayerInfo;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_PlayerInfo;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

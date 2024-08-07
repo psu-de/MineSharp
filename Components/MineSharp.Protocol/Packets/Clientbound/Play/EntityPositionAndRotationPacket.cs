@@ -25,7 +25,8 @@ public class EntityPositionAndRotationPacket : IPacket
     public sbyte Yaw { get; set; }
     public sbyte Pitch { get; set; }
     public bool OnGround { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityMoveLook;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntityMoveLook;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

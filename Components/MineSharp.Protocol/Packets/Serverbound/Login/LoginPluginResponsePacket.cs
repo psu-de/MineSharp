@@ -14,7 +14,8 @@ public class LoginPluginResponsePacket : IPacket
 
     public int MessageId { get; set; }
     public byte[]? Data { get; set; }
-    public PacketType Type => PacketType.SB_Login_LoginPluginResponse;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Login_LoginPluginResponse;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

@@ -25,7 +25,8 @@ public class DisconnectPacket : IPacket
     public Chat Reason { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_KickDisconnect;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_KickDisconnect;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

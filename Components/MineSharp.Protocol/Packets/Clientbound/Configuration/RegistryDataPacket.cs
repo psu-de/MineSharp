@@ -12,7 +12,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class RegistryDataPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_RegistryData;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Configuration_RegistryData;
     
     /// <summary>
     ///     The registry data

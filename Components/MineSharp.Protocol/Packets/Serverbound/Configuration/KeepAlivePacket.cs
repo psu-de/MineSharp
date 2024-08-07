@@ -12,7 +12,8 @@ public class KeepAlivePacket : IPacket
     }
 
     public long KeepAliveId { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_KeepAlive;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_KeepAlive;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

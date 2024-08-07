@@ -11,7 +11,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class KeepAlivePacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_KeepAlive;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Configuration_KeepAlive;
     
     /// <summary>
     ///     The keep alive id

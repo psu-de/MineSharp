@@ -21,7 +21,8 @@ public class HandshakePacket : IPacket
     public string Host { get; set; }
     public ushort Port { get; set; }
     public GameState NextState { get; set; }
-    public PacketType Type => PacketType.SB_Handshake_SetProtocol;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Handshake_SetProtocol;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

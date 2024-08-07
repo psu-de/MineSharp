@@ -6,7 +6,8 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 #pragma warning disable CS1591
 public class FinishConfigurationPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Configuration_FinishConfiguration;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_FinishConfiguration;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }

@@ -12,7 +12,8 @@ public class SwingArmPacket : IPacket
     }
 
     public PlayerHand Hand { get; set; }
-    public PacketType Type => PacketType.SB_Play_ArmAnimation;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_ArmAnimation;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

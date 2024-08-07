@@ -76,7 +76,8 @@ public class LoginPacket : IPacket
     public Position? DeathLocation { get; set; }
     public int? PortalCooldown { get; set; }
     public bool? DoLimitedCrafting { get; set; } // since 1.20.2
-    public PacketType Type => PacketType.CB_Play_Login;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_Login;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

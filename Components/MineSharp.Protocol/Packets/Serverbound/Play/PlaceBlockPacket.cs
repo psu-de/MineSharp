@@ -63,7 +63,8 @@ public class PlaceBlockPacket : IPacket
     public float CursorZ { get; set; }
     public bool InsideBlock { get; set; }
     public int? SequenceId { get; set; }
-    public PacketType Type => PacketType.SB_Play_BlockPlace;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_BlockPlace;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

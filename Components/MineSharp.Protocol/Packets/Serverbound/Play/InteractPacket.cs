@@ -53,7 +53,8 @@ public class InteractPacket : IPacket
     public float? TargetZ { get; set; }
     public PlayerHand? Hand { get; set; }
     public bool Sneaking { get; set; }
-    public PacketType Type => PacketType.SB_Play_UseEntity;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_UseEntity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

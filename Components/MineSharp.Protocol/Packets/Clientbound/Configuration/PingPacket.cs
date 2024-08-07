@@ -11,8 +11,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 public class PingPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_Ping;
-    
+    public PacketType Type => StaticType;
+    public static PacketType StaticType => PacketType.CB_Configuration_Ping;
+
     /// <summary>
     ///     The id of the ping
     /// </summary>

@@ -25,7 +25,8 @@ public class SpawnPaintingPacket : IPacket
     public int Title { get; set; }
     public Position Location { get; set; }
     public sbyte Direction { get; set; }
-    public PacketType Type => PacketType.CB_Play_SpawnEntityPainting;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

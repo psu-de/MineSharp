@@ -11,7 +11,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 public class EncryptionRequestPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_EncryptionBegin;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Login_EncryptionBegin;
     
     /// <summary>
     ///     The hashed server id

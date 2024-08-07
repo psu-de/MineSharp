@@ -16,7 +16,8 @@ public class UpdateAttributesPacket : IPacket
 
     public int EntityId { get; set; }
     public Attribute[] Attributes { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityUpdateAttributes;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntityUpdateAttributes;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

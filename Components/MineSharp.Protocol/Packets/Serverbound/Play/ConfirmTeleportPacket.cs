@@ -12,7 +12,8 @@ public class ConfirmTeleportPacket : IPacket
     }
 
     public int TeleportId { get; set; }
-    public PacketType Type => PacketType.SB_Play_TeleportConfirm;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_TeleportConfirm;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

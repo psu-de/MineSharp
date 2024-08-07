@@ -28,7 +28,8 @@ public class SpawnPlayerPacket : IPacket
     public double Z { get; set; }
     public byte Yaw { get; set; }
     public byte Pitch { get; set; }
-    public PacketType Type => PacketType.CB_Play_NamedEntitySpawn;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_NamedEntitySpawn;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

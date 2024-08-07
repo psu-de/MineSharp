@@ -19,7 +19,8 @@ public class UpdateCommandBlock : IPacket
     public string Command { get; set; }
     public int Mode { get; set; }
     public byte Flags { get; set; }
-    public PacketType Type => PacketType.SB_Play_UpdateCommandBlock;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_UpdateCommandBlock;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

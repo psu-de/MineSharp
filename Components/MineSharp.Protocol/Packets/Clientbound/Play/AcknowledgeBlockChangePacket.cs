@@ -44,7 +44,8 @@ public class AcknowledgeBlockChangePacket : IPacket
     public IPacketBody Body { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_AcknowledgePlayerDigging;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_AcknowledgePlayerDigging;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

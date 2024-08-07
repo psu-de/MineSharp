@@ -16,7 +16,8 @@ public class SetPassengersPacket : IPacket
     public int EntityId { get; set; }
 
     public int[] PassengersId { get; set; }
-    public PacketType Type => PacketType.CB_Play_SetPassengers;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_SetPassengers;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

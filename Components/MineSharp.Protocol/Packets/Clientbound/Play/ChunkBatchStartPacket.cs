@@ -11,7 +11,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public class ChunkBatchStartPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_ChunkBatchStart;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_ChunkBatchStart;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

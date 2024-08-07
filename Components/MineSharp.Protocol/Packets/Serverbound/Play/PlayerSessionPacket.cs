@@ -18,7 +18,8 @@ public class PlayerSessionPacket : IPacket
     public long ExpiresAt { get; set; }
     public byte[] PublicKey { get; set; }
     public byte[] KeySignature { get; set; }
-    public PacketType Type => PacketType.SB_Play_ChatSessionUpdate;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Play_ChatSessionUpdate;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

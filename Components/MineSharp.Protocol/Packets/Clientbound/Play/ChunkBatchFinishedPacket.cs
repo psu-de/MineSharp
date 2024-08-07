@@ -25,7 +25,8 @@ public class ChunkBatchFinishedPacket : IPacket
     public int BatchSize { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_ChunkBatchFinished;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_ChunkBatchFinished;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

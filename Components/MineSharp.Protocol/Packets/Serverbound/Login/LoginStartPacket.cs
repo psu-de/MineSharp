@@ -45,7 +45,8 @@ public class LoginStartPacket : IPacket
     public string Username { get; set; }
     public SignatureContainer? Signature { get; set; }
     public Uuid? PlayerUuid { get; set; }
-    public PacketType Type => PacketType.SB_Login_LoginStart;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Login_LoginStart;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

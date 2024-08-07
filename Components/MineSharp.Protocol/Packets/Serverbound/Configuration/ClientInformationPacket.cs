@@ -28,7 +28,8 @@ public class ClientInformationPacket : IPacket
     public int MainHand { get; set; }
     public bool EnableTextFiltering { get; set; }
     public bool AllowServerListings { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_Settings;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.SB_Configuration_Settings;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

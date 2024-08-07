@@ -14,7 +14,8 @@ public class EntityStatusPacket : IPacket
 
     public int EntityId { get; set; }
     public byte Status { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityStatus;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_EntityStatus;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

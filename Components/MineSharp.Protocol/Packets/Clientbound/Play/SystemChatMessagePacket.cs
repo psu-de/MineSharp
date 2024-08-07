@@ -14,7 +14,8 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public abstract class SystemChatMessagePacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_SystemChat;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_SystemChat;
     
     /// <summary>
     /// The message

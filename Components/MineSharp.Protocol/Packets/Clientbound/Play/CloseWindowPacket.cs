@@ -24,7 +24,8 @@ public class CloseWindowPacket : IPacket
     public byte WindowId { get; set; }
 
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_CloseWindow;
+    public PacketType Type => StaticType;
+public static PacketType StaticType => PacketType.CB_Play_CloseWindow;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
