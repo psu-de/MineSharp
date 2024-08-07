@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using fNbt;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Exceptions;
 
 namespace MineSharp.Core.Common;
 
@@ -238,6 +239,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         while (true)
         {
             var b = stream.ReadByte();
+            if (b == -1)
+            {
+                throw new EndOfStreamException();
+            }
+
             byteCount++;
             value |= (b & VarIntSegmentBits) << shift;
             if ((b & VarIntContinueBit) == 0x00)
@@ -248,7 +254,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             shift += 7;
             if (shift >= 32)
             {
-                throw new("VarInt is too big");
+                throw new SerializationException("VarInt is too big.");
             }
         }
 
@@ -278,7 +284,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
             shift += 7;
             if (shift >= 64)
             {
-                throw new("VarLong is too big");
+                throw new SerializationException("VarLong is too big.");
             }
         }
 

@@ -425,32 +425,21 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     {
         try
         {
-            while (!CancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    // run both tasks in parallel
-                    var receiveTask = Task.Run(ReceivePackets);
-                    var sendTask = Task.Run(SendPackets);
+            // run both tasks in parallel
+            var receiveTask = Task.Run(ReceivePackets);
+            var sendTask = Task.Run(SendPackets);
 
-                    // extract the exception from the task that finished first
-                    await await Task.WhenAny(receiveTask, sendTask);
-                    // DisposeInternal in the catch block will then stop the other task
-                }
-                catch (Exception ex)
-                {
-                    if (ex is SocketException or IOException)
-                    {
-                        // we probably can not continue after this
-                        throw;
-                    }
-                    Logger.Error(ex, "Encountered error in stream loop");
-                }
-            }
+            // extract the exception from the task that finished first
+            await await Task.WhenAny(receiveTask, sendTask);
+            // DisposeInternal in the catch block will then stop the other task
         }
         catch (Exception e)
         {
-            Logger.Error(e, "Encountered exception in outer stream loop. Connection will be terminated.");
+            // EndOfStreamException is expected when the connection is closed
+            if (e is not EndOfStreamException)
+            {
+                Logger.Error(e, "Encountered exception in outer stream loop. Connection will be terminated.");
+            }
             await DisposeInternal(true);
         }
     }
