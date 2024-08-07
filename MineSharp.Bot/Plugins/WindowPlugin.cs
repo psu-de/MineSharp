@@ -20,7 +20,7 @@ using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItem
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-///     The Window plugin takes care of minecraft window's system.
+///     The Window plugin takes care of Minecraft window's system.
 ///     It handles the Bot's Inventory, window slot updates and provides
 ///     methods to open blocks like chests, crafting tables, ...
 /// </summary>
@@ -304,11 +304,11 @@ public class WindowPlugin : Plugin
 
     private Window OpenWindow(int id, WindowInfo windowInfo)
     {
-        Logger.Debug("Opening window with id=" + id);
+        Logger.Debug("Opening window with id={WindowId}", id);
 
         if (openWindows.ContainsKey(id))
         {
-            throw new ArgumentException("Window with id " + id + " already opened");
+            throw new ArgumentException($"Window with id {id} already opened");
         }
 
         var window = new Window(
@@ -322,7 +322,7 @@ public class WindowPlugin : Plugin
         {
             if (!openWindows.TryAdd(id, window))
             {
-                Logger.Warn($"Could not add window with id {id}, it already existed.");
+                Logger.Warn("Could not add window with id {WindowId}, it already existed.", id);
             }
         }
 
@@ -335,7 +335,7 @@ public class WindowPlugin : Plugin
             && DateTime.Now - cacheTimestamp! <= TimeSpan.FromSeconds(5))
         {
             // use cache
-            Logger.Debug("Applying cached window items for window with id=" + id);
+            Logger.Debug("Applying cached window items for window with id={WindowId}", id);
             HandleWindowItems(cachedWindowItemsPacket);
         }
 
@@ -387,18 +387,17 @@ public class WindowPlugin : Plugin
         }
         else if (!openWindows.TryGetValue(packet.WindowId, out window))
         {
-            Logger.Warn($"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened");
+            Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened", nameof(WindowSetSlotPacket), packet.WindowId);
             return Task.CompletedTask;
         }
 
         if (window == null)
         {
-            Logger.Warn(
-                $"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened, {CurrentlyOpenedWindow?.ToString() ?? "null"}, {Inventory?.ToString() ?? "null"}");
+            Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened, {CurrentlyOpenedWindow}, {Inventory}", nameof(WindowSetSlotPacket), packet.WindowId, CurrentlyOpenedWindow?.ToString() ?? "null", Inventory?.ToString() ?? "null");
             return Task.CompletedTask;
         }
 
-        Logger.Debug("Handle set slot: {Slot}", packet.Slot);
+        // Logger.Debug("Handle set slot: {Slot}", packet.Slot);
 
         window.StateId = packet.StateId;
         window.SetSlot(packet.Slot);
@@ -413,7 +412,7 @@ public class WindowPlugin : Plugin
         {
             if (!openWindows.TryGetValue(packet.WindowId, out window))
             {
-                Logger.Warn($"Received {packet.GetType().Name} for windowId={packet.WindowId}, but its not opened");
+                Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened", packet.GetType().Name, packet.WindowId);
 
                 // Cache items in case it gets opened in a bit
                 cachedWindowItemsPacket = packet;
@@ -422,7 +421,7 @@ public class WindowPlugin : Plugin
                 return Task.CompletedTask;
             }
 
-            Logger.Debug($"HandleWindowItems for window {window.Title}");
+            Logger.Debug("HandleWindowItems for window {WindowTitle}", window.Title);
         }
 
         var slots = packet.Items
@@ -451,7 +450,7 @@ public class WindowPlugin : Plugin
         var windowInfo = Bot.Data.Windows.ById(packet.InventoryType);
 
         windowInfo = windowInfo with { Title = packet.WindowTitle };
-        Logger.Debug($"Received Open Window Packet id={packet.WindowId}");
+        Logger.Debug("Received Open Window Packet id={WindowId}", packet.WindowId);
         OpenWindow(packet.WindowId, windowInfo);
 
         return Task.CompletedTask;
