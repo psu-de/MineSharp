@@ -58,9 +58,10 @@ internal class MinecraftStream
     {
         var localCompressionThreshold = compressionThreshold;
 
+        var uncompressedLength = 0;
+        byte[] data = Array.Empty<byte>();
         lock (readLock)
         {
-            var uncompressedLength = 0;
             var length = PacketBuffer.ReadVarInt(stream, out _);
 
             if (localCompressionThreshold != CompressionDisabled)
@@ -69,22 +70,22 @@ internal class MinecraftStream
                 length -= r;
             }
 
-            var data = new byte[length];
+            data = new byte[length];
 
             var read = 0;
             while (read < length)
             {
                 read += stream.Read(data, read, length - read);
             }
-
-            var packetBuffer = uncompressedLength switch
-            {
-                > 0 => DecompressBuffer(data, uncompressedLength),
-                _ => new(data, protocolVersion)
-            };
-
-            return packetBuffer;
         }
+
+        var packetBuffer = uncompressedLength switch
+        {
+            > 0 => DecompressBuffer(data, uncompressedLength),
+            _ => new(data, protocolVersion)
+        };
+
+        return packetBuffer;
     }
 
     public void WritePacket(PacketBuffer buffer)

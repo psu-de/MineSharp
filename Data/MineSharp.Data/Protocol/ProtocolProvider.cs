@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Common.Protocol;
+﻿using System.Collections.Frozen;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
 using Newtonsoft.Json.Linq;
@@ -24,10 +25,10 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
 
     public ProtocolDataBlob GetData()
     {
-        var byFlow = new Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>>
+        var byFlow = new Dictionary<PacketFlow, Dictionary<GameState, FrozenDictionary<int, PacketType>>>
         {
-            { PacketFlow.Clientbound, new Dictionary<GameState, Dictionary<int, PacketType>>() },
-            { PacketFlow.Serverbound, new Dictionary<GameState, Dictionary<int, PacketType>>() }
+            { PacketFlow.Clientbound, new Dictionary<GameState, FrozenDictionary<int, PacketType>>() },
+            { PacketFlow.Serverbound, new Dictionary<GameState, FrozenDictionary<int, PacketType>>() }
         };
 
         foreach (var ns in token.Properties())
@@ -46,15 +47,16 @@ internal class ProtocolProvider : IDataProvider<ProtocolDataBlob>
             byFlow[PacketFlow.Serverbound].Add(state, sbPackets);
         }
 
-        return new(byFlow);
+        var frozenDict = byFlow.ToFrozenDictionary(x => x.Key, y => y.Value.ToFrozenDictionary());
+        return new(frozenDict);
     }
 
-    private Dictionary<int, PacketType> CollectPackets(string ns, string direction)
+    private FrozenDictionary<int, PacketType> CollectPackets(string ns, string direction)
     {
         var obj = (JObject)token.SelectToken($"{ns}.{direction}.types.packet[1][0].type[1].mappings")!;
 
         return obj.Properties()
-                  .ToDictionary(
+                  .ToFrozenDictionary(
                        x => Convert.ToInt32(x.Name, 16),
                        x => TypeLookup.FromName(
                            NameUtils.GetPacketName(

@@ -1,6 +1,7 @@
-﻿using MineSharp.Core.Common.Protocol;
+﻿using System.Collections.Frozen;
+using MineSharp.Core.Common.Protocol;
 
 namespace MineSharp.Data.Protocol;
 
 internal record ProtocolDataBlob(
-    Dictionary<PacketFlow, Dictionary<GameState, Dictionary<int, PacketType>>> IdToTypeMap);
+    FrozenDictionary<PacketFlow, FrozenDictionary<GameState, FrozenDictionary<int, PacketType>>> IdToTypeMap);
