@@ -188,7 +188,7 @@ public sealed partial record Identifier
     /// <returns><c>true</c> if the namespace is valid; otherwise, <c>false</c>.</returns>
     public static bool IsValidNamespace(string @namespace)
     {
-        return NamespaceRegex().IsMatch(@namespace);
+        return NamespaceRegex().MatchEntireString(@namespace) != null;
     }
 
     [GeneratedRegex("[a-z0-9.-_/]+")]
@@ -201,6 +201,6 @@ public sealed partial record Identifier
     /// <returns><c>true</c> if the name is valid; otherwise, <c>false</c>.</returns>
     public static bool IsValidName(string name)
     {
-        return NameRegex().IsMatch(name);
+        return NameRegex().MatchEntireString(name) != null;
     }
 }
