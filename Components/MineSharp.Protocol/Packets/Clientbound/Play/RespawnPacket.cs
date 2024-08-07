@@ -8,7 +8,7 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public sealed record RespawnPacket(
-    string Dimension,
+    string DimensionType,
     string DimensionName,
     long HashedSeed,
     sbyte GameMode,
@@ -35,7 +35,7 @@ public sealed record RespawnPacket(
                 $"{nameof(RespawnPacket)}.Write() is not supported for versions before 1.19.");
         }
 
-        buffer.WriteString(Dimension);
+        buffer.WriteString(DimensionType);
         buffer.WriteString(DimensionName);
         buffer.WriteLong(HashedSeed);
         buffer.WriteSByte(GameMode);
@@ -65,16 +65,16 @@ public sealed record RespawnPacket(
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        string dimension;
+        string dimensionType;
 
         if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
             var dimensionNbt = buffer.ReadNbtCompound();
-            dimension = dimensionNbt.Get<NbtString>("effects")!.Value;
+            dimensionType = dimensionNbt.Get<NbtString>("effects")!.Value;
         }
         else
         {
-            dimension = buffer.ReadString();
+            dimensionType = buffer.ReadString();
         }
 
         var dimensionName = buffer.ReadString();
@@ -105,7 +105,7 @@ public sealed record RespawnPacket(
         }
 
         return new RespawnPacket(
-            dimension,
+            dimensionType,
             dimensionName,
             hashedSeed,
             gameMode,

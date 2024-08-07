@@ -91,7 +91,7 @@ public class PlayerPlugin : Plugin
     /// <summary>
     ///     The Name of the dimension the bot is currently in.
     /// </summary>
-    public string? Dimension { get; private set; }
+    public string? DimensionName { get; private set; }
 
     /// <summary>
     ///     Whether the bot is alive or dead.
@@ -177,17 +177,17 @@ public class PlayerPlugin : Plugin
             0,
             (GameMode)loginPacket.GameMode,
             entity,
-            ParseDimension(loginPacket.DimensionName));
+            ParseDimension(loginPacket.DimensionType));
 
         PlayerMap.TryAdd(entity.ServerId, Self);
 
         Health = loginPacket.HasDeathLocation ? 0f : 20.0f;
         Food = 20.0f;
         Saturation = 20.0f;
-        Dimension = loginPacket.DimensionName;
+        DimensionName = loginPacket.DimensionName;
 
         Logger.Info(
-            $"Initialized Bot Entity: Position=({Entity!.Position}), GameMode={Self.GameMode}, Dimension={Dimension}.");
+            "Initialized Bot Entity: Position=({Position}), GameMode={GameMode}, Dimension={DimensionName} ({Dimension}).", Entity!.Position, Self.GameMode, DimensionName, Self!.Dimension);
 
         if (!loginPacket.HasDeathLocation)
         {
@@ -294,7 +294,7 @@ public class PlayerPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        Self!.Dimension = ParseDimension(packet.Dimension);
+        Self!.Dimension = ParseDimension(packet.DimensionType);
 
         OnRespawned.Dispatch(Bot);
         return Task.CompletedTask;
@@ -498,10 +498,10 @@ public class PlayerPlugin : Plugin
     {
         return dimensionName switch
         {
-            "minecraft:overworld" => Core.Common.Dimension.Overworld,
-            "minecraft:the_nether" => Core.Common.Dimension.Nether,
-            "minecraft:the_end" => Core.Common.Dimension.End,
-            _ => throw new UnreachableException()
+            "overworld" => Dimension.Overworld,
+            "the_nether" => Dimension.Nether,
+            "the_end" => Dimension.End,
+            _ => throw new UnreachableException($"{nameof(dimensionName)} was: {dimensionName}")
         };
     }
 }
