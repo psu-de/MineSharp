@@ -3,27 +3,27 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class KeepAlivePacket : IPacket
+/// <summary>
+///     Keep alive packet
+/// </summary>
+/// <param name="KeepAliveId">The keep-alive ID</param>
+public sealed record KeepAlivePacket(long KeepAliveId) : IPacket
 {
-    public KeepAlivePacket(long id)
-    {
-        KeepAliveId = id;
-    }
-
-    public long KeepAliveId { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_KeepAlive;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_KeepAlive;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteLong(KeepAliveId);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var id = buffer.ReadLong();
         return new KeepAlivePacket(id);
     }
 }
-#pragma warning restore CS1591

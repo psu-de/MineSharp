@@ -6,8 +6,21 @@ using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class MultiBlockUpdatePacket : IPacket
+public sealed record MultiBlockUpdatePacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_MultiBlockChange;
+
+    // Here is no non-argument constructor allowed
+    // Do not use
+#pragma warning disable CS8618
+    private MultiBlockUpdatePacket()
+#pragma warning restore CS8618
+    {
+    }
+
     /// <summary>
     ///     Constructor for before 1.20
     /// </summary>
@@ -33,11 +46,9 @@ public class MultiBlockUpdatePacket : IPacket
         Blocks = blocks;
     }
 
-    public long ChunkSection { get; set; }
-    public bool? SuppressLightUpdates { get; set; }
-    public long[] Blocks { get; set; }
-    public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_MultiBlockChange;
+    public long ChunkSection { get; init; }
+    public bool? SuppressLightUpdates { get; init; }
+    public long[] Blocks { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

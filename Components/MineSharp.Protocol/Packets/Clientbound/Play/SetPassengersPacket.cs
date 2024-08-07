@@ -5,19 +5,12 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 #pragma warning disable CS1591
-public class SetPassengersPacket : IPacket
+public sealed record SetPassengersPacket(int EntityId, int[] PassengersId) : IPacket
 {
-    public SetPassengersPacket(int entityId, int[] passengersId)
-    {
-        EntityId = entityId;
-        PassengersId = passengersId;
-    }
-
-    public int EntityId { get; set; }
-
-    public int[] PassengersId { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_SetPassengers;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SetPassengers;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

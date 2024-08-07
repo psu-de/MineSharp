@@ -7,8 +7,19 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class MessageAcknowledgementPacket : IPacket
+public sealed record MessageAcknowledgementPacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_MessageAcknowledgement;
+
+    // Here is no non-argument constructor allowed
+    // Do not use
+    private MessageAcknowledgementPacket()
+    {
+    }
+
     /**
      * Constructor for >= 1.19.3
      */
@@ -26,11 +37,9 @@ public class MessageAcknowledgementPacket : IPacket
         LastRejectedMessage = lastRejectedMessage;
     }
 
-    public int? Count { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_MessageAcknowledgement;
+    public int? Count { get; init; }
+    public ChatMessageItem[]? PreviousMessages { get; init; }
+    public ChatMessageItem? LastRejectedMessage { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

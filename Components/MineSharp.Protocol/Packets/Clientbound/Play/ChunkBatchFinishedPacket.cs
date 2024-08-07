@@ -8,25 +8,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     The ChunkBatchFinished packet, used since 1.20.2.
 ///     https://wiki.vg/Protocol#Chunk_Batch_Finished
 /// </summary>
-public class ChunkBatchFinishedPacket : IPacket
+/// <param name="BatchSize">The batch size</param>
+public sealed record ChunkBatchFinishedPacket(int BatchSize) : IPacket
 {
-    /// <summary>
-    ///     Create a new ChunkBatchFinishedPacket instance
-    /// </summary>
-    /// <param name="batchSize"></param>
-    public ChunkBatchFinishedPacket(int batchSize)
-    {
-        BatchSize = batchSize;
-    }
-
-    /// <summary>
-    ///     The batch size
-    /// </summary>
-    public int BatchSize { get; set; }
-
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_ChunkBatchFinished;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_ChunkBatchFinished;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -41,3 +29,4 @@ public static PacketType StaticType => PacketType.CB_Play_ChunkBatchFinished;
             buffer.ReadVarInt());
     }
 }
+

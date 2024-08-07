@@ -3,24 +3,24 @@ using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
+using static MineSharp.Protocol.Packets.Serverbound.Login.EncryptionResponsePacket;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-#pragma warning disable CS1591
-public class EncryptionResponsePacket : IPacket
+
+/// <summary>
+///     Encryption response packet
+/// </summary>
+/// <param name="SharedSecret">The shared secret</param>
+/// <param name="VerifyToken">The verify token</param>
+/// <param name="Crypto">The crypto container</param>
+public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? VerifyToken, CryptoContainer? Crypto) : IPacket
 {
-    public EncryptionResponsePacket(byte[] sharedSecret, byte[]? verifyToken, CryptoContainer? crypto)
-    {
-        SharedSecret = sharedSecret;
-        VerifyToken = verifyToken;
-        Crypto = crypto;
-    }
-
-    public byte[] SharedSecret { get; set; }
-    public byte[]? VerifyToken { get; set; }
-    public CryptoContainer? Crypto { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(SharedSecret.Length);
@@ -52,6 +52,7 @@ public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
         buffer.WriteBytes(VerifyToken);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var sharedSecretLength = buffer.ReadVarInt();
@@ -77,18 +78,14 @@ public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
         return new EncryptionResponsePacket(sharedSecret, verifyToken, crypto);
     }
 
-
-    public class CryptoContainer : ISerializable<CryptoContainer>
+    /// <summary>
+    ///     Crypto container class
+    /// </summary>
+    /// <param name="Salt">The salt</param>
+    /// <param name="MessageSignature">The message signature</param>
+    public sealed record CryptoContainer(long Salt, byte[] MessageSignature) : ISerializable<CryptoContainer>
     {
-        public CryptoContainer(long salt, byte[] messageSignature)
-        {
-            Salt = salt;
-            MessageSignature = messageSignature;
-        }
-
-        public long Salt { get; set; }
-        public byte[] MessageSignature { get; set; }
-
+        /// <inheritdoc />
         public void Write(PacketBuffer buffer)
         {
             buffer.WriteLong(Salt);
@@ -96,14 +93,14 @@ public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
             buffer.WriteBytes(MessageSignature.AsSpan());
         }
 
+        /// <inheritdoc />
         public static CryptoContainer Read(PacketBuffer buffer)
         {
             var salt = buffer.ReadLong();
             var length = buffer.ReadVarInt();
             var verifyToken = buffer.ReadBytes(length);
 
-            return new(salt, verifyToken);
+            return new CryptoContainer(salt, verifyToken);
         }
     }
 }
-#pragma warning restore CS1591

@@ -4,16 +4,12 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SetHeldItemPacket : IPacket
+public sealed record SetHeldItemPacket(sbyte Slot) : IPacket
 {
-    public SetHeldItemPacket(sbyte slot)
-    {
-        Slot = slot;
-    }
-
-    public sbyte Slot { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_HeldItemSlot;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_HeldItemSlot;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

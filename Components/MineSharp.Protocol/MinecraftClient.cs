@@ -361,10 +361,10 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                                       SendPacket(new Packets.Serverbound.Play.ClientInformationPacket(
                                                      Settings.Locale,
                                                      Settings.ViewDistance,
-                                                     (int)Settings.ChatMode,
+                                                     Settings.ChatMode,
                                                      Settings.ColoredChat,
                                                      Settings.DisplayedSkinParts,
-                                                     (int)Settings.MainHand,
+                                                     Settings.MainHand,
                                                      Settings.EnableTextFiltering,
                                                      Settings.AllowServerListings)));
             }
@@ -376,10 +376,10 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             _ = SendPacket(new ClientInformationPacket(
                            Settings.Locale,
                            Settings.ViewDistance,
-                           (int)Settings.ChatMode,
+                           Settings.ChatMode,
                            Settings.ColoredChat,
                            Settings.DisplayedSkinParts,
-                           (int)Settings.MainHand,
+                           Settings.MainHand,
                            Settings.EnableTextFiltering,
                            Settings.AllowServerListings));
         }

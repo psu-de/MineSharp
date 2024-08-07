@@ -8,16 +8,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Ping packet
 ///     See https://wiki.vg/Protocol#Ping_.28configuration.29
 /// </summary>
-public class PingPacket : IPacket
+/// <param name="Id">The id of the ping</param>
+public sealed record PingPacket(int Id) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
+    /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Configuration_Ping;
-
-    /// <summary>
-    ///     The id of the ping
-    /// </summary>
-    public required int Id { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -28,6 +25,6 @@ public class PingPacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new PingPacket() { Id = buffer.ReadInt() };
+        return new PingPacket(buffer.ReadInt());
     }
 }

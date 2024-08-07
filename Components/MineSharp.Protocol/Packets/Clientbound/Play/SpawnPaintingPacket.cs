@@ -4,30 +4,29 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     SpawnPaintingPacket used for versions &lt;= 1.18.2
 /// </summary>
-public class SpawnPaintingPacket : IPacket
+/// <param name="EntityId">The ID of the entity.</param>
+/// <param name="EntityUuid">The UUID of the entity.</param>
+/// <param name="Title">The title of the painting.</param>
+/// <param name="Location">The location of the painting.</param>
+/// <param name="Direction">The direction the painting is facing.</param>
+public sealed record SpawnPaintingPacket(
+    int EntityId,
+    Uuid EntityUuid,
+    int Title,
+    Position Location,
+    sbyte Direction
+) : IPacket
 {
-    public SpawnPaintingPacket(int entityId, Uuid entityUuid, int title, Position location, sbyte direction)
-    {
-        EntityId = entityId;
-        EntityUuid = entityUuid;
-        Title = title;
-        Location = location;
-        Direction = direction;
-    }
-
-
-    public int EntityId { get; set; }
-    public Uuid EntityUuid { get; set; }
-    public int Title { get; set; }
-    public Position Location { get; set; }
-    public sbyte Direction { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(EntityId);
@@ -37,6 +36,7 @@ public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
         buffer.WriteSByte(Direction);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
@@ -47,4 +47,3 @@ public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
         return new SpawnPaintingPacket(entityId, entityUuid, title, location, direction);
     }
 }
-#pragma warning restore CS1591

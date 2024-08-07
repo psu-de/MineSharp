@@ -8,16 +8,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Feature flags packet
 ///     See https://wiki.vg/Protocol#Feature_Flags
 /// </summary>
-public class FeatureFlagsPacket : IPacket
+/// <param name="FeatureFlags">The enabled feature flags</param>
+public sealed record FeatureFlagsPacket(string[] FeatureFlags) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Configuration_FeatureFlags;
-    
-    /// <summary>
-    ///     The enabled feature flags
-    /// </summary>
-    public required string[] FeatureFlags { get; init; }
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Configuration_FeatureFlags;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -28,7 +25,6 @@ public static PacketType StaticType => PacketType.CB_Configuration_FeatureFlags;
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new FeatureFlagsPacket { FeatureFlags = buffer.ReadVarIntArray(buff => buff.ReadString()) };
+        return new FeatureFlagsPacket(buffer.ReadVarIntArray(buff => buff.ReadString()));
     }
 }
-#pragma warning restore CS1591

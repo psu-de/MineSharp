@@ -127,7 +127,7 @@ internal class LoginPacketHandler : GameStatePacketHandler
             return Task.CompletedTask;
         }
 
-        _ = client.SendPacket(new AcknowledgeLoginPacket())
+        _ = client.SendPacket(new LoginAcknowledgedPacket())
                   .ContinueWith(_ => client.UpdateGameState(GameState.Configuration));
         return Task.CompletedTask;
     }

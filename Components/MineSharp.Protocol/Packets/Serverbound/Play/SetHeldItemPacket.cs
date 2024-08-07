@@ -7,25 +7,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     Sent when the player changes the slot selection
 /// </summary>
-public class SetHeldItemPacket : IPacket
+public sealed record SetHeldItemPacket(short Slot) : IPacket
 {
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    /// <param name="slot"></param>
-    public SetHeldItemPacket(short slot)
-    {
-        Slot = slot;
-    }
-
-    /// <summary>
-    ///     Index of the new selected hotbar slot (0-8)
-    /// </summary>
-    public short Slot { get; set; }
-
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_HeldItemSlot;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_HeldItemSlot;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

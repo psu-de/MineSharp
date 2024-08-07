@@ -4,28 +4,20 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class TeleportEntityPacket : IPacket
+public sealed record TeleportEntityPacket(
+    int EntityId,
+    double X,
+    double Y,
+    double Z,
+    sbyte Yaw,
+    sbyte Pitch,
+    bool OnGround
+) : IPacket
 {
-    public TeleportEntityPacket(int entityId, double x, double y, double z, sbyte yaw, sbyte pitch, bool onGround)
-    {
-        EntityId = entityId;
-        X = x;
-        Y = y;
-        Z = z;
-        Yaw = yaw;
-        Pitch = pitch;
-        OnGround = onGround;
-    }
-
-    public int EntityId { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public sbyte Yaw { get; set; }
-    public sbyte Pitch { get; set; }
-    public bool OnGround { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_EntityTeleport;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_EntityTeleport;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

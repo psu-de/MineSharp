@@ -8,11 +8,12 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     The ChunkBatchStart Packet, used since 1.20.2
 ///     https://wiki.vg/Protocol#Chunk_Batch_Start
 /// </summary>
-public class ChunkBatchStartPacket : IPacket
+public sealed record ChunkBatchStartPacket : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_ChunkBatchStart;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_ChunkBatchStart;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

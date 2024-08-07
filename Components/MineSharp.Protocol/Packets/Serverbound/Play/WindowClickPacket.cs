@@ -6,30 +6,20 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class WindowClickPacket : IPacket
+public sealed record WindowClickPacket(
+    byte WindowId,
+    int StateId,
+    short Slot,
+    sbyte MouseButton,
+    int Mode,
+    Slot[] ChangedSlots,
+    Item? SelectedItem
+) : IPacket
 {
-    public WindowClickPacket(byte windowId, int stateId, short slot, sbyte mouseButton, int mode, Slot[] changedSlots,
-                             Item? selectedItem)
-    {
-        WindowId = windowId;
-        StateId = stateId;
-        Slot = slot;
-        MouseButton = mouseButton;
-        Mode = mode;
-        ChangedSlots = changedSlots;
-        SelectedItem = selectedItem;
-    }
-
-    public byte WindowId { get; set; }
-    public int StateId { get; set; }
-    public short Slot { get; set; }
-    public sbyte MouseButton { get; set; }
-    public int Mode { get; set; }
-    public Slot[] ChangedSlots { get; set; }
-    public Item? SelectedItem { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_WindowClick;
-
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_WindowClick;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -51,7 +41,8 @@ public static PacketType StaticType => PacketType.SB_Play_WindowClick;
             buffer.ReadSByte(),
             buffer.ReadVarInt(),
             buffer.ReadVarIntArray(buff => buff.ReadSlot(version)),
-            buffer.ReadOptionalItem(version));
+            buffer.ReadOptionalItem(version)
+        );
     }
 }
 #pragma warning restore CS1591

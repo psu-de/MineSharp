@@ -4,14 +4,18 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 #pragma warning disable CS1591
-public class FinishConfigurationPacket : IPacket
+public sealed record FinishConfigurationPacket : IPacket
 {
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Configuration_FinishConfiguration;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Configuration_FinishConfiguration;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new FinishConfigurationPacket();

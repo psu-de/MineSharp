@@ -3,27 +3,28 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-#pragma warning disable CS1591
-public class PongPacket : IPacket
+
+/// <summary>
+///     Pong packet
+/// </summary>
+/// <param name="Id">The ID of the pong packet</param>
+public sealed record PongPacket(int Id) : IPacket
 {
-    public PongPacket(int id)
-    {
-        Id = id;
-    }
-
-    public int Id { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Configuration_Pong;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Configuration_Pong;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteInt(Id);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new PongPacket(
-            buffer.ReadInt());
+        return new PongPacket(buffer.ReadInt());
     }
 }
-#pragma warning restore CS1591
+

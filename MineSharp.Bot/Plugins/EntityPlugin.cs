@@ -317,7 +317,7 @@ public class EntityPlugin : Plugin
 
         var position = (playerPlugin!.Entity!.Position as MutableVector3)!;
 
-        if ((packet.Flags & 0x01) == 0x01)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.X))
         {
             position.Add(packet.X, 0, 0);
         }
@@ -326,7 +326,7 @@ public class EntityPlugin : Plugin
             position.SetX(packet.X);
         }
 
-        if ((packet.Flags & 0x02) == 0x02)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.Y))
         {
             position.Add(0, packet.Y, 0);
         }
@@ -335,7 +335,7 @@ public class EntityPlugin : Plugin
             position.SetY(packet.Y);
         }
 
-        if ((packet.Flags & 0x04) == 0x04)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.Z))
         {
             position.Add(0, 0, packet.Z);
         }
@@ -344,7 +344,7 @@ public class EntityPlugin : Plugin
             position.SetZ(packet.Z);
         }
 
-        if ((packet.Flags & 0x08) == 0x08)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.YRot))
         {
             playerPlugin!.Entity!.Pitch += packet.Pitch;
         }
@@ -353,7 +353,7 @@ public class EntityPlugin : Plugin
             playerPlugin!.Entity!.Pitch = packet.Pitch;
         }
 
-        if ((packet.Flags & 0x10) == 0x10)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.XRot))
         {
             playerPlugin!.Entity!.Yaw += packet.Yaw;
         }

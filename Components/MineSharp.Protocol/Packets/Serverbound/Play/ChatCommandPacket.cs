@@ -7,8 +7,21 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class ChatCommandPacket : IPacket
+public sealed record ChatCommandPacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_ChatCommand;
+
+    // Here is no non-argument constructor allowed
+    // Do not use
+#pragma warning disable CS8618
+    private ChatCommandPacket()
+#pragma warning restore CS8618
+    {
+    }
+
     /// <summary>
     ///     Constructor for 1.19 - 1.19.1
     /// </summary>
@@ -71,17 +84,15 @@ public class ChatCommandPacket : IPacket
         Acknowledged = acknowledged;
     }
 
-    public string Command { get; set; }
-    public long Timestamp { get; set; }
-    public long Salt { get; set; }
-    public ArgumentSignature[] Signatures { get; set; }
-    public bool? SignedPreview { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public int? MessageCount { get; set; }
-    public byte[]? Acknowledged { get; set; }
-    public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_ChatCommand;
+    public string Command { get; init; }
+    public long Timestamp { get; init; }
+    public long Salt { get; init; }
+    public ArgumentSignature[] Signatures { get; init; }
+    public bool? SignedPreview { get; init; }
+    public ChatMessageItem[]? PreviousMessages { get; init; }
+    public ChatMessageItem? LastRejectedMessage { get; init; }
+    public int? MessageCount { get; init; }
+    public byte[]? Acknowledged { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -140,23 +151,57 @@ public static PacketType StaticType => PacketType.SB_Play_ChatCommand;
         LastRejectedMessage!.Write(buffer, version);
     }
 
+    private const int AfterMc1192AcknowledgedLength = 20;
+
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        throw new NotImplementedException();
-    }
+        var command = buffer.ReadString();
+        var timestamp = buffer.ReadLong();
+        var salt = buffer.ReadLong();
+        var signatures = buffer.ReadVarIntArray((buf) => ArgumentSignature.Read(buf, version));
 
-    public class ArgumentSignature
-    {
-        public byte[] Signature;
-
-        public ArgumentSignature(string argumentName, byte[] signature)
+        bool? signedPreview = null;
+        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
         {
-            ArgumentName = argumentName;
-            Signature = signature;
+            signedPreview = buffer.ReadBool();
         }
 
-        public string ArgumentName { get; set; }
+        byte[]? acknowledged = null;
+        int? messageCount = null;
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        {
+            messageCount = buffer.ReadVarInt();
+            acknowledged = buffer.ReadBytes(AfterMc1192AcknowledgedLength);
+        }
 
+        ChatMessageItem[]? previousMessages = null;
+        ChatMessageItem? lastRejectedMessage = null;
+        if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
+        {
+            previousMessages = buffer.ReadVarIntArray((buf) => ChatMessageItem.Read(buf, version));
+            var hasLastRejectedMessage = buffer.ReadBool();
+            if (hasLastRejectedMessage)
+            {
+                lastRejectedMessage = ChatMessageItem.Read(buffer, version);
+            }
+        }
+
+        return new ChatCommandPacket
+        {
+            Command = command,
+            Timestamp = timestamp,
+            Salt = salt,
+            Signatures = signatures,
+            SignedPreview = signedPreview,
+            PreviousMessages = previousMessages,
+            LastRejectedMessage = lastRejectedMessage,
+            MessageCount = messageCount,
+            Acknowledged = acknowledged
+        };
+    }
+
+    public sealed record ArgumentSignature(string ArgumentName, byte[] Signature)
+    {
         public void Write(PacketBuffer buffer, MinecraftData version)
         {
             buffer.WriteString(ArgumentName);
@@ -170,6 +215,24 @@ public static PacketType StaticType => PacketType.SB_Play_ChatCommand;
             {
                 buffer.WriteBytes(Signature);
             }
+        }
+
+        private const int AfterMc1192SignatureLength = 256;
+
+        public static ArgumentSignature Read(PacketBuffer buffer, MinecraftData version)
+        {
+            var argumentName = buffer.ReadString();
+            byte[] signature;
+            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
+            {
+                var length = buffer.ReadVarInt();
+                signature = buffer.ReadBytes(length);
+            }
+            else
+            {
+                signature = buffer.ReadBytes(AfterMc1192SignatureLength);
+            }
+            return new ArgumentSignature(argumentName, signature);
         }
     }
 }

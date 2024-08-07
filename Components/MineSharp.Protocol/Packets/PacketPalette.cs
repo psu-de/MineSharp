@@ -85,11 +85,11 @@ internal static class PacketPalette
         RegisterPacket<LoginStartPacket>();
         RegisterPacket<EncryptionResponsePacket>();
         RegisterPacket<LoginPluginResponsePacket>();
-        RegisterPacket<AcknowledgeLoginPacket>();
+        RegisterPacket<LoginAcknowledgedPacket>();
 
         // Status
         RegisterPacket<StatusResponsePacket>();
-        RegisterPacket<PongResponsePacket>();
+        RegisterPacket<PingResponsePacket>();
 
         RegisterPacket<StatusRequestPacket>();
         RegisterPacket<PingRequestPacket>();

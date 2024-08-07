@@ -9,16 +9,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Configuration Disconnect packet
 ///     See https://wiki.vg/Protocol#Disconnect_.28configuration.29
 /// </summary>
-public class DisconnectPacket : IPacket
+/// <param name="Reason">Reason for disconnect</param>
+public sealed record DisconnectPacket(Chat Reason) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Configuration_Disconnect;
-    
-    /// <summary>
-    ///     Reason for disconnect
-    /// </summary>
-    public required Chat Reason { get; init; }
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Configuration_Disconnect;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -29,6 +26,6 @@ public static PacketType StaticType => PacketType.CB_Configuration_Disconnect;
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new DisconnectPacket { Reason = buffer.ReadChatComponent() };
+        return new DisconnectPacket(buffer.ReadChatComponent());
     }
 }

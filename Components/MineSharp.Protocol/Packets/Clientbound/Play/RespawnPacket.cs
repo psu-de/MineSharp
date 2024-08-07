@@ -7,42 +7,25 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class RespawnPacket : IPacket
+public sealed record RespawnPacket(
+    string Dimension,
+    string DimensionName,
+    long HashedSeed,
+    sbyte GameMode,
+    byte PreviousGameMode,
+    bool IsDebug,
+    bool IsFlat,
+    bool CopyMetadata,
+    bool? HasDeathLocation,
+    string? DeathDimensionName,
+    Position? DeathLocation,
+    int? PortalCooldown
+) : IPacket
 {
-    public RespawnPacket(string dimension, string dimensionName, long hashedSeed, sbyte gameMode, byte previousGameMode,
-                         bool isDebug,
-                         bool isFlat, bool copyMetadata, bool? hasDeathLocation, string? deathDimensionName,
-                         Position? deathLocation,
-                         int? portalCooldown)
-    {
-        Dimension = dimension;
-        DimensionName = dimensionName;
-        HashedSeed = hashedSeed;
-        GameMode = gameMode;
-        PreviousGameMode = previousGameMode;
-        IsDebug = isDebug;
-        IsFlat = isFlat;
-        CopyMetadata = copyMetadata;
-        HasDeathLocation = hasDeathLocation;
-        DeathDimensionName = deathDimensionName;
-        DeathLocation = deathLocation;
-        PortalCooldown = portalCooldown;
-    }
-
-    public string Dimension { get; set; }
-    public string DimensionName { get; set; }
-    public long HashedSeed { get; set; }
-    public sbyte GameMode { get; set; }
-    public byte PreviousGameMode { get; set; }
-    public bool IsDebug { get; set; }
-    public bool IsFlat { get; set; }
-    public bool CopyMetadata { get; set; }
-    public bool? HasDeathLocation { get; set; }
-    public string? DeathDimensionName { get; set; }
-    public Position? DeathLocation { get; set; }
-    public int? PortalCooldown { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_Respawn;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_Respawn;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

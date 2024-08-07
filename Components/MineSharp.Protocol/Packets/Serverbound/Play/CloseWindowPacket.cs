@@ -4,16 +4,12 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class CloseWindowPacket : IPacket
+public sealed record CloseWindowPacket(byte WindowId) : IPacket
 {
-    public CloseWindowPacket(byte windowId)
-    {
-        WindowId = windowId;
-    }
-
-    public byte WindowId { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_CloseWindow;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_CloseWindow;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -22,8 +18,7 @@ public static PacketType StaticType => PacketType.SB_Play_CloseWindow;
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new CloseWindowPacket(
-            buffer.ReadByte());
+        return new CloseWindowPacket(buffer.ReadByte());
     }
 }
 #pragma warning restore CS1591

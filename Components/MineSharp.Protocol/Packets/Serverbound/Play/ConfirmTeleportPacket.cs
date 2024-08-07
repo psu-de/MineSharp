@@ -4,16 +4,12 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class ConfirmTeleportPacket : IPacket
+public sealed record ConfirmTeleportPacket(int TeleportId) : IPacket
 {
-    public ConfirmTeleportPacket(int teleportId)
-    {
-        TeleportId = teleportId;
-    }
-
-    public int TeleportId { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_TeleportConfirm;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_TeleportConfirm;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

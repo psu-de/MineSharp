@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.NetworkTypes;
 /// <summary>
 ///     Represents a signed chat message
 /// </summary>
-public class ChatMessageItem
+public class ChatMessageItem : IVersionAwareSerializable<ChatMessageItem>
 {
     /// <summary>
     ///     Creates a new instance

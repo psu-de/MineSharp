@@ -3,20 +3,23 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-#pragma warning disable CS1591
-public class LoginPluginResponsePacket : IPacket
+
+/// <summary>
+///     Login plugin response packet
+/// </summary>
+/// <param name="MessageId">The message ID</param>
+/// <param name="Data">The data</param>
+public sealed record LoginPluginResponsePacket(int MessageId, byte[]? Data) : IPacket
 {
-    public LoginPluginResponsePacket(int messageId, byte[]? data)
-    {
-        MessageId = messageId;
-        Data = data;
-    }
-
-    public int MessageId { get; set; }
-    public byte[]? Data { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Login_LoginPluginResponse;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Login_LoginPluginResponse;
 
+    /// <inheritdoc />
+    public bool Successful => Data != null;
+
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(MessageId);
@@ -28,6 +31,7 @@ public static PacketType StaticType => PacketType.SB_Login_LoginPluginResponse;
         }
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
@@ -41,4 +45,4 @@ public static PacketType StaticType => PacketType.SB_Login_LoginPluginResponse;
         return new LoginPluginResponsePacket(messageId, data);
     }
 }
-#pragma warning restore CS1591
+

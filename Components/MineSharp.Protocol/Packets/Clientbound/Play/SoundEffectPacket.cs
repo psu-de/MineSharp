@@ -4,36 +4,24 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SoundEffectPacket : IPacket
+public sealed record SoundEffectPacket(
+    int SoundId,
+    string? SoundName,
+    bool? HasFixedRange,
+    float? Range,
+    int SoundCategory,
+    int EffectPositionX,
+    int EffectPositionY,
+    int EffectPositionZ,
+    float Volume,
+    float Pitch,
+    long Seed
+) : IPacket
 {
-    public SoundEffectPacket(int soundId, string? soundName, bool? hasFixedRange, float? range, int soundCategory, int effectPositionX, int effectPositionY, int effectPositionZ, float volume, float pitch, long seed)
-    {
-        SoundId = soundId;
-        SoundName = soundName;
-        HasFixedRange = hasFixedRange;
-        Range = range;
-        SoundCategory = soundCategory;
-        EffectPositionX = effectPositionX;
-        EffectPositionY = effectPositionY;
-        EffectPositionZ = effectPositionZ;
-        Volume = volume;
-        Pitch = pitch;
-        Seed = seed;
-    }
-
-    public int SoundId { get; set; }
-    public string? SoundName { get; set; }
-    public bool? HasFixedRange { get; set; }
-    public float? Range { get; set; }
-    public int SoundCategory { get; set; }
-    public int EffectPositionX { get; set; }
-    public int EffectPositionY { get; set; }
-    public int EffectPositionZ { get; set; }
-    public float Volume { get; set; }
-    public float Pitch { get; set; }
-    public long Seed { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_SoundEffect;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SoundEffect;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

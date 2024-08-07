@@ -3,42 +3,44 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class ParticlePacket : IPacket
+
+/// <summary>
+/// Represents a packet for particle effects in the game.
+/// </summary>
+/// <param name="ParticleId">The ID of the particle.</param>
+/// <param name="LongDistance">Indicates if the particle is long distance.</param>
+/// <param name="X">The X coordinate of the particle.</param>
+/// <param name="Y">The Y coordinate of the particle.</param>
+/// <param name="Z">The Z coordinate of the particle.</param>
+/// <param name="OffsetX">The X offset of the particle.</param>
+/// <param name="OffsetY">The Y offset of the particle.</param>
+/// <param name="OffsetZ">The Z offset of the particle.</param>
+/// <param name="MaxSpeed">The maximum speed of the particle.</param>
+/// <param name="ParticleCount">The number of particles.</param>
+/// <param name="Data">
+///     Data depends on the particle id.
+///     Will be an empty buffer for most particles.
+/// </param>
+public sealed record ParticlePacket(
+    int ParticleId,
+    bool LongDistance,
+    double X,
+    double Y,
+    double Z,
+    float OffsetX,
+    float OffsetY,
+    float OffsetZ,
+    float MaxSpeed,
+    int ParticleCount,
+    PacketBuffer Data
+) : IPacket
 {
-    public ParticlePacket(int particleId, bool longDistance, double x, double y, double z, float offsetX, float offsetY, float offsetZ, float maxSpeed, int particleCount, PacketBuffer data)
-    {
-        ParticleId = particleId;
-        LongDistance = longDistance;
-        X = x;
-        Y = y;
-        Z = z;
-        OffsetX = offsetX;
-        OffsetY = offsetY;
-        OffsetZ = offsetZ;
-        MaxSpeed = maxSpeed;
-        ParticleCount = particleCount;
-        Data = data;
-    }
-
-    public int ParticleId { get; set; }
-    public bool LongDistance { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public float OffsetX { get; set; }
-    public float OffsetY { get; set; }
-    public float OffsetZ { get; set; }
-    public float MaxSpeed { get; set; }
-    public int ParticleCount { get; set; }
-    /// <summary>
-    ///     Data depends on the particle id.
-    ///     Will be an empty buffer for most particles.
-    /// </summary>
-    public PacketBuffer Data { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(ParticleId);
@@ -54,6 +56,7 @@ public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
         buffer.WriteBytes(Data.GetBuffer());
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var particleId = buffer.ReadVarInt();
@@ -66,12 +69,9 @@ public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
         var offsetZ = buffer.ReadFloat();
         var maxSpeed = buffer.ReadFloat();
         var particleCount = buffer.ReadVarInt();
-        var byteBuffer = new byte[buffer.ReadableBytes];
-        buffer.ReadBytes(byteBuffer);
+        var byteBuffer = buffer.RestBuffer();
         var data = new PacketBuffer(byteBuffer, buffer.ProtocolVersion);
 
         return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, data);
     }
-
 }
-#pragma warning restore CS1591

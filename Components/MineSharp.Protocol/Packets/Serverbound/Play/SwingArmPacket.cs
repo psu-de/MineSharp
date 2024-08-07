@@ -4,22 +4,20 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class SwingArmPacket : IPacket
+public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
 {
-    public SwingArmPacket(PlayerHand hand)
-    {
-        Hand = hand;
-    }
-
-    public PlayerHand Hand { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_ArmAnimation;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_ArmAnimation;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt((int)Hand);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new SwingArmPacket(

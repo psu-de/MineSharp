@@ -4,22 +4,21 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class WindowSetSlotPacket : IPacket
+
+/// <summary>
+///     Represents a packet that sets a slot in a window.
+/// </summary>
+/// <param name="WindowId">The ID of the window.</param>
+/// <param name="StateId">The state ID of the window.</param>
+/// <param name="Slot">The slot to be set.</param>
+public sealed record WindowSetSlotPacket(sbyte WindowId, int StateId, Slot Slot) : IPacket
 {
-    public WindowSetSlotPacket(sbyte windowId, int stateId, Slot slot)
-    {
-        WindowId = windowId;
-        StateId = stateId;
-        Slot = slot;
-    }
-
-    public sbyte WindowId { get; set; }
-    public int StateId { get; set; }
-    public Slot Slot { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_SetSlot;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SetSlot;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteSByte(WindowId);
@@ -27,6 +26,7 @@ public static PacketType StaticType => PacketType.CB_Play_SetSlot;
         buffer.WriteSlot(Slot);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new WindowSetSlotPacket(
@@ -35,4 +35,4 @@ public static PacketType StaticType => PacketType.CB_Play_SetSlot;
             buffer.ReadSlot(version));
     }
 }
-#pragma warning restore CS1591
+

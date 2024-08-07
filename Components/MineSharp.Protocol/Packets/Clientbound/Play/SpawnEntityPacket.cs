@@ -5,48 +5,64 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SpawnEntityPacket : IPacket
+public sealed record SpawnEntityPacket(
+    int EntityId,
+    Uuid ObjectUuid,
+    int EntityType,
+    double X,
+    double Y,
+    double Z,
+    sbyte Pitch,
+    sbyte Yaw,
+    sbyte HeadPitch,
+    int ObjectData,
+    short VelocityX,
+    short VelocityY,
+    short VelocityZ
+) : IPacket
 {
-    public SpawnEntityPacket(int entityId, Uuid objectUuid, int entityType, double x, double y, double z, sbyte pitch,
-                             sbyte yaw,
-                             sbyte headPitch, int objectData, short velocityX, short velocityY, short velocityZ)
-    {
-        EntityId = entityId;
-        ObjectUuid = objectUuid;
-        EntityType = entityType;
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-        HeadPitch = headPitch;
-        ObjectData = objectData;
-        VelocityX = velocityX;
-        VelocityY = velocityY;
-        VelocityZ = velocityZ;
-    }
-
-    public int EntityId { get; set; }
-    public Uuid ObjectUuid { get; set; }
-    public int EntityType { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public sbyte Pitch { get; set; }
-    public sbyte Yaw { get; set; }
-    public sbyte HeadPitch { get; set; }
-    public int ObjectData { get; set; }
-    public short VelocityX { get; set; }
-    public short VelocityY { get; set; }
-    public short VelocityZ { get; set; }
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_SpawnEntity;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SpawnEntity;
 
+    /// <summary>
+    /// Writes the packet data to the buffer.
+    /// </summary>
+    /// <param name="buffer">The buffer to write to.</param>
+    /// <param name="version">The Minecraft version.</param>
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        throw new NotImplementedException();
+        buffer.WriteVarInt(EntityId);
+        buffer.WriteUuid(ObjectUuid);
+        buffer.WriteVarInt(EntityType);
+        buffer.WriteDouble(X);
+        buffer.WriteDouble(Y);
+        buffer.WriteDouble(Z);
+        buffer.WriteSByte(Pitch);
+        buffer.WriteSByte(Yaw);
+
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        {
+            buffer.WriteSByte(HeadPitch);
+            buffer.WriteVarInt(ObjectData);
+        }
+        else
+        {
+            buffer.WriteInt(ObjectData);
+        }
+
+        buffer.WriteShort(VelocityX);
+        buffer.WriteShort(VelocityY);
+        buffer.WriteShort(VelocityZ);
     }
 
+    /// <summary>
+    /// Reads the packet data from the buffer.
+    /// </summary>
+    /// <param name="buffer">The buffer to read from.</param>
+    /// <param name="version">The Minecraft version.</param>
+    /// <returns>A new instance of <see cref="SpawnEntityPacket"/>.</returns>
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
@@ -73,9 +89,7 @@ public static PacketType StaticType => PacketType.CB_Play_SpawnEntity;
         var velocityY = buffer.ReadShort();
         var velocityZ = buffer.ReadShort();
 
-        return new SpawnEntityPacket(entityId, objectUuid, type, x, y, z, pitch, yaw, headPitch, objectData, velocityX,
-                                     velocityY,
-                                     velocityZ);
+        return new SpawnEntityPacket(entityId, objectUuid, type, x, y, z, pitch, yaw, headPitch, objectData, velocityX, velocityY, velocityZ);
     }
 }
 #pragma warning restore CS1591

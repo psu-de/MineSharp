@@ -7,78 +7,60 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class LoginPacket : IPacket
+
+/// <summary>
+/// Represents a login packet.
+/// </summary>
+/// <param name="EntityId">The entity ID.</param>
+/// <param name="IsHardcore">Indicates if the game is in hardcore mode.</param>
+/// <param name="GameMode">The current game mode.</param>
+/// <param name="PreviousGameMode">The previous game mode.</param>
+/// <param name="DimensionNames">The names of the dimensions.</param>
+/// <param name="RegistryCodec">The registry codec.</param>
+/// <param name="DimensionType">The type of the dimension.</param>
+/// <param name="DimensionName">The name of the dimension.</param>
+/// <param name="HashedSeed">The hashed seed.</param>
+/// <param name="MaxPlayers">The maximum number of players.</param>
+/// <param name="ViewDistance">The view distance.</param>
+/// <param name="SimulationDistance">The simulation distance.</param>
+/// <param name="ReducedDebugInfo">Indicates if reduced debug info is enabled.</param>
+/// <param name="EnableRespawnScreen">Indicates if the respawn screen is enabled.</param>
+/// <param name="IsDebug">Indicates if the game is in debug mode.</param>
+/// <param name="IsFlat">Indicates if the world is flat.</param>
+/// <param name="HasDeathLocation">Indicates if there is a death location.</param>
+/// <param name="DeathDimensionName">The name of the death dimension.</param>
+/// <param name="DeathLocation">The death location.</param>
+/// <param name="PortalCooldown">The portal cooldown.</param>
+/// <param name="DoLimitedCrafting">Indicates if limited crafting is enabled.</param>
+public sealed record LoginPacket(
+    int EntityId,
+    bool IsHardcore,
+    byte GameMode,
+    sbyte PreviousGameMode,
+    string[] DimensionNames,
+    NbtCompound? RegistryCodec,
+    string DimensionType,
+    string DimensionName,
+    long HashedSeed,
+    int MaxPlayers,
+    int ViewDistance,
+    int SimulationDistance,
+    bool ReducedDebugInfo,
+    bool EnableRespawnScreen,
+    bool IsDebug,
+    bool IsFlat,
+    bool HasDeathLocation,
+    string? DeathDimensionName,
+    Position? DeathLocation,
+    int? PortalCooldown,
+    bool? DoLimitedCrafting) : IPacket
 {
-    public LoginPacket(int entityId,
-                       bool isHardcore,
-                       byte gameMode,
-                       sbyte previousGameMode,
-                       string[] dimensionNames,
-                       NbtCompound? registryCodec,
-                       string dimensionType,
-                       string dimensionName,
-                       long hashedSeed,
-                       int maxPlayers,
-                       int viewDistance,
-                       int simulationDistance,
-                       bool reducedDebugInfo,
-                       bool enableRespawnScreen,
-                       bool isDebug,
-                       bool isFlat,
-                       bool hasDeathLocation,
-                       string? deathDimensionName,
-                       Position? deathLocation,
-                       int? portalCooldown,
-                       bool? doLimitedCrafting)
-    {
-        EntityId = entityId;
-        IsHardcore = isHardcore;
-        GameMode = gameMode;
-        PreviousGameMode = previousGameMode;
-        DimensionNames = dimensionNames;
-        RegistryCodec = registryCodec;
-        DimensionType = dimensionType;
-        DimensionName = dimensionName;
-        HashedSeed = hashedSeed;
-        MaxPlayers = maxPlayers;
-        ViewDistance = viewDistance;
-        SimulationDistance = simulationDistance;
-        ReducedDebugInfo = reducedDebugInfo;
-        EnableRespawnScreen = enableRespawnScreen;
-        IsDebug = isDebug;
-        IsFlat = isFlat;
-        HasDeathLocation = hasDeathLocation;
-        DeathDimensionName = deathDimensionName;
-        DeathLocation = deathLocation;
-        PortalCooldown = portalCooldown;
-        DoLimitedCrafting = doLimitedCrafting;
-    }
-
-    public int EntityId { get; set; }
-    public bool IsHardcore { get; set; }
-    public byte GameMode { get; set; }
-    public sbyte PreviousGameMode { get; set; }
-    public string[] DimensionNames { get; set; }
-    public NbtCompound? RegistryCodec { get; set; }
-    public string DimensionType { get; set; }
-    public string DimensionName { get; set; }
-    public long HashedSeed { get; set; }
-    public int MaxPlayers { get; set; }
-    public int ViewDistance { get; set; }
-    public int SimulationDistance { get; set; }
-    public bool ReducedDebugInfo { get; set; }
-    public bool EnableRespawnScreen { get; set; }
-    public bool IsDebug { get; set; }
-    public bool IsFlat { get; set; }
-    public bool HasDeathLocation { get; set; }
-    public string? DeathDimensionName { get; set; }
-    public Position? DeathLocation { get; set; }
-    public int? PortalCooldown { get; set; }
-    public bool? DoLimitedCrafting { get; set; } // since 1.20.2
+    /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.CB_Play_Login;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_Login;
 
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
@@ -140,6 +122,7 @@ public static PacketType StaticType => PacketType.CB_Play_Login;
         }
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
@@ -271,4 +254,3 @@ public static PacketType StaticType => PacketType.CB_Play_Login;
             doLimitedCrafting);
     }
 }
-#pragma warning restore CS1591

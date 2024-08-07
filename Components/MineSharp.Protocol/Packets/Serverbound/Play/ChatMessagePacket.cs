@@ -7,8 +7,13 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class ChatMessagePacket : IPacket
+public sealed record ChatMessagePacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_ChatMessage;
+
     public ChatMessagePacket(
         string message,
         long timestamp,
@@ -50,17 +55,15 @@ public class ChatMessagePacket : IPacket
         : this(message, timestamp, salt, signature, null, null, null, messageCount, acknowledged)
     { }
 
-    public string Message { get; set; }
-    public long Timestamp { get; set; }
-    public long Salt { get; set; }
-    public byte[]? Signature { get; set; }
-    public bool? SignedPreview { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public int? MessageCount { get; set; }
-    public byte[]? Acknowledged { get; set; }
-    public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_ChatMessage;
+    public string Message { get; init; }
+    public long Timestamp { get; init; }
+    public long Salt { get; init; }
+    public byte[]? Signature { get; init; }
+    public bool? SignedPreview { get; init; }
+    public ChatMessageItem[]? PreviousMessages { get; init; }
+    public ChatMessageItem? LastRejectedMessage { get; init; }
+    public int? MessageCount { get; init; }
+    public byte[]? Acknowledged { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

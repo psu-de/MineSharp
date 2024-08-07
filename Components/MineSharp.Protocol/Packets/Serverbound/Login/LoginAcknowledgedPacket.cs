@@ -3,18 +3,25 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-#pragma warning disable CS1591
-public class AcknowledgeLoginPacket : IPacket
-{
-    public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Login_LoginAcknowledged;
 
+/// <summary>
+///     Login acknowledged packet
+/// </summary>
+public sealed record LoginAcknowledgedPacket() : IPacket
+{
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Login_LoginAcknowledged;
+
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new AcknowledgeLoginPacket();
+        return new LoginAcknowledgedPacket();
     }
 }
-#pragma warning restore CS1591
+

@@ -9,30 +9,14 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     Packet used to set slots in creative inventory (https://wiki.vg/Protocol#Set_Creative_Mode_Slot)
 /// </summary>
-public class SetCreativeSlotPacket : IPacket
+/// <param name="SlotIndex">The slot index</param>
+/// <param name="Item">The clicked Item</param>
+public sealed record SetCreativeSlotPacket(short SlotIndex, Item? Item) : IPacket
 {
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    public SetCreativeSlotPacket(short slotIndex, Item? item)
-    {
-        SlotIndex = slotIndex;
-        Item = item;
-    }
-
-    /// <summary>
-    ///     The inventory slot index
-    /// </summary>
-    public short SlotIndex { get; set; }
-
-    /// <summary>
-    ///     The clicked item
-    /// </summary>
-    public Item? Item { get; set; }
-
     /// <inheritdoc />
     public PacketType Type => StaticType;
-public static PacketType StaticType => PacketType.SB_Play_SetCreativeSlot;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_SetCreativeSlot;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

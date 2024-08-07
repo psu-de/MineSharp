@@ -3,7 +3,24 @@
 /// <summary>
 ///     A modifier for an attribute
 /// </summary>
-/// <param name="Uuid">The uuid associated with this Modifier. This is a constant value from minecraft java.</param>
+/// <param name="Uuid">The uuid associated with this Modifier. This is a constant value from Minecraft java.</param>
 /// <param name="Amount"></param>
 /// <param name="Operation"></param>
-public record Modifier(Uuid Uuid, double Amount, ModifierOp Operation);
+public sealed record Modifier(Uuid Uuid, double Amount, ModifierOp Operation)
+{
+    public void Write(PacketBuffer buffer)
+    {
+        buffer.WriteUuid(Uuid);
+        buffer.WriteDouble(Amount);
+        buffer.WriteByte((byte)Operation);
+    }
+
+    public static Modifier Read(PacketBuffer buffer)
+    {
+        var uuid = buffer.ReadUuid();
+        var amount = buffer.ReadDouble();
+        var operation = buffer.ReadByte();
+
+        return new(uuid, amount, (ModifierOp)operation);
+    }
+}
