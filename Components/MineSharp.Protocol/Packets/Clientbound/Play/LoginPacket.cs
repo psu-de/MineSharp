@@ -136,6 +136,7 @@ public sealed record LoginPacket(
         var previousGameMode = buffer.ReadSByte();
         var dimensionNames = buffer.ReadVarIntArray(buf => buf.ReadIdentifier());
         var registryCodec = buffer.ReadOptionalNbtCompound();
+        registryCodec = registryCodec?.NormalizeRegistryDataTopLevelIdentifiers();
 
         Identifier dimensionType;
         if (version.Version.Protocol < ProtocolVersion.V_1_19)

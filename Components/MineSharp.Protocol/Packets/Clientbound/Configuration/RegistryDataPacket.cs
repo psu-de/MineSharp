@@ -26,7 +26,9 @@ public sealed record RegistryDataPacket(NbtCompound RegistryData) : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new RegistryDataPacket(buffer.ReadNbtCompound());
+        var registryData = buffer.ReadNbtCompound();
+        registryData = registryData.NormalizeRegistryDataTopLevelIdentifiers();
+        return new RegistryDataPacket(registryData);
     }
 }
 
