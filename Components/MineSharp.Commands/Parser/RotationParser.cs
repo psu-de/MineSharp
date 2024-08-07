@@ -5,9 +5,11 @@ namespace MineSharp.Commands.Parser;
 
 public class RotationParser : IParser
 {
-    public string GetName()
+    public static readonly Identifier RotationIdentifier = Identifier.Parse("minecraft:rotation");
+
+    public Identifier GetName()
     {
-        return "minecraft:rotation";
+        return RotationIdentifier;
     }
 
     public int GetArgumentCount()

@@ -5,6 +5,9 @@ namespace MineSharp.Core.Common;
 
 /// <summary>
 /// Represents an identifier with a namespace and a name.
+/// This class is immutable.
+/// The <see cref="Equals(MineSharp.Core.Common.Identifier?)"/> and <see cref="GetHashCode"/> methods are overridden to compare two identifiers with the following rules:
+/// The default namespace is used for the comparison if none is specified.
 /// </summary>
 public sealed partial record Identifier
 {
@@ -16,6 +19,12 @@ public sealed partial record Identifier
     /// The namespace that is used when no namespace is specified.
     /// </summary>
     public const string NoNamespace = "";
+
+    /// <summary>
+    /// Represents an empty identifier.
+    /// It has no namespace and an empty name.
+    /// </summary>
+    public static readonly Identifier Empty = new("");
 
     /// <summary>
     /// The namespace part of the identifier.
@@ -57,6 +66,30 @@ public sealed partial record Identifier
     public Identifier ToCompleteIdentifier()
     {
         return HasNamespace ? this : new Identifier(DefaultNamespace, Name);
+    }
+
+    /// <inheritdoc/>
+    public bool Equals(Identifier? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        var @namespace = HasNamespace ? Namespace : DefaultNamespace;
+        var otherNamespace = other.HasNamespace ? other.Namespace : DefaultNamespace;
+        return Namespace == otherNamespace && Name == other.Name;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var @namespace = HasNamespace ? Namespace : DefaultNamespace;
+        return HashCode.Combine(@namespace, Name);
     }
 
     /// <summary>

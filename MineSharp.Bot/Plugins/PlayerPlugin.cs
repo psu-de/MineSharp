@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Diagnostics;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Utils;
@@ -91,7 +92,7 @@ public class PlayerPlugin : Plugin
     /// <summary>
     ///     The Name of the dimension the bot is currently in.
     /// </summary>
-    public string? DimensionName { get; private set; }
+    public Identifier? DimensionName { get; private set; }
 
     /// <summary>
     ///     Whether the bot is alive or dead.
@@ -493,15 +494,19 @@ public class PlayerPlugin : Plugin
         player.PermissionLevel = permissionLevel;
     }
 
-
-    private Dimension ParseDimension(string dimensionName)
+    private static readonly FrozenDictionary<Identifier, Dimension> DimensionByIdentifier = new Dictionary<Identifier, Dimension>
     {
-        return dimensionName switch
+        { Identifier.Parse("minecraft:overworld"), Dimension.Overworld },
+        { Identifier.Parse("minecraft:the_nether"), Dimension.Nether },
+        { Identifier.Parse("minecraft:the_end"), Dimension.End }
+    }.ToFrozenDictionary();
+
+    private Dimension ParseDimension(Identifier dimensionName)
+    {
+        if (!DimensionByIdentifier.TryGetValue(dimensionName, out var dimension))
         {
-            "minecraft:overworld" => Dimension.Overworld,
-            "minecraft:the_nether" => Dimension.Nether,
-            "minecraft:the_end" => Dimension.End,
-            _ => throw new UnreachableException($"{nameof(dimensionName)} was: {dimensionName}")
-        };
+            throw new UnreachableException($"{nameof(dimensionName)} was: {dimensionName}");
+        }
+        return dimension;
     }
 }

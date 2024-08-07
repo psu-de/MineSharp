@@ -8,8 +8,8 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public sealed record RespawnPacket(
-    string DimensionType,
-    string DimensionName,
+    Identifier DimensionType,
+    Identifier DimensionName,
     long HashedSeed,
     sbyte GameMode,
     byte PreviousGameMode,
@@ -17,7 +17,7 @@ public sealed record RespawnPacket(
     bool IsFlat,
     bool CopyMetadata,
     bool? HasDeathLocation,
-    string? DeathDimensionName,
+    Identifier? DeathDimensionName,
     Position? DeathLocation,
     int? PortalCooldown
 ) : IPacket
@@ -35,8 +35,8 @@ public sealed record RespawnPacket(
                 $"{nameof(RespawnPacket)}.Write() is not supported for versions before 1.19.");
         }
 
-        buffer.WriteString(DimensionType);
-        buffer.WriteString(DimensionName);
+        buffer.WriteIdentifier(DimensionType);
+        buffer.WriteIdentifier(DimensionName);
         buffer.WriteLong(HashedSeed);
         buffer.WriteSByte(GameMode);
         buffer.WriteByte(PreviousGameMode);
@@ -54,7 +54,7 @@ public sealed record RespawnPacket(
             return;
         }
 
-        buffer.WriteString(DeathDimensionName!);
+        buffer.WriteIdentifier(DeathDimensionName!);
         buffer.WriteULong(DeathLocation!.ToULong());
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
@@ -65,19 +65,19 @@ public sealed record RespawnPacket(
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        string dimensionType;
+        Identifier dimensionType;
 
         if (version.Version.Protocol <= ProtocolVersion.V_1_19)
         {
             var dimensionNbt = buffer.ReadNbtCompound();
-            dimensionType = dimensionNbt.Get<NbtString>("effects")!.Value;
+            dimensionType = Identifier.Parse(dimensionNbt.Get<NbtString>("effects")!.Value);
         }
         else
         {
-            dimensionType = buffer.ReadString();
+            dimensionType = buffer.ReadIdentifier();
         }
 
-        var dimensionName = buffer.ReadString();
+        var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
         var gameMode = buffer.ReadSByte();
         var previousGameMode = buffer.ReadByte();
@@ -86,14 +86,14 @@ public sealed record RespawnPacket(
         var copyMetadata = buffer.ReadBool();
 
         bool? hasDeathLocation = null;
-        string? deathDimensionName = null;
+        Identifier? deathDimensionName = null;
         Position? deathLocation = null;
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation ?? false)
             {
-                deathDimensionName = buffer.ReadString();
+                deathDimensionName = buffer.ReadIdentifier();
                 deathLocation = new(buffer.ReadULong());
             }
         }

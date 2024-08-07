@@ -5,9 +5,11 @@ namespace MineSharp.Commands.Parser;
 
 public class BlockPositionParser : IParser
 {
-    public string GetName()
+    public static readonly Identifier BlockPosIdentifier = Identifier.Parse("minecraft:block_pos");
+
+    public Identifier GetName()
     {
-        return "minecraft:block_pos";
+        return BlockPosIdentifier;
     }
 
     public int GetArgumentCount()

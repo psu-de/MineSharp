@@ -5,12 +5,13 @@ namespace MineSharp.Commands.Parser;
 
 public class ResourceParser : IParser
 {
+    public static readonly Identifier ResourceIdentifier = Identifier.Parse("minecraft:resource");
+
     public string? Registry { get; private set; }
 
-
-    public string GetName()
+    public Identifier GetName()
     {
-        return "minecraft:resource";
+        return ResourceIdentifier;
     }
 
     public int GetArgumentCount()

@@ -5,12 +5,14 @@ namespace MineSharp.Commands.Parser;
 
 public class IntegerParser : IParser
 {
+    public static readonly Identifier BrigadierIntegerIdentifier = Identifier.Parse("brigadier:integer");
+
     public int Min { get; private set; }
     public int Max { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "brigadier:integer";
+        return BrigadierIntegerIdentifier;
     }
 
     public int GetArgumentCount()

@@ -6,11 +6,13 @@ namespace MineSharp.Commands.Parser;
 
 public class TimeParser : IParser
 {
+    public static readonly Identifier TimeIdentifier = Identifier.Parse("minecraft:time");
+
     public int? Min { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "minecraft:time";
+        return TimeIdentifier;
     }
 
     public int GetArgumentCount()

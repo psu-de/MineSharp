@@ -5,11 +5,13 @@ namespace MineSharp.Commands.Parser;
 
 public class EntityParser : IParser
 {
+    public static readonly Identifier EntityIdentifier = Identifier.Parse("minecraft:entity");
+
     public byte Flags { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "minecraft:entity";
+        return EntityIdentifier;
     }
 
     public int GetArgumentCount()

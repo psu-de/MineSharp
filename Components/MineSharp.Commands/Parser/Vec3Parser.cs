@@ -5,9 +5,11 @@ namespace MineSharp.Commands.Parser;
 
 public class Vec3Parser : IParser
 {
-    public string GetName()
+    public static readonly Identifier Vec3Identifier = Identifier.Parse("minecraft:vec3");
+
+    public Identifier GetName()
     {
-        return "minecraft:vec3";
+        return Vec3Identifier;
     }
 
     public int GetArgumentCount()

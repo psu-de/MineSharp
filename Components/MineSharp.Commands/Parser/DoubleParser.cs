@@ -5,12 +5,14 @@ namespace MineSharp.Commands.Parser;
 
 public class DoubleParser : IParser
 {
+    public static readonly Identifier BrigadierDoubleIdentifier = Identifier.Parse("brigadier:double");
+
     public double Min { get; private set; }
     public double Max { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "brigadier:double";
+        return BrigadierDoubleIdentifier;
     }
 
     public int GetArgumentCount()

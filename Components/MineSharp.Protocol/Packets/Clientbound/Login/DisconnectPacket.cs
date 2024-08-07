@@ -1,4 +1,5 @@
 ﻿using MineSharp.ChatComponent;
+using MineSharp.ChatComponent.Components;
 using MineSharp.Core.Common;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -28,6 +29,18 @@ public sealed record DisconnectPacket(Chat Reason) : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var reason = buffer.ReadString();
-        return new DisconnectPacket(Chat.Parse(reason));
+        // Disconnect (login) packet is always sent as JSON text component according to wiki.vg
+        // But thats wrong. In the wild there were identifiers seen as well.
+        // So we try parse the indentifier and in case of error we parse the JSON text component
+        Chat chat;
+        if (Identifier.TryParse(reason, out var identifier))
+        {
+            chat = new TranslatableComponent(identifier.ToString());
+        }
+        else
+        {
+            chat = Chat.Parse(reason);
+        }
+        return new DisconnectPacket(chat);
     }
 }

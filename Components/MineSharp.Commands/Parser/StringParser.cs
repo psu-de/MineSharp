@@ -5,11 +5,13 @@ namespace MineSharp.Commands.Parser;
 
 public class StringParser : IParser
 {
+    public static readonly Identifier BrigadierStringIdentifier = Identifier.Parse("brigadier:string");
+
     public StringType Type { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "brigadier:string";
+        return BrigadierStringIdentifier;
     }
 
     public int GetArgumentCount()

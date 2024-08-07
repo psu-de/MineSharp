@@ -37,10 +37,10 @@ public sealed record LoginPacket(
     bool IsHardcore,
     byte GameMode,
     sbyte PreviousGameMode,
-    string[] DimensionNames,
+    Identifier[] DimensionNames,
     NbtCompound? RegistryCodec,
-    string DimensionType,
-    string DimensionName,
+    Identifier DimensionType,
+    Identifier DimensionName,
     long HashedSeed,
     int MaxPlayers,
     int ViewDistance,
@@ -50,7 +50,7 @@ public sealed record LoginPacket(
     bool IsDebug,
     bool IsFlat,
     bool HasDeathLocation,
-    string? DeathDimensionName,
+    Identifier? DeathDimensionName,
     Position? DeathLocation,
     int? PortalCooldown,
     bool? DoLimitedCrafting) : IPacket
@@ -77,12 +77,12 @@ public sealed record LoginPacket(
             buffer.WriteSByte(PreviousGameMode);
         }
 
-        buffer.WriteVarIntArray(DimensionNames, (buf, val) => buf.WriteString(val));
+        buffer.WriteVarIntArray(DimensionNames, (buf, val) => buf.WriteIdentifier(val));
         if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            buffer.WriteNbt(RegistryCodec);
-            buffer.WriteString(DimensionType);
-            buffer.WriteString(DimensionName);
+            buffer.WriteOptionalNbt(RegistryCodec);
+            buffer.WriteIdentifier(DimensionType);
+            buffer.WriteIdentifier(DimensionName);
             buffer.WriteLong(HashedSeed);
         }
 
@@ -94,8 +94,8 @@ public sealed record LoginPacket(
         if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
         {
             buffer.WriteBool(DoLimitedCrafting!.Value);
-            buffer.WriteString(DimensionType);
-            buffer.WriteString(DimensionName);
+            buffer.WriteIdentifier(DimensionType);
+            buffer.WriteIdentifier(DimensionName);
             buffer.WriteLong(HashedSeed);
             buffer.WriteByte(GameMode);
             buffer.WriteSByte(PreviousGameMode);
@@ -107,7 +107,7 @@ public sealed record LoginPacket(
         buffer.WriteBool(HasDeathLocation);
         if (HasDeathLocation)
         {
-            buffer.WriteString(DeathDimensionName!);
+            buffer.WriteIdentifier(DeathDimensionName!);
             buffer.WriteULong(DeathLocation!.ToULong());
         }
 
@@ -134,21 +134,21 @@ public sealed record LoginPacket(
         var isHardcore = buffer.ReadBool();
         var gameMode = buffer.ReadByte();
         var previousGameMode = buffer.ReadSByte();
-        var dimensionNames = buffer.ReadVarIntArray<string>(buf => buf.ReadString());
+        var dimensionNames = buffer.ReadVarIntArray(buf => buf.ReadIdentifier());
         var registryCodec = buffer.ReadOptionalNbtCompound();
 
-        string dimensionType;
+        Identifier dimensionType;
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
             var dimensionTypeNbt = buffer.ReadNbtCompound();
-            dimensionType = dimensionTypeNbt.Get<NbtString>("effects")!.Value;
+            dimensionType = Identifier.Parse(dimensionTypeNbt.Get<NbtString>("effects")!.Value);
         }
         else
         {
-            dimensionType = buffer.ReadString();
+            dimensionType = buffer.ReadIdentifier();
         }
 
-        var dimensionName = buffer.ReadString();
+        var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
         var maxPlayers = buffer.ReadVarInt();
         var viewDistance = buffer.ReadVarInt();
@@ -158,7 +158,7 @@ public sealed record LoginPacket(
         var isDebug = buffer.ReadBool();
         var isFlat = buffer.ReadBool();
         bool? hasDeathLocation = null;
-        string? deathDimensionName = null;
+        Identifier? deathDimensionName = null;
         Position? deathLocation = null;
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
@@ -166,7 +166,7 @@ public sealed record LoginPacket(
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)
             {
-                deathDimensionName = buffer.ReadString();
+                deathDimensionName = buffer.ReadIdentifier();
                 deathLocation = new(buffer.ReadULong());
             }
         }
@@ -205,26 +205,26 @@ public sealed record LoginPacket(
     {
         var entityId = buffer.ReadInt();
         var isHardcode = buffer.ReadBool();
-        var dimensionNames = buffer.ReadVarIntArray<string>(buf => buf.ReadString());
+        var dimensionNames = buffer.ReadVarIntArray(buf => buf.ReadIdentifier());
         var maxPlayer = buffer.ReadVarInt();
         var viewDistance = buffer.ReadVarInt();
         var simulationDistance = buffer.ReadVarInt();
         var reducedDebugInfo = buffer.ReadBool();
         var enableRespawnScreen = buffer.ReadBool();
         var doLimitedCrafting = buffer.ReadBool();
-        var dimensionType = buffer.ReadString();
-        var dimensionName = buffer.ReadString();
+        var dimensionType = buffer.ReadIdentifier();
+        var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
         var gameMode = buffer.ReadByte();
         var previousGameMode = buffer.ReadSByte();
         var isDebug = buffer.ReadBool();
         var isFlat = buffer.ReadBool();
         var hasDeathLocation = buffer.ReadBool();
-        string? deathDimensionName = null;
+        Identifier? deathDimensionName = null;
         Position? deathLocation = null;
         if (hasDeathLocation)
         {
-            deathDimensionName = buffer.ReadString();
+            deathDimensionName = buffer.ReadIdentifier();
             deathLocation = new(buffer.ReadULong());
         }
 

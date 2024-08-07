@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 /// </summary>
 /// <param name="ChannelName">The name of the channel the data was sent</param>
 /// <param name="Data">The message data</param>
-public sealed record PluginMessagePacket(string ChannelName, byte[] Data) : IPacket
+public sealed record PluginMessagePacket(Identifier ChannelName, byte[] Data) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,14 +19,14 @@ public sealed record PluginMessagePacket(string ChannelName, byte[] Data) : IPac
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(ChannelName);
+        buffer.WriteIdentifier(ChannelName);
         buffer.WriteBytes(Data);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var channelName = buffer.ReadString();
+        var channelName = buffer.ReadIdentifier();
         var data = buffer.RestBuffer();
         return new PluginMessagePacket(channelName, data);
     }

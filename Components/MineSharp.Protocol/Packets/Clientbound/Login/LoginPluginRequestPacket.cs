@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 /// <param name="MessageId">The message id</param>
 /// <param name="Channel">The channel identifier</param>
 /// <param name="Data">The raw message data</param>
-public sealed record LoginPluginRequestPacket(int MessageId, string Channel, byte[] Data) : IPacket
+public sealed record LoginPluginRequestPacket(int MessageId, Identifier Channel, byte[] Data) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,7 +21,7 @@ public sealed record LoginPluginRequestPacket(int MessageId, string Channel, byt
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(MessageId);
-        buffer.WriteString(Channel);
+        buffer.WriteIdentifier(Channel);
         buffer.WriteBytes(Data.AsSpan());
     }
 
@@ -29,7 +29,7 @@ public sealed record LoginPluginRequestPacket(int MessageId, string Channel, byt
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var messageId = buffer.ReadVarInt();
-        var channel = buffer.ReadString();
+        var channel = buffer.ReadIdentifier();
         var data = buffer.RestBuffer();
 
         return new LoginPluginRequestPacket(messageId, channel, data);

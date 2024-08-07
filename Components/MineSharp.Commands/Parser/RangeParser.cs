@@ -5,11 +5,13 @@ namespace MineSharp.Commands.Parser;
 
 public class RangeParser : IParser
 {
+    public static readonly Identifier RangeIdentifier = Identifier.Parse("minecraft:range");
+
     public bool Decimals { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "minecraft:range";
+        return RangeIdentifier;
     }
 
     public int GetArgumentCount()

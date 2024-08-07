@@ -5,9 +5,9 @@ namespace MineSharp.Commands.Parser;
 
 public class EmptyParser : IParser
 {
-    public string GetName()
+    public Identifier GetName()
     {
-        return string.Empty;
+        return Identifier.Empty;
     }
 
     public int GetArgumentCount()

@@ -13,7 +13,7 @@ public sealed record Attribute
     /// <param name="key">The name of this Attribute</param>
     /// <param name="base">The base value of this attribute</param>
     /// <param name="modifiers">The modifiers active for this attribute. Indexed by their UUID</param>
-    public Attribute(string key, double @base, Modifier[] modifiers)
+    public Attribute(Identifier key, double @base, Modifier[] modifiers)
     {
         Key = key;
         Base = @base;
@@ -23,7 +23,7 @@ public sealed record Attribute
     /// <summary>
     ///     The name of this Attribute
     /// </summary>
-    public string Key { get; init; }
+    public Identifier Key { get; init; }
 
     /// <summary>
     ///     The base value of this attribute
@@ -77,14 +77,14 @@ public sealed record Attribute
 
     public void Write(PacketBuffer buffer)
     {
-        buffer.WriteString(Key);
+        buffer.WriteIdentifier(Key);
         buffer.WriteDouble(Value);
         buffer.WriteVarIntArray(Modifiers.Values, (buffer, modifier) => modifier.Write(buffer));
     }
 
     public static Attribute Read(PacketBuffer buffer)
     {
-        var key = buffer.ReadString();
+        var key = buffer.ReadIdentifier();
         var value = buffer.ReadDouble();
         var modifiers = buffer.ReadVarIntArray(Modifier.Read);
 

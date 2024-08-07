@@ -6,7 +6,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
 public sealed record SoundEffectPacket(
     int SoundId,
-    string? SoundName,
+    Identifier? SoundName,
     bool? HasFixedRange,
     float? Range,
     int SoundCategory,
@@ -28,7 +28,7 @@ public sealed record SoundEffectPacket(
         buffer.WriteVarInt(SoundId);
         if (SoundId == 0)
         {
-            buffer.WriteString(SoundName!);
+            buffer.WriteIdentifier(SoundName!);
             buffer.WriteBool(HasFixedRange!.Value);
             if (HasFixedRange.Value)
             {
@@ -47,13 +47,13 @@ public sealed record SoundEffectPacket(
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var soundId = buffer.ReadVarInt();
-        string? soundName = null;
+        Identifier? soundName = null;
         bool? hasFixedRange = null;
         float? range = null;
 
         if (soundId == 0)
         {
-            soundName = buffer.ReadString();
+            soundName = buffer.ReadIdentifier();
             hasFixedRange = buffer.ReadBool();
             if (hasFixedRange.Value)
             {

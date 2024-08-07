@@ -74,7 +74,7 @@ public class Entity(
     /// <summary>
     ///     A list of attributes active on this entity
     /// </summary>
-    public ConcurrentDictionary<string, Attribute> Attributes { get; } = new();
+    public ConcurrentDictionary<Identifier, Attribute> Attributes { get; } = new();
 
     /// <summary>
     ///     The entity this entity is riding (f.e. an boat or a minecart)
@@ -87,7 +87,7 @@ public class Entity(
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public Attribute? GetAttribute(string name)
+    public Attribute? GetAttribute(Identifier name)
     {
         Attributes.TryGetValue(name, out var attr);
         return attr;
