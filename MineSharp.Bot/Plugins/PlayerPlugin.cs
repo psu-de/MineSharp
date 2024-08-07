@@ -498,9 +498,9 @@ public class PlayerPlugin : Plugin
     {
         return dimensionName switch
         {
-            "overworld" => Dimension.Overworld,
-            "the_nether" => Dimension.Nether,
-            "the_end" => Dimension.End,
+            "minecraft:overworld" => Dimension.Overworld,
+            "minecraft:the_nether" => Dimension.Nether,
+            "minecraft:the_end" => Dimension.End,
             _ => throw new UnreachableException($"{nameof(dimensionName)} was: {dimensionName}")
         };
     }

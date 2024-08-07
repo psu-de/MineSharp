@@ -581,7 +581,7 @@ public class ChatPlugin : Plugin
         ChatComponent.Chat? content,
         ChatComponent.Chat? target)
     {
-        var entry = Bot.Registry["chat_type"]["value"][index];
+        var entry = Bot.Registry["minecraft:chat_type"]["value"][index];
         var name = entry["name"]!.StringValue!;
         var element = entry["element"];
         var styleCompound = element["chat"]["style"];
