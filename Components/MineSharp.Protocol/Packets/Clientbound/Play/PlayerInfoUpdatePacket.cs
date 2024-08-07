@@ -5,7 +5,6 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.AddPlayerAction;
-using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.CryptoActionV19;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.InitializeChatAction;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
@@ -76,13 +75,6 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
                         actions.Add(UpdateGameModeAction.Read(buffer));
                         actions.Add(UpdateLatencyAction.Read(buffer));
                         actions.Add(UpdateDisplayName.Read(buffer));
-
-                        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19,
-                                                      ProtocolVersion.V_1_19_2))
-                        {
-                            actions.Add(CryptoActionV19.Read(buffer));
-                        }
-
                         break;
                     case 1:
                         actions.Add(UpdateGameModeAction.Read(buffer));
@@ -140,7 +132,6 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             Register<UpdateLatencyAction>();
             Register<UpdateDisplayName>();
             Register<InitializeChatAction>();
-            Register<CryptoActionV19>();
 
             return dict.ToFrozenDictionary();
         }
@@ -366,57 +357,5 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             return Read(buffer);
         }
     }
-
-    public sealed record CryptoActionV19(CryptoActionV19Data? Data) : IPlayerInfoAction, IPlayerInfoActionStatic
-    {
-        public static int StaticMask => 0x30;
-        public int Mask => StaticMask;
-
-        public sealed record CryptoActionV19Data(
-            long Timestamp,
-            byte[] EncodedPublicKey,
-            byte[] PublicKeySignature
-        );
-
-        public void Write(PacketBuffer buffer)
-        {
-            var present = Data != null;
-            buffer.WriteBool(present);
-
-            if (!present)
-            {
-                return;
-            }
-
-            buffer.WriteLong(Data!.Timestamp);
-            buffer.WriteVarInt(Data!.EncodedPublicKey.Length);
-            buffer.WriteBytes(Data!.EncodedPublicKey);
-            buffer.WriteVarInt(Data!.PublicKeySignature.Length);
-            buffer.WriteBytes(Data!.PublicKeySignature);
-        }
-
-        public static CryptoActionV19 Read(PacketBuffer buffer)
-        {
-            var present = buffer.ReadBool();
-            if (!present)
-            {
-                return new CryptoActionV19((CryptoActionV19Data?)null);
-            }
-
-            var timestamp = buffer.ReadLong();
-            var encodedPublicKey = new byte[buffer.ReadVarInt()];
-            buffer.ReadBytes(encodedPublicKey);
-            var publicKeySignature = new byte[buffer.ReadVarInt()];
-            buffer.ReadBytes(publicKeySignature);
-
-            return new CryptoActionV19(new CryptoActionV19Data(timestamp, encodedPublicKey, publicKeySignature));
-        }
-
-        static IPlayerInfoAction IPlayerInfoActionStatic.Read(PacketBuffer buffer)
-        {
-            return Read(buffer);
-        }
-    }
-
 }
 #pragma warning restore CS1591
