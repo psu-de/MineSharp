@@ -72,10 +72,17 @@ internal class MinecraftStream
 
             data = new byte[length];
 
-            var read = 0;
-            while (read < length)
+            var readRemaining = length;
+            var readStart = 0;
+            while (readRemaining > 0)
             {
-                read += stream.Read(data, read, length - read);
+                var read = stream.Read(data, readStart, readRemaining);
+                if (read == 0)
+                {
+                    throw new EndOfStreamException();
+                }
+                readStart += read;
+                readRemaining -= read;
             }
         }
 
