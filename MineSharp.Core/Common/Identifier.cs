@@ -137,11 +137,22 @@ public sealed partial record Identifier
     /// <exception cref="FormatException">Thrown when the string format is invalid.</exception>
     public static Identifier Parse(string identifierString)
     {
-        if (!TryParse(identifierString, out var identifier))
+        var parseError = TryParseInternal(identifierString, out var identifier);
+        if (parseError != null)
         {
-            throw new FormatException("Invalid identifier format");
+            throw new FormatException($"Invalid identifier format: {parseError}");
         }
-        return identifier;
+        return identifier!;
+    }
+
+    private static string? TryParseInternal(string identifierString, [NotNullWhen(true)] out Identifier? identifier)
+    {
+        var colonIndex = identifierString.IndexOf(':');
+        if (colonIndex == -1)
+        {
+            return TryCreateInternal(NoNamespace, identifierString, out identifier);
+        }
+        return TryCreateInternal(identifierString.Substring(0, colonIndex), identifierString.Substring(colonIndex + 1), out identifier);
     }
 
     /// <summary>
@@ -152,12 +163,7 @@ public sealed partial record Identifier
     /// <returns><c>true</c> if parsing is successful; otherwise, <c>false</c>.</returns>
     public static bool TryParse(string identifierString, [NotNullWhen(true)] out Identifier? identifier)
     {
-        var colonIndex = identifierString.IndexOf(':');
-        if (colonIndex == -1)
-        {
-            return TryCreate(NoNamespace, identifierString, out identifier);
-        }
-        return TryCreate(identifierString.Substring(0, colonIndex), identifierString.Substring(colonIndex + 1), out identifier);
+        return TryParseInternal(identifierString, out identifier) == null;
     }
 
     private static string? TryCreateInternal(string @namespace, string name, out Identifier? identifier)
