@@ -8,8 +8,9 @@ namespace MineSharp.Core.Common.Entities.Attributes;
 /// <param name="Uuid">The uuid associated with this Modifier. This is a constant value from Minecraft java.</param>
 /// <param name="Amount"></param>
 /// <param name="Operation"></param>
-public sealed record Modifier(Uuid Uuid, double Amount, ModifierOp Operation)
+public sealed record Modifier(Uuid Uuid, double Amount, ModifierOp Operation) : ISerializable<Modifier>
 {
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer)
     {
         buffer.WriteUuid(Uuid);
@@ -17,6 +18,7 @@ public sealed record Modifier(Uuid Uuid, double Amount, ModifierOp Operation)
         buffer.WriteByte((byte)Operation);
     }
 
+    /// <inheritdoc />
     public static Modifier Read(PacketBuffer buffer)
     {
         var uuid = buffer.ReadUuid();

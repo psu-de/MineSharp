@@ -6,7 +6,7 @@ namespace MineSharp.Core.Common.Entities.Attributes;
 /// <summary>
 ///     Entity Attribute
 /// </summary>
-public sealed record Attribute
+public sealed record Attribute : ISerializable<Attribute>
 {
     /// <summary>
     ///     Create a new Attribute
@@ -76,6 +76,7 @@ public sealed record Attribute
         Modifiers.Remove(uuid);
     }
 
+    /// <inheritdoc/>
     public void Write(PacketBuffer buffer)
     {
         buffer.WriteIdentifier(Key);
@@ -83,6 +84,7 @@ public sealed record Attribute
         buffer.WriteVarIntArray(Modifiers.Values, (buffer, modifier) => modifier.Write(buffer));
     }
 
+    /// <inheritdoc/>
     public static Attribute Read(PacketBuffer buffer)
     {
         var key = buffer.ReadIdentifier();
