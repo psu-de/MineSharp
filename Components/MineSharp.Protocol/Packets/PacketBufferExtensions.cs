@@ -1,6 +1,6 @@
 ﻿using MineSharp.ChatComponent;
 using MineSharp.Core;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 
 namespace MineSharp.Protocol.Packets;
 

@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 using ICSharpCode.SharpZipLib.Zip.Compression;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Protocol.Cryptography;
 using NLog;
 
@@ -9,19 +9,25 @@ namespace MineSharp.Protocol;
 /// <summary>
 /// Handles reading and writing packets.
 /// Also handles encryption and compression.
-/// This class is not thread-safe.
+/// This class is thread-safe.
 /// </summary>
 internal class MinecraftStream
 {
     private const int CompressionDisabled = -1;
 
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-    private readonly Deflater deflater = new();
 
-    private readonly Inflater inflater = new();
     private readonly NetworkStream networkStream;
 
     private readonly int protocolVersion;
+
+    // Always acquire the readLock before the writeLock if both are needed
+    private readonly object readLock = new();
+    private readonly object writeLock = new();
+
+    private readonly ThreadLocal<Inflater> inflater = new(() => new());
+    private readonly ThreadLocal<Deflater> deflater = new(() => new());
+
     private int compressionThreshold;
     private AesStream? encryptionStream;
 
@@ -32,7 +38,7 @@ internal class MinecraftStream
         this.protocolVersion = protocolVersion;
         this.networkStream = networkStream;
         stream = this.networkStream;
-        
+
         compressionThreshold = CompressionDisabled;
     }
 
@@ -40,7 +46,7 @@ internal class MinecraftStream
     {
         Logger.Debug("Enabling encryption.");
         encryptionStream = new(networkStream, sharedSecret);
-        stream           = encryptionStream;
+        stream = encryptionStream;
     }
 
     public void SetCompression(int threshold)
@@ -50,27 +56,40 @@ internal class MinecraftStream
 
     public PacketBuffer ReadPacket()
     {
-        var    uncompressedLength = 0;
-        var    length = ReadVarInt(out _);
+        var localCompressionThreshold = compressionThreshold;
 
-        if (compressionThreshold != CompressionDisabled)
+        var uncompressedLength = 0;
+        byte[] data = Array.Empty<byte>();
+        lock (readLock)
         {
-            uncompressedLength =  ReadVarInt(out var r);
-            length             -= r;
+            var length = PacketBuffer.ReadVarInt(stream, out _);
+
+            if (localCompressionThreshold != CompressionDisabled)
+            {
+                uncompressedLength = PacketBuffer.ReadVarInt(stream, out var r);
+                length -= r;
+            }
+
+            data = new byte[length];
+
+            var readRemaining = length;
+            var readStart = 0;
+            while (readRemaining > 0)
+            {
+                var read = stream.Read(data, readStart, readRemaining);
+                if (read == 0)
+                {
+                    throw new EndOfStreamException();
+                }
+                readStart += read;
+                readRemaining -= read;
+            }
         }
 
-        var data = new byte[length];
-            
-        var read = 0;
-        while (read < length)
-        {
-            read += stream.Read(data, read, length - read);
-        }
-        
         var packetBuffer = uncompressedLength switch
         {
             > 0 => DecompressBuffer(data, uncompressedLength),
-            _   => new(data, protocolVersion)
+            _ => new(data, protocolVersion)
         };
 
         return packetBuffer;
@@ -78,13 +97,17 @@ internal class MinecraftStream
 
     public void WritePacket(PacketBuffer buffer)
     {
-        if (compressionThreshold > 0)
+        var localCompressionThreshold = compressionThreshold;
+        if (localCompressionThreshold > 0)
         {
-            buffer = CompressBuffer(buffer);
+            buffer = CompressBuffer(buffer, localCompressionThreshold);
         }
-        
-        WriteVarInt((int)buffer.Size);
-        stream.Write(buffer.GetBuffer().AsSpan());
+
+        lock (writeLock)
+        {
+            PacketBuffer.WriteVarInt(stream, (int)buffer.Size);
+            stream.Write(buffer.GetBuffer());
+        }
     }
 
     private PacketBuffer DecompressBuffer(byte[] buffer, int length)
@@ -95,86 +118,73 @@ internal class MinecraftStream
         }
 
         var buffer2 = new byte[length];
-        inflater.SetInput(buffer);
-        inflater.Inflate(buffer2);
-        inflater.Reset();
+        var localInflater = inflater.Value!;
+        localInflater.SetInput(buffer);
+        localInflater.Inflate(buffer2);
+        localInflater.Reset();
 
         return new(buffer2, protocolVersion);
     }
 
-    private PacketBuffer CompressBuffer(PacketBuffer input)
+    // compressionThreshold is given as a parameter to make it thread-safe
+    private PacketBuffer CompressBuffer(PacketBuffer input, int compressionThreshold)
     {
         var output = new PacketBuffer(protocolVersion);
+        var buffer = input.GetBuffer();
+
         if (input.Size < compressionThreshold)
         {
             output.WriteVarInt(0);
-            output.WriteBytes(input.GetBuffer().AsSpan());
+            output.WriteBytes(buffer);
             return output;
         }
 
-        var buffer = input.GetBuffer();
         output.WriteVarInt(buffer.Length);
 
-        deflater.SetInput(buffer);
-        deflater.Finish();
+        var localDeflater = deflater.Value!;
+        localDeflater.SetInput(buffer);
+        localDeflater.Finish();
 
         var deflateBuf = new byte[8192];
-        while (!deflater.IsFinished)
+        while (!localDeflater.IsFinished)
         {
-            var j = deflater.Deflate(deflateBuf);
+            var j = localDeflater.Deflate(deflateBuf);
             output.WriteBytes(deflateBuf.AsSpan(0, j));
         }
 
-        deflater.Reset();
+        localDeflater.Reset();
         return output;
     }
 
-    private int ReadVarInt(out int read)
+    /// <summary>
+    /// This method checks if the stream is still connected.
+    /// This is method can be useful when you want to determine whether the stream is dead without reading or writing to it.
+    /// This is because the stream does not throw an exception when it is dead until you read or write to it.
+    /// </summary>
+    public bool CheckStreamUseable()
     {
-        var value = 0;
-        var length = 0;
-        byte currentByte;
+        var r = networkStream.Socket.Poll(0, SelectMode.SelectRead);
 
-        while (true)
+        if (r && !networkStream.DataAvailable)
         {
-            currentByte = (byte)stream.ReadByte();
-            value |= (currentByte & 0x7F) << (length * 7);
-
-            length++;
-            if (length > 5)
-            {
-                throw new("VarInt too big");
-            }
-
-            if ((currentByte & 0x80) != 0x80)
-            {
-                break;
-            }
+            // the socket got closed
+            // we would only get the exception next time we read or write to it
+            // so we do that now to get the exception
+            // we can not do this always because doing so would change the stream or block
+            var buffer = Array.Empty<byte>();
+            networkStream.Socket.Receive(buffer, SocketFlags.Peek); // this will throw an exception
+            return false;
         }
-
-        read = length;
-        return value;
+        return networkStream.Socket.Connected;
     }
-
-    private void WriteVarInt(int value)
-    {
-        while (true)
-        {
-            if ((value & ~0x7F) == 0)
-            {
-                stream.WriteByte((byte)value);
-                return;
-            }
-
-            stream.WriteByte((byte)((value & 0x7F) | 0x80));
-            value >>= 7;
-        }
-    }
-
 
     public void Close()
     {
-        networkStream.Close();
-        encryptionStream?.Close();
+        lock (readLock)
+            lock (writeLock)
+            {
+                networkStream.Close();
+                encryptionStream?.Close();
+            }
     }
 }

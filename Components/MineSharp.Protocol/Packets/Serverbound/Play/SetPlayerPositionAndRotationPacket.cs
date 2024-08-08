@@ -1,28 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class SetPlayerPositionAndRotationPacket : IPacket
+public sealed record SetPlayerPositionAndRotationPacket(double X, double Y, double Z, float Yaw, float Pitch, bool IsOnGround) : IPacket
 {
-    public SetPlayerPositionAndRotationPacket(double x, double y, double z, float yaw, float pitch, bool isOnGround)
-    {
-        X = x;
-        Y = y;
-        Z = z;
-        Yaw = yaw;
-        Pitch = pitch;
-        IsOnGround = isOnGround;
-    }
-
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public float Yaw { get; set; }
-    public float Pitch { get; set; }
-    public bool IsOnGround { get; set; }
-    public PacketType Type => PacketType.SB_Play_PositionLook;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_PositionLook;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

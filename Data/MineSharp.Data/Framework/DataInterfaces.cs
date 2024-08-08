@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
@@ -182,5 +183,5 @@ public interface IWindowData
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public WindowInfo ByName(string name);
+    public WindowInfo ByName(Identifier name);
 }

@@ -1,18 +1,26 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets;
 
 /// <summary>
-///     Represents a minecraft packet
+///     Represents a Minecraft packet
 /// </summary>
 public interface IPacket
 {
     /// <summary>
     ///     The corresponding <see cref="PacketType" />
+    ///     
+    /// <seealso cref="StaticType"/>
     /// </summary>
     public PacketType Type { get; }
+
+    /// <summary>
+    ///     The corresponding <see cref="PacketType" />.
+    ///     The same as <see cref="Type" /> but static.
+    /// </summary>
+    public static abstract PacketType StaticType { get; }
 
     /// <summary>
     ///     Serialize the packet data into the buffer.

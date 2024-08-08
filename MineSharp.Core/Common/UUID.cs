@@ -1,4 +1,7 @@
-﻿namespace MineSharp.Core.Common;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace MineSharp.Core.Common;
 
 // Thanks to MrZoidberg
 // https://gist.github.com/MrZoidberg/9bac07cf3f5aa5896f75
@@ -7,17 +10,12 @@
 ///     Represents an immutable Java universally unique identifier (UUID).
 ///     A UUID represents a 128-bit value.
 /// </summary>
-public struct Uuid : IEquatable<Uuid>
+public readonly struct Uuid : IEquatable<Uuid>
 {
     /// <summary>
     ///     Empty UUID
     /// </summary>
-    public static readonly Uuid Empty;
-
-    static Uuid()
-    {
-        Empty = new();
-    }
+    public static readonly Uuid Empty = new();
 
     /// <summary>
     ///     Constructs a new UUID using the specified data.
@@ -33,32 +31,41 @@ public struct Uuid : IEquatable<Uuid>
     /// <summary>
     ///     Constructs a new UUID using the specified data.
     /// </summary>
-    /// <param name="b">Bytes array that represents the UUID.</param>
-    public Uuid(byte[] b)
+    /// <param name="bytes">Bytes array that represents the UUID. Must be 16 bytes in big-endian order.</param>
+    public Uuid(ReadOnlySpan<byte> bytes)
     {
-        if (b == null)
-        {
-            throw new ArgumentNullException("b");
-        }
-
-        if (b.Length != 16)
+        if (bytes.Length != 16)
         {
             throw new ArgumentException("Length of the UUID byte array should be 16");
         }
 
-        MostSignificantBits = BitConverter.ToInt64(b, 0);
-        LeastSignificantBits = BitConverter.ToInt64(b, 8);
+        Span<byte> byteSpan = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
+        if (BitConverter.IsLittleEndian)
+        {
+            bytes.CopyTo(byteSpan);
+            byteSpan.Reverse();
+        }
+        else
+        {
+            // architecure is big-endian but our files are little-endian ordered
+            // so we need to reverse the longs
+            var longSpan = MemoryMarshal.Cast<byte, long>(byteSpan);
+            longSpan.Reverse();
+        }
+        // since we do these operations in-place, we are done here
     }
 
+    // The order of the most significant and least significant fields is important
+    // when serializing and deserializing the UUID as unmanaged data types (little-endian)
     /// <summary>
     ///     The least significant 64 bits of this UUID's 128 bit value.
     /// </summary>
-    public long LeastSignificantBits { get; }
+    public readonly long LeastSignificantBits;
 
     /// <summary>
     ///     The most significant 64 bits of this UUID's 128 bit value.
     /// </summary>
-    public long MostSignificantBits { get; }
+    public readonly long MostSignificantBits;
 
     /// <summary>
     ///     Returns a value that indicates whether this instance is equal to a specified
@@ -68,12 +75,10 @@ public struct Uuid : IEquatable<Uuid>
     /// <returns>true if o is a <paramref name="obj" /> that has the same value as this instance; otherwise, false.</returns>
     public override bool Equals(object? obj)
     {
-        if (!(obj is Uuid))
+        if (!(obj is Uuid uuid))
         {
             return false;
         }
-
-        var uuid = (Uuid)obj;
 
         return Equals(uuid);
     }
@@ -86,7 +91,7 @@ public struct Uuid : IEquatable<Uuid>
     /// <returns>true if <paramref name="uuid" /> is equal to this instance; otherwise, false.</returns>
     public bool Equals(Uuid uuid)
     {
-        return MostSignificantBits == uuid.MostSignificantBits && LeastSignificantBits == uuid.LeastSignificantBits;
+        return LeastSignificantBits == uuid.LeastSignificantBits && MostSignificantBits == uuid.MostSignificantBits;
     }
 
     /// <summary>
@@ -95,7 +100,8 @@ public struct Uuid : IEquatable<Uuid>
     /// <returns>The hash code for this instance.</returns>
     public override int GetHashCode()
     {
-        return ((Guid)this).GetHashCode();
+        // our hash code must not be compatible with Guid.GetHashCode so we do it ourselves
+        return HashCode.Combine(LeastSignificantBits, MostSignificantBits);
     }
 
     /// <summary>
@@ -112,25 +118,47 @@ public struct Uuid : IEquatable<Uuid>
             GetDigits(LeastSignificantBits, 12);
     }
 
+    private ReadOnlySpan<byte> AsByteSpan()
+    {
+        return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in this), 1));
+    }
+
     /// <summary>
-    ///     Returns a 16-element byte array that contains the value of this instance.
+    /// Writes the UUID to the specified destination span in big-endian order.
+    /// </summary>
+    /// <param name="destination">The destination span to write the UUID to.</param>
+    public void WriteTo(Span<byte> destination)
+    {
+        if (destination.Length != 16)
+        {
+            throw new ArgumentException("Destination span must be 16 bytes long");
+        }
+
+        var byteSpan = AsByteSpan();
+
+        if (BitConverter.IsLittleEndian)
+        {
+            byteSpan.CopyTo(destination);
+            destination.Reverse();
+        }
+        else
+        {
+            // architecture is big-endian but our fields are little-endian ordered
+            // so we need to reverse the longs
+            var longSpan = MemoryMarshal.Cast<byte, long>(destination);
+            longSpan.Reverse();
+        }
+    }
+
+    /// <summary>
+    ///     Returns a 16-element byte array that contains the value of this instance in big-endian.
     /// </summary>
     /// <returns>A 16-element byte array</returns>
     public byte[] ToByteArray()
     {
-        var uuidMostSignificantBytes = BitConverter.GetBytes(MostSignificantBits);
-        var uuidLeastSignificantBytes = BitConverter.GetBytes(LeastSignificantBits);
-        byte[] bytes =
-        {
-            uuidMostSignificantBytes[0], uuidMostSignificantBytes[1], uuidMostSignificantBytes[2],
-            uuidMostSignificantBytes[3], uuidMostSignificantBytes[4], uuidMostSignificantBytes[5],
-            uuidMostSignificantBytes[6], uuidMostSignificantBytes[7], uuidLeastSignificantBytes[0],
-            uuidLeastSignificantBytes[1], uuidLeastSignificantBytes[2], uuidLeastSignificantBytes[3],
-            uuidLeastSignificantBytes[4], uuidLeastSignificantBytes[5], uuidLeastSignificantBytes[6],
-            uuidLeastSignificantBytes[7]
-        };
-
-        return bytes;
+        var destinationBytes = new byte[16];
+        WriteTo(destinationBytes);
+        return destinationBytes;
     }
 
     /// <summary>Indicates whether the values of two specified <see cref="T:Uuid" /> objects are equal.</summary>
@@ -161,19 +189,8 @@ public struct Uuid : IEquatable<Uuid>
             return default;
         }
 
-        var uuidMostSignificantBytes = BitConverter.GetBytes(uuid.MostSignificantBits);
-        var uuidLeastSignificantBytes = BitConverter.GetBytes(uuid.LeastSignificantBits);
-        byte[] guidBytes =
-        {
-            uuidMostSignificantBytes[4], uuidMostSignificantBytes[5], uuidMostSignificantBytes[6],
-            uuidMostSignificantBytes[7], uuidMostSignificantBytes[2], uuidMostSignificantBytes[3],
-            uuidMostSignificantBytes[0], uuidMostSignificantBytes[1], uuidLeastSignificantBytes[7],
-            uuidLeastSignificantBytes[6], uuidLeastSignificantBytes[5], uuidLeastSignificantBytes[4],
-            uuidLeastSignificantBytes[3], uuidLeastSignificantBytes[2], uuidLeastSignificantBytes[1],
-            uuidLeastSignificantBytes[0]
-        };
-
-        return new(guidBytes);
+        var byteSpan = uuid.AsByteSpan();
+        return new(byteSpan, true);
     }
 
     /// <summary>Converts a <see cref="T:System.Guid" /> to an <see cref="T:Uuid" />.</summary>
@@ -186,16 +203,9 @@ public struct Uuid : IEquatable<Uuid>
             return default;
         }
 
-        var guidBytes = value.ToByteArray();
-        byte[] uuidBytes =
-        {
-            guidBytes[6], guidBytes[7], guidBytes[4], guidBytes[5], guidBytes[0], guidBytes[1], guidBytes[2],
-            guidBytes[3], guidBytes[15], guidBytes[14], guidBytes[13], guidBytes[12], guidBytes[11], guidBytes[10],
-            guidBytes[9], guidBytes[8]
-        };
-
-
-        return new(BitConverter.ToInt64(uuidBytes, 0), BitConverter.ToInt64(uuidBytes, 8));
+        Span<byte> byteSpan = stackalloc byte[16];
+        value.TryWriteBytes(byteSpan, true, out _);
+        return new(byteSpan);
     }
 
     /// <summary>

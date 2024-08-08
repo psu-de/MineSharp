@@ -1,13 +1,14 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class EmptyParser : IParser
 {
-    public string GetName()
+    public Identifier GetName()
     {
-        return string.Empty;
+        return Identifier.Empty;
     }
 
     public int GetArgumentCount()

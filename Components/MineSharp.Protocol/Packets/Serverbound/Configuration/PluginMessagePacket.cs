@@ -1,32 +1,34 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-#pragma warning disable CS1591
-public class PluginMessagePacket : IPacket
+
+/// <summary>
+///     Plugin message packet
+/// </summary>
+/// <param name="ChannelName">The name of the channel</param>
+/// <param name="Data">The data of the plugin message</param>
+public sealed record PluginMessagePacket(Identifier ChannelName, byte[] Data) : IPacket
 {
-    public PluginMessagePacket(string channelName, PacketBuffer data)
-    {
-        ChannelName = channelName;
-        Data = data;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Configuration_CustomPayload;
 
-    public string ChannelName { get; set; }
-    public PacketBuffer Data { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_CustomPayload;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteString(ChannelName);
-        buffer.WriteBytes(Data.GetBuffer());
+        buffer.WriteIdentifier(ChannelName);
+        buffer.WriteBytes(Data);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var channelName = buffer.ReadString();
-        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), version.Version.Protocol);
-        return new PluginMessagePacket(channelName, clone);
+        var channelName = buffer.ReadIdentifier();
+        var data = buffer.RestBuffer();
+        return new PluginMessagePacket(channelName, data);
     }
 }
-#pragma warning restore CS1591

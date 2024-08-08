@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Blocks;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
@@ -46,7 +47,7 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
         BlockType.Stonecutter
     };
 
-    private Dictionary<string, WindowInfo> windowMap = new();
+    private Dictionary<Identifier, WindowInfo> windowMap = new();
 
     private WindowInfo[]? Windows { get; set; }
 
@@ -66,7 +67,7 @@ internal class WindowData(IDataProvider<WindowInfo[]> provider) : IndexedData<Wi
         return Windows![id];
     }
 
-    public WindowInfo ByName(string name)
+    public WindowInfo ByName(Identifier name)
     {
         if (!Loaded)
         {

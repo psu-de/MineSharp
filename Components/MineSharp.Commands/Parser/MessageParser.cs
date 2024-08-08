@@ -1,13 +1,16 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class MessageParser : IParser
 {
-    public string GetName()
+    public static readonly Identifier MessageIdentifier = Identifier.Parse("minecraft:message");
+
+    public Identifier GetName()
     {
-        return "minecraft:message";
+        return MessageIdentifier;
     }
 
     public int GetArgumentCount()

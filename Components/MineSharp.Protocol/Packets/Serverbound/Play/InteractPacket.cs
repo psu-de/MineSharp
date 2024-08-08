@@ -1,59 +1,36 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using static MineSharp.Protocol.Packets.Serverbound.Play.InteractPacket;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class InteractPacket : IPacket
+public sealed record InteractPacket(
+    int EntityId,
+    InteractionType Interaction,
+    float? TargetX,
+    float? TargetY,
+    float? TargetZ,
+    PlayerHand? Hand,
+    bool Sneaking
+) : IPacket
 {
-    public enum InteractionType
-    {
-        Interact = 0,
-        Attack = 1,
-        InteractAt = 2
-    }
-
     /// <summary>
-    ///     Constructor
+    ///     Constructor for all interaction types except <see cref="InteractionType.InteractAt"/>.
     /// </summary>
     /// <param name="entityId"></param>
     /// <param name="interaction"></param>
     /// <param name="sneaking"></param>
     public InteractPacket(int entityId, InteractionType interaction, bool sneaking)
+        : this(entityId, interaction, null, null, null, null, sneaking)
     {
-        EntityId = entityId;
-        Interaction = interaction;
-        Sneaking = sneaking;
     }
 
-    /// <summary>
-    ///     Constructor for <see cref="InteractionType.InteractAt" />
-    /// </summary>
-    /// <param name="entityId"></param>
-    /// <param name="targetX"></param>
-    /// <param name="targetY"></param>
-    /// <param name="targetZ"></param>
-    /// <param name="hand"></param>
-    /// <param name="sneaking"></param>
-    public InteractPacket(int entityId, float targetX, float targetY, float targetZ, PlayerHand hand, bool sneaking)
-    {
-        EntityId = entityId;
-        Interaction = InteractionType.InteractAt;
-        TargetX = targetX;
-        TargetY = targetY;
-        TargetZ = targetZ;
-        Hand = hand;
-        Sneaking = sneaking;
-    }
-
-    public int EntityId { get; set; }
-    public InteractionType Interaction { get; set; }
-    public float? TargetX { get; set; }
-    public float? TargetY { get; set; }
-    public float? TargetZ { get; set; }
-    public PlayerHand? Hand { get; set; }
-    public bool Sneaking { get; set; }
-    public PacketType Type => PacketType.SB_Play_UseEntity;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_UseEntity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -79,17 +56,31 @@ public class InteractPacket : IPacket
         {
             return new InteractPacket(
                 entityId,
+                interaction,
                 buffer.ReadFloat(),
                 buffer.ReadFloat(),
                 buffer.ReadFloat(),
                 (PlayerHand)buffer.ReadVarInt(),
-                buffer.ReadBool());
+                buffer.ReadBool()
+            );
         }
 
         return new InteractPacket(
             entityId,
             interaction,
-            buffer.ReadBool());
+            null,
+            null,
+            null,
+            null,
+            buffer.ReadBool()
+        );
+    }
+
+    public enum InteractionType
+    {
+        Interact = 0,
+        Attack = 1,
+        InteractAt = 2
     }
 }
 #pragma warning restore CS1591

@@ -1,8 +1,8 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Exceptions;
@@ -14,24 +14,28 @@ namespace MineSharp.World.V1_18;
 /// </summary>
 public sealed class Chunk118 : IChunk
 {
-    private const int SectionCount = World118.WorldHeight / ChunkSection118.SectionSize;
     private readonly Dictionary<Position, BlockEntity> blockEntities;
 
     private readonly MinecraftData data;
+    private readonly DimensionInfo dimensionInfo;
     private readonly IChunkSection[] sections;
+
+    private int CalculateSectionCount() => dimensionInfo.GetWorldHeight() / ChunkSection118.SectionSize;
 
     /// <summary>
     ///     Create a new instance
     /// </summary>
     /// <param name="data"></param>
+    /// <param name="dimensionInfo"></param>
     /// <param name="coordinates"></param>
     /// <param name="blockEntities"></param>
-    public Chunk118(MinecraftData data, ChunkCoordinates coordinates, BlockEntity[] blockEntities)
+    public Chunk118(MinecraftData data, DimensionInfo dimensionInfo, ChunkCoordinates coordinates, BlockEntity[] blockEntities)
     {
         Coordinates = coordinates;
         this.data = data;
+        this.dimensionInfo = dimensionInfo;
         this.blockEntities = new();
-        sections = new IChunkSection[SectionCount];
+        sections = new IChunkSection[CalculateSectionCount()];
 
         foreach (var entity in blockEntities)
         {
@@ -49,7 +53,7 @@ public sealed class Chunk118 : IChunk
     public void LoadData(byte[] buf)
     {
         var buffer = new PacketBuffer(buf, data.Version.Protocol);
-        for (var i = 0; i < SectionCount; i++)
+        for (var i = 0; i < sections.Length; i++)
         {
             sections[i] = ChunkSection118.FromStream(data, buffer);
         }
@@ -107,7 +111,7 @@ public sealed class Chunk118 : IChunk
             {
                 block.Position = new(
                     block.Position.X,
-                    FromChunkSectionY(block.Position.Y, i),
+                    FromChunkSectionY(block.Position.Y, i, dimensionInfo.WorldMinY),
                     block.Position.Z);
                 yield return block;
 
@@ -121,7 +125,7 @@ public sealed class Chunk118 : IChunk
 
     private (int y, IChunkSection section) GetChunkSectionAndNewYFromPosition(Position position)
     {
-        var sectionIndex = GetSectionIndex(position.Y);
+        var sectionIndex = GetSectionIndex(position.Y, dimensionInfo.WorldMinY);
         if (sectionIndex >= sections.Length)
         {
             throw new OutOfWorldException($"The Y coordinate {position.Y} is out of the world.");
@@ -143,14 +147,14 @@ public sealed class Chunk118 : IChunk
         return v;
     }
 
-    private static int FromChunkSectionY(int y, int sectionIndex)
+    private static int FromChunkSectionY(int y, int sectionIndex, int worldMinY)
     {
-        const int negative_section_count = -World118.MIN_Y / ChunkSection118.SectionSize;
+        int negative_section_count = -worldMinY / ChunkSection118.SectionSize;
         return ((sectionIndex - negative_section_count) * ChunkSection118.SectionSize) + y;
     }
 
-    private static int GetSectionIndex(int y)
+    private static int GetSectionIndex(int y, int worldMinY)
     {
-        return (y - World118.MIN_Y) / ChunkSection118.SectionSize;
+        return (y - worldMinY) / ChunkSection118.SectionSize;
     }
 }

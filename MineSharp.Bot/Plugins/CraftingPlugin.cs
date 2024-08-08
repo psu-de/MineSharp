@@ -22,7 +22,7 @@ public class CraftingPlugin(MineSharpBot bot) : Plugin(bot)
     {
         windowPlugin = Bot.GetPlugin<WindowPlugin>();
 
-        await windowPlugin.WaitForInventory();
+        await windowPlugin.WaitForInventory().WaitAsync(Bot.CancellationToken);
     }
 
     /// <summary>

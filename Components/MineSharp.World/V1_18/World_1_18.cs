@@ -11,21 +11,13 @@ namespace MineSharp.World.V1_18;
 /// </summary>
 public class World118 : AbstractWorld
 {
-    internal const int WorldHeight = MAX_Y - MIN_Y;
-    internal const int MAX_Y = 320;
-    internal const int MIN_Y = -64;
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger(typeof(IWorld));
 
 
     /// <inheritdoc />
-    public World118(MinecraftData data) : base(data)
+    public World118(MinecraftData data, DimensionInfo dimensionInfo)
+        : base(data, dimensionInfo)
     { }
-
-    /// <inheritdoc />
-    public override int MaxY => MAX_Y;
-
-    /// <inheritdoc />
-    public override int MinY => MIN_Y;
 
     /// <inheritdoc />
     public override bool IsOutOfMap(Position position)
@@ -51,6 +43,6 @@ public class World118 : AbstractWorld
     /// <inheritdoc />
     public override IChunk CreateChunk(ChunkCoordinates coordinates, BlockEntity[] entities)
     {
-        return new Chunk118(Data, coordinates, entities);
+        return new Chunk118(Data, DimensionInfo, coordinates, entities);
     }
 }

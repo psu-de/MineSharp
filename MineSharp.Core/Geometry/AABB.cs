@@ -111,7 +111,7 @@ public class Aabb
     /// <param name="origin"></param>
     /// <param name="direction"></param>
     /// <returns></returns>
-    public bool IntersectsLine(Vector3 origin, Vector3 direction)
+    public double? IntersectsLine(Vector3 origin, Vector3 direction)
     {
         direction = direction.Normalized();
 
@@ -125,7 +125,11 @@ public class Aabb
         var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
         var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
 
-        return !(tMax < 0 || tMin > tMax);
+        if (tMax < 0 || tMin > tMax)
+        {
+            return null;
+        }
+        return tMin;
     }
 
     /// <summary>

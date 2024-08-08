@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Common.Blocks;
+﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
 
 namespace MineSharp.Physics;
@@ -20,7 +21,7 @@ internal static class PhysicsConst
     public const double FluidJumpFactor = 0.04d;
     public const int JumpDelay = 10;
 
-    public const string AttrMovementSpeed = "generic.movement_speed";
+    public static readonly Identifier AttrMovementSpeed = Identifier.Parse("generic.movement_speed");
     public const string SprintingUuid = "662a6b8d-da3e-4c1c-8813-96ea6097278d";
     public const double PlayerSprintSpeed = 0.3d;
     public const double DefaultPlayerSpeed = 0.1d;

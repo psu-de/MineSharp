@@ -62,11 +62,16 @@ public class MinecraftPlayer(
     public EntityPose Pose { get; set; } = EntityPose.Standing;
 
     /// <summary>
+    ///     The offset for the player's eye height.
+    /// </summary>
+    public static readonly Vector3 PlayerEyeHeightOffset = new(0, 1.62, 0);
+
+    /// <summary>
     ///     The position of this player's head.
     /// </summary>
     /// <returns></returns>
     public Vector3 GetHeadPosition()
     {
-        return Entity!.Position.Plus(Vector3.Up);
+        return Entity!.Position.Plus(PlayerEyeHeightOffset);
     }
 }

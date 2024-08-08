@@ -1,18 +1,16 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class PlayerInfoRemovePacket : IPacket
+public sealed record PlayerInfoRemovePacket(Uuid[] Players) : IPacket
 {
-    public PlayerInfoRemovePacket(Uuid[] players)
-    {
-        Players = players;
-    }
-
-    public Uuid[] Players { get; set; }
-    public PacketType Type => PacketType.CB_Play_PlayerRemove;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_PlayerRemove;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

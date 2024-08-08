@@ -1,13 +1,27 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 #pragma warning disable CS1591
-public class LoginStartPacket : IPacket
+public sealed record LoginStartPacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Login_LoginStart;
+
+    // Here is no non-argument constructor allowed
+    // Do not use
+#pragma warning disable CS8618
+    private LoginStartPacket()
+#pragma warning restore CS8618
+    {
+    }
+
     /// <summary>
     ///     Constructor for versions before 1.19
     /// </summary>
@@ -28,7 +42,6 @@ public class LoginStartPacket : IPacket
         PlayerUuid = playerUuid;
     }
 
-
     /// <summary>
     ///     Constructor for version 1.19-1.19.2
     /// </summary>
@@ -42,10 +55,9 @@ public class LoginStartPacket : IPacket
         PlayerUuid = playerUuid;
     }
 
-    public string Username { get; set; }
-    public SignatureContainer? Signature { get; set; }
-    public Uuid? PlayerUuid { get; set; }
-    public PacketType Type => PacketType.SB_Login_LoginStart;
+    public string Username { get; init; }
+    public SignatureContainer? Signature { get; init; }
+    public Uuid? PlayerUuid { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -101,19 +113,8 @@ public class LoginStartPacket : IPacket
         return new LoginStartPacket(username, signature, playerUuid);
     }
 
-    public class SignatureContainer : ISerializable<SignatureContainer>
+    public sealed record SignatureContainer(long Timestamp, byte[] PublicKey, byte[] Signature) : ISerializable<SignatureContainer>
     {
-        public SignatureContainer(long timestamp, byte[] publicKey, byte[] signature)
-        {
-            Timestamp = timestamp;
-            PublicKey = publicKey;
-            Signature = signature;
-        }
-
-        public long Timestamp { get; set; }
-        public byte[] PublicKey { get; set; }
-        public byte[] Signature { get; set; }
-
         public void Write(PacketBuffer buffer)
         {
             buffer.WriteLong(Timestamp);
@@ -126,12 +127,12 @@ public class LoginStartPacket : IPacket
         public static SignatureContainer Read(PacketBuffer buffer)
         {
             var timestamp = buffer.ReadLong();
-            Span<byte> publicKey = new byte[buffer.ReadVarInt()];
+            var publicKey = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(publicKey);
-            Span<byte> signature = new byte[buffer.ReadVarInt()];
+            var signature = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(signature);
 
-            return new(timestamp, publicKey.ToArray(), signature.ToArray());
+            return new(timestamp, publicKey, signature);
         }
     }
 }

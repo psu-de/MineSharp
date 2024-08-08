@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -7,15 +7,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     ChatPacket used before 1.19 to send a Chat message
 /// </summary>
-public class ChatPacket : IPacket
+public sealed record ChatPacket(string Message) : IPacket
 {
-    public ChatPacket(string message)
-    {
-        Message = message;
-    }
-
-    public string Message { get; set; }
-    public PacketType Type => PacketType.SB_Play_Chat;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_Chat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

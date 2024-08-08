@@ -22,11 +22,12 @@ public class AesStream : Stream
     /// <param name="key"></param>
     public AesStream(Stream stream, byte[] key)
     {
+        var cipherParameters = new ParametersWithIV(new KeyParameter(key), key, 0, 16);
         encryptCipher = new(new CfbBlockCipher(new AesEngine(), 8));
-        encryptCipher.Init(true, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
+        encryptCipher.Init(true, cipherParameters);
 
         decryptCipher = new(new CfbBlockCipher(new AesEngine(), 8));
-        decryptCipher.Init(false, new ParametersWithIV(new KeyParameter(key), key, 0, 16));
+        decryptCipher.Init(false, cipherParameters);
 
         baseStream = new CipherStream(stream, decryptCipher, encryptCipher);
     }

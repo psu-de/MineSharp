@@ -1,12 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Status;
 #pragma warning disable CS1591
-public class StatusRequestPacket : IPacket
+public sealed record StatusRequestPacket : IPacket
 {
-    public PacketType Type => PacketType.SB_Status_PingStart;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Status_PingStart;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     { }

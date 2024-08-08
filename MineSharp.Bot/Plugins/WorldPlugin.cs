@@ -12,7 +12,7 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-///     World plugin handles all kind of packets regarding the minecraft world,
+///     World plugin handles all kind of packets regarding the Minecraft world,
 ///     and provides methods to interact with it, like mining and digging.
 /// </summary>
 public class WorldPlugin : Plugin
@@ -30,27 +30,29 @@ public class WorldPlugin : Plugin
     /// <param name="bot"></param>
     public WorldPlugin(MineSharpBot bot) : base(bot)
     {
-        World = WorldVersion.CreateWorld(Bot.Data);
-
-        Bot.Client.On<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
-        Bot.Client.On<UnloadChunkPacket>(HandleUnloadChunkPacket);
-        Bot.Client.On<BlockUpdatePacket>(HandleBlockUpdatePacket);
-        Bot.Client.On<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket);
-        Bot.Client.On<ChunkBatchStartPacket>(HandleChunkBatchStartPacket);
-        Bot.Client.On<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket);
+        // we want all the packets. Even those that are sent before the plugin is initialized.
+        OnPacketAfterInitialization<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket, true);
+        OnPacketAfterInitialization<UnloadChunkPacket>(HandleUnloadChunkPacket, true);
+        OnPacketAfterInitialization<BlockUpdatePacket>(HandleBlockUpdatePacket, true);
+        OnPacketAfterInitialization<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket, true);
+        OnPacketAfterInitialization<ChunkBatchStartPacket>(HandleChunkBatchStartPacket, true);
+        OnPacketAfterInitialization<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket, true);
     }
 
     /// <summary>
     ///     The world of the Minecraft server
     /// </summary>
-    public IWorld World { get; }
+    public IAsyncWorld? World { get; private set; }
 
     /// <inheritdoc />
-    protected override Task Init()
+    protected override async Task Init()
     {
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
         windowPlugin = Bot.GetPlugin<WindowPlugin>();
-        return Task.CompletedTask;
+
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
+        var dimension = playerPlugin.Self!.Dimension;
+        World = WorldVersion.CreateWorld(Bot.Data, dimension);
     }
 
     /// <summary>
@@ -73,7 +75,7 @@ public class WorldPlugin : Plugin
             for (var z = chunkCoords.Z - radius; z <= chunkCoords.Z + radius; z++)
             {
                 var coords = new ChunkCoordinates(x, z);
-                while (!World.IsChunkLoaded(coords))
+                while (!World!.IsChunkLoaded(coords))
                 {
                     await Task.Delay(10);
                 }
@@ -288,7 +290,7 @@ public class WorldPlugin : Plugin
         }
 
         var coords = new ChunkCoordinates(packet.X, packet.Z);
-        var chunk = World.CreateChunk(coords, packet.BlockEntities);
+        var chunk = World!.CreateChunk(coords, packet.BlockEntities);
         chunk.LoadData(packet.ChunkData);
 
         World!.LoadChunk(chunk);
@@ -319,38 +321,22 @@ public class WorldPlugin : Plugin
         var blockInfo = Bot.Data.Blocks.ByState(packet.StateId)!;
         var block = new Block(blockInfo, packet.StateId, packet.Location);
 
-        World!.SetBlock(block);
-        return Task.CompletedTask;
+        return World!.SetBlockAsync(block);
     }
 
-    private Task HandleMultiBlockUpdatePacket(MultiBlockUpdatePacket packet)
+    private async Task HandleMultiBlockUpdatePacket(MultiBlockUpdatePacket packet)
     {
         if (!IsEnabled)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        var sectionX = packet.ChunkSection >> 42;
-        var sectionY = (packet.ChunkSection << 44) >> 44;
-        var sectionZ = (packet.ChunkSection << 22) >> 42;
-
-        if (sectionX > Math.Pow(2, 21))
-        {
-            sectionX -= (int)Math.Pow(2, 22);
-        }
-
-        if (sectionY > Math.Pow(2, 19))
-        {
-            sectionY -= (int)Math.Pow(2, 20);
-        }
-
-        if (sectionZ > Math.Pow(2, 21))
-        {
-            sectionZ -= (int)Math.Pow(2, 22);
-        }
+        var sectionX = packet.ChunkSection >> (64 - 22); // first 22 bits
+        var sectionZ = (packet.ChunkSection << 22) >> (64 - 22); // next 22 bits
+        var sectionY = (packet.ChunkSection << (22 + 22)) >> (64 - 20); // last 20 bits
 
         var coords = new ChunkCoordinates((int)sectionX, (int)sectionZ);
-        var chunk = World!.GetChunkAt(coords);
+        var chunk = await World!.GetChunkAtAsync(coords);
 
         foreach (var l in packet.Blocks)
         {
@@ -361,8 +347,6 @@ public class WorldPlugin : Plugin
 
             chunk.SetBlockAt(stateId, new(blockX, blockY, blockZ));
         }
-
-        return Task.CompletedTask;
     }
 
     private Task HandleChunkBatchStartPacket(ChunkBatchStartPacket packet)

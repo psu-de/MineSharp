@@ -1,6 +1,7 @@
 ﻿using MineSharp.Commands.Parser;
 using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands;
@@ -74,12 +75,12 @@ public class CommandTree
             return null;
         }
 
-        string name;
+        Identifier name;
 
         if (data.Version.Protocol < ProtocolVersion.V_1_19)
         {
             // in 1.18.x, the parser was specified by its name.
-            name = buffer.ReadString();
+            name = buffer.ReadIdentifier();
         }
         else
         {

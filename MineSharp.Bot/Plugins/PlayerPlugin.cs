@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Diagnostics;
 using MineSharp.Bot.Exceptions;
 using MineSharp.Bot.Utils;
@@ -91,7 +92,7 @@ public class PlayerPlugin : Plugin
     /// <summary>
     ///     The Name of the dimension the bot is currently in.
     /// </summary>
-    public string? Dimension { get; private set; }
+    public Identifier? DimensionName { get; private set; }
 
     /// <summary>
     ///     Whether the bot is alive or dead.
@@ -156,7 +157,7 @@ public class PlayerPlugin : Plugin
     {
         entities = Bot.GetPlugin<EntityPlugin>();
 
-        await Task.WhenAll(initLoginPacket, initPositionPacket);
+        await Task.WhenAll(initLoginPacket, initPositionPacket).WaitAsync(Bot.CancellationToken);
 
         var loginPacket = await initLoginPacket;
         var positionPacket = await initPositionPacket;
@@ -177,26 +178,29 @@ public class PlayerPlugin : Plugin
             0,
             (GameMode)loginPacket.GameMode,
             entity,
-            ParseDimension(loginPacket.DimensionName));
+            ParseDimension(loginPacket.DimensionType));
 
         PlayerMap.TryAdd(entity.ServerId, Self);
 
-        Health = 20.0f;
+        Health = loginPacket.HasDeathLocation ? 0f : 20.0f;
         Food = 20.0f;
         Saturation = 20.0f;
-        Dimension = loginPacket.DimensionName;
+        DimensionName = loginPacket.DimensionName;
 
         Logger.Info(
-            $"Initialized Bot Entity: Position=({Entity!.Position}), GameMode={Self.GameMode}, Dimension={Dimension}.");
+            "Initialized Bot Entity: Position=({Position}), GameMode={GameMode}, Dimension={DimensionName} ({Dimension}).", Entity!.Position, Self.GameMode, DimensionName, Self!.Dimension);
 
-        await Bot.Client.SendPacket(
-            new SetPlayerPositionAndRotationPacket(
-                positionPacket.X,
-                positionPacket.Y,
-                positionPacket.Z,
-                positionPacket.Yaw,
-                positionPacket.Pitch,
-                Entity.IsOnGround));
+        if (!loginPacket.HasDeathLocation)
+        {
+            await Bot.Client.SendPacket(
+                new SetPlayerPositionAndRotationPacket(
+                    positionPacket.X,
+                    positionPacket.Y,
+                    positionPacket.Z,
+                    positionPacket.Yaw,
+                    positionPacket.Pitch,
+                    Entity.IsOnGround));
+        }
 
         try
         {
@@ -291,7 +295,7 @@ public class PlayerPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        Self!.Dimension = ParseDimension(packet.Dimension);
+        Self!.Dimension = ParseDimension(packet.DimensionType);
 
         OnRespawned.Dispatch(Bot);
         return Task.CompletedTask;
@@ -428,27 +432,27 @@ public class PlayerPlugin : Plugin
     {
         switch (packet.Event)
         {
-            case 1: // End Raining
+            case GameEventPacket.GameEvent.EndRaining:
                 IsRaining = false;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 2: // Begin Raining
+            case GameEventPacket.GameEvent.BeginRaining:
                 IsRaining = true;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 7: // Rain Level Changed
+            case GameEventPacket.GameEvent.RainLevelChange:
                 RainLevel = packet.Value;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 8: // Thunder Level Changed
+            case GameEventPacket.GameEvent.ThunderLevelChange:
                 ThunderLevel = packet.Value;
                 OnWeatherChanged.Dispatch(Bot);
                 break;
 
-            case 3: // GameMode Change
+            case GameEventPacket.GameEvent.ChangeGameMode:
                 var gameMode = (GameMode)packet.Value;
                 Self!.GameMode = gameMode;
                 break;
@@ -490,15 +494,19 @@ public class PlayerPlugin : Plugin
         player.PermissionLevel = permissionLevel;
     }
 
-
-    private Dimension ParseDimension(string dimensionName)
+    private static readonly FrozenDictionary<Identifier, Dimension> DimensionByIdentifier = new Dictionary<Identifier, Dimension>
     {
-        return dimensionName switch
+        { Identifier.Parse("minecraft:overworld"), Dimension.Overworld },
+        { Identifier.Parse("minecraft:the_nether"), Dimension.Nether },
+        { Identifier.Parse("minecraft:the_end"), Dimension.End }
+    }.ToFrozenDictionary();
+
+    private Dimension ParseDimension(Identifier dimensionName)
+    {
+        if (!DimensionByIdentifier.TryGetValue(dimensionName, out var dimension))
         {
-            "minecraft:overworld" => Core.Common.Dimension.Overworld,
-            "minecraft:the_nether" => Core.Common.Dimension.Nether,
-            "minecraft:the_end" => Core.Common.Dimension.End,
-            _ => throw new UnreachableException()
-        };
+            throw new UnreachableException($"{nameof(dimensionName)} was: {dimensionName}");
+        }
+        return dimension;
     }
 }

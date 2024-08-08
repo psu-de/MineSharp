@@ -1,22 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SetHealthPacket : IPacket
+public sealed record SetHealthPacket(float Health, int Food, float Saturation) : IPacket
 {
-    public SetHealthPacket(float health, int food, float saturation)
-    {
-        Health = health;
-        Food = food;
-        Saturation = saturation;
-    }
-
-    public float Health { get; set; }
-    public int Food { get; set; }
-    public float Saturation { get; set; }
-    public PacketType Type => PacketType.CB_Play_UpdateHealth;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_UpdateHealth;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

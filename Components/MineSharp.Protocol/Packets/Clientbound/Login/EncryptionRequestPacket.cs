@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -8,25 +8,15 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 ///     Encryption request packet
 ///     See https://wiki.vg/Protocol#Encryption_Request
 /// </summary>
-public class EncryptionRequestPacket : IPacket
+/// <param name="ServerId">The hashed server id</param>
+/// <param name="PublicKey">The public key of the server</param>
+/// <param name="VerifyToken">Verify token</param>
+public sealed record EncryptionRequestPacket(string ServerId, byte[] PublicKey, byte[] VerifyToken) : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_EncryptionBegin;
-    
-    /// <summary>
-    ///     The hashed server id
-    /// </summary>
-    public required string ServerId { get; init; }
-
-    /// <summary>
-    ///     The public key of the server
-    /// </summary>
-    public required byte[] PublicKey { get; init; }
-
-    /// <summary>
-    ///     Verify token
-    /// </summary>
-    public required byte[] VerifyToken { get; init; }
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Login_EncryptionBegin;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -47,11 +37,6 @@ public class EncryptionRequestPacket : IPacket
         var verifyToken = new byte[buffer.ReadVarInt()];
         buffer.ReadBytes(verifyToken);
 
-        return new EncryptionRequestPacket()
-        {
-            ServerId    = serverId,
-            PublicKey   = publicKey,
-            VerifyToken = verifyToken
-        };
+        return new EncryptionRequestPacket(serverId, publicKey, verifyToken);
     }
 }

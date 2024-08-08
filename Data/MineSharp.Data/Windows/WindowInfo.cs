@@ -1,4 +1,6 @@
-﻿namespace MineSharp.Data.Windows;
+﻿using MineSharp.Core.Common;
+
+namespace MineSharp.Data.Windows;
 
 /// <summary>
 ///     Window descriptor.
@@ -9,11 +11,30 @@
 /// <param name="ExcludeInventory">Whether the player's inventory is excluded for this window</param>
 /// <param name="HasOffHandSlot">Whether the window has an offhand</param>
 public record WindowInfo(
-    string Name,
+    Identifier Name,
     string Title,
     int UniqueSlots,
     bool ExcludeInventory = false,
-    bool HasOffHandSlot = false);
+    bool HasOffHandSlot = false)
+{
+    /// <summary>
+    ///    Constructor for convenience that handles <see cref="Identifier"/> parsing.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="title"></param>
+    /// <param name="uniqueSlots"></param>
+    /// <param name="excludeInventory"></param>
+    /// <param name="hasOffHandSlot"></param>
+    public WindowInfo(
+        string name,
+        string title,
+        int uniqueSlots,
+        bool excludeInventory = false,
+        bool hasOffHandSlot = false)
+        : this(Identifier.Parse(name), title, uniqueSlots, excludeInventory, hasOffHandSlot)
+    {
+    }
+}
 
 #pragma warning disable CS1591
 

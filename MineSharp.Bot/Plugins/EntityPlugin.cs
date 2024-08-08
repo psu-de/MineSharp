@@ -60,7 +60,7 @@ public class EntityPlugin : Plugin
     protected override async Task Init()
     {
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
-        await playerPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
     }
 
     internal void AddEntity(Entity entity)
@@ -183,7 +183,7 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Add(
+        (entity.Velocity as MutableVector3)!.Set(
             NetUtils.ConvertToVelocity(packet.VelocityX),
             NetUtils.ConvertToVelocity(packet.VelocityY),
             NetUtils.ConvertToVelocity(packet.VelocityZ)
@@ -204,7 +204,7 @@ public class EntityPlugin : Plugin
             return Task.CompletedTask;
         }
 
-        (entity.Position as MutableVector3)!.Set(
+        (entity.Position as MutableVector3)!.Add(
             NetUtils.ConvertDeltaPosition(packet.DeltaX),
             NetUtils.ConvertDeltaPosition(packet.DeltaY),
             NetUtils.ConvertDeltaPosition(packet.DeltaZ)
@@ -212,7 +212,8 @@ public class EntityPlugin : Plugin
 
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateEntityPositionAndRotationPacket(EntityPositionAndRotationPacket packet)
@@ -236,7 +237,8 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateEntityRotationPacket(EntityRotationPacket packet)
@@ -255,7 +257,8 @@ public class EntityPlugin : Plugin
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
         entity.IsOnGround = packet.OnGround;
 
-        return OnEntityMoved.Dispatch(Bot, entity);
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleTeleportEntityPacket(TeleportEntityPacket packet)
@@ -275,8 +278,9 @@ public class EntityPlugin : Plugin
 
         entity.Yaw = NetUtils.FromAngleByte(packet.Yaw);
         entity.Pitch = NetUtils.FromAngleByte(packet.Pitch);
-        
-        return OnEntityMoved.Dispatch(Bot, entity);
+
+        _ = OnEntityMoved.Dispatch(Bot, entity);
+        return Task.CompletedTask;
     }
 
     private Task HandleUpdateAttributesPacket(UpdateAttributesPacket packet)
@@ -293,10 +297,8 @@ public class EntityPlugin : Plugin
 
         foreach (var attribute in packet.Attributes)
         {
-            if (!entity.Attributes.TryAdd(attribute.Key, attribute))
-            {
-                entity.Attributes[attribute.Key] = attribute;
-            }
+            // must not be Attributes[Key] = attribute because this might cause an exception
+            entity.Attributes.AddOrUpdate(attribute.Key, attribute, (key, oldvalue) => attribute);
         }
 
         return Task.CompletedTask;
@@ -313,7 +315,7 @@ public class EntityPlugin : Plugin
 
         var position = (playerPlugin!.Entity!.Position as MutableVector3)!;
 
-        if ((packet.Flags & 0x01) == 0x01)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.X))
         {
             position.Add(packet.X, 0, 0);
         }
@@ -322,7 +324,7 @@ public class EntityPlugin : Plugin
             position.SetX(packet.X);
         }
 
-        if ((packet.Flags & 0x02) == 0x02)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.Y))
         {
             position.Add(0, packet.Y, 0);
         }
@@ -331,7 +333,7 @@ public class EntityPlugin : Plugin
             position.SetY(packet.Y);
         }
 
-        if ((packet.Flags & 0x04) == 0x04)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.Z))
         {
             position.Add(0, 0, packet.Z);
         }
@@ -340,7 +342,7 @@ public class EntityPlugin : Plugin
             position.SetZ(packet.Z);
         }
 
-        if ((packet.Flags & 0x08) == 0x08)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.YRot))
         {
             playerPlugin!.Entity!.Pitch += packet.Pitch;
         }
@@ -349,7 +351,7 @@ public class EntityPlugin : Plugin
             playerPlugin!.Entity!.Pitch = packet.Pitch;
         }
 
-        if ((packet.Flags & 0x10) == 0x10)
+        if (packet.Flags.HasFlag(PlayerPositionPacket.PositionFlags.XRot))
         {
             playerPlugin!.Entity!.Yaw += packet.Yaw;
         }

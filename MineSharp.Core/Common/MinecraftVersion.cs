@@ -1,4 +1,4 @@
-﻿namespace MineSharp.Data;
+﻿namespace MineSharp.Core.Common;
 
 /// <summary>
 ///     A Minecraft Version
