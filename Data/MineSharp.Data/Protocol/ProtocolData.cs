@@ -3,12 +3,15 @@ using MineSharp.Core.Common.Protocol;
 using MineSharp.Data.Framework;
 using MineSharp.Data.Framework.Providers;
 using MineSharp.Data.Internal;
+using NLog;
 
 namespace MineSharp.Data.Protocol;
 
 internal class ProtocolData(IDataProvider<ProtocolDataBlob> provider)
     : IndexedData<ProtocolDataBlob>(provider), IProtocolData
 {
+    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
     private FrozenDictionary<PacketFlow, FrozenDictionary<GameState, FrozenDictionary<int, PacketType>>> idToType = FrozenDictionary<PacketFlow, FrozenDictionary<GameState, FrozenDictionary<int, PacketType>>>.Empty;
     private FrozenDictionary<PacketType, int> typeToId = FrozenDictionary<PacketType, int>.Empty;
 
@@ -29,7 +32,15 @@ internal class ProtocolData(IDataProvider<ProtocolDataBlob> provider)
             Load();
         }
 
-        return idToType[flow][state][id];
+        try
+        {
+            return idToType[flow][state][id];
+        }
+        catch (Exception)
+        {
+            Logger.Error("Failed to get PacketType for: flow = {Flow}, state = {State}, id = {Id}", flow, state, id);
+            throw;
+        }
     }
 
     protected override void InitializeData(ProtocolDataBlob data)
