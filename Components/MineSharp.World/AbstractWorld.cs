@@ -96,14 +96,22 @@ public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionI
     }
 
     /// <inheritdoc />
+    [Pure]
     public IChunk GetChunkAt(ChunkCoordinates coordinates)
     {
-        if (!Chunks.TryGetValue(coordinates, out var chunk))
+        if (!TryGetChunkAt(coordinates, out var chunk))
         {
             throw new ChunkNotLoadedException($"The chunk at {coordinates} is not loaded.");
         }
 
         return chunk;
+    }
+
+    /// <inheritdoc />
+    [Pure]
+    public bool TryGetChunkAt(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk)
+    {
+        return Chunks.TryGetValue(coordinates, out chunk);
     }
 
     /// <inheritdoc />
@@ -312,6 +320,12 @@ public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionI
     private Task<IChunk> RegisterChunkAwaiter(ChunkCoordinates coordinates)
     {
         var tcs = ChunkLoadAwaiters.GetOrAdd(coordinates, _ => new TaskCompletionSource<IChunk>());
+        // because there is a small chance that the chunk was loaded before we were able to add the awaiter
+        // we need to check again if the chunk is loaded
+        if (TryGetChunkAt(coordinates, out var chunk))
+        {
+            tcs.SetResult(chunk);
+        }
         return tcs.Task;
     }
 
