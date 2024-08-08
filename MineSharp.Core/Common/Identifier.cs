@@ -147,10 +147,21 @@ public sealed partial record Identifier
 
     private static string? TryParseInternal(string identifierString, [NotNullWhen(true)] out Identifier? identifier)
     {
+        if (string.IsNullOrEmpty(identifierString))
+        {
+            identifier = Empty;
+            return null;
+        }
+
         var colonIndex = identifierString.IndexOf(':');
         if (colonIndex == -1)
         {
             return TryCreateInternal(NoNamespace, identifierString, out identifier);
+        }
+        else if (colonIndex == 0 || colonIndex == identifierString.Length - 1)
+        {
+            identifier = null;
+            return "Colon must not be at the very start or end";
         }
         return TryCreateInternal(identifierString.Substring(0, colonIndex), identifierString.Substring(colonIndex + 1), out identifier);
     }
