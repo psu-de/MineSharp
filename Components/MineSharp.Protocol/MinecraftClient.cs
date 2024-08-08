@@ -7,6 +7,7 @@ using MineSharp.Auth;
 using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
 using MineSharp.Core;
+using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Concurrency;
 using MineSharp.Core.Events;
@@ -16,6 +17,7 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Connection;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
+using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
@@ -280,6 +282,17 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public EnsureOnlyRunOnceAsyncResult Disconnect(Chat? reason = null)
     {
+        if (reason is TranslatableComponent translatable
+           && Identifier.TryParse(translatable.Translation, out var identifier)
+           && identifier == DisconnectPacket.BrandIdentifier)
+        {
+            // ignore the disconnect packet if it is the weird brand reason
+            // because otherwise we can not connect to the server
+            // maybe this is a test from the server to check whether we know how to deal with this?!?
+            // and just continue logging in?!?
+            return new(Task.CompletedTask, true);
+        }
+
         return ConcurrencyHelper.EnsureOnlyRunOnceAsync(() => DisconnectInternal(reason), ref disconnectTask);
     }
 
