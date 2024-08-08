@@ -60,7 +60,7 @@ public class EntityPlugin : Plugin
     protected override async Task Init()
     {
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
-        await playerPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
     }
 
     internal void AddEntity(Entity entity)

@@ -67,11 +67,11 @@ public class PhysicsPlugin : Plugin
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
         worldPlugin = Bot.GetPlugin<WorldPlugin>();
 
-        await playerPlugin.WaitForInitialization();
-        await worldPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
+        await worldPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
 
         self = playerPlugin.Self;
-        await UpdateServerPos();
+        await UpdateServerPos().WaitAsync(Bot.CancellationToken);
 
         Engine = new(Bot.Data, self!, worldPlugin.World!, InputControls);
         Engine.OnCrouchingChanged += OnSneakingChanged;

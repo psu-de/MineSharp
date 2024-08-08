@@ -157,7 +157,7 @@ public class PlayerPlugin : Plugin
     {
         entities = Bot.GetPlugin<EntityPlugin>();
 
-        await Task.WhenAll(initLoginPacket, initPositionPacket);
+        await Task.WhenAll(initLoginPacket, initPositionPacket).WaitAsync(Bot.CancellationToken);
 
         var loginPacket = await initLoginPacket;
         var positionPacket = await initPositionPacket;

@@ -43,6 +43,7 @@ public abstract class Plugin
 
     /// <summary>
     ///     This method is called once when the plugin starts.
+    ///     It should stop (cancel) when the <see cref="MineSharpBot.CancellationToken"/> is cancelled.
     /// </summary>
     /// <returns></returns>
     protected virtual Task Init()
@@ -160,6 +161,7 @@ public abstract class Plugin
         catch (Exception e)
         {
             Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", GetType().Name);
+            initializationTask.TrySetException(e);
             throw;
         }
     }

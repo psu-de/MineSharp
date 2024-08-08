@@ -430,9 +430,9 @@ public class WindowPlugin : Plugin
         window.StateId = packet.StateId;
         window.SetSlots(slots);
 
-        if (window.WindowId == 0 && !inventoryLoadedTsc.Task.IsCompleted)
+        if (window.WindowId == 0)
         {
-            inventoryLoadedTsc.SetResult();
+            inventoryLoadedTsc.TrySetResult();
         }
 
         return Task.CompletedTask;

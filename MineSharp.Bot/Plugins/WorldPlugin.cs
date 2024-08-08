@@ -50,7 +50,7 @@ public class WorldPlugin : Plugin
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
         windowPlugin = Bot.GetPlugin<WindowPlugin>();
 
-        await playerPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
         var dimension = playerPlugin.Self!.Dimension;
         World = WorldVersion.CreateWorld(Bot.Data, dimension);
     }

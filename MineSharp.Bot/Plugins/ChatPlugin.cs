@@ -72,7 +72,7 @@ public class ChatPlugin : Plugin
                 ));
         }
 
-        await HandleDeclareCommandsPacket(await initDeclareCommandsPacket);
+        await HandleDeclareCommandsPacket(await initDeclareCommandsPacket.WaitAsync(Bot.CancellationToken)).WaitAsync(Bot.CancellationToken);
     }
 
     /// <summary>
