@@ -1,5 +1,5 @@
 ﻿using MineSharp.Core;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
@@ -59,7 +59,7 @@ public sealed record MessageAcknowledgementPacket : IPacket
             throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
 
         var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
@@ -68,7 +68,7 @@ public sealed record MessageAcknowledgementPacket : IPacket
             return;
         }
 
-        LastRejectedMessage!.Write(buffer, version);
+        LastRejectedMessage!.Write(buffer, version.Version);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

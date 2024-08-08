@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 using ICSharpCode.SharpZipLib.Zip.Compression;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Protocol.Cryptography;
 using NLog;
 

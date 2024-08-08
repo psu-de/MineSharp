@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Serialization;
 
 /// <summary>
 /// Provides helper methods for working with regular expressions.

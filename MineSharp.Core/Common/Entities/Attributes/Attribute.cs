@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using MineSharp.Core.Serialization;
 
 namespace MineSharp.Core.Common.Entities.Attributes;
 

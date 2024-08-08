@@ -1,6 +1,7 @@
 ﻿using MineSharp.ChatComponent;
 using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
@@ -305,7 +306,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             buffer.WriteLong(Timestamp);
             buffer.WriteLong(Salt);
-            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
+            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
 
             var hasUnsignedContent = UnsignedContent != null;
             buffer.WriteBool(hasUnsignedContent);
@@ -392,7 +393,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             timestamp = buffer.ReadLong();
             salt = buffer.ReadLong();
-            previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
+            previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version.Version));
 
             var hasUnsignedContent = buffer.ReadBool();
             unsignedContent = null;

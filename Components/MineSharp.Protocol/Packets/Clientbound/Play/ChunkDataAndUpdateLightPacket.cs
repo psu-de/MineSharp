@@ -1,7 +1,7 @@
 ﻿using fNbt;
 using MineSharp.Core;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;

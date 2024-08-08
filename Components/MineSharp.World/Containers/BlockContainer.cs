@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.World.Containers.Palettes;
 

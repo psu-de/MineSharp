@@ -1,4 +1,6 @@
-﻿namespace MineSharp.Core.Common.Entities.Attributes;
+﻿using MineSharp.Core.Serialization;
+
+namespace MineSharp.Core.Common.Entities.Attributes;
 
 /// <summary>
 ///     A modifier for an attribute

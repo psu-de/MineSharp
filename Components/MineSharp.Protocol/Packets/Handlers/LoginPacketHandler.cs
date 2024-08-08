@@ -2,8 +2,8 @@
 using System.Security.Cryptography;
 using MineSharp.Auth.Exceptions;
 using MineSharp.Core;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Cryptography;

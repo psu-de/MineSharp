@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;

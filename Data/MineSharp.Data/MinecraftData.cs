@@ -1,4 +1,5 @@
-﻿using MineSharp.Data.Biomes;
+﻿using MineSharp.Core.Common;
+using MineSharp.Data.Biomes;
 using MineSharp.Data.BlockCollisionShapes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
@@ -127,7 +128,7 @@ public class MinecraftData
     public ILanguageData Language { get; }
 
     /// <summary>
-    ///     The minecraft version of this instance
+    ///     The Minecraft version of this instance
     /// </summary>
     public MinecraftVersion Version { get; }
 

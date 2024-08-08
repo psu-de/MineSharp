@@ -1,5 +1,5 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 

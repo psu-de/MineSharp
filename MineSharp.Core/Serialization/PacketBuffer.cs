@@ -3,10 +3,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using fNbt;
+using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Exceptions;
 
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Serialization;
 
 /// <summary>
 ///     Read and write values from and to a byte buffer.
@@ -383,7 +384,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public BlockEntity ReadBlockEntity()
     {
         var packedXz = ReadByte();
-        var x = (byte)((packedXz >> 4) & 0xF);
+        var x = (byte)(packedXz >> 4 & 0xF);
         var z = (byte)(packedXz & 0xF);
         var y = ReadShort();
         var type = ReadVarInt();
@@ -533,7 +534,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
                 return;
             }
 
-            stream.WriteByte((byte)((value & 0x7F) | 0x80));
+            stream.WriteByte((byte)(value & 0x7F | 0x80));
             value >>>= 7;
         }
     }
@@ -547,7 +548,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     {
         while ((value & ~0x7F) != 0x00)
         {
-            buffer.WriteByte((byte)((value & 0xFF) | 0x80));
+            buffer.WriteByte((byte)(value & 0xFF | 0x80));
             value >>>= 7;
         }
 
@@ -615,7 +616,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public void WriteBlockEntity(BlockEntity entity)
     {
-        var packedXz = (byte)(((entity.X << 4) & 0xF) | (entity.Z & 0xF));
+        var packedXz = (byte)(entity.X << 4 & 0xF | entity.Z & 0xF);
         WriteByte(packedXz);
         WriteShort(entity.Y);
         WriteVarInt(entity.Type);

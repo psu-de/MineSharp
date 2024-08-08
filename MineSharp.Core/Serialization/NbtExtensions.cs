@@ -1,6 +1,7 @@
 ﻿using fNbt;
+using MineSharp.Core.Common;
 
-namespace MineSharp.Core.Common;
+namespace MineSharp.Core.Serialization;
 
 /// <summary>
 /// Provides extension methods for NbtCompound.
