@@ -18,11 +18,12 @@ public static class ConcurrencyHelper
     /// <inheritdoc cref="EnsureOnlyRunOnceAsync{TResult}(Func{Task{TResult}}, ref Task{TResult}?)" />
     public static EnsureOnlyRunOnceAsyncResult EnsureOnlyRunOnceAsync(Func<Task> action, ref Task? taskStore)
     {
-        var ret = EnsureOnlyRunOnceAsync(() =>
+        var ret = EnsureOnlyRunOnceAsync(async () =>
         {
-            var actualTask = action();
+            // we need to do the typical async/await because otherwise the exception would be lost and the task will not be faulted
+            await action();
             // return value does mean nothing. Is just used to call the other method.
-            return actualTask.ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
+            return true;
         },
         // this ref type conversion is safe because all Tasks with return type are also normal Tasks
         ref Unsafe.As<Task?, Task<bool>?>(ref taskStore));
