@@ -15,7 +15,7 @@ public sealed record UpdateCommandBlock(Position Location, string Command, int M
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteString(Command);
         buffer.WriteVarInt(Mode);
         buffer.WriteByte(Flags);
@@ -25,7 +25,7 @@ public sealed record UpdateCommandBlock(Position Location, string Command, int M
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new UpdateCommandBlock(
-            new(buffer.ReadULong()),
+            buffer.ReadPosition(),
             buffer.ReadString(),
             buffer.ReadVarInt(),
             buffer.ReadByte());

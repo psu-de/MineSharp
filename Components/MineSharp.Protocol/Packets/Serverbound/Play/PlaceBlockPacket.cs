@@ -80,7 +80,7 @@ public sealed record PlaceBlockPacket : IPacket
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(Hand);
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteVarInt((int)Direction);
         buffer.WriteFloat(CursorX);
         buffer.WriteFloat(CursorY);
@@ -96,7 +96,7 @@ public sealed record PlaceBlockPacket : IPacket
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var hand = buffer.ReadVarInt();
-        var position = new Position(buffer.ReadULong());
+        var position = buffer.ReadPosition();
         var direction = buffer.ReadVarInt();
         var cursorX = buffer.ReadFloat();
         var cursorY = buffer.ReadFloat();

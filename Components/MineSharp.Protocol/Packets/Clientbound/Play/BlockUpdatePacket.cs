@@ -20,14 +20,14 @@ public sealed record BlockUpdatePacket(Position Location, int StateId) : IPacket
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteVarInt(StateId);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var location = new Position(buffer.ReadULong());
+        var location = buffer.ReadPosition();
         var stateId = buffer.ReadVarInt();
         return new BlockUpdatePacket(location, stateId);
     }

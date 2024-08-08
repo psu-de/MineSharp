@@ -109,7 +109,7 @@ public sealed record LoginPacket(
         if (HasDeathLocation)
         {
             buffer.WriteIdentifier(DeathDimensionName!);
-            buffer.WriteULong(DeathLocation!.ToULong());
+            buffer.WritePosition(DeathLocation!);
         }
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
@@ -169,7 +169,7 @@ public sealed record LoginPacket(
             if (hasDeathLocation.Value)
             {
                 deathDimensionName = buffer.ReadIdentifier();
-                deathLocation = new(buffer.ReadULong());
+                deathLocation = buffer.ReadPosition();
             }
         }
 
@@ -227,7 +227,7 @@ public sealed record LoginPacket(
         if (hasDeathLocation)
         {
             deathDimensionName = buffer.ReadIdentifier();
-            deathLocation = new(buffer.ReadULong());
+            deathLocation = buffer.ReadPosition();
         }
 
         var portalCooldown = buffer.ReadVarInt();

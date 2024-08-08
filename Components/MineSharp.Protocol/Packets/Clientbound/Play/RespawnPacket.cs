@@ -56,7 +56,7 @@ public sealed record RespawnPacket(
         }
 
         buffer.WriteIdentifier(DeathDimensionName!);
-        buffer.WriteULong(DeathLocation!.ToULong());
+        buffer.WritePosition(DeathLocation!);
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
         {
@@ -95,7 +95,7 @@ public sealed record RespawnPacket(
             if (hasDeathLocation ?? false)
             {
                 deathDimensionName = buffer.ReadIdentifier();
-                deathLocation = new(buffer.ReadULong());
+                deathLocation = buffer.ReadPosition();
             }
         }
 

@@ -104,7 +104,7 @@ public sealed record AcknowledgeBlockChangePacket : IPacket
         /// <inheritdoc />
         public void Write(PacketBuffer buffer)
         {
-            buffer.WriteULong(Location.ToULong());
+            buffer.WritePosition(Location);
             buffer.WriteVarInt(Block);
             buffer.WriteVarInt(Status);
             buffer.WriteBool(Successful);
@@ -114,7 +114,7 @@ public sealed record AcknowledgeBlockChangePacket : IPacket
         public static IPacketBody Read(PacketBuffer buffer)
         {
             return new PacketBody118(
-                new(buffer.ReadULong()),
+                buffer.ReadPosition(),
                 buffer.ReadVarInt(),
                 buffer.ReadVarInt(),
                 buffer.ReadBool());

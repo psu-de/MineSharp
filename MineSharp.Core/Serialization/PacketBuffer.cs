@@ -6,6 +6,7 @@ using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Exceptions;
+using MineSharp.Core.Geometry;
 
 namespace MineSharp.Core.Serialization;
 
@@ -401,6 +402,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return new(x, y, z, type, nbt);
     }
 
+    public Position ReadPosition()
+    {
+        return new Position(ReadULong());
+    }
+
     public T? ReadOptional<T>()
         where T : class
     {
@@ -638,6 +644,11 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         WriteShort(entity.Y);
         WriteVarInt(entity.Type);
         WriteOptionalNbt(entity.Data);
+    }
+
+    public void WritePosition(Position position)
+    {
+        WriteULong(position.ToULong());
     }
 
     #endregion

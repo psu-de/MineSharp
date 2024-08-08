@@ -58,7 +58,7 @@ public sealed record PlayerActionPacket : IPacket
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(Status);
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteByte((byte)Face);
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
@@ -73,14 +73,14 @@ public sealed record PlayerActionPacket : IPacket
         {
             return new PlayerActionPacket(
                 buffer.ReadVarInt(),
-                new(buffer.ReadULong()),
+                buffer.ReadPosition(),
                 (BlockFace)buffer.ReadByte(),
                 buffer.ReadVarInt());
         }
 
         return new PlayerActionPacket(
             buffer.ReadVarInt(),
-            new(buffer.ReadULong()),
+            buffer.ReadPosition(),
             (BlockFace)buffer.ReadByte());
     }
 }

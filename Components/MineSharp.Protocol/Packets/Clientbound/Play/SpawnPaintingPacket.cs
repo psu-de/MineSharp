@@ -33,7 +33,7 @@ public sealed record SpawnPaintingPacket(
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(EntityUuid);
         buffer.WriteVarInt(Title);
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteSByte(Direction);
     }
 
@@ -43,7 +43,7 @@ public sealed record SpawnPaintingPacket(
         var entityId = buffer.ReadVarInt();
         var entityUuid = buffer.ReadUuid();
         var title = buffer.ReadVarInt();
-        var location = new Position(buffer.ReadULong());
+        var location = buffer.ReadPosition();
         var direction = buffer.ReadSByte();
         return new SpawnPaintingPacket(entityId, entityUuid, title, location, direction);
     }
