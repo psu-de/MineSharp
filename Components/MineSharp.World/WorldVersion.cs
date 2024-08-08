@@ -16,7 +16,7 @@ public static class WorldVersion
     /// <param name="dimension"></param>
     /// <returns></returns>
     /// <exception cref="NotSupportedException"></exception>
-    public static IWorld CreateWorld(MinecraftData version, Dimension dimension)
+    public static IAsyncWorld CreateWorld(MinecraftData version, Dimension dimension)
     {
         if (version.Version >= DimensionInfo.MinecraftVersionMajor118)
         {

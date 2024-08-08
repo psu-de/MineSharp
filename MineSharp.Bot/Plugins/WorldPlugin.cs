@@ -42,7 +42,7 @@ public class WorldPlugin : Plugin
     /// <summary>
     ///     The world of the Minecraft server
     /// </summary>
-    public IWorld? World { get; private set; }
+    public IAsyncWorld? World { get; private set; }
 
     /// <inheritdoc />
     protected override async Task Init()
@@ -321,15 +321,14 @@ public class WorldPlugin : Plugin
         var blockInfo = Bot.Data.Blocks.ByState(packet.StateId)!;
         var block = new Block(blockInfo, packet.StateId, packet.Location);
 
-        World!.SetBlock(block);
-        return Task.CompletedTask;
+        return World!.SetBlockAsync(block);
     }
 
-    private Task HandleMultiBlockUpdatePacket(MultiBlockUpdatePacket packet)
+    private async Task HandleMultiBlockUpdatePacket(MultiBlockUpdatePacket packet)
     {
         if (!IsEnabled)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var sectionX = packet.ChunkSection >> (64 - 22); // first 22 bits
@@ -337,7 +336,7 @@ public class WorldPlugin : Plugin
         var sectionY = (packet.ChunkSection << (22 + 22)) >> (64 - 20); // last 20 bits
 
         var coords = new ChunkCoordinates((int)sectionX, (int)sectionZ);
-        var chunk = World!.GetChunkAt(coords);
+        var chunk = await World!.GetChunkAtAsync(coords);
 
         foreach (var l in packet.Blocks)
         {
@@ -348,8 +347,6 @@ public class WorldPlugin : Plugin
 
             chunk.SetBlockAt(stateId, new(blockX, blockY, blockZ));
         }
-
-        return Task.CompletedTask;
     }
 
     private Task HandleChunkBatchStartPacket(ChunkBatchStartPacket packet)
