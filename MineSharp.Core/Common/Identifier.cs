@@ -69,7 +69,13 @@ public sealed partial record Identifier
         return HasNamespace ? this : new Identifier(DefaultNamespace, Name);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Determines whether the specified <see cref="Identifier"/> is equal to the current <see cref="Identifier"/>.
+    /// The comparison uses the default namespace if none is specified.
+    /// </summary>
+    /// <param name="other">The <see cref="Identifier"/> to compare with the current <see cref="Identifier"/>.</param>
+    /// <returns><c>true</c> if the specified <see cref="Identifier"/> is equal to the current <see cref="Identifier"/>; otherwise, <c>false</c>.</returns>
+    /// <seealso cref="EqualsStrict(Identifier?)"/>
     public bool Equals(Identifier? other)
     {
         if (other is null)
@@ -83,7 +89,28 @@ public sealed partial record Identifier
 
         var @namespace = HasNamespace ? Namespace : DefaultNamespace;
         var otherNamespace = other.HasNamespace ? other.Namespace : DefaultNamespace;
-        return Namespace == otherNamespace && Name == other.Name;
+        return @namespace == otherNamespace && Name == other.Name;
+    }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="Identifier"/> is equal to the current <see cref="Identifier"/>.
+    /// In contrast to <see cref="Equals(Identifier?)"/> this comparison is strict and does not use the default namespace if none is specified.
+    /// </summary>
+    /// <param name="other">The <see cref="Identifier"/> to compare with the current <see cref="Identifier"/>.</param>
+    /// <returns><c>true</c> if the specified <see cref="Identifier"/> is equal to the current <see cref="Identifier"/>; otherwise, <c>false</c>.</returns>
+    /// <seealso cref="Equals(Identifier?)"/>
+    public bool EqualsStrict(Identifier? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Namespace == other.Namespace && Name == other.Name;
     }
 
     /// <inheritdoc/>
