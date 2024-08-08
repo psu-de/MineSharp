@@ -529,6 +529,33 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
     }
 
+    // TODO: object is bad but IPacket is not allowed as generic type
+    private async Task<object?> ParsePacket(PacketPalette.PacketFactory packetFactory, PacketType packetType, PacketBuffer buffer)
+    {
+        var size = buffer.ReadableBytes;
+        try
+        {
+            var packet = packetFactory(buffer, Data);
+
+            var unreadBytes = buffer.ReadableBytes;
+            if (unreadBytes != 0)
+            {
+                Logger.Warn("After reading the packet {PacketType}, the buffer still contains {unreadBytes}/{Size} bytes.", packetType, unreadBytes, size);
+            }
+
+            return packet;
+        }
+        catch (EndOfStreamException e)
+        {
+            Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
+        }
+        finally
+        {
+            await buffer.DisposeAsync();
+        }
+        return null;
+    }
+
     private async Task HandleIncomingPacket(PacketType packetType, PacketBuffer buffer)
     {
         // Only parse packets that are awaited by an handler.
@@ -568,45 +595,42 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             return;
         }
 
-        var size = buffer.ReadableBytes;
+        var packet = (IPacket?) await ParsePacket(factory, packetType, buffer);
+
+        if (packet == null)
+        {
+            // The packet could not be parsed
+            return;
+        }
+
+        tcs?.TrySetResult(packet);
+
+        var packetHandlersTasks = new List<Task>();
         try
         {
-            var packet = factory(buffer, Data);
-            await buffer.DisposeAsync();
-
-            tcs?.TrySetResult(packet);
-
-            var packetHandlersTasks = new List<Task>();
-            try
+            // Run all handlers in parallel:
+            foreach (var handler in handlers)
             {
-                // Run all handlers in parallel:
-                foreach (var handler in handlers)
+                // The synchronous part of the handlers might throw an exception
+                // So we also do this in a try-catch block
+                try
                 {
-                    // The synchronous part of the handlers might throw an exception
-                    // So we also do this in a try-catch block
-                    try
-                    {
-                        packetHandlersTasks.Add(handler(packet));
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Warn(e, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
-                    }
+                    packetHandlersTasks.Add(handler(packet));
                 }
-
-                await Task.WhenAll(packetHandlersTasks);
-            }
-            catch (Exception)
-            {
-                foreach (var faultedTask in packetHandlersTasks.Where(task => task.Status == TaskStatus.Faulted))
+                catch (Exception e)
                 {
-                    Logger.Warn(faultedTask.Exception, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
+                    Logger.Warn(e, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
                 }
             }
+
+            await Task.WhenAll(packetHandlersTasks);
         }
-        catch (EndOfStreamException e)
+        catch (Exception)
         {
-            Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
+            foreach (var faultedTask in packetHandlersTasks.Where(task => task.Status == TaskStatus.Faulted))
+            {
+                Logger.Warn(faultedTask.Exception, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
+            }
         }
     }
 
