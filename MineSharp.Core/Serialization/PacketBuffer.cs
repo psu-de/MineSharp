@@ -111,6 +111,14 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     #region Reading
 
+    /// <summary>
+    ///     Read an unmanaged value from the buffer.
+    ///     This works great for signed and unsigned integer primitives.
+    ///     For other value types or custom structs this will likely not work (on some systems).
+    ///     Because this method just reverses the bytes if the system is little endian.
+    /// </summary>
+    /// <typeparam name="T">The unmanaged type to read.</typeparam>
+    /// <returns></returns>
     public T Read<T>()
         where T : unmanaged
     {
@@ -313,9 +321,9 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Uuid ReadUuid()
     {
-        var l1 = Read<long>();
-        var l2 = Read<long>();
-        return new(l1, l2);
+        Span<byte> bytes = stackalloc byte[16];
+        ReadBytes(bytes);
+        return new(bytes);
     }
 
     public T[] ReadVarIntArray<T>(Func<PacketBuffer, T> reader)
@@ -435,6 +443,14 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     #region Writing
 
+    /// <summary>
+    ///     Writes an unmanaged value to the buffer.
+    ///     This works great for signed and unsigned integer primitives.
+    ///     For other value types or custom structs this will likely not work (on some systems).
+    ///     Because this method just reverses the bytes if the system is little endian.
+    /// </summary>
+    /// <typeparam name="T">The unmanaged type to write.</typeparam>
+    /// <returns></returns>
     public void Write<T>(T value)
         where T : unmanaged
     {
@@ -574,8 +590,9 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public void WriteUuid(Uuid value)
     {
-        Write(value.MostSignificantBits);
-        Write(value.LeastSignificantBits);
+        Span<byte> bytes = stackalloc byte[16];
+        value.WriteTo(bytes);
+        WriteBytes(bytes);
     }
 
     public void WriteVarIntArray<T>(ICollection<T> collection, Action<PacketBuffer, T> writer)
