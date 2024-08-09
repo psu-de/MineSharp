@@ -256,7 +256,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
             byteCount++;
             value |= (b & VarIntSegmentBits) << shift;
-            if ((b & VarIntContinueBit) == 0x00)
+            if ((b & VarIntContinueBit) == 0)
             {
                 break;
             }
@@ -286,7 +286,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         {
             var b = ReadByte();
             value |= (long)(b & VarIntSegmentBits) << shift;
-            if ((b & VarIntContinueBit) == 0x00)
+            if ((b & VarIntContinueBit) == 0)
             {
                 break;
             }
@@ -550,13 +550,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     {
         while (true)
         {
-            if ((value & ~0x7F) == 0)
+            if ((value & ~VarIntSegmentBits) == 0)
             {
                 stream.WriteByte((byte)value);
                 return;
             }
 
-            stream.WriteByte((byte)(value & 0x7F | 0x80));
+            stream.WriteByte((byte)(value & VarIntSegmentBits | VarIntContinueBit));
             value >>>= 7;
         }
     }
@@ -566,15 +566,19 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         WriteVarInt(buffer, value);
     }
 
-    public void WriteVarLong(int value)
+    public void WriteVarLong(long value)
     {
-        while ((value & ~0x7F) != 0x00)
+        while (true)
         {
-            buffer.WriteByte((byte)(value & 0xFF | 0x80));
+            if ((value & ~VarIntSegmentBits) == 0)
+            {
+                WriteByte((byte)value);
+                return;
+            }
+
+            WriteByte((byte)(value & VarIntSegmentBits | VarIntContinueBit));
             value >>>= 7;
         }
-
-        buffer.WriteByte((byte)value);
     }
 
     public void WriteString(string value, Encoding? encoding = null)
