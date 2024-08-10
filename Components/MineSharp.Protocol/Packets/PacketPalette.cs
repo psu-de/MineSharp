@@ -175,6 +175,12 @@ internal static class PacketPalette
         RegisterPacket<SetBlockDestroyStagePacket>();
         RegisterPacket<SetCooldownPacket>();
         RegisterPacket<SpawnExperienceOrbPacket>();
+        RegisterPacket<HurtAnimationPacket>();
+        RegisterPacket<InitializeWorldBorderPacket>();
+        RegisterPacket<MapDataPacket>();
+        RegisterPacket<OpenHorseScreenPacket>();
+        RegisterPacket<UpdateLightPacket>();
+        RegisterPacket<WorldEventPacket>();
 
         RegisterPacket<SBKeepAlivePacket>();
         RegisterPacket<SetPlayerPositionPacket>();
