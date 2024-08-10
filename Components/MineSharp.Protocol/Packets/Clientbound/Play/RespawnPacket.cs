@@ -12,8 +12,8 @@ public sealed record RespawnPacket(
     Identifier DimensionType,
     Identifier DimensionName,
     long HashedSeed,
-    sbyte GameMode,
-    byte PreviousGameMode,
+    byte GameMode,
+    sbyte PreviousGameMode,
     bool IsDebug,
     bool IsFlat,
     bool CopyMetadata,
@@ -39,8 +39,8 @@ public sealed record RespawnPacket(
         buffer.WriteIdentifier(DimensionType);
         buffer.WriteIdentifier(DimensionName);
         buffer.WriteLong(HashedSeed);
-        buffer.WriteSByte(GameMode);
-        buffer.WriteByte(PreviousGameMode);
+        buffer.WriteByte(GameMode);
+        buffer.WriteSByte(PreviousGameMode);
         buffer.WriteBool(IsDebug);
         buffer.WriteBool(IsFlat);
         buffer.WriteBool(CopyMetadata);
@@ -50,17 +50,15 @@ public sealed record RespawnPacket(
             buffer.WriteBool(HasDeathLocation.Value);
         }
 
-        if (!HasDeathLocation ?? false)
+        if ((HasDeathLocation ?? false))
         {
-            return;
+            buffer.WriteIdentifier(DeathDimensionName!);
+            buffer.WritePosition(DeathLocation!);
         }
-
-        buffer.WriteIdentifier(DeathDimensionName!);
-        buffer.WritePosition(DeathLocation!);
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
         {
-            buffer.WriteVarInt(PortalCooldown!.Value);
+            buffer.WriteVarInt(PortalCooldown ?? 0);
         }
     }
 
@@ -80,8 +78,8 @@ public sealed record RespawnPacket(
 
         var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
-        var gameMode = buffer.ReadSByte();
-        var previousGameMode = buffer.ReadByte();
+        var gameMode = buffer.ReadByte();
+        var previousGameMode = buffer.ReadSByte();
         var isDebug = buffer.ReadBool();
         var isFlat = buffer.ReadBool();
         var copyMetadata = buffer.ReadBool();
@@ -92,7 +90,7 @@ public sealed record RespawnPacket(
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
         {
             hasDeathLocation = buffer.ReadBool();
-            if (hasDeathLocation ?? false)
+            if (hasDeathLocation.Value)
             {
                 deathDimensionName = buffer.ReadIdentifier();
                 deathLocation = buffer.ReadPosition();
@@ -104,6 +102,9 @@ public sealed record RespawnPacket(
         {
             portalCooldown = buffer.ReadVarInt();
         }
+
+        // Here is still something left in the buffer, but I can not figure out what it is.
+        // wiki.vg says something different for every version. But it does not match for the exact version I am using (1.20.4).
 
         return new RespawnPacket(
             dimensionType,

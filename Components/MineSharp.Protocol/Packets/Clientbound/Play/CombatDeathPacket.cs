@@ -1,4 +1,5 @@
-﻿using MineSharp.Core;
+﻿using MineSharp.ChatComponent;
+using MineSharp.Core;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -29,7 +30,7 @@ public sealed record CombatDeathPacket : IPacket
     /// <param name="playerId"></param>
     /// <param name="entityId"></param>
     /// <param name="message"></param>
-    public CombatDeathPacket(int playerId, int entityId, string message)
+    public CombatDeathPacket(int playerId, int entityId, Chat message)
     {
         PlayerId = playerId;
         EntityId = entityId;
@@ -41,13 +42,13 @@ public sealed record CombatDeathPacket : IPacket
     /// </summary>
     /// <param name="playerId"></param>
     /// <param name="message"></param>
-    public CombatDeathPacket(int playerId, string message)
+    public CombatDeathPacket(int playerId, Chat message)
     {
         PlayerId = playerId;
         Message = message;
     }
 
-    private CombatDeathPacket(int playerId, int? entityId, string message)
+    private CombatDeathPacket(int playerId, int? entityId, Chat message)
     {
         PlayerId = playerId;
         EntityId = entityId;
@@ -67,7 +68,7 @@ public sealed record CombatDeathPacket : IPacket
     /// <summary>
     ///     Death message
     /// </summary>
-    public string Message { get; init; }
+    public Chat Message { get; init; }
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -78,7 +79,7 @@ public sealed record CombatDeathPacket : IPacket
             buffer.WriteInt(EntityId!.Value);
         }
 
-        buffer.WriteString(Message);
+        buffer.WriteChatComponent(Message);
     }
 
     /// <inheritdoc />
@@ -91,7 +92,7 @@ public sealed record CombatDeathPacket : IPacket
             entityId = buffer.ReadInt();
         }
 
-        var message = buffer.ReadString();
+        var message = buffer.ReadChatComponent();
         return new CombatDeathPacket(playerId, entityId, message);
     }
 }
