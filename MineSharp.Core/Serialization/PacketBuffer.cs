@@ -327,6 +327,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         return new(bytes);
     }
 
+    public BitSet ReadBitSet()
+    {
+        var length = ReadVarInt();
+        var bytes = ReadBytes(length * sizeof(ulong));
+        return BitSet.Create(bytes);
+    }
+
     public T[] ReadVarIntArray<T>(Func<PacketBuffer, T> reader)
     {
         var array = new T[ReadVarInt()];
@@ -602,6 +609,13 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     {
         Span<byte> bytes = stackalloc byte[16];
         value.WriteTo(bytes);
+        WriteBytes(bytes);
+    }
+
+    public void WriteBitSet(BitSet bitSet)
+    {
+        var bytes = bitSet.ToByteArray();
+        WriteVarInt(bytes.Length / sizeof(ulong));
         WriteBytes(bytes);
     }
 
