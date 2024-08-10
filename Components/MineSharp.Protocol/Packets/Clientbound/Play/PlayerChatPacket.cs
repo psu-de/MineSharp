@@ -306,7 +306,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             buffer.WriteLong(Timestamp);
             buffer.WriteLong(Salt);
-            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
+            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
             var hasUnsignedContent = UnsignedContent != null;
             buffer.WriteBool(hasUnsignedContent);
@@ -393,7 +393,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             timestamp = buffer.ReadLong();
             salt = buffer.ReadLong();
-            previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version.Version));
+            previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
 
             var hasUnsignedContent = buffer.ReadBool();
             unsignedContent = null;

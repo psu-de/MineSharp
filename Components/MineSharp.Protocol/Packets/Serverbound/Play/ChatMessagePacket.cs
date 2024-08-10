@@ -122,7 +122,7 @@ public sealed record ChatMessagePacket : IPacket
             throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
         var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
@@ -132,7 +132,7 @@ public sealed record ChatMessagePacket : IPacket
             return;
         }
 
-        LastRejectedMessage!.Write(buffer, version.Version);
+        LastRejectedMessage!.Write(buffer);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -180,12 +180,12 @@ public sealed record ChatMessagePacket : IPacket
         }
 
 
-        previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version.Version));
+        previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
 
         var hasLastRejectedMessage = buffer.ReadBool();
         if (hasLastRejectedMessage)
         {
-            lastRejectedMessage = ChatMessageItem.Read(buffer, version.Version);
+            lastRejectedMessage = ChatMessageItem.Read(buffer);
         }
         else
         {

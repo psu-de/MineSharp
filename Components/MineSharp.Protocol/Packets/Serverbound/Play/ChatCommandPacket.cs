@@ -138,7 +138,7 @@ public sealed record ChatCommandPacket : IPacket
             throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
         var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
@@ -148,7 +148,7 @@ public sealed record ChatCommandPacket : IPacket
             return;
         }
 
-        LastRejectedMessage!.Write(buffer, version.Version);
+        LastRejectedMessage!.Write(buffer);
     }
 
     private const int AfterMc1192AcknowledgedLength = 20;
@@ -178,11 +178,11 @@ public sealed record ChatCommandPacket : IPacket
         ChatMessageItem? lastRejectedMessage = null;
         if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
         {
-            previousMessages = buffer.ReadVarIntArray((buf) => ChatMessageItem.Read(buf, version.Version));
+            previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
             var hasLastRejectedMessage = buffer.ReadBool();
             if (hasLastRejectedMessage)
             {
-                lastRejectedMessage = ChatMessageItem.Read(buffer, version.Version);
+                lastRejectedMessage = ChatMessageItem.Read(buffer);
             }
         }
 

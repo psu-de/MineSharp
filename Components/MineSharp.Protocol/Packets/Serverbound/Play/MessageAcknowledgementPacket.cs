@@ -59,7 +59,7 @@ public sealed record MessageAcknowledgementPacket : IPacket
             throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version.Version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
         var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
@@ -68,7 +68,7 @@ public sealed record MessageAcknowledgementPacket : IPacket
             return;
         }
 
-        LastRejectedMessage!.Write(buffer, version.Version);
+        LastRejectedMessage!.Write(buffer);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)

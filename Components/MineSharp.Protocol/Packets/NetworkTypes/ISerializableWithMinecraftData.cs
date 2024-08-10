@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Data;
 
 namespace MineSharp.Core.Serialization;
 
@@ -7,20 +7,20 @@ namespace MineSharp.Core.Serialization;
 ///     while being aware of the Minecraft version
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IVersionAwareSerializable<out T> where T : IVersionAwareSerializable<T>
+public interface ISerializableWithMinecraftData<out T> where T : ISerializableWithMinecraftData<T>
 {
     /// <summary>
     ///     Serialize the object into the buffer
     /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="version"></param>
-    public void Write(PacketBuffer buffer, MinecraftVersion version);
+    /// <param name="data"></param>
+    public void Write(PacketBuffer buffer, MinecraftData data);
 
     /// <summary>
     ///     Read the object from the buffer
     /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="version"></param>
+    /// <param name="data"></param>
     /// <returns></returns>
-    public static abstract T Read(PacketBuffer buffer, MinecraftVersion version);
+    public static abstract T Read(PacketBuffer buffer, MinecraftData data);
 }
