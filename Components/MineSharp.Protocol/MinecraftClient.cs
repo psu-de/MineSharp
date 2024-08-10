@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks.Dataflow;
+using ConcurrentCollections;
 using MineSharp.Auth;
 using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
@@ -109,6 +110,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     private readonly ConcurrentDictionary<PacketType, ConcurrentBag<AsyncPacketHandler>> packetHandlers;
     private readonly ConcurrentDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
+    private readonly ConcurrentHashSet<AsyncPacketHandler> packetReceivers;
     private GameStatePacketHandler gameStatePacketHandler;
     private readonly BufferBlock<PacketSendTask> packetQueue;
     private bool bundlePackets;
@@ -148,6 +150,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         gameStatePacketHandler = new HandshakePacketHandler(this);
         packetHandlers = new();
         packetWaiters = new();
+        packetReceivers = new();
         gameJoinedTcs = new();
         bundledPackets = new();
         tcpTcpFactory = tcpFactory;
@@ -342,6 +345,42 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         var packetType = T.StaticType;
         var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>());
         return tcs.Task.ContinueWith(prev => (T)prev.Result);
+    }
+
+    public sealed class OnPacketReceivedRegistration : IDisposable
+    {
+        private readonly MinecraftClient client;
+        private readonly AsyncPacketHandler handler;
+        public bool Disposed { get; private set; }
+
+        internal OnPacketReceivedRegistration(MinecraftClient client, AsyncPacketHandler handler)
+        {
+            this.client = client;
+            this.handler = handler;
+        }
+
+        public void Dispose()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+            client.packetReceivers.TryRemove(handler);
+            Disposed = true;
+        }
+    }
+
+    /// <summary>
+    /// Registers a handler that will be called whenever a packet is received.
+    /// CAUTION: This will parse all packets, even if they are not awaited by any other handler.
+    /// This can lead to performance issues if the server sends a lot of packets.
+    /// Use this for debugging purposes only.
+    /// </summary>
+    /// <param name="handler">A delegate that will be called when a packet is received.</param>
+    public OnPacketReceivedRegistration? OnPacketReceived(AsyncPacketHandler handler)
+    {
+        var added = packetReceivers.Add(handler);
+        return added ? new(this, handler) : null;
     }
 
     /// <summary>
@@ -602,7 +641,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
         packetWaiters.TryGetValue(packetType, out var tcs);
 
-        if (handlers.Count == 0 && tcs == null)
+        if (handlers.Count == 0 && tcs == null && packetReceivers.IsEmpty)
         {
             await buffer.DisposeAsync();
             return;
@@ -622,6 +661,20 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         try
         {
             // Run all handlers in parallel:
+            foreach (var packetReceiver in packetReceivers)
+            {
+                // The synchronous part of the handlers might throw an exception
+                // So we also do this in a try-catch block
+                try
+                {
+                    packetHandlersTasks.Add(packetReceiver(packet));
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(e, "An packet receiver threw an exception when receiving a packet of type {PacketType}.", packetType);
+                }
+            }
+
             foreach (var handler in handlers)
             {
                 // The synchronous part of the handlers might throw an exception
