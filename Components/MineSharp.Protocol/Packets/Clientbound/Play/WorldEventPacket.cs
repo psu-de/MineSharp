@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Tracing;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
@@ -103,7 +103,7 @@ public sealed record WorldEventPacket(EventType Event, Position Location, int Da
         EnderEyePlaced = 1503,
         /// <summary>
         /// Meaning of Data field:
-        /// See <see cref="SmokeDirection"/>
+        /// See <see cref="Direction"/>
         /// </summary>
         SpawnsSmokeParticles = 2000,
         /// <summary>
@@ -138,19 +138,6 @@ public sealed record WorldEventPacket(EventType Event, Position Location, int Da
         CopperRemoveWax = 3004,
         CopperScrapeOxidation = 3005
         #endregion
-    }
-
-    /// <summary>
-    ///     Enum representing the possible smoke directions.
-    /// </summary>
-    public enum SmokeDirection
-    {
-        Down = 0,
-        Up = 1,
-        North = 2,
-        South = 3,
-        West = 4,
-        East = 5
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
