@@ -105,6 +105,7 @@ public sealed class BitSet : IEquatable<BitSet>, ICloneable
 
     #region Constructors
 
+#pragma warning disable CS8618 // words in initialized in InitWords
     /// <summary>
     /// Creates a new bit set. All bits are initially <c>false</c>.
     /// </summary>
@@ -138,6 +139,7 @@ public sealed class BitSet : IEquatable<BitSet>, ICloneable
         this.wordsInUse = words.Length;
         CheckInvariants();
     }
+#pragma warning restore CS8618
 
     #endregion
 
@@ -694,6 +696,11 @@ public sealed class BitSet : IEquatable<BitSet>, ICloneable
         return newWords;
     }
 
+    /// <summary>
+    /// Writes the bits in this bit set to the specified span of ulongs.
+    /// </summary>
+    /// <param name="longs">A span of ulongs to write the bits to.</param>
+    /// <exception cref="ArgumentException">Thrown if the length of the span is less than the number of words in use.</exception>
     public void WriteTo(Span<ulong> longs)
     {
         if (longs.Length < wordsInUse)

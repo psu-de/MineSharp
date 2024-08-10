@@ -90,7 +90,7 @@ public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasI
             buffer.WriteBool(HasDisplayName);
             if (HasDisplayName)
             {
-                buffer.WriteChatComponent(DisplayName);
+                buffer.WriteChatComponent(DisplayName!);
             }
         }
 

@@ -329,9 +329,8 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public BitSet ReadBitSet()
     {
-        var length = ReadVarInt();
-        var bytes = ReadBytes(length * sizeof(ulong));
-        return BitSet.Create(bytes);
+        var longs = ReadLongArray();
+        return BitSet.Create(MemoryMarshal.Cast<long, ulong>(longs));
     }
 
     public T[] ReadVarIntArray<T>(Func<PacketBuffer, T> reader)
@@ -614,9 +613,8 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
 
     public void WriteBitSet(BitSet bitSet)
     {
-        var bytes = bitSet.ToByteArray();
-        WriteVarInt(bytes.Length / sizeof(ulong));
-        WriteBytes(bytes);
+        var longs = bitSet.ToLongArray();
+        WriteLongArray(MemoryMarshal.Cast<ulong, long>(longs));
     }
 
     public void WriteVarIntArray<T>(ICollection<T> collection, Action<PacketBuffer, T> writer)
@@ -629,7 +627,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
         }
     }
 
-    public void WriteLongArray(long[] array)
+    public void WriteLongArray(ReadOnlySpan<long> array)
     {
         WriteVarInt(array.Length);
         foreach (var l in array)

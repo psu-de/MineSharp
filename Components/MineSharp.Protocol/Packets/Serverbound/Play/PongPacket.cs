@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
 /// </summary>
-/// <param name="id"></param>
+/// <param name="Id"></param>
 public sealed record PongPacket(int Id) : IPacket
 {
     /// <inheritdoc />
