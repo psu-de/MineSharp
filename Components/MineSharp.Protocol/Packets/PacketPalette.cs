@@ -213,6 +213,7 @@ internal static class PacketPalette
         RegisterPacket<SetHeadRotationPacket>();
         RegisterPacket<SetRenderDistancePacket>();
         RegisterPacket<UpdateRecipeBookPacket>();
+        RegisterPacket<SetEntityMetadataPacket>();
 
         RegisterPacket<SBKeepAlivePacket>();
         RegisterPacket<SetPlayerPositionPacket>();
