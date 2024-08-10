@@ -52,8 +52,8 @@ public sealed record RespawnPacket(
 
         if ((HasDeathLocation ?? false))
         {
-            buffer.WriteIdentifier(DeathDimensionName!);
-            buffer.WritePosition(DeathLocation!);
+            buffer.WriteIdentifier(DeathDimensionName ?? throw new InvalidOperationException($"{nameof(DeathDimensionName)} must not be null if {nameof(HasDeathLocation)} is true."));
+            buffer.WritePosition(DeathLocation ?? throw new InvalidOperationException($"{nameof(DeathLocation)} must not be null if {nameof(HasDeathLocation)} is true."));
         }
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)

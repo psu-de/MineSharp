@@ -285,18 +285,6 @@ public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionI
         }
     }
 
-    /// <summary>
-    ///     Mutate <paramref name="position" /> to a world position
-    /// </summary>
-    /// <param name="coordinates"></param>
-    /// <param name="position"></param>
-    protected void MutateToWorldPosition(ChunkCoordinates coordinates, MutablePosition position)
-    {
-        var dx = coordinates.X * IChunk.Size;
-        var dz = coordinates.Z * IChunk.Size;
-        position.Set(position.X + dx, position.Y, position.Z + dz);
-    }
-
     private void OnChunkBlockUpdate(IChunk chunk, int state, Position position)
     {
         var worldPosition = ToWorldPosition(chunk.Coordinates, position);

@@ -62,14 +62,14 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
         var vel = Vector3.Zero.Clone();
         var k1 = 0;
 
-        var pos = new MutablePosition(0, 0, 0);
+        var pos = Position.Zero;
         for (var x = fromX; x < toX; ++x) // TODO: Implement world iterators, that would be nicer
         {
             for (var y = fromY; y < toY; ++y)
             {
                 for (var z = fromZ; z < toZ; ++z)
                 {
-                    pos.Set(x, y, z);
+                    pos = new(x, y, z);
                     var block = World.GetBlockAt(pos);
 
                     if (block.Info.Type != type)
@@ -143,12 +143,12 @@ internal class FluidPhysicsComponent(MinecraftPlayer player, IWorld world, Movem
     {
         var dX = 0.0d;
         var dZ = 0.0d;
-        var pos = new MutablePosition(0, 0, 0);
+        var pos = Position.Zero;
         var height = GetFluidHeight(world, fluid);
 
         foreach (var direction in XzPlane)
         {
-            pos.Set(
+            pos = new(
                 fluid.Position.X + (int)direction.X,
                 fluid.Position.Y + (int)direction.Y,
                 fluid.Position.Z + (int)direction.Z);

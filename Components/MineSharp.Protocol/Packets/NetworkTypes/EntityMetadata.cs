@@ -38,6 +38,7 @@ public sealed record EntityMetadata(EntityMetadataEntry[] Entries) : ISerializab
         var entries = new List<EntityMetadataEntry>();
         while (true)
         {
+            // TODO: Some metadata is broken and causes exceptions
             var index = buffer.Peek();
             if (index == EndOfMetadataIndex)
             {
@@ -235,15 +236,15 @@ public sealed record OptionalPositionMetadata(Position? Value) : IMetadataValue,
 {
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        var hasValue = Value != null;
+        var hasValue = Value.HasValue;
         buffer.WriteBool(hasValue);
-        if (hasValue) buffer.WritePosition(Value);
+        if (hasValue) buffer.WritePosition(Value!.Value);
     }
 
     public static OptionalPositionMetadata Read(PacketBuffer buffer, MinecraftData data)
     {
         var hasValue = buffer.ReadBool();
-        var value = hasValue ? buffer.ReadPosition() : null;
+        Position? value = hasValue ? buffer.ReadPosition() : null;
         return new(value);
     }
 }
@@ -260,7 +261,7 @@ public sealed record OptionalUuidMetadata(Uuid? Value) : IMetadataValue, ISerial
     {
         var hasValue = Value.HasValue;
         buffer.WriteBool(hasValue);
-        if (hasValue) buffer.WriteUuid(Value.Value);
+        if (hasValue) buffer.WriteUuid(Value!.Value);
     }
 
     public static OptionalUuidMetadata Read(PacketBuffer buffer, MinecraftData data)
@@ -365,8 +366,8 @@ public sealed record OptionalGlobalPositionMetadata(bool HasValue, Identifier? D
         buffer.WriteBool(HasValue);
         if (HasValue)
         {
-            buffer.WriteIdentifier(DimensionIdentifier);
-            buffer.WritePosition(Position);
+            buffer.WriteIdentifier(DimensionIdentifier ?? throw new InvalidOperationException($"{nameof(DimensionIdentifier)} must not be null if {nameof(HasValue)} is true."));
+            buffer.WritePosition(Position ?? throw new InvalidOperationException($"{nameof(Position)} must not be null if {nameof(HasValue)} is true."));
         }
     }
 
@@ -374,7 +375,7 @@ public sealed record OptionalGlobalPositionMetadata(bool HasValue, Identifier? D
     {
         var hasValue = buffer.ReadBool();
         var dimensionIdentifier = hasValue ? buffer.ReadIdentifier() : null;
-        var position = hasValue ? buffer.ReadPosition() : null;
+        Position? position = hasValue ? buffer.ReadPosition() : null;
         return new(hasValue, dimensionIdentifier, position);
     }
 }
