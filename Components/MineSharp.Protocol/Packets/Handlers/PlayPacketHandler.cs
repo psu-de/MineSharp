@@ -50,8 +50,7 @@ internal class PlayPacketHandler : GameStatePacketHandler
 
     private Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
     {
-        client.HandleBundleDelimiter();
-        return Task.CompletedTask;
+        return client.HandleBundleDelimiter();
     }
 
     private Task HandlePing(PingPacket ping)
