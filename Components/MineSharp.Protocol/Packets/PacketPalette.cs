@@ -37,6 +37,10 @@ using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAliveP
 using SBConfigurationPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
 using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
+using CBConfigurationAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.AddResourcePackPacket;
+using CBConfigurationRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.RemoveResourcePackPacket;
+using CBPlayAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.AddResourcePackPacket;
+using CBPlayRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.RemoveResourcePackPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -103,8 +107,8 @@ internal static class PacketPalette
         RegisterPacket<ConfPingPacket>();
         RegisterPacket<RegistryDataPacket>();
         RegisterPacket<FeatureFlagsPacket>();
-        RegisterPacket<AddResourcePackPacket>();
-        RegisterPacket<RemoveResourcePackPacket>();
+        RegisterPacket<CBConfigurationAddResourcePackPacket>();
+        RegisterPacket<CBConfigurationRemoveResourcePackPacket>();
         RegisterPacket<UpdateTagsPacket>();
 
         RegisterPacket<ConfClientInformation>();
@@ -181,6 +185,34 @@ internal static class PacketPalette
         RegisterPacket<OpenHorseScreenPacket>();
         RegisterPacket<UpdateLightPacket>();
         RegisterPacket<WorldEventPacket>();
+        RegisterPacket<CBPlayAddResourcePackPacket>();
+        RegisterPacket<CBPlayRemoveResourcePackPacket>();
+        RegisterPacket<DisplayObjectivePacket>();
+        RegisterPacket<EndCombatPacket>();
+        RegisterPacket<EnterCombatPacket>();
+        RegisterPacket<LookAtPacket>();
+        RegisterPacket<MerchantOffersPacket>();
+        RegisterPacket<MoveVehiclePacket>();
+        RegisterPacket<OpenBookPacket>();
+        RegisterPacket<OpenSignEditorPacket>();
+        RegisterPacket<PlaceGhostRecipePacket>();
+        RegisterPacket<PlayerAbilitiesPacket>();
+        RegisterPacket<RemoveEntityEffectPacket>();
+        RegisterPacket<ResetScorePacket>();
+        RegisterPacket<SelectAdvancementTabPacket>();
+        RegisterPacket<ServerDataPacket>();
+        RegisterPacket<SetActionBarTextPacket>();
+        RegisterPacket<SetBorderCenterPacket>();
+        RegisterPacket<SetBorderLerpSizePacket>();
+        RegisterPacket<SetBorderSizePacket>();
+        RegisterPacket<SetBorderWarningDelayPacket>();
+        RegisterPacket<SetBorderWarningDistancePacket>();
+        RegisterPacket<SetCameraPacket>();
+        RegisterPacket<SetCenterChunkPacket>();
+        RegisterPacket<SetDefaultSpawnPositionPacket>();
+        RegisterPacket<SetHeadRotationPacket>();
+        RegisterPacket<SetRenderDistancePacket>();
+        RegisterPacket<UpdateRecipeBookPacket>();
 
         RegisterPacket<SBKeepAlivePacket>();
         RegisterPacket<SetPlayerPositionPacket>();
