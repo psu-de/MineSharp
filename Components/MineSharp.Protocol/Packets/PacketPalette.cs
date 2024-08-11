@@ -214,6 +214,23 @@ internal static class PacketPalette
         RegisterPacket<SetRenderDistancePacket>();
         RegisterPacket<UpdateRecipeBookPacket>();
         RegisterPacket<SetEntityMetadataPacket>();
+        RegisterPacket<PickupItemPacket>();
+        RegisterPacket<SetEquipmentPacket>();
+        RegisterPacket<SetExperiencePacket>();
+        RegisterPacket<SetSimulationDistancePacket>();
+        RegisterPacket<SetSubtitleTextPacket>();
+        RegisterPacket<SetTabListHeaderFooterPacket>();
+        RegisterPacket<SetTickingStatePacket>();
+        RegisterPacket<SetTitleAnimationTimesPacket>();
+        RegisterPacket<SetTitleTextPacket>();
+        RegisterPacket<StartConfigurationPacket>();
+        RegisterPacket<StepTickPacket>();
+        RegisterPacket<StopSoundPacket>();
+        RegisterPacket<TagQueryResponsePacket>();
+        RegisterPacket<UpdateObjectivesPacket>();
+        RegisterPacket<UpdateScorePacket>();
+        RegisterPacket<UpdateTeamsPacket>();
+        RegisterPacket<UpdateTimePacket>();
 
         RegisterPacket<SBKeepAlivePacket>();
         RegisterPacket<SetPlayerPositionPacket>();

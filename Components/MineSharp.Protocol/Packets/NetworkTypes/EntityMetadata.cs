@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using fNbt;
 using MineSharp.ChatComponent;
 using MineSharp.Core.Common;
+using MineSharp.Core.Common.Items;
 using MineSharp.Core.Geometry;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
@@ -195,10 +196,10 @@ public sealed record OptionalTextComponentMetadata(Chat? Value) : IMetadataValue
     }
 }
 
-public sealed record SlotMetadata(Slot Value) : IMetadataValue, ISerializableWithMinecraftData<SlotMetadata>
+public sealed record SlotMetadata(Item? Value) : IMetadataValue, ISerializableWithMinecraftData<SlotMetadata>
 {
-    public void Write(PacketBuffer buffer, MinecraftData data) => buffer.WriteSlot(Value);
-    public static SlotMetadata Read(PacketBuffer buffer, MinecraftData data) => new(buffer.ReadSlot(data));
+    public void Write(PacketBuffer buffer, MinecraftData data) => buffer.WriteOptionalItem(Value);
+    public static SlotMetadata Read(PacketBuffer buffer, MinecraftData data) => new(buffer.ReadOptionalItem(data));
 }
 
 public sealed record BooleanMetadata(bool Value) : IMetadataValue, ISerializableWithMinecraftData<BooleanMetadata>

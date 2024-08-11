@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Items;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -70,14 +71,14 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
     /// <param name="SpecialPrice">The number added to the price when an item is discounted due to player reputation or other effects.</param>
     /// <param name="PriceMultiplier">Determines how much demand, player reputation, and temporary effects will adjust the price.</param>
     /// <param name="Demand">If positive, causes the price to increase. Negative values seem to be treated the same as zero.</param>
-    public sealed record Trade(Slot InputItem1, Slot OutputItem, Slot InputItem2, bool TradeDisabled, int NumberOfTradeUses, int MaximumNumberOfTradeUses, int XP, int SpecialPrice, float PriceMultiplier, int Demand) : ISerializableWithMinecraftData<Trade>
+    public sealed record Trade(Item? InputItem1, Item? OutputItem, Item? InputItem2, bool TradeDisabled, int NumberOfTradeUses, int MaximumNumberOfTradeUses, int XP, int SpecialPrice, float PriceMultiplier, int Demand) : ISerializableWithMinecraftData<Trade>
     {
         /// <inheritdoc />
         public void Write(PacketBuffer buffer, MinecraftData data)
         {
-            buffer.WriteSlot(InputItem1);
-            buffer.WriteSlot(OutputItem);
-            buffer.WriteSlot(InputItem2);
+            buffer.WriteOptionalItem(InputItem1);
+            buffer.WriteOptionalItem(OutputItem);
+            buffer.WriteOptionalItem(InputItem2);
             buffer.WriteBool(TradeDisabled);
             buffer.WriteInt(NumberOfTradeUses);
             buffer.WriteInt(MaximumNumberOfTradeUses);
@@ -90,9 +91,9 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
         /// <inheritdoc />
         public static Trade Read(PacketBuffer buffer, MinecraftData data)
         {
-            var inputItem1 = buffer.ReadSlot(data);
-            var outputItem = buffer.ReadSlot(data);
-            var inputItem2 = buffer.ReadSlot(data);
+            var inputItem1 = buffer.ReadOptionalItem(data);
+            var outputItem = buffer.ReadOptionalItem(data);
+            var inputItem2 = buffer.ReadOptionalItem(data);
             var tradeDisabled = buffer.ReadBool();
             var numberOfTradeUses = buffer.ReadInt();
             var maximumNumberOfTradeUses = buffer.ReadInt();
