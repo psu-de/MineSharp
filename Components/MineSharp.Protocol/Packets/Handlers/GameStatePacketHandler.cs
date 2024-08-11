@@ -3,7 +3,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal abstract class GameStatePacketHandler : IPacketHandler
+internal abstract class GameStatePacketHandler
 {
     public readonly GameState GameState;
 
@@ -12,7 +12,15 @@ internal abstract class GameStatePacketHandler : IPacketHandler
         GameState = gameState;
     }
 
+    public virtual Task StateEntered()
+    {
+        return Task.CompletedTask;
+    }
     public abstract Task HandleIncoming(IPacket packet);
-    public abstract Task HandleOutgoing(IPacket packet);
+    // normally this is not required
+    public virtual Task HandleOutgoing(IPacket packet)
+    {
+        return Task.CompletedTask;
+    }
     public abstract bool HandlesIncoming(PacketType type);
 }

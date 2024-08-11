@@ -13,7 +13,7 @@ using NLog;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class LoginPacketHandler : GameStatePacketHandler
+internal sealed class LoginPacketHandler : GameStatePacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -27,6 +27,12 @@ internal class LoginPacketHandler : GameStatePacketHandler
         this.data = data;
     }
 
+    public override Task StateEntered()
+    {
+        var login = HandshakeProtocol.GetLoginPacket(data, client.Session);
+        return client.SendPacket(login);
+    }
+
     public override Task HandleIncoming(IPacket packet)
     {
         return packet switch
@@ -34,14 +40,10 @@ internal class LoginPacketHandler : GameStatePacketHandler
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
             EncryptionRequestPacket encryption => HandleEncryptionRequest(encryption),
             SetCompressionPacket compression => HandleSetCompression(compression),
+            // TODO: handle LoginPluginRequestPacket
             LoginSuccessPacket success => HandleLoginSuccess(success),
             _ => throw new UnreachableException()
         };
-    }
-
-    public override Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
     }
 
     public override bool HandlesIncoming(PacketType type)
@@ -119,16 +121,16 @@ internal class LoginPacketHandler : GameStatePacketHandler
         return Task.CompletedTask;
     }
 
-    private Task HandleLoginSuccess(LoginSuccessPacket packet)
+    private async Task HandleLoginSuccess(LoginSuccessPacket packet)
     {
         if (data.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            client.UpdateGameState(GameState.Play);
-            return Task.CompletedTask;
+            await client.ChangeGameState(GameState.Play);
         }
-
-        _ = client.SendPacket(new LoginAcknowledgedPacket())
-                  .ContinueWith(_ => client.UpdateGameState(GameState.Configuration));
-        return Task.CompletedTask;
+        else
+        {
+            await client.SendPacket(new LoginAcknowledgedPacket());
+            await client.ChangeGameState(GameState.Configuration);
+        }
     }
 }

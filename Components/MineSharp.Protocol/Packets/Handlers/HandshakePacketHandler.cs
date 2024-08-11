@@ -1,11 +1,10 @@
 ﻿using MineSharp.Core.Common.Protocol;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
-using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class HandshakePacketHandler : GameStatePacketHandler
+internal sealed class HandshakePacketHandler : GameStatePacketHandler
 {
     private readonly MinecraftClient client;
 
@@ -24,7 +23,6 @@ internal class HandshakePacketHandler : GameStatePacketHandler
     {
         return packet switch
         {
-            HandshakePacket handshake => HandleHandshake(handshake),
             _ => throw new UnexpectedPacketException(
                 $"unexpected outgoing packet during handshaking: {packet.GetType().FullName}")
         };
@@ -33,12 +31,5 @@ internal class HandshakePacketHandler : GameStatePacketHandler
     public override bool HandlesIncoming(PacketType type)
     {
         return false;
-    }
-
-
-    private Task HandleHandshake(HandshakePacket packet)
-    {
-        client.UpdateGameState(packet.NextState);
-        return Task.CompletedTask;
     }
 }

@@ -7,8 +7,6 @@ using ConcurrentCollections;
 using MineSharp.Auth;
 using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
-using MineSharp.Core;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Concurrency;
 using MineSharp.Core.Events;
@@ -18,7 +16,6 @@ using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Connection;
 using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
-using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
@@ -124,7 +121,10 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     private readonly CancellationTokenSource cancellationTokenSource;
 
-    private readonly TaskCompletionSource gameJoinedTcs;
+    /// <summary>
+    /// Will be completed once the client has entered the <see cref="GameState.Play"/> state.
+    /// </summary>
+    internal readonly TaskCompletionSource GameJoinedTcs;
 
 
     /// <summary>
@@ -153,11 +153,11 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         {
             CancellationToken = CancellationToken
         });
-        gameStatePacketHandler = new HandshakePacketHandler(this);
+        gameStatePacketHandler = new NoStatePacketHandler(this);
         packetHandlers = new();
         packetWaiters = new();
         packetReceivers = new();
-        gameJoinedTcs = new();
+        GameJoinedTcs = new();
         bundledPackets = null;
         tcpTcpFactory = tcpFactory;
         ip = IpHelper.ResolveHostname(hostnameOrIp, ref port);
@@ -270,11 +270,17 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 // if the packetQueue is completed we can not send any more packets
                 // so we need to cancel the task here
                 // this must have happened because the CancellationToken was cancelled
+                Logger.Warn("Packet {PacketType} could not be added send queue. Queue closed.", packet.Type);
                 sendingTask.Task.TrySetCanceled(CancellationToken);
+            }
+            else
+            {
+                Logger.Trace("Packet {PacketType} was added to send queue", packet.Type);
             }
         }
         catch (OperationCanceledException e)
         {
+            Logger.Warn("Packet {PacketType} could not be added send queue. Sending Packet CancellationToken was cancelled.", packet.Type);
             sendingTask.Task.TrySetCanceled(e.CancellationToken);
             throw;
         }
@@ -291,17 +297,6 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     public EnsureOnlyRunOnceAsyncResult Disconnect(Chat? reason = null)
     {
-        if (reason is TranslatableComponent translatable
-           && Identifier.TryParse(translatable.Translation, out var identifier)
-           && identifier == DisconnectPacket.BrandIdentifier)
-        {
-            // ignore the disconnect packet if it is the weird brand reason
-            // because otherwise we can not connect to the server
-            // maybe this is a test from the server to check whether we know how to deal with this?!?
-            // and just continue logging in?!?
-            return new(Task.CompletedTask, true);
-        }
-
         return ConcurrencyHelper.EnsureOnlyRunOnceAsync(() => DisconnectInternal(reason), ref disconnectTask);
     }
 
@@ -312,7 +307,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         var message = reason.GetMessage(Data);
         Logger.Info($"Disconnecting: {message}");
 
-        gameJoinedTcs.TrySetException(new DisconnectedException("Client has been disconnected", message));
+        GameJoinedTcs.TrySetException(new DisconnectedException("Client has been disconnected", message));
 
         if (client is null || !client.Connected)
         {
@@ -395,12 +390,25 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <returns></returns>
     public Task WaitForGame()
     {
-        return gameJoinedTcs.Task;
+        return GameJoinedTcs.Task;
     }
 
-    internal void UpdateGameState(GameState next)
+    internal Task SendClientInformationPacket()
     {
-        gameStatePacketHandler = next switch
+        return SendPacket(new ClientInformationPacket(
+            Settings.Locale,
+            Settings.ViewDistance,
+            Settings.ChatMode,
+            Settings.ColoredChat,
+            Settings.DisplayedSkinParts,
+            Settings.MainHand,
+            Settings.EnableTextFiltering,
+            Settings.AllowServerListings));
+    }
+
+    internal async Task ChangeGameState(GameState next)
+    {
+        GameStatePacketHandler newGameStatePacketHandler = next switch
         {
             GameState.Handshaking => new HandshakePacketHandler(this),
             GameState.Login => new LoginPacketHandler(this, Data),
@@ -409,38 +417,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             GameState.Play => new PlayPacketHandler(this, Data),
             _ => throw new UnreachableException()
         };
-
-        if (next == GameState.Play && !gameJoinedTcs.Task.IsCompleted)
-        {
-            if (Data.Version.Protocol <= ProtocolVersion.V_1_20)
-            {
-                Task.Delay(10)
-                    .ContinueWith(x =>
-                                      SendPacket(new Packets.Serverbound.Play.ClientInformationPacket(
-                                                     Settings.Locale,
-                                                     Settings.ViewDistance,
-                                                     Settings.ChatMode,
-                                                     Settings.ColoredChat,
-                                                     Settings.DisplayedSkinParts,
-                                                     Settings.MainHand,
-                                                     Settings.EnableTextFiltering,
-                                                     Settings.AllowServerListings)));
-            }
-            gameJoinedTcs.TrySetResult();
-        }
-
-        if (next == GameState.Configuration)
-        {
-            _ = SendPacket(new ClientInformationPacket(
-                           Settings.Locale,
-                           Settings.ViewDistance,
-                           Settings.ChatMode,
-                           Settings.ColoredChat,
-                           Settings.DisplayedSkinParts,
-                           Settings.MainHand,
-                           Settings.EnableTextFiltering,
-                           Settings.AllowServerListings));
-        }
+        gameStatePacketHandler = newGameStatePacketHandler;
+        await newGameStatePacketHandler.StateEntered();
     }
 
     internal void EnableEncryption(byte[] key)
@@ -491,8 +469,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         try
         {
             // run both tasks in parallel
-            var receiveTask = Task.Run(ReceivePackets);
-            var sendTask = Task.Run(SendPackets);
+            var receiveTask = Task.Factory.StartNew(ReceivePackets, TaskCreationOptions.LongRunning);
+            var sendTask = Task.Factory.StartNew(SendPackets, TaskCreationOptions.LongRunning);
 
             // extract the exception from the task that finished first
             await await Task.WhenAny(receiveTask, sendTask);
@@ -521,7 +499,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             var gameState = gameStatePacketHandler.GameState;
             var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
 
-            if (gameState == GameState.Login)
+            Logger.Trace("Received packet {PacketType}. GameState = {GameState}, PacketId = {PacketId}", packetType, gameState, packetId);
+
+            if (gameState != GameState.Play)
             {
                 await HandleIncomingPacket(packetType, buffer);
             }
@@ -554,7 +534,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             try
             {
                 DispatchPacket(task.Packet);
-                task.Task.TrySetResult();
+                // TrySetResult must be run from a different task to prevent blocking the stream loop
+                // because the task continuation will be executed inline and might block or cause a deadlock
+                _ = Task.Run(task.Task.TrySetResult);
 
                 // TODO: this feels wrong
                 // we probably should ask outgoing packet listeners before sending the packet
@@ -611,7 +593,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
             return packet;
         }
-        catch (EndOfStreamException e)
+        catch (Exception e)
         {
             Logger.Error(e, "Could not read packet {PacketType}, it was {Size} bytes.", packetType, size);
         }
@@ -631,7 +613,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         //  - MinecraftClient.OnPacketReceived     <-- Forces all packets to be parsed
         //  - The internal IPacketHandler
 
-        Logger.Trace("Received packet {PacketType}", packetType);
+        Logger.Trace("Handling packet {PacketType}", packetType);
         var factory = PacketPalette.GetFactory(packetType);
         if (factory == null)
         {

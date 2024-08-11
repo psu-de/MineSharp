@@ -3,16 +3,13 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
-using NLog;
 using FinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
 using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class ConfigurationPacketHandler : GameStatePacketHandler
+internal sealed class ConfigurationPacketHandler : GameStatePacketHandler
 {
-    private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
     private readonly MinecraftClient client;
     private readonly MinecraftData data;
 
@@ -21,6 +18,11 @@ internal class ConfigurationPacketHandler : GameStatePacketHandler
     {
         this.client = client;
         this.data = data;
+    }
+
+    public override Task StateEntered()
+    {
+        return client.SendClientInformationPacket();
     }
 
     public override Task HandleIncoming(IPacket packet)
@@ -34,16 +36,6 @@ internal class ConfigurationPacketHandler : GameStatePacketHandler
 
             _ => Task.CompletedTask
         };
-    }
-
-    public override Task HandleOutgoing(IPacket packet)
-    {
-        if (packet is Serverbound.Configuration.FinishConfigurationPacket)
-        {
-            client.UpdateGameState(GameState.Play);
-        }
-
-        return Task.CompletedTask;
     }
 
     public override bool HandlesIncoming(PacketType type)
@@ -61,21 +53,19 @@ internal class ConfigurationPacketHandler : GameStatePacketHandler
         return Task.CompletedTask;
     }
 
-    private Task HandleFinishConfiguration(FinishConfigurationPacket packet)
+    private async Task HandleFinishConfiguration(FinishConfigurationPacket packet)
     {
-        _ = client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
-        return Task.CompletedTask;
+        await client.SendPacket(new Serverbound.Configuration.FinishConfigurationPacket());
+        await client.ChangeGameState(GameState.Play);
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
-        client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
-        return Task.CompletedTask;
+        return client.SendPacket(new Serverbound.Configuration.KeepAlivePacket(packet.KeepAliveId));
     }
 
     private Task HandlePing(PingPacket packet)
     {
-        client.SendPacket(new PongPacket(packet.Id));
-        return Task.CompletedTask;
+        return client.SendPacket(new PongPacket(packet.Id));
     }
 }

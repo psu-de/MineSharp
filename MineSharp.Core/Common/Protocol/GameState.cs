@@ -11,5 +11,7 @@ public enum GameState
     Login = 2,
     Play = 3,
     Configuration = 4,
+
+    None = -1
 #pragma warning restore CS1591
 }
