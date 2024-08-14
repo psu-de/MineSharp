@@ -15,7 +15,7 @@ using NLog;
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-///     This Plugins provides basic functionality for the minecraft player.
+///     This Plugins provides basic functionality for the Minecraft player.
 ///     It keeps track of things like Health and initializes the Bot entity,
 ///     which is required for many other plugins.
 /// </summary>
@@ -25,6 +25,7 @@ public class PlayerPlugin : Plugin
 
     private readonly Task<LoginPacket> initLoginPacket;
     private readonly Task<PlayerPositionPacket> initPositionPacket;
+    private readonly Task<SetHealthPacket> initHealthPacket;
     private EntityPlugin? entities;
 
     private PhysicsPlugin? physics;
@@ -51,6 +52,7 @@ public class PlayerPlugin : Plugin
         // already start listening to the packets here, as they sometimes get lost when calling in init() 
         initLoginPacket = Bot.Client.WaitForPacket<LoginPacket>();
         initPositionPacket = Bot.Client.WaitForPacket<PlayerPositionPacket>();
+        initHealthPacket = Bot.Client.WaitForPacket<SetHealthPacket>();
     }
 
     /// <summary>
@@ -180,17 +182,20 @@ public class PlayerPlugin : Plugin
             entity,
             ParseDimension(loginPacket.DimensionType));
 
-        PlayerMap.TryAdd(entity.ServerId, Self);
-
-        Health = loginPacket.HasDeathLocation ? 0f : 20.0f;
-        Food = 20.0f;
-        Saturation = 20.0f;
         DimensionName = loginPacket.DimensionName;
 
-        Logger.Info(
-            "Initialized Bot Entity: Position=({Position}), GameMode={GameMode}, Dimension={DimensionName} ({Dimension}).", Entity!.Position, Self.GameMode, DimensionName, Self!.Dimension);
+        var healthPacket = await initHealthPacket.WaitAsync(Bot.CancellationToken);
 
-        if (!loginPacket.HasDeathLocation)
+        Health = healthPacket.Health;
+        Food = healthPacket.Food;
+        Saturation = healthPacket.Saturation;
+
+        Logger.Info(
+            "Initialized Bot Entity: Position=({Position}), GameMode={GameMode}, Health={Health}, Dimension={DimensionName} ({Dimension}).", Entity!.Position, Self.GameMode, Health, DimensionName, Self!.Dimension);
+
+        PlayerMap.TryAdd(entity.ServerId, Self);
+
+        if (Health > 0)
         {
             await Bot.Client.SendPacket(
                 new SetPlayerPositionAndRotationPacket(

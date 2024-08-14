@@ -158,6 +158,12 @@ public abstract class Plugin
 
             Logger.Info("Plugin loaded: {PluginName}", GetType().Name);
         }
+        catch (OperationCanceledException e)
+        {
+            Logger.Error(e, "Plugin {PluginName} was cancelled during Init()", GetType().Name);
+            initializationTask.TrySetCanceled(e.CancellationToken);
+            throw;
+        }
         catch (Exception e)
         {
             Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", GetType().Name);
