@@ -1,27 +1,24 @@
-﻿using MineSharp.Data.Protocol;
+﻿using MineSharp.Core.Common.Protocol;
+using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class StatusPacketHandler : IPacketHandler
+internal sealed class StatusPacketHandler : GameStatePacketHandler
 {
-    private MinecraftClient client;
+    private readonly MinecraftClient client;
 
     public StatusPacketHandler(MinecraftClient client)
+        : base(GameState.Status)
     {
         this.client = client;
     }
 
-    public Task HandleIncoming(IPacket packet)
+    public override Task HandleIncoming(IPacket packet)
     {
         return Task.CompletedTask;
     }
 
-    public Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
-    }
-
-    public bool HandlesIncoming(PacketType type)
+    public override bool HandlesIncoming(PacketType type)
     {
         return false;
     }

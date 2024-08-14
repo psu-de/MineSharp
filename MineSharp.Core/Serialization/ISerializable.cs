@@ -1,12 +1,11 @@
-﻿using MineSharp.Core.Common;
-
-namespace MineSharp.Protocol.Packets;
+﻿namespace MineSharp.Core.Serialization;
 
 /// <summary>
 ///     Interface for serializing and deserializing objects from and to <see cref="PacketBuffer" />
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ISerializable<out T> where T : ISerializable<T>
+public interface ISerializable<out T>
+    where T : ISerializable<T>
 {
     /// <summary>
     ///     Serialize the object into the buffer

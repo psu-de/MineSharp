@@ -1,5 +1,5 @@
 ﻿using MineSharp.Core;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
@@ -7,8 +7,13 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class ChatMessagePacket : IPacket
+public sealed record ChatMessagePacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_ChatMessage;
+
     public ChatMessagePacket(
         string message,
         long timestamp,
@@ -50,16 +55,15 @@ public class ChatMessagePacket : IPacket
         : this(message, timestamp, salt, signature, null, null, null, messageCount, acknowledged)
     { }
 
-    public string Message { get; set; }
-    public long Timestamp { get; set; }
-    public long Salt { get; set; }
-    public byte[]? Signature { get; set; }
-    public bool? SignedPreview { get; set; }
-    public ChatMessageItem[]? PreviousMessages { get; set; }
-    public ChatMessageItem? LastRejectedMessage { get; set; }
-    public int? MessageCount { get; set; }
-    public byte[]? Acknowledged { get; set; }
-    public PacketType Type => PacketType.SB_Play_ChatMessage;
+    public string Message { get; init; }
+    public long Timestamp { get; init; }
+    public long Salt { get; init; }
+    public byte[]? Signature { get; init; }
+    public bool? SignedPreview { get; init; }
+    public ChatMessageItem[]? PreviousMessages { get; init; }
+    public ChatMessageItem? LastRejectedMessage { get; init; }
+    public int? MessageCount { get; init; }
+    public byte[]? Acknowledged { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -118,7 +122,7 @@ public class ChatMessagePacket : IPacket
             throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
         }
 
-        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
+        buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
         var hasLastRejectedMessage = LastRejectedMessage != null;
         buffer.WriteBool(hasLastRejectedMessage);
@@ -128,7 +132,7 @@ public class ChatMessagePacket : IPacket
             return;
         }
 
-        LastRejectedMessage!.Write(buffer, version);
+        LastRejectedMessage!.Write(buffer);
     }
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
@@ -176,12 +180,12 @@ public class ChatMessagePacket : IPacket
         }
 
 
-        previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
+        previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
 
         var hasLastRejectedMessage = buffer.ReadBool();
         if (hasLastRejectedMessage)
         {
-            lastRejectedMessage = ChatMessageItem.Read(buffer, version);
+            lastRejectedMessage = ChatMessageItem.Read(buffer);
         }
         else
         {

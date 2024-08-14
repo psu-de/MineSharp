@@ -1,27 +1,29 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class EntityStatusPacket : IPacket
+
+/// <summary>
+///     Entity status packet
+/// </summary>
+/// <param name="EntityId">The entity ID</param>
+/// <param name="Status">The status byte</param>
+public sealed record EntityStatusPacket(int EntityId, byte Status) : IPacket
 {
-    public EntityStatusPacket(int entityId, byte status)
-    {
-        EntityId = entityId;
-        Status = status;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_EntityStatus;
 
-    public int EntityId { get; set; }
-    public byte Status { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityStatus;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteByte(Status);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new EntityStatusPacket(
@@ -29,4 +31,4 @@ public class EntityStatusPacket : IPacket
             buffer.ReadByte());
     }
 }
-#pragma warning restore CS1591
+

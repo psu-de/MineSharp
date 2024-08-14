@@ -67,12 +67,13 @@ public class PhysicsPlugin : Plugin
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
         worldPlugin = Bot.GetPlugin<WorldPlugin>();
 
-        await playerPlugin.WaitForInitialization();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
+        await worldPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
 
         self = playerPlugin.Self;
-        await UpdateServerPos();
+        await UpdateServerPos().WaitAsync(Bot.CancellationToken);
 
-        Engine = new(Bot.Data, self!, worldPlugin.World, InputControls);
+        Engine = new(Bot.Data, self!, worldPlugin.World!, InputControls);
         Engine.OnCrouchingChanged += OnSneakingChanged;
         Engine.OnSprintingChanged += OnSprintingChanged;
     }
@@ -188,10 +189,19 @@ public class PhysicsPlugin : Plugin
     }
 
     /// <summary>
+    ///     Represents the result of a ray casting operation.
+    /// </summary>
+    /// <param name="Block">The block that was hit by the ray.</param>
+    /// <param name="Face">The face of the block that was hit.</param>
+    /// <param name="BlockCollisionShapeIndex">The index for the collision shape of the block that was hit. You can get the <see cref="Aabb"/> with: <c>MineSharp.Bot.Data.BlockCollisionShapes.GetForBlock(block)</c>.</param>
+    /// <param name="Distance">The distance from the ray origin to the hit point.</param>
+    public record RaycastBlockResult(Block Block, BlockFace Face, int BlockCollisionShapeIndex, double Distance);
+
+    /// <summary>
     ///     Casts a ray from the players eyes, and returns the first block that is hit.
     /// </summary>
     /// <returns></returns>
-    public (Block Block, BlockFace Face)? Raycast(double distance = 64)
+    public RaycastBlockResult? Raycast(double distance = 64)
     {
         if (distance < 0)
         {
@@ -207,7 +217,7 @@ public class PhysicsPlugin : Plugin
 
         foreach (var pos in iterator.Iterate())
         {
-            var block = worldPlugin!.World.GetBlockAt(pos);
+            var block = worldPlugin!.World!.GetBlockAt(pos);
             if (!block.IsSolid())
             {
                 continue;
@@ -215,13 +225,15 @@ public class PhysicsPlugin : Plugin
 
             var bbs = Bot.Data.BlockCollisionShapes.GetForBlock(block);
 
-            foreach (var bb in bbs)
+            for (int bbIndex = 0; bbIndex < bbs.Length; bbIndex++)
             {
+                var bb = bbs[bbIndex];
                 var blockBb = bb.Clone().Offset(block.Position.X, block.Position.Y, block.Position.Z);
 
-                if (blockBb.IntersectsLine(position, lookVector))
+                var intersectionDistance = blockBb.IntersectsLine(position, lookVector);
+                if (intersectionDistance is not null)
                 {
-                    return (block, iterator.CurrentFace);
+                    return new(block, iterator.CurrentFace, bbIndex, intersectionDistance.Value);
                 }
             }
         }
@@ -230,7 +242,7 @@ public class PhysicsPlugin : Plugin
     }
 
     /// <inheritdoc />
-    public override Task OnTick()
+    protected internal override Task OnTick()
     {
         if (!IsLoaded)
         {
@@ -307,7 +319,7 @@ public class PhysicsPlugin : Plugin
 
         await Bot.Client.SendPacket(packet);
 
-        await BotMoved.Dispatch(Bot);
+        _ = BotMoved.Dispatch(Bot);
     }
 
     private void OnSneakingChanged(PlayerPhysics sender, bool isSneaking)
@@ -319,7 +331,7 @@ public class PhysicsPlugin : Plugin
                 : EntityActionPacket.EntityAction.StopSneaking,
             0);
 
-        Bot.Client.SendPacket(packet);
+        _ = Bot.Client.SendPacket(packet);
     }
 
     private void OnSprintingChanged(PlayerPhysics sender, bool isSprinting)
@@ -331,7 +343,7 @@ public class PhysicsPlugin : Plugin
                 : EntityActionPacket.EntityAction.StopSprinting,
             0);
 
-        Bot.Client.SendPacket(packet);
+        _ = Bot.Client.SendPacket(packet);
     }
 
     private record PlayerState

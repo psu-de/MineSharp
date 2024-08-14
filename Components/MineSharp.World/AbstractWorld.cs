@@ -17,7 +17,8 @@ namespace MineSharp.World;
 ///     Base class for other implementations of the IWorld interface
 /// </summary>
 /// <param name="data"></param>
-public abstract class AbstractWorld(MinecraftData data) : IWorld
+/// <param name="dimensionInfo"></param>
+public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionInfo) : IWorld, IAsyncWorld
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -26,6 +27,11 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// </summary>
     public readonly MinecraftData Data = data;
 
+    /// <summary>
+    ///     The Dimension that this world represents
+    /// </summary>
+    public readonly DimensionInfo DimensionInfo = dimensionInfo;
+
     private readonly BlockInfo outOfMapBlock = data.Blocks.ByType(BlockType.Air)!;
 
     /// <summary>
@@ -33,11 +39,21 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// </summary>
     protected ConcurrentDictionary<ChunkCoordinates, IChunk> Chunks = new();
 
-    /// <inheritdoc />
-    public abstract int MaxY { get; }
+    /// <summary>
+    ///     A dictionary that holds <see cref="TaskCompletionSource{TResult}" /> for chunks that are yet to be loaded
+    ///     but are requested by some async method in this class.
+    /// </summary>
+    /// <remarks>
+    ///     Implementation Note: This could also be done using the <see cref="OnChunkLoaded"/> event, but this way
+    ///     has less overhead and is more robust. Since the user might remove the event listener.
+    /// </remarks>
+    protected ConcurrentDictionary<ChunkCoordinates, TaskCompletionSource<IChunk>> ChunkLoadAwaiters = new();
 
     /// <inheritdoc />
-    public abstract int MinY { get; }
+    public int MaxY => DimensionInfo.WorldMaxY;
+
+    /// <inheritdoc />
+    public int MinY => DimensionInfo.WorldMinY;
 
 
     /// <inheritdoc />
@@ -80,9 +96,10 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     }
 
     /// <inheritdoc />
+    [Pure]
     public IChunk GetChunkAt(ChunkCoordinates coordinates)
     {
-        if (!Chunks.TryGetValue(coordinates, out var chunk))
+        if (!TryGetChunkAt(coordinates, out var chunk))
         {
             throw new ChunkNotLoadedException($"The chunk at {coordinates} is not loaded.");
         }
@@ -92,22 +109,41 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
 
     /// <inheritdoc />
     [Pure]
+    public bool TryGetChunkAt(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk)
+    {
+        return Chunks.TryGetValue(coordinates, out chunk);
+    }
+
+    /// <inheritdoc />
+    [Pure]
     public bool IsChunkLoaded(ChunkCoordinates coordinates)
     {
-        return IsChunkLoaded(coordinates, out _);
+        return Chunks.ContainsKey(coordinates);
     }
 
     /// <inheritdoc />
     public void LoadChunk(IChunk chunk)
     {
-        if (IsChunkLoaded(chunk.Coordinates, out var oldChunk))
+        IChunk? oldChunk = null;
+        // to be thread-safe, we need to use AddOrUpdate
+        if (Chunks.AddOrUpdate(chunk.Coordinates, chunk, (key, oldValue) =>
+        {
+            oldChunk = oldValue;
+            return chunk;
+        }) != chunk)
+        {
+            throw new Exception($"Failed to update chunk at {chunk.Coordinates}. This should never happen.");
+        }
+
+        if (oldChunk != null)
         {
             oldChunk.OnBlockUpdated -= OnChunkBlockUpdate;
-            Chunks[chunk.Coordinates] = chunk;
         }
-        else
+
+        // we complete the chunk load awaiter before firing the events
+        if (ChunkLoadAwaiters.TryRemove(chunk.Coordinates, out var tcs))
         {
-            Chunks.TryAdd(chunk.Coordinates, chunk);
+            tcs.SetResult(chunk);
         }
 
         chunk.OnBlockUpdated += OnChunkBlockUpdate;
@@ -132,18 +168,41 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     public abstract bool IsOutOfMap(Position position);
 
+    /// <summary>
+    /// Get a block that represents the out of map block at the given position.
+    /// If the position is not out of map, this method returns null.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    private Block? GetOutOfMapBlock(Position position)
+    {
+        if (IsOutOfMap(position))
+        {
+            return new(outOfMapBlock, outOfMapBlock.DefaultState, position);
+        }
+        return null;
+    }
+
     /// <inheritdoc />
     public bool IsBlockLoaded(Position position, [NotNullWhen(true)] out IChunk? chunk)
     {
         return Chunks.TryGetValue(ToChunkCoordinates(position), out chunk);
     }
 
+    private Block GetBlockFromChunk(Position position, IChunk chunk)
+    {
+        var relative = ToChunkPosition(position);
+        var blockState = chunk.GetBlockAt(relative);
+        return new Block(Data.Blocks.ByState(blockState)!, blockState, position);
+    }
+
     /// <inheritdoc />
     public Block GetBlockAt(Position position)
     {
-        if (IsOutOfMap(position))
+        var block = GetOutOfMapBlock(position);
+        if (block != null)
         {
-            return new(outOfMapBlock, outOfMapBlock.DefaultState, position);
+            return block;
         }
 
         if (!IsBlockLoaded(position, out var chunk))
@@ -151,18 +210,17 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
             throw new ChunkNotLoadedException($"Block at {position} is not loaded.");
         }
 
-        var relative = ToChunkPosition(position);
-        var blockState = chunk.GetBlockAt(relative);
-        var block = new Block(
-            Data.Blocks.ByState(blockState)!,
-            blockState,
-            position);
-        return block;
+        return GetBlockFromChunk(position, chunk);
     }
 
     /// <inheritdoc />
     public void SetBlock(Block block)
     {
+        if (IsOutOfMap(block.Position))
+        {
+            throw new InvalidOperationException("Cannot set block at out of map position.");
+        }
+
         if (!IsBlockLoaded(block.Position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Block at {block.Position} is not loaded.");
@@ -175,6 +233,11 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
     /// <inheritdoc />
     public Biome GetBiomeAt(Position position)
     {
+        if (IsOutOfMap(position))
+        {
+            throw new InvalidOperationException("Cannot get biome at out of map position.");
+        }
+
         if (!IsBlockLoaded(position, out var chunk))
         {
             throw new ChunkNotLoadedException($"Position {position} is not loaded.");
@@ -222,25 +285,6 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
         }
     }
 
-    /// <summary>
-    ///     Mutate <paramref name="position" /> to a world position
-    /// </summary>
-    /// <param name="coordinates"></param>
-    /// <param name="position"></param>
-    protected void MutateToWorldPosition(ChunkCoordinates coordinates, MutablePosition position)
-    {
-        var dx = coordinates.X * IChunk.Size;
-        var dz = coordinates.Z * IChunk.Size;
-        position.Set(position.X + dx, position.Y, position.Z + dz);
-    }
-
-    /// <inheritdoc />
-    [Pure]
-    protected bool IsChunkLoaded(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk)
-    {
-        return Chunks.TryGetValue(coordinates, out chunk);
-    }
-
     private void OnChunkBlockUpdate(IChunk chunk, int state, Position position)
     {
         var worldPosition = ToWorldPosition(chunk.Coordinates, position);
@@ -258,4 +302,116 @@ public abstract class AbstractWorld(MinecraftData data) : IWorld
 
         return v;
     }
+
+    #region IAsyncWorld
+
+    private Task<IChunk> RegisterChunkAwaiter(ChunkCoordinates coordinates)
+    {
+        var tcs = ChunkLoadAwaiters.GetOrAdd(coordinates, _ => new TaskCompletionSource<IChunk>());
+        // because there is a small chance that the chunk was loaded before we were able to add the awaiter
+        // we need to check again if the chunk is loaded
+        if (TryGetChunkAt(coordinates, out var chunk))
+        {
+            tcs.SetResult(chunk);
+        }
+        return tcs.Task;
+    }
+
+    /// <inheritdoc/>
+    public Task<IChunk> GetChunkAtAsync(ChunkCoordinates coordinates)
+    {
+        if (Chunks.TryGetValue(coordinates, out var chunk))
+        {
+            return Task.FromResult(chunk);
+        }
+
+        // If the chunk is not loaded, we need to wait for it to be loaded
+        return RegisterChunkAwaiter(coordinates);
+    }
+
+    private Task<IChunk> GetChunkForBlockPosAsync(Position position)
+    {
+        return GetChunkAtAsync(ToChunkCoordinates(position));
+    }
+
+    /// <inheritdoc/>
+    public Task<Block> GetBlockAtAsync(Position position)
+    {
+        var block = GetOutOfMapBlock(position);
+        if (block != null)
+        {
+            return Task.FromResult(block);
+        }
+
+        var blockTask = GetChunkForBlockPosAsync(position)
+            .ContinueWith(chunkTask =>
+            {
+                var chunk = chunkTask.Result;
+                return GetBlockFromChunk(position, chunk);
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        return blockTask;
+    }
+
+    /// <inheritdoc/>
+    public Task SetBlockAsync(Block block)
+    {
+        if (IsOutOfMap(block.Position))
+        {
+            throw new InvalidOperationException("Cannot set block at out of map position.");
+        }
+
+        var blockTask = GetChunkForBlockPosAsync(block.Position)
+            .ContinueWith(chunkTask =>
+            {
+                var chunk = chunkTask.Result;
+                var relative = ToChunkPosition(block.Position);
+                chunk.SetBlockAt(block.State, relative);
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        return blockTask;
+    }
+
+    /// <inheritdoc/>
+    public Task<Biome> GetBiomeAtAsync(Position position)
+    {
+        if (IsOutOfMap(position))
+        {
+            throw new InvalidOperationException("Cannot get biome at out of map position.");
+        }
+
+        var biomeTask = GetChunkForBlockPosAsync(position)
+            .ContinueWith(chunkTask =>
+            {
+                var chunk = chunkTask.Result;
+                var relative = ToChunkPosition(position);
+                return chunk.GetBiomeAt(relative);
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        return biomeTask;
+    }
+
+    /// <inheritdoc/>
+    public Task SetBiomeAtAsync(Position position, Biome biome)
+    {
+        if (IsOutOfMap(position))
+        {
+            throw new InvalidOperationException("Cannot set biome at out of map position.");
+        }
+
+        var biomeTask = GetChunkForBlockPosAsync(position)
+            .ContinueWith(chunkTask =>
+            {
+                var chunk = chunkTask.Result;
+                var relative = ToChunkPosition(position);
+                chunk.SetBiomeAt(relative, biome);
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        return biomeTask;
+    }
+
+    /// <inheritdoc/>
+    public IAsyncEnumerable<Block> FindBlocksAsync(BlockType type, IWorldIterator iterator, int? maxCount = null)
+    {
+        // can be implemented once FindBlocks is implemented
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }

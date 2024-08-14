@@ -1,4 +1,6 @@
-﻿using NLog;
+﻿using MineSharp.Protocol.Packets;
+using NLog;
+using static MineSharp.Protocol.MinecraftClient;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -12,6 +14,11 @@ public abstract class Plugin
     private readonly TaskCompletionSource initializationTask;
 
     /// <summary>
+    ///     The bot
+    /// </summary>
+    protected readonly MineSharpBot Bot;
+
+    /// <summary>
     ///     Create a new Plugin instance
     /// </summary>
     /// <param name="bot"></param>
@@ -23,22 +30,20 @@ public abstract class Plugin
     }
 
     /// <summary>
-    ///     The bot
-    /// </summary>
-    protected MineSharpBot Bot { get; }
-
-    /// <summary>
     ///     Whether this plugin is currently enabled
     /// </summary>
     public bool IsEnabled { get; private set; }
 
     /// <summary>
     ///     Whether this plugin is loaded and functional
+    ///     
+    /// <seealso cref="WaitForInitialization"/>
     /// </summary>
-    public bool IsLoaded { get; private set; }
+    public bool IsLoaded => initializationTask.Task.IsCompleted;
 
     /// <summary>
     ///     This method is called once when the plugin starts.
+    ///     It should stop (cancel) when the <see cref="MineSharpBot.CancellationToken"/> is cancelled.
     /// </summary>
     /// <returns></returns>
     protected virtual Task Init()
@@ -48,9 +53,10 @@ public abstract class Plugin
 
     /// <summary>
     ///     This method is called each minecraft tick. (About 20 times a second.)
+    ///     It should stop (cancel) when the <see cref="MineSharpBot.CancellationToken"/> is cancelled.
     /// </summary>
     /// <returns></returns>
-    public virtual Task OnTick()
+    protected internal virtual Task OnTick()
     {
         return Task.CompletedTask;
     }
@@ -105,6 +111,38 @@ public abstract class Plugin
         return initializationTask.Task;
     }
 
+    private AsyncPacketHandler<TPacket> CreateAfterInitializationPacketHandlerWrapper<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
+        where TPacket : IPacket
+    {
+        return async param =>
+        {
+            if (queuePacketsSentBeforeInitializationCompleted)
+            {
+                await WaitForInitialization();
+            }
+            else
+            {
+                if (!IsLoaded)
+                {
+                    return;
+                }
+            }
+            await packetHandler(param);
+        };
+    }
+
+    /// <summary>
+    ///     Registers a packet handler that is only invoked after the plugin has been initialized.
+    /// </summary>
+    /// <typeparam name="TPacket">The type of the packet.</typeparam>
+    /// <param name="packetHandler">The packet handler to be called.</param>
+    /// <param name="queuePacketsSentBeforeInitializationCompleted">Whether packets sent before the plugin has been initialized should be queued and processed after initialization.</param>
+    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
+        where TPacket : IPacket
+    {
+        Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler, queuePacketsSentBeforeInitializationCompleted));
+    }
+
     internal async Task Initialize()
     {
         if (IsLoaded)
@@ -118,12 +156,18 @@ public abstract class Plugin
 
             initializationTask.TrySetResult();
 
-            IsLoaded = true;
             Logger.Info("Plugin loaded: {PluginName}", GetType().Name);
+        }
+        catch (OperationCanceledException e)
+        {
+            Logger.Error(e, "Plugin {PluginName} was cancelled during Init()", GetType().Name);
+            initializationTask.TrySetCanceled(e.CancellationToken);
+            throw;
         }
         catch (Exception e)
         {
             Logger.Error(e, "Plugin {PluginName} threw an exception during Init(). Aborting", GetType().Name);
+            initializationTask.TrySetException(e);
             throw;
         }
     }

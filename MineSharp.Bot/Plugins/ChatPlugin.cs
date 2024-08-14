@@ -72,7 +72,7 @@ public class ChatPlugin : Plugin
                 ));
         }
 
-        await HandleDeclareCommandsPacket(await initDeclareCommandsPacket);
+        await HandleDeclareCommandsPacket(await initDeclareCommandsPacket.WaitAsync(Bot.CancellationToken)).WaitAsync(Bot.CancellationToken);
     }
 
     /// <summary>
@@ -136,6 +136,7 @@ public class ChatPlugin : Plugin
         };
     }
 
+    private static readonly Identifier MessageIdentifier = Identifier.Parse("minecraft:message");
 
     /*
      * Thanks to Minecraft-Console-Client
@@ -177,7 +178,7 @@ public class ChatPlugin : Plugin
                     var arg = command.Split(' ', argCnt + 1);
                     if ((node.Flags & 0x04) > 0)
                     {
-                        if (node.Parser != null && node.Parser.GetName() == "minecraft:message")
+                        if (node.Parser != null && node.Parser.GetName() == MessageIdentifier)
                         {
                             arguments.Add((node.Name!, command));
                         }
@@ -531,14 +532,14 @@ public class ChatPlugin : Plugin
     {
         return packet switch
         {
-            SystemChatMessagePacket.Before192 before192 
+            SystemChatMessagePacket.Before192 before192
                 => HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType),
 
-            SystemChatMessagePacket.Since192 since192 
+            SystemChatMessagePacket.Since192 since192
                 => HandleChatInternal(null,
                                       since192.Message,
                                       since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage),
-                
+
             _ => throw new UnreachableException()
         };
     }
@@ -582,7 +583,7 @@ public class ChatPlugin : Plugin
         ChatComponent.Chat? target)
     {
         var entry = Bot.Registry["minecraft:chat_type"]["value"][index];
-        var name = entry["name"]!.StringValue!;
+        var name = Identifier.Parse(entry["name"]!.StringValue!);
         var element = entry["element"];
         var styleCompound = element["chat"]["style"];
         var translation = element["chat"]["translation_key"].StringValue;
@@ -620,9 +621,9 @@ public class ChatPlugin : Plugin
         return (translatable, GetChatMessageType(name));
     }
 
-    private static ChatMessageType GetChatMessageType(string message)
+    private static ChatMessageType GetChatMessageType(Identifier message)
     {
-        return message switch
+        return message.ToString() switch
         {
             "minecraft:chat" => ChatMessageType.Chat,
             "minecraft:emote_command" => ChatMessageType.Emote,
@@ -633,7 +634,7 @@ public class ChatPlugin : Plugin
         };
     }
 
-    private static ChatMessageType UnknownChatMessage(string msg)
+    private static ChatMessageType UnknownChatMessage(Identifier msg)
     {
         Logger.Debug("Unknown chat message type {message}.", msg);
         return ChatMessageType.Raw;

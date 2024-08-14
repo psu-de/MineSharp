@@ -2,8 +2,8 @@
 using System.Security.Cryptography;
 using MineSharp.Auth.Exceptions;
 using MineSharp.Core;
-using MineSharp.Core.Common;
 using MineSharp.Core.Common.Protocol;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Cryptography;
@@ -13,7 +13,7 @@ using NLog;
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class LoginPacketHandler : IPacketHandler
+internal sealed class LoginPacketHandler : GameStatePacketHandler
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -21,29 +21,32 @@ internal class LoginPacketHandler : IPacketHandler
     private readonly MinecraftData data;
 
     public LoginPacketHandler(MinecraftClient client, MinecraftData data)
+        : base(GameState.Login)
     {
         this.client = client;
         this.data = data;
     }
 
-    public Task HandleIncoming(IPacket packet)
+    public override Task StateEntered()
+    {
+        var login = HandshakeProtocol.GetLoginPacket(data, client.Session);
+        return client.SendPacket(login);
+    }
+
+    public override Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
             EncryptionRequestPacket encryption => HandleEncryptionRequest(encryption),
             SetCompressionPacket compression => HandleSetCompression(compression),
+            // TODO: handle LoginPluginRequestPacket
             LoginSuccessPacket success => HandleLoginSuccess(success),
             _ => throw new UnreachableException()
         };
     }
 
-    public Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
-    }
-
-    public bool HandlesIncoming(PacketType type)
+    public override bool HandlesIncoming(PacketType type)
     {
         return type is PacketType.CB_Login_Disconnect
             or PacketType.CB_Login_EncryptionBegin
@@ -118,16 +121,16 @@ internal class LoginPacketHandler : IPacketHandler
         return Task.CompletedTask;
     }
 
-    private Task HandleLoginSuccess(LoginSuccessPacket packet)
+    private async Task HandleLoginSuccess(LoginSuccessPacket packet)
     {
         if (data.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            client.UpdateGameState(GameState.Play);
-            return Task.CompletedTask;
+            await client.ChangeGameState(GameState.Play);
         }
-
-        _ = client.SendPacket(new AcknowledgeLoginPacket())
-                  .ContinueWith(_ => client.UpdateGameState(GameState.Configuration));
-        return Task.CompletedTask;
+        else
+        {
+            await client.SendPacket(new LoginAcknowledgedPacket());
+            await client.ChangeGameState(GameState.Configuration);
+        }
     }
 }

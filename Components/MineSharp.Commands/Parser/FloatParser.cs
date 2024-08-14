@@ -1,16 +1,19 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class FloatParser : IParser
 {
+    public static readonly Identifier BrigadierFloatIdentifier = Identifier.Parse("brigadier:float");
+
     public float Min { get; private set; }
     public float Max { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "brigadier:float";
+        return BrigadierFloatIdentifier;
     }
 
     public int GetArgumentCount()

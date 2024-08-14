@@ -101,11 +101,16 @@ public class TranslatableComponent : Chat
         var with = With.Select(x => x.GetMessage(data)).ToArray();
         if (data == null)
         {
-            Logger.Warn("Cannot translate message because no minecraft data was provided!");
+            Logger.Warn("Cannot translate message because no minecraft data was provided! For: {TranslationKey}", Translation);
             return string.Join(' ', with);
         }
 
         var rule = data.Language.GetTranslation(Translation)!;
+        if (rule == null)
+        {
+            Logger.Warn("Cannot translate message because no translation string was found! For: {TranslationKey}", Translation);
+            return string.Join(' ', with);
+        }
         return TranslateString(rule, with);
     }
 

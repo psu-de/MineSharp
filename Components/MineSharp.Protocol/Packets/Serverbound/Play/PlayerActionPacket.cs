@@ -1,13 +1,26 @@
 ﻿using MineSharp.Core;
-using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class PlayerActionPacket : IPacket
+public sealed record PlayerActionPacket : IPacket
 {
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_BlockDig;
+
+    // Here is no non-argument constructor allowed
+    // Do not use
+#pragma warning disable CS8618
+    private PlayerActionPacket()
+#pragma warning restore CS8618
+    {
+    }
+
     /// <summary>
     ///     Constructor for versions before 1.19
     /// </summary>
@@ -37,16 +50,15 @@ public class PlayerActionPacket : IPacket
         SequenceId = sequenceId;
     }
 
-    public int Status { get; set; }
-    public Position Location { get; set; }
-    public BlockFace Face { get; set; }
-    public int? SequenceId { get; set; }
-    public PacketType Type => PacketType.SB_Play_BlockDig;
+    public int Status { get; init; }
+    public Position Location { get; init; }
+    public BlockFace Face { get; init; }
+    public int? SequenceId { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(Status);
-        buffer.WriteULong(Location.ToULong());
+        buffer.WritePosition(Location);
         buffer.WriteByte((byte)Face);
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
@@ -61,14 +73,14 @@ public class PlayerActionPacket : IPacket
         {
             return new PlayerActionPacket(
                 buffer.ReadVarInt(),
-                new(buffer.ReadULong()),
+                buffer.ReadPosition(),
                 (BlockFace)buffer.ReadByte(),
                 buffer.ReadVarInt());
         }
 
         return new PlayerActionPacket(
             buffer.ReadVarInt(),
-            new(buffer.ReadULong()),
+            buffer.ReadPosition(),
             (BlockFace)buffer.ReadByte());
     }
 }

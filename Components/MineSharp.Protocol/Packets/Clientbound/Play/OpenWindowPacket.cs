@@ -1,35 +1,31 @@
 ﻿using MineSharp.ChatComponent;
 using MineSharp.Core;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class OpenWindowPacket : IPacket
+
+/// <summary>
+/// Represents a packet to open a window in the client.
+/// </summary>
+/// <param name="WindowId">The ID of the window.</param>
+/// <param name="InventoryType">The type of the inventory.</param>
+/// <param name="WindowTitle">The title of the window.</param>
+/// <param name="WindowTitleChat">The chat component of the window title.</param>
+public sealed record OpenWindowPacket(int WindowId, int InventoryType, string WindowTitle, Chat? WindowTitleChat = null) : IPacket
 {
-    public OpenWindowPacket(int windowId, int inventoryType, string windowTitle)
-    {
-        WindowId = windowId;
-        InventoryType = inventoryType;
-        WindowTitle = windowTitle;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_OpenWindow;
 
     public OpenWindowPacket(int windowId, int inventoryType, Chat windowTitle)
+        : this(windowId, inventoryType, windowTitle.GetMessage(null), windowTitle)
     {
-        WindowId = windowId;
-        InventoryType = inventoryType;
-        WindowTitleChat = windowTitle;
-        WindowTitle = windowTitle.GetMessage(null);
     }
 
-    public int WindowId { get; set; }
-    public int InventoryType { get; set; }
-    public string WindowTitle { get; set; }
-
-    public Chat? WindowTitleChat { get; set; }
-    public PacketType Type => PacketType.CB_Play_OpenWindow;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(WindowId);
@@ -37,6 +33,7 @@ public class OpenWindowPacket : IPacket
         buffer.WriteString(WindowTitle);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol == ProtocolVersion.V_1_20_3)
@@ -54,4 +51,3 @@ public class OpenWindowPacket : IPacket
             buffer.ReadString());
     }
 }
-#pragma warning restore CS1591

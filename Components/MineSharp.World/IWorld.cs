@@ -73,6 +73,16 @@ public interface IWorld
     public IChunk GetChunkAt(ChunkCoordinates coordinates);
 
     /// <summary>
+    ///     Try to get the chunk at the given chunk coordinates.
+    ///     This method does the same as <see cref="GetChunkAt" /> but does not throw an exception.
+    ///     Instead it returns a boolean indicating the success of the operation.
+    /// </summary>
+    /// <param name="coordinates"></param>
+    /// <param name="chunk"></param>
+    /// <returns></returns>
+    public bool TryGetChunkAt(ChunkCoordinates coordinates, [NotNullWhen(true)] out IChunk? chunk);
+
+    /// <summary>
     ///     Whether the chunk at the given coordinates is loaded
     /// </summary>
     /// <param name="coordinates"></param>

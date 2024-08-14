@@ -1,4 +1,6 @@
-﻿using MineSharp.Data;
+﻿using MineSharp.Core;
+using MineSharp.Core.Common.Protocol;
+using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -6,18 +8,28 @@ using KeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePac
 
 namespace MineSharp.Protocol.Packets.Handlers;
 
-internal class PlayPacketHandler : IPacketHandler
+internal sealed class PlayPacketHandler : GameStatePacketHandler
 {
     private readonly MinecraftClient client;
     private readonly MinecraftData data;
 
     public PlayPacketHandler(MinecraftClient client, MinecraftData data)
+        : base(GameState.Play)
     {
         this.client = client;
         this.data = data;
     }
 
-    public Task HandleIncoming(IPacket packet)
+    public override async Task StateEntered()
+    {
+        if (data.Version.Protocol <= ProtocolVersion.V_1_20)
+        {
+            await client.SendClientInformationPacket();
+        }
+        client.GameJoinedTcs.SetResult();
+    }
+
+    public override Task HandleIncoming(IPacket packet)
     {
         return packet switch
         {
@@ -29,12 +41,7 @@ internal class PlayPacketHandler : IPacketHandler
         };
     }
 
-    public Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
-    }
-
-    public bool HandlesIncoming(PacketType type)
+    public override bool HandlesIncoming(PacketType type)
     {
         return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping
             or PacketType.CB_Play_KickDisconnect;
@@ -42,20 +49,17 @@ internal class PlayPacketHandler : IPacketHandler
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
-        client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
-        return Task.CompletedTask;
+        return client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
     }
 
     private Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
     {
-        client.HandleBundleDelimiter();
-        return Task.CompletedTask;
+        return client.HandleBundleDelimiter();
     }
 
     private Task HandlePing(PingPacket ping)
     {
-        client.SendPacket(new PongPacket(ping.Id));
-        return Task.CompletedTask;
+        return client.SendPacket(new PongPacket(ping.Id));
     }
 
     private Task HandleDisconnect(DisconnectPacket packet)

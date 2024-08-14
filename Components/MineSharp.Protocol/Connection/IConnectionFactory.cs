@@ -16,5 +16,9 @@ public interface IConnectionFactory
     /// <returns></returns>
     public Task<TcpClient> CreateOpenConnection(IPAddress address, ushort port);
 
+    /// <summary>
+    ///     Create an HTTP client
+    /// </summary>
+    /// <returns></returns>
     public HttpClient CreateHttpClient();
 }

@@ -1,5 +1,4 @@
 ﻿using MineSharp.Core.Common;
-using NLog;
 
 namespace MineSharp.Protocol;
 
@@ -16,7 +15,7 @@ public record ClientSettings
         24,
         ChatMode.Enabled,
         true,
-        0x7F,
+        SkinPart.All,
         PlayerHand.MainHand,
         false,
         true);
@@ -25,7 +24,7 @@ public record ClientSettings
     ///     Constructor
     /// </summary>
     public ClientSettings(string locale, byte viewDistance, ChatMode chatMode, bool coloredChat,
-                          byte displayedSkinParts,
+                          SkinPart displayedSkinParts,
                           PlayerHand mainHand, bool enableTextFiltering, bool allowServerListings)
     {
         Locale = locale;
@@ -61,7 +60,7 @@ public record ClientSettings
     /// <summary>
     ///     Bitmask of skin parts displayed by the client (not used)
     /// </summary>
-    public byte DisplayedSkinParts { get; }
+    public SkinPart DisplayedSkinParts { get; }
 
     /// <summary>
     ///     The clients main hand
@@ -77,6 +76,26 @@ public record ClientSettings
     ///     Whether you want to show up in a server's online players list
     /// </summary>
     public bool AllowServerListings { get; }
+}
+
+/// <summary>
+///     Specifies the parts of the skin that are enabled
+/// </summary>
+[Flags]
+public enum SkinPart : byte
+{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    None = 0x00,
+    Cape = 0x01,
+    Jacket = 0x02,
+    LeftSleeve = 0x04,
+    RightSleeve = 0x08,
+    LeftPants = 0x10,
+    RightPants = 0x20,
+    Hat = 0x40,
+    // 0x80 is unused
+    All = Cape | Jacket | LeftSleeve | RightSleeve | LeftPants | RightPants | Hat
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
 
 /// <summary>

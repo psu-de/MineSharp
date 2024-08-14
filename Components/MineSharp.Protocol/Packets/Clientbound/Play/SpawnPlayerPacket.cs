@@ -1,35 +1,37 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     SpawnPlayerPacket used for versions &lt;= 1.20.1
 ///     Merged with SpawnEntityPacket in 1.20.2
 /// </summary>
-public class SpawnPlayerPacket : IPacket
+/// <param name="EntityId">The ID of the entity.</param>
+/// <param name="PlayerUuid">The UUID of the player.</param>
+/// <param name="X">The X coordinate of the player.</param>
+/// <param name="Y">The Y coordinate of the player.</param>
+/// <param name="Z">The Z coordinate of the player.</param>
+/// <param name="Yaw">The yaw of the player.</param>
+/// <param name="Pitch">The pitch of the player.</param>
+public sealed record SpawnPlayerPacket(
+    int EntityId,
+    Uuid PlayerUuid,
+    double X,
+    double Y,
+    double Z,
+    byte Yaw,
+    byte Pitch
+) : IPacket
 {
-    public SpawnPlayerPacket(int entityId, Uuid playerUuid, double x, double y, double z, byte yaw, byte pitch)
-    {
-        EntityId = entityId;
-        PlayerUuid = playerUuid;
-        X = x;
-        Y = y;
-        Z = z;
-        Yaw = yaw;
-        Pitch = pitch;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_NamedEntitySpawn;
 
-    public int EntityId { get; set; }
-    public Uuid PlayerUuid { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public byte Yaw { get; set; }
-    public byte Pitch { get; set; }
-    public PacketType Type => PacketType.CB_Play_NamedEntitySpawn;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(EntityId);
@@ -41,6 +43,7 @@ public class SpawnPlayerPacket : IPacket
         buffer.WriteByte(Pitch);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
@@ -53,4 +56,3 @@ public class SpawnPlayerPacket : IPacket
         return new SpawnPlayerPacket(entityId, playerUuid, x, y, z, yaw, pitch);
     }
 }
-#pragma warning restore CS1591

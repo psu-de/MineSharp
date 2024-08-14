@@ -1,24 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SetEntityVelocityPacket : IPacket
+public sealed record SetEntityVelocityPacket(int EntityId, short VelocityX, short VelocityY, short VelocityZ) : IPacket
 {
-    public SetEntityVelocityPacket(int entityId, short velocityX, short velocityY, short velocityZ)
-    {
-        EntityId = entityId;
-        VelocityX = velocityX;
-        VelocityY = velocityY;
-        VelocityZ = velocityZ;
-    }
-
-    public int EntityId { get; set; }
-    public short VelocityX { get; set; }
-    public short VelocityY { get; set; }
-    public short VelocityZ { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityVelocity;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_EntityVelocity;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
