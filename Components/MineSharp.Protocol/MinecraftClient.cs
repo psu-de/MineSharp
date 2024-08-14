@@ -750,8 +750,8 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
             // the server closes the connection 
             // after sending the StatusResponsePacket
-            await client.Disconnect();
-            client.Dispose();
+            // so just dispose the client (no point in disconnecting)
+            await client.DisposeAsync();
         });
 
         await client.SendPacket(new StatusRequestPacket(), responseTimeoutCancellationToken);
