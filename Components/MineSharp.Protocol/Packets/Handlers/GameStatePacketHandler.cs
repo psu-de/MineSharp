@@ -17,10 +17,5 @@ internal abstract class GameStatePacketHandler
         return Task.CompletedTask;
     }
     public abstract Task HandleIncoming(IPacket packet);
-    // normally this is not required
-    public virtual Task HandleOutgoing(IPacket packet)
-    {
-        return Task.CompletedTask;
-    }
     public abstract bool HandlesIncoming(PacketType type);
 }

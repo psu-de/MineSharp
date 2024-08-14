@@ -537,10 +537,6 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 // TrySetResult must be run from a different task to prevent blocking the stream loop
                 // because the task continuation will be executed inline and might block or cause a deadlock
                 _ = Task.Run(task.Task.TrySetResult);
-
-                // TODO: this feels wrong
-                // we probably should ask outgoing packet listeners before sending the packet
-                await HandleOutgoingPacket(task.Packet);
             }
             catch (SocketException e)
             {
@@ -693,18 +689,6 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             {
                 Logger.Warn(faultedTask.Exception, "An packet handler for packet of type {PacketType} threw an exception.", packetType);
             }
-        }
-    }
-
-    private async Task HandleOutgoingPacket(IPacket packet)
-    {
-        try
-        {
-            await gameStatePacketHandler.HandleOutgoing(packet);
-        }
-        catch (Exception e)
-        {
-            Logger.Error(e, $"error in outgoing packet handler. Packet={packet.Type}");
         }
     }
 
