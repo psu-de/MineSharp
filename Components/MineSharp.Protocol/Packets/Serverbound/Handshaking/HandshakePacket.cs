@@ -1,4 +1,5 @@
-﻿using MineSharp.Core.Common.Protocol;
+﻿using MineSharp.Core;
+using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -13,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Handshaking;
 /// <param name="Host">The host address</param>
 /// <param name="Port">The port number</param>
 /// <param name="NextState">The next game state</param>
-public sealed record HandshakePacket(int ProtocolVersion, string Host, ushort Port, GameState NextState) : IPacket
+public sealed record HandshakePacket(ProtocolVersion ProtocolVersion, string Host, ushort Port, GameState NextState) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -23,7 +24,7 @@ public sealed record HandshakePacket(int ProtocolVersion, string Host, ushort Po
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(ProtocolVersion);
+        buffer.WriteVarInt((int)ProtocolVersion);
         buffer.WriteString(Host);
         buffer.WriteUShort(Port);
         buffer.WriteVarInt((int)NextState);
@@ -32,7 +33,7 @@ public sealed record HandshakePacket(int ProtocolVersion, string Host, ushort Po
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var protocolVersion = buffer.ReadVarInt();
+        var protocolVersion = (ProtocolVersion)buffer.ReadVarInt();
         var host = buffer.ReadString();
         var port = buffer.ReadUShort();
         var nextState = (GameState)buffer.ReadVarInt();

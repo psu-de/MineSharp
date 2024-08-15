@@ -101,7 +101,7 @@ public sealed record ChatCommandPacket : IPacket
         buffer.WriteLong(Salt);
         buffer.WriteVarIntArray(Signatures, (buffer, signature) => signature.Write(buffer, version));
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (version.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             if (!SignedPreview.HasValue)
             {
@@ -128,7 +128,7 @@ public sealed record ChatCommandPacket : IPacket
             return;
         }
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return;
         }
@@ -161,7 +161,7 @@ public sealed record ChatCommandPacket : IPacket
         var signatures = buffer.ReadVarIntArray((buf) => ArgumentSignature.Read(buf, version));
 
         bool? signedPreview = null;
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (version.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             signedPreview = buffer.ReadBool();
         }
@@ -176,7 +176,7 @@ public sealed record ChatCommandPacket : IPacket
 
         ChatMessageItem[]? previousMessages = null;
         ChatMessageItem? lastRejectedMessage = null;
-        if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
         {
             previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
             var hasLastRejectedMessage = buffer.ReadBool();
@@ -206,7 +206,7 @@ public sealed record ChatCommandPacket : IPacket
         {
             buffer.WriteString(ArgumentName);
 
-            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol <= ProtocolVersion.V_1_19_1)
             {
                 buffer.WriteVarInt(Signature.Length);
                 buffer.WriteBytes(Signature);
@@ -223,7 +223,7 @@ public sealed record ChatCommandPacket : IPacket
         {
             var argumentName = buffer.ReadString();
             byte[] signature;
-            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
+            if (version.Version.Protocol <= ProtocolVersion.V_1_19_1)
             {
                 var length = buffer.ReadVarInt();
                 signature = buffer.ReadBytes(length);

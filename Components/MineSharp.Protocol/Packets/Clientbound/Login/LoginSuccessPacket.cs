@@ -27,7 +27,7 @@ public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? 
         buffer.WriteUuid(Uuid);
         buffer.WriteString(Username);
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return;
         }
@@ -47,7 +47,7 @@ public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? 
         var username = buffer.ReadString();
         Property[]? properties = null;
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             properties = buffer.ReadVarIntArray(Property.Read);
         }

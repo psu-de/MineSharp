@@ -380,7 +380,7 @@ public class PlayerPlugin : Plugin
                             break;
                         }
 
-                        if (!updateListedAction.Listed && Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_2)
+                        if (!updateListedAction.Listed && Bot.Data.Version.Protocol <= ProtocolVersion.V_1_19_1)
                         {
                             OnPlayerLeft.Dispatch(Bot, player);
                         }

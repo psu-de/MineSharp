@@ -22,7 +22,7 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
 
     public override async Task StateEntered()
     {
-        if (data.Version.Protocol <= ProtocolVersion.V_1_20)
+        if (data.Version.Protocol <= ProtocolVersion.V_1_20_0)
         {
             await client.SendClientInformationPacket();
         }

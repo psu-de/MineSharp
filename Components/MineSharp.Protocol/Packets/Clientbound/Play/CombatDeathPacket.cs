@@ -74,7 +74,7 @@ public sealed record CombatDeathPacket : IPacket
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(PlayerId);
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteInt(EntityId!.Value);
         }
@@ -87,7 +87,7 @@ public sealed record CombatDeathPacket : IPacket
     {
         var playerId = buffer.ReadVarInt();
         int? entityId = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             entityId = buffer.ReadInt();
         }

@@ -52,13 +52,13 @@ public sealed record MultiBlockUpdatePacket : IPacket
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_20 && SuppressLightUpdates == null)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0 && SuppressLightUpdates == null)
         {
             throw new MineSharpPacketVersionException(nameof(SuppressLightUpdates), version.Version.Protocol);
         }
 
         buffer.WriteLong(ChunkSection);
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteBool(SuppressLightUpdates!.Value);
         }
@@ -70,7 +70,7 @@ public sealed record MultiBlockUpdatePacket : IPacket
     {
         var chunkSection = buffer.ReadLong();
         bool? suppressLightUpdates = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             suppressLightUpdates = buffer.ReadBool();
         }

@@ -64,7 +64,7 @@ public sealed record LoginPacket(
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             throw new NotSupportedException(
                 $"{nameof(LoginPacket)}.Write() is not supported for versions before 1.19.");
@@ -112,7 +112,7 @@ public sealed record LoginPacket(
             buffer.WritePosition(DeathLocation ?? throw new InvalidOperationException($"{nameof(DeathLocation)} must not be null if {nameof(HasDeathLocation)} is true."));
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             if (PortalCooldown == null)
             {
@@ -140,7 +140,7 @@ public sealed record LoginPacket(
         registryCodec = registryCodec?.NormalizeRegistryDataTopLevelIdentifiers();
 
         Identifier dimensionType;
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             var dimensionTypeNbt = buffer.ReadNbtCompound();
             dimensionType = Identifier.Parse(dimensionTypeNbt.Get<NbtString>("effects")!.Value);
@@ -163,7 +163,7 @@ public sealed record LoginPacket(
         Identifier? deathDimensionName = null;
         Position? deathLocation = null;
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)
@@ -174,7 +174,7 @@ public sealed record LoginPacket(
         }
 
         int? portalCooldown = null;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             portalCooldown = buffer.ReadVarInt();
         }

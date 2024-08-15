@@ -65,7 +65,7 @@ public sealed record AcknowledgeBlockChangePacket : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new AcknowledgeBlockChangePacket(PacketBody118.Read(buffer));
         }

@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using ICSharpCode.SharpZipLib.Zip.Compression;
+using MineSharp.Core;
 using MineSharp.Core.Serialization;
 using MineSharp.Protocol.Cryptography;
 using NLog;
@@ -19,7 +20,7 @@ internal class MinecraftStream
 
     private readonly NetworkStream networkStream;
 
-    private readonly int protocolVersion;
+    private readonly ProtocolVersion protocolVersion;
 
     // Always acquire the readLock before the writeLock if both are needed
     private readonly object readLock = new();
@@ -33,7 +34,7 @@ internal class MinecraftStream
 
     private Stream stream;
 
-    public MinecraftStream(NetworkStream networkStream, int protocolVersion)
+    public MinecraftStream(NetworkStream networkStream, ProtocolVersion protocolVersion)
     {
         this.protocolVersion = protocolVersion;
         this.networkStream = networkStream;

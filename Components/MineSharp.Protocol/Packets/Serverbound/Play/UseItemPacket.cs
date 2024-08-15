@@ -26,7 +26,7 @@ public sealed record UseItemPacket(PlayerHand Hand, int? SequenceId = null) : IP
     {
         buffer.WriteVarInt((int)Hand);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt((int)SequenceId!);
         }
@@ -37,7 +37,7 @@ public sealed record UseItemPacket(PlayerHand Hand, int? SequenceId = null) : IP
     {
         var hand = (PlayerHand)buffer.ReadVarInt();
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new UseItemPacket(hand);
         }

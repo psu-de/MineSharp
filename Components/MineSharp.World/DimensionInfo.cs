@@ -1,5 +1,5 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Data;
+﻿using MineSharp.Core;
+using MineSharp.Core.Common;
 
 namespace MineSharp.World;
 
@@ -8,7 +8,7 @@ namespace MineSharp.World;
 /// </summary>
 public record DimensionInfo(Dimension Dimension, int WorldMinY, int WorldMaxY)
 {
-    public static readonly MinecraftVersion MinecraftVersionMajor118 = new("1.18", -1);
+    public static readonly MinecraftVersion MinecraftVersionMajor118 = new("1.18", ProtocolVersion.Unknown);
 
     // TODO: Select Version Specific Dimension Info
     // since we currently only support 1.18 and above this is fine

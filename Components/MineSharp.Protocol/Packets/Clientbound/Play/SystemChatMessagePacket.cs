@@ -25,8 +25,8 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
     {
         return version.Version.Protocol switch
         {
-            >= ProtocolVersion.V_1_19_2 => Since192._Read(buffer, version),
-            < ProtocolVersion.V_1_19_2 => Before192._Read(buffer, version)
+            >= ProtocolVersion.V_1_19_1 => Since191._Read(buffer, version),
+            < ProtocolVersion.V_1_19_1 => Before191._Read(buffer, version)
         };
     }
 
@@ -35,7 +35,7 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
     /// 
     /// Used before Minecraft Java 1.19.2
     /// </summary>
-    public sealed record Before192(Chat Message, int ChatType) : SystemChatMessagePacket(Message)
+    public sealed record Before191(Chat Message, int ChatType) : SystemChatMessagePacket(Message)
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -44,7 +44,7 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
             buffer.WriteVarInt(ChatType);
         }
 
-        internal static Before192 _Read(PacketBuffer buffer, MinecraftData version)
+        internal static Before191 _Read(PacketBuffer buffer, MinecraftData version)
         {
             return new(buffer.ReadChatComponent(), buffer.ReadInt());
         }
@@ -55,7 +55,7 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
     /// 
     /// Used since Minecraft Java 1.19.2
     /// </summary>
-    public sealed record Since192(Chat Message, bool IsOverlay) : SystemChatMessagePacket(Message)
+    public sealed record Since191(Chat Message, bool IsOverlay) : SystemChatMessagePacket(Message)
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData version)
@@ -64,7 +64,7 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
             buffer.WriteBool(IsOverlay);
         }
 
-        internal static Since192 _Read(PacketBuffer buffer, MinecraftData version)
+        internal static Since191 _Read(PacketBuffer buffer, MinecraftData version)
         {
             return new(buffer.ReadChatComponent(), buffer.ReadBool());
         }

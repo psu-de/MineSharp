@@ -45,7 +45,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_20 && TrustEdges == null)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0 && TrustEdges == null)
         {
             throw new MineSharpPacketVersionException(nameof(TrustEdges), version.Version.Protocol);
         }
@@ -62,7 +62,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
             buffer.WriteBlockEntity(entity);
         }
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteBool(TrustEdges!.Value);
         }
@@ -103,7 +103,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
         }
 
         bool? trustEdges = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             trustEdges = buffer.ReadBool();
         }

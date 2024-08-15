@@ -26,7 +26,7 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
         buffer.WriteVarInt(SharedSecret.Length);
         buffer.WriteBytes(SharedSecret);
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (version.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             var hasVerifyToken = VerifyToken != null;
             buffer.WriteBool(hasVerifyToken);
@@ -60,7 +60,7 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
         CryptoContainer? crypto = null;
         byte[]? verifyToken = null;
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (version.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             var hasVerifyToken = buffer.ReadBool();
             buffer.WriteBool(hasVerifyToken);

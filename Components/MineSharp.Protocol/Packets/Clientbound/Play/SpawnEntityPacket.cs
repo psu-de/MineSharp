@@ -43,7 +43,7 @@ public sealed record SpawnEntityPacket(
         buffer.WriteSByte(Pitch);
         buffer.WriteSByte(Yaw);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteSByte(HeadPitch);
             buffer.WriteVarInt(ObjectData);
@@ -76,7 +76,7 @@ public sealed record SpawnEntityPacket(
         var yaw = buffer.ReadSByte();
         sbyte headPitch = 0;
         var objectData = 0;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             headPitch = buffer.ReadSByte();
             objectData = buffer.ReadVarInt();

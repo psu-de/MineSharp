@@ -7,7 +7,8 @@ namespace MineSharp.Core.Serialization;
 ///     while being aware of the Minecraft version
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ISerializableWithMinecraftData<out T> where T : ISerializableWithMinecraftData<T>
+public interface ISerializableWithMinecraftData<out T>
+    where T : ISerializableWithMinecraftData<T>
 {
     /// <summary>
     ///     Serialize the object into the buffer

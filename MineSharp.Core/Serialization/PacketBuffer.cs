@@ -21,7 +21,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     ///     Create a new empty, writeable PacketBuffer
     /// </summary>
     /// <param name="protocolVersion"></param>
-    public PacketBuffer(int protocolVersion)
+    public PacketBuffer(ProtocolVersion protocolVersion)
     {
         ProtocolVersion = protocolVersion;
         buffer = new();
@@ -32,7 +32,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="protocolVersion"></param>
     /// <param name="bytes"></param>
-    public PacketBuffer(byte[] bytes, int protocolVersion)
+    public PacketBuffer(byte[] bytes, ProtocolVersion protocolVersion)
     {
         ProtocolVersion = protocolVersion;
         buffer = new(bytes);
@@ -57,12 +57,12 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     ///     Whether to use anonymous nbt compounds. This is used since
     ///     Minecraft Java 1.20.2
     /// </summary>
-    public bool UseAnonymousNbt => ProtocolVersion >= Core.ProtocolVersion.V_1_20_2;
+    public bool UseAnonymousNbt => ProtocolVersion >= ProtocolVersion.V_1_20_2;
 
     /// <summary>
     ///     The protocol version this packet buffer uses
     /// </summary>
-    public int ProtocolVersion { get; }
+    public ProtocolVersion ProtocolVersion { get; }
 
     /// <summary>
     ///     Disposes the underlying <see cref="MemoryStream" />

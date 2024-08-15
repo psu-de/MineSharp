@@ -67,7 +67,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         {
             var uuid = buffer.ReadUuid();
             var actions = new List<IPlayerInfoAction>();
-            if (version.Version.Protocol <= ProtocolVersion.V_18_2)
+            if (version.Version.Protocol <= ProtocolVersion.V_1_18_2)
             {
                 switch (action)
                 {

@@ -151,7 +151,7 @@ public class MinecraftData
             throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
         }
 
-        var protocolVersion = (int)ProtocolVersions.Value[version].SelectToken("version")!;
+        var protocolVersion = (Core.ProtocolVersion)(int)ProtocolVersions.Value[version].SelectToken("version")!;
         var minecraftVersion = new MinecraftVersion(version, protocolVersion);
 
         var biomeToken = await LoadAsset("biomes", versionToken);
@@ -242,8 +242,8 @@ public class MinecraftData
     {
         return version.Protocol switch
         {
-            >= 765 => new(new WindowVersion1203()),
-            >= 736 => new WindowData(new WindowVersion1161()),
+            >= Core.ProtocolVersion.V_1_20_3 => new(new WindowVersion1203()),
+            >= Core.ProtocolVersion.V_1_16_1 => new WindowData(new WindowVersion1161()),
             _ => throw new NotSupportedException()
         };
     }

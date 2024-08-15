@@ -3,127 +3,228 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
-using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
-#pragma warning disable CS1591
-public sealed record LoginStartPacket : IPacket
+
+public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Login_LoginStart;
 
-    // Here is no non-argument constructor allowed
-    // Do not use
-#pragma warning disable CS8618
+    // all versions contain these fields:
+    public abstract string Username { get; init; }
+
+    // may only be called from sub class in this class
     private LoginStartPacket()
-#pragma warning restore CS8618
     {
     }
 
-    /// <summary>
-    ///     Constructor for versions before 1.19
-    /// </summary>
-    /// <param name="username"></param>
-    public LoginStartPacket(string username)
+    public sealed record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_7_0, LoginStartPacket>
     {
-        Username = username;
-    }
+        /// <inheritdoc />
+        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
+        /// <inheritdoc />
+        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_7_0;
 
-    /// <summary>
-    ///     Constructor for versions >= 1.19.3
-    /// </summary>
-    /// <param name="username"></param>
-    /// <param name="playerUuid"></param>
-    public LoginStartPacket(string username, Uuid? playerUuid)
-    {
-        Username = username;
-        PlayerUuid = playerUuid;
-    }
-
-    /// <summary>
-    ///     Constructor for version 1.19-1.19.2
-    /// </summary>
-    /// <param name="username"></param>
-    /// <param name="signature"></param>
-    /// <param name="playerUuid"></param>
-    public LoginStartPacket(string username, SignatureContainer? signature, Uuid? playerUuid = null)
-    {
-        Username = username;
-        Signature = signature;
-        PlayerUuid = playerUuid;
-    }
-
-    public string Username { get; init; }
-    public SignatureContainer? Signature { get; init; }
-    public Uuid? PlayerUuid { get; init; }
-
-    public void Write(PacketBuffer buffer, MinecraftData version)
-    {
-        buffer.WriteString(Username);
-
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        /// <inheritdoc />
+        public override void Write(PacketBuffer buffer, MinecraftData data)
         {
+            buffer.WriteString(Username);
+        }
+
+        /// <inheritdoc />
+        public static LoginStartPacketV_1_7_0 Read(PacketBuffer buffer, MinecraftData data)
+        {
+            var username = buffer.ReadString();
+            return new(username);
+        }
+
+        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
+        {
+            return Read(buffer, data);
+        }
+    }
+
+    public sealed record LoginStartPacketV_1_19_0(
+        string Username,
+        SignatureContainer? Signature,
+        Uuid? PlayerUuid
+    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_0, LoginStartPacket>
+    {
+        /// <inheritdoc />
+        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
+        /// <inheritdoc />
+        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_19_0;
+
+        /// <inheritdoc />
+        public override void Write(PacketBuffer buffer, MinecraftData data)
+        {
+            buffer.WriteString(Username);
+
             var hasSignature = Signature != null;
             buffer.WriteBool(hasSignature);
-            Signature?.Write(buffer);
-        }
-
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_2)
-        {
-            return;
-        }
-
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
-        {
-            buffer.WriteBool(PlayerUuid.HasValue);
-            if (PlayerUuid.HasValue)
+            if (hasSignature)
             {
-                buffer.WriteUuid(PlayerUuid!.Value);
+                Signature!.Write(buffer);
             }
 
-            return;
+            WriteOptionalUuid(buffer, PlayerUuid);
         }
 
-        if (!PlayerUuid.HasValue)
+        /// <inheritdoc />
+        public static LoginStartPacketV_1_19_0 Read(PacketBuffer buffer, MinecraftData data)
         {
-            throw new MineSharpPacketVersionException(nameof(PlayerUuid), version.Version.Protocol);
+            var username = buffer.ReadString();
+
+            SignatureContainer? signature = null;
+            var hasSignature = buffer.ReadBool();
+            if (hasSignature)
+            {
+                signature = SignatureContainer.Read(buffer);
+            }
+
+            Uuid? playerUuid = ReadOptionalUuid(buffer);
+            return new(username, signature, playerUuid);
         }
 
-        buffer.WriteUuid(PlayerUuid.Value);
+        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
+        {
+            return Read(buffer, data);
+        }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public sealed record LoginStartPacketV_1_19_3(
+        string Username,
+        Uuid? PlayerUuid
+    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_3, LoginStartPacket>
     {
-        var username = buffer.ReadString();
-        SignatureContainer? signature = null;
-        Uuid? playerUuid = null;
+        /// <inheritdoc />
+        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
+        /// <inheritdoc />
+        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_19_3;
 
-        if (version.Version.Protocol is >= ProtocolVersion.V_1_19 and <= ProtocolVersion.V_1_19_2)
+        /// <inheritdoc />
+        public override void Write(PacketBuffer buffer, MinecraftData data)
         {
-            signature = SignatureContainer.Read(buffer);
+            buffer.WriteString(Username);
+            WriteOptionalUuid(buffer, PlayerUuid);
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_2)
+        /// <inheritdoc />
+        public static LoginStartPacketV_1_19_3 Read(PacketBuffer buffer, MinecraftData data)
         {
-            playerUuid = buffer.ReadUuid();
+            var username = buffer.ReadString();
+            Uuid? playerUuid = ReadOptionalUuid(buffer);
+            return new(username, playerUuid);
         }
 
-        return new LoginStartPacket(username, signature, playerUuid);
+        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
+        {
+            return Read(buffer, data);
+        }
+    }
+
+    public sealed record LoginStartPacketV_1_20_2(
+        string Username,
+        Uuid PlayerUuid
+    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_20_2, LoginStartPacket>
+    {
+        /// <inheritdoc />
+        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
+        /// <inheritdoc />
+        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_20_2;
+
+        /// <inheritdoc />
+        public override void Write(PacketBuffer buffer, MinecraftData data)
+        {
+            buffer.WriteString(Username);
+            buffer.WriteUuid(PlayerUuid);
+        }
+
+        /// <inheritdoc />
+        public static LoginStartPacketV_1_20_2 Read(PacketBuffer buffer, MinecraftData data)
+        {
+            var username = buffer.ReadString();
+            var playerUuid = buffer.ReadUuid();
+            return new(username, playerUuid);
+        }
+
+        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
+        {
+            return Read(buffer, data);
+        }
+    }
+
+    private static void WriteOptionalUuid(PacketBuffer buffer, Uuid? uuid)
+    {
+        var hasUuid = uuid.HasValue;
+        buffer.WriteBool(hasUuid);
+        if (hasUuid)
+        {
+            buffer.WriteUuid(uuid!.Value);
+        }
+    }
+
+    private static Uuid? ReadOptionalUuid(PacketBuffer buffer)
+    {
+        Uuid? uuid = null;
+        var hasUuid = buffer.ReadBool();
+        if (hasUuid)
+        {
+            uuid = buffer.ReadUuid();
+        }
+        return uuid;
+    }
+
+    public static readonly PacketVersionSubTypeLookup<LoginStartPacket> PacketVersionSubTypeLookup;
+
+    static LoginStartPacket()
+    {
+        PacketVersionSubTypeLookup = InitializeVersionPackets();
+    }
+
+    private static PacketVersionSubTypeLookup<LoginStartPacket> InitializeVersionPackets()
+    {
+        PacketVersionSubTypeLookup<LoginStartPacket> lookup = new();
+
+        lookup.RegisterVersionPacket<LoginStartPacketV_1_7_0>();
+        lookup.RegisterVersionPacket<LoginStartPacketV_1_19_0>();
+        lookup.RegisterVersionPacket<LoginStartPacketV_1_19_3>();
+        lookup.RegisterVersionPacket<LoginStartPacketV_1_20_2>();
+
+        lookup.Freeze();
+        return lookup;
+    }
+
+    /// <inheritdoc />
+    public static LoginStartPacket Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return PacketVersionSubTypeLookup.Read(buffer, data);
+    }
+
+    /// <inheritdoc />
+    public abstract void Write(PacketBuffer buffer, MinecraftData data);
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     public sealed record SignatureContainer(long Timestamp, byte[] PublicKey, byte[] Signature) : ISerializable<SignatureContainer>
     {
+        /// <inheritdoc />
         public void Write(PacketBuffer buffer)
         {
             buffer.WriteLong(Timestamp);
             buffer.WriteVarInt(PublicKey.Length);
-            buffer.WriteBytes(PublicKey.AsSpan());
+            buffer.WriteBytes(PublicKey);
             buffer.WriteVarInt(Signature.Length);
-            buffer.WriteBytes(Signature.AsSpan());
+            buffer.WriteBytes(Signature);
         }
 
+        /// <inheritdoc />
         public static SignatureContainer Read(PacketBuffer buffer)
         {
             var timestamp = buffer.ReadLong();
@@ -136,4 +237,3 @@ public sealed record LoginStartPacket : IPacket
         }
     }
 }
-#pragma warning restore CS1591

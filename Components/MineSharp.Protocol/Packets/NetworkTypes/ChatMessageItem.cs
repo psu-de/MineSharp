@@ -49,10 +49,9 @@ public class ChatMessageItem : ISerializable<ChatMessageItem>
     ///     Serialize the ChatMessageItem into buffer
     /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="version"></param>
     public void Write(PacketBuffer buffer)
     {
-        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_2)
+        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_1)
         {
             buffer.WriteUuid(Sender!.Value);
             buffer.WriteVarInt(Signature!.Length);
@@ -79,7 +78,7 @@ public class ChatMessageItem : ISerializable<ChatMessageItem>
         Uuid? uuid = null;
         byte[]? signature = null;
 
-        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_2)
+        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_1)
         {
             uuid = buffer.ReadUuid();
             signature = new byte[buffer.ReadVarInt()];

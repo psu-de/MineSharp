@@ -112,7 +112,7 @@ public sealed record ChatMessagePacket : IPacket
 
         buffer.WriteBool(SignedPreview.Value);
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return;
         }
@@ -174,7 +174,7 @@ public sealed record ChatMessagePacket : IPacket
 
         signedPreview = buffer.ReadBool();
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (version.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value);
         }

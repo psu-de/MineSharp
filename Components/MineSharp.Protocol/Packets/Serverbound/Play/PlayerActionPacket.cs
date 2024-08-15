@@ -61,7 +61,7 @@ public sealed record PlayerActionPacket : IPacket
         buffer.WritePosition(Location);
         buffer.WriteByte((byte)Face);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt(SequenceId!.Value);
         }
@@ -69,7 +69,7 @@ public sealed record PlayerActionPacket : IPacket
 
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             return new PlayerActionPacket(
                 buffer.ReadVarInt(),

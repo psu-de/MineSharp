@@ -87,7 +87,7 @@ public sealed record PlaceBlockPacket : IPacket
         buffer.WriteFloat(CursorZ);
         buffer.WriteBool(InsideBlock);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt(SequenceId!.Value);
         }
@@ -103,7 +103,7 @@ public sealed record PlaceBlockPacket : IPacket
         var cursorZ = buffer.ReadFloat();
         var insideBlock = buffer.ReadBool();
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new PlaceBlockPacket(hand, position, (BlockFace)direction, cursorX, cursorY, cursorZ, insideBlock);
         }
