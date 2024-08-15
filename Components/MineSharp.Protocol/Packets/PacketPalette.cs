@@ -1,6 +1,4 @@
 ﻿using System.Collections.Frozen;
-using MineSharp.Core.Serialization;
-using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using MineSharp.Protocol.Packets.Clientbound.Login;
@@ -46,7 +44,6 @@ namespace MineSharp.Protocol.Packets;
 
 internal static class PacketPalette
 {
-    public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData version);
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     private static readonly FrozenDictionary<PacketType, PacketFactory> PacketFactories;

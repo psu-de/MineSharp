@@ -53,5 +53,7 @@ public interface IPacketStatic<TSelf> : IPacketStatic, ISerializableWithMinecraf
 {
 }
 
-public delegate TPacket PacketReadDelegate<out TPacket>(PacketBuffer buffer, MinecraftData data)
+public delegate TPacket PacketFactory<out TPacket>(PacketBuffer buffer, MinecraftData data)
     where TPacket : IPacket;
+
+public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData data);

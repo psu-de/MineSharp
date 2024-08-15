@@ -6,10 +6,10 @@ using MineSharp.Data;
 
 namespace MineSharp.Protocol.Packets;
 
-public sealed class PacketVersionSubTypeLookup<TBasePacket> : IReadOnlyDictionary<ProtocolVersion, PacketReadDelegate<TBasePacket>>
+public sealed class PacketVersionSubTypeLookup<TBasePacket> : IReadOnlyDictionary<ProtocolVersion, PacketFactory<TBasePacket>>
     where TBasePacket : IPacketStatic<TBasePacket>
 {
-    private readonly SortedList<ProtocolVersion, PacketReadDelegate<TBasePacket>> protocolVersionToPacketReadDelegate = new();
+    private readonly SortedList<ProtocolVersion, PacketFactory<TBasePacket>> protocolVersionToPacketFactory = new();
     public bool Frozen { get; private set; }
 
     public void RegisterVersionPacket<TVersionPacket>()
@@ -21,8 +21,8 @@ public sealed class PacketVersionSubTypeLookup<TBasePacket> : IReadOnlyDictionar
         }
 
         var firstVersionUsedStatic = TVersionPacket.FirstVersionUsedStatic;
-        PacketReadDelegate<TBasePacket> readDelegate = TVersionPacket.Read;
-        if (!protocolVersionToPacketReadDelegate.TryAdd(firstVersionUsedStatic, readDelegate))
+        PacketFactory<TBasePacket> readDelegate = TVersionPacket.Read;
+        if (!protocolVersionToPacketFactory.TryAdd(firstVersionUsedStatic, readDelegate))
         {
             throw new InvalidOperationException($"There is already a version specific packet registered for protocol version: {firstVersionUsedStatic}");
         }
@@ -33,53 +33,53 @@ public sealed class PacketVersionSubTypeLookup<TBasePacket> : IReadOnlyDictionar
         Frozen = true;
     }
 
-    public bool TryGetPacketReadDelegate(ProtocolVersion protocolVersion, [NotNullWhen(true)] out PacketReadDelegate<TBasePacket>? packetReadDelegate)
+    public bool TryGetPacketFactory(ProtocolVersion protocolVersion, [NotNullWhen(true)] out PacketFactory<TBasePacket>? PacketFactory)
     {
-        packetReadDelegate = protocolVersionToPacketReadDelegate.LowerBound(protocolVersion);
-        return packetReadDelegate != null;
+        PacketFactory = protocolVersionToPacketFactory.LowerBound(protocolVersion);
+        return PacketFactory != null;
     }
 
-    public PacketReadDelegate<TBasePacket> GetPacketReadDelegate(ProtocolVersion protocolVersion)
+    public PacketFactory<TBasePacket> GetPacketFactory(ProtocolVersion protocolVersion)
     {
-        if (!TryGetPacketReadDelegate(protocolVersion, out var packetReadDelegate))
+        if (!TryGetPacketFactory(protocolVersion, out var PacketFactory))
         {
             // TODO: create custom exception
             throw new Exception($"There is no version specific packet registered that is suitable for the protocol version: {protocolVersion}");
         }
-        return packetReadDelegate;
+        return PacketFactory;
     }
 
     public TBasePacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var packetReadDelegate = GetPacketReadDelegate(buffer.ProtocolVersion);
-        return packetReadDelegate(buffer, data);
+        var PacketFactory = GetPacketFactory(buffer.ProtocolVersion);
+        return PacketFactory(buffer, data);
     }
 
     #region Implementation of IReadOnlyDictionary
 
-    public IEnumerable<ProtocolVersion> Keys => protocolVersionToPacketReadDelegate.Keys;
-    public IEnumerable<PacketReadDelegate<TBasePacket>> Values => protocolVersionToPacketReadDelegate.Values;
-    public int Count => protocolVersionToPacketReadDelegate.Count;
-    public PacketReadDelegate<TBasePacket> this[ProtocolVersion key] => protocolVersionToPacketReadDelegate[key];
+    public IEnumerable<ProtocolVersion> Keys => protocolVersionToPacketFactory.Keys;
+    public IEnumerable<PacketFactory<TBasePacket>> Values => protocolVersionToPacketFactory.Values;
+    public int Count => protocolVersionToPacketFactory.Count;
+    public PacketFactory<TBasePacket> this[ProtocolVersion key] => protocolVersionToPacketFactory[key];
 
     public bool ContainsKey(ProtocolVersion key)
     {
-        return protocolVersionToPacketReadDelegate.ContainsKey(key);
+        return protocolVersionToPacketFactory.ContainsKey(key);
     }
 
-    public bool TryGetValue(ProtocolVersion key, [MaybeNullWhen(false)] out PacketReadDelegate<TBasePacket> value)
+    public bool TryGetValue(ProtocolVersion key, [MaybeNullWhen(false)] out PacketFactory<TBasePacket> value)
     {
-        return protocolVersionToPacketReadDelegate.TryGetValue(key, out value);
+        return protocolVersionToPacketFactory.TryGetValue(key, out value);
     }
 
-    public IEnumerator<KeyValuePair<ProtocolVersion, PacketReadDelegate<TBasePacket>>> GetEnumerator()
+    public IEnumerator<KeyValuePair<ProtocolVersion, PacketFactory<TBasePacket>>> GetEnumerator()
     {
-        return protocolVersionToPacketReadDelegate.GetEnumerator();
+        return protocolVersionToPacketFactory.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return protocolVersionToPacketReadDelegate.GetEnumerator();
+        return protocolVersionToPacketFactory.GetEnumerator();
     }
 
     #endregion

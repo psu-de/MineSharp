@@ -576,8 +576,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
     }
 
-    // TODO: object is bad but IPacket is not allowed as generic type
-    private async Task<object?> ParsePacket(PacketPalette.PacketFactory packetFactory, PacketType packetType, PacketBuffer buffer)
+    private async Task<IPacket?> ParsePacket(PacketFactory packetFactory, PacketType packetType, PacketBuffer buffer)
     {
         var size = buffer.ReadableBytes;
         try
@@ -587,7 +586,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             var unreadBytes = buffer.ReadableBytes;
             if (unreadBytes != 0)
             {
-                Logger.Warn("After reading the packet {PacketType}, the buffer still contains {unreadBytes}/{Size} bytes.", packetType, unreadBytes, size);
+                Logger.Warn("After reading the packet {PacketType}, the buffer still contains {UnreadBytes}/{Size} bytes.", packetType, unreadBytes, size);
             }
 
             return packet;
