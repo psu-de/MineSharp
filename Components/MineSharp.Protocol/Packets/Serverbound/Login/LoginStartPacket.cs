@@ -178,12 +178,7 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         return uuid;
     }
 
-    public static readonly PacketVersionSubTypeLookup<LoginStartPacket> PacketVersionSubTypeLookup;
-
-    static LoginStartPacket()
-    {
-        PacketVersionSubTypeLookup = InitializeVersionPackets();
-    }
+    public static readonly PacketVersionSubTypeLookup<LoginStartPacket> PacketVersionSubTypeLookup = InitializeVersionPackets();
 
     private static PacketVersionSubTypeLookup<LoginStartPacket> InitializeVersionPackets()
     {
