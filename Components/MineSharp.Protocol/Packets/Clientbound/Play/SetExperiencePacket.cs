@@ -1,4 +1,4 @@
-using MineSharp.Core.Serialization;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="ExperienceBar">The experience bar value between 0 and 1</param>
 /// <param name="Level">The experience level</param>
 /// <param name="TotalExperience">The total experience points</param>
-public sealed record SetExperiencePacket(float ExperienceBar, int Level, int TotalExperience) : IPacket
+public sealed record SetExperiencePacket(float ExperienceBar, int Level, int TotalExperience) : IPacketStatic<SetExperiencePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record SetExperiencePacket(float ExperienceBar, int Level, int Tot
     public static PacketType StaticType => PacketType.CB_Play_Experience;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteFloat(ExperienceBar);
         buffer.WriteVarInt(Level);
@@ -26,12 +26,17 @@ public sealed record SetExperiencePacket(float ExperienceBar, int Level, int Tot
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetExperiencePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var experienceBar = buffer.ReadFloat();
         var level = buffer.ReadVarInt();
         var totalExperience = buffer.ReadVarInt();
 
         return new SetExperiencePacket(experienceBar, level, totalExperience);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

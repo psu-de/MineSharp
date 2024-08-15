@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
+public sealed record SwingArmPacket(PlayerHand Hand) : IPacketStatic<SwingArmPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -13,16 +13,21 @@ public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
     public static PacketType StaticType => PacketType.SB_Play_ArmAnimation;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Hand);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SwingArmPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new SwingArmPacket(
             (PlayerHand)buffer.ReadVarInt());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

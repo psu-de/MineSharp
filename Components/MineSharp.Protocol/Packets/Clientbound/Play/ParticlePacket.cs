@@ -33,7 +33,7 @@ public sealed record ParticlePacket(
     float MaxSpeed,
     int ParticleCount,
     PacketBuffer Data
-) : IPacket
+) : IPacketStatic<ParticlePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -41,7 +41,7 @@ public sealed record ParticlePacket(
     public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(ParticleId);
         buffer.WriteBool(LongDistance);
@@ -57,7 +57,7 @@ public sealed record ParticlePacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ParticlePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var particleId = buffer.ReadVarInt();
         var longDistance = buffer.ReadBool();
@@ -70,8 +70,13 @@ public sealed record ParticlePacket(
         var maxSpeed = buffer.ReadFloat();
         var particleCount = buffer.ReadVarInt();
         var byteBuffer = buffer.RestBuffer();
-        var data = new PacketBuffer(byteBuffer, buffer.ProtocolVersion);
+        var particleData = new PacketBuffer(byteBuffer, buffer.ProtocolVersion);
 
-        return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, data);
+        return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, particleData);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

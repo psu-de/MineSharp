@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="WindowId">The window ID</param>
 /// <param name="Recipe">A recipe ID</param>
-public sealed record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : IPacket
+public sealed record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : IPacketStatic<PlaceGhostRecipePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,18 +18,23 @@ public sealed record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : 
     public static PacketType StaticType => PacketType.CB_Play_CraftRecipeResponse;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte(WindowId);
         buffer.WriteIdentifier(Recipe);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlaceGhostRecipePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var windowId = buffer.ReadByte();
         var recipe = buffer.ReadIdentifier();
 
         return new PlaceGhostRecipePacket(windowId, recipe);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Flags">Bit field indicating various abilities.</param>
 /// <param name="FlyingSpeed">The flying speed of the player.</param>
 /// <param name="FieldOfViewModifier">Modifies the field of view, like a speed potion.</param>
-public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float FlyingSpeed, float FieldOfViewModifier) : IPacket
+public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float FlyingSpeed, float FieldOfViewModifier) : IPacketStatic<PlayerAbilitiesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float Fly
     public static PacketType StaticType => PacketType.CB_Play_Abilities;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte((byte)Flags);
         buffer.WriteFloat(FlyingSpeed);
@@ -27,13 +27,18 @@ public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float Fly
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerAbilitiesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var flags = (PlayerAbilitiesFlags)buffer.ReadByte();
         var flyingSpeed = buffer.ReadByte();
         var fieldOfViewModifier = buffer.ReadByte();
 
         return new PlayerAbilitiesPacket(flags, flyingSpeed, fieldOfViewModifier);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

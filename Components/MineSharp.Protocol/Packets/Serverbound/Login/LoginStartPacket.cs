@@ -35,7 +35,7 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
 
         /// <inheritdoc />
-        public static LoginStartPacketV_1_7_0 Read(PacketBuffer buffer, MinecraftData data)
+        public static new LoginStartPacketV_1_7_0 Read(PacketBuffer buffer, MinecraftData data)
         {
             var username = buffer.ReadString();
             return new(username);
@@ -74,7 +74,7 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
 
         /// <inheritdoc />
-        public static LoginStartPacketV_1_19_0 Read(PacketBuffer buffer, MinecraftData data)
+        public static new LoginStartPacketV_1_19_0 Read(PacketBuffer buffer, MinecraftData data)
         {
             var username = buffer.ReadString();
 
@@ -113,7 +113,7 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
 
         /// <inheritdoc />
-        public static LoginStartPacketV_1_19_3 Read(PacketBuffer buffer, MinecraftData data)
+        public static new LoginStartPacketV_1_19_3 Read(PacketBuffer buffer, MinecraftData data)
         {
             var username = buffer.ReadString();
             Uuid? playerUuid = ReadOptionalUuid(buffer);
@@ -144,7 +144,7 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
 
         /// <inheritdoc />
-        public static LoginStartPacketV_1_20_2 Read(PacketBuffer buffer, MinecraftData data)
+        public static new LoginStartPacketV_1_20_2 Read(PacketBuffer buffer, MinecraftData data)
         {
             var username = buffer.ReadString();
             var playerUuid = buffer.ReadUuid();
@@ -199,13 +199,13 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
     }
 
     /// <inheritdoc />
+    public abstract void Write(PacketBuffer buffer, MinecraftData data);
+
+    /// <inheritdoc />
     public static LoginStartPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return PacketVersionSubTypeLookup.Read(buffer, data);
     }
-
-    /// <inheritdoc />
-    public abstract void Write(PacketBuffer buffer, MinecraftData data);
 
     static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
     {

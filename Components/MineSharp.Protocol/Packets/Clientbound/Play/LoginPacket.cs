@@ -54,7 +54,7 @@ public sealed record LoginPacket(
     Identifier? DeathDimensionName,
     Position? DeathLocation,
     int? PortalCooldown,
-    bool? DoLimitedCrafting) : IPacket
+    bool? DoLimitedCrafting) : IPacketStatic<LoginPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -62,9 +62,9 @@ public sealed record LoginPacket(
     public static PacketType StaticType => PacketType.CB_Play_Login;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             throw new NotSupportedException(
                 $"{nameof(LoginPacket)}.Write() is not supported for versions before 1.19.");
@@ -72,14 +72,14 @@ public sealed record LoginPacket(
 
         buffer.WriteInt(EntityId);
         buffer.WriteBool(IsHardcore);
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
             buffer.WriteByte(GameMode);
             buffer.WriteSByte(PreviousGameMode);
         }
 
         buffer.WriteVarIntArray(DimensionNames, (buf, val) => buf.WriteIdentifier(val));
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
             buffer.WriteOptionalNbt(RegistryCodec);
             buffer.WriteIdentifier(DimensionType);
@@ -92,7 +92,7 @@ public sealed record LoginPacket(
         buffer.WriteVarInt(SimulationDistance);
         buffer.WriteBool(ReducedDebugInfo);
         buffer.WriteBool(EnableRespawnScreen);
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_2)
         {
             buffer.WriteBool(DoLimitedCrafting!.Value);
             buffer.WriteIdentifier(DimensionType);
@@ -112,11 +112,11 @@ public sealed record LoginPacket(
             buffer.WritePosition(DeathLocation ?? throw new InvalidOperationException($"{nameof(DeathLocation)} must not be null if {nameof(HasDeathLocation)} is true."));
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             if (PortalCooldown == null)
             {
-                throw new MineSharpPacketVersionException(nameof(PortalCooldown), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(PortalCooldown), data.Version.Protocol);
             }
 
             buffer.WriteVarInt(PortalCooldown.Value);
@@ -124,11 +124,11 @@ public sealed record LoginPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LoginPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_2)
         {
-            return ReadV1_20_2(buffer, version);
+            return ReadV1_20_2(buffer, data);
         }
 
         var entityId = buffer.ReadInt();
@@ -140,7 +140,7 @@ public sealed record LoginPacket(
         registryCodec = registryCodec?.NormalizeRegistryDataTopLevelIdentifiers();
 
         Identifier dimensionType;
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             var dimensionTypeNbt = buffer.ReadNbtCompound();
             dimensionType = Identifier.Parse(dimensionTypeNbt.Get<NbtString>("effects")!.Value);
@@ -163,7 +163,7 @@ public sealed record LoginPacket(
         Identifier? deathDimensionName = null;
         Position? deathLocation = null;
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)
@@ -174,7 +174,7 @@ public sealed record LoginPacket(
         }
 
         int? portalCooldown = null;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             portalCooldown = buffer.ReadVarInt();
         }
@@ -201,6 +201,11 @@ public sealed record LoginPacket(
             deathLocation,
             portalCooldown,
             false);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     private static LoginPacket ReadV1_20_2(PacketBuffer buffer, MinecraftData data)

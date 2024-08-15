@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Header">The header text component</param>
 /// <param name="Footer">The footer text component</param>
-public sealed record SetTabListHeaderFooterPacket(Chat Header, Chat Footer) : IPacket
+public sealed record SetTabListHeaderFooterPacket(Chat Header, Chat Footer) : IPacketStatic<SetTabListHeaderFooterPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,18 +18,23 @@ public sealed record SetTabListHeaderFooterPacket(Chat Header, Chat Footer) : IP
     public static PacketType StaticType => PacketType.CB_Play_PlayerlistHeader;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteChatComponent(Header);
         buffer.WriteChatComponent(Footer);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetTabListHeaderFooterPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var header = buffer.ReadChatComponent();
         var footer = buffer.ReadChatComponent();
 
         return new SetTabListHeaderFooterPacket(header, footer);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

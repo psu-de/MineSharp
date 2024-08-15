@@ -24,7 +24,7 @@ public sealed record SpawnPlayerPacket(
     double Z,
     byte Yaw,
     byte Pitch
-) : IPacket
+) : IPacketStatic<SpawnPlayerPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -32,7 +32,7 @@ public sealed record SpawnPlayerPacket(
     public static PacketType StaticType => PacketType.CB_Play_NamedEntitySpawn;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(PlayerUuid);
@@ -44,7 +44,7 @@ public sealed record SpawnPlayerPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnPlayerPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var playerUuid = buffer.ReadUuid();
@@ -54,5 +54,10 @@ public sealed record SpawnPlayerPacket(
         var yaw = buffer.ReadByte();
         var pitch = buffer.ReadByte();
         return new SpawnPlayerPacket(entityId, playerUuid, x, y, z, yaw, pitch);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

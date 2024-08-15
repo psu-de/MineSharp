@@ -6,7 +6,7 @@ using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerPositionPacket : IPacket
+public sealed record PlayerPositionPacket : IPacketStatic<PlayerPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -73,7 +73,7 @@ public sealed record PlayerPositionPacket : IPacket
     public int TeleportId { get; init; }
     public bool? DismountVehicle { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteDouble(X);
         buffer.WriteDouble(Y);
@@ -83,20 +83,20 @@ public sealed record PlayerPositionPacket : IPacket
         buffer.WriteSByte((sbyte)Flags);
         buffer.WriteVarInt(TeleportId);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_4)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_4)
         {
             return;
         }
 
         if (!DismountVehicle.HasValue)
         {
-            throw new MineSharpPacketVersionException(nameof(DismountVehicle), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(DismountVehicle), data.Version.Protocol);
         }
 
         buffer.WriteBool(DismountVehicle.Value);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerPositionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadDouble();
         var y = buffer.ReadDouble();
@@ -106,13 +106,18 @@ public sealed record PlayerPositionPacket : IPacket
         var flags = (PositionFlags)buffer.ReadSByte();
         var teleportId = buffer.ReadVarInt();
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_4)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_4)
         {
             return new PlayerPositionPacket(x, y, z, yaw, pitch, flags, teleportId);
         }
 
         var dismountVehicle = buffer.ReadBool();
         return new PlayerPositionPacket(x, y, z, yaw, pitch, flags, teleportId, dismountVehicle);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     [Flags]

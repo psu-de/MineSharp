@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record UpdateCommandBlock(Position Location, string Command, int Mode, byte Flags) : IPacket
+public sealed record UpdateCommandBlock(Position Location, string Command, int Mode, byte Flags) : IPacketStatic<UpdateCommandBlock>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -13,7 +13,7 @@ public sealed record UpdateCommandBlock(Position Location, string Command, int M
     public static PacketType StaticType => PacketType.SB_Play_UpdateCommandBlock;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteString(Command);
@@ -22,13 +22,18 @@ public sealed record UpdateCommandBlock(Position Location, string Command, int M
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateCommandBlock Read(PacketBuffer buffer, MinecraftData data)
     {
         return new UpdateCommandBlock(
             buffer.ReadPosition(),
             buffer.ReadString(),
             buffer.ReadVarInt(),
             buffer.ReadByte());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

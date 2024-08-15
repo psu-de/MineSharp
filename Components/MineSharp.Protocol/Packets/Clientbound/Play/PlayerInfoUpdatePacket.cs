@@ -11,16 +11,16 @@ using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 #pragma warning disable CS1591
-public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IPacket
+public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IPacketStatic<PlayerInfoUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_PlayerInfo;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             buffer.WriteSByte((sbyte)Action);
         }
@@ -30,16 +30,16 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
 
         buffer.WriteVarInt(Data.Length);
-        foreach (var data in Data)
+        foreach (var actionData in Data)
         {
-            data.Write(buffer);
+            actionData.Write(buffer);
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerInfoUpdatePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         int action;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             action = buffer.ReadByte();
         }
@@ -48,8 +48,13 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             action = buffer.ReadVarInt();
         }
 
-        var data = buffer.ReadVarIntArray(buffer => ActionEntry.Read(buffer, version, action));
-        return new PlayerInfoUpdatePacket(action, data);
+        var actionData = buffer.ReadVarIntArray(buffer => ActionEntry.Read(buffer, data, action));
+        return new PlayerInfoUpdatePacket(action, actionData);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     public sealed record ActionEntry(Uuid Player, IPlayerInfoAction[] Actions)
@@ -63,11 +68,11 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             }
         }
 
-        public static ActionEntry Read(PacketBuffer buffer, MinecraftData version, int action)
+        public static ActionEntry Read(PacketBuffer buffer, MinecraftData data, int action)
         {
             var uuid = buffer.ReadUuid();
             var actions = new List<IPlayerInfoAction>();
-            if (version.Version.Protocol <= ProtocolVersion.V_1_18_2)
+            if (data.Version.Protocol <= ProtocolVersion.V_1_18_2)
             {
                 switch (action)
                 {

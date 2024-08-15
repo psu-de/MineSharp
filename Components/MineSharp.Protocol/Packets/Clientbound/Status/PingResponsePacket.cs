@@ -3,12 +3,12 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Status;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Packet for ping response
 /// </summary>
 /// <param name="Payload">The payload of the ping response</param>
-public sealed record PingResponsePacket(long Payload) : IPacket
+public sealed record PingResponsePacket(long Payload) : IPacketStatic<PingResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,15 +16,19 @@ public sealed record PingResponsePacket(long Payload) : IPacket
     public static PacketType StaticType => PacketType.CB_Status_Ping;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteLong(Payload);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PingResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new PingResponsePacket(buffer.ReadLong());
     }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
+    }
 }
-#pragma warning restore CS1591

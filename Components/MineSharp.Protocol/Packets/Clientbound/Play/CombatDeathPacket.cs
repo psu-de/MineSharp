@@ -5,11 +5,11 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Combat death packet
 /// </summary>
-public sealed record CombatDeathPacket : IPacket
+public sealed record CombatDeathPacket : IPacketStatic<CombatDeathPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -71,10 +71,10 @@ public sealed record CombatDeathPacket : IPacket
     public Chat Message { get; init; }
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(PlayerId);
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteInt(EntityId!.Value);
         }
@@ -83,11 +83,11 @@ public sealed record CombatDeathPacket : IPacket
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static CombatDeathPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var playerId = buffer.ReadVarInt();
         int? entityId = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             entityId = buffer.ReadInt();
         }
@@ -95,5 +95,9 @@ public sealed record CombatDeathPacket : IPacket
         var message = buffer.ReadChatComponent();
         return new CombatDeathPacket(playerId, entityId, message);
     }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
+    }
 }
-#pragma warning restore CS1591

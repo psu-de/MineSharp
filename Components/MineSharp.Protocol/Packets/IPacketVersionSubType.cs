@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -36,7 +37,7 @@ public interface IPacketVersionSubTypeStatic<TBasePacket> : IPacketVersionSubTyp
     /// <param name="buffer"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static abstract TBasePacket Read(PacketBuffer buffer, MinecraftData data);
+    public static new abstract TBasePacket Read(PacketBuffer buffer, MinecraftData data);
 }
 
 public interface IPacketVersionSubTypeStatic<TSelf, TBasePacket> : IPacketVersionSubTypeStatic<TBasePacket>, ISerializableWithMinecraftData<TSelf>

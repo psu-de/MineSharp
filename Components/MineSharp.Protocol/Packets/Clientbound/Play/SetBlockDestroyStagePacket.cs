@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="EntityId">The ID of the entity breaking the block</param>
 /// <param name="Location">Block Position</param>
 /// <param name="DestroyStage">0–9 to set it, any other value to remove it</param>
-public sealed record SetBlockDestroyStagePacket(int EntityId, Position Location, byte DestroyStage) : IPacket
+public sealed record SetBlockDestroyStagePacket(int EntityId, Position Location, byte DestroyStage) : IPacketStatic<SetBlockDestroyStagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record SetBlockDestroyStagePacket(int EntityId, Position Location,
     public static PacketType StaticType => PacketType.CB_Play_BlockBreakAnimation;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WritePosition(Location);
@@ -27,7 +27,7 @@ public sealed record SetBlockDestroyStagePacket(int EntityId, Position Location,
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetBlockDestroyStagePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var location = buffer.ReadPosition();
@@ -37,5 +37,10 @@ public sealed record SetBlockDestroyStagePacket(int EntityId, Position Location,
             entityId,
             location,
             destroyStage);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

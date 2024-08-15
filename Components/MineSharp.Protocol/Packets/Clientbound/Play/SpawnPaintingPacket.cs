@@ -20,7 +20,7 @@ public sealed record SpawnPaintingPacket(
     int Title,
     Position Location,
     sbyte Direction
-) : IPacket
+) : IPacketStatic<SpawnPaintingPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,7 +28,7 @@ public sealed record SpawnPaintingPacket(
     public static PacketType StaticType => PacketType.CB_Play_SpawnEntityPainting;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(EntityUuid);
@@ -38,7 +38,7 @@ public sealed record SpawnPaintingPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnPaintingPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var entityUuid = buffer.ReadUuid();
@@ -46,5 +46,10 @@ public sealed record SpawnPaintingPacket(
         var location = buffer.ReadPosition();
         var direction = buffer.ReadSByte();
         return new SpawnPaintingPacket(entityId, entityUuid, title, location, direction);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

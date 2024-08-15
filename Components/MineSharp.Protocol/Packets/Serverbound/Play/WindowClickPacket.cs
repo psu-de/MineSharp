@@ -15,14 +15,14 @@ public sealed record WindowClickPacket(
     int Mode,
     Slot[] ChangedSlots,
     Item? SelectedItem
-) : IPacket
+) : IPacketStatic<WindowClickPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_WindowClick;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte(WindowId);
         buffer.WriteVarInt(StateId);
@@ -33,7 +33,7 @@ public sealed record WindowClickPacket(
         buffer.WriteOptionalItem(SelectedItem);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static WindowClickPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new WindowClickPacket(
             buffer.ReadByte(),
@@ -41,9 +41,14 @@ public sealed record WindowClickPacket(
             buffer.ReadShort(),
             buffer.ReadSByte(),
             buffer.ReadVarInt(),
-            buffer.ReadVarIntArray(buff => buff.ReadSlot(version)),
-            buffer.ReadOptionalItem(version)
+            buffer.ReadVarIntArray(buff => buff.ReadSlot(data)),
+            buffer.ReadOptionalItem(data)
         );
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

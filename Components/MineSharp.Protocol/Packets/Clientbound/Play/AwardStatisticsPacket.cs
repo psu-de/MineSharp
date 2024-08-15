@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Count">Number of elements in the statistics array.</param>
 /// <param name="Statistics">Array of statistics.</param>
-public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Statistic[] Statistics) : IPacket
+public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Statistic[] Statistics) : IPacketStatic<AwardStatisticsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Stat
     public static PacketType StaticType => PacketType.CB_Play_Statistics;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(Count);
         foreach (var statistic in Statistics)
@@ -30,7 +30,7 @@ public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Stat
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static AwardStatisticsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var count = buffer.ReadVarInt();
         var statistics = new Statistic[count];
@@ -43,6 +43,11 @@ public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Stat
         }
 
         return new AwardStatisticsPacket(count, statistics);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Sequence id used to synchronize server and client.
 ///     Only used for versions &gt;= 1.19
 /// </param>
-public sealed record UseItemPacket(PlayerHand Hand, int? SequenceId = null) : IPacket
+public sealed record UseItemPacket(PlayerHand Hand, int? SequenceId = null) : IPacketStatic<UseItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,26 +22,31 @@ public sealed record UseItemPacket(PlayerHand Hand, int? SequenceId = null) : IP
     public static PacketType StaticType => PacketType.SB_Play_UseItem;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Hand);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt((int)SequenceId!);
         }
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UseItemPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var hand = (PlayerHand)buffer.ReadVarInt();
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new UseItemPacket(hand);
         }
 
         return new UseItemPacket(hand, buffer.ReadVarInt());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

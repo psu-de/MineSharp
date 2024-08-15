@@ -1,4 +1,4 @@
-using MineSharp.Core.Serialization;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Z">Absolute position (Z coordinate)</param>
 /// <param name="Yaw">Absolute rotation on the vertical axis, in degrees</param>
 /// <param name="Pitch">Absolute rotation on the horizontal axis, in degrees</param>
-public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, float Pitch) : IPacket
+public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, float Pitch) : IPacketStatic<MoveVehiclePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,7 +20,7 @@ public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, 
     public static PacketType StaticType => PacketType.CB_Play_VehicleMove;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteDouble(X);
         buffer.WriteDouble(Y);
@@ -30,7 +30,7 @@ public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, 
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static MoveVehiclePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadDouble();
         var y = buffer.ReadDouble();
@@ -39,5 +39,10 @@ public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, 
         var pitch = buffer.ReadFloat();
 
         return new MoveVehiclePacket(x, y, z, yaw, pitch);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

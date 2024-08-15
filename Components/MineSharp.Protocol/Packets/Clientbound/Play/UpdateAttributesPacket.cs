@@ -8,25 +8,30 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 public sealed record UpdateAttributesPacket(
     int EntityId,
     Attribute[] Attributes
-) : IPacket
+) : IPacketStatic<UpdateAttributesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_EntityUpdateAttributes;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteVarIntArray(Attributes, (buffer, attribute) => attribute.Write(buffer));
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateAttributesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var attributes = buffer.ReadVarIntArray(Attribute.Read);
 
         return new UpdateAttributesPacket(entityId, attributes);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

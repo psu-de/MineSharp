@@ -20,7 +20,7 @@ public sealed record SpawnEntityPacket(
     short VelocityX,
     short VelocityY,
     short VelocityZ
-) : IPacket
+) : IPacketStatic<SpawnEntityPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -32,7 +32,7 @@ public sealed record SpawnEntityPacket(
     /// </summary>
     /// <param name="buffer">The buffer to write to.</param>
     /// <param name="version">The Minecraft version.</param>
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(ObjectUuid);
@@ -43,7 +43,7 @@ public sealed record SpawnEntityPacket(
         buffer.WriteSByte(Pitch);
         buffer.WriteSByte(Yaw);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteSByte(HeadPitch);
             buffer.WriteVarInt(ObjectData);
@@ -64,7 +64,7 @@ public sealed record SpawnEntityPacket(
     /// <param name="buffer">The buffer to read from.</param>
     /// <param name="version">The Minecraft version.</param>
     /// <returns>A new instance of <see cref="SpawnEntityPacket"/>.</returns>
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnEntityPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var objectUuid = buffer.ReadUuid();
@@ -76,7 +76,7 @@ public sealed record SpawnEntityPacket(
         var yaw = buffer.ReadSByte();
         sbyte headPitch = 0;
         var objectData = 0;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             headPitch = buffer.ReadSByte();
             objectData = buffer.ReadVarInt();
@@ -91,6 +91,11 @@ public sealed record SpawnEntityPacket(
         var velocityZ = buffer.ReadShort();
 
         return new SpawnEntityPacket(entityId, objectUuid, type, x, y, z, pitch, yaw, headPitch, objectData, velocityX, velocityY, velocityZ);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

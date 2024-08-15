@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The ID of the entity taking damage</param>
 /// <param name="Yaw">The direction the damage is coming from in relation to the entity</param>
-public sealed record HurtAnimationPacket(int EntityId, float Yaw) : IPacket
+public sealed record HurtAnimationPacket(int EntityId, float Yaw) : IPacketStatic<HurtAnimationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,18 +17,23 @@ public sealed record HurtAnimationPacket(int EntityId, float Yaw) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_HurtAnimation;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteFloat(Yaw);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static HurtAnimationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var yaw = buffer.ReadFloat();
 
         return new HurtAnimationPacket(entityId, yaw);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

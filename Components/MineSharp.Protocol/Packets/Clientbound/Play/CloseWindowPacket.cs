@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Close window packet
 ///     <param name="WindowId">The id of the window to close</param>
 /// </summary>
-public sealed record CloseWindowPacket(byte WindowId) : IPacket
+public sealed record CloseWindowPacket(byte WindowId) : IPacketStatic<CloseWindowPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,14 +16,19 @@ public sealed record CloseWindowPacket(byte WindowId) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_CloseWindow;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte(WindowId);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static CloseWindowPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new CloseWindowPacket(buffer.ReadByte());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

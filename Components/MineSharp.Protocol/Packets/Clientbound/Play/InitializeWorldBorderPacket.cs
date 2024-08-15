@@ -23,7 +23,7 @@ public sealed record InitializeWorldBorderPacket(
     long Speed,
     int PortalTeleportBoundary,
     int WarningBlocks,
-    int WarningTime) : IPacket
+    int WarningTime) : IPacketStatic<InitializeWorldBorderPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,7 +31,7 @@ public sealed record InitializeWorldBorderPacket(
     public static PacketType StaticType => PacketType.CB_Play_InitializeWorldBorder;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteDouble(X);
         buffer.WriteDouble(Z);
@@ -44,7 +44,7 @@ public sealed record InitializeWorldBorderPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static InitializeWorldBorderPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadDouble();
         var z = buffer.ReadDouble();
@@ -64,5 +64,10 @@ public sealed record InitializeWorldBorderPacket(
             portalTeleportBoundary,
             warningBlocks,
             warningTime);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

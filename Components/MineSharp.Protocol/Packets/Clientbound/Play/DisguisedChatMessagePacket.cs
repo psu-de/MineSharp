@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="ChatType">The type of chat</param>
 /// <param name="Name">The name associated with the chat</param>
 /// <param name="Target">The target of the chat message (optional)</param>
-public sealed record DisguisedChatMessagePacket(Chat Message, int ChatType, Chat Name, Chat? Target) : IPacket
+public sealed record DisguisedChatMessagePacket(Chat Message, int ChatType, Chat Name, Chat? Target) : IPacketStatic<DisguisedChatMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,7 +20,7 @@ public sealed record DisguisedChatMessagePacket(Chat Message, int ChatType, Chat
     public static PacketType StaticType => PacketType.CB_Play_ProfilelessChat;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteChatComponent(Message);
         buffer.WriteVarInt(ChatType);
@@ -33,12 +33,17 @@ public sealed record DisguisedChatMessagePacket(Chat Message, int ChatType, Chat
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static DisguisedChatMessagePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new DisguisedChatMessagePacket(
             buffer.ReadChatComponent(),
             buffer.ReadVarInt(),
             buffer.ReadChatComponent(),
             buffer.ReadBool() ? buffer.ReadChatComponent() : null);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

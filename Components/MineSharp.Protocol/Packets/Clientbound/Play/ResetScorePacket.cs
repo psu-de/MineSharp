@@ -1,4 +1,4 @@
-using MineSharp.Core.Serialization;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="EntityName">The entity whose score this is. For players, this is their username; for other entities, it is their UUID.</param>
 /// <param name="HasObjectiveName">Whether the score should be removed for the specified objective, or for all of them.</param>
 /// <param name="ObjectiveName">The name of the objective the score belongs to. Only present if the previous field is true.</param>
-public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, string? ObjectiveName) : IPacket
+public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, string? ObjectiveName) : IPacketStatic<ResetScorePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, 
     public static PacketType StaticType => PacketType.CB_Play_ResetScore;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(EntityName);
         buffer.WriteBool(HasObjectiveName);
@@ -29,7 +29,7 @@ public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, 
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ResetScorePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityName = buffer.ReadString();
         var hasObjectiveName = buffer.ReadBool();
@@ -40,5 +40,10 @@ public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, 
         }
 
         return new ResetScorePacket(entityName, hasObjectiveName, objectiveName);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

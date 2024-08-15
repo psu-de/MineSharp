@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Advances the client processing by the specified number of ticks. Has no effect unless client ticking is frozen.
 /// </summary>
 /// <param name="TickSteps">The number of tick steps to advance</param>
-public sealed record StepTickPacket(int TickSteps) : IPacket
+public sealed record StepTickPacket(int TickSteps) : IPacketStatic<StepTickPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,15 +16,20 @@ public sealed record StepTickPacket(int TickSteps) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_StepTick;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(TickSteps);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static StepTickPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var tickSteps = buffer.ReadVarInt();
         return new StepTickPacket(tickSteps);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

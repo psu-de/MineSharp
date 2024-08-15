@@ -1,5 +1,4 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Core.Common.Items;
+﻿using MineSharp.Core.Common.Items;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -18,7 +17,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Experience">Total experience for this villager (always 0 for the wandering trader).</param>
 /// <param name="IsRegularVillager">True if this is a regular villager; false for the wandering trader.</param>
 /// <param name="CanRestock">True for regular villagers and false for the wandering trader.</param>
-public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades, int VillagerLevel, int Experience, bool IsRegularVillager, bool CanRestock) : IPacket
+public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades, int VillagerLevel, int Experience, bool IsRegularVillager, bool CanRestock) : IPacketStatic<MerchantOffersPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,13 +25,13 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
     public static PacketType StaticType => PacketType.CB_Play_TradeList;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(WindowId);
         buffer.WriteVarInt(Size);
         foreach (var trade in Trades)
         {
-            trade.Write(buffer, version);
+            trade.Write(buffer, data);
         }
         buffer.WriteVarInt(VillagerLevel);
         buffer.WriteVarInt(Experience);
@@ -41,14 +40,14 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static MerchantOffersPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var windowId = buffer.ReadVarInt();
         var size = buffer.ReadVarInt();
         var trades = new Trade[size];
         for (int i = 0; i < size; i++)
         {
-            trades[i] = Trade.Read(buffer, version);
+            trades[i] = Trade.Read(buffer, data);
         }
         var villagerLevel = buffer.ReadVarInt();
         var experience = buffer.ReadVarInt();
@@ -56,6 +55,11 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
         var canRestock = buffer.ReadBool();
 
         return new MerchantOffersPacket(windowId, size, trades, villagerLevel, experience, isRegularVillager, canRestock);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="TransactionId">The transaction ID</param>
 /// <param name="Nbt">The NBT of the block or entity</param>
-public sealed record TagQueryResponsePacket(int TransactionId, NbtTag? Nbt) : IPacket
+public sealed record TagQueryResponsePacket(int TransactionId, NbtTag? Nbt) : IPacketStatic<TagQueryResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,18 +18,23 @@ public sealed record TagQueryResponsePacket(int TransactionId, NbtTag? Nbt) : IP
     public static PacketType StaticType => PacketType.CB_Play_NbtQueryResponse;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(TransactionId);
         buffer.WriteOptionalNbt(Nbt);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static TagQueryResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var transactionId = buffer.ReadVarInt();
         var nbt = buffer.ReadOptionalNbt();
 
         return new TagQueryResponsePacket(transactionId, nbt);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

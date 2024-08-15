@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Uuid">Unique ID for this bar</param>
 /// <param name="Action">Determines the layout of the remaining packet</param>
-public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
+public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacketStatic<BossBarPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,7 +21,7 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_BossBar;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteUuid(Uuid);
         buffer.WriteVarInt((int)Action.Type);
@@ -29,7 +29,7 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static BossBarPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var uuid = buffer.ReadUuid();
         var actionType = (BossBarActionType)buffer.ReadVarInt();
@@ -37,6 +37,10 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         return new BossBarPacket(uuid, action);
     }
 
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
+    }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     /// <summary>

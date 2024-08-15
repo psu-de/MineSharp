@@ -33,7 +33,7 @@ public sealed record SpawnLivingEntityPacket(
     short VelocityX,
     short VelocityY,
     short VelocityZ
-) : IPacket
+) : IPacketStatic<SpawnLivingEntityPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -41,7 +41,7 @@ public sealed record SpawnLivingEntityPacket(
     public static PacketType StaticType => PacketType.CB_Play_SpawnEntityLiving;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(EntityUuid);
@@ -58,7 +58,7 @@ public sealed record SpawnLivingEntityPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnLivingEntityPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new SpawnLivingEntityPacket(
             buffer.ReadVarInt(),
@@ -74,5 +74,10 @@ public sealed record SpawnLivingEntityPacket(
             buffer.ReadShort(),
             buffer.ReadShort()
         );
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

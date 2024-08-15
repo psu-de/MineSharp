@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Metadata">The entity metadata</param>
-public sealed record SetEntityMetadataPacket(int EntityId, EntityMetadata Metadata) : IPacket
+public sealed record SetEntityMetadataPacket(int EntityId, EntityMetadata Metadata) : IPacketStatic<SetEntityMetadataPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,18 +19,23 @@ public sealed record SetEntityMetadataPacket(int EntityId, EntityMetadata Metada
     public static PacketType StaticType => PacketType.CB_Play_EntityMetadata;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
-        Metadata.Write(buffer, version);
+        Metadata.Write(buffer, data);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetEntityMetadataPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
-        var metadata = EntityMetadata.Read(buffer, version);
+        var metadata = EntityMetadata.Read(buffer, data);
 
         return new SetEntityMetadataPacket(entityId, metadata);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

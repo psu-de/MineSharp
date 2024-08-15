@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Yaw">The yaw rotation</param>
 /// <param name="Pitch">The pitch rotation</param>
 /// <param name="OnGround">Whether the entity is on the ground</param>
-public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, bool OnGround) : IPacket
+public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, bool OnGround) : IPacketStatic<EntityRotationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, 
     public static PacketType StaticType => PacketType.CB_Play_EntityLook;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteSByte(Yaw);
@@ -28,7 +28,7 @@ public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, 
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static EntityRotationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var yaw = buffer.ReadSByte();
@@ -36,6 +36,11 @@ public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, 
         var onGround = buffer.ReadBool();
 
         return new EntityRotationPacket(entityId, yaw, pitch, onGround);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 

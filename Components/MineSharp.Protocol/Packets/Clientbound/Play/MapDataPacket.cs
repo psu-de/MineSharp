@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="HasIcons">Indicates if the map has icons</param>
 /// <param name="Icons">Array of icons on the map</param>
 /// <param name="ColorPatch">Details of the color patch update</param>
-public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasIcons, Icon[]? Icons, ColorPatchInfo ColorPatch) : IPacket
+public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasIcons, Icon[]? Icons, ColorPatchInfo ColorPatch) : IPacketStatic<MapDataPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -23,7 +23,7 @@ public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasI
     public static PacketType StaticType => PacketType.CB_Play_Map;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(MapId);
         buffer.WriteByte(Scale);
@@ -46,7 +46,7 @@ public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasI
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static MapDataPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var mapId = buffer.ReadVarInt();
         var scale = buffer.ReadByte();
@@ -67,6 +67,11 @@ public sealed record MapDataPacket(int MapId, byte Scale, bool Locked, bool HasI
         var colorPatch = ColorPatchInfo.Read(buffer);
 
         return new MapDataPacket(mapId, scale, locked, hasIcons, icons, colorPatch);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

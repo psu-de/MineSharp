@@ -35,7 +35,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
     long[] EmptySkyLightMask,
     long[] EmptyBlockLightMask,
     byte[][] SkyLight,
-    byte[][] BlockLight) : IPacket
+    byte[][] BlockLight) : IPacketStatic<ChunkDataAndUpdateLightPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -43,11 +43,11 @@ public sealed record ChunkDataAndUpdateLightPacket(
     public static PacketType StaticType => PacketType.CB_Play_MapChunk;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_0 && TrustEdges == null)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0 && TrustEdges == null)
         {
-            throw new MineSharpPacketVersionException(nameof(TrustEdges), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(TrustEdges), data.Version.Protocol);
         }
 
         buffer.WriteInt(X);
@@ -62,7 +62,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
             buffer.WriteBlockEntity(entity);
         }
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteBool(TrustEdges!.Value);
         }
@@ -88,7 +88,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChunkDataAndUpdateLightPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadInt();
         var z = buffer.ReadInt();
@@ -103,7 +103,7 @@ public sealed record ChunkDataAndUpdateLightPacket(
         }
 
         bool? trustEdges = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             trustEdges = buffer.ReadBool();
         }
@@ -139,5 +139,10 @@ public sealed record ChunkDataAndUpdateLightPacket(
             emptyBlockLightMask,
             skyLight,
             blockLight);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

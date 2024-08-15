@@ -15,14 +15,14 @@ public sealed record EntitySoundEffectPacket(
     float Volume,
     float Pitch,
     long Seed
-) : IPacket
+) : IPacketStatic<EntitySoundEffectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_EntitySoundEffect;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(SoundId);
         if (SoundId == 0)
@@ -41,7 +41,7 @@ public sealed record EntitySoundEffectPacket(
         buffer.WriteLong(Seed);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static EntitySoundEffectPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var soundId = buffer.ReadVarInt();
         Identifier? soundName = null;
@@ -65,6 +65,11 @@ public sealed record EntitySoundEffectPacket(
         var seed = buffer.ReadLong();
 
         return new EntitySoundEffectPacket(soundId, soundName, hasFixedRange, range, soundCategory, entityId, volume, pitch, seed);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

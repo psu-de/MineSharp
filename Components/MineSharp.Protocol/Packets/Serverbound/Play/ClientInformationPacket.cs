@@ -14,14 +14,14 @@ public sealed record ClientInformationPacket(
     PlayerHand MainHand,
     bool EnableTextFiltering,
     bool AllowServerListings
-) : IPacket
+) : IPacketStatic<ClientInformationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_Settings;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Locale);
         buffer.WriteByte(ViewDistance);
@@ -33,7 +33,7 @@ public sealed record ClientInformationPacket(
         buffer.WriteBool(AllowServerListings);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ClientInformationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ClientInformationPacket(
             buffer.ReadString(),
@@ -45,6 +45,11 @@ public sealed record ClientInformationPacket(
             buffer.ReadBool(),
             buffer.ReadBool()
         );
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

@@ -22,7 +22,7 @@ public sealed record UpdateObjectivesPacket(
     // this field can not be named "Type" or "ObjectiveType"
     ObjectiveType? ObjectiveTypeValue,
     IScoreboardNumberFormat? NumberFormat
-) : IPacket
+) : IPacketStatic<UpdateObjectivesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,7 +30,7 @@ public sealed record UpdateObjectivesPacket(
     public static PacketType StaticType => PacketType.CB_Play_ScoreboardObjective;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(ObjectiveName);
         buffer.WriteByte((byte)Mode);
@@ -51,7 +51,7 @@ public sealed record UpdateObjectivesPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateObjectivesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var objectiveName = buffer.ReadString();
         var mode = (ObjectiveMode)buffer.ReadByte();
@@ -79,6 +79,11 @@ public sealed record UpdateObjectivesPacket(
             objectiveType,
             numberFormat
         );
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

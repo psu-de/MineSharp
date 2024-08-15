@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 ///     Resource pack response packet
 /// </summary>
 /// <param name="Result">The result of the resource pack response</param>
-public sealed record ResourcePackResponsePacket(ResourcePackResponsePacket.ResourcePackResult Result) : IPacket
+public sealed record ResourcePackResponsePacket(ResourcePackResponsePacket.ResourcePackResult Result) : IPacketStatic<ResourcePackResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,16 +16,21 @@ public sealed record ResourcePackResponsePacket(ResourcePackResponsePacket.Resou
     public static PacketType StaticType => PacketType.SB_Configuration_ResourcePackReceive;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Result);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ResourcePackResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var result = (ResourcePackResult)buffer.ReadVarInt();
         return new ResourcePackResponsePacket(result);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

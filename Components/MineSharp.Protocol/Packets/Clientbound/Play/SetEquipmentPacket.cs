@@ -1,5 +1,4 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Core.Common.Items;
+﻿using MineSharp.Core.Common.Items;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
@@ -13,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Equipment">The equipment list</param>
-public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment) : IPacket
+public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment) : IPacketStatic<SetEquipmentPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,19 +20,19 @@ public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment
     public static PacketType StaticType => PacketType.CB_Play_EntityEquipment;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         for (int i = 0; i < Equipment.Length; i++)
         {
             var entry = Equipment[i];
             var isLastEntry = i == Equipment.Length - 1;
-            entry.Write(buffer, version, isLastEntry);
+            entry.Write(buffer, data, isLastEntry);
         }
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetEquipmentPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var equipment = new List<EquipmentEntry>();
@@ -42,7 +41,7 @@ public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment
             var slot = buffer.Peek();
             // wiki.vg says: "has the top bit set if another entry follows, and otherwise unset if this is the last item in the array"
             var isLast = (slot & 0x80) == 0;
-            equipment.Add(EquipmentEntry.Read(buffer, version));
+            equipment.Add(EquipmentEntry.Read(buffer, data));
             if (isLast)
             {
                 break;
@@ -50,6 +49,11 @@ public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment
         }
 
         return new SetEquipmentPacket(entityId, equipment.ToArray());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

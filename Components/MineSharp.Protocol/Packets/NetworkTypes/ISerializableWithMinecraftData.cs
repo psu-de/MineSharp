@@ -1,6 +1,7 @@
-﻿using MineSharp.Data;
+﻿using MineSharp.Core.Serialization;
+using MineSharp.Data;
 
-namespace MineSharp.Core.Serialization;
+namespace MineSharp.Protocol.Packets.NetworkTypes;
 
 /// <summary>
 ///     Interface for serializing and deserializing objects from and to <see cref="PacketBuffer" />

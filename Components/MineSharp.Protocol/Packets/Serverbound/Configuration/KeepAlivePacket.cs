@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 ///     Keep alive packet
 /// </summary>
 /// <param name="KeepAliveId">The keep-alive ID</param>
-public sealed record KeepAlivePacket(long KeepAliveId) : IPacket
+public sealed record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlivePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,15 +16,20 @@ public sealed record KeepAlivePacket(long KeepAliveId) : IPacket
     public static PacketType StaticType => PacketType.SB_Configuration_KeepAlive;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteLong(KeepAliveId);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static KeepAlivePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new KeepAlivePacket(buffer.ReadLong());
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }
 

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Acknowledge block change packet
 /// </summary>
-public sealed record AcknowledgeBlockChangePacket : IPacket
+public sealed record AcknowledgeBlockChangePacket : IPacketStatic<AcknowledgeBlockChangePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -57,20 +57,25 @@ public sealed record AcknowledgeBlockChangePacket : IPacket
     public IPacketBody Body { get; set; }
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         Body.Write(buffer);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static AcknowledgeBlockChangePacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new AcknowledgeBlockChangePacket(PacketBody118.Read(buffer));
         }
 
         return new AcknowledgeBlockChangePacket(PacketBody119.Read(buffer));
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

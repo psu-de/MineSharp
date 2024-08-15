@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 /// <param name="Uuid">Uuid</param>
 /// <param name="Username">Username of the client</param>
 /// <param name="Properties">A list of properties sent for versions &gt;= 1.19</param>
-public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? Properties = null) : IPacket
+public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? Properties = null) : IPacketStatic<LoginSuccessPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,37 +22,42 @@ public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? 
     public static PacketType StaticType => PacketType.CB_Login_Success;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteUuid(Uuid);
         buffer.WriteString(Username);
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return;
         }
 
         if (Properties == null)
         {
-            throw new MineSharpPacketVersionException(nameof(Properties), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(Properties), data.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(Properties, (buffer, property) => property.Write(buffer));
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LoginSuccessPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var uuid = buffer.ReadUuid();
         var username = buffer.ReadString();
         Property[]? properties = null;
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             properties = buffer.ReadVarIntArray(Property.Read);
         }
 
         return new LoginSuccessPacket(uuid, username, properties);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

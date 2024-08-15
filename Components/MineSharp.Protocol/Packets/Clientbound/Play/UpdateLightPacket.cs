@@ -26,7 +26,7 @@ public sealed record UpdateLightPacket(
     BitSet EmptyBlockLightMask,
     LightArray[] SkyLightArrays,
     LightArray[] BlockLightArrays
-) : IPacket
+) : IPacketStatic<UpdateLightPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,7 +34,7 @@ public sealed record UpdateLightPacket(
     public static PacketType StaticType => PacketType.CB_Play_UpdateLight;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(ChunkX);
         buffer.WriteVarInt(ChunkZ);
@@ -55,7 +55,7 @@ public sealed record UpdateLightPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateLightPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var chunkX = buffer.ReadVarInt();
         var chunkZ = buffer.ReadVarInt();
@@ -86,6 +86,11 @@ public sealed record UpdateLightPacket(
             skyLightArrays,
             blockLightArrays
         );
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 
     /// <summary>

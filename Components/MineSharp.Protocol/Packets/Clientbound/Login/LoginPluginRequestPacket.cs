@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 /// <param name="MessageId">The message id</param>
 /// <param name="Channel">The channel identifier</param>
 /// <param name="Data">The raw message data</param>
-public sealed record LoginPluginRequestPacket(int MessageId, Identifier Channel, byte[] Data) : IPacket
+public sealed record LoginPluginRequestPacket(int MessageId, Identifier Channel, byte[] Data) : IPacketStatic<LoginPluginRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record LoginPluginRequestPacket(int MessageId, Identifier Channel,
     public static PacketType StaticType => PacketType.CB_Login_LoginPluginRequest;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(MessageId);
         buffer.WriteIdentifier(Channel);
@@ -27,12 +27,17 @@ public sealed record LoginPluginRequestPacket(int MessageId, Identifier Channel,
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LoginPluginRequestPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var messageId = buffer.ReadVarInt();
         var channel = buffer.ReadIdentifier();
-        var data = buffer.RestBuffer();
+        var pluginData = buffer.RestBuffer();
 
-        return new LoginPluginRequestPacket(messageId, channel, data);
+        return new LoginPluginRequestPacket(messageId, channel, pluginData);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

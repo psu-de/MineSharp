@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to set the title text in the client.
 /// </summary>
 /// <param name="TitleText">The title text to be displayed</param>
-public sealed record SetTitleTextPacket(Chat TitleText) : IPacket
+public sealed record SetTitleTextPacket(Chat TitleText) : IPacketStatic<SetTitleTextPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,15 +17,20 @@ public sealed record SetTitleTextPacket(Chat TitleText) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_SetTitleText;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteChatComponent(TitleText);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetTitleTextPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var titleText = buffer.ReadChatComponent();
         return new SetTitleTextPacket(titleText);
+    }
+
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
     }
 }

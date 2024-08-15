@@ -9,36 +9,41 @@ using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerChatPacket;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
+public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacketStatic<PlayerChatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_PlayerChat;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        Body.Write(buffer, version);
+        Body.Write(buffer, data);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerChatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol == ProtocolVersion.V_1_19_0)
+        if (data.Version.Protocol == ProtocolVersion.V_1_19_0)
         {
             return new PlayerChatPacket(V119Body.Read(buffer));
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_1)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_1)
         {
-            return new PlayerChatPacket(V11923Body.Read(buffer, version));
+            return new PlayerChatPacket(V11923Body.Read(buffer, data));
         }
 
         throw new NotImplementedException();
     }
 
+    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
+    {
+        return Read(buffer, data);
+    }
+
     public interface IChatMessageBody
     {
-        void Write(PacketBuffer buffer, MinecraftData version);
+        void Write(PacketBuffer buffer, MinecraftData data);
     }
 
     /// <summary>
@@ -66,7 +71,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
     ) : IChatMessageBody
     {
         /// <inheritdoc />
-        public void Write(PacketBuffer buffer, MinecraftData version)
+        public void Write(PacketBuffer buffer, MinecraftData data)
         {
             buffer.WriteChatComponent(SignedChat);
 
@@ -262,9 +267,9 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
         public Chat NetworkName { get; init; }
         public Chat? NetworkTargetName { get; init; }
 
-        public void Write(PacketBuffer buffer, MinecraftData version)
+        public void Write(PacketBuffer buffer, MinecraftData data)
         {
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 var hasPreviousSignature = PreviousSignature != null;
                 buffer.WriteBool(hasPreviousSignature);
@@ -277,7 +282,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             buffer.WriteUuid(Sender);
 
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 buffer.WriteVarInt(Signature!.Length);
                 buffer.WriteBytes(Signature);
@@ -294,7 +299,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             buffer.WriteString(PlainMessage);
 
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 var hasFormattedMessage = FormattedMessage != null;
                 buffer.WriteBool(hasFormattedMessage);
@@ -332,7 +337,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
             }
         }
 
-        public static V11923Body Read(PacketBuffer buffer, MinecraftData version)
+        public static V11923Body Read(PacketBuffer buffer, MinecraftData data)
         {
             byte[]? previousSignature = null;
             Uuid sender;
@@ -350,7 +355,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
             Chat networkName;
             Chat? networkTargetName = null;
 
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 var hasPreviousSignature = buffer.ReadBool();
                 if (hasPreviousSignature)
@@ -362,7 +367,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             sender = buffer.ReadUuid();
 
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 signature = new byte[buffer.ReadVarInt()];
                 buffer.ReadBytes(signature);
@@ -381,7 +386,7 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 
             plainMessage = buffer.ReadString();
 
-            if (version.Version.Protocol == ProtocolVersion.V_1_19_1)
+            if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
             {
                 var hasFormattedMessage = buffer.ReadBool();
                 formattedMessage = null;
