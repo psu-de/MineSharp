@@ -33,26 +33,25 @@ public sealed class PacketVersionSubTypeLookup<TBasePacket> : IReadOnlyDictionar
         Frozen = true;
     }
 
-    public bool TryGetPacketFactory(ProtocolVersion protocolVersion, [NotNullWhen(true)] out PacketFactory<TBasePacket>? PacketFactory)
+    public bool TryGetPacketFactory(ProtocolVersion protocolVersion, [NotNullWhen(true)] out PacketFactory<TBasePacket>? packetFactory)
     {
-        PacketFactory = protocolVersionToPacketFactory.LowerBound(protocolVersion);
-        return PacketFactory != null;
+        return protocolVersionToPacketFactory.TryGetLowerBound(protocolVersion, out packetFactory);
     }
 
     public PacketFactory<TBasePacket> GetPacketFactory(ProtocolVersion protocolVersion)
     {
-        if (!TryGetPacketFactory(protocolVersion, out var PacketFactory))
+        if (!TryGetPacketFactory(protocolVersion, out var packetFactory))
         {
             // TODO: create custom exception
             throw new Exception($"There is no version specific packet registered that is suitable for the protocol version: {protocolVersion}");
         }
-        return PacketFactory;
+        return packetFactory;
     }
 
     public TBasePacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var PacketFactory = GetPacketFactory(buffer.ProtocolVersion);
-        return PacketFactory(buffer, data);
+        var packetFactory = GetPacketFactory(buffer.ProtocolVersion);
+        return packetFactory(buffer, data);
     }
 
     #region Implementation of IReadOnlyDictionary

@@ -5,7 +5,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets;
 
-public interface IPacketVersionSubType
+public interface IPacketVersionSubType : IPacket
 {
     public ProtocolVersion FirstVersionUsed { get; }
 }
