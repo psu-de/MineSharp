@@ -22,6 +22,8 @@ using MineSharp.Protocol.Packets.Serverbound.Status;
 using MineSharp.Protocol.Registrations;
 using Newtonsoft.Json.Linq;
 using NLog;
+using ConfigurationClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
+using PlayClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 
 namespace MineSharp.Protocol;
 
@@ -482,7 +484,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     {
         IPacket packet = gameState switch
         {
-            GameState.Configuration => new Packets.Serverbound.Configuration.ClientInformationPacket(
+            GameState.Configuration => new ConfigurationClientInformationPacket(
                 Settings.Locale,
                 Settings.ViewDistance,
                 Settings.ChatMode,
@@ -491,7 +493,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 Settings.MainHand,
                 Settings.EnableTextFiltering,
                 Settings.AllowServerListings),
-            GameState.Play => new Packets.Serverbound.Play.ClientInformationPacket(
+            GameState.Play => new PlayClientInformationPacket(
                 Settings.Locale,
                 Settings.ViewDistance,
                 Settings.ChatMode,
