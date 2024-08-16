@@ -20,6 +20,7 @@ using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
 using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using MineSharp.Protocol.Packets.Serverbound.Status;
+using MineSharp.Protocol.Registrations;
 using Newtonsoft.Json.Linq;
 using NLog;
 
@@ -105,7 +106,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     private Task? streamLoop;
     private int onConnectionLostFired;
 
-    private readonly ConcurrentDictionary<PacketType, ConcurrentBag<AsyncPacketHandler>> packetHandlers;
+    private readonly ConcurrentDictionary<PacketType, ConcurrentHashSet<AsyncPacketHandler>> packetHandlers;
     private readonly ConcurrentDictionary<PacketType, TaskCompletionSource<object>> packetWaiters;
     private readonly ConcurrentHashSet<AsyncPacketHandler> packetReceivers;
     private GameStatePacketHandler gameStatePacketHandler;
@@ -323,17 +324,43 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
+    /// Represents a registration for a packet handler that will be called whenever a packet of type <typeparamref name="T" /> is received.
+    /// This registration can be used to unregister the handler.
+    /// </summary>
+    /// <typeparam name="T">The type of the packet.</typeparam>
+    public sealed class OnPacketRegistration<T> : AbstractPacketReceiveRegistration
+         where T : IPacket
+    {
+        internal OnPacketRegistration(MinecraftClient client, AsyncPacketHandler handler)
+            : base(client, handler)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected override void Unregister()
+        {
+            var key = T.StaticType;
+            if (Client.packetHandlers.TryGetValue(key, out var handlers))
+            {
+                handlers.TryRemove(Handler);
+            }
+        }
+    }
+
+    /// <summary>
     ///     Registers an <paramref name="handler" /> that will be called whenever an packet of type <typeparamref name="T" />
     ///     is received
     /// </summary>
     /// <param name="handler">A delegate that will be called when a packet of type T is received</param>
     /// <typeparam name="T">The type of the packet</typeparam>
-    public void On<T>(AsyncPacketHandler<T> handler) where T : IPacket
+    /// <returns>A registration object that can be used to unregister the handler.</returns>
+    public OnPacketRegistration<T>? On<T>(AsyncPacketHandler<T> handler) where T : IPacket
     {
         var key = T.StaticType;
-
-        packetHandlers.GetOrAdd(key, _ => new ConcurrentBag<AsyncPacketHandler>())
-                      .Add(p => handler((T)p));
+        AsyncPacketHandler rawHandler = packet => handler((T)packet);
+        var added = packetHandlers.GetOrAdd(key, _ => new ConcurrentHashSet<AsyncPacketHandler>())
+                      .Add(rawHandler);
+        return added ? new(this, rawHandler) : null;
     }
 
     /// <summary>
@@ -348,26 +375,21 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         return tcs.Task.ContinueWith(prev => (T)prev.Result);
     }
 
-    public sealed class OnPacketReceivedRegistration : IDisposable
+    /// <summary>
+    /// Represents a registration for a packet handler that will be called whenever any packet is received.
+    /// This registration can be used to unregister the handler.
+    /// </summary>
+    public sealed class OnPacketReceivedRegistration : AbstractPacketReceiveRegistration
     {
-        private readonly MinecraftClient client;
-        private readonly AsyncPacketHandler handler;
-        public bool Disposed { get; private set; }
-
         internal OnPacketReceivedRegistration(MinecraftClient client, AsyncPacketHandler handler)
+            : base(client, handler)
         {
-            this.client = client;
-            this.handler = handler;
         }
 
-        public void Dispose()
+        /// <inheritdoc/>
+        protected override void Unregister()
         {
-            if (Disposed)
-            {
-                return;
-            }
-            client.packetReceivers.TryRemove(handler);
-            Disposed = true;
+            Client.packetReceivers.TryRemove(Handler);
         }
     }
 
@@ -378,6 +400,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// Use this for debugging purposes only.
     /// </summary>
     /// <param name="handler">A delegate that will be called when a packet is received.</param>
+    /// <returns>A registration object that can be used to unregister the handler.</returns>
     public OnPacketReceivedRegistration? OnPacketReceived(AsyncPacketHandler handler)
     {
         var added = packetReceivers.Add(handler);
@@ -642,7 +665,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             return;
         }
 
-        var packet = (IPacket?) await ParsePacket(factory, packetType, buffer);
+        var packet = (IPacket?)await ParsePacket(factory, packetType, buffer);
 
         if (packet == null)
         {
