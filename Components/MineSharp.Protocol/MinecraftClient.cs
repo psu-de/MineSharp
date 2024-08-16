@@ -18,7 +18,6 @@ using MineSharp.Protocol.Exceptions;
 using MineSharp.Protocol.Packets;
 using MineSharp.Protocol.Packets.Clientbound.Status;
 using MineSharp.Protocol.Packets.Handlers;
-using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using MineSharp.Protocol.Registrations;
 using Newtonsoft.Json.Linq;
@@ -479,17 +478,31 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         return GameJoinedTcs.Task;
     }
 
-    internal Task SendClientInformationPacket()
+    internal Task SendClientInformationPacket(GameState gameState)
     {
-        return SendPacket(new ClientInformationPacket(
-            Settings.Locale,
-            Settings.ViewDistance,
-            Settings.ChatMode,
-            Settings.ColoredChat,
-            Settings.DisplayedSkinParts,
-            Settings.MainHand,
-            Settings.EnableTextFiltering,
-            Settings.AllowServerListings));
+        IPacket packet = gameState switch
+        {
+            GameState.Configuration => new Packets.Serverbound.Configuration.ClientInformationPacket(
+                Settings.Locale,
+                Settings.ViewDistance,
+                Settings.ChatMode,
+                Settings.ColoredChat,
+                Settings.DisplayedSkinParts,
+                Settings.MainHand,
+                Settings.EnableTextFiltering,
+                Settings.AllowServerListings),
+            GameState.Play => new Packets.Serverbound.Play.ClientInformationPacket(
+                Settings.Locale,
+                Settings.ViewDistance,
+                Settings.ChatMode,
+                Settings.ColoredChat,
+                Settings.DisplayedSkinParts,
+                Settings.MainHand,
+                Settings.EnableTextFiltering,
+                Settings.AllowServerListings),
+            _ => throw new NotImplementedException(),
+        };
+        return SendPacket(packet);
     }
 
     internal async Task ChangeGameState(GameState next)

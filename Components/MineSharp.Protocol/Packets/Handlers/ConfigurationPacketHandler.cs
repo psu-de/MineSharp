@@ -22,7 +22,7 @@ internal sealed class ConfigurationPacketHandler : GameStatePacketHandler
 
     public override Task StateEntered()
     {
-        return client.SendClientInformationPacket();
+        return client.SendClientInformationPacket(GameState);
     }
 
     public override Task HandleIncoming(IPacket packet)
