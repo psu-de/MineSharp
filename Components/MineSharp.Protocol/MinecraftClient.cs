@@ -748,35 +748,34 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             throw new MineSharpHostException("failed to connect to server");
         }
 
-        var responseTimeoutCts = new CancellationTokenSource();
+        using var responseTimeoutCts = new CancellationTokenSource();
         var responseTimeoutCancellationToken = responseTimeoutCts.Token;
-        var taskCompletionSource = new TaskCompletionSource<ServerStatus>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        client.On<StatusResponsePacket>(async packet =>
-        {
-            var json = packet.Response;
-            var response = ServerStatus.FromJToken(JToken.Parse(json), client.Data);
-            taskCompletionSource.TrySetResult(response);
-
-            // the server closes the connection 
-            // after sending the StatusResponsePacket
-            // so just dispose the client (no point in disconnecting)
-            await client.DisposeAsync();
-        });
+        var statusResponsePacketTask = client.WaitForPacket<StatusResponsePacket>();
 
         await client.SendPacket(new StatusRequestPacket(), responseTimeoutCancellationToken);
         await client.SendPacket(new PingRequestPacket(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), responseTimeoutCancellationToken);
 
-        responseTimeoutCancellationToken.Register(
-            () =>
-            {
-                taskCompletionSource.TrySetCanceled(responseTimeoutCancellationToken);
-                responseTimeoutCts.Dispose();
-            });
-
         responseTimeoutCts.CancelAfter(responseTimeout);
 
-        return await taskCompletionSource.Task;
+        var statusResponsePacket = await statusResponsePacketTask.WaitAsync(responseTimeoutCancellationToken);
+        var json = statusResponsePacket.Response;
+        var response = ServerStatus.FromJToken(JToken.Parse(json), client.Data);
+
+        // the server closes the connection 
+        // after sending the StatusResponsePacket and PingResponsePacket
+        // so just dispose the client (no point in disconnecting)
+        try
+        {
+            await client.DisposeAsync();
+        }
+        catch (Exception)
+        {
+            // ignore all errors
+            // in most cases the exception is an OperationCanceledException because the connection was terminated
+        }
+
+        return response;
     }
 
     /// <summary>
