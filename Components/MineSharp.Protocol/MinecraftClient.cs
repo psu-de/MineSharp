@@ -7,6 +7,7 @@ using ConcurrentCollections;
 using MineSharp.Auth;
 using MineSharp.ChatComponent;
 using MineSharp.ChatComponent.Components;
+using MineSharp.Core;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Concurrency;
 using MineSharp.Core.Events;
@@ -22,6 +23,9 @@ using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using MineSharp.Protocol.Packets.Serverbound.Status;
 using Newtonsoft.Json.Linq;
 using NLog;
+
+using PlayClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
+using ConfigurationClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 
 namespace MineSharp.Protocol;
 
@@ -395,15 +399,28 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     internal Task SendClientInformationPacket()
     {
-        return SendPacket(new ClientInformationPacket(
-            Settings.Locale,
-            Settings.ViewDistance,
-            Settings.ChatMode,
-            Settings.ColoredChat,
-            Settings.DisplayedSkinParts,
-            Settings.MainHand,
-            Settings.EnableTextFiltering,
-            Settings.AllowServerListings));
+        IPacket packet = Data.Version.Protocol >= ProtocolVersion.V_1_20_3
+            ? new ConfigurationClientInformationPacket(
+                Settings.Locale,
+                Settings.ViewDistance,
+                Settings.ChatMode,
+                Settings.ColoredChat,
+                Settings.DisplayedSkinParts,
+                Settings.MainHand,
+                Settings.EnableTextFiltering,
+                Settings.AllowServerListings)
+            : new PlayClientInformationPacket(
+                Settings.Locale,
+                Settings.ViewDistance,
+                Settings.ChatMode,
+                Settings.ColoredChat,
+                Settings.DisplayedSkinParts,
+                Settings.MainHand,
+                Settings.EnableTextFiltering,
+                Settings.AllowServerListings
+            );
+
+        return SendPacket(packet);
     }
 
     internal async Task ChangeGameState(GameState next)
