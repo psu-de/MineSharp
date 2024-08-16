@@ -44,7 +44,7 @@ public class WindowPlugin : Plugin
     /// <param name="bot"></param>
     public WindowPlugin(MineSharpBot bot) : base(bot)
     {
-        inventoryLoadedTsc = new();
+        inventoryLoadedTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
         openWindows = new ConcurrentDictionary<int, Window>();
         windowLock = new();
 
@@ -135,7 +135,7 @@ public class WindowPlugin : Plugin
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
 
-        openContainerTsc = new();
+        openContainerTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var packet = new PlaceBlockPacket(
             (int)PlayerHand.MainHand,

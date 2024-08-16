@@ -157,7 +157,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         packetHandlers = new();
         packetWaiters = new();
         packetReceivers = new();
-        GameJoinedTcs = new();
+        GameJoinedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
         bundledPackets = null;
         tcpTcpFactory = tcpFactory;
         ip = IpHelper.ResolveHostname(hostnameOrIp, ref port);
@@ -262,7 +262,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <returns>A task that resolves once the packet was actually sent.</returns>
     public async Task SendPacket(IPacket packet, CancellationToken cancellation = default)
     {
-        var sendingTask = new PacketSendTask(packet, cancellation, new());
+        var sendingTask = new PacketSendTask(packet, cancellation, new(TaskCreationOptions.RunContinuationsAsynchronously));
         try
         {
             if (!await packetQueue.SendAsync(sendingTask, cancellation))
@@ -344,7 +344,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     public Task<T> WaitForPacket<T>() where T : IPacket
     {
         var packetType = T.StaticType;
-        var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>());
+        var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously));
         return tcs.Task.ContinueWith(prev => (T)prev.Result);
     }
 
@@ -534,21 +534,24 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             try
             {
                 DispatchPacket(task.Packet);
-                // TrySetResult must be run from a different task to prevent blocking the stream loop
-                // because the task continuation will be executed inline and might block or cause a deadlock
-                _ = Task.Run(task.Task.TrySetResult);
+                task.Task.TrySetResult();
             }
-            catch (SocketException e)
+            catch (OperationCanceledException e)
             {
-                Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", task.Packet.Type);
-                task.Task.TrySetException(e);
-                // break the loop to prevent further packets from being sent
-                // because the connection is probably dead
+                task.Task.TrySetCanceled(e.CancellationToken);
+                // we should stop. So we do by rethrowing the exception
                 throw;
             }
             catch (Exception e)
             {
+                Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", task.Packet.Type);
                 task.Task.TrySetException(e);
+                if (e is SocketException)
+                {
+                    // break the loop to prevent further packets from being sent
+                    // because the connection is probably dead
+                    throw;
+                }
             }
         }
     }
@@ -724,7 +727,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
         var responseTimeoutCts = new CancellationTokenSource();
         var responseTimeoutCancellationToken = responseTimeoutCts.Token;
-        var taskCompletionSource = new TaskCompletionSource<ServerStatus>();
+        var taskCompletionSource = new TaskCompletionSource<ServerStatus>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         client.On<StatusResponsePacket>(async packet =>
         {

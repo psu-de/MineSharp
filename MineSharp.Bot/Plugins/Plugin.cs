@@ -26,7 +26,7 @@ public abstract class Plugin
     {
         Bot = bot;
         IsEnabled = true;
-        initializationTask = new();
+        initializationTask = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
     /// <summary>
