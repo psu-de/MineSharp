@@ -28,17 +28,17 @@ public class EntityPlugin : Plugin
     {
         Entities = new ConcurrentDictionary<int, Entity>();
 
-        Bot.Client.On<SpawnEntityPacket>(HandleSpawnEntityPacket);
-        Bot.Client.On<SpawnLivingEntityPacket>(HandleSpawnLivingEntityPacket);
-        Bot.Client.On<RemoveEntitiesPacket>(HandleRemoveEntitiesPacket);
-        Bot.Client.On<SetEntityVelocityPacket>(HandleSetEntityVelocityPacket);
-        Bot.Client.On<EntityPositionPacket>(HandleUpdateEntityPositionPacket);
-        Bot.Client.On<EntityPositionAndRotationPacket>(HandleUpdateEntityPositionAndRotationPacket);
-        Bot.Client.On<EntityRotationPacket>(HandleUpdateEntityRotationPacket);
-        Bot.Client.On<TeleportEntityPacket>(HandleTeleportEntityPacket);
-        Bot.Client.On<UpdateAttributesPacket>(HandleUpdateAttributesPacket);
-        Bot.Client.On<PlayerPositionPacket>(HandleSynchronizePlayerPosition);
-        Bot.Client.On<SetPassengersPacket>(HandleSetPassengersPacket);
+        OnPacketAfterInitialization<SpawnEntityPacket>(HandleSpawnEntityPacket);
+        OnPacketAfterInitialization<SpawnLivingEntityPacket>(HandleSpawnLivingEntityPacket);
+        OnPacketAfterInitialization<RemoveEntitiesPacket>(HandleRemoveEntitiesPacket);
+        OnPacketAfterInitialization<SetEntityVelocityPacket>(HandleSetEntityVelocityPacket);
+        OnPacketAfterInitialization<EntityPositionPacket>(HandleUpdateEntityPositionPacket);
+        OnPacketAfterInitialization<EntityPositionAndRotationPacket>(HandleUpdateEntityPositionAndRotationPacket);
+        OnPacketAfterInitialization<EntityRotationPacket>(HandleUpdateEntityRotationPacket);
+        OnPacketAfterInitialization<TeleportEntityPacket>(HandleTeleportEntityPacket);
+        OnPacketAfterInitialization<UpdateAttributesPacket>(HandleUpdateAttributesPacket);
+        OnPacketAfterInitialization<PlayerPositionPacket>(HandleSynchronizePlayerPosition);
+        OnPacketAfterInitialization<SetPassengersPacket>(HandleSetPassengersPacket);
     }
 
     /// <summary>

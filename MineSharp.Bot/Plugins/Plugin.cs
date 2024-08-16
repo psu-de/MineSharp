@@ -1,4 +1,6 @@
-﻿using MineSharp.Protocol.Packets;
+﻿using ConcurrentCollections;
+using MineSharp.Protocol.Packets;
+using MineSharp.Protocol.Registrations;
 using NLog;
 using static MineSharp.Protocol.MinecraftClient;
 
@@ -7,7 +9,7 @@ namespace MineSharp.Bot.Plugins;
 /// <summary>
 ///     Plugin for <see cref="MineSharpBot" />.
 /// </summary>
-public abstract class Plugin
+public abstract class Plugin : IAsyncDisposable
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -19,6 +21,12 @@ public abstract class Plugin
     protected readonly MineSharpBot Bot;
 
     /// <summary>
+    ///    All the registrations for packet handlers that this plugin has mode.
+    ///    Used to unregister them when the plugin is disposed.
+    /// </summary>
+    protected readonly ConcurrentHashSet<AbstractPacketReceiveRegistration> PacketReceiveRegistrations;
+
+    /// <summary>
     ///     Create a new Plugin instance
     /// </summary>
     /// <param name="bot"></param>
@@ -27,6 +35,7 @@ public abstract class Plugin
         Bot = bot;
         IsEnabled = true;
         initializationTask = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        PacketReceiveRegistrations = new();
     }
 
     /// <summary>
@@ -137,10 +146,14 @@ public abstract class Plugin
     /// <typeparam name="TPacket">The type of the packet.</typeparam>
     /// <param name="packetHandler">The packet handler to be called.</param>
     /// <param name="queuePacketsSentBeforeInitializationCompleted">Whether packets sent before the plugin has been initialized should be queued and processed after initialization.</param>
-    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
+    public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = true)
         where TPacket : IPacket
     {
-        Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler, queuePacketsSentBeforeInitializationCompleted));
+        var registration = Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler, queuePacketsSentBeforeInitializationCompleted));
+        if (registration != null)
+        {
+            PacketReceiveRegistrations.Add(registration);
+        }
     }
 
     internal async Task Initialize()
@@ -170,5 +183,29 @@ public abstract class Plugin
             initializationTask.TrySetException(e);
             throw;
         }
+    }
+
+    /// <inheritdoc/>
+    public ValueTask DisposeAsync()
+    {
+        GC.SuppressFinalize(this);
+        return DisposeAsyncInternal();
+    }
+
+    /// <summary>
+    ///     Disposes the plugin asynchronously.
+    ///     Can be overridden by plugins to add custom dispose logic.
+    ///     IMPORTANT: Always call base.DisposeAsync() in the overridden method (at the end).
+    /// </summary>
+    /// <returns>A ValueTask representing the asynchronous dispose operation.</returns>
+    protected virtual ValueTask DisposeAsyncInternal()
+    {
+        var registrations = PacketReceiveRegistrations.ToArray();
+        foreach (var registration in registrations)
+        {
+            PacketReceiveRegistrations.TryRemove(registration);
+            registration.Dispose();
+        }
+        return ValueTask.CompletedTask;
     }
 }

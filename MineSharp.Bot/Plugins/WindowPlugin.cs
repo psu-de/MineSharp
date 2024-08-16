@@ -60,10 +60,10 @@ public class WindowPlugin : Plugin
 
         // OnPacketAfterInitialization is required to ensure that the plugin is initialized
         // before handling packets. Otherwise we have race conditions that might cause errors
-        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems, true);
-        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot, true);
-        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange, true);
-        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow, true);
+        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems);
+        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot);
+        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange);
+        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow);
     }
 
     /// <summary>

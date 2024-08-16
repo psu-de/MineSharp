@@ -45,10 +45,10 @@ public class ChatPlugin : Plugin
             _ => null
         };
 
-        Bot.Client.On<PlayerChatPacket>(HandleChatMessagePacket);
-        Bot.Client.On<ChatPacket>(HandleChat);
-        Bot.Client.On<SystemChatMessagePacket>(HandleSystemChatMessage);
-        Bot.Client.On<DisguisedChatMessagePacket>(HandleDisguisedChatMessage);
+        OnPacketAfterInitialization<PlayerChatPacket>(HandleChatMessagePacket);
+        OnPacketAfterInitialization<ChatPacket>(HandleChat);
+        OnPacketAfterInitialization<SystemChatMessagePacket>(HandleSystemChatMessage);
+        OnPacketAfterInitialization<DisguisedChatMessagePacket>(HandleDisguisedChatMessage);
 
         initDeclareCommandsPacket = Bot.Client.WaitForPacket<DeclareCommandsPacket>();
     }
@@ -72,7 +72,8 @@ public class ChatPlugin : Plugin
                 ));
         }
 
-        await HandleDeclareCommandsPacket(await initDeclareCommandsPacket.WaitAsync(Bot.CancellationToken)).WaitAsync(Bot.CancellationToken);
+        var declareCommandsPacket = await initDeclareCommandsPacket.WaitAsync(Bot.CancellationToken);
+        await HandleDeclareCommandsPacket(declareCommandsPacket).WaitAsync(Bot.CancellationToken);
     }
 
     /// <summary>
