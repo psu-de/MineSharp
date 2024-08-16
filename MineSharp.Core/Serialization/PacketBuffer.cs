@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using fNbt;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
@@ -35,7 +34,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     public PacketBuffer(byte[] bytes, ProtocolVersion protocolVersion)
     {
         ProtocolVersion = protocolVersion;
-        buffer = new(bytes);
+        buffer = new(bytes, false);
     }
 
     /// <summary>
@@ -81,7 +80,7 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    ///     Return the buffer's byte array
+    ///     Return a copy of the buffer's byte array
     /// </summary>
     /// <returns></returns>
     public byte[] GetBuffer()
@@ -96,8 +95,45 @@ public class PacketBuffer : IDisposable, IAsyncDisposable
     /// <returns></returns>
     public string HexDump(bool cutToPosition = false)
     {
-        var hex = Convert.ToHexString(GetBuffer().Skip(cutToPosition ? (int)Position : 0).ToArray());
-        return Regex.Replace(hex, ".{2}", "$0 ").TrimEnd();
+        byte[] dataToDump;
+        if (cutToPosition)
+        {
+            dataToDump = new byte[ReadableBytes];
+            PeekBytes(dataToDump);
+        }
+        else
+        {
+            dataToDump = GetBuffer();
+        }
+
+        if (dataToDump.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        var hexStringBuffer = new char[dataToDump.Length * 3 - 1];
+        var hexStringBufferSpan = new Span<char>(hexStringBuffer);
+        for (var i = 0; i < dataToDump.Length; i++)
+        {
+            var b = dataToDump[i];
+            b.TryFormat(hexStringBufferSpan.Slice(i * 3, 2), out _, "X2");
+            if (i != dataToDump.Length - 1)
+            {
+                // Add a space between each byte
+                // but not at the very end
+                hexStringBufferSpan[i * 3 + 2] = ' ';
+            }
+        }
+        return new string(hexStringBuffer);
+    }
+
+    private void PeekBytes(Span<byte> bytes)
+    {
+        EnsureEnoughReadableBytes(bytes.Length);
+
+        var oldPosition = buffer.Position;
+        buffer.Read(bytes);
+        buffer.Position = oldPosition;
     }
 
     private void EnsureEnoughReadableBytes(int count)
