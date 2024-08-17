@@ -110,8 +110,8 @@ internal sealed class LoginPacketHandler : GameStatePacketHandler
             response = new(sharedSecret, encVerToken, null);
         }
 
-        _ = client.SendPacket(response)
-                  .ContinueWith(_ => client.EnableEncryption(aes.Key));
+        await client.SendPacket(response);
+        client.EnableEncryption(aes.Key);
     }
 
     private Task HandleSetCompression(SetCompressionPacket packet)

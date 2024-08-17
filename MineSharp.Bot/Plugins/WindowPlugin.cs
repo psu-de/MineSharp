@@ -44,7 +44,7 @@ public class WindowPlugin : Plugin
     /// <param name="bot"></param>
     public WindowPlugin(MineSharpBot bot) : base(bot)
     {
-        inventoryLoadedTsc = new();
+        inventoryLoadedTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
         openWindows = new ConcurrentDictionary<int, Window>();
         windowLock = new();
 
@@ -60,10 +60,10 @@ public class WindowPlugin : Plugin
 
         // OnPacketAfterInitialization is required to ensure that the plugin is initialized
         // before handling packets. Otherwise we have race conditions that might cause errors
-        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems, true);
-        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot, true);
-        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange, true);
-        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow, true);
+        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems);
+        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot);
+        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange);
+        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public class WindowPlugin : Plugin
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
 
-        openContainerTsc = new();
+        openContainerTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var packet = new PlaceBlockPacket(
             (int)PlayerHand.MainHand,

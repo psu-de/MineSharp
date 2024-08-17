@@ -24,7 +24,7 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
     {
         if (data.Version.Protocol <= ProtocolVersion.V_1_20)
         {
-            await client.SendClientInformationPacket();
+            await client.SendClientInformationPacket(GameState);
         }
         client.GameJoinedTcs.SetResult();
     }

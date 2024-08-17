@@ -31,12 +31,12 @@ public class WorldPlugin : Plugin
     public WorldPlugin(MineSharpBot bot) : base(bot)
     {
         // we want all the packets. Even those that are sent before the plugin is initialized.
-        OnPacketAfterInitialization<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket, true);
-        OnPacketAfterInitialization<UnloadChunkPacket>(HandleUnloadChunkPacket, true);
-        OnPacketAfterInitialization<BlockUpdatePacket>(HandleBlockUpdatePacket, true);
-        OnPacketAfterInitialization<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket, true);
-        OnPacketAfterInitialization<ChunkBatchStartPacket>(HandleChunkBatchStartPacket, true);
-        OnPacketAfterInitialization<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket, true);
+        OnPacketAfterInitialization<ChunkDataAndUpdateLightPacket>(HandleChunkDataAndLightUpdatePacket);
+        OnPacketAfterInitialization<UnloadChunkPacket>(HandleUnloadChunkPacket);
+        OnPacketAfterInitialization<BlockUpdatePacket>(HandleBlockUpdatePacket);
+        OnPacketAfterInitialization<MultiBlockUpdatePacket>(HandleMultiBlockUpdatePacket);
+        OnPacketAfterInitialization<ChunkBatchStartPacket>(HandleChunkBatchStartPacket);
+        OnPacketAfterInitialization<ChunkBatchFinishedPacket>(HandleChunkBatchFinishedPacket);
     }
 
     /// <summary>
