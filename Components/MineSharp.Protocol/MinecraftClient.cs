@@ -407,8 +407,15 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             cts.Dispose();
             throw new InvalidOperationException("Could not register packet handler");
         }
+        // this registration is required because otherwise the task will only get cancelled when the next packet of that ype is received
+        var cancellationRegistration = token.Register(() =>
+        {
+            // cancelling the tcs will later dispose the other stuff
+            tcs.TrySetCanceled(token);
+        });
         tcs.Task.ContinueWith(_ =>
         {
+            cancellationRegistration.Dispose();
             packetRegistration.Dispose();
             cts.Dispose();
         }, TaskContinuationOptions.ExecuteSynchronously);
