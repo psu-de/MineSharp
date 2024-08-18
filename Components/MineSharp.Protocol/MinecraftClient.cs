@@ -532,18 +532,36 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         stream!.SetCompression(threshold);
     }
 
-    internal async Task HandleBundleDelimiter()
+    internal void HandleBundleDelimiter()
     {
         var bundledPackets = Interlocked.Exchange(ref this.bundledPackets, null);
         if (bundledPackets != null)
         {
-            Logger.Debug("Processing bundled packets");
-            var tasks = bundledPackets.Select(
-                                           p => HandleIncomingPacket(p.Type, p.Buffer))
-                                      .ToArray();
+            _ = Task.Run(() => ProcessBundledPackets(bundledPackets), CancellationToken);
+        }
+        else
+        {
+            if (Interlocked.CompareExchange(ref this.bundledPackets, new(), null) != null)
+            {
+                Logger.Warn("Bundling could not be enabled because it was already enabled. This is a race condition.");
+            }
+        }
+    }
+
+    private async Task ProcessBundledPackets(ConcurrentQueue<(PacketType, PacketBuffer)> packets)
+    {
+        Logger.Debug($"Processing {packets.Count} bundled packets");
+        try
+        {
+            // wiki.vg: the client is guaranteed to process every packet in the bundle on the same tick
+            // we don't guarantee that.
+            // TODO: process bundled packets within a single tick
+            var tasks = packets.Select(
+                                    p => HandleIncomingPacket(p.Item1, p.Item2))
+                               .ToArray();
 
             // no clearing required the queue will no longer be used and will get GCed
-            //bundledPackets.Clear();
+            // bundledPackets.Clear();
 
             await Task.WhenAll(tasks);
 
@@ -552,16 +570,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 Logger.Error(faultedTask.Exception, "Error handling bundled packet.");
             }
         }
-        else
+        catch (Exception e)
         {
-            if (Interlocked.CompareExchange(ref this.bundledPackets, new(), null) == null)
-            {
-                Logger.Debug("Bundling packets!");
-            }
-            else
-            {
-                Logger.Warn("Bundling could not be enabled because it was already enabled. This is a race condition.");
-            }
+            Logger.Error(e, "Error handling bundled packets.");
         }
     }
 
@@ -601,6 +612,14 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
 
             Logger.Trace("Received packet {PacketType}. GameState = {GameState}, PacketId = {PacketId}", packetType, gameState, packetId);
+
+            // handle BundleDelimiter packet here, because there is a race condition where some
+            // packets may be read before HandleBundleDelimiter is invoked through a handler
+            if (packetType == PacketType.CB_Play_BundleDelimiter)
+            {
+                HandleBundleDelimiter();
+                continue;
+            }
 
             if (gameState != GameState.Play)
             {
