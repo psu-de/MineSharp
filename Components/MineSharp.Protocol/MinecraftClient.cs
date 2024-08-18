@@ -367,18 +367,18 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <summary>
     /// Waits until a packet of the specified type is received and matches the given condition.
     /// </summary>
-    /// <typeparam name="T">The type of the packet.</typeparam>
+    /// <typeparam name="TPacket">The type of the packet.</typeparam>
     /// <param name="condition">A function that evaluates the packet and returns true if the condition is met.</param>
     /// <param name="cancellationToken">A token to cancel the wait for the matching packet.</param>
     /// <returns>A task that completes once a packet matching the condition is received.</returns>
-    public Task WaitForPacketWhere<T>(Func<T, Task<bool>> condition, CancellationToken cancellationToken = default)
-         where T : IPacket
+    public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, Task<bool>> condition, CancellationToken cancellationToken = default)
+         where TPacket : IPacket
     {
         // linked token is required to cancel the task when the client is disconnected
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
         var token = cts.Token;
-        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        async Task PacketHandler(T packet)
+        var tcs = new TaskCompletionSource<TPacket>(TaskCreationOptions.RunContinuationsAsynchronously);
+        async Task PacketHandler(TPacket packet)
         {
             try
             {
@@ -388,7 +388,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 }
                 if (await condition(packet).WaitAsync(token))
                 {
-                    tcs.TrySetResult();
+                    tcs.TrySetResult(packet);
                 }
             }
             catch (OperationCanceledException e)
@@ -400,31 +400,26 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
                 tcs.TrySetException(e);
             }
         }
-        var packetRegistration = On<T>(PacketHandler);
+        var packetRegistration = On<TPacket>(PacketHandler);
         if (packetRegistration == null)
         {
             // TODO: Can this occur?
             cts.Dispose();
             throw new InvalidOperationException("Could not register packet handler");
         }
-        return tcs.Task.ContinueWith(_ =>
+        tcs.Task.ContinueWith(_ =>
         {
             packetRegistration.Dispose();
             cts.Dispose();
         }, TaskContinuationOptions.ExecuteSynchronously);
+        return tcs.Task;
     }
 
-    /// <summary>
-    /// Waits until a packet of the specified type is received and matches the given condition.
-    /// </summary>
-    /// <typeparam name="T">The type of the packet.</typeparam>
-    /// <param name="condition">A function that evaluates the packet and returns true if the condition is met.</param>
-    /// <param name="cancellationToken">A token to cancel the wait for the matching packet.</param>
-    /// <returns>A task that completes once a packet matching the condition is received.</returns>
-    public Task WaitForPacketWhere<T>(Func<T, bool> condition, CancellationToken cancellationToken = default)
-        where T : IPacket
+    /// <inheritdoc cref="WaitForPacketWhere{TPacket}(Func{TPacket, Task{bool}}, CancellationToken)"/>
+    public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, bool> condition, CancellationToken cancellationToken = default)
+        where TPacket : IPacket
     {
-        return WaitForPacketWhere<T>(packet => Task.FromResult(condition(packet)), cancellationToken);
+        return WaitForPacketWhere<TPacket>(packet => Task.FromResult(condition(packet)), cancellationToken);
     }
 
     /// <summary>
