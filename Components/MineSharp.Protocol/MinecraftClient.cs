@@ -236,7 +236,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             return true;
         }
 
-        Logger.Debug($"Connecting to {ip}:{Port}.");
+        Logger.Debug($"Connecting to {ip}:{Port} with PVN={Data.Version.Protocol}");
 
         try
         {
