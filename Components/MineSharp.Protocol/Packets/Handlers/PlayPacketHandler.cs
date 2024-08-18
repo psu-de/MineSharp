@@ -20,13 +20,10 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
         this.data = data;
     }
 
-    public override async Task StateEntered()
+    public override Task StateEntered()
     {
-        if (data.Version.Protocol <= ProtocolVersion.V_1_20)
-        {
-            await client.SendClientInformationPacket(GameState);
-        }
         client.GameJoinedTcs.SetResult();
+        return Task.CompletedTask;
     }
 
     public override Task HandleIncoming(IPacket packet)
@@ -37,6 +34,7 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
             BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             PingPacket ping => HandlePing(ping),
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
+            LoginPacket login => HandleLogin(login),
             _ => Task.CompletedTask
         };
     }
@@ -44,7 +42,7 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
     public override bool HandlesIncoming(PacketType type)
     {
         return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping
-            or PacketType.CB_Play_KickDisconnect;
+            or PacketType.CB_Play_KickDisconnect or PacketType.CB_Play_Login;
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
@@ -66,5 +64,14 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
     {
         _ = Task.Run(() => client.Disconnect(packet.Reason));
         return Task.CompletedTask;
+    }
+
+    private Task HandleLogin(LoginPacket packet)
+    {
+        return data.Version.Protocol switch
+        {
+            <= ProtocolVersion.V_1_20 => client.SendClientInformationPacket(GameState),
+            _ => Task.CompletedTask
+        };
     }
 }
