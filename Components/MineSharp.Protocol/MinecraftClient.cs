@@ -565,8 +565,9 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         try
         {
             // run both tasks in parallel
-            var receiveTask = Task.Factory.StartNew(ReceivePackets, TaskCreationOptions.LongRunning);
-            var sendTask = Task.Factory.StartNew(SendPackets, TaskCreationOptions.LongRunning);
+            // because the task factory does not unwrap the tasks (like Task.Run) we need to do it manually
+            var receiveTask = Task.Factory.StartNew(ReceivePackets, TaskCreationOptions.LongRunning).Unwrap();
+            var sendTask = Task.Factory.StartNew(SendPackets, TaskCreationOptions.LongRunning).Unwrap();
 
             // extract the exception from the task that finished first
             await await Task.WhenAny(receiveTask, sendTask);
@@ -585,71 +586,89 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     private async Task ReceivePackets()
     {
-        while (true)
+        try
         {
-            CancellationToken.ThrowIfCancellationRequested();
-
-            var buffer = stream!.ReadPacket();
-
-            var packetId = buffer.ReadVarInt();
-            var gameState = gameStatePacketHandler.GameState;
-            var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
-
-            Logger.Trace("Received packet {PacketType}. GameState = {GameState}, PacketId = {PacketId}", packetType, gameState, packetId);
-
-            if (gameState != GameState.Play)
+            while (true)
             {
-                await HandleIncomingPacket(packetType, buffer);
-            }
-            else
-            {
-                var bundledPackets = this.bundledPackets;
-                if (bundledPackets != null)
+                CancellationToken.ThrowIfCancellationRequested();
+
+                var buffer = stream!.ReadPacket();
+
+                var packetId = buffer.ReadVarInt();
+                var gameState = gameStatePacketHandler.GameState;
+                var packetType = Data.Protocol.GetPacketType(PacketFlow.Clientbound, gameState, packetId);
+
+                Logger.Trace("Received packet {PacketType}. GameState = {GameState}, PacketId = {PacketId}", packetType, gameState, packetId);
+
+                if (gameState != GameState.Play)
                 {
-                    bundledPackets.Enqueue((packetType, buffer));
+                    await HandleIncomingPacket(packetType, buffer);
                 }
                 else
                 {
-                    // handle the packet in a new task to prevent blocking the stream loop
-                    _ = Task.Run(() => HandleIncomingPacket(packetType, buffer));
+                    var bundledPackets = this.bundledPackets;
+                    if (bundledPackets != null)
+                    {
+                        bundledPackets.Enqueue((packetType, buffer));
+                    }
+                    else
+                    {
+                        // handle the packet in a new task to prevent blocking the stream loop
+                        _ = Task.Run(() => HandleIncomingPacket(packetType, buffer));
+                    }
                 }
             }
         }
+        catch (Exception e)
+        {
+            Logger.Debug(e, "ReceivePackets loop ended with exception.");
+            throw;
+        }
+        // can never exit without exception because infinite loop without break
     }
 
     private async Task SendPackets()
     {
-        await foreach (var task in packetQueue.ReceiveAllAsync())
+        try
         {
-            if (task.Token.IsCancellationRequested)
+            await foreach (var task in packetQueue.ReceiveAllAsync())
             {
-                task.Task.TrySetCanceled();
-                continue;
-            }
-
-            try
-            {
-                DispatchPacket(task.Packet);
-                task.Task.TrySetResult();
-            }
-            catch (OperationCanceledException e)
-            {
-                task.Task.TrySetCanceled(e.CancellationToken);
-                // we should stop. So we do by rethrowing the exception
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", task.Packet.Type);
-                task.Task.TrySetException(e);
-                if (e is SocketException)
+                if (task.Token.IsCancellationRequested)
                 {
-                    // break the loop to prevent further packets from being sent
-                    // because the connection is probably dead
+                    task.Task.TrySetCanceled();
+                    continue;
+                }
+
+                try
+                {
+                    DispatchPacket(task.Packet);
+                    task.Task.TrySetResult();
+                }
+                catch (OperationCanceledException e)
+                {
+                    task.Task.TrySetCanceled(e.CancellationToken);
+                    // we should stop. So we do by rethrowing the exception
                     throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Encountered exception while dispatching packet {PacketType}", task.Packet.Type);
+                    task.Task.TrySetException(e);
+                    if (e is SocketException)
+                    {
+                        // break the loop to prevent further packets from being sent
+                        // because the connection is probably dead
+                        throw;
+                    }
                 }
             }
         }
+        catch (Exception e)
+        {
+            Logger.Debug(e, "SendPackets loop ended with exception.");
+            throw;
+        }
+        // can never exit without exception because infinite loop without break (because we never complete the BufferBlock we only cancel it)
     }
 
     private void DispatchPacket(IPacket packet)
