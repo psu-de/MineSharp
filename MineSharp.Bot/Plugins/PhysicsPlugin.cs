@@ -268,7 +268,7 @@ public class PhysicsPlugin : Plugin
             {
                 Logger.Error(e.ToString());
             }
-
+            
             tickCounter++;
         });
 
@@ -289,15 +289,7 @@ public class PhysicsPlugin : Plugin
 
     private async Task UpdateServerPositionIfNeeded()
     {
-        if (Math.Abs(lastPlayerState.X - self!.Entity!.Position.X) > PositionThreshold
-            || Math.Abs(lastPlayerState.Y - self!.Entity!.Position.Y) > PositionThreshold
-            || Math.Abs(lastPlayerState.Z - self!.Entity!.Position.Z) > PositionThreshold
-            || Math.Abs(lastPlayerState.Yaw - self!.Entity!.Yaw) > PositionThreshold
-            || Math.Abs(lastPlayerState.Pitch - self!.Entity!.Pitch) > PositionThreshold
-            || lastPlayerState.OnGround != self!.Entity!.IsOnGround)
-        {
-            await UpdateServerPos();
-        }
+        await UpdateServerPos();
     }
 
     private async Task UpdateServerPos()
