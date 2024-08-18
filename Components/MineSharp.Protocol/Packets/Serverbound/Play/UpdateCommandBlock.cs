@@ -2,10 +2,18 @@
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using static MineSharp.Protocol.Packets.Serverbound.Play.UpdateCommandBlock;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-#pragma warning disable CS1591
-public sealed record UpdateCommandBlock(Position Location, string Command, int Mode, byte Flags) : IPacket
+
+/// <summary>
+///     Sent by the client when the player updated a command block.
+/// </summary>
+/// <param name="Location">The position of the command block.</param>
+/// <param name="Command">The command to be executed by the command block.</param>
+/// <param name="Mode">The mode of the command block.</param>
+/// <param name="Flags">The flags for the command block.</param>
+public sealed record UpdateCommandBlock(Position Location, string Command, CommandBlockMode Mode, CommandBlockFlags Flags) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,18 +25,38 @@ public sealed record UpdateCommandBlock(Position Location, string Command, int M
     {
         buffer.WritePosition(Location);
         buffer.WriteString(Command);
-        buffer.WriteVarInt(Mode);
-        buffer.WriteByte(Flags);
+        buffer.WriteVarInt((int)Mode);
+        buffer.WriteSByte((sbyte)Flags);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new UpdateCommandBlock(
-            buffer.ReadPosition(),
-            buffer.ReadString(),
-            buffer.ReadVarInt(),
-            buffer.ReadByte());
+        var location = buffer.ReadPosition();
+        var command = buffer.ReadString();
+        var mode = (CommandBlockMode)buffer.ReadVarInt();
+        var flags = (CommandBlockFlags)buffer.ReadSByte();
+
+        return new UpdateCommandBlock(location, command, mode, flags);
     }
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public enum CommandBlockMode
+    {
+        Sequence,
+        Auto,
+        Redstone
+    }
+
+    [Flags]
+    public enum CommandBlockFlags : sbyte
+    {
+        /// <summary>
+        /// If not set, the output of the previous command will not be stored within the command block.
+        /// </summary>
+        TrackOutput = 0x01,
+        Conditional = 0x02,
+        Automatic = 0x04
+    }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
-#pragma warning restore CS1591

@@ -5,27 +5,27 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-///     Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
+///     Ping request packet sent by the client to the server.
 /// </summary>
-/// <param name="Id"></param>
-public sealed record PongPacket(int Id) : IPacket
+/// <param name="Payload">The payload, which may be any number. Notchian clients use a system-dependent time value counted in milliseconds.</param>
+public sealed record PingRequestPacket(long Payload) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.SB_Play_Pong;
+    public static PacketType StaticType => PacketType.SB_Play_PingRequest;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteInt(Id);
+        buffer.WriteLong(Payload);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var id = buffer.ReadInt();
+        var payload = buffer.ReadLong();
 
-        return new PongPacket(id);
+        return new PingRequestPacket(payload);
     }
 }

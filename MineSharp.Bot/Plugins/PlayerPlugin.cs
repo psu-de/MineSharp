@@ -220,7 +220,7 @@ public class PlayerPlugin : Plugin
     /// <returns></returns>
     public Task Respawn()
     {
-        return Bot.Client.SendPacket(new ClientCommandPacket(0));
+        return Bot.Client.SendPacket(new ClientCommandPacket(ClientCommandPacket.ClientCommandAction.PerformRespawn));
     }
 
 

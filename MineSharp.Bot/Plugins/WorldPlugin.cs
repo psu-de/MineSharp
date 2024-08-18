@@ -4,10 +4,12 @@ using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Geometry;
 using MineSharp.Protocol.Packets.Clientbound.Play;
+using MineSharp.Protocol.Packets.NetworkTypes;
 using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;
 using MineSharp.World.Chunks;
 using NLog;
+using static MineSharp.Protocol.Packets.Serverbound.Play.UpdateCommandBlock;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -92,7 +94,7 @@ public class WorldPlugin : Plugin
     /// <param name="flags"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public Task UpdateCommandBlock(Position location, string command, int mode, byte flags)
+    public Task UpdateCommandBlock(Position location, string command, CommandBlockMode mode, CommandBlockFlags flags)
     {
         if (playerPlugin?.Self?.GameMode != GameMode.Creative)
         {
@@ -141,7 +143,7 @@ public class WorldPlugin : Plugin
 
         // first packet: Start digging
         var startPacket = new PlayerActionPacket( // TODO: PlayerActionPacket hardcoded values
-            (int)PlayerActionStatus.StartedDigging,
+            PlayerActionStatus.StartDigging,
             block.Position,
             face.Value,
             ++Bot.SequenceId); // Sequence Id is ignored when sending before 1.19
@@ -173,7 +175,7 @@ public class WorldPlugin : Plugin
                 await Task.Delay(time);
 
                 var finishPacket = new PlayerActionPacket(
-                    (int)PlayerActionStatus.FinishedDigging,
+                    PlayerActionStatus.FinishedDigging,
                     block.Position,
                     face.Value,
                     ++Bot.SequenceId);
@@ -191,7 +193,7 @@ public class WorldPlugin : Plugin
 
             if (ack.Body is AcknowledgeBlockChangePacket.PacketBody118 p118)
             {
-                if ((PlayerActionStatus)p118.Status != PlayerActionStatus.StartedDigging)
+                if ((PlayerActionStatus)p118.Status != PlayerActionStatus.StartDigging)
                 {
                     return MineBlockStatus.Failed;
                 }
@@ -206,7 +208,7 @@ public class WorldPlugin : Plugin
         catch (TaskCanceledException)
         {
             var cancelPacket = new PlayerActionPacket(
-                (int)PlayerActionStatus.CancelledDigging,
+                PlayerActionStatus.CancelledDigging,
                 block.Position,
                 face.Value,
                 ++Bot.SequenceId);
@@ -229,7 +231,7 @@ public class WorldPlugin : Plugin
     {
         // TODO: PlaceBlock: Hardcoded values
         var packet = new PlaceBlockPacket(
-            (int)hand,
+            hand,
             position,
             face,
             0.5f,

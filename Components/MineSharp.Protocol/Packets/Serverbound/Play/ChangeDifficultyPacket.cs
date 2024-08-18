@@ -1,31 +1,32 @@
 ﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-///     Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
+///     Change difficulty packet
 /// </summary>
-/// <param name="Id"></param>
-public sealed record PongPacket(int Id) : IPacket
+/// <param name="NewDifficulty">The new difficulty level</param>
+public sealed record ChangeDifficultyPacket(DifficultyLevel NewDifficulty) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.SB_Play_Pong;
+    public static PacketType StaticType => PacketType.SB_Play_SetDifficulty;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteInt(Id);
+        buffer.WriteByte((byte)NewDifficulty);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var id = buffer.ReadInt();
+        var newDifficulty = (DifficultyLevel)buffer.ReadByte();
 
-        return new PongPacket(id);
+        return new ChangeDifficultyPacket(newDifficulty);
     }
 }

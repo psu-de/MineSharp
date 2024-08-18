@@ -3,10 +3,10 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
 
-namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
+namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 /// <summary>
-///     Update Tags (configuration) packet
+///     Update Tags packet
 /// </summary>
 /// <param name="Registries">Array of registries with their tags</param>
 public sealed record UpdateTagsPacket(Registry[] Registries) : IPacket
@@ -14,7 +14,7 @@ public sealed record UpdateTagsPacket(Registry[] Registries) : IPacket
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.CB_Configuration_Tags;
+    public static PacketType StaticType => PacketType.CB_Play_Tags;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

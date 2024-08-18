@@ -6,27 +6,27 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-///     Sent by the client when the player swings their arm.
+///     Packet sent by the client when a recipe is first seen in the recipe book.
 /// </summary>
-/// <param name="Hand">The hand used by the player.</param>
-public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
+/// <param name="RecipeId">The ID of the recipe.</param>
+public sealed record SetSeenRecipePacket(Identifier RecipeId) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.SB_Play_ArmAnimation;
+    public static PacketType StaticType => PacketType.SB_Play_DisplayedRecipe;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt((int)Hand);
+        buffer.WriteIdentifier(RecipeId);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var hand = (PlayerHand)buffer.ReadVarInt();
+        var recipeId = buffer.ReadIdentifier();
 
-        return new SwingArmPacket(hand);
+        return new SetSeenRecipePacket(recipeId);
     }
 }

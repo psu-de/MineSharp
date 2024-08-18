@@ -5,27 +5,27 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-///     Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
+///     Lock Difficulty packet
 /// </summary>
-/// <param name="Id"></param>
-public sealed record PongPacket(int Id) : IPacket
+/// <param name="Locked">Indicates if the difficulty is locked</param>
+public sealed record LockDifficultyPacket(bool Locked) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.SB_Play_Pong;
+    public static PacketType StaticType => PacketType.SB_Play_LockDifficulty;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteInt(Id);
+        buffer.WriteBool(Locked);
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var id = buffer.ReadInt();
+        var locked = buffer.ReadBool();
 
-        return new PongPacket(id);
+        return new LockDifficultyPacket(locked);
     }
 }

@@ -5,27 +5,25 @@ using MineSharp.Data.Protocol;
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
-///     Pong Packet https://wiki.vg/Protocol#Ping_Response_.28play.29
+///     Acknowledge Configuration packet sent by the client upon receiving a Start Configuration packet from the server.
 /// </summary>
-/// <param name="Id"></param>
-public sealed record PongPacket(int Id) : IPacket
+public sealed record AcknowledgeConfigurationPacket() : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
-    public static PacketType StaticType => PacketType.SB_Play_Pong;
+    public static PacketType StaticType => PacketType.SB_Play_ConfigurationAcknowledged;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteInt(Id);
+        // No fields to write
     }
 
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var id = buffer.ReadInt();
-
-        return new PongPacket(id);
+        // No fields to read
+        return new AcknowledgeConfigurationPacket();
     }
 }
