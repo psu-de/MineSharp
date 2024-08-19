@@ -31,7 +31,6 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
         return packet switch
         {
             KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
-            BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             PingPacket ping => HandlePing(ping),
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
             LoginPacket login => HandleLogin(login),
@@ -41,18 +40,13 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
 
     public override bool HandlesIncoming(PacketType type)
     {
-        return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping
+        return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_Ping
             or PacketType.CB_Play_KickDisconnect or PacketType.CB_Play_Login;
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
         return client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
-    }
-
-    private Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
-    {
-        return client.HandleBundleDelimiter();
     }
 
     private Task HandlePing(PingPacket ping)
