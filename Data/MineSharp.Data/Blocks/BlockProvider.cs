@@ -60,7 +60,7 @@ internal class BlockProvider : IDataProvider<BlockInfo[]>
 
         return new(
             id,
-            BlockTypeLookup.FromName(NameUtils.GetBiomeName(name)),
+            BlockTypeLookup.FromName(NameUtils.GetBlockName(name)),
             name,
             displayName,
             hardness,
