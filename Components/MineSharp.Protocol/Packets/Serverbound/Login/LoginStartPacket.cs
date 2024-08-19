@@ -21,6 +21,9 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
     {
     }
 
+    /// <summary>
+    /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_7_0"/>
+    /// </summary>
     public sealed record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_7_0, LoginStartPacket>
     {
         /// <inheritdoc />
@@ -47,6 +50,9 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
     }
 
+    /// <summary>
+    /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_19_0"/>
+    /// </summary>
     public sealed record LoginStartPacketV_1_19_0(
         string Username,
         SignatureContainer? Signature,
@@ -95,6 +101,9 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
     }
 
+    /// <summary>
+    /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_19_3"/>
+    /// </summary>
     public sealed record LoginStartPacketV_1_19_3(
         string Username,
         Uuid? PlayerUuid
@@ -126,6 +135,9 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
         }
     }
 
+    /// <summary>
+    /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_20_2"/>
+    /// </summary>
     public sealed record LoginStartPacketV_1_20_2(
         string Username,
         Uuid PlayerUuid
