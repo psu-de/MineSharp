@@ -10,7 +10,7 @@ var generators = new[]
 {
     new BiomeGenerator().Run(data), new BlockGenerator().Run(data), new EffectGenerator().Run(data),
     new EnchantmentGenerator().Run(data), new EntityGenerator().Run(data), new ItemGenerator().Run(data),
-    new ProtocolGenerator().Run(data)
+    new ProtocolGenerator().Run(data), new ParticleGenerator().Run(data)
 };
 
 if (Directory.Exists(DirectoryUtils.GetSourceDirectory()))

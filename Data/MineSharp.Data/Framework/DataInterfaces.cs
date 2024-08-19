@@ -5,6 +5,7 @@ using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Common.Particles;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Common.Recipes;
 using MineSharp.Core.Geometry;
@@ -185,3 +186,8 @@ public interface IWindowData
     /// <returns></returns>
     public WindowInfo ByName(Identifier name);
 }
+
+/// <summary>
+/// Interface for implementing particle data
+/// </summary>
+public interface IParticleData : INameAndProtocolNumberIndexedData<ParticleType>;
