@@ -254,6 +254,8 @@ internal static class PacketPalette
         RegisterPacket<UpdateRecipesPacket>();
         RegisterPacket<CBPlayUpdateTagsPacket>();
         RegisterPacket<ExplosionPacket>();
+        RegisterPacket<LinkEntitiesPacket>();
+        RegisterPacket<SetContainerPropertyPacket>();
 
         // SB
         RegisterPacket<SBKeepAlivePacket>();
@@ -311,6 +313,7 @@ internal static class PacketPalette
         RegisterPacket<TeleportToEntityPacket>();
         RegisterPacket<UpdateCommandBlockMinecartPacket>();
         RegisterPacket<UpdateSignPacket>();
+        RegisterPacket<ClickContainerButtonPacket>();
 
         return packetFactories.ToFrozenDictionary();
     }
