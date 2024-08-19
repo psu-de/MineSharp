@@ -253,6 +253,7 @@ internal static class PacketPalette
         RegisterPacket<UpdateAdvancementsPacket>();
         RegisterPacket<UpdateRecipesPacket>();
         RegisterPacket<CBPlayUpdateTagsPacket>();
+        RegisterPacket<ExplosionPacket>();
 
         // SB
         RegisterPacket<SBKeepAlivePacket>();

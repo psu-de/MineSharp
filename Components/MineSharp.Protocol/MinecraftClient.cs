@@ -552,7 +552,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     private async Task ProcessBundledPackets(ConcurrentQueue<(PacketType, PacketBuffer)> packets)
     {
-        Logger.Debug($"Processing {packets.Count} bundled packets");
+        Logger.Trace($"Processing {packets.Count} bundled packets");
         try
         {
             // wiki.vg: the client is guaranteed to process every packet in the bundle on the same tick
