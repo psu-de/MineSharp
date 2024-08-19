@@ -2,7 +2,7 @@
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
-namespace MineSharp.Protocol.Packets.Clientbound.Play;
+namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
 /// <summary>
 ///     Used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
