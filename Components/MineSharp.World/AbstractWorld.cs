@@ -307,7 +307,7 @@ public abstract class AbstractWorld(MinecraftData data, DimensionInfo dimensionI
 
     private Task<IChunk> RegisterChunkAwaiter(ChunkCoordinates coordinates)
     {
-        var tcs = ChunkLoadAwaiters.GetOrAdd(coordinates, _ => new TaskCompletionSource<IChunk>());
+        var tcs = ChunkLoadAwaiters.GetOrAdd(coordinates, _ => new TaskCompletionSource<IChunk>(TaskCreationOptions.RunContinuationsAsynchronously));
         // because there is a small chance that the chunk was loaded before we were able to add the awaiter
         // we need to check again if the chunk is loaded
         if (TryGetChunkAt(coordinates, out var chunk))

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core;
+using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
@@ -32,7 +33,7 @@ public sealed record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
     /// <param name="cursorZ"></param>
     /// <param name="insideBlock"></param>
     /// <param name="sequenceId"></param>
-    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY,
+    public PlaceBlockPacket(PlayerHand hand, Position location, BlockFace direction, float cursorX, float cursorY,
                             float cursorZ, bool insideBlock,
                             int sequenceId)
     {
@@ -56,7 +57,7 @@ public sealed record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
     /// <param name="cursorY"></param>
     /// <param name="cursorZ"></param>
     /// <param name="insideBlock"></param>
-    public PlaceBlockPacket(int hand, Position location, BlockFace direction, float cursorX, float cursorY,
+    public PlaceBlockPacket(PlayerHand hand, Position location, BlockFace direction, float cursorX, float cursorY,
                             float cursorZ, bool insideBlock)
     {
         Hand = hand;
@@ -68,7 +69,7 @@ public sealed record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
         InsideBlock = insideBlock;
     }
 
-    public int Hand { get; init; }
+    public PlayerHand Hand { get; init; }
     public Position Location { get; init; }
     public BlockFace Direction { get; init; }
     public float CursorX { get; init; }
@@ -79,7 +80,7 @@ public sealed record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
 
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        buffer.WriteVarInt(Hand);
+        buffer.WriteVarInt((int)Hand);
         buffer.WritePosition(Location);
         buffer.WriteVarInt((int)Direction);
         buffer.WriteFloat(CursorX);
@@ -95,7 +96,7 @@ public sealed record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
 
     public static PlaceBlockPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var hand = buffer.ReadVarInt();
+        var hand = (PlayerHand)buffer.ReadVarInt();
         var position = buffer.ReadPosition();
         var direction = buffer.ReadVarInt();
         var cursorX = buffer.ReadFloat();

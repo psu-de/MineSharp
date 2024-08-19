@@ -3,6 +3,7 @@ using MineSharp.Core.Geometry;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
@@ -27,7 +28,7 @@ public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
     /// <param name="status"></param>
     /// <param name="location"></param>
     /// <param name="face"></param>
-    public PlayerActionPacket(int status, Position location, BlockFace face)
+    public PlayerActionPacket(PlayerActionStatus status, Position location, BlockFace face)
     {
         Status = status;
         Location = location;
@@ -42,7 +43,7 @@ public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
     /// <param name="location"></param>
     /// <param name="face"></param>
     /// <param name="sequenceId"></param>
-    public PlayerActionPacket(int status, Position location, BlockFace face, int? sequenceId)
+    public PlayerActionPacket(PlayerActionStatus status, Position location, BlockFace face, int? sequenceId)
     {
         Status = status;
         Location = location;
@@ -50,14 +51,14 @@ public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
         SequenceId = sequenceId;
     }
 
-    public int Status { get; init; }
+    public PlayerActionStatus Status { get; init; }
     public Position Location { get; init; }
     public BlockFace Face { get; init; }
     public int? SequenceId { get; init; }
 
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        buffer.WriteVarInt(Status);
+        buffer.WriteVarInt((int)Status);
         buffer.WritePosition(Location);
         buffer.WriteByte((byte)Face);
 
@@ -72,14 +73,14 @@ public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
         if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             return new PlayerActionPacket(
-                buffer.ReadVarInt(),
+                (PlayerActionStatus)buffer.ReadVarInt(),
                 buffer.ReadPosition(),
                 (BlockFace)buffer.ReadByte(),
                 buffer.ReadVarInt());
         }
 
         return new PlayerActionPacket(
-            buffer.ReadVarInt(),
+            (PlayerActionStatus)buffer.ReadVarInt(),
             buffer.ReadPosition(),
             (BlockFace)buffer.ReadByte());
     }

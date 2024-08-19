@@ -39,15 +39,15 @@ public class PlayerPlugin : Plugin
         Players = new ConcurrentDictionary<Uuid, MinecraftPlayer>();
         PlayerMap = new ConcurrentDictionary<int, MinecraftPlayer>();
 
-        Bot.Client.On<SetHealthPacket>(HandleSetHealthPacket);
-        Bot.Client.On<CombatDeathPacket>(HandleCombatDeathPacket);
-        Bot.Client.On<RespawnPacket>(HandleRespawnPacket);
-        Bot.Client.On<SpawnPlayerPacket>(HandleSpawnPlayer);
-        Bot.Client.On<PlayerInfoUpdatePacket>(HandlePlayerInfoUpdate);
-        Bot.Client.On<PlayerInfoRemovePacket>(HandlePlayerInfoRemove);
-        Bot.Client.On<GameEventPacket>(HandleGameEvent);
-        Bot.Client.On<AcknowledgeBlockChangePacket>(HandleAcknowledgeBlockChange);
-        Bot.Client.On<EntityStatusPacket>(HandleEntityStatus);
+        OnPacketAfterInitialization<SetHealthPacket>(HandleSetHealthPacket);
+        OnPacketAfterInitialization<CombatDeathPacket>(HandleCombatDeathPacket);
+        OnPacketAfterInitialization<RespawnPacket>(HandleRespawnPacket);
+        OnPacketAfterInitialization<SpawnPlayerPacket>(HandleSpawnPlayer);
+        OnPacketAfterInitialization<PlayerInfoUpdatePacket>(HandlePlayerInfoUpdate);
+        OnPacketAfterInitialization<PlayerInfoRemovePacket>(HandlePlayerInfoRemove);
+        OnPacketAfterInitialization<GameEventPacket>(HandleGameEvent);
+        OnPacketAfterInitialization<AcknowledgeBlockChangePacket>(HandleAcknowledgeBlockChange);
+        OnPacketAfterInitialization<EntityStatusPacket>(HandleEntityStatus);
 
         // already start listening to the packets here, as they sometimes get lost when calling in init() 
         initLoginPacket = Bot.Client.WaitForPacket<LoginPacket>();
@@ -220,7 +220,7 @@ public class PlayerPlugin : Plugin
     /// <returns></returns>
     public Task Respawn()
     {
-        return Bot.Client.SendPacket(new ClientCommandPacket(0));
+        return Bot.Client.SendPacket(new ClientCommandPacket(ClientCommandPacket.ClientCommandAction.PerformRespawn));
     }
 
 

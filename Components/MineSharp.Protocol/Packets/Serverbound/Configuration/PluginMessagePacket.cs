@@ -8,9 +8,9 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 /// <summary>
 ///     Plugin message packet
 /// </summary>
-/// <param name="ChannelName">The name of the channel</param>
+/// <param name="Channel">The name of the channel</param>
 /// <param name="Data">The data of the plugin message</param>
-public sealed record PluginMessagePacket(Identifier ChannelName, byte[] Data) : IPacketStatic<PluginMessagePacket>
+public sealed record PluginMessagePacket(Identifier Channel, byte[] Data) : IPacketStatic<PluginMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,16 +20,17 @@ public sealed record PluginMessagePacket(Identifier ChannelName, byte[] Data) : 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        buffer.WriteIdentifier(ChannelName);
+        buffer.WriteIdentifier(Channel);
         buffer.WriteBytes(Data);
     }
 
     /// <inheritdoc />
     public static PluginMessagePacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var channelName = buffer.ReadIdentifier();
+        var channel = buffer.ReadIdentifier();
         var pluginData = buffer.RestBuffer();
-        return new PluginMessagePacket(channelName, pluginData);
+
+        return new PluginMessagePacket(channel, pluginData);
     }
 
     static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)

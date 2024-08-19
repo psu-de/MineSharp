@@ -24,8 +24,9 @@ public sealed record PongPacket(int Id) : IPacketStatic<PongPacket>
     /// <inheritdoc />
     public static PongPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        return new PongPacket(
-            buffer.ReadInt());
+        var id = buffer.ReadInt();
+
+        return new PongPacket(id);
     }
 
     static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)

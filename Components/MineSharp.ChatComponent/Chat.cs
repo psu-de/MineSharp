@@ -238,7 +238,7 @@ public abstract partial class Chat
             return KeybindComponent.Parse(tag);
         }
 
-        var empty = obj.Tags.FirstOrDefault(x => string.IsNullOrEmpty(x.Name));
+        var empty = obj[""];
         if (empty is not null)
         {
             return Parse(empty);

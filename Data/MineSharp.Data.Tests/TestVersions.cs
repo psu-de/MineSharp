@@ -4,6 +4,7 @@ using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Common.Particles;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Data.Tests;
@@ -46,6 +47,7 @@ public class Tests
             data.Materials.GetMultiplier(Material.Shovel, ItemType.StoneSword);
             data.Protocol.GetPacketId(PacketType.CB_Play_Login);
             data.Recipes.ByItem(ItemType.DiamondShovel);
+            data.Particles.GetProtocolId(ParticleType.Composter);
             data.Windows.ById(0);
         }
     }

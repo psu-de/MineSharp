@@ -404,7 +404,7 @@ public class PhysicsPlugin : Plugin
             var yawTicks = Math.Abs((int)(deltaYaw / yawPerTick));
             var pitchTicks = Math.Abs((int)(deltaPitch / pitchPerTick));
 
-            task = new();
+            task = new(TaskCreationOptions.RunContinuationsAsynchronously);
             remainingYawTicks = yawTicks;
             remainingPitchTicks = pitchTicks;
         }

@@ -64,9 +64,19 @@ public sealed class MineSharpBot : IAsyncDisposable, IDisposable
 
         plugins = new Dictionary<Guid, Plugin>();
 
-        Client.On<RegistryDataPacket>(packet => Task.FromResult(Registry = packet.RegistryData));
-        Client.On<LoginPacket>(
-            packet => Task.FromResult(packet.RegistryCodec != null ? Registry = packet.RegistryCodec : null));
+        Client.On<RegistryDataPacket>(packet =>
+        {
+            Registry = packet.RegistryData;
+            return Task.CompletedTask;
+        });
+        Client.On<LoginPacket>(packet =>
+        {
+            if (packet.RegistryCodec != null)
+            {
+                Registry = packet.RegistryCodec;
+            }
+            return Task.CompletedTask;
+        });
     }
 
     /// <summary>

@@ -98,6 +98,11 @@ internal static class NameUtils
     {
         return CommonGetName(name);
     }
+    
+    public static string GetParticleName(string name)
+    {
+        return CommonGetName(name); 
+    }
 
     public static string GetPacketName(string name, string direction, string ns)
     {

@@ -20,13 +20,10 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
         this.data = data;
     }
 
-    public override async Task StateEntered()
+    public override Task StateEntered()
     {
-        if (data.Version.Protocol <= ProtocolVersion.V_1_20_0)
-        {
-            await client.SendClientInformationPacket();
-        }
         client.GameJoinedTcs.SetResult();
+        return Task.CompletedTask;
     }
 
     public override Task HandleIncoming(IPacket packet)
@@ -34,27 +31,22 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
         return packet switch
         {
             KeepAlivePacket keepAlive => HandleKeepAlive(keepAlive),
-            BundleDelimiterPacket bundleDelimiter => HandleBundleDelimiter(bundleDelimiter),
             PingPacket ping => HandlePing(ping),
             DisconnectPacket disconnect => HandleDisconnect(disconnect),
+            LoginPacket login => HandleLogin(login),
             _ => Task.CompletedTask
         };
     }
 
     public override bool HandlesIncoming(PacketType type)
     {
-        return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_BundleDelimiter or PacketType.CB_Play_Ping
-            or PacketType.CB_Play_KickDisconnect;
+        return type is PacketType.CB_Play_KeepAlive or PacketType.CB_Play_Ping
+            or PacketType.CB_Play_KickDisconnect or PacketType.CB_Play_Login;
     }
 
     private Task HandleKeepAlive(KeepAlivePacket packet)
     {
         return client.SendPacket(new Serverbound.Play.KeepAlivePacket(packet.KeepAliveId));
-    }
-
-    private Task HandleBundleDelimiter(BundleDelimiterPacket bundleDelimiter)
-    {
-        return client.HandleBundleDelimiter();
     }
 
     private Task HandlePing(PingPacket ping)
@@ -66,5 +58,14 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
     {
         _ = Task.Run(() => client.Disconnect(packet.Reason));
         return Task.CompletedTask;
+    }
+
+    private Task HandleLogin(LoginPacket packet)
+    {
+        return data.Version.Protocol switch
+        {
+            <= ProtocolVersion.V_1_20_0 => client.SendClientInformationPacket(GameState),
+            _ => Task.CompletedTask
+        };
     }
 }
