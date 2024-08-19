@@ -9,7 +9,7 @@ using MineSharp.Protocol.Packets.Serverbound.Play;
 using MineSharp.World;
 using MineSharp.World.Chunks;
 using NLog;
-using static MineSharp.Protocol.Packets.Serverbound.Play.UpdateCommandBlock;
+using static MineSharp.Protocol.Packets.Serverbound.Play.CommandBlockUpdatePacket;
 
 namespace MineSharp.Bot.Plugins;
 
@@ -101,7 +101,7 @@ public class WorldPlugin : Plugin
             throw new("Player must be in creative mode.");
         }
 
-        var packet = new UpdateCommandBlock(location, command, mode, flags);
+        var packet = new CommandBlockUpdatePacket(location, command, mode, flags);
         return Bot.Client.SendPacket(packet);
     }
 

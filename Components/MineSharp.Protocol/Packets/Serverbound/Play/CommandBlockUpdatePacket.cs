@@ -2,7 +2,7 @@
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
-using static MineSharp.Protocol.Packets.Serverbound.Play.UpdateCommandBlock;
+using static MineSharp.Protocol.Packets.Serverbound.Play.CommandBlockUpdatePacket;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 
@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Command">The command to be executed by the command block.</param>
 /// <param name="Mode">The mode of the command block.</param>
 /// <param name="Flags">The flags for the command block.</param>
-public sealed record UpdateCommandBlock(Position Location, string Command, CommandBlockMode Mode, CommandBlockFlags Flags) : IPacket
+public sealed record CommandBlockUpdatePacket(Position Location, string Command, CommandBlockMode Mode, CommandBlockFlags Flags) : IPacket
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -37,7 +37,7 @@ public sealed record UpdateCommandBlock(Position Location, string Command, Comma
         var mode = (CommandBlockMode)buffer.ReadVarInt();
         var flags = (CommandBlockFlags)buffer.ReadSByte();
 
-        return new UpdateCommandBlock(location, command, mode, flags);
+        return new CommandBlockUpdatePacket(location, command, mode, flags);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

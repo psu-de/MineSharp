@@ -28,12 +28,12 @@ using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.Pl
 using CBPlayRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.RemoveResourcePackPacket;
 using CBPlayUpdateTagsPacket = MineSharp.Protocol.Packets.Clientbound.Play.UpdateTagsPacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
-using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
+using ConfClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
 using ConfPongPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PongPacket;
 using LoginDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Login.DisconnectPacket;
-using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
+using PlayClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 using PlayDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Play.DisconnectPacket;
 using PlayPingPacket = MineSharp.Protocol.Packets.Clientbound.Play.PingPacket;
 using PlayPongPacket = MineSharp.Protocol.Packets.Serverbound.Play.PongPacket;
@@ -128,7 +128,7 @@ internal static class PacketPalette
         RegisterPacket<CBConfigurationUpdateTagsPacket>();
 
         // SB
-        RegisterPacket<ConfClientInformation>();
+        RegisterPacket<ConfClientInformationPacket>();
         RegisterPacket<SBConfigurationPluginMessagePacket>();
         RegisterPacket<SBFinishConfigurationPacket>();
         RegisterPacket<SBConfigurationKeepAlivePacket>();
@@ -268,7 +268,7 @@ internal static class PacketPalette
         RegisterPacket<MessageAcknowledgementPacket>();
         RegisterPacket<PlayerSessionPacket>();
         RegisterPacket<ConfirmTeleportPacket>();
-        RegisterPacket<UpdateCommandBlock>();
+        RegisterPacket<CommandBlockUpdatePacket>();
         RegisterPacket<WindowClickPacket>();
         RegisterPacket<PlaceBlockPacket>();
         RegisterPacket<PlayerActionPacket>();
@@ -281,7 +281,7 @@ internal static class PacketPalette
         RegisterPacket<ChunkBatchReceivedPacket>();
         RegisterPacket<SetCreativeSlotPacket>();
         RegisterPacket<PlayPongPacket>();
-        RegisterPacket<PlayClientInformation>();
+        RegisterPacket<PlayClientInformationPacket>();
         RegisterPacket<AcknowledgeConfigurationPacket>();
         RegisterPacket<ChangeContainerSlotStatePacket>();
         RegisterPacket<SBPlayChangeDifficultyPacket>();
