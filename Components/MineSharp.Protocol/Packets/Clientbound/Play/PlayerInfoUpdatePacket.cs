@@ -4,6 +4,7 @@ using MineSharp.Core.Common;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Packets.NetworkTypes;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.AddPlayerAction;
 using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.InitializeChatAction;
@@ -29,11 +30,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             buffer.WriteVarInt(Action);
         }
 
-        buffer.WriteVarInt(Data.Length);
-        foreach (var actionData in Data)
-        {
-            actionData.Write(buffer);
-        }
+        buffer.WriteVarIntArray(Data, (buffer, actionData) => actionData.Write(buffer, data));
     }
 
     public static PlayerInfoUpdatePacket Read(PacketBuffer buffer, MinecraftData data)
@@ -41,7 +38,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         int action;
         if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
-            action = buffer.ReadByte();
+            action = buffer.ReadSByte();
         }
         else
         {
@@ -49,7 +46,8 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
 
         var actionData = buffer.ReadVarIntArray(buffer => ActionEntry.Read(buffer, data, action));
-        return new PlayerInfoUpdatePacket(action, actionData);
+
+        return new(action, actionData);
     }
 
     static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
@@ -57,15 +55,20 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         return Read(buffer, data);
     }
 
-    public sealed record ActionEntry(Uuid Player, IPlayerInfoAction[] Actions)
+    public sealed record ActionEntry(Uuid Player, IPlayerInfoAction[] Actions) : ISerializableWithMinecraftData<ActionEntry>
     {
-        public void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer, MinecraftData data)
         {
             buffer.WriteUuid(Player);
             foreach (var action in Actions)
             {
                 action.Write(buffer);
             }
+        }
+
+        public static ActionEntry Read(PacketBuffer buffer, MinecraftData data)
+        {
+            throw new NotImplementedException("This type does not support the normal Read method.");
         }
 
         public static ActionEntry Read(PacketBuffer buffer, MinecraftData data, int action)
@@ -157,7 +160,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         public static abstract IPlayerInfoAction Read(PacketBuffer buffer);
     }
 
-    public sealed record AddPlayerAction(string Name, Property[] Properties) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record AddPlayerAction(string Name, Property[] Properties) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<AddPlayerAction>
     {
         public static int StaticMask => 0x01;
         public int Mask => StaticMask;
@@ -180,7 +183,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             return Read(buffer);
         }
 
-        public sealed record Property(string Name, string Value, string? Signature)
+        public sealed record Property(string Name, string Value, string? Signature) : ISerializable<Property>
         {
             public void Write(PacketBuffer buffer)
             {
@@ -211,7 +214,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
     }
 
-    public sealed record UpdateGameModeAction(GameMode GameMode) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record UpdateGameModeAction(GameMode GameMode) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<UpdateGameModeAction>
     {
         public static int StaticMask => 0x04;
         public int Mask => StaticMask;
@@ -233,7 +236,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
     }
 
-    public sealed record UpdateListedAction(bool Listed) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record UpdateListedAction(bool Listed) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<UpdateListedAction>
     {
         public static int StaticMask => 0x08;
         public int Mask => StaticMask;
@@ -255,7 +258,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
     }
 
-    public sealed record UpdateLatencyAction(int Ping) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record UpdateLatencyAction(int Ping) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<UpdateLatencyAction>
     {
         public static int StaticMask => 0x10;
         public int Mask => StaticMask;
@@ -277,7 +280,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
     }
 
-    public sealed record UpdateDisplayName(string? DisplayName) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record UpdateDisplayName(string? DisplayName) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<UpdateDisplayName>
     {
         public static int StaticMask => 0x20;
         public int Mask => StaticMask;
@@ -310,7 +313,7 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         }
     }
 
-    public sealed record InitializeChatAction(InitializeChatActionData? Data) : IPlayerInfoAction, IPlayerInfoActionStatic
+    public sealed record InitializeChatAction(InitializeChatActionData? Data) : IPlayerInfoAction, IPlayerInfoActionStatic, ISerializable<InitializeChatAction>
     {
         public static int StaticMask => 0x02;
         public int Mask => StaticMask;
@@ -320,24 +323,40 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
             long PublicKeyExpiryTime,
             byte[] EncodedPublicKey,
             byte[] PublicKeySignature
-        );
+        ) : ISerializable<InitializeChatActionData>
+        {
+            public void Write(PacketBuffer buffer)
+            {
+                buffer.WriteUuid(ChatSessionId);
+                buffer.WriteLong(PublicKeyExpiryTime);
+                buffer.WriteVarInt(EncodedPublicKey.Length);
+                buffer.WriteBytes(EncodedPublicKey);
+                buffer.WriteVarInt(PublicKeySignature.Length);
+                buffer.WriteBytes(PublicKeySignature);
+            }
+
+            public static InitializeChatActionData Read(PacketBuffer buffer)
+            {
+                var chatSessionId = buffer.ReadUuid();
+                var publicKeyExpiryTime = buffer.ReadLong();
+                var encodedPublicKey = new byte[buffer.ReadVarInt()];
+                buffer.ReadBytes(encodedPublicKey);
+                var publicKeySignature = new byte[buffer.ReadVarInt()];
+                buffer.ReadBytes(publicKeySignature);
+
+                return new(chatSessionId, publicKeyExpiryTime, encodedPublicKey, publicKeySignature);
+            }
+        }
 
         public void Write(PacketBuffer buffer)
         {
             var present = Data != null;
             buffer.WriteBool(present);
 
-            if (!present)
+            if (present)
             {
-                return;
+                Data!.Write(buffer);
             }
-
-            buffer.WriteUuid(Data!.ChatSessionId);
-            buffer.WriteLong(Data!.PublicKeyExpiryTime);
-            buffer.WriteVarInt(Data!.EncodedPublicKey.Length);
-            buffer.WriteBytes(Data!.EncodedPublicKey);
-            buffer.WriteVarInt(Data!.PublicKeySignature.Length);
-            buffer.WriteBytes(Data!.PublicKeySignature);
         }
 
         public static InitializeChatAction Read(PacketBuffer buffer)
@@ -348,14 +367,9 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
                 return new InitializeChatAction((InitializeChatActionData?)null);
             }
 
-            var chatSessionId = buffer.ReadUuid();
-            var publicKeyExpiryTime = buffer.ReadLong();
-            var encodedPublicKey = new byte[buffer.ReadVarInt()];
-            buffer.ReadBytes(encodedPublicKey);
-            var publicKeySignature = new byte[buffer.ReadVarInt()];
-            buffer.ReadBytes(publicKeySignature);
+            var data = InitializeChatActionData.Read(buffer);
 
-            return new InitializeChatAction(new InitializeChatActionData(chatSessionId, publicKeyExpiryTime, encodedPublicKey, publicKeySignature));
+            return new(data);
         }
 
         static IPlayerInfoAction IPlayerInfoActionStatic.Read(PacketBuffer buffer)

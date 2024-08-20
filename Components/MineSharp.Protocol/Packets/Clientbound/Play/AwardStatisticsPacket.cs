@@ -2,15 +2,15 @@
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using static MineSharp.Protocol.Packets.Clientbound.Play.AwardStatisticsPacket;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 /// <summary>
 ///     Award statistics packet sent as a response to Client Command.
 /// </summary>
-/// <param name="Count">Number of elements in the statistics array.</param>
 /// <param name="Statistics">Array of statistics.</param>
-public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Statistic[] Statistics) : IPacketStatic<AwardStatisticsPacket>
+public sealed record AwardStatisticsPacket(Statistic[] Statistics) : IPacketStatic<AwardStatisticsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,29 +20,15 @@ public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Stat
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        buffer.WriteVarInt(Count);
-        foreach (var statistic in Statistics)
-        {
-            buffer.WriteVarInt((int)statistic.CategoryId);
-            buffer.WriteVarInt((int)statistic.StatisticId);
-            buffer.WriteVarInt(statistic.Value);
-        }
+        buffer.WriteVarIntArray(Statistics, (buffer, statistic) => statistic.Write(buffer));
     }
 
     /// <inheritdoc />
     public static AwardStatisticsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var count = buffer.ReadVarInt();
-        var statistics = new Statistic[count];
-        for (int i = 0; i < count; i++)
-        {
-            var categoryId = (CategoryId)buffer.ReadVarInt();
-            var statisticId = (StatisticId)buffer.ReadVarInt();
-            var value = buffer.ReadVarInt();
-            statistics[i] = new Statistic(categoryId, statisticId, value);
-        }
+        var statistics = buffer.ReadVarIntArray(Statistic.Read);
 
-        return new AwardStatisticsPacket(count, statistics);
+        return new(statistics);
     }
 
     static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
@@ -56,7 +42,26 @@ public sealed record AwardStatisticsPacket(int Count, AwardStatisticsPacket.Stat
     /// <param name="CategoryId">The category ID of the statistic.</param>
     /// <param name="StatisticId">The statistic ID.</param>
     /// <param name="Value">The value of the statistic.</param>
-    public sealed record Statistic(CategoryId CategoryId, StatisticId StatisticId, int Value);
+    public sealed record Statistic(CategoryId CategoryId, StatisticId StatisticId, int Value) : ISerializable<Statistic>
+    {
+        /// <inheritdoc/>
+        public void Write(PacketBuffer buffer)
+        {
+            buffer.WriteVarInt((int)CategoryId);
+            buffer.WriteVarInt((int)StatisticId);
+            buffer.WriteVarInt(Value);
+        }
+
+        /// <inheritdoc/>
+        public static Statistic Read(PacketBuffer buffer)
+        {
+            var categoryId = (CategoryId)buffer.ReadVarInt();
+            var statisticId = (StatisticId)buffer.ReadVarInt();
+            var value = buffer.ReadVarInt();
+
+            return new(categoryId, statisticId, value);
+        }
+    }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     /// <summary>

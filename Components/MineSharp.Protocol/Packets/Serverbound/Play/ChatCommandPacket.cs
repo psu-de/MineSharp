@@ -205,7 +205,7 @@ public sealed record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
         return Read(buffer, data);
     }
 
-    public sealed record ArgumentSignature(string ArgumentName, byte[] Signature)
+    public sealed record ArgumentSignature(string ArgumentName, byte[] Signature) : ISerializableWithMinecraftData<ArgumentSignature>
     {
         public void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -237,7 +237,7 @@ public sealed record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
             {
                 signature = buffer.ReadBytes(AfterMc1192SignatureLength);
             }
-            return new ArgumentSignature(argumentName, signature);
+            return new(argumentName, signature);
         }
     }
 }
