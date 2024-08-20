@@ -27,13 +27,7 @@ public class MinecraftData
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly MinecraftDataRepository MinecraftDataRepository =
-        new(
-            Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "MineSharp",
-                "MinecraftData"),
-            new());
+    private static readonly GitHubRepositoryHelper MinecraftDataRepository = new("PrismarineJs/minecraft-data");
 
     private static readonly Lazy<Dictionary<string, JToken>> ProtocolVersions = new(LoadProtocolVersions);
     private static readonly Dictionary<string, MinecraftData> LoadedData = new();
@@ -211,14 +205,15 @@ public class MinecraftData
 
     private static Task<JToken> LoadAsset(string resource, JToken version)
     {
-        return MinecraftDataRepository.GetAsset(
-            $"{resource}.json",
-            (string)version.SelectToken(resource)!);
+        var versionPath = (string)version.SelectToken(resource)!;
+        var fullyQualifiedName = $"data/{versionPath}/{resource}.json";
+        
+        return MinecraftDataRepository.GetAsset(fullyQualifiedName);
     }
 
     private static async Task<JToken?> TryGetVersion(string version)
     {
-        var resourceMap = await MinecraftDataRepository.GetResourceMap();
+        var resourceMap = await MinecraftDataRepository.GetAsset("data/dataPaths.json");
 
         var versionToken = resourceMap["pc"]?[version];
         if (versionToken is not null)
@@ -237,9 +232,7 @@ public class MinecraftData
 
     private static Dictionary<string, JToken> LoadProtocolVersions()
     {
-        var protocolVersions = (JArray)MinecraftDataRepository.GetAsset(
-                                                                   "protocolVersions.json",
-                                                                   "pc/common")
+        var protocolVersions = (JArray)MinecraftDataRepository.GetAsset("data/pc/common/protocolVersions.json")
                                                               .Result;
 
         return protocolVersions
