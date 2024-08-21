@@ -1,40 +1,45 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Core", "MineSharp.Core\MineSharp.Core.csproj", "{4D9DE515-02F9-432D-ABD3-DD1EAC8F033B}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35125.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Core", "MineSharp.Core\MineSharp.Core.csproj", "{4D9DE515-02F9-432D-ABD3-DD1EAC8F033B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{CAB43D13-C4AC-4D69-AB04-ECF9B514115D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Auth", "Components\MineSharp.Auth\MineSharp.Auth.csproj", "{63B60BB4-DB86-423A-9585-82FD060089F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Auth", "Components\MineSharp.Auth\MineSharp.Auth.csproj", "{63B60BB4-DB86-423A-9585-82FD060089F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Protocol", "Components\MineSharp.Protocol\MineSharp.Protocol.csproj", "{4F3F3C20-B7DA-47E1-8751-1F90F22ADDB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Protocol", "Components\MineSharp.Protocol\MineSharp.Protocol.csproj", "{4F3F3C20-B7DA-47E1-8751-1F90F22ADDB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.World", "Components\MineSharp.World\MineSharp.World.csproj", "{2B385CE0-26CA-4848-B791-3286600B2CFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.World", "Components\MineSharp.World\MineSharp.World.csproj", "{2B385CE0-26CA-4848-B791-3286600B2CFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5FB9D901-4E29-4F19-B20B-E099C21A2C88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.World.Tests", "Components\Tests\MineSharp.World.Tests\MineSharp.World.Tests.csproj", "{EBC07383-378A-47CE-B97A-D22703E9EF43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.World.Tests", "Components\Tests\MineSharp.World.Tests\MineSharp.World.Tests.csproj", "{EBC07383-378A-47CE-B97A-D22703E9EF43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Windows", "Components\MineSharp.Windows\MineSharp.Windows.csproj", "{B756D51E-636F-45B9-9600-B50ADD64A61F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Windows", "Components\MineSharp.Windows\MineSharp.Windows.csproj", "{B756D51E-636F-45B9-9600-B50ADD64A61F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Windows.Tests", "Components\Tests\MineSharp.Windows.Tests\MineSharp.Windows.Tests.csproj", "{7DE700D4-E9C6-4C76-8276-CB7616AD959B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Windows.Tests", "Components\Tests\MineSharp.Windows.Tests\MineSharp.Windows.Tests.csproj", "{7DE700D4-E9C6-4C76-8276-CB7616AD959B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Physics", "Components\MineSharp.Physics\MineSharp.Physics.csproj", "{3DCD548E-7834-4665-BA10-10EB2BF83A8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Physics", "Components\MineSharp.Physics\MineSharp.Physics.csproj", "{3DCD548E-7834-4665-BA10-10EB2BF83A8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Bot", "MineSharp.Bot\MineSharp.Bot.csproj", "{EF690A10-E46C-4B38-9BBC-C72CBD3229A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Bot", "MineSharp.Bot\MineSharp.Bot.csproj", "{EF690A10-E46C-4B38-9BBC-C72CBD3229A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Commands", "Components\MineSharp.Commands\MineSharp.Commands.csproj", "{ACCD1366-DBDD-453D-80BD-150F2C5CDBDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Commands", "Components\MineSharp.Commands\MineSharp.Commands.csproj", "{ACCD1366-DBDD-453D-80BD-150F2C5CDBDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Bot.IntegrationTests", "MineSharp.Bot.IntegrationTests\MineSharp.Bot.IntegrationTests.csproj", "{1D8A5126-D720-4AEC-8FD1-5A70C69A0AD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Bot.IntegrationTests", "MineSharp.Bot.IntegrationTests\MineSharp.Bot.IntegrationTests.csproj", "{1D8A5126-D720-4AEC-8FD1-5A70C69A0AD9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{7441DE2E-3B7A-42F5-B3FC-FD25FCF46B8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Data", "Data\MineSharp.Data\MineSharp.Data.csproj", "{D6F1AE8D-ACA3-4E2A-A103-13BE9579A70D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data", "Data\MineSharp.Data\MineSharp.Data.csproj", "{D6F1AE8D-ACA3-4E2A-A103-13BE9579A70D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.SourceGenerator", "Data\MineSharp.SourceGenerator\MineSharp.SourceGenerator.csproj", "{A1AC37F2-6209-473B-A787-0F1601998BEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.SourceGenerator", "Data\MineSharp.SourceGenerator\MineSharp.SourceGenerator.csproj", "{A1AC37F2-6209-473B-A787-0F1601998BEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.ChatComponent", "Components\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj", "{6CFF9878-00D1-4FE3-9146-B6B2EE746A0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.ChatComponent", "Components\MineSharp.ChatComponent\MineSharp.ChatComponent.csproj", "{6CFF9878-00D1-4FE3-9146-B6B2EE746A0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.Data.Tests", "Data\MineSharp.Data.Tests\MineSharp.Data.Tests.csproj", "{1B36A1EF-2A07-4606-B748-B6E708C697E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineSharp.Data.Tests", "Data\MineSharp.Data.Tests\MineSharp.Data.Tests.csproj", "{1B36A1EF-2A07-4606-B748-B6E708C697E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineSharp.PacketSourceGenerator", "Components\MineSharp.PacketSourceGenerator\MineSharp.PacketSourceGenerator.csproj", "{0642A83E-11AE-4DF3-B414-4942B10FEA56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,6 +107,13 @@ Global
 		{1B36A1EF-2A07-4606-B748-B6E708C697E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B36A1EF-2A07-4606-B748-B6E708C697E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B36A1EF-2A07-4606-B748-B6E708C697E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0642A83E-11AE-4DF3-B414-4942B10FEA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0642A83E-11AE-4DF3-B414-4942B10FEA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0642A83E-11AE-4DF3-B414-4942B10FEA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0642A83E-11AE-4DF3-B414-4942B10FEA56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{63B60BB4-DB86-423A-9585-82FD060089F2} = {CAB43D13-C4AC-4D69-AB04-ECF9B514115D}
@@ -117,5 +129,9 @@ Global
 		{A1AC37F2-6209-473B-A787-0F1601998BEB} = {7441DE2E-3B7A-42F5-B3FC-FD25FCF46B8F}
 		{6CFF9878-00D1-4FE3-9146-B6B2EE746A0C} = {CAB43D13-C4AC-4D69-AB04-ECF9B514115D}
 		{1B36A1EF-2A07-4606-B748-B6E708C697E3} = {7441DE2E-3B7A-42F5-B3FC-FD25FCF46B8F}
+		{0642A83E-11AE-4DF3-B414-4942B10FEA56} = {CAB43D13-C4AC-4D69-AB04-ECF9B514115D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65B6B1B2-E12A-4D4B-8643-EC7B1A9EEF2F}
 	EndGlobalSection
 EndGlobal
