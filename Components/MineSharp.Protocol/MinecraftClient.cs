@@ -262,8 +262,10 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// </summary>
     /// <param name="packet">The packet to send.</param>
     /// <param name="cancellation">Optional cancellation token.</param>
+    /// <typeparam name="TPacket">The type of the packet to be sent.</typeparam>
     /// <returns>A task that resolves once the packet was actually sent.</returns>
-    public async Task SendPacket(IPacket packet, CancellationToken cancellation = default)
+    public async Task SendPacket<TPacket>(TPacket packet, CancellationToken cancellation = default)
+        where TPacket : IPacketServerbound
     {
         var sendingTask = new PacketSendTask(packet, cancellation, new(TaskCreationOptions.RunContinuationsAsynchronously));
         try
@@ -487,7 +489,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     internal Task SendClientInformationPacket(GameState gameState)
     {
-        IPacket packet = gameState switch
+        IPacketServerbound packet = gameState switch
         {
             GameState.Configuration => new ConfigurationClientInformationPacket(
                 Settings.Locale,
@@ -720,7 +722,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
     }
 
-    private async Task<IPacket?> ParsePacket(PacketFactory packetFactory, PacketType packetType, PacketBuffer buffer)
+    private async Task<IPacketClientbound?> ParsePacket(PacketFactory<IPacketClientbound> packetFactory, PacketType packetType, PacketBuffer buffer)
     {
         var size = buffer.ReadableBytes;
         try
@@ -756,7 +758,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         //  - The internal IPacketHandler
 
         Logger.Trace("Handling packet {PacketType}", packetType);
-        var factory = PacketPalette.GetFactory(packetType);
+        var factory = PacketPalette.GetClientboundFactory(packetType);
         if (factory == null)
         {
             await buffer.DisposeAsync();

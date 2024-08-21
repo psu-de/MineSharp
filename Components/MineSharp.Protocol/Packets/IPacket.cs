@@ -53,6 +53,20 @@ public interface IPacketStatic<TSelf> : IPacketStatic, ISerializableWithMinecraf
 {
 }
 
+/// <summary>
+///     Represents a Minecraft packet that is sent from the server to the client
+/// </summary>
+public interface IPacketClientbound : IPacket
+{
+}
+
+/// <summary>
+///     Represents a Minecraft packet that is sent from the client to the server
+/// </summary>
+public interface IPacketServerbound : IPacket
+{
+}
+
 public delegate TPacket PacketFactory<out TPacket>(PacketBuffer buffer, MinecraftData data)
     where TPacket : IPacket;
 

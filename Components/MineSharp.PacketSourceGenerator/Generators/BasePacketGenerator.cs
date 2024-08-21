@@ -1,5 +1,7 @@
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
+using MineSharp.PacketSourceGenerator.Protocol;
 using MineSharp.PacketSourceGenerator.Utils;
 
 namespace MineSharp.PacketSourceGenerator.Generators;
@@ -16,7 +18,15 @@ public sealed class BasePacketGenerator : AbstractPacketGenerator
 
 	public override string? BuildBodyForType()
 	{
-		var extendsString = "";
+		var packetFlowInterfaceType = Args.NamespaceParseResult.PacketFlow switch
+		{
+			PacketFlow.Serverbound => Args.CommonSymbolHolder.IPacketServerbound,
+			PacketFlow.Clientbound => Args.CommonSymbolHolder.IPacketClientbound,
+			_ => throw new NotImplementedException()
+		};
+		var packetFlowInterfaceTypeString = BuildTypeName(packetFlowInterfaceType);
+
+		var extendsString = $": {packetFlowInterfaceTypeString}";
 		List<string> methods = new();
 
 		if (VersionSubTypes.Count > 0)
@@ -60,12 +70,12 @@ public sealed class BasePacketGenerator : AbstractPacketGenerator
 			{{GeneratedCodeAttributeDeclaration}}
 			private static {{packetVersionSubTypeLookupTypeString}} InitializeVersionPackets()
 			{
-			    {{packetVersionSubTypeLookupTypeString}} lookup = new();
+				{{packetVersionSubTypeLookupTypeString}} lookup = new();
 
-			    {{registerVersionPacketCalls.Join(Args.GeneratorOptions.NewLine).IndentLines(indentString: Args.GeneratorOptions.Indent, ignoreFirstLine: true)}}
+				{{registerVersionPacketCalls.Join(Args.GeneratorOptions.NewLine).IndentLines(indentString: Args.GeneratorOptions.Indent, ignoreFirstLine: true)}}
 
-			    lookup.Freeze();
-			    return lookup;
+				lookup.Freeze();
+				return lookup;
 			}
 			""";
 	}
@@ -98,7 +108,7 @@ public sealed class BasePacketGenerator : AbstractPacketGenerator
 			{{GeneratedCodeAttributeDeclaration}}
 			public static {{returnTypeString}} Read({{packetBufferTypeString}} buffer, {{minecraftDataTypeString}} data)
 			{
-			    return PacketVersionSubTypeLookup.Read(buffer, data);
+				return PacketVersionSubTypeLookup.Read(buffer, data);
 			}
 			""";
 	}

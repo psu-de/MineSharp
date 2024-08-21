@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.CodeDom.Compiler;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -20,6 +20,9 @@ public record CommonSymbolHolder(
 	INamedTypeSymbol IPacketStaticOfTSelf,
 	IMethodSymbol IPacketStatic_Read,
 	IPropertySymbol IPacketStatic_StaticType,
+
+	INamedTypeSymbol IPacketClientbound,
+	INamedTypeSymbol IPacketServerbound,
 
 	INamedTypeSymbol IPacketVersionSubType,
 	INamedTypeSymbol IPacketVersionSubTypeOfTBasePacket,
@@ -69,6 +72,9 @@ public record CommonSymbolHolder(
 			CheckNotNull(compilation.GetTypeByMetadataName($"{PacketNamespace}.IPacketStatic`1")),
 			CheckNotNull(GetReadMethodSymbol(IPacketStatic, IPacket)),
 			CheckNotNull(GetStaticTypePropertySymbol(IPacketStatic, PacketType)),
+
+			CheckNotNull(compilation.GetTypeByMetadataName($"{PacketNamespace}.IPacketClientbound")),
+			CheckNotNull(compilation.GetTypeByMetadataName($"{PacketNamespace}.IPacketServerbound")),
 
 			CheckNotNull(compilation.GetTypeByMetadataName($"{PacketNamespace}.IPacketVersionSubType")),
 			CheckNotNull(compilation.GetTypeByMetadataName($"{PacketNamespace}.IPacketVersionSubType`1")),

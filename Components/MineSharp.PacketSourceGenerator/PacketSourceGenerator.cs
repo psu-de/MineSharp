@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -79,7 +79,7 @@ public class PacketSourceGenerator
 			KnownValidPacketTypes.Add(packetNamespaceType);
 			var tcs = new TaskCompletionSource<IReadOnlyList<INamedTypeSymbol>>(TaskCreationOptions.RunContinuationsAsynchronously);
 			_lastBasePacketGeneratorArgumentsTcsBundle = (packetNamespaceType, tcs);
-			return CreateGeneratorTask(packetNamespaceType, async args => new BasePacketGenerator(args, await tcs.Task));
+			return CreateGeneratorTask(checkPacketNamespaceArguments, async args => new BasePacketGenerator(args, await tcs.Task));
 		}
 		else
 		{
@@ -96,7 +96,7 @@ public class PacketSourceGenerator
 
 				AddPacketSubType(baseType, packetNamespaceType);
 
-				return CreateGeneratorTask(packetNamespaceType, args => Task.FromResult(new SubTypePacketGenerator(args)));
+				return CreateGeneratorTask(checkPacketNamespaceArguments, args => Task.FromResult(new SubTypePacketGenerator(args)));
 			}
 			else
 			{
@@ -124,10 +124,11 @@ public class PacketSourceGenerator
 		subTypes.Add(subType);
 	}
 
-	private Task<GeneratedSourceFileInfo?> CreateGeneratorTask<TGenerator>(INamedTypeSymbol type, Func<GeneratorArguments, Task<TGenerator>> generatorFactory)
+	private Task<GeneratedSourceFileInfo?> CreateGeneratorTask<TGenerator>(PacketValidator.CheckPacketNamespaceArguments checkPacketNamespaceArguments, Func<GeneratorArguments, Task<TGenerator>> generatorFactory)
 		where TGenerator : AbstractPacketGenerator
 	{
-		var generatorArguments = new GeneratorArguments(CommonSymbolHolder, type, GeneratorOptions, CancellationToken);
+		var type = checkPacketNamespaceArguments.PacketNamespaceType;
+		var generatorArguments = new GeneratorArguments(CommonSymbolHolder, type, checkPacketNamespaceArguments.NamespaceParseResult, GeneratorOptions, CancellationToken);
 		return Task.Run(async () => (await generatorFactory(generatorArguments)).GenerateFile(), CancellationToken);
 	}
 
