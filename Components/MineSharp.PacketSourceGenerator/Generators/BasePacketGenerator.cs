@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.CodeAnalysis;
+using MineSharp.PacketSourceGenerator.Utils;
 
 namespace MineSharp.PacketSourceGenerator.Generators;
 
@@ -48,12 +48,12 @@ public sealed class BasePacketGenerator : AbstractPacketGenerator
 
 	private string BuildInitializeVersionPacketsMethod(string packetVersionSubTypeLookupTypeString)
 	{
-		var sb = new StringBuilder();
+		List<string> registerVersionPacketCalls = new();
 		foreach (var versionSubType in VersionSubTypes)
 		{
 			var versionSubTypeString = BuildTypeName(versionSubType);
-			sb.Append($"lookup.RegisterVersionPacket<{versionSubTypeString}>();");
-			sb.Append(Args.GeneratorOptions.NewLine);
+			var call = $"lookup.RegisterVersionPacket<{versionSubTypeString}>();";
+			registerVersionPacketCalls.Add(call);
 		}
 
 		return $$"""
@@ -62,7 +62,7 @@ public sealed class BasePacketGenerator : AbstractPacketGenerator
 			{
 			    {{packetVersionSubTypeLookupTypeString}} lookup = new();
 
-			    {{sb}}
+			    {{registerVersionPacketCalls.Join(Args.GeneratorOptions.NewLine).IndentLines(indentString: Args.GeneratorOptions.Indent, ignoreFirstLine: true)}}
 
 			    lookup.Freeze();
 			    return lookup;

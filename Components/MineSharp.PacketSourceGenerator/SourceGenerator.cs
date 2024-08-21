@@ -39,7 +39,7 @@ public class SourceGenerator : IIncrementalGenerator
 		foreach (var type in typeMembers)
 		{
 			var typeNamespace = type.ContainingNamespace;
-			var namespaceName = typeNamespace.ToDisplayString();
+			var namespaceName = typeNamespace.ToDisplayString(SymbolHelper.FullyQualifiedFormatWithoutGlobalPrefix);
 			var packetNamespaceParseResult = PacketValidator.ParsePacketNamespace(namespaceName);
 			if (packetNamespaceParseResult is null)
 			{

@@ -92,6 +92,11 @@ public static class SymbolHelper
 		{
 			var symbol = stack.Pop();
 
+			if (symbol is INamedTypeSymbol symbolAsNamedTypeSymbol)
+			{
+				yield return symbolAsNamedTypeSymbol;
+			}
+
 			foreach (var member in symbol.GetMembers())
 			{
 				if (member is INamespaceSymbol memberAsNamespace)
@@ -101,7 +106,6 @@ public static class SymbolHelper
 				else if (member is INamedTypeSymbol memberAsNamedTypeSymbol)
 				{
 					stack.Push(memberAsNamedTypeSymbol);
-					yield return memberAsNamedTypeSymbol;
 				}
 			}
 		}
