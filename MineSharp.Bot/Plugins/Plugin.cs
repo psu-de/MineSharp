@@ -121,7 +121,7 @@ public abstract class Plugin : IAsyncDisposable
     }
 
     private AsyncPacketHandler<TPacket> CreateAfterInitializationPacketHandlerWrapper<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = false)
-        where TPacket : IPacketStatic<TPacket>
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         return async param =>
         {
@@ -147,8 +147,8 @@ public abstract class Plugin : IAsyncDisposable
     /// <param name="packetHandler">The packet handler to be called.</param>
     /// <param name="queuePacketsSentBeforeInitializationCompleted">Whether packets sent before the plugin has been initialized should be queued and processed after initialization.</param>
     public void OnPacketAfterInitialization<TPacket>(AsyncPacketHandler<TPacket> packetHandler, bool queuePacketsSentBeforeInitializationCompleted = true)
-        where TPacket : IPacketStatic<TPacket>
-	{
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
+    {
         var registration = Bot.Client.On(CreateAfterInitializationPacketHandlerWrapper(packetHandler, queuePacketsSentBeforeInitializationCompleted));
         if (registration != null)
         {

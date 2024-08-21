@@ -36,14 +36,14 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <summary>
     ///     Delegate for handling packets async
     /// </summary>
-    public delegate Task AsyncPacketHandler(IPacket packet);
+    public delegate Task AsyncPacketHandler(IPacketClientbound packet);
 
     /// <summary>
     ///     Delegate for handling a specific packet async
     /// </summary>
     /// <typeparam name="TPacket"></typeparam>
     public delegate Task AsyncPacketHandler<in TPacket>(TPacket packet)
-        where TPacket : IPacketStatic<TPacket>;
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound;
 
     /// <summary>
     ///     The latest version supported
@@ -333,7 +333,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// </summary>
     /// <typeparam name="TPacket">The type of the packet.</typeparam>
     public sealed class OnPacketRegistration<TPacket> : AbstractPacketReceiveRegistration
-         where TPacket : IPacketStatic<TPacket>
+         where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         internal OnPacketRegistration(MinecraftClient client, AsyncPacketHandler handler)
             : base(client, handler)
@@ -359,7 +359,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <typeparam name="TPacket">The type of the packet</typeparam>
     /// <returns>A registration object that can be used to unregister the handler.</returns>
     public OnPacketRegistration<TPacket>? On<TPacket>(AsyncPacketHandler<TPacket> handler)
-        where TPacket : IPacketStatic<TPacket>
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         var key = TPacket.StaticType;
         AsyncPacketHandler rawHandler = packet => handler((TPacket)packet);
@@ -376,7 +376,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <param name="cancellationToken">A token to cancel the wait for the matching packet.</param>
     /// <returns>A task that completes once a packet matching the condition is received.</returns>
     public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, Task<bool>> condition, CancellationToken cancellationToken = default)
-         where TPacket : IPacketStatic<TPacket>
+         where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         // linked token is required to cancel the task when the client is disconnected
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
@@ -428,7 +428,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     /// <inheritdoc cref="WaitForPacketWhere{TPacket}(Func{TPacket, Task{bool}}, CancellationToken)"/>
     public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, bool> condition, CancellationToken cancellationToken = default)
-        where TPacket : IPacketStatic<TPacket>
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         return WaitForPacketWhere<TPacket>(packet => Task.FromResult(condition(packet)), cancellationToken);
     }
@@ -439,7 +439,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <typeparam name="TPacket">The type of the packet</typeparam>
     /// <returns>A task that completes once the packet is received</returns>
     public Task<TPacket> WaitForPacket<TPacket>()
-        where TPacket : IPacketStatic<TPacket>
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         var packetType = TPacket.StaticType;
         var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously));

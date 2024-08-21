@@ -3,7 +3,7 @@
 /// <summary>
 ///     Specifies the GameMode of a player
 /// </summary>
-public enum GameMode
+public enum GameMode : byte
 {
     /// <summary>
     ///     Survival game mode
