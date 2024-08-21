@@ -23,11 +23,13 @@ using CBKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAliveP
 using CBPlayAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.AddResourcePackPacket;
 using CBPlayChangeDifficultyPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChangeDifficultyPacket;
 using CBPlayMoveVehiclePacket = MineSharp.Protocol.Packets.Clientbound.Play.MoveVehiclePacket;
+using CBPlayPingResponsePacket = MineSharp.Protocol.Packets.Clientbound.Play.PingResponsePacket;
 using CBPlayPlayerAbilitiesPacket = MineSharp.Protocol.Packets.Clientbound.Play.PlayerAbilitiesPacket;
 using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
 using CBPlayRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.RemoveResourcePackPacket;
 using CBPlayUpdateTagsPacket = MineSharp.Protocol.Packets.Clientbound.Play.UpdateTagsPacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
+using CBStatusPingResponsePacket = MineSharp.Protocol.Packets.Clientbound.Status.PingResponsePacket;
 using ConfClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
@@ -108,7 +110,7 @@ internal static class PacketPalette
         // Status
         // CB
         RegisterPacket<StatusResponsePacket>();
-        RegisterPacket<PingResponsePacket>();
+        RegisterPacket<CBStatusPingResponsePacket>();
 
         // SB
         RegisterPacket<StatusRequestPacket>();
@@ -256,6 +258,7 @@ internal static class PacketPalette
         RegisterPacket<ExplosionPacket>();
         RegisterPacket<LinkEntitiesPacket>();
         RegisterPacket<SetContainerPropertyPacket>();
+        RegisterPacket<CBPlayPingResponsePacket>();
 
         // SB
         RegisterPacket<SBKeepAlivePacket>();
