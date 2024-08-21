@@ -19,14 +19,14 @@ public sealed partial record EntityStatusPacket(int EntityId, sbyte Status) : IP
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        buffer.WriteVarInt(EntityId);
+        buffer.WriteInt(EntityId);
         buffer.WriteSByte(Status);
     }
 
     /// <inheritdoc />
     public static EntityStatusPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var entityId = buffer.ReadVarInt();
+        var entityId = buffer.ReadInt();
         var status = buffer.ReadSByte();
 
         return new EntityStatusPacket(entityId, status);
