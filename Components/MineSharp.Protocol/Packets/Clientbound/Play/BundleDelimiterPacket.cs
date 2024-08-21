@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Bundle delimiter packet
 /// </summary>
-public sealed record BundleDelimiterPacket : IPacketStatic<BundleDelimiterPacket>
+public sealed partial record BundleDelimiterPacket : IPacketStatic<BundleDelimiterPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,10 +22,5 @@ public sealed record BundleDelimiterPacket : IPacketStatic<BundleDelimiterPacket
     public static BundleDelimiterPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new BundleDelimiterPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

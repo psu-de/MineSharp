@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Y">The Y coordinate</param>
 /// <param name="Z">The Z coordinate</param>
 /// <param name="Count">The amount of experience this orb will reward once collected</param>
-public sealed record SpawnExperienceOrbPacket(int EntityId, double X, double Y, double Z, short Count) : IPacketStatic<SpawnExperienceOrbPacket>
+public sealed partial record SpawnExperienceOrbPacket(int EntityId, double X, double Y, double Z, short Count) : IPacketStatic<SpawnExperienceOrbPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -39,10 +39,5 @@ public sealed record SpawnExperienceOrbPacket(int EntityId, double X, double Y, 
         var count = buffer.ReadShort();
 
         return new SpawnExperienceOrbPacket(entityId, x, y, z, count);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

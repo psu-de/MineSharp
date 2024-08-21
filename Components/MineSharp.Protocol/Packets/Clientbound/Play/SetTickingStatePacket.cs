@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="TickRate">The tick rate of the client</param>
 /// <param name="IsFrozen">Whether the client is frozen</param>
-public sealed record SetTickingStatePacket(float TickRate, bool IsFrozen) : IPacketStatic<SetTickingStatePacket>
+public sealed partial record SetTickingStatePacket(float TickRate, bool IsFrozen) : IPacketStatic<SetTickingStatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record SetTickingStatePacket(float TickRate, bool IsFrozen) : IPac
         var isFrozen = buffer.ReadBool();
 
         return new SetTickingStatePacket(tickRate, isFrozen);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

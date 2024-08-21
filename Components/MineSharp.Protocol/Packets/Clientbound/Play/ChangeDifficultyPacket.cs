@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Difficulty">The difficulty setting</param>
 /// <param name="DifficultyLocked">Whether the difficulty is locked</param>
-public sealed record ChangeDifficultyPacket(DifficultyLevel Difficulty, bool DifficultyLocked) : IPacketStatic<ChangeDifficultyPacket>
+public sealed partial record ChangeDifficultyPacket(DifficultyLevel Difficulty, bool DifficultyLocked) : IPacketStatic<ChangeDifficultyPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,10 +31,5 @@ public sealed record ChangeDifficultyPacket(DifficultyLevel Difficulty, bool Dif
         var difficultyLocked = buffer.ReadBool();
 
         return new ChangeDifficultyPacket(difficulty, difficultyLocked);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

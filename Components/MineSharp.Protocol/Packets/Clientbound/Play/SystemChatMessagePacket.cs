@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// Packet for system messages displayed in chat or hotbar
 /// See https://wiki.vg/Protocol#System_Chat_Message
 /// </summary>
-public abstract record SystemChatMessagePacket(Chat Message) : IPacketStatic<SystemChatMessagePacket>
+public abstract partial record SystemChatMessagePacket(Chat Message) : IPacketStatic<SystemChatMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,11 +28,6 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacketStatic<Sys
             >= ProtocolVersion.V_1_19_1 => Since191._Read(buffer, data),
             < ProtocolVersion.V_1_19_1 => Before191._Read(buffer, data)
         };
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

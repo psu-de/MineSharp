@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record TeleportEntityPacket(
+public sealed partial record TeleportEntityPacket(
     int EntityId,
     double X,
     double Y,
@@ -42,11 +42,6 @@ public sealed record TeleportEntityPacket(
 
         return new TeleportEntityPacket(
             entityId, x, y, z, yaw, pitch, onGround);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

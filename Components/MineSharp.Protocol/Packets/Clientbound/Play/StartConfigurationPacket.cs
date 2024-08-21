@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Sent during gameplay in order to redo the configuration process.
 ///     The client must respond with Acknowledge Configuration for the process to start.
 /// </summary>
-public sealed record StartConfigurationPacket() : IPacketStatic<StartConfigurationPacket>
+public sealed partial record StartConfigurationPacket() : IPacketStatic<StartConfigurationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record StartConfigurationPacket() : IPacketStatic<StartConfigurati
     {
         // No fields to read
         return new StartConfigurationPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Combat death packet
 /// </summary>
-public sealed record CombatDeathPacket : IPacketStatic<CombatDeathPacket>
+public sealed partial record CombatDeathPacket : IPacketStatic<CombatDeathPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -94,10 +94,5 @@ public sealed record CombatDeathPacket : IPacketStatic<CombatDeathPacket>
 
         var message = buffer.ReadChatComponent();
         return new CombatDeathPacket(playerId, entityId, message);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

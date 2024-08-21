@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Status">The status byte</param>
-public sealed record EntityStatusPacket(int EntityId, sbyte Status) : IPacketStatic<EntityStatusPacket>
+public sealed partial record EntityStatusPacket(int EntityId, sbyte Status) : IPacketStatic<EntityStatusPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,14 +30,9 @@ public sealed record EntityStatusPacket(int EntityId, sbyte Status) : IPacketSta
         var status = buffer.ReadSByte();
 
         return new EntityStatusPacket(entityId, status);
-	}
+    }
 
-	static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-	{
-		return Read(buffer, data);
-	}
-
-	// TODO: Add all the meanings of the status
-	// not all statuses are valid for all entities
-	// https://wiki.vg/Entity_statuses
+    // TODO: Add all the meanings of the status
+    // not all statuses are valid for all entities
+    // https://wiki.vg/Entity_statuses
 }

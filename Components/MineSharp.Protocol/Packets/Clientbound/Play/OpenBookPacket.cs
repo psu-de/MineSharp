@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Sent when a player right clicks with a signed book. This tells the client to open the book GUI.
 /// </summary>
 /// <param name="Hand">The hand used to open the book.</param>
-public sealed record OpenBookPacket(PlayerHand Hand) : IPacketStatic<OpenBookPacket>
+public sealed partial record OpenBookPacket(PlayerHand Hand) : IPacketStatic<OpenBookPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record OpenBookPacket(PlayerHand Hand) : IPacketStatic<OpenBookPac
     {
         var hand = (PlayerHand)buffer.ReadVarInt();
         return new OpenBookPacket(hand);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

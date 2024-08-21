@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Title">The title of the painting.</param>
 /// <param name="Location">The location of the painting.</param>
 /// <param name="Direction">The direction the painting is facing.</param>
-public sealed record SpawnPaintingPacket(
+public sealed partial record SpawnPaintingPacket(
     int EntityId,
     Uuid EntityUuid,
     int Title,
@@ -46,10 +46,5 @@ public sealed record SpawnPaintingPacket(
         var location = buffer.ReadPosition();
         var direction = buffer.ReadSByte();
         return new SpawnPaintingPacket(entityId, entityUuid, title, location, direction);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

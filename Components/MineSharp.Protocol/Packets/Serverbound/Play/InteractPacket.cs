@@ -6,7 +6,7 @@ using static MineSharp.Protocol.Packets.Serverbound.Play.InteractPacket;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record InteractPacket(
+public sealed partial record InteractPacket(
     int EntityId,
     InteractionType Interaction,
     float? TargetX,
@@ -74,11 +74,6 @@ public sealed record InteractPacket(
             null,
             buffer.ReadBool()
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     public enum InteractionType

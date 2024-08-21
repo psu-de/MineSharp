@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="WindowId">The window ID</param>
 /// <param name="Recipe">A recipe ID</param>
-public sealed record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : IPacketStatic<PlaceGhostRecipePacket>
+public sealed partial record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : IPacketStatic<PlaceGhostRecipePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,10 +31,5 @@ public sealed record PlaceGhostRecipePacket(byte WindowId, Identifier Recipe) : 
         var recipe = buffer.ReadIdentifier();
 
         return new PlaceGhostRecipePacket(windowId, recipe);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

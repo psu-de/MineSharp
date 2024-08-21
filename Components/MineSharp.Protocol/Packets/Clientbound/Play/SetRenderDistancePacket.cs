@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     This packet is sent by the server when the client reappears in the overworld after leaving the end.
 /// </summary>
 /// <param name="ViewDistance">Render distance (2-32).</param>
-public sealed record SetRenderDistancePacket(int ViewDistance) : IPacketStatic<SetRenderDistancePacket>
+public sealed partial record SetRenderDistancePacket(int ViewDistance) : IPacketStatic<SetRenderDistancePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record SetRenderDistancePacket(int ViewDistance) : IPacketStatic<S
     {
         var viewDistance = buffer.ReadVarInt();
         return new SetRenderDistancePacket(viewDistance);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

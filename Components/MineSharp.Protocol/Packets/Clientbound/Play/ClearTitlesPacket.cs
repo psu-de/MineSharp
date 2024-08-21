@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Clear Titles packet
 /// </summary>
 /// <param name="Reset">Whether to reset the client's current title information</param>
-public sealed record ClearTitlesPacket(bool Reset) : IPacketStatic<ClearTitlesPacket>
+public sealed partial record ClearTitlesPacket(bool Reset) : IPacketStatic<ClearTitlesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record ClearTitlesPacket(bool Reset) : IPacketStatic<ClearTitlesPa
     {
         var reset = buffer.ReadBool();
         return new ClearTitlesPacket(reset);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

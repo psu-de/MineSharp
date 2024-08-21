@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 /// <param name="ServerId">The hashed server id</param>
 /// <param name="PublicKey">The public key of the server</param>
 /// <param name="VerifyToken">Verify token</param>
-public sealed record EncryptionRequestPacket(string ServerId, byte[] PublicKey, byte[] VerifyToken) : IPacketStatic<EncryptionRequestPacket>
+public sealed partial record EncryptionRequestPacket(string ServerId, byte[] PublicKey, byte[] VerifyToken) : IPacketStatic<EncryptionRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -38,10 +38,5 @@ public sealed record EncryptionRequestPacket(string ServerId, byte[] PublicKey, 
         buffer.ReadBytes(verifyToken);
 
         return new EncryptionRequestPacket(serverId, publicKey, verifyToken);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

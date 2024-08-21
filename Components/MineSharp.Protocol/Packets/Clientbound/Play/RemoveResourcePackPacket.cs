@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to remove a resource pack.
 /// </summary>
 /// <param name="Uuid">The UUID of the resource pack to be removed.</param>
-public sealed record RemoveResourcePackPacket(Uuid? Uuid) : IPacketStatic<RemoveResourcePackPacket>
+public sealed partial record RemoveResourcePackPacket(Uuid? Uuid) : IPacketStatic<RemoveResourcePackPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,10 +34,5 @@ public sealed record RemoveResourcePackPacket(Uuid? Uuid) : IPacketStatic<Remove
         Uuid? uuid = hasUuid ? buffer.ReadUuid() : null;
 
         return new RemoveResourcePackPacket(uuid);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

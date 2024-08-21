@@ -14,23 +14,23 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="EntityId">Player ID</param>
 /// <param name="Action">The ID of the action</param>
 /// <param name="JumpBoost">Only used by the “start jump with horse” action, in which case it ranges from 0 to 100. In all other cases it is 0.</param>
-public sealed record EntityActionPacket(int EntityId, EntityActionPacket.EntityAction Action, int JumpBoost) : IPacketStatic<EntityActionPacket>
+public sealed partial record EntityActionPacket(int EntityId, EntityActionPacket.EntityAction Action, int JumpBoost) : IPacketStatic<EntityActionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_EntityAction;
 
-	/// <inheritdoc />
-	public void Write(PacketBuffer buffer, MinecraftData data)
+    /// <inheritdoc />
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteVarInt((int)Action);
         buffer.WriteVarInt(JumpBoost);
     }
 
-	/// <inheritdoc />
-	public static EntityActionPacket Read(PacketBuffer buffer, MinecraftData data)
+    /// <inheritdoc />
+    public static EntityActionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new EntityActionPacket(
             buffer.ReadVarInt(),
@@ -38,13 +38,8 @@ public sealed record EntityActionPacket(int EntityId, EntityActionPacket.EntityA
             buffer.ReadVarInt());
     }
 
-	static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-	{
-		return Read(buffer, data);
-	}
-
 #pragma warning disable CS1591
-	public enum EntityAction
+    public enum EntityAction
     {
         StartSneaking = 0,
         StopSneaking = 1,

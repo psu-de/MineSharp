@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlivePacket>
+public sealed partial record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlivePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,11 +20,6 @@ public sealed record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlive
     {
         var id = buffer.ReadLong();
         return new KeepAlivePacket(id);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

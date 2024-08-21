@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
+public sealed partial record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -83,11 +83,6 @@ public sealed record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
             (PlayerActionStatus)buffer.ReadVarInt(),
             buffer.ReadPosition(),
             (BlockFace)buffer.ReadByte());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

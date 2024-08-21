@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Animation">The animation ID</param>
-public sealed record EntityAnimationPacket(int EntityId, EntityAnimation Animation) : IPacketStatic<EntityAnimationPacket>
+public sealed partial record EntityAnimationPacket(int EntityId, EntityAnimation Animation) : IPacketStatic<EntityAnimationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,11 +31,6 @@ public sealed record EntityAnimationPacket(int EntityId, EntityAnimation Animati
         var animation = (EntityAnimation)buffer.ReadByte();
 
         return new EntityAnimationPacket(entityId, animation);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

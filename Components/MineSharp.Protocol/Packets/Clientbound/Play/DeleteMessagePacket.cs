@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="MessageId">The message ID + 1, used for validating message signature.</param>
 /// <param name="Signature">The previous message's signature. Always 256 bytes and not length-prefixed.</param>
-public sealed record DeleteMessagePacket(int MessageId, byte[]? Signature) : IPacketStatic<DeleteMessagePacket>
+public sealed partial record DeleteMessagePacket(int MessageId, byte[]? Signature) : IPacketStatic<DeleteMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -38,10 +38,5 @@ public sealed record DeleteMessagePacket(int MessageId, byte[]? Signature) : IPa
         }
 
         return new DeleteMessagePacket(messageId, signature);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Represents a client command packet.
 /// </summary>
 /// <param name="ActionId">The action ID of the client command.</param>
-public sealed record ClientCommandPacket(ClientCommandAction ActionId) : IPacketStatic<ClientCommandPacket>
+public sealed partial record ClientCommandPacket(ClientCommandAction ActionId) : IPacketStatic<ClientCommandPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,15 +30,10 @@ public sealed record ClientCommandPacket(ClientCommandAction ActionId) : IPacket
         return new ClientCommandPacket(actionId);
     }
 
-	static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-	{
-		return Read(buffer, data);
-	}
-
-	/// <summary>
-	///    Represents the action ID of the client command.
-	/// </summary>
-	public enum ClientCommandAction
+    /// <summary>
+    ///    Represents the action ID of the client command.
+    /// </summary>
+    public enum ClientCommandAction
     {
         /// <summary>
         /// Sent when the client is ready to complete login and when the client is ready to respawn after death.

@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Message">The chat message</param>
 /// <param name="Position">The position of the chat message</param>
 /// <param name="Sender">The UUID of the message sender</param>
-public sealed record ChatPacket(string Message, byte Position, Uuid Sender) : IPacketStatic<ChatPacket>
+public sealed partial record ChatPacket(string Message, byte Position, Uuid Sender) : IPacketStatic<ChatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,11 +34,6 @@ public sealed record ChatPacket(string Message, byte Position, Uuid Sender) : IP
             buffer.ReadString(),
             buffer.ReadByte(),
             buffer.ReadUuid());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

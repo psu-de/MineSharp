@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     This packet is used to indicate whether the player is on ground (walking/swimming), or airborne (jumping/falling).
 /// </summary>
 /// <param name="OnGround">True if the client is on the ground, false otherwise.</param>
-public sealed record SetPlayerOnGroundPacket(bool OnGround) : IPacketStatic<SetPlayerOnGroundPacket>
+public sealed partial record SetPlayerOnGroundPacket(bool OnGround) : IPacketStatic<SetPlayerOnGroundPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record SetPlayerOnGroundPacket(bool OnGround) : IPacketStatic<SetP
         var onGround = buffer.ReadBool();
 
         return new(onGround);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

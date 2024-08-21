@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Z">The Z coordinate of the player.</param>
 /// <param name="Yaw">The yaw of the player.</param>
 /// <param name="Pitch">The pitch of the player.</param>
-public sealed record SpawnPlayerPacket(
+public sealed partial record SpawnPlayerPacket(
     int EntityId,
     Uuid PlayerUuid,
     double X,
@@ -54,10 +54,5 @@ public sealed record SpawnPlayerPacket(
         var yaw = buffer.ReadByte();
         var pitch = buffer.ReadByte();
         return new SpawnPlayerPacket(entityId, playerUuid, x, y, z, yaw, pitch);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -23,7 +23,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="EmptyBlockLightMask"></param>
 /// <param name="SkyLight"></param>
 /// <param name="BlockLight"></param>
-public sealed record ChunkDataAndUpdateLightPacket(
+public sealed partial record ChunkDataAndUpdateLightPacket(
     int X,
     int Z,
     NbtCompound Heightmaps,
@@ -139,10 +139,5 @@ public sealed record ChunkDataAndUpdateLightPacket(
             emptyBlockLightMask,
             skyLight,
             blockLight);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

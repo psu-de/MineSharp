@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     It will also be ignored if the player attempts to teleport to themselves. 
 /// </summary>
 /// <param name="TargetPlayer">UUID of the player to teleport to (can also be an entity UUID).</param>
-public sealed record TeleportToEntityPacket(Uuid TargetPlayer) : IPacketStatic<TeleportToEntityPacket>
+public sealed partial record TeleportToEntityPacket(Uuid TargetPlayer) : IPacketStatic<TeleportToEntityPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,10 +33,5 @@ public sealed record TeleportToEntityPacket(Uuid TargetPlayer) : IPacketStatic<T
         var targetPlayer = buffer.ReadUuid();
 
         return new(targetPlayer);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

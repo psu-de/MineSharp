@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Set Simulation Distance packet
 /// </summary>
 /// <param name="SimulationDistance">The distance that the client will process specific things, such as entities.</param>
-public sealed record SetSimulationDistancePacket(int SimulationDistance) : IPacketStatic<SetSimulationDistancePacket>
+public sealed partial record SetSimulationDistancePacket(int SimulationDistance) : IPacketStatic<SetSimulationDistancePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record SetSimulationDistancePacket(int SimulationDistance) : IPack
     {
         var simulationDistance = buffer.ReadVarInt();
         return new SetSimulationDistancePacket(simulationDistance);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

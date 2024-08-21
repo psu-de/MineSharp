@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Channel">Name of the plugin channel used to send the data</param>
 /// <param name="Data">Any data, depending on the channel</param>
-public sealed record PluginMessagePacket(Identifier Channel, byte[] Data) : IPacketStatic<PluginMessagePacket>
+public sealed partial record PluginMessagePacket(Identifier Channel, byte[] Data) : IPacketStatic<PluginMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,10 +31,5 @@ public sealed record PluginMessagePacket(Identifier Channel, byte[] Data) : IPac
         var pluginData = buffer.RestBuffer();
 
         return new PluginMessagePacket(channel, pluginData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

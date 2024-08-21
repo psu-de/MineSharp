@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     See https://wiki.vg/Protocol#Registry_Data
 /// </summary>
 /// <param name="RegistryData">The registry data</param>
-public sealed record RegistryDataPacket(NbtCompound RegistryData) : IPacketStatic<RegistryDataPacket>
+public sealed partial record RegistryDataPacket(NbtCompound RegistryData) : IPacketStatic<RegistryDataPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -29,11 +29,6 @@ public sealed record RegistryDataPacket(NbtCompound RegistryData) : IPacketStati
         var registryData = buffer.ReadNbtCompound();
         registryData = registryData.NormalizeRegistryDataTopLevelIdentifiers();
         return new RegistryDataPacket(registryData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     Acknowledge Configuration packet sent by the client upon receiving a Start Configuration packet from the server.
 /// </summary>
-public sealed record AcknowledgeConfigurationPacket() : IPacketStatic<AcknowledgeConfigurationPacket>
+public sealed partial record AcknowledgeConfigurationPacket() : IPacketStatic<AcknowledgeConfigurationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -25,10 +25,5 @@ public sealed record AcknowledgeConfigurationPacket() : IPacketStatic<Acknowledg
     {
         // No fields to read
         return new AcknowledgeConfigurationPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

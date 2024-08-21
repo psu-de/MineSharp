@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 /// <param name="Uuid">Uuid</param>
 /// <param name="Username">Username of the client</param>
 /// <param name="Properties">A list of properties sent for versions &gt;= 1.19</param>
-public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? Properties = null) : IPacketStatic<LoginSuccessPacket>
+public sealed partial record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? Properties = null) : IPacketStatic<LoginSuccessPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -53,11 +53,6 @@ public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? 
         }
 
         return new LoginSuccessPacket(uuid, username, properties);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

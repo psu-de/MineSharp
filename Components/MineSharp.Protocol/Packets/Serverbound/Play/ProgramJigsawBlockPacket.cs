@@ -17,7 +17,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="JointType">Joint type, <c>rollable</c> if the attached piece can be rotated, else <c>aligned</c></param>
 /// <param name="SelectionPriority">Selection priority</param>
 /// <param name="PlacementPriority">Placement priority</param>
-public sealed record ProgramJigsawBlockPacket(
+public sealed partial record ProgramJigsawBlockPacket(
     Position Location,
     Identifier Name,
     Identifier Target,
@@ -66,10 +66,5 @@ public sealed record ProgramJigsawBlockPacket(
             jointType,
             selectionPriority,
             placementPriority);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

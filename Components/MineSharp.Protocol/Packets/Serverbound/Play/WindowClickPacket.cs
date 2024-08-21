@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record WindowClickPacket(
+public sealed partial record WindowClickPacket(
     byte WindowId,
     int StateId,
     short Slot,
@@ -44,11 +44,6 @@ public sealed record WindowClickPacket(
             buffer.ReadVarIntArray(buff => buff.ReadSlot(data)),
             buffer.ReadOptionalItem(data)
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

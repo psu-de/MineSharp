@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Location">The location of the block entity</param>
 /// <param name="BlockEntityType">The type of the block entity</param>
 /// <param name="NbtData">The NBT data to set</param>
-public sealed record BlockEntityDataPacket(Position Location, int BlockEntityType, NbtTag? NbtData) : IPacketStatic<BlockEntityDataPacket>
+public sealed partial record BlockEntityDataPacket(Position Location, int BlockEntityType, NbtTag? NbtData) : IPacketStatic<BlockEntityDataPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -35,10 +35,5 @@ public sealed record BlockEntityDataPacket(Position Location, int BlockEntityTyp
         var nbtData = buffer.ReadOptionalNbt();
 
         return new BlockEntityDataPacket(location, type, nbtData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

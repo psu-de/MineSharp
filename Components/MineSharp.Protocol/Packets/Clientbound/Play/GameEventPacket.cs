@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Event">The game event</param>
 /// <param name="Value">The value associated with the event</param>
-public sealed record GameEventPacket(GameEvent Event, float Value) : IPacketStatic<GameEventPacket>
+public sealed partial record GameEventPacket(GameEvent Event, float Value) : IPacketStatic<GameEventPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,11 +30,6 @@ public sealed record GameEventPacket(GameEvent Event, float Value) : IPacketStat
         var @event = buffer.ReadByte();
         var value = buffer.ReadFloat();
         return new GameEventPacket((GameEvent)@event, value);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

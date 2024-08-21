@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 /// Represents a packet sent by the server to update the list of recipes.
 /// </summary>
-public sealed record UpdateRecipesPacket(
+public sealed partial record UpdateRecipesPacket(
     Recipe[] Recipes
 ) : IPacketStatic<UpdateRecipesPacket>
 {
@@ -41,11 +41,6 @@ public sealed record UpdateRecipesPacket(
             recipes[i] = Recipe.Read(buffer, data);
         }
         return new UpdateRecipesPacket(recipes);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

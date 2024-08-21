@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     See https://wiki.vg/Protocol#Clientbound_Keep_Alive_.28configuration.29
 /// </summary>
 /// <param name="KeepAliveId">The keep alive id</param>
-public sealed record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlivePacket>
+public sealed partial record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlivePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record KeepAlivePacket(long KeepAliveId) : IPacketStatic<KeepAlive
     public static KeepAlivePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new KeepAlivePacket(buffer.ReadLong());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

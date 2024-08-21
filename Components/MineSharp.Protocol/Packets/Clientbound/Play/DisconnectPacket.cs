@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Reason">
 ///     The reason for being disconnected
 /// </param>
-public sealed record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPacket>
+public sealed partial record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,11 +28,6 @@ public sealed record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPac
     public static DisconnectPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new DisconnectPacket(buffer.ReadChatComponent());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

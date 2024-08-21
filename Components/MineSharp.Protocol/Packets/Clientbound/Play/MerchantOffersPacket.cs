@@ -17,7 +17,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Experience">Total experience for this villager (always 0 for the wandering trader).</param>
 /// <param name="IsRegularVillager">True if this is a regular villager; false for the wandering trader.</param>
 /// <param name="CanRestock">True for regular villagers and false for the wandering trader.</param>
-public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades, int VillagerLevel, int Experience, bool IsRegularVillager, bool CanRestock) : IPacketStatic<MerchantOffersPacket>
+public sealed partial record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades, int VillagerLevel, int Experience, bool IsRegularVillager, bool CanRestock) : IPacketStatic<MerchantOffersPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -55,11 +55,6 @@ public sealed record MerchantOffersPacket(int WindowId, int Size, Trade[] Trades
         var canRestock = buffer.ReadBool();
 
         return new MerchantOffersPacket(windowId, size, trades, villagerLevel, experience, isRegularVillager, canRestock);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

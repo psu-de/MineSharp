@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to set the border warning delay.
 /// </summary>
 /// <param name="WarningTime">The warning time in seconds as set by /worldborder warning time.</param>
-public sealed record SetBorderWarningDelayPacket(int WarningTime) : IPacketStatic<SetBorderWarningDelayPacket>
+public sealed partial record SetBorderWarningDelayPacket(int WarningTime) : IPacketStatic<SetBorderWarningDelayPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record SetBorderWarningDelayPacket(int WarningTime) : IPacketStati
     {
         var warningTime = buffer.ReadVarInt();
         return new SetBorderWarningDelayPacket(warningTime);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Position">The position of the scoreboard.</param>
 /// <param name="ScoreName">The unique name for the scoreboard to be displayed.</param>
-public sealed record DisplayObjectivePacket(int Position, string ScoreName) : IPacketStatic<DisplayObjectivePacket>
+public sealed partial record DisplayObjectivePacket(int Position, string ScoreName) : IPacketStatic<DisplayObjectivePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record DisplayObjectivePacket(int Position, string ScoreName) : IP
         var scoreName = buffer.ReadString();
 
         return new DisplayObjectivePacket(position, scoreName);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

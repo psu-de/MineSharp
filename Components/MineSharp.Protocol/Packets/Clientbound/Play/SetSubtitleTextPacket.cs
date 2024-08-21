@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to set the subtitle text.
 /// </summary>
 /// <param name="SubtitleText">The subtitle text to be displayed.</param>
-public sealed record SetSubtitleTextPacket(Chat SubtitleText) : IPacketStatic<SetSubtitleTextPacket>
+public sealed partial record SetSubtitleTextPacket(Chat SubtitleText) : IPacketStatic<SetSubtitleTextPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record SetSubtitleTextPacket(Chat SubtitleText) : IPacketStatic<Se
     {
         var subtitleText = buffer.ReadChatComponent();
         return new SetSubtitleTextPacket(subtitleText);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

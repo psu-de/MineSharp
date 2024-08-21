@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="WindowId">The window ID</param>
 /// <param name="Recipe">The recipe ID</param>
 /// <param name="MakeAll">Whether to make all items (true if shift is down when clicked)</param>
-public sealed record PlaceRecipePacket(byte WindowId, Identifier Recipe, bool MakeAll) : IPacketStatic<PlaceRecipePacket>
+public sealed partial record PlaceRecipePacket(byte WindowId, Identifier Recipe, bool MakeAll) : IPacketStatic<PlaceRecipePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,10 +34,5 @@ public sealed record PlaceRecipePacket(byte WindowId, Identifier Recipe, bool Ma
         var makeAll = buffer.ReadBool();
 
         return new(windowId, recipe, makeAll);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -6,7 +6,7 @@ using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerPositionPacket : IPacketStatic<PlayerPositionPacket>
+public sealed partial record PlayerPositionPacket : IPacketStatic<PlayerPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -113,11 +113,6 @@ public sealed record PlayerPositionPacket : IPacketStatic<PlayerPositionPacket>
 
         var dismountVehicle = buffer.ReadBool();
         return new PlayerPositionPacket(x, y, z, yaw, pitch, flags, teleportId, dismountVehicle);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     [Flags]

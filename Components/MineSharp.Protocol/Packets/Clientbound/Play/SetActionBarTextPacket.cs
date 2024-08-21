@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     except that chat message blocking isn't performed. Used by the Notchian server only to implement the /title command.
 /// </summary>
 /// <param name="ActionBarText">The text to display in the action bar</param>
-public sealed record SetActionBarTextPacket(Chat ActionBarText) : IPacketStatic<SetActionBarTextPacket>
+public sealed partial record SetActionBarTextPacket(Chat ActionBarText) : IPacketStatic<SetActionBarTextPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,10 +28,5 @@ public sealed record SetActionBarTextPacket(Chat ActionBarText) : IPacketStatic<
     {
         var actionBarText = buffer.ReadChatComponent();
         return new SetActionBarTextPacket(actionBarText);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

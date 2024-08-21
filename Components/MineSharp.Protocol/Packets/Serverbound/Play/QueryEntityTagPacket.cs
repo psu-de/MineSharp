@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="TransactionId">An incremental ID so that the client can verify that the response matches.</param>
 /// <param name="EntityId">The ID of the entity to query.</param>
-public sealed record QueryEntityTagPacket(int TransactionId, int EntityId) : IPacketStatic<QueryEntityTagPacket>
+public sealed partial record QueryEntityTagPacket(int TransactionId, int EntityId) : IPacketStatic<QueryEntityTagPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,10 +31,5 @@ public sealed record QueryEntityTagPacket(int TransactionId, int EntityId) : IPa
         var entityId = buffer.ReadVarInt();
 
         return new(transactionId, entityId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Start">Start of the text to replace</param>
 /// <param name="Length">Length of the text to replace</param>
 /// <param name="Matches">Array of matches</param>
-public sealed record CommandSuggestionsResponsePacket(int Id, int Start, int Length, Match[] Matches) : IPacketStatic<CommandSuggestionsResponsePacket>
+public sealed partial record CommandSuggestionsResponsePacket(int Id, int Start, int Length, Match[] Matches) : IPacketStatic<CommandSuggestionsResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -47,11 +47,6 @@ public sealed record CommandSuggestionsResponsePacket(int Id, int Start, int Len
         }
 
         return new CommandSuggestionsResponsePacket(id, start, length, matches);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

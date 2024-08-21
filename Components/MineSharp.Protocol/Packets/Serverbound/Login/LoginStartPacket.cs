@@ -1,12 +1,11 @@
-﻿using MineSharp.Core;
-using MineSharp.Core.Common;
+﻿using MineSharp.Core.Common;
 using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Login;
 
-public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
+public abstract partial record LoginStartPacket : IPacketStatic<LoginStartPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -24,13 +23,8 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
     /// <summary>
     /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_7_0"/>
     /// </summary>
-    public sealed record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_7_0, LoginStartPacket>
+    public sealed partial record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_7_0, LoginStartPacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_7_0;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -43,27 +37,17 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
             var username = buffer.ReadString();
             return new(username);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
     /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_19_0"/>
     /// </summary>
-    public sealed record LoginStartPacketV_1_19_0(
+    public sealed partial record LoginStartPacketV_1_19_0(
         string Username,
         SignatureContainer? Signature,
         Uuid? PlayerUuid
     ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_0, LoginStartPacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_19_0;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -94,26 +78,16 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
             Uuid? playerUuid = ReadOptionalUuid(buffer);
             return new(username, signature, playerUuid);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
     /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_19_3"/>
     /// </summary>
-    public sealed record LoginStartPacketV_1_19_3(
+    public sealed partial record LoginStartPacketV_1_19_3(
         string Username,
         Uuid? PlayerUuid
     ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_3, LoginStartPacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_19_3;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -128,26 +102,16 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
             Uuid? playerUuid = ReadOptionalUuid(buffer);
             return new(username, playerUuid);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
     /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_20_2"/>
     /// </summary>
-    public sealed record LoginStartPacketV_1_20_2(
+    public sealed partial record LoginStartPacketV_1_20_2(
         string Username,
         Uuid PlayerUuid
     ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_20_2, LoginStartPacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_20_2;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -161,11 +125,6 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
             var username = buffer.ReadString();
             var playerUuid = buffer.ReadUuid();
             return new(username, playerUuid);
-        }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
         }
     }
 
@@ -188,35 +147,6 @@ public abstract record LoginStartPacket : IPacketStatic<LoginStartPacket>
             uuid = buffer.ReadUuid();
         }
         return uuid;
-    }
-
-    public static readonly PacketVersionSubTypeLookup<LoginStartPacket> PacketVersionSubTypeLookup = InitializeVersionPackets();
-
-    private static PacketVersionSubTypeLookup<LoginStartPacket> InitializeVersionPackets()
-    {
-        PacketVersionSubTypeLookup<LoginStartPacket> lookup = new();
-
-        lookup.RegisterVersionPacket<LoginStartPacketV_1_7_0>();
-        lookup.RegisterVersionPacket<LoginStartPacketV_1_19_0>();
-        lookup.RegisterVersionPacket<LoginStartPacketV_1_19_3>();
-        lookup.RegisterVersionPacket<LoginStartPacketV_1_20_2>();
-
-        lookup.Freeze();
-        return lookup;
-    }
-
-    /// <inheritdoc />
-    public abstract void Write(PacketBuffer buffer, MinecraftData data);
-
-    /// <inheritdoc />
-    public static LoginStartPacket Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return PacketVersionSubTypeLookup.Read(buffer, data);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     public sealed record SignatureContainer(long Timestamp, byte[] PublicKey, byte[] Signature) : ISerializable<SignatureContainer>

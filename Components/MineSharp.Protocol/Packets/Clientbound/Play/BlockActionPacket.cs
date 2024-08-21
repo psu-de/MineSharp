@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="ActionId">Varies depending on block — see Block Actions.</param>
 /// <param name="ActionParameter">Varies depending on block — see Block Actions.</param>
 /// <param name="BlockType">The block type ID for the block. This value is unused by the Notchian client, as it will infer the type of block based on the given position.</param>
-public sealed record BlockActionPacket(Position Location, byte ActionId, byte ActionParameter, int BlockType) : IPacketStatic<BlockActionPacket>
+public sealed partial record BlockActionPacket(Position Location, byte ActionId, byte ActionParameter, int BlockType) : IPacketStatic<BlockActionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -38,10 +38,5 @@ public sealed record BlockActionPacket(Position Location, byte ActionId, byte Ac
         var blockType = buffer.ReadVarInt();
 
         return new BlockActionPacket(location, actionId, actionParameter, blockType);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

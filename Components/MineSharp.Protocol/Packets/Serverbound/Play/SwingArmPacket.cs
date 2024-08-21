@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Sent by the client when the player swings their arm.
 /// </summary>
 /// <param name="Hand">The hand used by the player.</param>
-public sealed record SwingArmPacket(PlayerHand Hand) : IPacketStatic<SwingArmPacket>
+public sealed partial record SwingArmPacket(PlayerHand Hand) : IPacketStatic<SwingArmPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,10 +28,5 @@ public sealed record SwingArmPacket(PlayerHand Hand) : IPacketStatic<SwingArmPac
         var hand = (PlayerHand)buffer.ReadVarInt();
 
         return new SwingArmPacket(hand);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

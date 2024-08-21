@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Select Trade packet sent by the client when a player selects a specific trade offered by a villager NPC.
 /// </summary>
 /// <param name="SelectedSlot">The selected slot in the player's current (trading) inventory.</param>
-public sealed record SelectTradePacket(int SelectedSlot) : IPacketStatic<SelectTradePacket>
+public sealed partial record SelectTradePacket(int SelectedSlot) : IPacketStatic<SelectTradePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record SelectTradePacket(int SelectedSlot) : IPacketStatic<SelectT
         var selectedSlot = buffer.ReadVarInt();
 
         return new(selectedSlot);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

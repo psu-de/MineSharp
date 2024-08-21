@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Category">Optional category of the sound. If not present, then sounds from all sources are cleared.</param>
 /// <param name="Sound">Optional sound effect name. If not present, then all sounds are cleared.</param>
-public sealed record StopSoundPacket(SoundCategory? Category, Identifier? Sound) : IPacketStatic<StopSoundPacket>
+public sealed partial record StopSoundPacket(SoundCategory? Category, Identifier? Sound) : IPacketStatic<StopSoundPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -53,11 +53,6 @@ public sealed record StopSoundPacket(SoundCategory? Category, Identifier? Sound)
         }
 
         return new StopSoundPacket(category, sound);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

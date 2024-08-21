@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     Sent when the player changes the slot selection
 /// </summary>
-public sealed record SetHeldItemPacket(short Slot) : IPacketStatic<SetHeldItemPacket>
+public sealed partial record SetHeldItemPacket(short Slot) : IPacketStatic<SetHeldItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -24,10 +24,5 @@ public sealed record SetHeldItemPacket(short Slot) : IPacketStatic<SetHeldItemPa
     public static SetHeldItemPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new SetHeldItemPacket(buffer.ReadShort());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="HeadYaw">New angle, not a delta</param>
-public sealed record SetHeadRotationPacket(int EntityId, byte HeadYaw) : IPacketStatic<SetHeadRotationPacket>
+public sealed partial record SetHeadRotationPacket(int EntityId, byte HeadYaw) : IPacketStatic<SetHeadRotationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record SetHeadRotationPacket(int EntityId, byte HeadYaw) : IPacket
         var headYaw = buffer.ReadByte();
 
         return new SetHeadRotationPacket(entityId, headYaw);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

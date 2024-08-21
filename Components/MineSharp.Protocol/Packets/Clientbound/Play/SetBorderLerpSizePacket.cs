@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="OldDiameter">Current length of a single side of the world border, in meters.</param>
 /// <param name="NewDiameter">Target length of a single side of the world border, in meters.</param>
 /// <param name="Speed">Number of real-time milliseconds until New Diameter is reached.</param>
-public sealed record SetBorderLerpSizePacket(double OldDiameter, double NewDiameter, long Speed) : IPacketStatic<SetBorderLerpSizePacket>
+public sealed partial record SetBorderLerpSizePacket(double OldDiameter, double NewDiameter, long Speed) : IPacketStatic<SetBorderLerpSizePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,10 +33,5 @@ public sealed record SetBorderLerpSizePacket(double OldDiameter, double NewDiame
         var speed = buffer.ReadVarLong();
 
         return new SetBorderLerpSizePacket(oldDiameter, newDiameter, speed);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -9,7 +9,7 @@ using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerChatPacket;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacketStatic<PlayerChatPacket>
+public sealed partial record PlayerChatPacket(IChatMessageBody Body) : IPacketStatic<PlayerChatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,11 +34,6 @@ public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacketStatic<Pla
         }
 
         throw new NotImplementedException();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     public interface IChatMessageBody

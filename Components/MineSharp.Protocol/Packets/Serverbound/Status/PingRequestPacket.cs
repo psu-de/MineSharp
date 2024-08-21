@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Status;
 ///     Packet for ping request
 /// </summary>
 /// <param name="Payload">The payload of the ping request</param>
-public sealed record PingRequestPacket(long Payload) : IPacketStatic<PingRequestPacket>
+public sealed partial record PingRequestPacket(long Payload) : IPacketStatic<PingRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -25,11 +25,6 @@ public sealed record PingRequestPacket(long Payload) : IPacketStatic<PingRequest
     public static PingRequestPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new PingRequestPacket(buffer.ReadLong());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

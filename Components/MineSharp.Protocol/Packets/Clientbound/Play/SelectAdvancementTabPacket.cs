@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Sent either when the client switches tab in the GUI or when an advancement in another tab is made.
 /// </summary>
 /// <param name="Identifier">The identifier of the advancement tab. If no or an invalid identifier is sent, the client will switch to the first tab in the GUI.</param>
-public sealed record SelectAdvancementTabPacket(Identifier? Identifier) : IPacketStatic<SelectAdvancementTabPacket>
+public sealed partial record SelectAdvancementTabPacket(Identifier? Identifier) : IPacketStatic<SelectAdvancementTabPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -48,10 +48,5 @@ public sealed record SelectAdvancementTabPacket(Identifier? Identifier) : IPacke
         Identifier? identifier = hasId ? buffer.ReadIdentifier() : null;
 
         return new SelectAdvancementTabPacket(identifier);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

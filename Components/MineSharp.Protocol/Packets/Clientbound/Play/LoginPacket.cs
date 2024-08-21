@@ -33,7 +33,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="DeathLocation">The death location.</param>
 /// <param name="PortalCooldown">The portal cooldown.</param>
 /// <param name="DoLimitedCrafting">Indicates if limited crafting is enabled.</param>
-public sealed record LoginPacket(
+public sealed partial record LoginPacket(
     int EntityId,
     bool IsHardcore,
     byte GameMode,
@@ -201,11 +201,6 @@ public sealed record LoginPacket(
             deathLocation,
             portalCooldown,
             false);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     private static LoginPacket ReadV1_20_2(PacketBuffer buffer, MinecraftData data)

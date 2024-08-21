@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="NumberOfChunks">Number of chunks</param>
 /// <param name="ChunkBiomes">Array of chunk biome data</param>
-public sealed record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] ChunkBiomes) : IPacketStatic<ChunkBiomesPacket>
+public sealed partial record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] ChunkBiomes) : IPacketStatic<ChunkBiomesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -38,11 +38,6 @@ public sealed record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] Chun
         }
 
         return new ChunkBiomesPacket(numberOfChunks, chunkBiomeData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

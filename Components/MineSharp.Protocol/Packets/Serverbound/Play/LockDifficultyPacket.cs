@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Lock Difficulty packet
 /// </summary>
 /// <param name="Locked">Indicates if the difficulty is locked</param>
-public sealed record LockDifficultyPacket(bool Locked) : IPacketStatic<LockDifficultyPacket>
+public sealed partial record LockDifficultyPacket(bool Locked) : IPacketStatic<LockDifficultyPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record LockDifficultyPacket(bool Locked) : IPacketStatic<LockDiffi
         var locked = buffer.ReadBool();
 
         return new(locked);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

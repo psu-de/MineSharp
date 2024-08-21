@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="ChunkX">Chunk X coordinate of the loading area center.</param>
 /// <param name="ChunkZ">Chunk Z coordinate of the loading area center.</param>
-public sealed record SetCenterChunkPacket(int ChunkX, int ChunkZ) : IPacketStatic<SetCenterChunkPacket>
+public sealed partial record SetCenterChunkPacket(int ChunkX, int ChunkZ) : IPacketStatic<SetCenterChunkPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record SetCenterChunkPacket(int ChunkX, int ChunkZ) : IPacketStati
         var chunkZ = buffer.ReadVarInt();
 
         return new SetCenterChunkPacket(chunkX, chunkZ);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

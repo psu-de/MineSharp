@@ -22,7 +22,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Data depends on the particle id.
 ///     Will be an empty buffer for most particles.
 /// </param>
-public sealed record ParticlePacket(
+public sealed partial record ParticlePacket(
     int ParticleId,
     bool LongDistance,
     double X,
@@ -73,10 +73,5 @@ public sealed record ParticlePacket(
         var particleData = ParticleDataRegistry.Read(buffer, data, particleId);
 
         return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, particleData);
-	}
-
-	static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-	{
-		return Read(buffer, data);
-	}
+    }
 }

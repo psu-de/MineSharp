@@ -12,7 +12,7 @@ using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerInfoUpdatePacket.
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
 #pragma warning disable CS1591
-public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IPacketStatic<PlayerInfoUpdatePacket>
+public sealed partial record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IPacketStatic<PlayerInfoUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -48,11 +48,6 @@ public sealed record PlayerInfoUpdatePacket(int Action, ActionEntry[] Data) : IP
         var actionData = buffer.ReadVarIntArray(buffer => ActionEntry.Read(buffer, data, action));
 
         return new(action, actionData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     public sealed record ActionEntry(Uuid Player, IPlayerInfoAction[] Actions) : ISerializableWithMinecraftData<ActionEntry>

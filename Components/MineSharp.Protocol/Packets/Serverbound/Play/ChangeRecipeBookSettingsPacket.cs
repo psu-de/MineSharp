@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="BookId">The ID of the recipe book.</param>
 /// <param name="BookOpen">Whether the book is open.</param>
 /// <param name="FilterActive">Whether the filter is active.</param>
-public sealed record ChangeRecipeBookSettingsPacket(RecipeBookType BookId, bool BookOpen, bool FilterActive) : IPacketStatic<ChangeRecipeBookSettingsPacket>
+public sealed partial record ChangeRecipeBookSettingsPacket(RecipeBookType BookId, bool BookOpen, bool FilterActive) : IPacketStatic<ChangeRecipeBookSettingsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,11 +34,6 @@ public sealed record ChangeRecipeBookSettingsPacket(RecipeBookType BookId, bool 
         var filterActive = buffer.ReadBool();
 
         return new(bookId, bookOpen, filterActive);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

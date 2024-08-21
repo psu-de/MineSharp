@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 ///     Resource pack response packet
 /// </summary>
 /// <param name="Result">The result of the resource pack response</param>
-public sealed record ResourcePackResponsePacket(ResourcePackResult Result) : IPacketStatic<ResourcePackResponsePacket>
+public sealed partial record ResourcePackResponsePacket(ResourcePackResult Result) : IPacketStatic<ResourcePackResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -29,9 +29,4 @@ public sealed record ResourcePackResponsePacket(ResourcePackResult Result) : IPa
 
         return new ResourcePackResponsePacket(result);
     }
-
-	static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-	{
-		return Read(buffer, data);
-	}
 }

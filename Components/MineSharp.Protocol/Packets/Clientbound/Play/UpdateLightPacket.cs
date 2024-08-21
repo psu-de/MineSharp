@@ -17,7 +17,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="EmptyBlockLightMask">BitSet for empty block light sections</param>
 /// <param name="SkyLightArrays">Array of sky light data</param>
 /// <param name="BlockLightArrays">Array of block light data</param>
-public sealed record UpdateLightPacket(
+public sealed partial record UpdateLightPacket(
     int ChunkX,
     int ChunkZ,
     BitSet SkyLightMask,
@@ -86,11 +86,6 @@ public sealed record UpdateLightPacket(
             skyLightArrays,
             blockLightArrays
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

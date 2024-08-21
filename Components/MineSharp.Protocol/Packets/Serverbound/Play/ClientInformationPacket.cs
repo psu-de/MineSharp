@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record ClientInformationPacket(
+public sealed partial record ClientInformationPacket(
     string Locale,
     byte ViewDistance,
     ChatMode ChatMode,
@@ -45,11 +45,6 @@ public sealed record ClientInformationPacket(
             buffer.ReadBool(),
             buffer.ReadBool()
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

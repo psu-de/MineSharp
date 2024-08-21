@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="WorldAge">The world age in ticks</param>
 /// <param name="TimeOfDay">The time of day in ticks</param>
-public sealed record UpdateTimePacket(long WorldAge, long TimeOfDay) : IPacketStatic<UpdateTimePacket>
+public sealed partial record UpdateTimePacket(long WorldAge, long TimeOfDay) : IPacketStatic<UpdateTimePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,10 +34,5 @@ public sealed record UpdateTimePacket(long WorldAge, long TimeOfDay) : IPacketSt
         var timeOfDay = buffer.ReadLong();
 
         return new UpdateTimePacket(worldAge, timeOfDay);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

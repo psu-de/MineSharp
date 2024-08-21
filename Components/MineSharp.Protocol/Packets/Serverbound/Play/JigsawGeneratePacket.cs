@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Location">Block entity location.</param>
 /// <param name="Levels">Value of the levels slider/max depth to generate.</param>
 /// <param name="KeepJigsaws">Whether to keep jigsaws.</param>
-public sealed record JigsawGeneratePacket(Position Location, int Levels, bool KeepJigsaws) : IPacketStatic<JigsawGeneratePacket>
+public sealed partial record JigsawGeneratePacket(Position Location, int Levels, bool KeepJigsaws) : IPacketStatic<JigsawGeneratePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,10 +34,5 @@ public sealed record JigsawGeneratePacket(Position Location, int Levels, bool Ke
         var keepJigsaws = buffer.ReadBool();
 
         return new(location, levels, keepJigsaws);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

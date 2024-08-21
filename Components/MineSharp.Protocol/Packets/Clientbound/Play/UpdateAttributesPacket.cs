@@ -5,7 +5,7 @@ using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record UpdateAttributesPacket(
+public sealed partial record UpdateAttributesPacket(
     int EntityId,
     Attribute[] Attributes
 ) : IPacketStatic<UpdateAttributesPacket>
@@ -27,11 +27,6 @@ public sealed record UpdateAttributesPacket(
         var attributes = buffer.ReadVarIntArray(Attribute.Read);
 
         return new UpdateAttributesPacket(entityId, attributes);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

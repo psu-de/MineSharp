@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="SlotId">The ID of the slot that was changed</param>
 /// <param name="WindowId">The ID of the window that was changed</param>
 /// <param name="State">The new state of the slot. True for enabled, false for disabled</param>
-public sealed record ChangeContainerSlotStatePacket(int SlotId, int WindowId, bool State) : IPacketStatic<ChangeContainerSlotStatePacket>
+public sealed partial record ChangeContainerSlotStatePacket(int SlotId, int WindowId, bool State) : IPacketStatic<ChangeContainerSlotStatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,10 +34,5 @@ public sealed record ChangeContainerSlotStatePacket(int SlotId, int WindowId, bo
         var state = buffer.ReadBool();
 
         return new(slotId, windowId, state);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

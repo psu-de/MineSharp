@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="Action">The action taken</param>
 /// <param name="TabId">The identifier of the tab, only present if action is <see cref="SeenAdvancementsAction.OpenedTab"/></param>
-public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Identifier? TabId) : IPacketStatic<SeenAdvancementsPacket>
+public sealed partial record SeenAdvancementsPacket(SeenAdvancementsAction Action, Identifier? TabId) : IPacketStatic<SeenAdvancementsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -39,11 +39,6 @@ public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Ident
         }
 
         return new(action, tabId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

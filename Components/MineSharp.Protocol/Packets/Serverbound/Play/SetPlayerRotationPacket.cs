@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Yaw">Absolute rotation on the X Axis, in degrees.</param>
 /// <param name="Pitch">Absolute rotation on the Y Axis, in degrees.</param>
 /// <param name="OnGround">True if the client is on the ground, false otherwise.</param>
-public sealed record SetPlayerRotationPacket(float Yaw, float Pitch, bool OnGround) : IPacketStatic<SetPlayerRotationPacket>
+public sealed partial record SetPlayerRotationPacket(float Yaw, float Pitch, bool OnGround) : IPacketStatic<SetPlayerRotationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,10 +33,5 @@ public sealed record SetPlayerRotationPacket(float Yaw, float Pitch, bool OnGrou
         var onGround = buffer.ReadBool();
 
         return new(yaw, pitch, onGround);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

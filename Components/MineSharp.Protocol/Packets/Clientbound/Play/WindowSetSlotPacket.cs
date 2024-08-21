@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="WindowId">The ID of the window.</param>
 /// <param name="StateId">The state ID of the window.</param>
 /// <param name="Slot">The slot to be set.</param>
-public sealed record WindowSetSlotPacket(sbyte WindowId, int StateId, Slot Slot) : IPacketStatic<WindowSetSlotPacket>
+public sealed partial record WindowSetSlotPacket(sbyte WindowId, int StateId, Slot Slot) : IPacketStatic<WindowSetSlotPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,11 +34,6 @@ public sealed record WindowSetSlotPacket(sbyte WindowId, int StateId, Slot Slot)
             buffer.ReadSByte(),
             buffer.ReadVarInt(),
             buffer.ReadSlot(data));
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

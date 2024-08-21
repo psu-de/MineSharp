@@ -8,7 +8,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record RespawnPacket(
+public sealed partial record RespawnPacket(
     Identifier DimensionType,
     Identifier DimensionName,
     long HashedSeed,
@@ -119,11 +119,6 @@ public sealed record RespawnPacket(
             deathDimensionName,
             deathLocation,
             portalCooldown);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

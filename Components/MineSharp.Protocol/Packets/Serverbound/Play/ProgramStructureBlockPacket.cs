@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Integrity">Integrity, between 0 and 1</param>
 /// <param name="Seed">Seed for the structure</param>
 /// <param name="Flags">Flags. See <see cref="StructureBlockFlags"/></param>
-public sealed record ProgramStructureBlockPacket(
+public sealed partial record ProgramStructureBlockPacket(
     Position Location,
     StructureBlockAction Action,
     StructureBlockMode Mode,
@@ -105,11 +105,6 @@ public sealed record ProgramStructureBlockPacket(
             integrity,
             seed,
             flags);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

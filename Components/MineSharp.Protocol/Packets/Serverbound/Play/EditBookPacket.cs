@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Slot">The hotbar slot where the written book is located</param>
 /// <param name="Entries">Text from each page. Maximum array size is 200. Maximum string length is 8192 chars.</param>
 /// <param name="Title">Title of the book. Only present if the book is being signed.</param>
-public sealed record EditBookPacket(int Slot, string[] Entries, string? Title) : IPacketStatic<EditBookPacket>
+public sealed partial record EditBookPacket(int Slot, string[] Entries, string? Title) : IPacketStatic<EditBookPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -39,10 +39,5 @@ public sealed record EditBookPacket(int Slot, string[] Entries, string? Title) :
         var title = hasTitle ? buffer.ReadString() : null;
 
         return new(slot, entries, title);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

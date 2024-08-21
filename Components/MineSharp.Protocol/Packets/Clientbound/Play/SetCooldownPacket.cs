@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="ItemId">Numeric ID of the item to apply a cooldown to.</param>
 /// <param name="CooldownTicks">Number of ticks to apply a cooldown for, or 0 to clear the cooldown.</param>
-public sealed record SetCooldownPacket(int ItemId, int CooldownTicks) : IPacketStatic<SetCooldownPacket>
+public sealed partial record SetCooldownPacket(int ItemId, int CooldownTicks) : IPacketStatic<SetCooldownPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record SetCooldownPacket(int ItemId, int CooldownTicks) : IPacketS
         var cooldownTicks = buffer.ReadVarInt();
 
         return new SetCooldownPacket(itemId, cooldownTicks);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

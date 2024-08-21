@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="EffectId">The effect ID</param>
-public sealed record RemoveEntityEffectPacket(int EntityId, int EffectId) : IPacketStatic<RemoveEntityEffectPacket>
+public sealed partial record RemoveEntityEffectPacket(int EntityId, int EffectId) : IPacketStatic<RemoveEntityEffectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record RemoveEntityEffectPacket(int EntityId, int EffectId) : IPac
         var effectId = buffer.ReadVarInt();
 
         return new RemoveEntityEffectPacket(entityId, effectId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

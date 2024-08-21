@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Award statistics packet sent as a response to Client Command.
 /// </summary>
 /// <param name="Statistics">Array of statistics.</param>
-public sealed record AwardStatisticsPacket(Statistic[] Statistics) : IPacketStatic<AwardStatisticsPacket>
+public sealed partial record AwardStatisticsPacket(Statistic[] Statistics) : IPacketStatic<AwardStatisticsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -29,11 +29,6 @@ public sealed record AwardStatisticsPacket(Statistic[] Statistics) : IPacketStat
         var statistics = buffer.ReadVarIntArray(Statistic.Read);
 
         return new(statistics);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

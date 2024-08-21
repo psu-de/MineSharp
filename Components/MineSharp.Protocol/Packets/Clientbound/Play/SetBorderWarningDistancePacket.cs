@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to set the border warning distance.
 /// </summary>
 /// <param name="WarningBlocks">The warning distance in meters.</param>
-public sealed record SetBorderWarningDistancePacket(int WarningBlocks) : IPacketStatic<SetBorderWarningDistancePacket>
+public sealed partial record SetBorderWarningDistancePacket(int WarningBlocks) : IPacketStatic<SetBorderWarningDistancePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record SetBorderWarningDistancePacket(int WarningBlocks) : IPacket
     {
         var warningBlocks = buffer.ReadVarInt();
         return new SetBorderWarningDistancePacket(warningBlocks);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

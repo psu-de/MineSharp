@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
+public sealed partial record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -198,11 +198,6 @@ public sealed record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
             MessageCount = messageCount,
             Acknowledged = acknowledged
         };
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     public sealed record ArgumentSignature(string ArgumentName, byte[] Signature) : ISerializableWithMinecraftData<ArgumentSignature>

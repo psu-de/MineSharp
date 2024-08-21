@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     ChatPacket used before 1.19 to send a Chat message
 /// </summary>
-public sealed record ChatPacket(string Message) : IPacketStatic<ChatPacket>
+public sealed partial record ChatPacket(string Message) : IPacketStatic<ChatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,11 +22,6 @@ public sealed record ChatPacket(string Message) : IPacketStatic<ChatPacket>
     public static ChatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ChatPacket(buffer.ReadString());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

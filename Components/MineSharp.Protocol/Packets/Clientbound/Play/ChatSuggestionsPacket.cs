@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Action">The action to perform</param>
 /// <param name="Count">Number of elements in the following array</param>
 /// <param name="Entries">Array of chat suggestions</param>
-public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Count, string[] Entries) : IPacketStatic<ChatSuggestionsPacket>
+public sealed partial record ChatSuggestionsPacket(ChatSuggestionAction Action, int Count, string[] Entries) : IPacketStatic<ChatSuggestionsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -34,11 +34,6 @@ public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Coun
         var entries = buffer.ReadVarIntArray(buf => buf.ReadString());
 
         return new ChatSuggestionsPacket(action, count, entries);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

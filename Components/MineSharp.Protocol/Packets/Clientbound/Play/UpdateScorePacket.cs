@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Value">The score to be displayed next to the entry</param>
 /// <param name="DisplayName">The custom display name</param>
 /// <param name="NumberFormat">The number format for the score</param>
-public sealed record UpdateScorePacket(
+public sealed partial record UpdateScorePacket(
     string EntityName,
     string ObjectiveName,
     int Value,
@@ -79,10 +79,5 @@ public sealed record UpdateScorePacket(
             displayName,
             numberFormat
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

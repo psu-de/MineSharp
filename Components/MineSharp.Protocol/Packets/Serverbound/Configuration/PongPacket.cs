@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 ///     Pong packet
 /// </summary>
 /// <param name="Id">The ID of the pong packet</param>
-public sealed record PongPacket(int Id) : IPacketStatic<PongPacket>
+public sealed partial record PongPacket(int Id) : IPacketStatic<PongPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -25,11 +25,6 @@ public sealed record PongPacket(int Id) : IPacketStatic<PongPacket>
     public static PongPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new PongPacket(buffer.ReadInt());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

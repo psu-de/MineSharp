@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="DeltaY">The change in Y position</param>
 /// <param name="DeltaZ">The change in Z position</param>
 /// <param name="OnGround">Whether the entity is on the ground</param>
-public sealed record EntityPositionPacket(int EntityId, short DeltaX, short DeltaY, short DeltaZ, bool OnGround) : IPacketStatic<EntityPositionPacket>
+public sealed partial record EntityPositionPacket(int EntityId, short DeltaX, short DeltaY, short DeltaZ, bool OnGround) : IPacketStatic<EntityPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -42,11 +42,6 @@ public sealed record EntityPositionPacket(int EntityId, short DeltaX, short Delt
             entityId,
             deltaX, deltaY, deltaZ,
             onGround);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

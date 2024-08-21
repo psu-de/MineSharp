@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record SoundEffectPacket(
+public sealed partial record SoundEffectPacket(
     int SoundId,
     Identifier? SoundName,
     bool? HasFixedRange,
@@ -71,11 +71,6 @@ public sealed record SoundEffectPacket(
         var seed = buffer.ReadLong();
 
         return new SoundEffectPacket(soundId, soundName, hasFixedRange, range, soundCategory, effectPositionX, effectPositionY, effectPositionZ, volume, pitch, seed);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Enter Combat packet
 /// </summary>
-public sealed record EnterCombatPacket() : IPacketStatic<EnterCombatPacket>
+public sealed partial record EnterCombatPacket() : IPacketStatic<EnterCombatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -25,10 +25,5 @@ public sealed record EnterCombatPacket() : IPacketStatic<EnterCombatPacket>
     {
         // No fields to read
         return new EnterCombatPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

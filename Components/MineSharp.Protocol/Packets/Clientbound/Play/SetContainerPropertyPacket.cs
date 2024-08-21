@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="WindowId">The window ID</param>
 /// <param name="Property">The property to be updated</param>
 /// <param name="Value">The new value for the property</param>
-public sealed record SetContainerPropertyPacket(byte WindowId, short Property, short Value) : IPacketStatic<SetContainerPropertyPacket>
+public sealed partial record SetContainerPropertyPacket(byte WindowId, short Property, short Value) : IPacketStatic<SetContainerPropertyPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,11 +33,6 @@ public sealed record SetContainerPropertyPacket(byte WindowId, short Property, s
         var value = buffer.ReadShort();
 
         return new SetContainerPropertyPacket(windowId, property, value);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     // TODO: Add all the meanings of the properties

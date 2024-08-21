@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Status;
 ///     Packet for server status response
 /// </summary>
 /// <param name="Response">The server response</param>
-public sealed record StatusResponsePacket(string Response) : IPacketStatic<StatusResponsePacket>
+public sealed partial record StatusResponsePacket(string Response) : IPacketStatic<StatusResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -25,10 +25,5 @@ public sealed record StatusResponsePacket(string Response) : IPacketStatic<Statu
     public static StatusResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new StatusResponsePacket(buffer.ReadString());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

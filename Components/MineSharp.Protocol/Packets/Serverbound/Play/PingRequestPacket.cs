@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Ping request packet sent by the client to the server.
 /// </summary>
 /// <param name="Payload">The payload, which may be any number. Notchian clients use a system-dependent time value counted in milliseconds.</param>
-public sealed record PingRequestPacket(long Payload) : IPacketStatic<PingRequestPacket>
+public sealed partial record PingRequestPacket(long Payload) : IPacketStatic<PingRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record PingRequestPacket(long Payload) : IPacketStatic<PingRequest
         var payload = buffer.ReadLong();
 
         return new(payload);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

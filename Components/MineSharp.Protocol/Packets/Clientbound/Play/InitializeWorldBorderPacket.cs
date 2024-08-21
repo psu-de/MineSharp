@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="PortalTeleportBoundary">Resulting coordinates from a portal teleport are limited to ±value</param>
 /// <param name="WarningBlocks">Warning distance in meters</param>
 /// <param name="WarningTime">Warning time in seconds</param>
-public sealed record InitializeWorldBorderPacket(
+public sealed partial record InitializeWorldBorderPacket(
     double X,
     double Z,
     double OldDiameter,
@@ -64,10 +64,5 @@ public sealed record InitializeWorldBorderPacket(
             portalTeleportBoundary,
             warningBlocks,
             warningTime);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -6,7 +6,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record SpawnEntityPacket(
+public sealed partial record SpawnEntityPacket(
     int EntityId,
     Uuid ObjectUuid,
     int EntityType,
@@ -91,11 +91,6 @@ public sealed record SpawnEntityPacket(
         var velocityZ = buffer.ReadShort();
 
         return new SpawnEntityPacket(entityId, objectUuid, type, x, y, z, pitch, yaw, headPitch, objectData, velocityX, velocityY, velocityZ);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

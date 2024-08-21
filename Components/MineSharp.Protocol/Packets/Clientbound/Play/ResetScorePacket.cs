@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="EntityName">The entity whose score this is. For players, this is their username; for other entities, it is their UUID.</param>
 /// <param name="HasObjectiveName">Whether the score should be removed for the specified objective, or for all of them.</param>
 /// <param name="ObjectiveName">The name of the objective the score belongs to. Only present if the previous field is true.</param>
-public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, string? ObjectiveName) : IPacketStatic<ResetScorePacket>
+public sealed partial record ResetScorePacket(string EntityName, bool HasObjectiveName, string? ObjectiveName) : IPacketStatic<ResetScorePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -40,10 +40,5 @@ public sealed record ResetScorePacket(string EntityName, bool HasObjectiveName, 
         }
 
         return new ResetScorePacket(entityName, hasObjectiveName, objectiveName);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

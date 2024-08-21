@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="X">The X coordinate of the world border center.</param>
 /// <param name="Z">The Z coordinate of the world border center.</param>
-public sealed record SetBorderCenterPacket(double X, double Z) : IPacketStatic<SetBorderCenterPacket>
+public sealed partial record SetBorderCenterPacket(double X, double Z) : IPacketStatic<SetBorderCenterPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record SetBorderCenterPacket(double X, double Z) : IPacketStatic<S
         var z = buffer.ReadDouble();
 
         return new SetBorderCenterPacket(x, z);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

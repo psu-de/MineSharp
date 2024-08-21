@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     See https://wiki.vg/Protocol#Feature_Flags
 /// </summary>
 /// <param name="FeatureFlags">The enabled feature flags</param>
-public sealed record FeatureFlagsPacket(Identifier[] FeatureFlags) : IPacketStatic<FeatureFlagsPacket>
+public sealed partial record FeatureFlagsPacket(Identifier[] FeatureFlags) : IPacketStatic<FeatureFlagsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -27,10 +27,5 @@ public sealed record FeatureFlagsPacket(Identifier[] FeatureFlags) : IPacketStat
     public static FeatureFlagsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new FeatureFlagsPacket(buffer.ReadVarIntArray(buff => buff.ReadIdentifier()));
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

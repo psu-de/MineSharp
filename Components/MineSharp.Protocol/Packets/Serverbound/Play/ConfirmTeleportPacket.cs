@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record ConfirmTeleportPacket(int TeleportId) : IPacketStatic<ConfirmTeleportPacket>
+public sealed partial record ConfirmTeleportPacket(int TeleportId) : IPacketStatic<ConfirmTeleportPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,11 +20,6 @@ public sealed record ConfirmTeleportPacket(int TeleportId) : IPacketStatic<Confi
     {
         var teleportId = buffer.ReadVarInt();
         return new ConfirmTeleportPacket(teleportId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

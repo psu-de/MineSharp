@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Handshaking;
 /// <param name="Host">The host address</param>
 /// <param name="Port">The port number</param>
 /// <param name="NextState">The next game state</param>
-public sealed record HandshakePacket(ProtocolVersion ProtocolVersion, string Host, ushort Port, GameState NextState) : IPacketStatic<HandshakePacket>
+public sealed partial record HandshakePacket(ProtocolVersion ProtocolVersion, string Host, ushort Port, GameState NextState) : IPacketStatic<HandshakePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -39,11 +39,6 @@ public sealed record HandshakePacket(ProtocolVersion ProtocolVersion, string Hos
         var nextState = (GameState)buffer.ReadVarInt();
 
         return new HandshakePacket(protocolVersion, host, port, nextState);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

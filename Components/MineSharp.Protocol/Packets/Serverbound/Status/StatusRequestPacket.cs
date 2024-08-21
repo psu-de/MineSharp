@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Status;
 #pragma warning disable CS1591
-public sealed record StatusRequestPacket : IPacketStatic<StatusRequestPacket>
+public sealed partial record StatusRequestPacket : IPacketStatic<StatusRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,11 +17,6 @@ public sealed record StatusRequestPacket : IPacketStatic<StatusRequestPacket>
     public static StatusRequestPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new StatusRequestPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

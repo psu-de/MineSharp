@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] PublicKey, byte[] KeySignature) : IPacketStatic<PlayerSessionPacket>
+public sealed partial record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] PublicKey, byte[] KeySignature) : IPacketStatic<PlayerSessionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -32,11 +32,6 @@ public sealed record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] 
         buffer.ReadBytes(keySignature);
 
         return new PlayerSessionPacket(sessionId, expiresAt, publicKey, keySignature);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

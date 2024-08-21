@@ -6,7 +6,7 @@ using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record MultiBlockUpdatePacket : IPacketStatic<MultiBlockUpdatePacket>
+public sealed partial record MultiBlockUpdatePacket : IPacketStatic<MultiBlockUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -77,11 +77,6 @@ public sealed record MultiBlockUpdatePacket : IPacketStatic<MultiBlockUpdatePack
 
         var blocks = buffer.ReadVarIntArray(buf => buf.ReadVarLong());
         return new MultiBlockUpdatePacket(chunkSection, suppressLightUpdates, blocks);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

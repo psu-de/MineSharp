@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 ///     Set Compression packet
 /// </summary>
 /// <param name="Threshold">Threshold for when to use compression</param>
-public sealed record SetCompressionPacket(int Threshold) : IPacketStatic<SetCompressionPacket>
+public sealed partial record SetCompressionPacket(int Threshold) : IPacketStatic<SetCompressionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,10 +26,5 @@ public sealed record SetCompressionPacket(int Threshold) : IPacketStatic<SetComp
     {
         var threshold = buffer.ReadVarInt();
         return new SetCompressionPacket(threshold);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

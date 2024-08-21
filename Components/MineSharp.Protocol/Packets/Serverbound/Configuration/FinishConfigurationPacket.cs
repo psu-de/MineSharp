@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 #pragma warning disable CS1591
-public sealed record FinishConfigurationPacket : IPacketStatic<FinishConfigurationPacket>
+public sealed partial record FinishConfigurationPacket : IPacketStatic<FinishConfigurationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,11 +19,6 @@ public sealed record FinishConfigurationPacket : IPacketStatic<FinishConfigurati
     public static FinishConfigurationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new FinishConfigurationPacket();
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

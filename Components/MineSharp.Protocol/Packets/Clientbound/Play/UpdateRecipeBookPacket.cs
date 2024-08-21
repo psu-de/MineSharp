@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="SmokerRecipeBookFilterActive">If true, the filtering option is active when the player opens its inventory.</param>
 /// <param name="RecipeIds">List of recipe IDs.</param>
 /// <param name="OptionalRecipeIds">Optional list of recipe IDs, only present if action is Init.</param>
-public sealed record UpdateRecipeBookPacket(
+public sealed partial record UpdateRecipeBookPacket(
     RecipeBookAction Action,
     bool CraftingRecipeBookOpen,
     bool CraftingRecipeBookFilterActive,
@@ -108,11 +108,6 @@ public sealed record UpdateRecipeBookPacket(
             smokerRecipeBookFilterActive,
             recipeIds,
             optionalRecipeIds);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="InventoryType">The type of the inventory.</param>
 /// <param name="WindowTitle">The title of the window.</param>
 /// <param name="WindowTitleChat">The chat component of the window title.</param>
-public sealed record OpenWindowPacket(int WindowId, int InventoryType, string WindowTitle, Chat? WindowTitleChat = null) : IPacketStatic<OpenWindowPacket>
+public sealed partial record OpenWindowPacket(int WindowId, int InventoryType, string WindowTitle, Chat? WindowTitleChat = null) : IPacketStatic<OpenWindowPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -49,10 +49,5 @@ public sealed record OpenWindowPacket(int WindowId, int InventoryType, string Wi
             buffer.ReadVarInt(),
             buffer.ReadVarInt(),
             buffer.ReadString());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

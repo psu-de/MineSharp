@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerInfoRemovePacket(Uuid[] Players) : IPacketStatic<PlayerInfoRemovePacket>
+public sealed partial record PlayerInfoRemovePacket(Uuid[] Players) : IPacketStatic<PlayerInfoRemovePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,11 +21,6 @@ public sealed record PlayerInfoRemovePacket(Uuid[] Players) : IPacketStatic<Play
     {
         var players = buffer.ReadVarIntArray(buffer => buffer.ReadUuid());
         return new PlayerInfoRemovePacket(players);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Login;
 ///     See https://wiki.vg/Protocol#Disconnect_.28login.29
 /// </summary>
 /// <param name="Reason">The reason for being disconnected</param>
-public sealed record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPacket>
+public sealed partial record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,10 +31,5 @@ public sealed record DisconnectPacket(Chat Reason) : IPacketStatic<DisconnectPac
         // Disconnect (login) packet is always sent as JSON text component according to wiki.vg
         var chat = Chat.Parse(reason);
         return new DisconnectPacket(chat);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

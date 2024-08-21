@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 /// <param name="MainHand">The main hand setting</param>
 /// <param name="EnableTextFiltering">Whether text filtering is enabled</param>
 /// <param name="AllowServerListings">Whether server listings are allowed</param>
-public sealed record ClientInformationPacket(
+public sealed partial record ClientInformationPacket(
     string Locale,
     byte ViewDistance,
     ChatMode ChatMode,
@@ -58,11 +58,6 @@ public sealed record ClientInformationPacket(
             buffer.ReadBool(),
             buffer.ReadBool()
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

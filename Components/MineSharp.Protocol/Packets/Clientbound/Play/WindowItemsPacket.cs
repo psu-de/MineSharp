@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="StateId">The state ID of the window.</param>
 /// <param name="Items">The items in the window.</param>
 /// <param name="SelectedItem">The selected item in the window.</param>
-public sealed record WindowItemsPacket(byte WindowId, int StateId, Item?[] Items, Item? SelectedItem) : IPacketStatic<WindowItemsPacket>
+public sealed partial record WindowItemsPacket(byte WindowId, int StateId, Item?[] Items, Item? SelectedItem) : IPacketStatic<WindowItemsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -37,11 +37,6 @@ public sealed record WindowItemsPacket(byte WindowId, int StateId, Item?[] Items
             buffer.ReadVarInt(),
             buffer.ReadVarIntArray(buff => buff.ReadOptionalItem(data)),
             buffer.ReadOptionalItem(data));
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

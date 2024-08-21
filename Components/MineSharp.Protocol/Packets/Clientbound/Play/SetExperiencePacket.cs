@@ -1,5 +1,4 @@
-﻿using MineSharp.Core;
-using MineSharp.Core.Serialization;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -8,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Set Experience packet
 /// </summary>
-public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
+public abstract partial record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -37,13 +36,8 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
     /// <summary>
     /// Version specific <see cref="SetExperiencePacket"/> for <see cref="Core.ProtocolVersion.V_1_7_0"/>
     /// </summary>
-    public sealed record SetExperiencePacketV_1_7_0(float ExperienceBar, short ShortLevel, short ShortTotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_7_0, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_7_0(float ExperienceBar, short ShortLevel, short ShortTotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_7_0, SetExperiencePacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_7_0;
-
         /// <inheritdoc />
         public override int Level
         {
@@ -86,16 +80,6 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
 
             return new(experienceBar, level, totalExperience);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
-
-        static SetExperiencePacket IPacketVersionSubTypeStatic<SetExperiencePacket>.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
@@ -103,13 +87,8 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
     /// 
     /// Level and TotalExperience become VarInt in 1.8.0.
     /// </summary>
-    public sealed record SetExperiencePacketV_1_8_0(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_8_0, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_8_0(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_8_0, SetExperiencePacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_8_0;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -127,16 +106,6 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
 
             return new(experienceBar, level, totalExperience);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
-
-        static SetExperiencePacket IPacketVersionSubTypeStatic<SetExperiencePacket>.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
@@ -144,13 +113,8 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
     /// 
     /// Level and TotalExperience are swapped in 1.19.3.
     /// </summary>
-    public sealed record SetExperiencePacketV_1_19_3(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_19_3, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_19_3(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_19_3, SetExperiencePacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_19_3;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -168,16 +132,6 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
 
             return new(experienceBar, level, totalExperience);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
-
-        static SetExperiencePacket IPacketVersionSubTypeStatic<SetExperiencePacket>.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
     }
 
     /// <summary>
@@ -185,13 +139,8 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
     /// 
     /// Level and TotalExperience are swapped back again in 1.20.2.
     /// </summary>
-    public sealed record SetExperiencePacketV_1_20_2(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_20_2, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_20_2(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_20_2, SetExperiencePacket>
     {
-        /// <inheritdoc />
-        public ProtocolVersion FirstVersionUsed => FirstVersionUsedStatic;
-        /// <inheritdoc />
-        public static ProtocolVersion FirstVersionUsedStatic => ProtocolVersion.V_1_20_2;
-
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
         {
@@ -209,44 +158,5 @@ public abstract record SetExperiencePacket : IPacketStatic<SetExperiencePacket>
 
             return new(experienceBar, level, totalExperience);
         }
-
-        static IPacket IPacketVersionSubTypeStatic.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
-
-        static SetExperiencePacket IPacketVersionSubTypeStatic<SetExperiencePacket>.Read(PacketBuffer buffer, MinecraftData data)
-        {
-            return Read(buffer, data);
-        }
-    }
-
-    public static readonly PacketVersionSubTypeLookup<SetExperiencePacket> PacketVersionSubTypeLookup = InitializeVersionPackets();
-
-    private static PacketVersionSubTypeLookup<SetExperiencePacket> InitializeVersionPackets()
-    {
-        PacketVersionSubTypeLookup<SetExperiencePacket> lookup = new();
-
-        lookup.RegisterVersionPacket<SetExperiencePacketV_1_7_0>();
-        lookup.RegisterVersionPacket<SetExperiencePacketV_1_8_0>();
-        lookup.RegisterVersionPacket<SetExperiencePacketV_1_19_3>();
-        lookup.RegisterVersionPacket<SetExperiencePacketV_1_20_2>();
-
-        lookup.Freeze();
-        return lookup;
-    }
-
-    /// <inheritdoc />
-    public abstract void Write(PacketBuffer buffer, MinecraftData data);
-
-    /// <inheritdoc />
-    public static SetExperiencePacket Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return PacketVersionSubTypeLookup.Read(buffer, data);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

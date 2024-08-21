@@ -14,7 +14,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Line2">Second line of text in the sign</param>
 /// <param name="Line3">Third line of text in the sign</param>
 /// <param name="Line4">Fourth line of text in the sign</param>
-public sealed record UpdateSignPacket(
+public sealed partial record UpdateSignPacket(
     Position Location,
     bool IsFrontText,
     string Line1,
@@ -53,10 +53,5 @@ public sealed record UpdateSignPacket(
             location,
             isFrontText,
             line1, line2, line3, line4);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

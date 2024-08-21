@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="WindowId">The ID of the window sent by Open Screen.</param>
 /// <param name="ButtonId">Meaning depends on window type; see below.</param>
-public sealed record ClickContainerButtonPacket(byte WindowId, byte ButtonId) : IPacketStatic<ClickContainerButtonPacket>
+public sealed partial record ClickContainerButtonPacket(byte WindowId, byte ButtonId) : IPacketStatic<ClickContainerButtonPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,11 +30,6 @@ public sealed record ClickContainerButtonPacket(byte WindowId, byte ButtonId) : 
         var buttonId = buffer.ReadByte();
 
         return new(windowId, buttonId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     // TODO: Add all the meanings of the properties

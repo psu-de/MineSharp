@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="SourcePositionX">The X coordinate of the source position, if present</param>
 /// <param name="SourcePositionY">The Y coordinate of the source position, if present</param>
 /// <param name="SourcePositionZ">The Z coordinate of the source position, if present</param>
-public sealed record DamageEventPacket(
+public sealed partial record DamageEventPacket(
     int EntityId,
     int SourceTypeId,
     int SourceCauseId,
@@ -74,10 +74,5 @@ public sealed record DamageEventPacket(
             sourcePositionX,
             sourcePositionY,
             sourcePositionZ);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

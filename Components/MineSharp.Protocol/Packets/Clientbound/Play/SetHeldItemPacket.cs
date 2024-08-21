@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record SetHeldItemPacket(sbyte Slot) : IPacketStatic<SetHeldItemPacket>
+public sealed partial record SetHeldItemPacket(sbyte Slot) : IPacketStatic<SetHeldItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,11 +20,6 @@ public sealed record SetHeldItemPacket(sbyte Slot) : IPacketStatic<SetHeldItemPa
     {
         return new SetHeldItemPacket(
             buffer.ReadSByte());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

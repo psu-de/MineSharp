@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record RemoveEntitiesPacket(int[] EntityIds) : IPacketStatic<RemoveEntitiesPacket>
+public sealed partial record RemoveEntitiesPacket(int[] EntityIds) : IPacketStatic<RemoveEntitiesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,11 +20,6 @@ public sealed record RemoveEntitiesPacket(int[] EntityIds) : IPacketStatic<Remov
     {
         var entityIds = buffer.ReadVarIntArray(buf => buf.ReadVarInt());
         return new RemoveEntitiesPacket(entityIds);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

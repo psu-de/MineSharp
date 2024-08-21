@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="ObjectiveValue">The text to be displayed for the score</param>
 /// <param name="ObjectiveTypeValue">The type of the objective</param>
 /// <param name="NumberFormat">The number format for the score</param>
-public sealed record UpdateObjectivesPacket(
+public sealed partial record UpdateObjectivesPacket(
     string ObjectiveName,
     ObjectiveMode Mode,
     Chat? ObjectiveValue,
@@ -79,11 +79,6 @@ public sealed record UpdateObjectivesPacket(
             objectiveType,
             numberFormat
         );
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

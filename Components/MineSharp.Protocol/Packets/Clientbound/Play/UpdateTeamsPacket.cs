@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="TeamName">A unique name for the team</param>
 /// <param name="MethodData">The data for the method type of this packet</param>
-public sealed record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod MethodData) : IPacketStatic<UpdateTeamsPacket>
+public sealed partial record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod MethodData) : IPacketStatic<UpdateTeamsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -35,11 +35,6 @@ public sealed record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod Metho
         var method = (UpdateTeamsMethodType)buffer.ReadByte();
         var methodData = UpdateTeamsMethodRegistry.Read(buffer, method);
         return new UpdateTeamsPacket(teamName, methodData);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

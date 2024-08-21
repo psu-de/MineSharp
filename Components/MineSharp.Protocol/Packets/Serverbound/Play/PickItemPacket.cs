@@ -19,7 +19,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///         Set Held Item, switching to the newly chosen slot.
 /// </summary>
 /// <param name="SlotToUse">The slot to use</param>
-public sealed record PickItemPacket(int SlotToUse) : IPacketStatic<PickItemPacket>
+public sealed partial record PickItemPacket(int SlotToUse) : IPacketStatic<PickItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -38,10 +38,5 @@ public sealed record PickItemPacket(int SlotToUse) : IPacketStatic<PickItemPacke
         var slotToUse = buffer.ReadVarInt();
 
         return new(slotToUse);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 /// <param name="SharedSecret">The shared secret</param>
 /// <param name="VerifyToken">The verify token</param>
 /// <param name="Crypto">The crypto container</param>
-public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? VerifyToken, CryptoContainer? Crypto) : IPacketStatic<EncryptionResponsePacket>
+public sealed partial record EncryptionResponsePacket(byte[] SharedSecret, byte[]? VerifyToken, CryptoContainer? Crypto) : IPacketStatic<EncryptionResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -76,11 +76,6 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
         verifyToken = buffer.ReadBytes(verifyTokenLength);
 
         return new EncryptionResponsePacket(sharedSecret, verifyToken, crypto);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record SetPlayerPositionPacket(double X, double Y, double Z, bool IsOnGround) : IPacketStatic<SetPlayerPositionPacket>
+public sealed partial record SetPlayerPositionPacket(double X, double Y, double Z, bool IsOnGround) : IPacketStatic<SetPlayerPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -26,11 +26,6 @@ public sealed record SetPlayerPositionPacket(double X, double Y, double Z, bool 
         var z = buffer.ReadDouble();
         var isOnGround = buffer.ReadBool();
         return new SetPlayerPositionPacket(x, y, z, isOnGround);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

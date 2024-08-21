@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="FadeIn">Ticks to spend fading in.</param>
 /// <param name="Stay">Ticks to keep the title displayed.</param>
 /// <param name="FadeOut">Ticks to spend fading out, not when to start fading out.</param>
-public sealed record SetTitleAnimationTimesPacket(int FadeIn, int Stay, int FadeOut) : IPacketStatic<SetTitleAnimationTimesPacket>
+public sealed partial record SetTitleAnimationTimesPacket(int FadeIn, int Stay, int FadeOut) : IPacketStatic<SetTitleAnimationTimesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,10 +33,5 @@ public sealed record SetTitleAnimationTimesPacket(int FadeIn, int Stay, int Fade
         var fadeOut = buffer.ReadInt();
 
         return new SetTitleAnimationTimesPacket(fadeIn, stay, fadeOut);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

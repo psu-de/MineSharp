@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record EntitySoundEffectPacket(
+public sealed partial record EntitySoundEffectPacket(
     int SoundId,
     Identifier? SoundName,
     bool? HasFixedRange,
@@ -65,11 +65,6 @@ public sealed record EntitySoundEffectPacket(
         var seed = buffer.ReadLong();
 
         return new EntitySoundEffectPacket(soundId, soundName, hasFixedRange, range, soundCategory, entityId, volume, pitch, seed);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

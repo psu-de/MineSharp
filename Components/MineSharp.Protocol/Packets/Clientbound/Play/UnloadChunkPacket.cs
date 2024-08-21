@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="X">The X coordinate of the chunk.</param>
 /// <param name="Z">The Z coordinate of the chunk.</param>
-public sealed record UnloadChunkPacket(int X, int Z) : IPacketStatic<UnloadChunkPacket>
+public sealed partial record UnloadChunkPacket(int X, int Z) : IPacketStatic<UnloadChunkPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -29,11 +29,6 @@ public sealed record UnloadChunkPacket(int X, int Z) : IPacketStatic<UnloadChunk
         var x = buffer.ReadInt();
         var z = buffer.ReadInt();
         return new UnloadChunkPacket(x, z);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 

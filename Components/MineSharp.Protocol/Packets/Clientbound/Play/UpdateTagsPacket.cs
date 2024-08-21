@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Update Tags packet
 /// </summary>
 /// <param name="Registries">Array of registries with their tags</param>
-public sealed record UpdateTagsPacket(Registry[] Registries) : IPacketStatic<UpdateTagsPacket>
+public sealed partial record UpdateTagsPacket(Registry[] Registries) : IPacketStatic<UpdateTagsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,10 +28,5 @@ public sealed record UpdateTagsPacket(Registry[] Registries) : IPacketStatic<Upd
         var registries = buffer.ReadVarIntArray(Registry.Read);
 
         return new UpdateTagsPacket(registries);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

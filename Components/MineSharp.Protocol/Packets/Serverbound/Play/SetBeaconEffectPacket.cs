@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="PrimaryEffect">The primary effect ID</param>
 /// <param name="SecondaryEffect">The secondary effect ID</param>
-public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEffect) : IPacketStatic<SetBeaconEffectPacket>
+public sealed partial record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEffect) : IPacketStatic<SetBeaconEffectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -46,10 +46,5 @@ public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEff
         return new(
             primaryEffect,
             secondaryEffect);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

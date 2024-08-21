@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record SetHealthPacket(float Health, int Food, float Saturation) : IPacketStatic<SetHealthPacket>
+public sealed partial record SetHealthPacket(float Health, int Food, float Saturation) : IPacketStatic<SetHealthPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -24,11 +24,6 @@ public sealed record SetHealthPacket(float Health, int Food, float Saturation) :
         var food = buffer.ReadVarInt();
         var saturation = buffer.ReadFloat();
         return new SetHealthPacket(health, food, saturation);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
 #pragma warning restore CS1591

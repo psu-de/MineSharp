@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Flags">The flags for the effect</param>
 /// <param name="HasFactorData">Indicates if the effect has factor data</param>
 /// <param name="FactorCodec">The factor codec data</param>
-public sealed record EntityEffectPacket(
+public sealed partial record EntityEffectPacket(
     int EntityId,
     int EffectId,
     byte Amplifier,
@@ -69,11 +69,6 @@ public sealed record EntityEffectPacket(
             flags,
             hasFactorData,
             factorCodec);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

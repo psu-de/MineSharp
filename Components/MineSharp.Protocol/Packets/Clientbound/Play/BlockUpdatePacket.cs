@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Location">The location of the block update</param>
 /// <param name="StateId">The new state id</param>
-public sealed record BlockUpdatePacket(Position Location, int StateId) : IPacketStatic<BlockUpdatePacket>
+public sealed partial record BlockUpdatePacket(Position Location, int StateId) : IPacketStatic<BlockUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,10 +30,5 @@ public sealed record BlockUpdatePacket(Position Location, int StateId) : IPacket
         var location = buffer.ReadPosition();
         var stateId = buffer.ReadVarInt();
         return new BlockUpdatePacket(location, stateId);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

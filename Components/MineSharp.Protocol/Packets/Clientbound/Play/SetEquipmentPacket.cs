@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Equipment">The equipment list</param>
-public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment) : IPacketStatic<SetEquipmentPacket>
+public sealed partial record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment) : IPacketStatic<SetEquipmentPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -49,11 +49,6 @@ public sealed record SetEquipmentPacket(int EntityId, EquipmentEntry[] Equipment
         }
 
         return new SetEquipmentPacket(entityId, equipment.ToArray());
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
     /// <summary>

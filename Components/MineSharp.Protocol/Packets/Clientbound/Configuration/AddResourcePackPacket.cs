@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 /// <param name="Forced">Whether the client is forced to use the resource pack.</param>
 /// <param name="HasPromptMessage">Whether a custom message should be used on the resource pack prompt.</param>
 /// <param name="PromptMessage">The custom message shown in the prompt, if present.</param>
-public sealed record AddResourcePackPacket(Uuid Uuid, string Url, string Hash, bool Forced, bool HasPromptMessage, Chat? PromptMessage) : IPacketStatic<AddResourcePackPacket>
+public sealed partial record AddResourcePackPacket(Uuid Uuid, string Url, string Hash, bool Forced, bool HasPromptMessage, Chat? PromptMessage) : IPacketStatic<AddResourcePackPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -53,10 +53,5 @@ public sealed record AddResourcePackPacket(Uuid Uuid, string Url, string Hash, b
             forced,
             hasPromptMessage,
             promptMessage);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }

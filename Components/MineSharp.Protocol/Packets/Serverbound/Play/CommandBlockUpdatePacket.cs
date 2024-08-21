@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Command">The command to be executed by the command block.</param>
 /// <param name="Mode">The mode of the command block.</param>
 /// <param name="Flags">The flags for the command block.</param>
-public sealed record CommandBlockUpdatePacket(
+public sealed partial record CommandBlockUpdatePacket(
     Position Location,
     string Command,
     CommandBlockMode Mode,
@@ -43,11 +43,6 @@ public sealed record CommandBlockUpdatePacket(
         var flags = (CommandBlockFlags)buffer.ReadSByte();
 
         return new CommandBlockUpdatePacket(location, command, mode, flags);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

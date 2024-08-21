@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Z">Absolute position (Z coordinate).</param>
 /// <param name="Yaw">Absolute rotation on the vertical axis, in degrees.</param>
 /// <param name="Pitch">Absolute rotation on the horizontal axis, in degrees.</param>
-public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, float Pitch) : IPacketStatic<MoveVehiclePacket>
+public sealed partial record MoveVehiclePacket(double X, double Y, double Z, float Yaw, float Pitch) : IPacketStatic<MoveVehiclePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -40,10 +40,5 @@ public sealed record MoveVehiclePacket(double X, double Y, double Z, float Yaw, 
         var pitch = buffer.ReadFloat();
 
         return new(x, y, z, yaw, pitch);
-    }
-
-    static IPacket IPacketStatic.Read(PacketBuffer buffer, MinecraftData data)
-    {
-        return Read(buffer, data);
     }
 }
