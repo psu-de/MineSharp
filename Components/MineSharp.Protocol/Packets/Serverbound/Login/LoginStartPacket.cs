@@ -23,7 +23,7 @@ public abstract partial record LoginStartPacket : IPacketStatic<LoginStartPacket
     /// <summary>
     /// Version specific <see cref="LoginStartPacket"/> for <see cref="Core.ProtocolVersion.V_1_7_0"/>
     /// </summary>
-    public sealed partial record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_7_0, LoginStartPacket>
+    public sealed partial record LoginStartPacketV_1_7_0(string Username) : LoginStartPacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -46,7 +46,7 @@ public abstract partial record LoginStartPacket : IPacketStatic<LoginStartPacket
         string Username,
         SignatureContainer? Signature,
         Uuid? PlayerUuid
-    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_0, LoginStartPacket>
+    ) : LoginStartPacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -86,7 +86,7 @@ public abstract partial record LoginStartPacket : IPacketStatic<LoginStartPacket
     public sealed partial record LoginStartPacketV_1_19_3(
         string Username,
         Uuid? PlayerUuid
-    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_19_3, LoginStartPacket>
+    ) : LoginStartPacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -110,7 +110,7 @@ public abstract partial record LoginStartPacket : IPacketStatic<LoginStartPacket
     public sealed partial record LoginStartPacketV_1_20_2(
         string Username,
         Uuid PlayerUuid
-    ) : LoginStartPacket, IPacketVersionSubTypeStatic<LoginStartPacketV_1_20_2, LoginStartPacket>
+    ) : LoginStartPacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)

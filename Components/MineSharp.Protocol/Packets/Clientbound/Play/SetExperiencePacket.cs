@@ -36,7 +36,7 @@ public abstract partial record SetExperiencePacket : IPacketStatic<SetExperience
     /// <summary>
     /// Version specific <see cref="SetExperiencePacket"/> for <see cref="Core.ProtocolVersion.V_1_7_0"/>
     /// </summary>
-    public sealed partial record SetExperiencePacketV_1_7_0(float ExperienceBar, short ShortLevel, short ShortTotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_7_0, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_7_0(float ExperienceBar, short ShortLevel, short ShortTotalExperience) : SetExperiencePacket
     {
         /// <inheritdoc />
         public override int Level
@@ -87,7 +87,7 @@ public abstract partial record SetExperiencePacket : IPacketStatic<SetExperience
     /// 
     /// Level and TotalExperience become VarInt in 1.8.0.
     /// </summary>
-    public sealed partial record SetExperiencePacketV_1_8_0(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_8_0, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_8_0(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -113,7 +113,7 @@ public abstract partial record SetExperiencePacket : IPacketStatic<SetExperience
     /// 
     /// Level and TotalExperience are swapped in 1.19.3.
     /// </summary>
-    public sealed partial record SetExperiencePacketV_1_19_3(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_19_3, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_19_3(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -139,7 +139,7 @@ public abstract partial record SetExperiencePacket : IPacketStatic<SetExperience
     /// 
     /// Level and TotalExperience are swapped back again in 1.20.2.
     /// </summary>
-    public sealed partial record SetExperiencePacketV_1_20_2(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket, IPacketVersionSubTypeStatic<SetExperiencePacketV_1_20_2, SetExperiencePacket>
+    public sealed partial record SetExperiencePacketV_1_20_2(float ExperienceBar, int Level, int TotalExperience) : SetExperiencePacket
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)

@@ -12,7 +12,11 @@ public sealed class SubTypePacketGenerator : AbstractPacketGenerator
 
 	public override string? BuildBodyForType()
 	{
-		var extendsString = "";
+		var basePacketType = Args.TypeSymbol.BaseType!; // must not be null otherwise we shouldn't be here
+		var genericIPacketVersionSubTypeStatic2 = Args.CommonSymbolHolder.IPacketVersionSubTypeStaticOfTSelfAndTBasePacket.Construct(Args.TypeSymbol, basePacketType);
+		var genericIPacketVersionSubTypeStatic2String = BuildTypeName(genericIPacketVersionSubTypeStatic2);
+
+		var extendsString = $": {genericIPacketVersionSubTypeStatic2String}";
 		List<string> methods = new();
 
 		// FirstVersionUsed and FirstVersionUsedStatic
@@ -21,7 +25,6 @@ public sealed class SubTypePacketGenerator : AbstractPacketGenerator
 		// IPacketVersionSubTypeStatic.Read
 		methods.Add(BuildPacketReadMethod(Args.CommonSymbolHolder.IPacketVersionSubTypeStatic_Read));
 		// IPacketVersionSubTypeStatic<>.Read
-		var basePacketType = Args.TypeSymbol.BaseType!; // must not be null otherwise we shouldn't be here
 		var genericIPacketVersionSubTypeStatic = Args.CommonSymbolHolder.IPacketVersionSubTypeStaticOfTBasePacket.Construct(basePacketType);
 		var genericIPacketVersionSubTypeStatic_Read = CommonSymbolHolder.GetReadMethodSymbol(genericIPacketVersionSubTypeStatic, basePacketType);
 		methods.Add(BuildPacketReadMethod(genericIPacketVersionSubTypeStatic_Read ?? throw new InvalidOperationException($"Read method not found for {genericIPacketVersionSubTypeStatic}")));

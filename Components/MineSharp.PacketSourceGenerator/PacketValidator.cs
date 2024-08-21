@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -185,12 +185,7 @@ public static class PacketValidator
 			errorMessages.Add($"The packet sub type '{packetSubType}' must be sealed");
 		}
 
-		var basePacketType = packetSubType.BaseType!;
-		var expectedPacketInterfaceType = symbolHolder.IPacketVersionSubTypeStaticOfTSelfAndTBasePacket.Construct(packetSubType, basePacketType);
-		if (!packetSubType.AllInterfaces.Contains(expectedPacketInterfaceType, SymbolEqualityComparer.Default))
-		{
-			errorMessages.Add($"The packet sub type '{packetSubType}' does not implement the expected interface '{expectedPacketInterfaceType}'");
-		}
+		// we do not check for the interface IPacketVersionSubTypeStatic<,> because we generate the implementation
 
 		return Task.FromResult(errorMessages.ToImmutableArray());
 	}
