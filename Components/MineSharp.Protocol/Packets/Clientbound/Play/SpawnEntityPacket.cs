@@ -31,7 +31,7 @@ public sealed partial record SpawnEntityPacket(
     /// Writes the packet data to the buffer.
     /// </summary>
     /// <param name="buffer">The buffer to write to.</param>
-    /// <param name="version">The Minecraft version.</param>
+    /// <param name="data">The Minecraft data.</param>
     public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
@@ -62,7 +62,7 @@ public sealed partial record SpawnEntityPacket(
     /// Reads the packet data from the buffer.
     /// </summary>
     /// <param name="buffer">The buffer to read from.</param>
-    /// <param name="version">The Minecraft version.</param>
+    /// <param name="data">The Minecraft data.</param>
     /// <returns>A new instance of <see cref="SpawnEntityPacket"/>.</returns>
     public static SpawnEntityPacket Read(PacketBuffer buffer, MinecraftData data)
     {

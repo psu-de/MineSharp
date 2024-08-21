@@ -71,7 +71,6 @@ public class ChatMessageItem : ISerializable<ChatMessageItem>
     ///     Deserialize a ChatMessageItem from the buffer
     /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="version"></param>
     /// <returns></returns>
     public static ChatMessageItem Read(PacketBuffer buffer)
     {
@@ -93,7 +92,6 @@ public class ChatMessageItem : ISerializable<ChatMessageItem>
                 buffer.ReadBytes(signature);
             }
         }
-
 
         return new(uuid, signature);
     }

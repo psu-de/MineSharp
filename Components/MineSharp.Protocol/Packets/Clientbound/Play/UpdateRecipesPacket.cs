@@ -362,7 +362,7 @@ public sealed partial record UpdateRecipesPacket(
             var template = Ingredient.Read(buffer, data);
             var baseItem = Ingredient.Read(buffer, data);
             var addition = Ingredient.Read(buffer, data);
-            var result = buffer.ReadOptionalItem(data);
+            var result = buffer.ReadOptionalItem(data)!;
             return new SmithingTransformData(template, baseItem, addition, result);
         }
 
