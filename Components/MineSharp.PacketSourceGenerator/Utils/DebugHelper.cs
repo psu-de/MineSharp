@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -30,7 +30,7 @@ public static class DebugHelper
 		}
 	}
 
-	private const string DebugFileName = $"debug{SourceGenerator.SourceGeneratorName}.txt.user";
+	private const string DebugFileName = $"debugSourceGenerator.txt.user";
 
 	private static bool DoesDebugFileExist(string? sourceFilePath)
 	{
