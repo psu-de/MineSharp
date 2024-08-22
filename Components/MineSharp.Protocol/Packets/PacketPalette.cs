@@ -6,7 +6,6 @@ using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Clientbound.Status;
-using MineSharp.Protocol.Packets.Serverbound.Configuration;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 using MineSharp.Protocol.Packets.Serverbound.Login;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -14,17 +13,29 @@ using MineSharp.Protocol.Packets.Serverbound.Status;
 using NLog;
 using CBChatPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChatPacket;
 using CBCloseWindowPacket = MineSharp.Protocol.Packets.Clientbound.Play.CloseWindowPacket;
+using CBConfigurationAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.AddResourcePackPacket;
 using CBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.KeepAlivePacket;
+using CBConfigurationPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
+using CBConfigurationRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.RemoveResourcePackPacket;
+using CBConfigurationUpdateTagsPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.UpdateTagsPacket;
 using CBFinishConfigurationPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.FinishConfigurationPacket;
 using CBKeepAlivePacket = MineSharp.Protocol.Packets.Clientbound.Play.KeepAlivePacket;
-using CBConfigurationPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PluginMessagePacket;
+using CBPlayAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.AddResourcePackPacket;
+using CBPlayChangeDifficultyPacket = MineSharp.Protocol.Packets.Clientbound.Play.ChangeDifficultyPacket;
+using CBPlayMoveVehiclePacket = MineSharp.Protocol.Packets.Clientbound.Play.MoveVehiclePacket;
+using CBPlayPingResponsePacket = MineSharp.Protocol.Packets.Clientbound.Play.PingResponsePacket;
+using CBPlayPlayerAbilitiesPacket = MineSharp.Protocol.Packets.Clientbound.Play.PlayerAbilitiesPacket;
+using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
+using CBPlayRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.RemoveResourcePackPacket;
+using CBPlayUpdateTagsPacket = MineSharp.Protocol.Packets.Clientbound.Play.UpdateTagsPacket;
 using CBSetHeldItemPacket = MineSharp.Protocol.Packets.Clientbound.Play.SetHeldItemPacket;
-using ConfClientInformation = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
+using CBStatusPingResponsePacket = MineSharp.Protocol.Packets.Clientbound.Status.PingResponsePacket;
+using ConfClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ClientInformationPacket;
 using ConfigurationDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.DisconnectPacket;
 using ConfPingPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.PingPacket;
 using ConfPongPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PongPacket;
 using LoginDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Login.DisconnectPacket;
-using PlayClientInformation = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
+using PlayClientInformationPacket = MineSharp.Protocol.Packets.Serverbound.Play.ClientInformationPacket;
 using PlayDisconnectPacket = MineSharp.Protocol.Packets.Clientbound.Play.DisconnectPacket;
 using PlayPingPacket = MineSharp.Protocol.Packets.Clientbound.Play.PingPacket;
 using PlayPongPacket = MineSharp.Protocol.Packets.Serverbound.Play.PongPacket;
@@ -32,15 +43,17 @@ using SBChatMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatMess
 using SBChatPacket = MineSharp.Protocol.Packets.Serverbound.Play.ChatPacket;
 using SBCloseWindowPacket = MineSharp.Protocol.Packets.Serverbound.Play.CloseWindowPacket;
 using SBConfigurationKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.KeepAlivePacket;
+using SBConfigurationPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
+using SBConfigurationResourcePackResponsePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.ResourcePackResponsePacket;
 using SBFinishConfigurationPacket = MineSharp.Protocol.Packets.Serverbound.Configuration.FinishConfigurationPacket;
 using SBKeepAlivePacket = MineSharp.Protocol.Packets.Serverbound.Play.KeepAlivePacket;
-using SBConfigurationPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Configuration.PluginMessagePacket;
+using SBPlayChangeDifficultyPacket = MineSharp.Protocol.Packets.Serverbound.Play.ChangeDifficultyPacket;
+using SBPlayMoveVehiclePacket = MineSharp.Protocol.Packets.Serverbound.Play.MoveVehiclePacket;
+using SBPlayPingRequestPacket = MineSharp.Protocol.Packets.Serverbound.Play.PingRequestPacket;
+using SBPlayPlayerAbilitiesPacket = MineSharp.Protocol.Packets.Serverbound.Play.PlayerAbilitiesPacket;
+using SBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Serverbound.Play.PluginMessagePacket;
 using SBSetHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItemPacket;
-using CBPlayPluginMessagePacket = MineSharp.Protocol.Packets.Clientbound.Play.PluginMessagePacket;
-using CBConfigurationAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.AddResourcePackPacket;
-using CBConfigurationRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Configuration.RemoveResourcePackPacket;
-using CBPlayAddResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.AddResourcePackPacket;
-using CBPlayRemoveResourcePackPacket = MineSharp.Protocol.Packets.Clientbound.Play.RemoveResourcePackPacket;
+using StatusPingRequestPacket = MineSharp.Protocol.Packets.Serverbound.Status.PingRequestPacket;
 
 namespace MineSharp.Protocol.Packets;
 
@@ -81,25 +94,30 @@ internal static class PacketPalette
         RegisterPacket<HandshakePacket>();
 
         // Login
+        // CB
         RegisterPacket<LoginDisconnectPacket>();
         RegisterPacket<EncryptionRequestPacket>();
         RegisterPacket<LoginSuccessPacket>();
         RegisterPacket<SetCompressionPacket>();
         RegisterPacket<LoginPluginRequestPacket>();
 
+        // SB
         RegisterPacket<LoginStartPacket>();
         RegisterPacket<EncryptionResponsePacket>();
         RegisterPacket<LoginPluginResponsePacket>();
         RegisterPacket<LoginAcknowledgedPacket>();
 
         // Status
+        // CB
         RegisterPacket<StatusResponsePacket>();
-        RegisterPacket<PingResponsePacket>();
+        RegisterPacket<CBStatusPingResponsePacket>();
 
+        // SB
         RegisterPacket<StatusRequestPacket>();
-        RegisterPacket<PingRequestPacket>();
+        RegisterPacket<StatusPingRequestPacket>();
 
         // Configuration
+        // CB
         RegisterPacket<CBConfigurationPluginMessagePacket>();
         RegisterPacket<ConfigurationDisconnectPacket>();
         RegisterPacket<CBFinishConfigurationPacket>();
@@ -109,16 +127,18 @@ internal static class PacketPalette
         RegisterPacket<FeatureFlagsPacket>();
         RegisterPacket<CBConfigurationAddResourcePackPacket>();
         RegisterPacket<CBConfigurationRemoveResourcePackPacket>();
-        RegisterPacket<UpdateTagsPacket>();
+        RegisterPacket<CBConfigurationUpdateTagsPacket>();
 
-        RegisterPacket<ConfClientInformation>();
+        // SB
+        RegisterPacket<ConfClientInformationPacket>();
         RegisterPacket<SBConfigurationPluginMessagePacket>();
         RegisterPacket<SBFinishConfigurationPacket>();
         RegisterPacket<SBConfigurationKeepAlivePacket>();
         RegisterPacket<ConfPongPacket>();
-        RegisterPacket<ResourcePackResponsePacket>();
+        RegisterPacket<SBConfigurationResourcePackResponsePacket>();
 
         // Play
+        // CB
         RegisterPacket<SpawnPaintingPacket>();
         RegisterPacket<SpawnLivingEntityPacket>();
         RegisterPacket<SpawnEntityPacket>();
@@ -167,7 +187,7 @@ internal static class PacketPalette
         RegisterPacket<BlockActionPacket>();
         RegisterPacket<BlockEntityDataPacket>();
         RegisterPacket<BossBarPacket>();
-        RegisterPacket<ChangeDifficultyPacket>();
+        RegisterPacket<CBPlayChangeDifficultyPacket>();
         RegisterPacket<ChatSuggestionsPacket>();
         RegisterPacket<ChunkBiomesPacket>();
         RegisterPacket<ClearTitlesPacket>();
@@ -192,11 +212,11 @@ internal static class PacketPalette
         RegisterPacket<EnterCombatPacket>();
         RegisterPacket<LookAtPacket>();
         RegisterPacket<MerchantOffersPacket>();
-        RegisterPacket<MoveVehiclePacket>();
+        RegisterPacket<CBPlayMoveVehiclePacket>();
         RegisterPacket<OpenBookPacket>();
         RegisterPacket<OpenSignEditorPacket>();
         RegisterPacket<PlaceGhostRecipePacket>();
-        RegisterPacket<PlayerAbilitiesPacket>();
+        RegisterPacket<CBPlayPlayerAbilitiesPacket>();
         RegisterPacket<RemoveEntityEffectPacket>();
         RegisterPacket<ResetScorePacket>();
         RegisterPacket<SelectAdvancementTabPacket>();
@@ -231,7 +251,16 @@ internal static class PacketPalette
         RegisterPacket<UpdateScorePacket>();
         RegisterPacket<UpdateTeamsPacket>();
         RegisterPacket<UpdateTimePacket>();
+        RegisterPacket<EntityEffectPacket>();
+        RegisterPacket<UpdateAdvancementsPacket>();
+        RegisterPacket<UpdateRecipesPacket>();
+        RegisterPacket<CBPlayUpdateTagsPacket>();
+        RegisterPacket<ExplosionPacket>();
+        RegisterPacket<LinkEntitiesPacket>();
+        RegisterPacket<SetContainerPropertyPacket>();
+        RegisterPacket<CBPlayPingResponsePacket>();
 
+        // SB
         RegisterPacket<SBKeepAlivePacket>();
         RegisterPacket<SetPlayerPositionPacket>();
         RegisterPacket<SetPlayerPositionAndRotationPacket>();
@@ -242,7 +271,7 @@ internal static class PacketPalette
         RegisterPacket<MessageAcknowledgementPacket>();
         RegisterPacket<PlayerSessionPacket>();
         RegisterPacket<ConfirmTeleportPacket>();
-        RegisterPacket<UpdateCommandBlock>();
+        RegisterPacket<CommandBlockUpdatePacket>();
         RegisterPacket<WindowClickPacket>();
         RegisterPacket<PlaceBlockPacket>();
         RegisterPacket<PlayerActionPacket>();
@@ -255,7 +284,39 @@ internal static class PacketPalette
         RegisterPacket<ChunkBatchReceivedPacket>();
         RegisterPacket<SetCreativeSlotPacket>();
         RegisterPacket<PlayPongPacket>();
-        RegisterPacket<PlayClientInformation>();
+        RegisterPacket<PlayClientInformationPacket>();
+        RegisterPacket<AcknowledgeConfigurationPacket>();
+        RegisterPacket<ChangeContainerSlotStatePacket>();
+        RegisterPacket<SBPlayChangeDifficultyPacket>();
+        RegisterPacket<ChangeRecipeBookSettingsPacket>();
+        RegisterPacket<CommandSuggestionsRequestPacket>();
+        RegisterPacket<EditBookPacket>();
+        RegisterPacket<JigsawGeneratePacket>();
+        RegisterPacket<LockDifficultyPacket>();
+        RegisterPacket<SBPlayMoveVehiclePacket>();
+        RegisterPacket<PaddleBoatPacket>();
+        RegisterPacket<PickItemPacket>();
+        RegisterPacket<SBPlayPingRequestPacket>();
+        RegisterPacket<PlaceRecipePacket>();
+        RegisterPacket<SBPlayPlayerAbilitiesPacket>();
+        RegisterPacket<PlayerInputPacket>();
+        RegisterPacket<SBPlayPluginMessagePacket>();
+        RegisterPacket<ProgramJigsawBlockPacket>();
+        RegisterPacket<ProgramStructureBlockPacket>();
+        RegisterPacket<QueryBlockEntityTagPacket>();
+        RegisterPacket<QueryEntityTagPacket>();
+        RegisterPacket<RenameItemPacket>();
+        RegisterPacket<ResourcePackResponsePacket>();
+        RegisterPacket<SeenAdvancementsPacket>();
+        RegisterPacket<SelectTradePacket>();
+        RegisterPacket<SetBeaconEffectPacket>();
+        RegisterPacket<SetPlayerOnGroundPacket>();
+        RegisterPacket<SetPlayerRotationPacket>();
+        RegisterPacket<SetSeenRecipePacket>();
+        RegisterPacket<TeleportToEntityPacket>();
+        RegisterPacket<UpdateCommandBlockMinecartPacket>();
+        RegisterPacket<UpdateSignPacket>();
+        RegisterPacket<ClickContainerButtonPacket>();
 
         return packetFactories.ToFrozenDictionary();
     }

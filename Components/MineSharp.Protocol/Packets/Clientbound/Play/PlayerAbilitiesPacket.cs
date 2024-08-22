@@ -1,7 +1,7 @@
 ﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
-using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerAbilitiesPacket;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
@@ -21,7 +21,7 @@ public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float Fly
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteByte((byte)Flags);
+        buffer.WriteSByte((sbyte)Flags);
         buffer.WriteFloat(FlyingSpeed);
         buffer.WriteFloat(FieldOfViewModifier);
     }
@@ -29,35 +29,10 @@ public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags, float Fly
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        var flags = (PlayerAbilitiesFlags)buffer.ReadByte();
-        var flyingSpeed = buffer.ReadByte();
-        var fieldOfViewModifier = buffer.ReadByte();
+        var flags = (PlayerAbilitiesFlags)buffer.ReadSByte();
+        var flyingSpeed = buffer.ReadFloat();
+        var fieldOfViewModifier = buffer.ReadFloat();
 
         return new PlayerAbilitiesPacket(flags, flyingSpeed, fieldOfViewModifier);
-    }
-
-    /// <summary>
-    /// Flags representing various player abilities.
-    /// </summary>
-    [Flags]
-    public enum PlayerAbilitiesFlags : byte
-    {
-        /// <summary>
-        /// Player is invulnerable.
-        /// </summary>
-        Invulnerable = 0x01,
-        /// <summary>
-        /// Player is flying.
-        /// </summary>
-        Flying = 0x02,
-        /// <summary>
-        /// Player is allowed to fly.
-        /// </summary>
-        AllowFlying = 0x04,
-        /// <summary>
-        /// Player is in creative mode.
-        /// And can instantly break blocks.
-        /// </summary>
-        CreativeMode = 0x08,
     }
 }

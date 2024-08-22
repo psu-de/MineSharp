@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
+using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 
@@ -32,7 +33,7 @@ public sealed record ParticlePacket(
     float OffsetZ,
     float MaxSpeed,
     int ParticleCount,
-    PacketBuffer Data
+    IParticleData? Data
 ) : IPacket
 {
     /// <inheritdoc />
@@ -41,7 +42,7 @@ public sealed record ParticlePacket(
     public static PacketType StaticType => PacketType.CB_Play_WorldParticles;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(ParticleId);
         buffer.WriteBool(LongDistance);
@@ -53,11 +54,11 @@ public sealed record ParticlePacket(
         buffer.WriteFloat(OffsetZ);
         buffer.WriteFloat(MaxSpeed);
         buffer.WriteVarInt(ParticleCount);
-        buffer.WriteBytes(Data.GetBuffer());
+        Data?.Write(buffer, data);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static IPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var particleId = buffer.ReadVarInt();
         var longDistance = buffer.ReadBool();
@@ -69,9 +70,8 @@ public sealed record ParticlePacket(
         var offsetZ = buffer.ReadFloat();
         var maxSpeed = buffer.ReadFloat();
         var particleCount = buffer.ReadVarInt();
-        var byteBuffer = buffer.RestBuffer();
-        var data = new PacketBuffer(byteBuffer, buffer.ProtocolVersion);
+        var particleData = ParticleDataRegistry.Read(buffer, data, particleId);
 
-        return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, data);
+        return new ParticlePacket(particleId, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount, particleData);
     }
 }

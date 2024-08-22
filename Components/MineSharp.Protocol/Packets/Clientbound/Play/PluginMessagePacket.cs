@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Clientbound Plugin Message packet
 /// </summary>
 /// <param name="Channel">Name of the plugin channel used to send the data</param>
-/// <param name="Data">Any data. The length of this array must be inferred from the packet length</param>
+/// <param name="Data">Any data, depending on the channel</param>
 public sealed record PluginMessagePacket(Identifier Channel, byte[] Data) : IPacket
 {
     /// <inheritdoc />

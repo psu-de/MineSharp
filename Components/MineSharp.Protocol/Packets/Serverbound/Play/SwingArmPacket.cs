@@ -4,7 +4,11 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
-#pragma warning disable CS1591
+
+/// <summary>
+///     Sent by the client when the player swings their arm.
+/// </summary>
+/// <param name="Hand">The hand used by the player.</param>
 public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
 {
     /// <inheritdoc />
@@ -21,8 +25,8 @@ public sealed record SwingArmPacket(PlayerHand Hand) : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new SwingArmPacket(
-            (PlayerHand)buffer.ReadVarInt());
+        var hand = (PlayerHand)buffer.ReadVarInt();
+
+        return new SwingArmPacket(hand);
     }
 }
-#pragma warning restore CS1591
