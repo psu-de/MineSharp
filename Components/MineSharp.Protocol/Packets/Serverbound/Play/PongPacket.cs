@@ -24,7 +24,8 @@ public sealed record PongPacket(int Id) : IPacket
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new PongPacket(
-            buffer.ReadInt());
+        var id = buffer.ReadInt();
+
+        return new PongPacket(id);
     }
 }

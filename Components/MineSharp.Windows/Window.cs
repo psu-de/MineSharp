@@ -1,6 +1,7 @@
 ﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
 using MineSharp.Core.Events;
+using MineSharp.Data.Windows;
 using MineSharp.Windows.Clicks;
 using NLog;
 
@@ -200,6 +201,18 @@ public class Window
                    return x;
                })
               .ToArray();
+    }
+
+    /// <summary>
+    ///     Returns only the hotbar slots of the inventory part of this window.
+    ///     Only works for player inventories
+    /// </summary>
+    /// <returns></returns>
+    public Slot[] GetHotbarSlots()
+    {
+        return GetInventorySlots()
+            .Where(x => x.SlotIndex >= (short)PlayerWindowSlots.HotbarStart && x.SlotIndex <= (short)PlayerWindowSlots.HotbarEnd)
+            .ToArray();
     }
 
     /// <summary>
