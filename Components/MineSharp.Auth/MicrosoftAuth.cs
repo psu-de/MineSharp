@@ -6,9 +6,9 @@ using CmlLib.Core.Auth;
 using CmlLib.Core.Auth.Microsoft;
 using CmlLib.Core.Auth.Microsoft.MsalClient;
 using Microsoft.Identity.Client;
-using MineSharp.Auth.Cache;
 using MineSharp.Auth.Exceptions;
 using MineSharp.Auth.Responses;
+using MineSharp.Core.Cache;
 using MineSharp.Core.Common;
 using NLog;
 
@@ -114,13 +114,10 @@ public static class MicrosoftAuth
     private static string GetCacheForUser(string username)
     {
         var filename = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(username)));
-        var cache = CacheManager.Get("Sessions");
+        var cache = CacheManager.GetCacheDirectory("Sessions");
         var path = Path.Join(cache, filename);
-
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
+        
+        Directory.CreateDirectory(path);
 
         return Path.Join(path);
     }

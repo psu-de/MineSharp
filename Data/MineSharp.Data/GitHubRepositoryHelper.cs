@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using MineSharp.Core.Cache;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
@@ -9,10 +10,6 @@ internal class GitHubRepositoryHelper
 {
     private const string GITHUB_CONTENT_URL = "https://raw.githubusercontent.com";
     private const string GITHUB_API_URL = "https://api.github.com/repos";
-
-    private static readonly string CacheDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "MineSharp");
     
     private static readonly HttpClient HttpClient = new();
     private static readonly TimeSpan InvalidateFilesAfter = TimeSpan.FromDays(1);
@@ -27,7 +24,7 @@ internal class GitHubRepositoryHelper
     {
         repository = repositoryName;
         repositoryContentUrl = $"{GITHUB_CONTENT_URL}/{repositoryName}";
-        cache = Path.Combine(CacheDirectory, repositoryName.Split('/')[^1]);
+        cache = CacheManager.GetCacheDirectory(repositoryName.Split('/')[^1]);
         assetInvalidationTableFile = Path.Combine(cache, "asset_updates.json");
         
         Directory.CreateDirectory(cache);
@@ -42,11 +39,6 @@ internal class GitHubRepositoryHelper
         else
         {
             assetsLastChecked = new Dictionary<string, DateTime>();
-        }
-
-        foreach (var kvp in assetsLastChecked)
-        {
-            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
         }
     }
     
@@ -66,19 +58,21 @@ internal class GitHubRepositoryHelper
     
     private async Task<bool> CheckIfFileNeedsDownload(string file, string branch)
     {
-        var localFilePath = Path.Join(cache, GetFilenameWithBranch(file, branch));
-        if (!File.Exists(localFilePath))
+        var relativePath = GetFilenameWithBranch(file, branch);
+        var absolutePath = Path.Join(cache, relativePath);
+        
+        if (!File.Exists(absolutePath))
         {
             return true;
         }
 
-        if (assetsLastChecked.TryGetValue(localFilePath, out var time)
+        if (assetsLastChecked.TryGetValue(relativePath, out var time)
             && (DateTime.UtcNow - time) <= InvalidateFilesAfter)
         {
             return false;
         }
 
-        var localFileTime = File.GetLastWriteTimeUtc(localFilePath);
+        var localFileTime = File.GetLastWriteTimeUtc(absolutePath);
         var urlEncodedFile = HttpUtility.UrlEncode($"{file.Replace('\\', '/')}");
         var url = $"{GITHUB_API_URL}/{repository}/commits?sha={branch}&path={urlEncodedFile}&per_page=1";
 
@@ -89,7 +83,7 @@ internal class GitHubRepositoryHelper
         {
             Logger.Debug($"Checking {file} for updates");
             var message = await HttpClient.SendAsync(request);
-            var token   = JToken.Parse(await message.Content.ReadAsStringAsync());
+            var token = JToken.Parse(await message.Content.ReadAsStringAsync());
             var timeToken = token.SelectToken("[0].commit.committer.date");
 
             if (timeToken is null)
@@ -99,9 +93,9 @@ internal class GitHubRepositoryHelper
                 return false;
             }
 
+            await MarkAssetAsChecked(absolutePath);
+            
             var dt = ((DateTime)timeToken).ToUniversalTime();
-            await UpdateAssetTable(localFilePath, dt);
-
             return localFileTime - dt <= TimeSpan.Zero;
         }
         catch (HttpRequestException e)
@@ -113,8 +107,8 @@ internal class GitHubRepositoryHelper
     
     private async Task DownloadAsset(string file)
     {
-        file = file.Replace(Path.DirectorySeparatorChar, '/');
-        var url = $"{repositoryContentUrl}/{file}";
+        var remoteFile = file.Replace(Path.DirectorySeparatorChar, '/');
+        var url = $"{repositoryContentUrl}/{remoteFile}";
 
         var cacheFilePath  = Path.Combine(cache, file);
         var cacheDirectory = Path.GetDirectoryName(cacheFilePath) ?? throw new FileNotFoundException();
@@ -127,6 +121,7 @@ internal class GitHubRepositoryHelper
             await using var fileStream = new FileStream(cacheFilePath, FileMode.OpenOrCreate, FileAccess.Write);
 
             await stream.CopyToAsync(fileStream);
+            await MarkAssetAsChecked(file);
         }
         catch (HttpRequestException e)
         {
@@ -134,9 +129,9 @@ internal class GitHubRepositoryHelper
         }
     }
     
-    private Task UpdateAssetTable(string key, DateTime value)
+    private Task MarkAssetAsChecked(string key)
     {
-        assetsLastChecked[key] = value;
+        assetsLastChecked[key] = DateTime.UtcNow;
         var json = JsonConvert.SerializeObject(assetsLastChecked);
         
         return File.WriteAllTextAsync(assetInvalidationTableFile, json);
