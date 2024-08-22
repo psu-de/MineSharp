@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Uuid">Unique ID for this bar</param>
 /// <param name="Action">Determines the layout of the remaining packet</param>
-public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
+public sealed partial record BossBarPacket(Uuid Uuid, IBossBarAction Action) : IPacketStatic<BossBarPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,7 +21,7 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_BossBar;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteUuid(Uuid);
         buffer.WriteVarInt((int)Action.Type);
@@ -29,32 +29,30 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static BossBarPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var uuid = buffer.ReadUuid();
         var actionType = (BossBarActionType)buffer.ReadVarInt();
-        var action = BossBarAction.Read(buffer, actionType);
-        return new BossBarPacket(uuid, action);
+        var action = BossBarActionRegistry.Read(buffer, actionType);
+        return new(uuid, action);
     }
-
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    /// <summary>
-    ///     Represents the action of a boss bar packet
-    /// </summary>
-    public interface IBossBarAction<T> where T : BossBarAction
+    public interface IBossBarAction
     {
-        static abstract BossBarActionType StaticType { get; }
-        void Write(PacketBuffer buffer);
-        static abstract T Read(PacketBuffer buffer);
+        public BossBarActionType Type { get; }
+        public void Write(PacketBuffer buffer);
     }
 
-    public abstract record BossBarAction
+    public interface IBossBarActionStatic
     {
-        public abstract BossBarActionType Type { get; }
-        public abstract void Write(PacketBuffer buffer);
+        public static abstract BossBarActionType StaticType { get; }
+        public static abstract IBossBarAction Read(PacketBuffer buffer);
+    }
 
-        public static BossBarAction Read(PacketBuffer buffer, BossBarActionType type)
+    public static class BossBarActionRegistry
+    {
+        public static IBossBarAction Read(PacketBuffer buffer, BossBarActionType type)
         {
             if (BossActionReaders.TryGetValue(type, out var reader))
             {
@@ -63,15 +61,22 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
             throw new ArgumentOutOfRangeException();
         }
 
-        public static readonly FrozenDictionary<BossBarActionType, Func<PacketBuffer, BossBarAction>> BossActionReaders = CreateBossActionReadersLookup();
+        public static readonly FrozenDictionary<BossBarActionType, Func<PacketBuffer, IBossBarAction>> BossActionReaders;
 
-        private static FrozenDictionary<BossBarActionType, Func<PacketBuffer, BossBarAction>> CreateBossActionReadersLookup()
+        static BossBarActionRegistry()
         {
-            Dictionary<BossBarActionType, Func<PacketBuffer, BossBarAction>> lookup = new();
+            BossActionReaders = InitializeBossActionReaders();
+        }
 
-            void Register<T>() where T : BossBarAction, IBossBarAction<T>
+        private static FrozenDictionary<BossBarActionType, Func<PacketBuffer, IBossBarAction>> InitializeBossActionReaders()
+        {
+            Dictionary<BossBarActionType, Func<PacketBuffer, IBossBarAction>> lookup = new();
+
+            void Register<T>()
+                where T : IBossBarAction, IBossBarActionStatic
             {
-                lookup.Add(T.StaticType, buffer => T.Read(buffer));
+                var factory = T.Read;
+                lookup.Add(T.StaticType, factory);
             }
 
             Register<AddBossBarAction>();
@@ -115,12 +120,12 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         TwentyNotches = 4
     }
 
-    public sealed record AddBossBarAction(Chat Title, float Health, BossBarColor Color, BossBarDivision Division, byte Flags) : BossBarAction, IBossBarAction<AddBossBarAction>
+    public sealed record AddBossBarAction(Chat Title, float Health, BossBarColor Color, BossBarDivision Division, byte Flags) : IBossBarAction, IBossBarActionStatic, ISerializable<AddBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.Add;
 
-        public override void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer)
         {
             buffer.WriteChatComponent(Title);
             buffer.WriteFloat(Health);
@@ -136,29 +141,39 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
             var color = (BossBarColor)buffer.ReadVarInt();
             var division = (BossBarDivision)buffer.ReadVarInt();
             var flags = buffer.ReadByte();
-            return new AddBossBarAction(title, health, color, division, flags);
+            return new(title, health, color, division, flags);
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 
-    public sealed record RemoveBossBarAction() : BossBarAction(), IBossBarAction<RemoveBossBarAction>
+    public sealed record RemoveBossBarAction() : IBossBarAction, IBossBarActionStatic, ISerializable<RemoveBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.Remove;
 
-        public override void Write(PacketBuffer buffer) { }
+        public void Write(PacketBuffer buffer) { }
 
         public static RemoveBossBarAction Read(PacketBuffer buffer)
         {
-            return new RemoveBossBarAction();
+            return new();
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 
-    public sealed record UpdateHealthBossBarAction(float Health) : BossBarAction, IBossBarAction<UpdateHealthBossBarAction>
+    public sealed record UpdateHealthBossBarAction(float Health) : IBossBarAction, IBossBarActionStatic, ISerializable<UpdateHealthBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.UpdateHealth;
 
-        public override void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer)
         {
             buffer.WriteFloat(Health);
         }
@@ -166,16 +181,21 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         public static UpdateHealthBossBarAction Read(PacketBuffer buffer)
         {
             var health = buffer.ReadFloat();
-            return new UpdateHealthBossBarAction(health);
+            return new(health);
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 
-    public sealed record UpdateTitleBossBarAction(Chat Title) : BossBarAction, IBossBarAction<UpdateTitleBossBarAction>
+    public sealed record UpdateTitleBossBarAction(Chat Title) : IBossBarAction, IBossBarActionStatic, ISerializable<UpdateTitleBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.UpdateTitle;
 
-        public override void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer)
         {
             buffer.WriteChatComponent(Title);
         }
@@ -183,16 +203,21 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         public static UpdateTitleBossBarAction Read(PacketBuffer buffer)
         {
             var title = buffer.ReadChatComponent();
-            return new UpdateTitleBossBarAction(title);
+            return new(title);
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 
-    public sealed record UpdateStyleBossBarAction(BossBarColor Color, BossBarDivision Division) : BossBarAction, IBossBarAction<UpdateStyleBossBarAction>
+    public sealed record UpdateStyleBossBarAction(BossBarColor Color, BossBarDivision Division) : IBossBarAction, IBossBarActionStatic, ISerializable<UpdateStyleBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.UpdateStyle;
 
-        public override void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer)
         {
             buffer.WriteVarInt((int)Color);
             buffer.WriteVarInt((int)Division);
@@ -202,16 +227,21 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         {
             var color = (BossBarColor)buffer.ReadVarInt();
             var division = (BossBarDivision)buffer.ReadVarInt();
-            return new UpdateStyleBossBarAction(color, division);
+            return new(color, division);
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 
-    public sealed record UpdateFlagsBossBarAction(byte Flags) : BossBarAction, IBossBarAction<UpdateFlagsBossBarAction>
+    public sealed record UpdateFlagsBossBarAction(byte Flags) : IBossBarAction, IBossBarActionStatic, ISerializable<UpdateFlagsBossBarAction>
     {
-        public override BossBarActionType Type => StaticType;
+        public BossBarActionType Type => StaticType;
         public static BossBarActionType StaticType => BossBarActionType.UpdateFlags;
 
-        public override void Write(PacketBuffer buffer)
+        public void Write(PacketBuffer buffer)
         {
             buffer.WriteByte(Flags);
         }
@@ -219,7 +249,12 @@ public sealed record BossBarPacket(Uuid Uuid, BossBarAction Action) : IPacket
         public static UpdateFlagsBossBarAction Read(PacketBuffer buffer)
         {
             var flags = buffer.ReadByte();
-            return new UpdateFlagsBossBarAction(flags);
+            return new(flags);
+        }
+
+        static IBossBarAction IBossBarActionStatic.Read(PacketBuffer buffer)
+        {
+            return Read(buffer);
         }
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

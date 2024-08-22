@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 /// </summary>
 /// <param name="MessageId">The message ID</param>
 /// <param name="Data">The data</param>
-public sealed record LoginPluginResponsePacket(int MessageId, byte[]? Data) : IPacket
+public sealed partial record LoginPluginResponsePacket(int MessageId, byte[]? Data) : IPacketStatic<LoginPluginResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,7 +20,7 @@ public sealed record LoginPluginResponsePacket(int MessageId, byte[]? Data) : IP
     public bool Successful => Data != null;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(MessageId);
         buffer.WriteBool(Data != null);
@@ -32,17 +32,17 @@ public sealed record LoginPluginResponsePacket(int MessageId, byte[]? Data) : IP
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LoginPluginResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var messageId = buffer.ReadVarInt();
         var hasData = buffer.ReadBool();
-        var data = hasData switch
+        var pluginData = hasData switch
         {
             true => buffer.RestBuffer(),
             false => null
         };
 
-        return new LoginPluginResponsePacket(messageId, data);
+        return new LoginPluginResponsePacket(messageId, pluginData);
     }
 }
 

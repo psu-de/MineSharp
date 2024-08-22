@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Finish configuration packet
 ///     See https://wiki.vg/Protocol#Finish_Configuration
 /// </summary>
-public sealed record FinishConfigurationPacket : IPacket
+public sealed partial record FinishConfigurationPacket : IPacketStatic<FinishConfigurationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,11 +16,11 @@ public sealed record FinishConfigurationPacket : IPacket
     public static PacketType StaticType => PacketType.CB_Configuration_FinishConfiguration;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     { }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static FinishConfigurationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new FinishConfigurationPacket();
     }

@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Packet sent by the server to set the world border size.
 /// </summary>
 /// <param name="Diameter">Length of a single side of the world border, in meters.</param>
-public sealed record SetBorderSizePacket(double Diameter) : IPacket
+public sealed partial record SetBorderSizePacket(double Diameter) : IPacketStatic<SetBorderSizePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,13 +16,13 @@ public sealed record SetBorderSizePacket(double Diameter) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_WorldBorderSize;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteDouble(Diameter);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetBorderSizePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var diameter = buffer.ReadDouble();
         return new SetBorderSizePacket(diameter);

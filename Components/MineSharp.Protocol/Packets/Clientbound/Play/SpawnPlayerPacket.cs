@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Z">The Z coordinate of the player.</param>
 /// <param name="Yaw">The yaw of the player.</param>
 /// <param name="Pitch">The pitch of the player.</param>
-public sealed record SpawnPlayerPacket(
+public sealed partial record SpawnPlayerPacket(
     int EntityId,
     Uuid PlayerUuid,
     double X,
@@ -24,7 +24,7 @@ public sealed record SpawnPlayerPacket(
     double Z,
     byte Yaw,
     byte Pitch
-) : IPacket
+) : IPacketStatic<SpawnPlayerPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -32,7 +32,7 @@ public sealed record SpawnPlayerPacket(
     public static PacketType StaticType => PacketType.CB_Play_NamedEntitySpawn;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(PlayerUuid);
@@ -44,7 +44,7 @@ public sealed record SpawnPlayerPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnPlayerPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var playerUuid = buffer.ReadUuid();

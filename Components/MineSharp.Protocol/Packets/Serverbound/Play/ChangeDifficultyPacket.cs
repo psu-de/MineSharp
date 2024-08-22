@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Change difficulty packet
 /// </summary>
 /// <param name="NewDifficulty">The new difficulty level</param>
-public sealed record ChangeDifficultyPacket(DifficultyLevel NewDifficulty) : IPacket
+public sealed partial record ChangeDifficultyPacket(DifficultyLevel NewDifficulty) : IPacketStatic<ChangeDifficultyPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,16 +17,16 @@ public sealed record ChangeDifficultyPacket(DifficultyLevel NewDifficulty) : IPa
     public static PacketType StaticType => PacketType.SB_Play_SetDifficulty;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte((byte)NewDifficulty);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChangeDifficultyPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var newDifficulty = (DifficultyLevel)buffer.ReadByte();
 
-        return new ChangeDifficultyPacket(newDifficulty);
+        return new(newDifficulty);
     }
 }

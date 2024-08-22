@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="RawBuffer">
 ///     Raw buffer. The Command tree is not parsed here
 /// </param>
-public sealed record DeclareCommandsPacket(PacketBuffer RawBuffer) : IPacket
+public sealed partial record DeclareCommandsPacket(PacketBuffer RawBuffer) : IPacketStatic<DeclareCommandsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,15 +18,15 @@ public sealed record DeclareCommandsPacket(PacketBuffer RawBuffer) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_DeclareCommands;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteBytes(RawBuffer.GetBuffer());
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static DeclareCommandsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), version.Version.Protocol);
+        var clone = new PacketBuffer(buffer.ReadBytes((int)buffer.ReadableBytes), data.Version.Protocol);
         return new DeclareCommandsPacket(clone);
     }
 }

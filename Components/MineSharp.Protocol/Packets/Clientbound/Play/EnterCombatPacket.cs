@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 ///     Enter Combat packet
 /// </summary>
-public sealed record EnterCombatPacket() : IPacket
+public sealed partial record EnterCombatPacket() : IPacketStatic<EnterCombatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -15,13 +15,13 @@ public sealed record EnterCombatPacket() : IPacket
     public static PacketType StaticType => PacketType.CB_Play_EnterCombatEvent;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         // No fields to write
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static EnterCombatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         // No fields to read
         return new EnterCombatPacket();

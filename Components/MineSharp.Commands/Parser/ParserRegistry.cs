@@ -221,8 +221,8 @@ internal static class ParserRegistry
     {
         var mapping = data.Version.Protocol switch
         {
-            ProtocolVersion.V_1_19 => Mapping119,
-            ProtocolVersion.V_1_19_2 => Mapping119,
+            ProtocolVersion.V_1_19_0 => Mapping119,
+            ProtocolVersion.V_1_19_1 => Mapping119,
             ProtocolVersion.V_1_19_3 => Mapping1193,
             >= ProtocolVersion.V_1_19_4 and < ProtocolVersion.V_1_20_3 => Mapping1194,
             >= ProtocolVersion.V_1_20_3 => Mapping1203,

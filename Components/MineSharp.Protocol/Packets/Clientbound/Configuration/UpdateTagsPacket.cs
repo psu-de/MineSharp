@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Update Tags (configuration) packet
 /// </summary>
 /// <param name="Registries">Array of registries with their tags</param>
-public sealed record UpdateTagsPacket(Registry[] Registries) : IPacket
+public sealed partial record UpdateTagsPacket(Registry[] Registries) : IPacketStatic<UpdateTagsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,13 +17,13 @@ public sealed record UpdateTagsPacket(Registry[] Registries) : IPacket
     public static PacketType StaticType => PacketType.CB_Configuration_Tags;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarIntArray(Registries, (buffer, registry) => registry.Write(buffer));
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateTagsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var registries = buffer.ReadVarIntArray(Registry.Read);
 

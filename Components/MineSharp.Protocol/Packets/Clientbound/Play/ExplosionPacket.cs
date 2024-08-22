@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="LargeExplosionParticleID">The particle ID for large explosion particles.</param>
 /// <param name="LargeExplosionParticleData">The particle data for large explosion particles.</param>
 /// <param name="Sound">The sound played during the explosion.</param>
-public sealed record ExplosionPacket(
+public sealed partial record ExplosionPacket(
     double X,
     double Y,
     double Z,
@@ -39,7 +39,7 @@ public sealed record ExplosionPacket(
     int LargeExplosionParticleID,
     IParticleData? LargeExplosionParticleData,
     ExplosionSound Sound
-) : IPacket
+) : IPacketStatic<ExplosionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -72,7 +72,7 @@ public sealed record ExplosionPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData data)
+    public static ExplosionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadDouble();
         var y = buffer.ReadDouble();

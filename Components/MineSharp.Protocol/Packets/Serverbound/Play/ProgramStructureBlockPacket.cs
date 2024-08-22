@@ -24,7 +24,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Integrity">Integrity, between 0 and 1</param>
 /// <param name="Seed">Seed for the structure</param>
 /// <param name="Flags">Flags. See <see cref="StructureBlockFlags"/></param>
-public sealed record ProgramStructureBlockPacket(
+public sealed partial record ProgramStructureBlockPacket(
     Position Location,
     StructureBlockAction Action,
     StructureBlockMode Mode,
@@ -40,7 +40,7 @@ public sealed record ProgramStructureBlockPacket(
     string Metadata,
     float Integrity,
     long Seed,
-    StructureBlockFlags Flags) : IPacket
+    StructureBlockFlags Flags) : IPacketStatic<ProgramStructureBlockPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -48,7 +48,7 @@ public sealed record ProgramStructureBlockPacket(
     public static PacketType StaticType => PacketType.SB_Play_UpdateStructureBlock;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteVarInt((int)Action);
@@ -69,7 +69,7 @@ public sealed record ProgramStructureBlockPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ProgramStructureBlockPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var action = (StructureBlockAction)buffer.ReadVarInt();
@@ -88,7 +88,7 @@ public sealed record ProgramStructureBlockPacket(
         var seed = buffer.ReadVarLong();
         var flags = (StructureBlockFlags)buffer.ReadSByte();
 
-        return new ProgramStructureBlockPacket(
+        return new(
             location,
             action,
             mode,

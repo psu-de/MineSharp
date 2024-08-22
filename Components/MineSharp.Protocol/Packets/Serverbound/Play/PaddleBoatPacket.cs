@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="LeftPaddleTurning">Indicates if the left paddle is turning</param>
 /// <param name="RightPaddleTurning">Indicates if the right paddle is turning</param>
-public sealed record PaddleBoatPacket(bool LeftPaddleTurning, bool RightPaddleTurning) : IPacket
+public sealed partial record PaddleBoatPacket(bool LeftPaddleTurning, bool RightPaddleTurning) : IPacketStatic<PaddleBoatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,18 +17,18 @@ public sealed record PaddleBoatPacket(bool LeftPaddleTurning, bool RightPaddleTu
     public static PacketType StaticType => PacketType.SB_Play_SteerBoat;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteBool(LeftPaddleTurning);
         buffer.WriteBool(RightPaddleTurning);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PaddleBoatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var leftPaddleTurning = buffer.ReadBool();
         var rightPaddleTurning = buffer.ReadBool();
 
-        return new PaddleBoatPacket(leftPaddleTurning, rightPaddleTurning);
+        return new(leftPaddleTurning, rightPaddleTurning);
     }
 }

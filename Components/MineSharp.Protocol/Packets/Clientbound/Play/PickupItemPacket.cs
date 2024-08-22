@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="CollectedEntityId">The ID of the collected entity</param>
 /// <param name="CollectorEntityId">The ID of the collector entity</param>
 /// <param name="PickupItemCount">The number of items picked up. Seems to be 1 for XP orbs, otherwise the number of items in the stack.</param>
-public sealed record PickupItemPacket(int CollectedEntityId, int CollectorEntityId, int PickupItemCount) : IPacket
+public sealed partial record PickupItemPacket(int CollectedEntityId, int CollectorEntityId, int PickupItemCount) : IPacketStatic<PickupItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record PickupItemPacket(int CollectedEntityId, int CollectorEntity
     public static PacketType StaticType => PacketType.CB_Play_Collect;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(CollectedEntityId);
         buffer.WriteVarInt(CollectorEntityId);
@@ -27,7 +27,7 @@ public sealed record PickupItemPacket(int CollectedEntityId, int CollectorEntity
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PickupItemPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var collectedEntityId = buffer.ReadVarInt();
         var collectorEntityId = buffer.ReadVarInt();

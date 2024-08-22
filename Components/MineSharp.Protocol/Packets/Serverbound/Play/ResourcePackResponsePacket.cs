@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="Uuid">The unique identifier of the resource pack</param>
 /// <param name="Result">The result of the resource pack response</param>
-public sealed record ResourcePackResponsePacket(Uuid Uuid, ResourcePackResult Result) : IPacket
+public sealed partial record ResourcePackResponsePacket(Uuid Uuid, ResourcePackResult Result) : IPacketStatic<ResourcePackResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,18 +19,18 @@ public sealed record ResourcePackResponsePacket(Uuid Uuid, ResourcePackResult Re
     public static PacketType StaticType => PacketType.SB_Play_ResourcePackReceive;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteUuid(Uuid);
         buffer.WriteVarInt((int)Result);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ResourcePackResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var uuid = buffer.ReadUuid();
         var result = (ResourcePackResult)buffer.ReadVarInt();
 
-        return new ResourcePackResponsePacket(uuid, result);
+        return new(uuid, result);
     }
 }

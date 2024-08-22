@@ -5,7 +5,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record SoundEffectPacket(
+public sealed partial record SoundEffectPacket(
     int SoundId,
     Identifier? SoundName,
     bool? HasFixedRange,
@@ -17,14 +17,14 @@ public sealed record SoundEffectPacket(
     float Volume,
     float Pitch,
     long Seed
-) : IPacket
+) : IPacketStatic<SoundEffectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_SoundEffect;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(SoundId);
         if (SoundId == 0)
@@ -45,7 +45,7 @@ public sealed record SoundEffectPacket(
         buffer.WriteLong(Seed);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SoundEffectPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var soundId = buffer.ReadVarInt();
         Identifier? soundName = null;

@@ -12,14 +12,14 @@ public interface INameAndProtocolNumberIndexedData
     ///     The number of data entries
     /// </summary>
     public int Count { get; }
-    
+
     /// <summary>
     /// Return the protocol number associated with the given identifier.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     public int GetProtocolId(Identifier name);
-    
+
     /// <summary>
     /// Return the <see cref="Identifier"/> associated with the given protocol number.
     /// </summary>
@@ -40,9 +40,9 @@ public interface INameAndProtocolNumberIndexedData<TEnum> : INameAndProtocolNumb
     public int GetProtocolId(TEnum type);
 
     /// <summary>
-    /// Return <typeparam name="TEnum"></typeparam> associated with the given protocol number.
+    /// Return <typeparamref name="TEnum"/> associated with the given protocol number.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     public TEnum GetType(int id);
-} 
+}

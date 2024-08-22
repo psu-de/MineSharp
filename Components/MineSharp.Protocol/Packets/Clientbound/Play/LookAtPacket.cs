@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="IsEntity">If true, additional information about an entity is provided.</param>
 /// <param name="EntityId">The entity to face towards. Only if IsEntity is true.</param>
 /// <param name="EntityFeetOrEyes">Whether to look at the entity's eyes or feet. Same values and meanings as FeetOrEyes, just for the entity's head/feet. Only if IsEntity is true.</param>
-public sealed record LookAtPacket(LookAtPosition FeetOrEyes, double TargetX, double TargetY, double TargetZ, bool IsEntity, int? EntityId, LookAtPosition? EntityFeetOrEyes) : IPacket
+public sealed partial record LookAtPacket(LookAtPosition FeetOrEyes, double TargetX, double TargetY, double TargetZ, bool IsEntity, int? EntityId, LookAtPosition? EntityFeetOrEyes) : IPacketStatic<LookAtPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -23,7 +23,7 @@ public sealed record LookAtPacket(LookAtPosition FeetOrEyes, double TargetX, dou
     public static PacketType StaticType => PacketType.CB_Play_FacePlayer;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)FeetOrEyes);
         buffer.WriteDouble(TargetX);
@@ -39,7 +39,7 @@ public sealed record LookAtPacket(LookAtPosition FeetOrEyes, double TargetX, dou
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LookAtPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var feetOrEyes = (LookAtPosition)buffer.ReadVarInt();
         var targetX = buffer.ReadDouble();

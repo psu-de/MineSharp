@@ -12,7 +12,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="HasIcon">Indicates if the server has an icon.</param>
 /// <param name="Icon">Optional icon bytes in the PNG format.</param>
 /// <param name="EnforcesSecureChat">Indicates if the server enforces secure chat.</param>
-public sealed record ServerDataPacket(Chat Motd, bool HasIcon, byte[]? Icon, bool EnforcesSecureChat) : IPacket
+public sealed partial record ServerDataPacket(Chat Motd, bool HasIcon, byte[]? Icon, bool EnforcesSecureChat) : IPacketStatic<ServerDataPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -20,7 +20,7 @@ public sealed record ServerDataPacket(Chat Motd, bool HasIcon, byte[]? Icon, boo
     public static PacketType StaticType => PacketType.CB_Play_ServerData;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteChatComponent(Motd);
         buffer.WriteBool(HasIcon);
@@ -33,7 +33,7 @@ public sealed record ServerDataPacket(Chat Motd, bool HasIcon, byte[]? Icon, boo
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ServerDataPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var motd = buffer.ReadChatComponent();
         var hasIcon = buffer.ReadBool();

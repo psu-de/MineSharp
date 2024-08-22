@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record ChatCommandPacket : IPacket
+public sealed partial record ChatCommandPacket : IPacketStatic<ChatCommandPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -94,33 +94,33 @@ public sealed record ChatCommandPacket : IPacket
     public int? MessageCount { get; init; }
     public byte[]? Acknowledged { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Command);
         buffer.WriteLong(Timestamp);
         buffer.WriteLong(Salt);
-        buffer.WriteVarIntArray(Signatures, (buffer, signature) => signature.Write(buffer, version));
+        buffer.WriteVarIntArray(Signatures, (buffer, signature) => signature.Write(buffer, data));
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (data.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             if (!SignedPreview.HasValue)
             {
-                throw new MineSharpPacketVersionException(nameof(SignedPreview), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(SignedPreview), data.Version.Protocol);
             }
 
             buffer.WriteBool(SignedPreview.Value!);
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             if (Acknowledged == null)
             {
-                throw new MineSharpPacketVersionException(nameof(Acknowledged), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(Acknowledged), data.Version.Protocol);
             }
 
             if (!MessageCount.HasValue)
             {
-                throw new MineSharpPacketVersionException(nameof(MessageCount), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(MessageCount), data.Version.Protocol);
             }
 
             buffer.WriteVarInt(MessageCount.Value);
@@ -128,14 +128,14 @@ public sealed record ChatCommandPacket : IPacket
             return;
         }
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (data.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return;
         }
 
         if (PreviousMessages == null)
         {
-            throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(PreviousMessages), data.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
@@ -153,22 +153,22 @@ public sealed record ChatCommandPacket : IPacket
 
     private const int AfterMc1192AcknowledgedLength = 20;
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChatCommandPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var command = buffer.ReadString();
         var timestamp = buffer.ReadLong();
         var salt = buffer.ReadLong();
-        var signatures = buffer.ReadVarIntArray((buf) => ArgumentSignature.Read(buf, version));
+        var signatures = buffer.ReadVarIntArray((buf) => ArgumentSignature.Read(buf, data));
 
         bool? signedPreview = null;
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (data.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             signedPreview = buffer.ReadBool();
         }
 
         byte[]? acknowledged = null;
         int? messageCount = null;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             messageCount = buffer.ReadVarInt();
             acknowledged = buffer.ReadBytes(AfterMc1192AcknowledgedLength);
@@ -176,7 +176,7 @@ public sealed record ChatCommandPacket : IPacket
 
         ChatMessageItem[]? previousMessages = null;
         ChatMessageItem? lastRejectedMessage = null;
-        if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
+        if (data.Version.Protocol == ProtocolVersion.V_1_19_1)
         {
             previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
             var hasLastRejectedMessage = buffer.ReadBool();
@@ -200,13 +200,13 @@ public sealed record ChatCommandPacket : IPacket
         };
     }
 
-    public sealed record ArgumentSignature(string ArgumentName, byte[] Signature)
+    public sealed record ArgumentSignature(string ArgumentName, byte[] Signature) : ISerializableWithMinecraftData<ArgumentSignature>
     {
-        public void Write(PacketBuffer buffer, MinecraftData version)
+        public void Write(PacketBuffer buffer, MinecraftData data)
         {
             buffer.WriteString(ArgumentName);
 
-            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
+            if (data.Version.Protocol <= ProtocolVersion.V_1_19_1)
             {
                 buffer.WriteVarInt(Signature.Length);
                 buffer.WriteBytes(Signature);
@@ -219,11 +219,11 @@ public sealed record ChatCommandPacket : IPacket
 
         private const int AfterMc1192SignatureLength = 256;
 
-        public static ArgumentSignature Read(PacketBuffer buffer, MinecraftData version)
+        public static ArgumentSignature Read(PacketBuffer buffer, MinecraftData data)
         {
             var argumentName = buffer.ReadString();
             byte[] signature;
-            if (version.Version.Protocol <= ProtocolVersion.V_1_19_2)
+            if (data.Version.Protocol <= ProtocolVersion.V_1_19_1)
             {
                 var length = buffer.ReadVarInt();
                 signature = buffer.ReadBytes(length);
@@ -232,7 +232,7 @@ public sealed record ChatCommandPacket : IPacket
             {
                 signature = buffer.ReadBytes(AfterMc1192SignatureLength);
             }
-            return new ArgumentSignature(argumentName, signature);
+            return new(argumentName, signature);
         }
     }
 }

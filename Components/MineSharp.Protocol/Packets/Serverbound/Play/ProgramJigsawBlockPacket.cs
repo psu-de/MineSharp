@@ -17,7 +17,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="JointType">Joint type, <c>rollable</c> if the attached piece can be rotated, else <c>aligned</c></param>
 /// <param name="SelectionPriority">Selection priority</param>
 /// <param name="PlacementPriority">Placement priority</param>
-public sealed record ProgramJigsawBlockPacket(
+public sealed partial record ProgramJigsawBlockPacket(
     Position Location,
     Identifier Name,
     Identifier Target,
@@ -25,7 +25,7 @@ public sealed record ProgramJigsawBlockPacket(
     string FinalState,
     string JointType,
     int SelectionPriority,
-    int PlacementPriority) : IPacket
+    int PlacementPriority) : IPacketStatic<ProgramJigsawBlockPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,7 +33,7 @@ public sealed record ProgramJigsawBlockPacket(
     public static PacketType StaticType => PacketType.SB_Play_UpdateJigsawBlock;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteIdentifier(Name);
@@ -46,7 +46,7 @@ public sealed record ProgramJigsawBlockPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ProgramJigsawBlockPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var name = buffer.ReadIdentifier();
@@ -57,7 +57,7 @@ public sealed record ProgramJigsawBlockPacket(
         var selectionPriority = buffer.ReadVarInt();
         var placementPriority = buffer.ReadVarInt();
 
-        return new ProgramJigsawBlockPacket(
+        return new(
             location,
             name,
             target,

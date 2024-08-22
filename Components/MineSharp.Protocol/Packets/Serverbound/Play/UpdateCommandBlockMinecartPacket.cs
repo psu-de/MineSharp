@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="EntityId">The entity ID</param>
 /// <param name="Command">The command to be executed</param>
 /// <param name="TrackOutput">Whether to track the output of the command</param>
-public sealed record UpdateCommandBlockMinecartPacket(int EntityId, string Command, bool TrackOutput) : IPacket
+public sealed partial record UpdateCommandBlockMinecartPacket(int EntityId, string Command, bool TrackOutput) : IPacketStatic<UpdateCommandBlockMinecartPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record UpdateCommandBlockMinecartPacket(int EntityId, string Comma
     public static PacketType StaticType => PacketType.SB_Play_UpdateCommandBlockMinecart;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteString(Command);
@@ -26,13 +26,13 @@ public sealed record UpdateCommandBlockMinecartPacket(int EntityId, string Comma
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateCommandBlockMinecartPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var command = buffer.ReadString();
         var trackOutput = buffer.ReadBool();
 
-        return new UpdateCommandBlockMinecartPacket(
+        return new(
             entityId,
             command,
             trackOutput);

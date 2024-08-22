@@ -1,11 +1,10 @@
 ﻿using System.Collections.Frozen;
-using MineSharp.Core.Serialization;
-using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.Clientbound.Configuration;
 using MineSharp.Protocol.Packets.Clientbound.Login;
 using MineSharp.Protocol.Packets.Clientbound.Play;
 using MineSharp.Protocol.Packets.Clientbound.Status;
+using MineSharp.Protocol.Packets.NetworkTypes;
 using MineSharp.Protocol.Packets.Serverbound.Handshaking;
 using MineSharp.Protocol.Packets.Serverbound.Login;
 using MineSharp.Protocol.Packets.Serverbound.Play;
@@ -59,19 +58,19 @@ namespace MineSharp.Protocol.Packets;
 
 internal static class PacketPalette
 {
-    public delegate IPacket PacketFactory(PacketBuffer buffer, MinecraftData version);
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly FrozenDictionary<PacketType, PacketFactory> PacketFactories;
+    private static readonly FrozenDictionary<PacketType, PacketFactory<IPacketClientbound>> ClientboundPacketFactories;
+    private static readonly FrozenDictionary<PacketType, PacketFactory<IPacketServerbound>> ServerboundPacketFactories;
 
     static PacketPalette()
     {
-        PacketFactories = InitializePackets();
+        (ClientboundPacketFactories, ServerboundPacketFactories) = InitializePackets();
     }
 
-    public static PacketFactory? GetFactory(PacketType packetType)
+    public static PacketFactory<IPacketClientbound>? GetClientboundFactory(PacketType packetType)
     {
-        if (!PacketFactories.TryGetValue(packetType, out var packet))
+        if (!ClientboundPacketFactories.TryGetValue(packetType, out var packet))
         {
             // Logger.Trace($"Unknown packet for state {state}, direction {direction} and id {id}.");
             return null;
@@ -80,245 +79,261 @@ internal static class PacketPalette
         return packet;
     }
 
-    private static FrozenDictionary<PacketType, PacketFactory> InitializePackets()
+    private static (FrozenDictionary<PacketType, PacketFactory<IPacketClientbound>> Clientbound, FrozenDictionary<PacketType, PacketFactory<IPacketServerbound>> Serverbound) InitializePackets()
     {
-        Dictionary<PacketType, PacketFactory> packetFactories = new();
+        Dictionary<PacketType, PacketFactory<IPacketClientbound>> clientboundPacketFactories = new();
+        Dictionary<PacketType, PacketFactory<IPacketServerbound>> serverboundPacketFactories = new();
 
-        void RegisterPacket<TPacket>()
-            where TPacket : IPacket
+        void RegisterPacketClientbound<TPacket>()
+            where TPacket : IPacketStatic<TPacket>, IPacketClientbound
         {
-            packetFactories.Add(TPacket.StaticType, TPacket.Read);
+            PacketFactory<IPacketClientbound> readDelegate = (buffer, data) => GetPacketFactory<TPacket>()(buffer, data);
+            clientboundPacketFactories.Add(TPacket.StaticType, readDelegate);
+        }
+
+        void RegisterPacketServerbound<TPacket>()
+            where TPacket : IPacketStatic<TPacket>, IPacketServerbound
+        {
+            PacketFactory<IPacketServerbound> readDelegate = (buffer, data) => GetPacketFactory<TPacket>()(buffer, data);
+            serverboundPacketFactories.Add(TPacket.StaticType, readDelegate);
+        }
+
+        PacketFactory<TPacket> GetPacketFactory<TPacket>()
+            where TPacket : IPacket, ISerializableWithMinecraftData<TPacket>
+        {
+            return TPacket.Read;
         }
 
         // Handshaking
-        RegisterPacket<HandshakePacket>();
+        // SB
+        RegisterPacketServerbound<HandshakePacket>();
 
         // Login
         // CB
-        RegisterPacket<LoginDisconnectPacket>();
-        RegisterPacket<EncryptionRequestPacket>();
-        RegisterPacket<LoginSuccessPacket>();
-        RegisterPacket<SetCompressionPacket>();
-        RegisterPacket<LoginPluginRequestPacket>();
+        RegisterPacketClientbound<LoginDisconnectPacket>();
+        RegisterPacketClientbound<EncryptionRequestPacket>();
+        RegisterPacketClientbound<LoginSuccessPacket>();
+        RegisterPacketClientbound<SetCompressionPacket>();
+        RegisterPacketClientbound<LoginPluginRequestPacket>();
 
         // SB
-        RegisterPacket<LoginStartPacket>();
-        RegisterPacket<EncryptionResponsePacket>();
-        RegisterPacket<LoginPluginResponsePacket>();
-        RegisterPacket<LoginAcknowledgedPacket>();
+        RegisterPacketServerbound<LoginStartPacket>();
+        RegisterPacketServerbound<EncryptionResponsePacket>();
+        RegisterPacketServerbound<LoginPluginResponsePacket>();
+        RegisterPacketServerbound<LoginAcknowledgedPacket>();
 
         // Status
         // CB
-        RegisterPacket<StatusResponsePacket>();
-        RegisterPacket<CBStatusPingResponsePacket>();
+        RegisterPacketClientbound<StatusResponsePacket>();
+        RegisterPacketClientbound<CBStatusPingResponsePacket>();
 
         // SB
-        RegisterPacket<StatusRequestPacket>();
-        RegisterPacket<StatusPingRequestPacket>();
+        RegisterPacketServerbound<StatusRequestPacket>();
+        RegisterPacketServerbound<StatusPingRequestPacket>();
 
         // Configuration
         // CB
-        RegisterPacket<CBConfigurationPluginMessagePacket>();
-        RegisterPacket<ConfigurationDisconnectPacket>();
-        RegisterPacket<CBFinishConfigurationPacket>();
-        RegisterPacket<CBConfigurationKeepAlivePacket>();
-        RegisterPacket<ConfPingPacket>();
-        RegisterPacket<RegistryDataPacket>();
-        RegisterPacket<FeatureFlagsPacket>();
-        RegisterPacket<CBConfigurationAddResourcePackPacket>();
-        RegisterPacket<CBConfigurationRemoveResourcePackPacket>();
-        RegisterPacket<CBConfigurationUpdateTagsPacket>();
+        RegisterPacketClientbound<CBConfigurationPluginMessagePacket>();
+        RegisterPacketClientbound<ConfigurationDisconnectPacket>();
+        RegisterPacketClientbound<CBFinishConfigurationPacket>();
+        RegisterPacketClientbound<CBConfigurationKeepAlivePacket>();
+        RegisterPacketClientbound<ConfPingPacket>();
+        RegisterPacketClientbound<RegistryDataPacket>();
+        RegisterPacketClientbound<FeatureFlagsPacket>();
+        RegisterPacketClientbound<CBConfigurationAddResourcePackPacket>();
+        RegisterPacketClientbound<CBConfigurationRemoveResourcePackPacket>();
+        RegisterPacketClientbound<CBConfigurationUpdateTagsPacket>();
 
         // SB
-        RegisterPacket<ConfClientInformationPacket>();
-        RegisterPacket<SBConfigurationPluginMessagePacket>();
-        RegisterPacket<SBFinishConfigurationPacket>();
-        RegisterPacket<SBConfigurationKeepAlivePacket>();
-        RegisterPacket<ConfPongPacket>();
-        RegisterPacket<SBConfigurationResourcePackResponsePacket>();
+        RegisterPacketServerbound<ConfClientInformationPacket>();
+        RegisterPacketServerbound<SBConfigurationPluginMessagePacket>();
+        RegisterPacketServerbound<SBFinishConfigurationPacket>();
+        RegisterPacketServerbound<SBConfigurationKeepAlivePacket>();
+        RegisterPacketServerbound<ConfPongPacket>();
+        RegisterPacketServerbound<SBConfigurationResourcePackResponsePacket>();
 
         // Play
         // CB
-        RegisterPacket<SpawnPaintingPacket>();
-        RegisterPacket<SpawnLivingEntityPacket>();
-        RegisterPacket<SpawnEntityPacket>();
-        RegisterPacket<CBKeepAlivePacket>();
-        RegisterPacket<ChunkDataAndUpdateLightPacket>();
-        RegisterPacket<ParticlePacket>();
-        RegisterPacket<UnloadChunkPacket>();
-        RegisterPacket<BlockUpdatePacket>();
-        RegisterPacket<MultiBlockUpdatePacket>();
-        RegisterPacket<LoginPacket>();
-        RegisterPacket<PlayerPositionPacket>();
-        RegisterPacket<SetHealthPacket>();
-        RegisterPacket<CombatDeathPacket>();
-        RegisterPacket<RespawnPacket>();
-        RegisterPacket<RemoveEntitiesPacket>();
-        RegisterPacket<SetEntityVelocityPacket>();
-        RegisterPacket<EntityPositionPacket>();
-        RegisterPacket<EntityPositionAndRotationPacket>();
-        RegisterPacket<EntityRotationPacket>();
-        RegisterPacket<TeleportEntityPacket>();
-        RegisterPacket<UpdateAttributesPacket>();
-        RegisterPacket<DeclareCommandsPacket>();
-        RegisterPacket<CBChatPacket>();
-        RegisterPacket<PlayerChatPacket>();
-        RegisterPacket<SpawnPlayerPacket>();
-        RegisterPacket<PlayerInfoUpdatePacket>();
-        RegisterPacket<PlayerInfoRemovePacket>();
-        RegisterPacket<GameEventPacket>();
-        RegisterPacket<AcknowledgeBlockChangePacket>();
-        RegisterPacket<WindowItemsPacket>();
-        RegisterPacket<WindowSetSlotPacket>();
-        RegisterPacket<OpenWindowPacket>();
-        RegisterPacket<CBCloseWindowPacket>();
-        RegisterPacket<CBSetHeldItemPacket>();
-        RegisterPacket<EntitySoundEffectPacket>();
-        RegisterPacket<SoundEffectPacket>();
-        RegisterPacket<SystemChatMessagePacket>();
-        RegisterPacket<DisguisedChatMessagePacket>();
-        RegisterPacket<EntityStatusPacket>();
-        RegisterPacket<ChunkBatchStartPacket>();
-        RegisterPacket<ChunkBatchFinishedPacket>();
-        RegisterPacket<PlayPingPacket>();
-        RegisterPacket<PlayDisconnectPacket>();
-        RegisterPacket<SetPassengersPacket>();
-        RegisterPacket<AwardStatisticsPacket>();
-        RegisterPacket<BlockActionPacket>();
-        RegisterPacket<BlockEntityDataPacket>();
-        RegisterPacket<BossBarPacket>();
-        RegisterPacket<CBPlayChangeDifficultyPacket>();
-        RegisterPacket<ChatSuggestionsPacket>();
-        RegisterPacket<ChunkBiomesPacket>();
-        RegisterPacket<ClearTitlesPacket>();
-        RegisterPacket<CBPlayPluginMessagePacket>();
-        RegisterPacket<CommandSuggestionsResponsePacket>();
-        RegisterPacket<DamageEventPacket>();
-        RegisterPacket<DeleteMessagePacket>();
-        RegisterPacket<EntityAnimationPacket>();
-        RegisterPacket<SetBlockDestroyStagePacket>();
-        RegisterPacket<SetCooldownPacket>();
-        RegisterPacket<SpawnExperienceOrbPacket>();
-        RegisterPacket<HurtAnimationPacket>();
-        RegisterPacket<InitializeWorldBorderPacket>();
-        RegisterPacket<MapDataPacket>();
-        RegisterPacket<OpenHorseScreenPacket>();
-        RegisterPacket<UpdateLightPacket>();
-        RegisterPacket<WorldEventPacket>();
-        RegisterPacket<CBPlayAddResourcePackPacket>();
-        RegisterPacket<CBPlayRemoveResourcePackPacket>();
-        RegisterPacket<DisplayObjectivePacket>();
-        RegisterPacket<EndCombatPacket>();
-        RegisterPacket<EnterCombatPacket>();
-        RegisterPacket<LookAtPacket>();
-        RegisterPacket<MerchantOffersPacket>();
-        RegisterPacket<CBPlayMoveVehiclePacket>();
-        RegisterPacket<OpenBookPacket>();
-        RegisterPacket<OpenSignEditorPacket>();
-        RegisterPacket<PlaceGhostRecipePacket>();
-        RegisterPacket<CBPlayPlayerAbilitiesPacket>();
-        RegisterPacket<RemoveEntityEffectPacket>();
-        RegisterPacket<ResetScorePacket>();
-        RegisterPacket<SelectAdvancementTabPacket>();
-        RegisterPacket<ServerDataPacket>();
-        RegisterPacket<SetActionBarTextPacket>();
-        RegisterPacket<SetBorderCenterPacket>();
-        RegisterPacket<SetBorderLerpSizePacket>();
-        RegisterPacket<SetBorderSizePacket>();
-        RegisterPacket<SetBorderWarningDelayPacket>();
-        RegisterPacket<SetBorderWarningDistancePacket>();
-        RegisterPacket<SetCameraPacket>();
-        RegisterPacket<SetCenterChunkPacket>();
-        RegisterPacket<SetDefaultSpawnPositionPacket>();
-        RegisterPacket<SetHeadRotationPacket>();
-        RegisterPacket<SetRenderDistancePacket>();
-        RegisterPacket<UpdateRecipeBookPacket>();
-        RegisterPacket<SetEntityMetadataPacket>();
-        RegisterPacket<PickupItemPacket>();
-        RegisterPacket<SetEquipmentPacket>();
-        RegisterPacket<SetExperiencePacket>();
-        RegisterPacket<SetSimulationDistancePacket>();
-        RegisterPacket<SetSubtitleTextPacket>();
-        RegisterPacket<SetTabListHeaderFooterPacket>();
-        RegisterPacket<SetTickingStatePacket>();
-        RegisterPacket<SetTitleAnimationTimesPacket>();
-        RegisterPacket<SetTitleTextPacket>();
-        RegisterPacket<StartConfigurationPacket>();
-        RegisterPacket<StepTickPacket>();
-        RegisterPacket<StopSoundPacket>();
-        RegisterPacket<TagQueryResponsePacket>();
-        RegisterPacket<UpdateObjectivesPacket>();
-        RegisterPacket<UpdateScorePacket>();
-        RegisterPacket<UpdateTeamsPacket>();
-        RegisterPacket<UpdateTimePacket>();
-        RegisterPacket<EntityEffectPacket>();
-        RegisterPacket<UpdateAdvancementsPacket>();
-        RegisterPacket<UpdateRecipesPacket>();
-        RegisterPacket<CBPlayUpdateTagsPacket>();
-        RegisterPacket<ExplosionPacket>();
-        RegisterPacket<LinkEntitiesPacket>();
-        RegisterPacket<SetContainerPropertyPacket>();
-        RegisterPacket<CBPlayPingResponsePacket>();
+        RegisterPacketClientbound<SpawnPaintingPacket>();
+        RegisterPacketClientbound<SpawnLivingEntityPacket>();
+        RegisterPacketClientbound<SpawnEntityPacket>();
+        RegisterPacketClientbound<CBKeepAlivePacket>();
+        RegisterPacketClientbound<ChunkDataAndUpdateLightPacket>();
+        RegisterPacketClientbound<ParticlePacket>();
+        RegisterPacketClientbound<UnloadChunkPacket>();
+        RegisterPacketClientbound<BlockUpdatePacket>();
+        RegisterPacketClientbound<MultiBlockUpdatePacket>();
+        RegisterPacketClientbound<LoginPacket>();
+        RegisterPacketClientbound<PlayerPositionPacket>();
+        RegisterPacketClientbound<SetHealthPacket>();
+        RegisterPacketClientbound<CombatDeathPacket>();
+        RegisterPacketClientbound<RespawnPacket>();
+        RegisterPacketClientbound<RemoveEntitiesPacket>();
+        RegisterPacketClientbound<SetEntityVelocityPacket>();
+        RegisterPacketClientbound<EntityPositionPacket>();
+        RegisterPacketClientbound<EntityPositionAndRotationPacket>();
+        RegisterPacketClientbound<EntityRotationPacket>();
+        RegisterPacketClientbound<TeleportEntityPacket>();
+        RegisterPacketClientbound<UpdateAttributesPacket>();
+        RegisterPacketClientbound<DeclareCommandsPacket>();
+        RegisterPacketClientbound<CBChatPacket>();
+        RegisterPacketClientbound<PlayerChatPacket>();
+        RegisterPacketClientbound<SpawnPlayerPacket>();
+        RegisterPacketClientbound<PlayerInfoUpdatePacket>();
+        RegisterPacketClientbound<PlayerInfoRemovePacket>();
+        RegisterPacketClientbound<GameEventPacket>();
+        RegisterPacketClientbound<AcknowledgeBlockChangePacket>();
+        RegisterPacketClientbound<WindowItemsPacket>();
+        RegisterPacketClientbound<WindowSetSlotPacket>();
+        RegisterPacketClientbound<OpenWindowPacket>();
+        RegisterPacketClientbound<CBCloseWindowPacket>();
+        RegisterPacketClientbound<CBSetHeldItemPacket>();
+        RegisterPacketClientbound<EntitySoundEffectPacket>();
+        RegisterPacketClientbound<SoundEffectPacket>();
+        RegisterPacketClientbound<SystemChatMessagePacket>();
+        RegisterPacketClientbound<DisguisedChatMessagePacket>();
+        RegisterPacketClientbound<EntityStatusPacket>();
+        RegisterPacketClientbound<ChunkBatchStartPacket>();
+        RegisterPacketClientbound<ChunkBatchFinishedPacket>();
+        RegisterPacketClientbound<PlayPingPacket>();
+        RegisterPacketClientbound<PlayDisconnectPacket>();
+        RegisterPacketClientbound<SetPassengersPacket>();
+        RegisterPacketClientbound<AwardStatisticsPacket>();
+        RegisterPacketClientbound<BlockActionPacket>();
+        RegisterPacketClientbound<BlockEntityDataPacket>();
+        RegisterPacketClientbound<BossBarPacket>();
+        RegisterPacketClientbound<CBPlayChangeDifficultyPacket>();
+        RegisterPacketClientbound<ChatSuggestionsPacket>();
+        RegisterPacketClientbound<ChunkBiomesPacket>();
+        RegisterPacketClientbound<ClearTitlesPacket>();
+        RegisterPacketClientbound<CBPlayPluginMessagePacket>();
+        RegisterPacketClientbound<CommandSuggestionsResponsePacket>();
+        RegisterPacketClientbound<DamageEventPacket>();
+        RegisterPacketClientbound<DeleteMessagePacket>();
+        RegisterPacketClientbound<EntityAnimationPacket>();
+        RegisterPacketClientbound<SetBlockDestroyStagePacket>();
+        RegisterPacketClientbound<SetCooldownPacket>();
+        RegisterPacketClientbound<SpawnExperienceOrbPacket>();
+        RegisterPacketClientbound<HurtAnimationPacket>();
+        RegisterPacketClientbound<InitializeWorldBorderPacket>();
+        RegisterPacketClientbound<MapDataPacket>();
+        RegisterPacketClientbound<OpenHorseScreenPacket>();
+        RegisterPacketClientbound<UpdateLightPacket>();
+        RegisterPacketClientbound<WorldEventPacket>();
+        RegisterPacketClientbound<CBPlayAddResourcePackPacket>();
+        RegisterPacketClientbound<CBPlayRemoveResourcePackPacket>();
+        RegisterPacketClientbound<DisplayObjectivePacket>();
+        RegisterPacketClientbound<EndCombatPacket>();
+        RegisterPacketClientbound<EnterCombatPacket>();
+        RegisterPacketClientbound<LookAtPacket>();
+        RegisterPacketClientbound<MerchantOffersPacket>();
+        RegisterPacketClientbound<CBPlayMoveVehiclePacket>();
+        RegisterPacketClientbound<OpenBookPacket>();
+        RegisterPacketClientbound<OpenSignEditorPacket>();
+        RegisterPacketClientbound<PlaceGhostRecipePacket>();
+        RegisterPacketClientbound<CBPlayPlayerAbilitiesPacket>();
+        RegisterPacketClientbound<RemoveEntityEffectPacket>();
+        RegisterPacketClientbound<ResetScorePacket>();
+        RegisterPacketClientbound<SelectAdvancementTabPacket>();
+        RegisterPacketClientbound<ServerDataPacket>();
+        RegisterPacketClientbound<SetActionBarTextPacket>();
+        RegisterPacketClientbound<SetBorderCenterPacket>();
+        RegisterPacketClientbound<SetBorderLerpSizePacket>();
+        RegisterPacketClientbound<SetBorderSizePacket>();
+        RegisterPacketClientbound<SetBorderWarningDelayPacket>();
+        RegisterPacketClientbound<SetBorderWarningDistancePacket>();
+        RegisterPacketClientbound<SetCameraPacket>();
+        RegisterPacketClientbound<SetCenterChunkPacket>();
+        RegisterPacketClientbound<SetDefaultSpawnPositionPacket>();
+        RegisterPacketClientbound<SetHeadRotationPacket>();
+        RegisterPacketClientbound<SetRenderDistancePacket>();
+        RegisterPacketClientbound<UpdateRecipeBookPacket>();
+        RegisterPacketClientbound<SetEntityMetadataPacket>();
+        RegisterPacketClientbound<PickupItemPacket>();
+        RegisterPacketClientbound<SetEquipmentPacket>();
+        RegisterPacketClientbound<SetExperiencePacket>();
+        RegisterPacketClientbound<SetSimulationDistancePacket>();
+        RegisterPacketClientbound<SetSubtitleTextPacket>();
+        RegisterPacketClientbound<SetTabListHeaderFooterPacket>();
+        RegisterPacketClientbound<SetTickingStatePacket>();
+        RegisterPacketClientbound<SetTitleAnimationTimesPacket>();
+        RegisterPacketClientbound<SetTitleTextPacket>();
+        RegisterPacketClientbound<StartConfigurationPacket>();
+        RegisterPacketClientbound<StepTickPacket>();
+        RegisterPacketClientbound<StopSoundPacket>();
+        RegisterPacketClientbound<TagQueryResponsePacket>();
+        RegisterPacketClientbound<UpdateObjectivesPacket>();
+        RegisterPacketClientbound<UpdateScorePacket>();
+        RegisterPacketClientbound<UpdateTeamsPacket>();
+        RegisterPacketClientbound<UpdateTimePacket>();
+        RegisterPacketClientbound<EntityEffectPacket>();
+        RegisterPacketClientbound<UpdateAdvancementsPacket>();
+        RegisterPacketClientbound<UpdateRecipesPacket>();
+        RegisterPacketClientbound<CBPlayUpdateTagsPacket>();
+        RegisterPacketClientbound<ExplosionPacket>();
+        RegisterPacketClientbound<LinkEntitiesPacket>();
+        RegisterPacketClientbound<SetContainerPropertyPacket>();
+        RegisterPacketClientbound<CBPlayPingResponsePacket>();
 
         // SB
-        RegisterPacket<SBKeepAlivePacket>();
-        RegisterPacket<SetPlayerPositionPacket>();
-        RegisterPacket<SetPlayerPositionAndRotationPacket>();
-        RegisterPacket<ClientCommandPacket>();
-        RegisterPacket<SBChatPacket>();
-        RegisterPacket<SBChatMessagePacket>();
-        RegisterPacket<ChatCommandPacket>();
-        RegisterPacket<MessageAcknowledgementPacket>();
-        RegisterPacket<PlayerSessionPacket>();
-        RegisterPacket<ConfirmTeleportPacket>();
-        RegisterPacket<CommandBlockUpdatePacket>();
-        RegisterPacket<WindowClickPacket>();
-        RegisterPacket<PlaceBlockPacket>();
-        RegisterPacket<PlayerActionPacket>();
-        RegisterPacket<SwingArmPacket>();
-        RegisterPacket<InteractPacket>();
-        RegisterPacket<SBCloseWindowPacket>();
-        RegisterPacket<EntityActionPacket>();
-        RegisterPacket<UseItemPacket>();
-        RegisterPacket<SBSetHeldItemPacket>();
-        RegisterPacket<ChunkBatchReceivedPacket>();
-        RegisterPacket<SetCreativeSlotPacket>();
-        RegisterPacket<PlayPongPacket>();
-        RegisterPacket<PlayClientInformationPacket>();
-        RegisterPacket<AcknowledgeConfigurationPacket>();
-        RegisterPacket<ChangeContainerSlotStatePacket>();
-        RegisterPacket<SBPlayChangeDifficultyPacket>();
-        RegisterPacket<ChangeRecipeBookSettingsPacket>();
-        RegisterPacket<CommandSuggestionsRequestPacket>();
-        RegisterPacket<EditBookPacket>();
-        RegisterPacket<JigsawGeneratePacket>();
-        RegisterPacket<LockDifficultyPacket>();
-        RegisterPacket<SBPlayMoveVehiclePacket>();
-        RegisterPacket<PaddleBoatPacket>();
-        RegisterPacket<PickItemPacket>();
-        RegisterPacket<SBPlayPingRequestPacket>();
-        RegisterPacket<PlaceRecipePacket>();
-        RegisterPacket<SBPlayPlayerAbilitiesPacket>();
-        RegisterPacket<PlayerInputPacket>();
-        RegisterPacket<SBPlayPluginMessagePacket>();
-        RegisterPacket<ProgramJigsawBlockPacket>();
-        RegisterPacket<ProgramStructureBlockPacket>();
-        RegisterPacket<QueryBlockEntityTagPacket>();
-        RegisterPacket<QueryEntityTagPacket>();
-        RegisterPacket<RenameItemPacket>();
-        RegisterPacket<ResourcePackResponsePacket>();
-        RegisterPacket<SeenAdvancementsPacket>();
-        RegisterPacket<SelectTradePacket>();
-        RegisterPacket<SetBeaconEffectPacket>();
-        RegisterPacket<SetPlayerOnGroundPacket>();
-        RegisterPacket<SetPlayerRotationPacket>();
-        RegisterPacket<SetSeenRecipePacket>();
-        RegisterPacket<TeleportToEntityPacket>();
-        RegisterPacket<UpdateCommandBlockMinecartPacket>();
-        RegisterPacket<UpdateSignPacket>();
-        RegisterPacket<ClickContainerButtonPacket>();
+        RegisterPacketServerbound<SBKeepAlivePacket>();
+        RegisterPacketServerbound<SetPlayerPositionPacket>();
+        RegisterPacketServerbound<SetPlayerPositionAndRotationPacket>();
+        RegisterPacketServerbound<ClientCommandPacket>();
+        RegisterPacketServerbound<SBChatPacket>();
+        RegisterPacketServerbound<SBChatMessagePacket>();
+        RegisterPacketServerbound<ChatCommandPacket>();
+        RegisterPacketServerbound<MessageAcknowledgementPacket>();
+        RegisterPacketServerbound<PlayerSessionPacket>();
+        RegisterPacketServerbound<ConfirmTeleportPacket>();
+        RegisterPacketServerbound<CommandBlockUpdatePacket>();
+        RegisterPacketServerbound<WindowClickPacket>();
+        RegisterPacketServerbound<PlaceBlockPacket>();
+        RegisterPacketServerbound<PlayerActionPacket>();
+        RegisterPacketServerbound<SwingArmPacket>();
+        RegisterPacketServerbound<InteractPacket>();
+        RegisterPacketServerbound<SBCloseWindowPacket>();
+        RegisterPacketServerbound<EntityActionPacket>();
+        RegisterPacketServerbound<UseItemPacket>();
+        RegisterPacketServerbound<SBSetHeldItemPacket>();
+        RegisterPacketServerbound<ChunkBatchReceivedPacket>();
+        RegisterPacketServerbound<SetCreativeSlotPacket>();
+        RegisterPacketServerbound<PlayPongPacket>();
+        RegisterPacketServerbound<PlayClientInformationPacket>();
+        RegisterPacketServerbound<AcknowledgeConfigurationPacket>();
+        RegisterPacketServerbound<ChangeContainerSlotStatePacket>();
+        RegisterPacketServerbound<SBPlayChangeDifficultyPacket>();
+        RegisterPacketServerbound<ChangeRecipeBookSettingsPacket>();
+        RegisterPacketServerbound<CommandSuggestionsRequestPacket>();
+        RegisterPacketServerbound<EditBookPacket>();
+        RegisterPacketServerbound<JigsawGeneratePacket>();
+        RegisterPacketServerbound<LockDifficultyPacket>();
+        RegisterPacketServerbound<SBPlayMoveVehiclePacket>();
+        RegisterPacketServerbound<PaddleBoatPacket>();
+        RegisterPacketServerbound<PickItemPacket>();
+        RegisterPacketServerbound<SBPlayPingRequestPacket>();
+        RegisterPacketServerbound<PlaceRecipePacket>();
+        RegisterPacketServerbound<SBPlayPlayerAbilitiesPacket>();
+        RegisterPacketServerbound<PlayerInputPacket>();
+        RegisterPacketServerbound<SBPlayPluginMessagePacket>();
+        RegisterPacketServerbound<ProgramJigsawBlockPacket>();
+        RegisterPacketServerbound<ProgramStructureBlockPacket>();
+        RegisterPacketServerbound<QueryBlockEntityTagPacket>();
+        RegisterPacketServerbound<QueryEntityTagPacket>();
+        RegisterPacketServerbound<RenameItemPacket>();
+        RegisterPacketServerbound<ResourcePackResponsePacket>();
+        RegisterPacketServerbound<SeenAdvancementsPacket>();
+        RegisterPacketServerbound<SelectTradePacket>();
+        RegisterPacketServerbound<SetBeaconEffectPacket>();
+        RegisterPacketServerbound<SetPlayerOnGroundPacket>();
+        RegisterPacketServerbound<SetPlayerRotationPacket>();
+        RegisterPacketServerbound<SetSeenRecipePacket>();
+        RegisterPacketServerbound<TeleportToEntityPacket>();
+        RegisterPacketServerbound<UpdateCommandBlockMinecartPacket>();
+        RegisterPacketServerbound<UpdateSignPacket>();
+        RegisterPacketServerbound<ClickContainerButtonPacket>();
 
-        return packetFactories.ToFrozenDictionary();
+        return (clientboundPacketFactories.ToFrozenDictionary(), serverboundPacketFactories.ToFrozenDictionary());
     }
 
 }

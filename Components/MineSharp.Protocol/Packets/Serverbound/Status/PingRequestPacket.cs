@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Status;
 ///     Packet for ping request
 /// </summary>
 /// <param name="Payload">The payload of the ping request</param>
-public sealed record PingRequestPacket(long Payload) : IPacket
+public sealed partial record PingRequestPacket(long Payload) : IPacketStatic<PingRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,13 +16,13 @@ public sealed record PingRequestPacket(long Payload) : IPacket
     public static PacketType StaticType => PacketType.SB_Status_Ping;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteLong(Payload);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PingRequestPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new PingRequestPacket(buffer.ReadLong());
     }

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="NumberOfChunks">Number of chunks</param>
 /// <param name="ChunkBiomes">Array of chunk biome data</param>
-public sealed record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] ChunkBiomes) : IPacket
+public sealed partial record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] ChunkBiomes) : IPacketStatic<ChunkBiomesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,30 +18,23 @@ public sealed record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] Chun
     public static PacketType StaticType => PacketType.CB_Play_ChunkBiomes;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(NumberOfChunks);
         foreach (var chunk in ChunkBiomes)
         {
-            buffer.WriteInt(chunk.ChunkZ);
-            buffer.WriteInt(chunk.ChunkX);
-            buffer.WriteVarInt(chunk.Size);
-            buffer.WriteBytes(chunk.Data);
+            chunk.Write(buffer);
         }
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChunkBiomesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var numberOfChunks = buffer.ReadVarInt();
         var chunkBiomeData = new ChunkBiomeData[numberOfChunks];
         for (int i = 0; i < numberOfChunks; i++)
         {
-            var chunkZ = buffer.ReadInt();
-            var chunkX = buffer.ReadInt();
-            var size = buffer.ReadVarInt();
-            var data = buffer.ReadBytes(size);
-            chunkBiomeData[i] = new ChunkBiomeData(chunkZ, chunkX, size, data);
+            chunkBiomeData[i] = ChunkBiomeData.Read(buffer);
         }
 
         return new ChunkBiomesPacket(numberOfChunks, chunkBiomeData);
@@ -54,5 +47,26 @@ public sealed record ChunkBiomesPacket(int NumberOfChunks, ChunkBiomeData[] Chun
     /// <param name="ChunkX">Chunk X coordinate</param>
     /// <param name="Size">Size of data in bytes</param>
     /// <param name="Data">Chunk data structure</param>
-    public sealed record ChunkBiomeData(int ChunkZ, int ChunkX, int Size, byte[] Data);
+    public sealed record ChunkBiomeData(int ChunkZ, int ChunkX, int Size, byte[] Data) : ISerializable<ChunkBiomeData>
+    {
+        /// <inheritdoc />
+        public void Write(PacketBuffer buffer)
+        {
+            buffer.WriteInt(ChunkZ);
+            buffer.WriteInt(ChunkX);
+            buffer.WriteVarInt(Size);
+            buffer.WriteBytes(Data);
+        }
+
+        /// <inheritdoc />
+        public static ChunkBiomeData Read(PacketBuffer buffer)
+        {
+            var chunkZ = buffer.ReadInt();
+            var chunkX = buffer.ReadInt();
+            var size = buffer.ReadVarInt();
+            var data = buffer.ReadBytes(size);
+
+            return new(chunkZ, chunkX, size, data);
+        }
+    }
 }

@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record MessageAcknowledgementPacket : IPacket
+public sealed partial record MessageAcknowledgementPacket : IPacketStatic<MessageAcknowledgementPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -41,13 +41,13 @@ public sealed record MessageAcknowledgementPacket : IPacket
     public ChatMessageItem[]? PreviousMessages { get; init; }
     public ChatMessageItem? LastRejectedMessage { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             if (Count == null)
             {
-                throw new MineSharpPacketVersionException(nameof(Count), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(Count), data.Version.Protocol);
             }
 
             buffer.WriteVarInt(Count.Value);
@@ -56,7 +56,7 @@ public sealed record MessageAcknowledgementPacket : IPacket
 
         if (PreviousMessages == null)
         {
-            throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(PreviousMessages), data.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
@@ -71,8 +71,9 @@ public sealed record MessageAcknowledgementPacket : IPacket
         LastRejectedMessage!.Write(buffer);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static MessageAcknowledgementPacket Read(PacketBuffer buffer, MinecraftData data)
     {
+        // TODO: implement this method
         throw new NotImplementedException();
     }
 }

@@ -3,12 +3,12 @@ using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Status;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Packet for server status response
 /// </summary>
 /// <param name="Response">The server response</param>
-public sealed record StatusResponsePacket(string Response) : IPacket
+public sealed partial record StatusResponsePacket(string Response) : IPacketStatic<StatusResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,15 +16,14 @@ public sealed record StatusResponsePacket(string Response) : IPacket
     public static PacketType StaticType => PacketType.CB_Status_ServerInfo;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Response);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static StatusResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new StatusResponsePacket(buffer.ReadString());
     }
 }
-#pragma warning restore CS1591

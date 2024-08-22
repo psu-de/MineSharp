@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="TransactionId">The id of the transaction</param>
 /// <param name="Text">All text behind the cursor without the '/'</param>
-public sealed record CommandSuggestionsRequestPacket(int TransactionId, string Text) : IPacket
+public sealed partial record CommandSuggestionsRequestPacket(int TransactionId, string Text) : IPacketStatic<CommandSuggestionsRequestPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,18 +17,18 @@ public sealed record CommandSuggestionsRequestPacket(int TransactionId, string T
     public static PacketType StaticType => PacketType.SB_Play_TabComplete;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(TransactionId);
         buffer.WriteString(Text);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static CommandSuggestionsRequestPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var transactionId = buffer.ReadVarInt();
         var text = buffer.ReadString();
 
-        return new CommandSuggestionsRequestPacket(transactionId, text);
+        return new(transactionId, text);
     }
 }

@@ -17,9 +17,17 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>minecraft, protocol, minecraft-protocol</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <!-- "Win32 Long Path" must be enabled for this because we have really long names. See: https://learn.microsoft.com/en-us/archive/blogs/jeremykuhne/net-4-6-2-and-long-paths-on-windows-10#enabling-win32-long-path-support
+    And exceeding MAX_PATH will cause build error. (Visual Studio will crash when trying to open the generated files even if Long Paths are enabled)
+    Also see: https://github.com/dotnet/roslyn/issues/48833 -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- The source generator for the Packet classes -->
+    <ProjectReference Include="..\MineSharp.PacketSourceGenerator\MineSharp.PacketSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+
     <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj"/>
     <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
     <ProjectReference Include="..\MineSharp.Auth\MineSharp.Auth.csproj"/>

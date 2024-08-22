@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     The ChunkBatchStart Packet, used since 1.20.2
 ///     https://wiki.vg/Protocol#Chunk_Batch_Start
 /// </summary>
-public sealed record ChunkBatchStartPacket : IPacket
+public sealed partial record ChunkBatchStartPacket : IPacketStatic<ChunkBatchStartPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,11 +16,11 @@ public sealed record ChunkBatchStartPacket : IPacket
     public static PacketType StaticType => PacketType.CB_Play_ChunkBatchStart;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     { }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChunkBatchStartPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ChunkBatchStartPacket();
     }

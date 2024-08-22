@@ -7,19 +7,19 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <summary>
 ///     ChatPacket used before 1.19 to send a Chat message
 /// </summary>
-public sealed record ChatPacket(string Message) : IPacket
+public sealed partial record ChatPacket(string Message) : IPacketStatic<ChatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_Chat;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Message);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ChatPacket(buffer.ReadString());
     }

@@ -15,7 +15,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="SourcePositionX">The X coordinate of the source position, if present</param>
 /// <param name="SourcePositionY">The Y coordinate of the source position, if present</param>
 /// <param name="SourcePositionZ">The Z coordinate of the source position, if present</param>
-public sealed record DamageEventPacket(
+public sealed partial record DamageEventPacket(
     int EntityId,
     int SourceTypeId,
     int SourceCauseId,
@@ -23,7 +23,7 @@ public sealed record DamageEventPacket(
     bool HasSourcePosition,
     double? SourcePositionX,
     double? SourcePositionY,
-    double? SourcePositionZ) : IPacket
+    double? SourcePositionZ) : IPacketStatic<DamageEventPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -31,7 +31,7 @@ public sealed record DamageEventPacket(
     public static PacketType StaticType => PacketType.CB_Play_DamageEvent;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteVarInt(SourceTypeId);
@@ -47,7 +47,7 @@ public sealed record DamageEventPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static DamageEventPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var sourceTypeId = buffer.ReadVarInt();

@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="Action">The action taken</param>
 /// <param name="TabId">The identifier of the tab, only present if action is <see cref="SeenAdvancementsAction.OpenedTab"/></param>
-public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Identifier? TabId) : IPacket
+public sealed partial record SeenAdvancementsPacket(SeenAdvancementsAction Action, Identifier? TabId) : IPacketStatic<SeenAdvancementsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Ident
     public static PacketType StaticType => PacketType.SB_Play_AdvancementTab;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Action);
         if (Action == SeenAdvancementsAction.OpenedTab)
@@ -29,7 +29,7 @@ public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Ident
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SeenAdvancementsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var action = (SeenAdvancementsAction)buffer.ReadVarInt();
         Identifier? tabId = null;
@@ -38,7 +38,7 @@ public sealed record SeenAdvancementsPacket(SeenAdvancementsAction Action, Ident
             tabId = buffer.ReadIdentifier();
         }
 
-        return new SeenAdvancementsPacket(action, tabId);
+        return new(action, tabId);
     }
 
     /// <summary>

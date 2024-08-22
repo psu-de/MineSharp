@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Sent as a player is renaming an item in an anvil.
 /// </summary>
 /// <param name="ItemName">The new name of the item.</param>
-public sealed record RenameItemPacket(string ItemName) : IPacket
+public sealed partial record RenameItemPacket(string ItemName) : IPacketStatic<RenameItemPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,16 +16,16 @@ public sealed record RenameItemPacket(string ItemName) : IPacket
     public static PacketType StaticType => PacketType.SB_Play_NameItem;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(ItemName);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static RenameItemPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var itemName = buffer.ReadString();
 
-        return new RenameItemPacket(itemName);
+        return new(itemName);
     }
 }

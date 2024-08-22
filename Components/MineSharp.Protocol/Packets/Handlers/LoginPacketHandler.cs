@@ -88,7 +88,7 @@ internal sealed class LoginPacketHandler : GameStatePacketHandler
         var encVerToken = rsa.Encrypt(packet.VerifyToken!, RSAEncryptionPadding.Pkcs1);
 
         EncryptionResponsePacket response;
-        if (ProtocolVersion.IsBetween(data.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2)
+        if (data.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1)
             && client.Session.OnlineSession
             && client.Session.Certificate is not null)
         {

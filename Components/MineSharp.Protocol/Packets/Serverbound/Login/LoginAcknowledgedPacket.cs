@@ -7,7 +7,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 /// <summary>
 ///     Login acknowledged packet
 /// </summary>
-public sealed record LoginAcknowledgedPacket() : IPacket
+public sealed partial record LoginAcknowledgedPacket() : IPacketStatic<LoginAcknowledgedPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -15,11 +15,11 @@ public sealed record LoginAcknowledgedPacket() : IPacket
     public static PacketType StaticType => PacketType.SB_Login_LoginAcknowledged;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     { }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LoginAcknowledgedPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new LoginAcknowledgedPacket();
     }

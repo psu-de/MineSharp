@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Sideways">Positive to the left of the player.</param>
 /// <param name="Forward">Positive forward.</param>
 /// <param name="Flags">Bit mask of flags. See <see cref="PlayerInputFlags"/>.</param>
-public sealed record PlayerInputPacket(float Sideways, float Forward, PlayerInputFlags Flags) : IPacket
+public sealed partial record PlayerInputPacket(float Sideways, float Forward, PlayerInputFlags Flags) : IPacketStatic<PlayerInputPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record PlayerInputPacket(float Sideways, float Forward, PlayerInpu
     public static PacketType StaticType => PacketType.SB_Play_SteerVehicle;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteFloat(Sideways);
         buffer.WriteFloat(Forward);
@@ -27,13 +27,13 @@ public sealed record PlayerInputPacket(float Sideways, float Forward, PlayerInpu
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerInputPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var sideways = buffer.ReadFloat();
         var forward = buffer.ReadFloat();
         var flags = (PlayerInputFlags)buffer.ReadByte();
 
-        return new PlayerInputPacket(sideways, forward, flags);
+        return new(sideways, forward, flags);
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Location">The position of the sign</param>
 /// <param name="IsFrontText">Whether the opened editor is for the front or on the back of the sign</param>
-public sealed record OpenSignEditorPacket(Position Location, bool IsFrontText) : IPacket
+public sealed partial record OpenSignEditorPacket(Position Location, bool IsFrontText) : IPacketStatic<OpenSignEditorPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,14 +19,14 @@ public sealed record OpenSignEditorPacket(Position Location, bool IsFrontText) :
     public static PacketType StaticType => PacketType.CB_Play_OpenSignEntity;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteBool(IsFrontText);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static OpenSignEditorPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var isFrontText = buffer.ReadBool();

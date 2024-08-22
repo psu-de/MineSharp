@@ -7,7 +7,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record PlaceBlockPacket : IPacket
+public sealed partial record PlaceBlockPacket : IPacketStatic<PlaceBlockPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -78,7 +78,7 @@ public sealed record PlaceBlockPacket : IPacket
     public bool InsideBlock { get; init; }
     public int? SequenceId { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Hand);
         buffer.WritePosition(Location);
@@ -88,13 +88,13 @@ public sealed record PlaceBlockPacket : IPacket
         buffer.WriteFloat(CursorZ);
         buffer.WriteBool(InsideBlock);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt(SequenceId!.Value);
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlaceBlockPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var hand = (PlayerHand)buffer.ReadVarInt();
         var position = buffer.ReadPosition();
@@ -104,7 +104,7 @@ public sealed record PlaceBlockPacket : IPacket
         var cursorZ = buffer.ReadFloat();
         var insideBlock = buffer.ReadBool();
 
-        if (version.Version.Protocol < ProtocolVersion.V_1_19)
+        if (data.Version.Protocol < ProtocolVersion.V_1_19_0)
         {
             return new PlaceBlockPacket(hand, position, (BlockFace)direction, cursorX, cursorY, cursorZ, insideBlock);
         }

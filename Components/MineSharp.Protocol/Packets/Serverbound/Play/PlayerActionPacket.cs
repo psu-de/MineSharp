@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerActionPacket : IPacket
+public sealed partial record PlayerActionPacket : IPacketStatic<PlayerActionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -56,21 +56,21 @@ public sealed record PlayerActionPacket : IPacket
     public BlockFace Face { get; init; }
     public int? SequenceId { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Status);
         buffer.WritePosition(Location);
         buffer.WriteByte((byte)Face);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             buffer.WriteVarInt(SequenceId!.Value);
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerActionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             return new PlayerActionPacket(
                 (PlayerActionStatus)buffer.ReadVarInt(),

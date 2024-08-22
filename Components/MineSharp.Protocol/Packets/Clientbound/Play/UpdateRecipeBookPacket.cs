@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="SmokerRecipeBookFilterActive">If true, the filtering option is active when the player opens its inventory.</param>
 /// <param name="RecipeIds">List of recipe IDs.</param>
 /// <param name="OptionalRecipeIds">Optional list of recipe IDs, only present if action is Init.</param>
-public sealed record UpdateRecipeBookPacket(
+public sealed partial record UpdateRecipeBookPacket(
     RecipeBookAction Action,
     bool CraftingRecipeBookOpen,
     bool CraftingRecipeBookFilterActive,
@@ -31,7 +31,7 @@ public sealed record UpdateRecipeBookPacket(
     bool SmokerRecipeBookOpen,
     bool SmokerRecipeBookFilterActive,
     Identifier[] RecipeIds,
-    Identifier[]? OptionalRecipeIds) : IPacket
+    Identifier[]? OptionalRecipeIds) : IPacketStatic<UpdateRecipeBookPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -39,7 +39,7 @@ public sealed record UpdateRecipeBookPacket(
     public static PacketType StaticType => PacketType.CB_Play_UnlockRecipes;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Action);
         buffer.WriteBool(CraftingRecipeBookOpen);
@@ -69,7 +69,7 @@ public sealed record UpdateRecipeBookPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateRecipeBookPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var action = (RecipeBookAction)buffer.ReadVarInt();
         var craftingRecipeBookOpen = buffer.ReadBool();

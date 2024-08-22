@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="TransactionId">An incremental ID so that the client can verify that the response matches.</param>
 /// <param name="Location">The location of the block to check.</param>
-public sealed record QueryBlockEntityTagPacket(int TransactionId, Position Location) : IPacket
+public sealed partial record QueryBlockEntityTagPacket(int TransactionId, Position Location) : IPacketStatic<QueryBlockEntityTagPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,18 +19,18 @@ public sealed record QueryBlockEntityTagPacket(int TransactionId, Position Locat
     public static PacketType StaticType => PacketType.SB_Play_QueryBlockNbt;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(TransactionId);
         buffer.WritePosition(Location);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static QueryBlockEntityTagPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var transactionId = buffer.ReadVarInt();
         var location = buffer.ReadPosition();
 
-        return new QueryBlockEntityTagPacket(transactionId, location);
+        return new(transactionId, location);
     }
 }

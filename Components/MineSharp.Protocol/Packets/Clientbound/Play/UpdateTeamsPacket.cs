@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="TeamName">A unique name for the team</param>
 /// <param name="MethodData">The data for the method type of this packet</param>
-public sealed record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod MethodData) : IPacket
+public sealed partial record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod MethodData) : IPacketStatic<UpdateTeamsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,7 +21,7 @@ public sealed record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod Metho
     public static PacketType StaticType => PacketType.CB_Play_Teams;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(TeamName);
         buffer.WriteByte((byte)MethodData.MethodType);
@@ -29,7 +29,7 @@ public sealed record UpdateTeamsPacket(string TeamName, IUpdateTeamsMethod Metho
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateTeamsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var teamName = buffer.ReadString();
         var method = (UpdateTeamsMethodType)buffer.ReadByte();

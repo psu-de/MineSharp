@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Packet sent by the client when a recipe is first seen in the recipe book.
 /// </summary>
 /// <param name="RecipeId">The ID of the recipe.</param>
-public sealed record SetSeenRecipePacket(Identifier RecipeId) : IPacket
+public sealed partial record SetSeenRecipePacket(Identifier RecipeId) : IPacketStatic<SetSeenRecipePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,16 +17,16 @@ public sealed record SetSeenRecipePacket(Identifier RecipeId) : IPacket
     public static PacketType StaticType => PacketType.SB_Play_DisplayedRecipe;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteIdentifier(RecipeId);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetSeenRecipePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var recipeId = buffer.ReadIdentifier();
 
-        return new SetSeenRecipePacket(recipeId);
+        return new(recipeId);
     }
 }

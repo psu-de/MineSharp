@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Ping response packet
 /// </summary>
 /// <param name="Payload">The payload, should be the same as sent by the client</param>
-public sealed record PingResponsePacket(long Payload) : IPacket
+public sealed partial record PingResponsePacket(long Payload) : IPacketStatic<PingResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,10 +22,10 @@ public sealed record PingResponsePacket(long Payload) : IPacket
     }
 
     /// <inheritdoc/>
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PingResponsePacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var payload = buffer.ReadLong();
 
-        return new PingResponsePacket(payload);
+        return new(payload);
     }
 }

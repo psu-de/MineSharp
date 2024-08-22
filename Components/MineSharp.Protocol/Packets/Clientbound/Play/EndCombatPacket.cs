@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     End Combat packet
 /// </summary>
 /// <param name="Duration">Length of the combat in ticks</param>
-public sealed record EndCombatPacket(int Duration) : IPacket
+public sealed partial record EndCombatPacket(int Duration) : IPacketStatic<EndCombatPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,13 +16,13 @@ public sealed record EndCombatPacket(int Duration) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_EndCombatEvent;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(Duration);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static EndCombatPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var duration = buffer.ReadVarInt();
         return new EndCombatPacket(duration);

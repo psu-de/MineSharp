@@ -4,14 +4,14 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record SetPlayerPositionPacket(double X, double Y, double Z, bool IsOnGround) : IPacket
+public sealed partial record SetPlayerPositionPacket(double X, double Y, double Z, bool IsOnGround) : IPacketStatic<SetPlayerPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_Position;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteDouble(X);
         buffer.WriteDouble(Y);
@@ -19,7 +19,7 @@ public sealed record SetPlayerPositionPacket(double X, double Y, double Z, bool 
         buffer.WriteBool(IsOnGround);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetPlayerPositionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var x = buffer.ReadDouble();
         var y = buffer.ReadDouble();

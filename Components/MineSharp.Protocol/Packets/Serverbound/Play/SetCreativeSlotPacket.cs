@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="SlotIndex">The slot index</param>
 /// <param name="Item">The clicked Item</param>
-public sealed record SetCreativeSlotPacket(short SlotIndex, Item? Item) : IPacket
+public sealed partial record SetCreativeSlotPacket(short SlotIndex, Item? Item) : IPacketStatic<SetCreativeSlotPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,17 +19,17 @@ public sealed record SetCreativeSlotPacket(short SlotIndex, Item? Item) : IPacke
     public static PacketType StaticType => PacketType.SB_Play_SetCreativeSlot;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteShort(SlotIndex);
         buffer.WriteOptionalItem(Item);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetCreativeSlotPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var index = buffer.ReadShort();
-        var item = buffer.ReadOptionalItem(version);
+        var item = buffer.ReadOptionalItem(data);
         return new SetCreativeSlotPacket(index, item);
     }
 }

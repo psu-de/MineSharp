@@ -11,7 +11,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Action">The action to perform</param>
 /// <param name="Count">Number of elements in the following array</param>
 /// <param name="Entries">Array of chat suggestions</param>
-public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Count, string[] Entries) : IPacket
+public sealed partial record ChatSuggestionsPacket(ChatSuggestionAction Action, int Count, string[] Entries) : IPacketStatic<ChatSuggestionsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -19,7 +19,7 @@ public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Coun
     public static PacketType StaticType => PacketType.CB_Play_ChatSuggestions;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt((int)Action);
         buffer.WriteVarInt(Count);
@@ -27,7 +27,7 @@ public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Coun
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChatSuggestionsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var action = (ChatSuggestionAction)buffer.ReadVarInt();
         var count = buffer.ReadVarInt();
@@ -36,15 +36,15 @@ public sealed record ChatSuggestionsPacket(ChatSuggestionAction Action, int Coun
         return new ChatSuggestionsPacket(action, count, entries);
     }
 
-	/// <summary>
-	///     Enum representing the action for chat suggestions
-	/// </summary>
-	public enum ChatSuggestionAction
-	{
+    /// <summary>
+    ///     Enum representing the action for chat suggestions
+    /// </summary>
+    public enum ChatSuggestionAction
+    {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-		Add = 0,
+        Add = 0,
         Remove = 1,
         Set = 2
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-	}
+    }
 }

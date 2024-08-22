@@ -13,7 +13,12 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Command">The command to be executed by the command block.</param>
 /// <param name="Mode">The mode of the command block.</param>
 /// <param name="Flags">The flags for the command block.</param>
-public sealed record CommandBlockUpdatePacket(Position Location, string Command, CommandBlockMode Mode, CommandBlockFlags Flags) : IPacket
+public sealed partial record CommandBlockUpdatePacket(
+    Position Location,
+    string Command,
+    CommandBlockMode Mode,
+    CommandBlockFlags Flags
+) : IPacketStatic<CommandBlockUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,7 +26,7 @@ public sealed record CommandBlockUpdatePacket(Position Location, string Command,
     public static PacketType StaticType => PacketType.SB_Play_UpdateCommandBlock;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteString(Command);
@@ -30,7 +35,7 @@ public sealed record CommandBlockUpdatePacket(Position Location, string Command,
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static CommandBlockUpdatePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var command = buffer.ReadString();

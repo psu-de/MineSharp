@@ -10,7 +10,7 @@ public class MinecraftVersion
     /// </summary>
     /// <param name="version"></param>
     /// <param name="protocol"></param>
-    public MinecraftVersion(string version, int protocol)
+    public MinecraftVersion(string version, ProtocolVersion protocol)
     {
         var versionNumbers = version.Split(".").Select(x => Convert.ToInt32(x)).ToArray();
         Major = versionNumbers[0];
@@ -22,7 +22,7 @@ public class MinecraftVersion
     /// <summary>
     ///     The protocol version number
     /// </summary>
-    public int Protocol { get; }
+    public ProtocolVersion Protocol { get; }
 
     /// <summary>
     ///     The major version

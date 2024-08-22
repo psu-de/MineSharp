@@ -1,4 +1,4 @@
-using MineSharp.Core.Serialization;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 ///     Sets the entity that the player renders from. This is normally used when the player left-clicks an entity while in spectator mode.
 /// </summary>
 /// <param name="CameraId">ID of the entity to set the client's camera to.</param>
-public sealed record SetCameraPacket(int CameraId) : IPacket
+public sealed partial record SetCameraPacket(int CameraId) : IPacketStatic<SetCameraPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,13 +16,13 @@ public sealed record SetCameraPacket(int CameraId) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_Camera;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(CameraId);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetCameraPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var cameraId = buffer.ReadVarInt();
         return new SetCameraPacket(cameraId);

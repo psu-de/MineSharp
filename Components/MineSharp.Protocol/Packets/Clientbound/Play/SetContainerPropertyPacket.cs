@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="WindowId">The window ID</param>
 /// <param name="Property">The property to be updated</param>
 /// <param name="Value">The new value for the property</param>
-public sealed record SetContainerPropertyPacket(byte WindowId, short Property, short Value) : IPacket
+public sealed partial record SetContainerPropertyPacket(byte WindowId, short Property, short Value) : IPacketStatic<SetContainerPropertyPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record SetContainerPropertyPacket(byte WindowId, short Property, s
     public static PacketType StaticType => PacketType.CB_Play_CraftProgressBar;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte(WindowId);
         buffer.WriteShort(Property);
@@ -26,7 +26,7 @@ public sealed record SetContainerPropertyPacket(byte WindowId, short Property, s
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetContainerPropertyPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var windowId = buffer.ReadByte();
         var property = buffer.ReadShort();

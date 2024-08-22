@@ -7,7 +7,7 @@ using MineSharp.Protocol.Packets.NetworkTypes;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record ChatMessagePacket : IPacket
+public sealed partial record ChatMessagePacket : IPacketStatic<ChatMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -65,13 +65,13 @@ public sealed record ChatMessagePacket : IPacket
     public int? MessageCount { get; init; }
     public byte[]? Acknowledged { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Message);
         buffer.WriteLong(Timestamp);
         buffer.WriteLong(Salt);
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             var hasSignature = Signature != null;
             buffer.WriteBool(hasSignature);
@@ -88,7 +88,7 @@ public sealed record ChatMessagePacket : IPacket
 
             if (MessageCount == null)
             {
-                throw new MineSharpPacketVersionException(nameof(MessageCount), version.Version.Protocol);
+                throw new MineSharpPacketVersionException(nameof(MessageCount), data.Version.Protocol);
             }
 
             buffer.WriteVarInt(MessageCount.Value);
@@ -99,12 +99,12 @@ public sealed record ChatMessagePacket : IPacket
         // only 1.19-1.19.2
         if (Signature == null)
         {
-            throw new MineSharpPacketVersionException(nameof(Signature), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(Signature), data.Version.Protocol);
         }
 
         if (SignedPreview == null)
         {
-            throw new MineSharpPacketVersionException(nameof(SignedPreview), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(SignedPreview), data.Version.Protocol);
         }
 
         buffer.WriteVarInt(Signature.Length);
@@ -112,14 +112,14 @@ public sealed record ChatMessagePacket : IPacket
 
         buffer.WriteBool(SignedPreview.Value);
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (data.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return;
         }
 
         if (PreviousMessages == null)
         {
-            throw new MineSharpPacketVersionException(nameof(PreviousMessages), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(PreviousMessages), data.Version.Protocol);
         }
 
         buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
@@ -135,7 +135,7 @@ public sealed record ChatMessagePacket : IPacket
         LastRejectedMessage!.Write(buffer);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChatMessagePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var message = buffer.ReadString();
         var timestamp = buffer.ReadLong();
@@ -147,7 +147,7 @@ public sealed record ChatMessagePacket : IPacket
         int? messageCount;
         byte[]? acknowledged;
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19_3)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_3)
         {
             var hasSignature = buffer.ReadBool();
 
@@ -174,7 +174,7 @@ public sealed record ChatMessagePacket : IPacket
 
         signedPreview = buffer.ReadBool();
 
-        if (version.Version.Protocol != ProtocolVersion.V_1_19_2)
+        if (data.Version.Protocol != ProtocolVersion.V_1_19_1)
         {
             return new ChatMessagePacket(message, timestamp, salt, signature, signedPreview.Value);
         }

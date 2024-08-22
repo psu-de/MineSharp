@@ -14,13 +14,13 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="Value">The score to be displayed next to the entry</param>
 /// <param name="DisplayName">The custom display name</param>
 /// <param name="NumberFormat">The number format for the score</param>
-public sealed record UpdateScorePacket(
+public sealed partial record UpdateScorePacket(
     string EntityName,
     string ObjectiveName,
     int Value,
     Chat? DisplayName,
     IScoreboardNumberFormat? NumberFormat
-) : IPacket
+) : IPacketStatic<UpdateScorePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -28,7 +28,7 @@ public sealed record UpdateScorePacket(
     public static PacketType StaticType => PacketType.CB_Play_ScoreboardScore;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(EntityName);
         buffer.WriteString(ObjectiveName);
@@ -52,7 +52,7 @@ public sealed record UpdateScorePacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateScorePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityName = buffer.ReadString();
         var objectiveName = buffer.ReadString();

@@ -8,7 +8,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     The ChunkBatchReceived packet, used since 1.20.2.
 ///     https://wiki.vg/Protocol#Chunk_Batch_Received
 /// </summary>
-public sealed record ChunkBatchReceivedPacket(float ChunksPerTick) : IPacket
+public sealed partial record ChunkBatchReceivedPacket(float ChunksPerTick) : IPacketStatic<ChunkBatchReceivedPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -16,13 +16,13 @@ public sealed record ChunkBatchReceivedPacket(float ChunksPerTick) : IPacket
     public static PacketType StaticType => PacketType.SB_Play_ChunkBatchReceived;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteFloat(ChunksPerTick);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ChunkBatchReceivedPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ChunkBatchReceivedPacket(buffer.ReadFloat());
     }

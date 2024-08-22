@@ -14,7 +14,14 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// <param name="Line2">Second line of text in the sign</param>
 /// <param name="Line3">Third line of text in the sign</param>
 /// <param name="Line4">Fourth line of text in the sign</param>
-public sealed record UpdateSignPacket(Position Location, bool IsFrontText, string Line1, string Line2, string Line3, string Line4) : IPacket
+public sealed partial record UpdateSignPacket(
+    Position Location,
+    bool IsFrontText,
+    string Line1,
+    string Line2,
+    string Line3,
+    string Line4
+) : IPacketStatic<UpdateSignPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -22,7 +29,7 @@ public sealed record UpdateSignPacket(Position Location, bool IsFrontText, strin
     public static PacketType StaticType => PacketType.SB_Play_UpdateSign;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteBool(IsFrontText);
@@ -33,7 +40,7 @@ public sealed record UpdateSignPacket(Position Location, bool IsFrontText, strin
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateSignPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var isFrontText = buffer.ReadBool();
@@ -42,7 +49,7 @@ public sealed record UpdateSignPacket(Position Location, bool IsFrontText, strin
         var line3 = buffer.ReadString();
         var line4 = buffer.ReadString();
 
-        return new UpdateSignPacket(
+        return new(
             location,
             isFrontText,
             line1, line2, line3, line4);

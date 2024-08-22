@@ -6,7 +6,7 @@ using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record MultiBlockUpdatePacket : IPacket
+public sealed partial record MultiBlockUpdatePacket : IPacketStatic<MultiBlockUpdatePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -50,15 +50,15 @@ public sealed record MultiBlockUpdatePacket : IPacket
     public bool? SuppressLightUpdates { get; init; }
     public long[] Blocks { get; init; }
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol < ProtocolVersion.V_1_20 && SuppressLightUpdates == null)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0 && SuppressLightUpdates == null)
         {
-            throw new MineSharpPacketVersionException(nameof(SuppressLightUpdates), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(SuppressLightUpdates), data.Version.Protocol);
         }
 
         buffer.WriteLong(ChunkSection);
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             buffer.WriteBool(SuppressLightUpdates!.Value);
         }
@@ -66,11 +66,11 @@ public sealed record MultiBlockUpdatePacket : IPacket
         buffer.WriteVarIntArray(Blocks, (buf, val) => buf.WriteLong(val));
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static MultiBlockUpdatePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var chunkSection = buffer.ReadLong();
         bool? suppressLightUpdates = null;
-        if (version.Version.Protocol < ProtocolVersion.V_1_20)
+        if (data.Version.Protocol < ProtocolVersion.V_1_20_0)
         {
             suppressLightUpdates = buffer.ReadBool();
         }

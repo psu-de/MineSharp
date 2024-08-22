@@ -424,7 +424,6 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
     /// <summary>
     /// Dispatch this event
     /// </summary>
-    /// <param name="block">Whether to block until all handlers are completed</param>
     /// <param name="arg1">First argument for the handlers</param>
     /// <param name="arg2">Second argument for the handlers</param>
     /// <param name="arg3">Third argument for the handlers</param>

@@ -5,14 +5,14 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public sealed record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] PublicKey, byte[] KeySignature) : IPacket
+public sealed partial record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] PublicKey, byte[] KeySignature) : IPacketStatic<PlayerSessionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.SB_Play_ChatSessionUpdate;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteUuid(SessionId);
         buffer.WriteLong(ExpiresAt);
@@ -22,7 +22,7 @@ public sealed record PlayerSessionPacket(Uuid SessionId, long ExpiresAt, byte[] 
         buffer.WriteBytes(KeySignature);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerSessionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var sessionId = buffer.ReadUuid();
         var expiresAt = buffer.ReadLong();

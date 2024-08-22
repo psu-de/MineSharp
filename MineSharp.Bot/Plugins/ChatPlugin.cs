@@ -41,7 +41,7 @@ public class ChatPlugin : Plugin
         messageCollector = Bot.Data.Version.Protocol switch
         {
             >= ProtocolVersion.V_1_19_3 => new LastSeenMessageCollector1193(),
-            >= ProtocolVersion.V_1_19_2 => new LastSeenMessageCollector1192(),
+            >= ProtocolVersion.V_1_19_1 => new LastSeenMessageCollector1192(),
             _ => null
         };
 
@@ -84,7 +84,7 @@ public class ChatPlugin : Plugin
     /// <returns></returns>
     public Task SendChat(string message)
     {
-        if (Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19
+        if (Bot.Data.Version.Protocol >= ProtocolVersion.V_1_19_0
             && message.StartsWith('/'))
         {
             return SendCommand(message.Substring(1));
@@ -96,11 +96,12 @@ public class ChatPlugin : Plugin
             // 1.19.3
             >= ProtocolVersion.V_1_19_3 => SendChat1_19_3(message),
 
-            // 1.19.2
-            >= ProtocolVersion.V_1_19_2 => SendChat1_19_2(message),
-
+            // FIXME: Check whether this is still correct. wiki.vg says that 1.19.1 and 1.19.2 have the same protocol version
             // 1.19.1
-            >= ProtocolVersion.V_1_19 => SendChat1_19_1(message),
+            >= ProtocolVersion.V_1_19_1 => SendChat1_19_1(message),
+
+            // 1.19.0
+            >= ProtocolVersion.V_1_19_0 => SendChat1_19_0(message),
 
             // Literally every version before.
             _ => Bot.Client.SendPacket(new SBChatMessage(message))
@@ -126,11 +127,12 @@ public class ChatPlugin : Plugin
             // 1.19.3
             >= ProtocolVersion.V_1_19_3 => SendCommand1_19_3(command, arguments),
 
-            // 1.19.2
-            >= ProtocolVersion.V_1_19_2 => SendCommand1_19_2(command, arguments),
-
+            // FIXME: Check whether this is still correct. wiki.vg says that 1.19.1 and 1.19.2 have the same protocol version
             // 1.19.1
-            >= ProtocolVersion.V_1_19 => SendCommand1_19_1(command, arguments),
+            >= ProtocolVersion.V_1_19_1 => SendCommand1_19_1(command, arguments),
+
+            // 1.19.0
+            >= ProtocolVersion.V_1_19_0 => SendCommand1_19_0(command, arguments),
 
             // Literally every version before
             _ => SendChat("/" + command)
@@ -206,7 +208,7 @@ public class ChatPlugin : Plugin
     }
 
 
-    private Task SendChat1_19_1(string message)
+    private Task SendChat1_19_0(string message)
     {
         byte[] signature;
         var timestamp = DateTimeOffset.UtcNow;
@@ -235,7 +237,7 @@ public class ChatPlugin : Plugin
                 false));
     }
 
-    private Task SendCommand1_19_1(string command, List<(string, string)> arguments)
+    private Task SendCommand1_19_0(string command, List<(string, string)> arguments)
     {
         var timestamp = DateTimeOffset.UtcNow;
 
@@ -273,7 +275,7 @@ public class ChatPlugin : Plugin
                 false));
     }
 
-    private Task SendChat1_19_2(string message)
+    private Task SendChat1_19_1(string message)
     {
         var collector = (LastSeenMessageCollector1192)messageCollector!;
         var messages = collector.AcknowledgeMessages();
@@ -312,7 +314,7 @@ public class ChatPlugin : Plugin
                                      ));
     }
 
-    private Task SendCommand1_19_2(string command, List<(string, string)> arguments)
+    private Task SendCommand1_19_1(string command, List<(string, string)> arguments)
     {
         var collector = (LastSeenMessageCollector1192)messageCollector!;
         var acknowledged = collector.AcknowledgeMessages();
@@ -533,13 +535,13 @@ public class ChatPlugin : Plugin
     {
         return packet switch
         {
-            SystemChatMessagePacket.Before192 before192
-                => HandleChatInternal(null, before192.Message, (ChatMessageType)before192.ChatType),
+            SystemChatMessagePacket.Before191 before191
+                => HandleChatInternal(null, before191.Message, (ChatMessageType)before191.ChatType),
 
-            SystemChatMessagePacket.Since192 since192
+            SystemChatMessagePacket.Since191 since191
                 => HandleChatInternal(null,
-                                      since192.Message,
-                                      since192.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage),
+                                      since191.Message,
+                                      since191.IsOverlay ? ChatMessageType.GameInfo : ChatMessageType.SystemMessage),
 
             _ => throw new UnreachableException()
         };

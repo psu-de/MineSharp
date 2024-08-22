@@ -16,11 +16,11 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="AdvancementMappings">The advancement mappings</param>
 /// <param name="Identifiers">The identifiers of the advancements that should be removed</param>
 /// <param name="ProgressMappings">The progress mappings</param>
-public sealed record UpdateAdvancementsPacket(
+public sealed partial record UpdateAdvancementsPacket(
     bool ResetClear,
     KeyValuePair<Identifier, Advancement>[] AdvancementMappings,
     Identifier[] Identifiers,
-    KeyValuePair<Identifier, AdvancementProgress>[] ProgressMappings) : IPacket
+    KeyValuePair<Identifier, AdvancementProgress>[] ProgressMappings) : IPacketStatic<UpdateAdvancementsPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -51,7 +51,7 @@ public sealed record UpdateAdvancementsPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData data)
+    public static UpdateAdvancementsPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var resetClear = buffer.ReadBool();
         var advancementMappingsCount = buffer.ReadVarInt();

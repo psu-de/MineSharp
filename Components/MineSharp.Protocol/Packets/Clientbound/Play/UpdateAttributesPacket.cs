@@ -5,23 +5,23 @@ using Attribute = MineSharp.Core.Common.Entities.Attributes.Attribute;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record UpdateAttributesPacket(
+public sealed partial record UpdateAttributesPacket(
     int EntityId,
     Attribute[] Attributes
-) : IPacket
+) : IPacketStatic<UpdateAttributesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_EntityUpdateAttributes;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteVarIntArray(Attributes, (buffer, attribute) => attribute.Write(buffer));
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateAttributesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var attributes = buffer.ReadVarIntArray(Attribute.Read);

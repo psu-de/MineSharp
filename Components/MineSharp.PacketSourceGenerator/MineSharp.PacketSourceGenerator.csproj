@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<!-- Generates a package at build -->
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<!-- Do not include the generator as a lib dependency -->
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12.0</LangVersion>
+
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsRoslynComponent>true</IsRoslynComponent>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GetTargetPathDependsOn>
+			$(GetTargetPathDependsOn);GetDependencyTargetPaths
+		</GetTargetPathDependsOn>
+	</PropertyGroup>
+
+	<Target Name="GetDependencyTargetPaths">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
+		</ItemGroup>
+	</Target>
+	
+	<ItemGroup>
+		<PackageReference Update="NETStandard.Library" PrivateAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Generator Dependencies -->
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+		<!-- Package the Microsoft.Bcl.AsyncInterfaces dependency alongside the generator assembly -->
+		<None Include="$(PkgMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+		<!-- Package the generator in the analyzer directory of the nuget package -->
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="debugSourceGenerator.txt.user" />
+	</ItemGroup>
+
+</Project>

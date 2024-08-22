@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 /// </summary>
 /// <param name="PrimaryEffect">The primary effect ID</param>
 /// <param name="SecondaryEffect">The secondary effect ID</param>
-public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEffect) : IPacket
+public sealed partial record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEffect) : IPacketStatic<SetBeaconEffectPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,7 +17,7 @@ public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEff
     public static PacketType StaticType => PacketType.SB_Play_SetBeaconEffect;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         var hasPrimaryEffect = PrimaryEffect.HasValue;
         buffer.WriteBool(hasPrimaryEffect);
@@ -35,7 +35,7 @@ public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEff
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetBeaconEffectPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var hasPrimaryEffect = buffer.ReadBool();
         int? primaryEffect = hasPrimaryEffect ? buffer.ReadVarInt() : null;
@@ -43,7 +43,7 @@ public sealed record SetBeaconEffectPacket(int? PrimaryEffect, int? SecondaryEff
         var hasSecondaryEffect = buffer.ReadBool();
         int? secondaryEffect = hasSecondaryEffect ? buffer.ReadVarInt() : null;
 
-        return new SetBeaconEffectPacket(
+        return new(
             primaryEffect,
             secondaryEffect);
     }

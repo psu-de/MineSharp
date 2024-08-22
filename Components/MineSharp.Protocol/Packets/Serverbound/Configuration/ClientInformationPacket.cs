@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
 /// <param name="MainHand">The main hand setting</param>
 /// <param name="EnableTextFiltering">Whether text filtering is enabled</param>
 /// <param name="AllowServerListings">Whether server listings are allowed</param>
-public sealed record ClientInformationPacket(
+public sealed partial record ClientInformationPacket(
     string Locale,
     byte ViewDistance,
     ChatMode ChatMode,
@@ -25,7 +25,7 @@ public sealed record ClientInformationPacket(
     PlayerHand MainHand,
     bool EnableTextFiltering,
     bool AllowServerListings
-) : IPacket
+) : IPacketStatic<ClientInformationPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -33,7 +33,7 @@ public sealed record ClientInformationPacket(
     public static PacketType StaticType => PacketType.SB_Configuration_Settings;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(Locale);
         buffer.WriteByte(ViewDistance);
@@ -46,7 +46,7 @@ public sealed record ClientInformationPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static ClientInformationPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new ClientInformationPacket(
             buffer.ReadString(),

@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Play;
 ///     Player abilities packet sent by the client to update the player's abilities.
 /// </summary>
 /// <param name="Flags">Bit mask indicating the player's abilities. Client may only send the <see cref="PlayerAbilitiesFlags.Flying"/> flag.</param>
-public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags) : IPacket
+public sealed partial record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags) : IPacketStatic<PlayerAbilitiesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,16 +17,16 @@ public sealed record PlayerAbilitiesPacket(PlayerAbilitiesFlags Flags) : IPacket
     public static PacketType StaticType => PacketType.SB_Play_Abilities;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte((byte)Flags);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static PlayerAbilitiesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var flags = (PlayerAbilitiesFlags)buffer.ReadByte();
 
-        return new PlayerAbilitiesPacket(flags);
+        return new(flags);
     }
 }

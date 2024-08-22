@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Event">The game event</param>
 /// <param name="Value">The value associated with the event</param>
-public sealed record GameEventPacket(GameEvent Event, float Value) : IPacket
+public sealed partial record GameEventPacket(GameEvent Event, float Value) : IPacketStatic<GameEventPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,14 +18,14 @@ public sealed record GameEventPacket(GameEvent Event, float Value) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_GameStateChange;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte((byte)Event);
         buffer.WriteFloat(Value);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static GameEventPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var @event = buffer.ReadByte();
         var value = buffer.ReadFloat();

@@ -64,7 +64,7 @@ internal sealed class PlayPacketHandler : GameStatePacketHandler
     {
         return data.Version.Protocol switch
         {
-            <= ProtocolVersion.V_1_20 => client.SendClientInformationPacket(GameState),
+            <= ProtocolVersion.V_1_20_0 => client.SendClientInformationPacket(GameState),
             _ => Task.CompletedTask
         };
     }

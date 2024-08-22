@@ -20,7 +20,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="VelocityX">The X velocity of the entity.</param>
 /// <param name="VelocityY">The Y velocity of the entity.</param>
 /// <param name="VelocityZ">The Z velocity of the entity.</param>
-public sealed record SpawnLivingEntityPacket(
+public sealed partial record SpawnLivingEntityPacket(
     int EntityId,
     Uuid EntityUuid,
     int EntityType,
@@ -33,7 +33,7 @@ public sealed record SpawnLivingEntityPacket(
     short VelocityX,
     short VelocityY,
     short VelocityZ
-) : IPacket
+) : IPacketStatic<SpawnLivingEntityPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -41,7 +41,7 @@ public sealed record SpawnLivingEntityPacket(
     public static PacketType StaticType => PacketType.CB_Play_SpawnEntityLiving;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteUuid(EntityUuid);
@@ -58,7 +58,7 @@ public sealed record SpawnLivingEntityPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SpawnLivingEntityPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         return new SpawnLivingEntityPacket(
             buffer.ReadVarInt(),

@@ -15,14 +15,14 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="ObjectiveValue">The text to be displayed for the score</param>
 /// <param name="ObjectiveTypeValue">The type of the objective</param>
 /// <param name="NumberFormat">The number format for the score</param>
-public sealed record UpdateObjectivesPacket(
+public sealed partial record UpdateObjectivesPacket(
     string ObjectiveName,
     ObjectiveMode Mode,
     Chat? ObjectiveValue,
     // this field can not be named "Type" or "ObjectiveType"
     ObjectiveType? ObjectiveTypeValue,
     IScoreboardNumberFormat? NumberFormat
-) : IPacket
+) : IPacketStatic<UpdateObjectivesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -30,7 +30,7 @@ public sealed record UpdateObjectivesPacket(
     public static PacketType StaticType => PacketType.CB_Play_ScoreboardObjective;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteString(ObjectiveName);
         buffer.WriteByte((byte)Mode);
@@ -51,7 +51,7 @@ public sealed record UpdateObjectivesPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static UpdateObjectivesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var objectiveName = buffer.ReadString();
         var mode = (ObjectiveMode)buffer.ReadByte();

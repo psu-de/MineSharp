@@ -8,7 +8,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record RespawnPacket(
+public sealed partial record RespawnPacket(
     Identifier DimensionType,
     Identifier DimensionName,
     long HashedSeed,
@@ -21,16 +21,16 @@ public sealed record RespawnPacket(
     Identifier? DeathDimensionName,
     Position? DeathLocation,
     int? PortalCooldown
-) : IPacket
+) : IPacketStatic<RespawnPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_Respawn;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
-        if (version.Version.Protocol <= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol <= ProtocolVersion.V_1_19_0)
         {
             throw new NotSupportedException(
                 $"{nameof(RespawnPacket)}.Write() is not supported for versions before 1.19.");
@@ -56,17 +56,17 @@ public sealed record RespawnPacket(
             buffer.WritePosition(DeathLocation ?? throw new InvalidOperationException($"{nameof(DeathLocation)} must not be null if {nameof(HasDeathLocation)} is true."));
         }
 
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             buffer.WriteVarInt(PortalCooldown ?? 0);
         }
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static RespawnPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         Identifier dimensionType;
 
-        if (version.Version.Protocol <= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol <= ProtocolVersion.V_1_19_0)
         {
             var dimensionNbt = buffer.ReadNbtCompound();
             dimensionType = Identifier.Parse(dimensionNbt.Get<NbtString>("effects")!.Value);
@@ -87,7 +87,7 @@ public sealed record RespawnPacket(
         bool? hasDeathLocation = null;
         Identifier? deathDimensionName = null;
         Position? deathLocation = null;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_19)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_19_0)
         {
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)
@@ -98,7 +98,7 @@ public sealed record RespawnPacket(
         }
 
         int? portalCooldown = null;
-        if (version.Version.Protocol >= ProtocolVersion.V_1_20)
+        if (data.Version.Protocol >= ProtocolVersion.V_1_20_0)
         {
             portalCooldown = buffer.ReadVarInt();
         }

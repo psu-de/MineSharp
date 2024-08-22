@@ -16,7 +16,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="DisableRelativeVolume">
 ///     If true, the effect is played from 2 blocks away in the correct direction, ignoring distance-based volume adjustment.
 /// </param>
-public sealed record WorldEventPacket(EventType Event, Position Location, int Data, bool DisableRelativeVolume) : IPacket
+public sealed partial record WorldEventPacket(EventType Event, Position Location, int Data, bool DisableRelativeVolume) : IPacketStatic<WorldEventPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -24,7 +24,7 @@ public sealed record WorldEventPacket(EventType Event, Position Location, int Da
     public static PacketType StaticType => PacketType.CB_Play_WorldEvent;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteInt((int)Event);
         buffer.WritePosition(Location);
@@ -33,14 +33,14 @@ public sealed record WorldEventPacket(EventType Event, Position Location, int Da
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static WorldEventPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var eventType = (EventType)buffer.ReadInt();
         var location = buffer.ReadPosition();
-        var data = buffer.ReadInt();
+        var eventData = buffer.ReadInt();
         var disableRelativeVolume = buffer.ReadBool();
 
-        return new WorldEventPacket(eventType, location, data, disableRelativeVolume);
+        return new WorldEventPacket(eventType, location, eventData, disableRelativeVolume);
     }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

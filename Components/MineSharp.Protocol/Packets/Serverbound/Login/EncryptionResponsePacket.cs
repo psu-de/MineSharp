@@ -13,7 +13,7 @@ namespace MineSharp.Protocol.Packets.Serverbound.Login;
 /// <param name="SharedSecret">The shared secret</param>
 /// <param name="VerifyToken">The verify token</param>
 /// <param name="Crypto">The crypto container</param>
-public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? VerifyToken, CryptoContainer? Crypto) : IPacket
+public sealed partial record EncryptionResponsePacket(byte[] SharedSecret, byte[]? VerifyToken, CryptoContainer? Crypto) : IPacketStatic<EncryptionResponsePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -21,12 +21,12 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
     public static PacketType StaticType => PacketType.SB_Login_EncryptionBegin;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(SharedSecret.Length);
         buffer.WriteBytes(SharedSecret);
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (data.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             var hasVerifyToken = VerifyToken != null;
             buffer.WriteBool(hasVerifyToken);
@@ -35,7 +35,7 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
             {
                 if (Crypto == null)
                 {
-                    throw new MineSharpPacketVersionException(nameof(Crypto), version.Version.Protocol);
+                    throw new MineSharpPacketVersionException(nameof(Crypto), data.Version.Protocol);
                 }
 
                 Crypto.Write(buffer);
@@ -45,7 +45,7 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
 
         if (VerifyToken == null)
         {
-            throw new MineSharpPacketVersionException(nameof(VerifyToken), version.Version.Protocol);
+            throw new MineSharpPacketVersionException(nameof(VerifyToken), data.Version.Protocol);
         }
 
         buffer.WriteVarInt(VerifyToken.Length);
@@ -53,14 +53,14 @@ public sealed record EncryptionResponsePacket(byte[] SharedSecret, byte[]? Verif
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static EncryptionResponsePacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var sharedSecretLength = buffer.ReadVarInt();
         var sharedSecret = buffer.ReadBytes(sharedSecretLength);
         CryptoContainer? crypto = null;
         byte[]? verifyToken = null;
 
-        if (ProtocolVersion.IsBetween(version.Version.Protocol, ProtocolVersion.V_1_19, ProtocolVersion.V_1_19_2))
+        if (data.Version.Protocol.IsBetween(ProtocolVersion.V_1_19_0, ProtocolVersion.V_1_19_1))
         {
             var hasVerifyToken = buffer.ReadBool();
             buffer.WriteBool(hasVerifyToken);

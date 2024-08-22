@@ -36,13 +36,14 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <summary>
     ///     Delegate for handling packets async
     /// </summary>
-    public delegate Task AsyncPacketHandler(IPacket packet);
+    public delegate Task AsyncPacketHandler(IPacketClientbound packet);
 
     /// <summary>
     ///     Delegate for handling a specific packet async
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public delegate Task AsyncPacketHandler<in T>(T packet) where T : IPacket;
+    /// <typeparam name="TPacket"></typeparam>
+    public delegate Task AsyncPacketHandler<in TPacket>(TPacket packet)
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound;
 
     /// <summary>
     ///     The latest version supported
@@ -261,8 +262,10 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// </summary>
     /// <param name="packet">The packet to send.</param>
     /// <param name="cancellation">Optional cancellation token.</param>
+    /// <typeparam name="TPacket">The type of the packet to be sent.</typeparam>
     /// <returns>A task that resolves once the packet was actually sent.</returns>
-    public async Task SendPacket(IPacket packet, CancellationToken cancellation = default)
+    public async Task SendPacket<TPacket>(TPacket packet, CancellationToken cancellation = default)
+        where TPacket : IPacketServerbound
     {
         var sendingTask = new PacketSendTask(packet, cancellation, new(TaskCreationOptions.RunContinuationsAsynchronously));
         try
@@ -325,12 +328,12 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
-    /// Represents a registration for a packet handler that will be called whenever a packet of type <typeparamref name="T" /> is received.
+    /// Represents a registration for a packet handler that will be called whenever a packet of type <typeparamref name="TPacket" /> is received.
     /// This registration can be used to unregister the handler.
     /// </summary>
-    /// <typeparam name="T">The type of the packet.</typeparam>
-    public sealed class OnPacketRegistration<T> : AbstractPacketReceiveRegistration
-         where T : IPacket
+    /// <typeparam name="TPacket">The type of the packet.</typeparam>
+    public sealed class OnPacketRegistration<TPacket> : AbstractPacketReceiveRegistration
+         where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         internal OnPacketRegistration(MinecraftClient client, AsyncPacketHandler handler)
             : base(client, handler)
@@ -340,7 +343,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         /// <inheritdoc/>
         protected override void Unregister()
         {
-            var key = T.StaticType;
+            var key = TPacket.StaticType;
             if (Client.packetHandlers.TryGetValue(key, out var handlers))
             {
                 handlers.TryRemove(Handler);
@@ -353,12 +356,13 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     ///     is received
     /// </summary>
     /// <param name="handler">A delegate that will be called when a packet of type T is received</param>
-    /// <typeparam name="T">The type of the packet</typeparam>
+    /// <typeparam name="TPacket">The type of the packet</typeparam>
     /// <returns>A registration object that can be used to unregister the handler.</returns>
-    public OnPacketRegistration<T>? On<T>(AsyncPacketHandler<T> handler) where T : IPacket
+    public OnPacketRegistration<TPacket>? On<TPacket>(AsyncPacketHandler<TPacket> handler)
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
-        var key = T.StaticType;
-        AsyncPacketHandler rawHandler = packet => handler((T)packet);
+        var key = TPacket.StaticType;
+        AsyncPacketHandler rawHandler = packet => handler((TPacket)packet);
         var added = packetHandlers.GetOrAdd(key, _ => new ConcurrentHashSet<AsyncPacketHandler>())
                       .Add(rawHandler);
         return added ? new(this, rawHandler) : null;
@@ -372,7 +376,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <param name="cancellationToken">A token to cancel the wait for the matching packet.</param>
     /// <returns>A task that completes once a packet matching the condition is received.</returns>
     public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, Task<bool>> condition, CancellationToken cancellationToken = default)
-         where TPacket : IPacket
+         where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         // linked token is required to cancel the task when the client is disconnected
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
@@ -424,7 +428,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     /// <inheritdoc cref="WaitForPacketWhere{TPacket}(Func{TPacket, Task{bool}}, CancellationToken)"/>
     public Task<TPacket> WaitForPacketWhere<TPacket>(Func<TPacket, bool> condition, CancellationToken cancellationToken = default)
-        where TPacket : IPacket
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
         return WaitForPacketWhere<TPacket>(packet => Task.FromResult(condition(packet)), cancellationToken);
     }
@@ -432,13 +436,14 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
     /// <summary>
     ///     Waits until a packet of the specified type is received.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TPacket">The type of the packet</typeparam>
     /// <returns>A task that completes once the packet is received</returns>
-    public Task<T> WaitForPacket<T>() where T : IPacket
+    public Task<TPacket> WaitForPacket<TPacket>()
+        where TPacket : IPacketStatic<TPacket>, IPacketClientbound
     {
-        var packetType = T.StaticType;
+        var packetType = TPacket.StaticType;
         var tcs = packetWaiters.GetOrAdd(packetType, _ => new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously));
-        return tcs.Task.ContinueWith(prev => (T)prev.Result);
+        return tcs.Task.ContinueWith(prev => (TPacket)prev.Result);
     }
 
     /// <summary>
@@ -484,7 +489,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
 
     internal Task SendClientInformationPacket(GameState gameState)
     {
-        IPacket packet = gameState switch
+        IPacketServerbound packet = gameState switch
         {
             GameState.Configuration => new ConfigurationClientInformationPacket(
                 Settings.Locale,
@@ -717,8 +722,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
     }
 
-    // TODO: object is bad but IPacket is not allowed as generic type
-    private async Task<object?> ParsePacket(PacketPalette.PacketFactory packetFactory, PacketType packetType, PacketBuffer buffer)
+    private async Task<IPacketClientbound?> ParsePacket(PacketFactory<IPacketClientbound> packetFactory, PacketType packetType, PacketBuffer buffer)
     {
         var size = buffer.ReadableBytes;
         try
@@ -728,7 +732,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             var unreadBytes = buffer.ReadableBytes;
             if (unreadBytes != 0)
             {
-                Logger.Warn("After reading the packet {PacketType}, the buffer still contains {unreadBytes}/{Size} bytes.", packetType, unreadBytes, size);
+                Logger.Warn("After reading the packet {PacketType}, the buffer still contains {UnreadBytes}/{Size} bytes.", packetType, unreadBytes, size);
             }
 
             return packet;
@@ -754,7 +758,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         //  - The internal IPacketHandler
 
         Logger.Trace("Handling packet {PacketType}", packetType);
-        var factory = PacketPalette.GetFactory(packetType);
+        var factory = PacketPalette.GetClientboundFactory(packetType);
         if (factory == null)
         {
             await buffer.DisposeAsync();
@@ -783,7 +787,7 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
             return;
         }
 
-        var packet = (IPacket?)await ParsePacket(factory, packetType, buffer);
+        var packet = await ParsePacket(factory, packetType, buffer);
 
         if (packet == null)
         {

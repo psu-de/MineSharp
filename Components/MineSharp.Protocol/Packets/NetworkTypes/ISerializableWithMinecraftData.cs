@@ -1,13 +1,15 @@
-﻿using MineSharp.Data;
+﻿using MineSharp.Core.Serialization;
+using MineSharp.Data;
 
-namespace MineSharp.Core.Serialization;
+namespace MineSharp.Protocol.Packets.NetworkTypes;
 
 /// <summary>
 ///     Interface for serializing and deserializing objects from and to <see cref="PacketBuffer" />
 ///     while being aware of the Minecraft version
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ISerializableWithMinecraftData<out T> where T : ISerializableWithMinecraftData<T>
+public interface ISerializableWithMinecraftData<out T>
+    where T : ISerializableWithMinecraftData<T>
 {
     /// <summary>
     ///     Serialize the object into the buffer

@@ -12,9 +12,9 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <summary>
 /// Represents a packet sent by the server to update the list of recipes.
 /// </summary>
-public sealed record UpdateRecipesPacket(
+public sealed partial record UpdateRecipesPacket(
     Recipe[] Recipes
-) : IPacket
+) : IPacketStatic<UpdateRecipesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -32,7 +32,7 @@ public sealed record UpdateRecipesPacket(
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData data)
+    public static UpdateRecipesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var numRecipes = buffer.ReadVarInt();
         var recipes = new Recipe[numRecipes];
@@ -362,7 +362,7 @@ public sealed record UpdateRecipesPacket(
             var template = Ingredient.Read(buffer, data);
             var baseItem = Ingredient.Read(buffer, data);
             var addition = Ingredient.Read(buffer, data);
-            var result = buffer.ReadOptionalItem(data);
+            var result = buffer.ReadOptionalItem(data)!;
             return new SmithingTransformData(template, baseItem, addition, result);
         }
 

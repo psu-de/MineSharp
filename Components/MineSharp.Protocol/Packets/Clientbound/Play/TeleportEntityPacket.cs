@@ -4,7 +4,7 @@ using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public sealed record TeleportEntityPacket(
+public sealed partial record TeleportEntityPacket(
     int EntityId,
     double X,
     double Y,
@@ -12,14 +12,14 @@ public sealed record TeleportEntityPacket(
     sbyte Yaw,
     sbyte Pitch,
     bool OnGround
-) : IPacket
+) : IPacketStatic<TeleportEntityPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
     /// <inheritdoc />
     public static PacketType StaticType => PacketType.CB_Play_EntityTeleport;
 
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteVarInt(EntityId);
         buffer.WriteDouble(X);
@@ -30,7 +30,7 @@ public sealed record TeleportEntityPacket(
         buffer.WriteBool(OnGround);
     }
 
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static TeleportEntityPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var entityId = buffer.ReadVarInt();
         var x = buffer.ReadDouble();

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="Location">The spawn location</param>
 /// <param name="Angle">The angle at which to respawn at</param>
-public sealed record SetDefaultSpawnPositionPacket(Position Location, float Angle) : IPacket
+public sealed partial record SetDefaultSpawnPositionPacket(Position Location, float Angle) : IPacketStatic<SetDefaultSpawnPositionPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,14 +18,14 @@ public sealed record SetDefaultSpawnPositionPacket(Position Location, float Angl
     public static PacketType StaticType => PacketType.CB_Play_SpawnPosition;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WritePosition(Location);
         buffer.WriteFloat(Angle);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SetDefaultSpawnPositionPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var location = buffer.ReadPosition();
         var angle = buffer.ReadFloat();

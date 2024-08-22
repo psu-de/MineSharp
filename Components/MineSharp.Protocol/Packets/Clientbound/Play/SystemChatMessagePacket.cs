@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// Packet for system messages displayed in chat or hotbar
 /// See https://wiki.vg/Protocol#System_Chat_Message
 /// </summary>
-public abstract record SystemChatMessagePacket(Chat Message) : IPacket
+public abstract partial record SystemChatMessagePacket(Chat Message) : IPacketStatic<SystemChatMessagePacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,24 +18,24 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
     public static PacketType StaticType => PacketType.CB_Play_SystemChat;
 
     /// <inheritdoc />
-    public abstract void Write(PacketBuffer buffer, MinecraftData version);
+    public abstract void Write(PacketBuffer buffer, MinecraftData data);
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static SystemChatMessagePacket Read(PacketBuffer buffer, MinecraftData data)
     {
-        return version.Version.Protocol switch
+        return data.Version.Protocol switch
         {
-            >= ProtocolVersion.V_1_19_2 => Since192._Read(buffer, version),
-            < ProtocolVersion.V_1_19_2 => Before192._Read(buffer, version)
+            >= ProtocolVersion.V_1_19_1 => Since191._Read(buffer, data),
+            < ProtocolVersion.V_1_19_1 => Before191._Read(buffer, data)
         };
     }
 
     /// <summary>
     /// <inheritdoc cref="SystemChatMessagePacket"/><br/>
     /// 
-    /// Used before Minecraft Java 1.19.2
+    /// Used before Minecraft Java 1.19.1
     /// </summary>
-    public sealed record Before192(Chat Message, int ChatType) : SystemChatMessagePacket(Message)
+    public sealed record Before191(Chat Message, int ChatType) : SystemChatMessagePacket(Message)
     {
         /// <inheritdoc />
         public override void Write(PacketBuffer buffer, MinecraftData data)
@@ -44,7 +44,7 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
             buffer.WriteVarInt(ChatType);
         }
 
-        internal static Before192 _Read(PacketBuffer buffer, MinecraftData version)
+        internal static Before191 _Read(PacketBuffer buffer, MinecraftData data)
         {
             return new(buffer.ReadChatComponent(), buffer.ReadInt());
         }
@@ -53,18 +53,18 @@ public abstract record SystemChatMessagePacket(Chat Message) : IPacket
     /// <summary>
     /// <inheritdoc cref="SystemChatMessagePacket"/><br/>
     /// 
-    /// Used since Minecraft Java 1.19.2
+    /// Used since Minecraft Java 1.19.1
     /// </summary>
-    public sealed record Since192(Chat Message, bool IsOverlay) : SystemChatMessagePacket(Message)
+    public sealed record Since191(Chat Message, bool IsOverlay) : SystemChatMessagePacket(Message)
     {
         /// <inheritdoc />
-        public override void Write(PacketBuffer buffer, MinecraftData version)
+        public override void Write(PacketBuffer buffer, MinecraftData data)
         {
             buffer.WriteChatComponent(Message);
             buffer.WriteBool(IsOverlay);
         }
 
-        internal static Since192 _Read(PacketBuffer buffer, MinecraftData version)
+        internal static Since191 _Read(PacketBuffer buffer, MinecraftData data)
         {
             return new(buffer.ReadChatComponent(), buffer.ReadBool());
         }

@@ -10,7 +10,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// <param name="WindowId">The window ID</param>
 /// <param name="SlotCount">The number of slots in the horse inventory</param>
 /// <param name="EntityId">The entity ID of the horse</param>
-public sealed record OpenHorseScreenPacket(byte WindowId, int SlotCount, int EntityId) : IPacket
+public sealed partial record OpenHorseScreenPacket(byte WindowId, int SlotCount, int EntityId) : IPacketStatic<OpenHorseScreenPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -18,7 +18,7 @@ public sealed record OpenHorseScreenPacket(byte WindowId, int SlotCount, int Ent
     public static PacketType StaticType => PacketType.CB_Play_OpenHorseWindow;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteByte(WindowId);
         buffer.WriteVarInt(SlotCount);
@@ -26,7 +26,7 @@ public sealed record OpenHorseScreenPacket(byte WindowId, int SlotCount, int Ent
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static OpenHorseScreenPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var windowId = buffer.ReadByte();
         var slotCount = buffer.ReadVarInt();

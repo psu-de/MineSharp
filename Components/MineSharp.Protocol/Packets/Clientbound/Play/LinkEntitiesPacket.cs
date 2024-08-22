@@ -9,7 +9,7 @@ namespace MineSharp.Protocol.Packets.Clientbound.Play;
 /// </summary>
 /// <param name="AttachedEntityId">The attached entity's ID</param>
 /// <param name="HoldingEntityId">The ID of the entity holding the lead. Set to -1 to detach.</param>
-public sealed record LinkEntitiesPacket(int AttachedEntityId, int HoldingEntityId) : IPacket
+public sealed partial record LinkEntitiesPacket(int AttachedEntityId, int HoldingEntityId) : IPacketStatic<LinkEntitiesPacket>
 {
     /// <inheritdoc />
     public PacketType Type => StaticType;
@@ -17,14 +17,14 @@ public sealed record LinkEntitiesPacket(int AttachedEntityId, int HoldingEntityI
     public static PacketType StaticType => PacketType.CB_Play_AttachEntity;
 
     /// <inheritdoc />
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer, MinecraftData data)
     {
         buffer.WriteInt(AttachedEntityId);
         buffer.WriteInt(HoldingEntityId);
     }
 
     /// <inheritdoc />
-    public static IPacket Read(PacketBuffer buffer, MinecraftData version)
+    public static LinkEntitiesPacket Read(PacketBuffer buffer, MinecraftData data)
     {
         var attachedEntityId = buffer.ReadInt();
         var holdingEntityId = buffer.ReadInt();
