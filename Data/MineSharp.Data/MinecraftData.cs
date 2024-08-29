@@ -31,7 +31,6 @@ public class MinecraftData
     private static readonly GitHubRepositoryHelper McInfoRepository = new("MineSharp-NET/mcinfo");
 
     private static readonly Lazy<Dictionary<string, JToken>> ProtocolVersions = new(LoadProtocolVersions);
-    private static readonly Dictionary<string, MinecraftData> LoadedData = new();
     
     private MinecraftData(
         Registries registries,
@@ -129,11 +128,6 @@ public class MinecraftData
     /// <returns></returns>
     public static async Task<MinecraftData> FromVersion(string version)
     {
-        if (LoadedData.TryGetValue(version, out var loaded))
-        {
-            return loaded;
-        }
-
         var minecraftDataResourceMap = await TryGetMinecraftDataResourceMap(version);
         var mcinfoResourceMap = await TryGetMcInfoResourceMap(version);
 
@@ -214,8 +208,7 @@ public class MinecraftData
             recipes,
             language,
             minecraftVersion);
-
-        LoadedData.Add(version, data);
+        
         return data;
     }
 
