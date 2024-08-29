@@ -131,7 +131,7 @@ public class WindowPlugin : Plugin
     /// <exception cref="ArgumentException"></exception>
     public async Task<Window> OpenContainer(Block block, int timeoutMs = 10 * 1000)
     {
-        if (!Bot.Data.Windows.AllowedBlocksToOpen.Contains(block.Info.Type))
+        if (!Data.Mappings.Windows.OpenableBlocks.Contains(block.Info.Type))
         {
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
@@ -637,7 +637,8 @@ public class WindowPlugin : Plugin
 
     private Task HandleOpenWindow(OpenWindowPacket packet)
     {
-        var windowInfo = Bot.Data.Windows.ById(packet.InventoryType);
+        var type = Bot.Data.Menus.ById(packet.InventoryType);
+        var windowInfo = Data.Mappings.Windows.WindowsInfos[type.Name];
 
         windowInfo = windowInfo with { Title = packet.WindowTitle };
         Logger.Debug("Received Open Window Packet id={WindowId}", packet.WindowId);

@@ -47,8 +47,8 @@ public class Tests
             data.Materials.GetMultiplier(Material.Shovel, ItemType.StoneSword);
             data.Protocol.GetPacketId(PacketType.CB_Play_Login);
             data.Recipes.ByItem(ItemType.DiamondShovel);
-            data.Particles.GetProtocolId(ParticleType.Composter);
-            data.Windows.ById(0);
+            data.Particles.ByType(ParticleType.Composter);
+            data.Menus.ById(0);
         }
     }
 }

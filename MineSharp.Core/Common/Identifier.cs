@@ -248,4 +248,14 @@ public sealed partial record Identifier
     {
         return NameRegex().MatchEntireString(name) != null;
     }
+    
+    /// <summary>
+    /// implicitly parse an identifier from a string
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static implicit operator Identifier(string value)
+    {
+        return Parse(value);
+    }
 }

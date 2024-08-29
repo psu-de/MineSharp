@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Common.Items;
+using MineSharp.Core.Registries;
 
 namespace MineSharp.Core.Common.Blocks;
 
@@ -24,7 +25,7 @@ namespace MineSharp.Core.Common.Blocks;
 public class BlockInfo(
     int id,
     BlockType type,
-    string name,
+    Identifier name,
     string displayName,
     float hardness,
     float resistance,
@@ -38,6 +39,7 @@ public class BlockInfo(
     ItemType[] harvestTools,
     int defaultState,
     BlockState state)
+    : IRegistryObject<BlockType>
 {
     /// <summary>
     ///     The numerical id of this block (depends on Minecraft version)
@@ -52,7 +54,7 @@ public class BlockInfo(
     /// <summary>
     ///     The text id of this block
     /// </summary>
-    public string Name { get; } = name;
+    public Identifier Name { get; } = name;
 
     /// <summary>
     ///     Minecraft's display name for this block

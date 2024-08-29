@@ -647,8 +647,15 @@ public sealed class MinecraftClient : IAsyncDisposable, IDisposable
         }
         catch (Exception e)
         {
-            Logger.Debug(e, "ReceivePackets loop ended with exception.");
-            throw;
+            if (e is IOException)
+            {
+                //ignore
+            }
+            else
+            {
+                Logger.Debug(e, "ReceivePackets loop ended with exception.");
+                throw;
+            }
         }
         // can never exit without exception because infinite loop without break
     }

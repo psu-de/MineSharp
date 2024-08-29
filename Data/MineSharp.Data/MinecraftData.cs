@@ -1,20 +1,20 @@
 ﻿using MineSharp.Core.Common;
-using MineSharp.Data.Biomes;
+using MineSharp.Core.Common.Biomes;
+using MineSharp.Core.Common.Blocks;
+using MineSharp.Core.Common.Effects;
+using MineSharp.Core.Common.Enchantments;
+using MineSharp.Core.Common.Entities;
+using MineSharp.Core.Common.Items;
+using MineSharp.Core.Common.Particles;
+using MineSharp.Core.Registries;
 using MineSharp.Data.BlockCollisionShapes;
-using MineSharp.Data.Blocks;
-using MineSharp.Data.Effects;
-using MineSharp.Data.Enchantments;
-using MineSharp.Data.Entities;
 using MineSharp.Data.Exceptions;
 using MineSharp.Data.Framework;
-using MineSharp.Data.Items;
 using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
-using MineSharp.Data.Particles;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
-using MineSharp.Data.Windows;
-using MineSharp.Data.Windows.Versions;
+using MineSharp.Data.Utils;
 using Newtonsoft.Json.Linq;
 using NLog;
 
@@ -28,76 +28,74 @@ public class MinecraftData
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
     private static readonly GitHubRepositoryHelper MinecraftDataRepository = new("PrismarineJs/minecraft-data");
+    private static readonly GitHubRepositoryHelper McInfoRepository = new("MineSharp-NET/mcinfo");
 
     private static readonly Lazy<Dictionary<string, JToken>> ProtocolVersions = new(LoadProtocolVersions);
     private static readonly Dictionary<string, MinecraftData> LoadedData = new();
-
+    
     private MinecraftData(
-        IBiomeData biomes,
-        IBlockData blocks,
+        Registries registries,
         IBlockCollisionShapeData blockCollisionShapes,
-        IEffectData effects,
-        IEnchantmentData enchantments,
-        IEntityData entities,
-        IItemData items,
         IProtocolData protocol,
         IMaterialData materials,
         IRecipeData recipes,
-        IWindowData windows,
         ILanguageData language,
-        IParticleData particles,
         MinecraftVersion version)
     {
-        Biomes = biomes;
-        Blocks = blocks;
+        Registries = registries;
         BlockCollisionShapes = blockCollisionShapes;
-        Effects = effects;
-        Enchantments = enchantments;
-        Entities = entities;
-        Items = items;
         Protocol = protocol;
         Materials = materials;
         Recipes = recipes;
-        Windows = windows;
         Language = language;
-        Particles = particles;
+        Registries = registries;
         Version = version;
+        
+        // for convenience, the most common registries have their own field in MinecraftData
+        Biomes = registries.Biomes;
+        Blocks = registries.Blocks;
+        Effects = registries.Effects;
+        Enchantments = registries.Enchantments;
+        Entities = registries.Entities;
+        Items = registries.Items;
+        Particles = registries.Particles;
+        Menus = registries.Menus;
     }
 
     /// <summary>
-    ///     The Biome data provider for this version
+    /// All client- and server-side registries for minecraft:vanilla
     /// </summary>
-    public IBiomeData Biomes { get; }
-
-    /// <summary>
-    ///     The Block data provider for this version
-    /// </summary>
-    public IBlockData Blocks { get; }
+    public Registries Registries { get; }
+    
+    
+    /// <inheritdoc cref="Data.Registries.Biomes"/>
+    public BiomeRegistry Biomes { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Blocks"/>
+    public BlockRegistry Blocks { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Effects"/>
+    public EffectRegistry Effects { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Enchantments"/>
+    public EnchantmentRegistry Enchantments { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Entities"/>
+    public EntityRegistry Entities { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Items"/>
+    public ItemRegistry Items { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Particles"/>
+    public ParticleRegistry Particles { get; }
+    
+    /// <inheritdoc cref="Data.Registries.Menus"/>
+    public Registry<RegistryResource> Menus { get; }
 
     /// <summary>
     ///     The Collision shape data provider for this version
     /// </summary>
     public IBlockCollisionShapeData BlockCollisionShapes { get; }
-
-    /// <summary>
-    ///     The effect data provider for this version
-    /// </summary>
-    public IEffectData Effects { get; }
-
-    /// <summary>
-    ///     The enchantment data provider for this version
-    /// </summary>
-    public IEnchantmentData Enchantments { get; }
-
-    /// <summary>
-    ///     The entity data provider for this version
-    /// </summary>
-    public IEntityData Entities { get; }
-
-    /// <summary>
-    ///     The item data provider for this version
-    /// </summary>
-    public IItemData Items { get; }
 
     /// <summary>
     ///     The protocol data provider for this version
@@ -115,19 +113,9 @@ public class MinecraftData
     public IRecipeData Recipes { get; }
 
     /// <summary>
-    ///     The window data for this version
-    /// </summary>
-    public IWindowData Windows { get; }
-
-    /// <summary>
     ///     The language data provider for this version
     /// </summary>
     public ILanguageData Language { get; }
-    
-    /// <summary>
-    /// The particle data for this version
-    /// </summary>
-    public IParticleData Particles { get; }
 
     /// <summary>
     ///     The Minecraft version of this instance
@@ -146,64 +134,92 @@ public class MinecraftData
             return loaded;
         }
 
-        var versionToken = await TryGetVersion(version);
+        var minecraftDataResourceMap = await TryGetMinecraftDataResourceMap(version);
+        var mcinfoResourceMap = await TryGetMcInfoResourceMap(version);
 
-        if (versionToken is null)
+        if (mcinfoResourceMap is null)
         {
-            throw new MineSharpVersionNotSupportedException($"Version {version} is not supported.");
+            throw new MineSharpVersionNotSupportedException($"Version {version} is not supported by mcinfo.");
+        }
+        
+        if (minecraftDataResourceMap is null)
+        {
+            throw new MineSharpVersionNotSupportedException($"Version {version} is not supported by minecraft-data.");
         }
 
         var protocolVersion = (int)ProtocolVersions.Value[version].SelectToken("version")!;
         var minecraftVersion = new MinecraftVersion(version, protocolVersion);
 
-        var biomeToken = await LoadAsset("biomes", versionToken);
-        var shapesToken = await LoadAsset("blockCollisionShapes", versionToken);
-        var blocksToken = await LoadAsset("blocks", versionToken);
-        var itemsToken = await LoadAsset("items", versionToken);
-        var effectsToken = await LoadAsset("effects", versionToken);
-        var enchantmentsToken = await LoadAsset("enchantments", versionToken);
-        var entitiesToken = await LoadAsset("entities", versionToken);
-        var protocolToken = await LoadAsset("protocol", versionToken);
-        var materialsToken = await LoadAsset("materials", versionToken);
-        var recipesToken = await LoadAsset("recipes", versionToken);
-        var languageToken = await LoadAsset("language", versionToken);
-        var particleToken = await LoadAsset("particles", versionToken);
+        var shapesToken = await LoadMinecraftDataAsset("blockCollisionShapes", minecraftDataResourceMap);
+        var protocolToken = await LoadMinecraftDataAsset("protocol", minecraftDataResourceMap);
+        var materialsToken = await LoadMinecraftDataAsset("materials", minecraftDataResourceMap);
+        var recipesToken = await LoadMinecraftDataAsset("recipes", minecraftDataResourceMap);
+        var languageToken = await LoadMinecraftDataAsset("language", minecraftDataResourceMap);
+        var registriesToken = await LoadMcInfoAsset("registries", mcinfoResourceMap);
+        
+        var parser = new DataParser();
+        var biomes = await RegistryHelper.LoadRegistry<BiomeRegistry, BiomeInfo, BiomeType>(
+            () => LoadMinecraftDataAsset("biomes", minecraftDataResourceMap), 
+            parser.ParseBiome);
 
-        var biomes = new BiomeData(new BiomeProvider(biomeToken));
-        var items = new ItemData(new ItemProvider(itemsToken));
-        var blocks = new BlockData(new BlockProvider(blocksToken, items));
+        var items = await RegistryHelper.LoadRegistry<ItemRegistry, ItemInfo, ItemType>(
+            () => LoadMinecraftDataAsset("items", minecraftDataResourceMap),
+            parser.ParseItem);
+
+        var blocks = await RegistryHelper.LoadRegistry<BlockRegistry, BlockInfo, BlockType, int>(
+            () => LoadMinecraftDataAsset("blocks", minecraftDataResourceMap),
+            x => parser.ParseBlock(x, items),
+            x => (int)x.SelectToken("maxStateId")!); // order blocks by max state because BlockRegistry#ByState requires it
+
+        var effects = await RegistryHelper.LoadRegistry<EffectRegistry, EffectInfo, EffectType>(
+            () => LoadMinecraftDataAsset("effects", minecraftDataResourceMap),
+            parser.ParseEffect);
+
+        var enchantments = await RegistryHelper.LoadRegistry<EnchantmentRegistry, EnchantmentInfo, EnchantmentType>(
+            () => LoadMinecraftDataAsset("enchantments", minecraftDataResourceMap),
+            parser.ParseEnchantment);
+        
+        var entities = await RegistryHelper.LoadRegistry<EntityRegistry, EntityInfo, EntityType>(
+            () => LoadMinecraftDataAsset("entities", minecraftDataResourceMap),
+            parser.ParseEntity);
+        
+        var particles = await RegistryHelper.LoadRegistry<ParticleRegistry, RegistryResource<ParticleType>, ParticleType>(
+            () => LoadMinecraftDataAsset("particles", minecraftDataResourceMap),
+            parser.ParseParticle);
+        
+        var registries = new Registries
+        {
+            [biomes.Name] = biomes,
+            [blocks.Name] = blocks,
+            [items.Name] = items,
+            [effects.Name] = effects,
+            [enchantments.Name] = enchantments,
+            [entities.Name] = entities,
+            [particles.Name] = particles
+        };
+
+        ParseAdditionalRegistries(registries, registriesToken);
+        
         var shapes = new BlockCollisionShapeData(new BlockCollisionShapesProvider(shapesToken));
-        var effects = new EffectData(new EffectProvider(effectsToken));
-        var enchantments = new EnchantmentData(new EnchantmentProvider(enchantmentsToken));
-        var entities = new EntityData(new EntityProvider(entitiesToken));
         var protocol = new ProtocolData(new ProtocolProvider(protocolToken));
         var materials = new MaterialData(new MaterialsProvider(materialsToken, items));
         var recipes = new RecipeData(new(recipesToken, items));
         var language = new LanguageData(new LanguageProvider(languageToken));
-        var particles = new ParticleData(new ParticleDataProvider(particleToken));
-        var windows = GetWindowData(minecraftVersion);
 
         var data = new MinecraftData(
-            biomes,
-            blocks,
+            registries,
             shapes,
-            effects,
-            enchantments,
-            entities,
-            items,
             protocol,
             materials,
             recipes,
-            windows,
             language,
-            particles,
             minecraftVersion);
 
         LoadedData.Add(version, data);
         return data;
     }
 
-    private static Task<JToken> LoadAsset(string resource, JToken version)
+    private static Task<JToken> LoadMinecraftDataAsset(string resource, JToken version)
     {
         var versionPath = (string)version.SelectToken(resource)!;
         var fullyQualifiedName = $"data/{versionPath}/{resource}.json";
@@ -211,7 +227,19 @@ public class MinecraftData
         return MinecraftDataRepository.GetAsset(fullyQualifiedName);
     }
 
-    private static async Task<JToken?> TryGetVersion(string version)
+    private static Task<JToken> LoadMcInfoAsset(string resource, JToken resourceMap)
+    {
+        var filepath = (string?)resourceMap.SelectToken(resource);
+
+        if (string.IsNullOrEmpty(filepath))
+        {
+            throw new InvalidOperationException($"Data {resource} is not available.");
+        }
+        
+        return McInfoRepository.GetAsset(filepath, "main");
+    }
+
+    private static async Task<JToken?> TryGetMinecraftDataResourceMap(string version)
     {
         var resourceMap = await MinecraftDataRepository.GetAsset("data/dataPaths.json");
 
@@ -230,6 +258,13 @@ public class MinecraftData
         return resourceMap["pc"]?[majorVersion];
     }
 
+    private static async Task<JToken?> TryGetMcInfoResourceMap(string version)
+    {
+        var resourceMap = await McInfoRepository.GetAsset("summary.json", "main");
+
+        return resourceMap[version];
+    }
+
     private static Dictionary<string, JToken> LoadProtocolVersions()
     {
         var protocolVersions = (JArray)MinecraftDataRepository.GetAsset("data/pc/common/protocolVersions.json")
@@ -242,13 +277,27 @@ public class MinecraftData
                    x => x);
     }
 
-    private static IWindowData GetWindowData(MinecraftVersion version)
+    private static void ParseAdditionalRegistries(Registries registries, JToken token)
     {
-        return version.Protocol switch
+        var obj = (JObject)token;
+
+        foreach (var property in obj.Properties())
         {
-            >= 765 => new(new WindowVersion1203()),
-            >= 736 => new WindowData(new WindowVersion1161()),
-            _ => throw new NotSupportedException()
-        };
+            var name = Identifier.Parse(property.Name);
+            if (registries.ContainsKey(name))
+            {
+                continue;
+            }
+            
+            var registry = new Registry<RegistryResource>(name);
+
+            foreach (var entry in ((JObject)property.Value).Properties())
+            {
+                var resource = new RegistryResource(Identifier.Parse(entry.Name), (int)entry.Value);
+                registry.Register(resource);
+            }
+
+            registries.Add(registry);
+        }
     }
 }

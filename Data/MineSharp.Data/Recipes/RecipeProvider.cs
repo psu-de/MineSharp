@@ -8,10 +8,10 @@ namespace MineSharp.Data.Recipes;
 
 internal class RecipeProvider : IDataProvider<RecipeDataBlob>
 {
-    private readonly IItemData items;
+    private readonly ItemRegistry items;
     private readonly JObject token;
 
-    public RecipeProvider(JToken token, IItemData items)
+    public RecipeProvider(JToken token, ItemRegistry items)
     {
         if (token.Type != JTokenType.Object)
         {

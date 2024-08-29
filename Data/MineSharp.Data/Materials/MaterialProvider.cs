@@ -10,11 +10,11 @@ namespace MineSharp.Data.Materials;
 internal class MaterialsProvider : IDataProvider<MaterialDataBlob>
 {
     private static readonly EnumNameLookup<Material> MaterialLookup = new();
-    private readonly IItemData items;
+    private readonly ItemRegistry items;
 
     private readonly JObject token;
 
-    public MaterialsProvider(JToken token, IItemData items)
+    public MaterialsProvider(JToken token, ItemRegistry items)
     {
         if (token.Type != JTokenType.Object)
         {

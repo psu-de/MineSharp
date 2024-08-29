@@ -4,7 +4,7 @@
 ///     Interface for implementing a data provider
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IDataProvider<out T>
+public interface IDataProvider<T>
 {
     /// <summary>
     ///     Return all data entries

@@ -52,7 +52,7 @@ internal static class WorldUtils
             return true;
         }
 
-        if (!blockAtFeet.Info.Name.StartsWith("trapdoor"))
+        if (!blockAtFeet.Info.Name.Name.StartsWith("trapdoor"))
         {
             return false;
         }

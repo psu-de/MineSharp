@@ -1,4 +1,6 @@
-﻿namespace MineSharp.Core.Common.Enchantments;
+﻿using MineSharp.Core.Registries;
+
+namespace MineSharp.Core.Common.Enchantments;
 
 /// <summary>
 ///     Descriptor for enchantments
@@ -20,7 +22,7 @@
 public record EnchantmentInfo(
     int Id,
     EnchantmentType Type,
-    string Name,
+    Identifier Name,
     string DisplayName,
     int MaxLevel,
     EnchantCost MinCost,
@@ -31,7 +33,8 @@ public record EnchantmentInfo(
     EnchantmentCategory Category,
     int Weight,
     bool Tradeable,
-    bool Discoverable);
+    bool Discoverable)
+    : IRegistryObject<EnchantmentType>;
 
 /// <summary>
 ///     Enchantment cost

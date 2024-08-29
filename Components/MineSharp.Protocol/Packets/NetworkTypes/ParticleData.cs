@@ -22,7 +22,7 @@ public static class ParticleDataRegistry
 {
     public static IParticleData? Read(PacketBuffer buffer, MinecraftData data, int particleId)
     {
-        var particleTypeIdentifier = data.Particles.GetName(particleId);
+        var particleTypeIdentifier = data.Particles.ByProtocolId(particleId);
         return Read(buffer, data, particleTypeIdentifier);
     }
 

@@ -1,4 +1,5 @@
 ﻿using MineSharp.Core.Common.Enchantments;
+using MineSharp.Core.Registries;
 
 namespace MineSharp.Core.Common.Items;
 
@@ -16,9 +17,10 @@ namespace MineSharp.Core.Common.Items;
 public record ItemInfo(
     int Id,
     ItemType Type,
-    string Name,
+    Identifier Name,
     string DisplayName,
     int StackSize,
     int? MaxDurability,
     EnchantmentCategory[] EnchantCategories,
-    ItemType[] RepairWith);
+    ItemType[] RepairWith) 
+    : IRegistryObject<ItemType>;

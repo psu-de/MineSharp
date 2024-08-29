@@ -15,7 +15,7 @@ public class MinecraftVersion
         var versionNumbers = version.Split(".").Select(x => Convert.ToInt32(x)).ToArray();
         Major = versionNumbers[0];
         Minor = versionNumbers[1];
-        Patch = versionNumbers.Length > 2 ? versionNumbers[2] : 0;
+        Patch = versionNumbers.Length > 2 ? versionNumbers[2] : 1;
         Protocol = protocol;
     }
 

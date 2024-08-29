@@ -1,4 +1,6 @@
-﻿namespace MineSharp.Core.Common.Entities;
+﻿using MineSharp.Core.Registries;
+
+namespace MineSharp.Core.Common.Entities;
 
 /// <summary>
 ///     Entity descriptor class
@@ -14,9 +16,10 @@
 public record EntityInfo(
     int Id,
     EntityType Type,
-    string Name,
+    Identifier Name,
     string DisplayName,
     float Width,
     float Height,
     MobType MobType,
-    EntityCategory Category);
+    EntityCategory Category)
+    : IRegistryObject<EntityType>;

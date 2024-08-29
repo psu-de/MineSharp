@@ -42,12 +42,12 @@ internal class GitHubRepositoryHelper
         }
     }
     
-    public async Task<JToken> GetAsset(string file, string branch = "master")
+    public async Task<JToken> GetAsset(string file, string branchOrTag = "master")
     {
-        var relativePath = GetFilenameWithBranch(file, branch);
+        var relativePath = GetFilenameWithBranch(file, branchOrTag);
         var cachePath = Path.Combine(cache, relativePath);
 
-        if (await CheckIfFileNeedsDownload(file, branch))
+        if (await CheckIfFileNeedsDownload(file, branchOrTag))
         {
             Logger.Debug($"Updating '{relativePath}', because a newer version is available or it does not exist");
             await DownloadAsset(relativePath);
@@ -56,9 +56,9 @@ internal class GitHubRepositoryHelper
         return JToken.Parse(await File.ReadAllTextAsync(cachePath));
     }
     
-    private async Task<bool> CheckIfFileNeedsDownload(string file, string branch)
+    private async Task<bool> CheckIfFileNeedsDownload(string file, string branchOrTag)
     {
-        var relativePath = GetFilenameWithBranch(file, branch);
+        var relativePath = GetFilenameWithBranch(file, branchOrTag);
         var absolutePath = Path.Join(cache, relativePath);
         
         if (!File.Exists(absolutePath))
@@ -66,15 +66,14 @@ internal class GitHubRepositoryHelper
             return true;
         }
 
-        if (assetsLastChecked.TryGetValue(relativePath, out var time)
-            && (DateTime.UtcNow - time) <= InvalidateFilesAfter)
+        if (IsAssetValid(relativePath))
         {
             return false;
         }
 
         var localFileTime = File.GetLastWriteTimeUtc(absolutePath);
         var urlEncodedFile = HttpUtility.UrlEncode($"{file.Replace('\\', '/')}");
-        var url = $"{GITHUB_API_URL}/{repository}/commits?sha={branch}&path={urlEncodedFile}&per_page=1";
+        var url = $"{GITHUB_API_URL}/{repository}/commits?sha={branchOrTag}&path={urlEncodedFile}&per_page=1";
 
         var request = new HttpRequestMessage { RequestUri = new(url), Method = HttpMethod.Get };
         request.Headers.UserAgent.Add(new("MineSharp", "1.0"));
@@ -93,7 +92,7 @@ internal class GitHubRepositoryHelper
                 return false;
             }
 
-            await MarkAssetAsChecked(absolutePath);
+            await MarkAssetAsChecked(relativePath);
             
             var dt = ((DateTime)timeToken).ToUniversalTime();
             return localFileTime - dt <= TimeSpan.Zero;
@@ -127,6 +126,16 @@ internal class GitHubRepositoryHelper
         {
             Logger.Error(e, $"Could not fetch asset '{file}'. Request url: '{url}'");
         }
+    }
+
+    private bool IsAssetValid(string key)
+    {
+        if (!assetsLastChecked.TryGetValue(key, out var lastChecked))
+        {
+            return true;
+        }
+        
+        return (DateTime.UtcNow - lastChecked) < InvalidateFilesAfter;
     }
     
     private Task MarkAssetAsChecked(string key)

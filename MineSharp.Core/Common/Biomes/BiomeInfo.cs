@@ -1,4 +1,6 @@
-﻿namespace MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Registries;
+
+namespace MineSharp.Core.Common.Biomes;
 
 /// <summary>
 ///     Descriptor class for biomes.
@@ -15,10 +17,10 @@
 public record BiomeInfo(
     int Id,
     BiomeType Type,
-    string Name,
+    Identifier Name,
     string DisplayName,
     BiomeCategory Category,
     float Temperature,
     bool Precipitation,
     Dimension Dimension,
-    int Color);
+    int Color) : IRegistryObject<BiomeType>;
