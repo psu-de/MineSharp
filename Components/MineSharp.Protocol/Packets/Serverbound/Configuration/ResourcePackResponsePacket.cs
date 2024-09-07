@@ -1,28 +1,33 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
+using MineSharp.Protocol.Packets.NetworkTypes;
+
 namespace MineSharp.Protocol.Packets.Serverbound.Configuration;
-#pragma warning disable CS1591
-public class ResourcePackResponsePacket : IPacket
+/// <summary>
+///     Resource pack response packet
+/// </summary>
+/// <param name="Result">The result of the resource pack response</param>
+public sealed record ResourcePackResponsePacket(ResourcePackResult Result) : IPacket
 {
-    public ResourcePackResponsePacket(int result)
-    {
-        Result = result;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Configuration_ResourcePackReceive;
 
-    public int Result { get; set; }
-    public PacketType Type => PacketType.SB_Configuration_ResourcePackReceive;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
-        buffer.WriteVarInt(Result);
+        buffer.WriteVarInt((int)Result);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new ResourcePackResponsePacket(
-            buffer.ReadVarInt());
+        var result = (ResourcePackResult)buffer.ReadVarInt();
+
+        return new ResourcePackResponsePacket(result);
     }
+
 }
-#pragma warning restore CS1591

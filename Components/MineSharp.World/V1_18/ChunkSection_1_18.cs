@@ -1,7 +1,7 @@
-﻿using MineSharp.Core.Common;
-using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Geometry;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.World.Chunks;
 using MineSharp.World.Containers;
@@ -19,12 +19,13 @@ internal class ChunkSection118 : IChunkSection
     public ChunkSection118(MinecraftData data, short blockCount, BlockContainer blocks, BiomeContainer biomes)
     {
         this.data = data;
-        SolidBlockCount = blockCount;
+        solidBlockCount = blockCount;
         blockContainer = blocks;
         biomeContainer = biomes;
     }
 
-    public short SolidBlockCount { get; set; }
+    private int solidBlockCount;
+    public short SolidBlockCount => (short)solidBlockCount;
 
     public int GetBlockAt(Position position)
     {
@@ -44,11 +45,11 @@ internal class ChunkSection118 : IChunkSection
         {
             if (isSolid)
             {
-                SolidBlockCount++;
+                Interlocked.Increment(ref solidBlockCount);
             }
             else
             {
-                SolidBlockCount--;
+                Interlocked.Decrement(ref solidBlockCount);
             }
         }
 

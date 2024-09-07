@@ -7,6 +7,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

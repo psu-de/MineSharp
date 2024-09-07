@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -8,10 +8,12 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Finish configuration packet
 ///     See https://wiki.vg/Protocol#Finish_Configuration
 /// </summary>
-public class FinishConfigurationPacket : IPacket
+public sealed record FinishConfigurationPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_FinishConfiguration;
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Configuration_FinishConfiguration;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)

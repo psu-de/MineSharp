@@ -1,4 +1,5 @@
-﻿using MineSharp.Data.Biomes;
+﻿using MineSharp.Core.Common;
+using MineSharp.Data.Biomes;
 using MineSharp.Data.BlockCollisionShapes;
 using MineSharp.Data.Blocks;
 using MineSharp.Data.Effects;
@@ -9,6 +10,7 @@ using MineSharp.Data.Framework;
 using MineSharp.Data.Items;
 using MineSharp.Data.Language;
 using MineSharp.Data.Materials;
+using MineSharp.Data.Particles;
 using MineSharp.Data.Protocol;
 using MineSharp.Data.Recipes;
 using MineSharp.Data.Windows;
@@ -49,6 +51,7 @@ public class MinecraftData
         IRecipeData recipes,
         IWindowData windows,
         ILanguageData language,
+        IParticleData particles,
         MinecraftVersion version)
     {
         Biomes = biomes;
@@ -63,6 +66,7 @@ public class MinecraftData
         Recipes = recipes;
         Windows = windows;
         Language = language;
+        Particles = particles;
         Version = version;
     }
 
@@ -125,9 +129,14 @@ public class MinecraftData
     ///     The language data provider for this version
     /// </summary>
     public ILanguageData Language { get; }
+    
+    /// <summary>
+    /// The particle data for this version
+    /// </summary>
+    public IParticleData Particles { get; }
 
     /// <summary>
-    ///     The minecraft version of this instance
+    ///     The Minecraft version of this instance
     /// </summary>
     public MinecraftVersion Version { get; }
 
@@ -164,6 +173,7 @@ public class MinecraftData
         var materialsToken = await LoadAsset("materials", versionToken);
         var recipesToken = await LoadAsset("recipes", versionToken);
         var languageToken = await LoadAsset("language", versionToken);
+        var particleToken = await LoadAsset("particles", versionToken);
 
         var biomes = new BiomeData(new BiomeProvider(biomeToken));
         var items = new ItemData(new ItemProvider(itemsToken));
@@ -176,6 +186,7 @@ public class MinecraftData
         var materials = new MaterialData(new MaterialsProvider(materialsToken, items));
         var recipes = new RecipeData(new(recipesToken, items));
         var language = new LanguageData(new LanguageProvider(languageToken));
+        var particles = new ParticleData(new ParticleDataProvider(particleToken));
         var windows = GetWindowData(minecraftVersion);
 
         var data = new MinecraftData(
@@ -191,6 +202,7 @@ public class MinecraftData
             recipes,
             windows,
             language,
+            particles,
             minecraftVersion);
 
         LoadedData.Add(version, data);

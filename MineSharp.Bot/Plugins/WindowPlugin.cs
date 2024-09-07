@@ -4,6 +4,7 @@ using MineSharp.Bot.Windows;
 using MineSharp.Core.Common;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Concurrency;
 using MineSharp.Core.Events;
 using MineSharp.Core.Geometry;
 using MineSharp.Data.Windows;
@@ -20,7 +21,7 @@ using SBHeldItemPacket = MineSharp.Protocol.Packets.Serverbound.Play.SetHeldItem
 namespace MineSharp.Bot.Plugins;
 
 /// <summary>
-///     The Window plugin takes care of minecraft window's system.
+///     The Window plugin takes care of Minecraft window's system.
 ///     It handles the Bot's Inventory, window slot updates and provides
 ///     methods to open blocks like chests, crafting tables, ...
 /// </summary>
@@ -44,7 +45,7 @@ public class WindowPlugin : Plugin
     /// <param name="bot"></param>
     public WindowPlugin(MineSharpBot bot) : base(bot)
     {
-        inventoryLoadedTsc = new();
+        inventoryLoadedTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
         openWindows = new ConcurrentDictionary<int, Window>();
         windowLock = new();
 
@@ -58,10 +59,12 @@ public class WindowPlugin : Plugin
 
         CreativeInventory = new(bot);
 
-        Bot.Client.On<WindowItemsPacket>(HandleWindowItems);
-        Bot.Client.On<WindowSetSlotPacket>(HandleSetSlot);
-        Bot.Client.On<CBHeldItemPacket>(HandleHeldItemChange);
-        Bot.Client.On<OpenWindowPacket>(HandleOpenWindow);
+        // OnPacketAfterInitialization is required to ensure that the plugin is initialized
+        // before handling packets. Otherwise we have race conditions that might cause errors
+        OnPacketAfterInitialization<WindowItemsPacket>(HandleWindowItems);
+        OnPacketAfterInitialization<WindowSetSlotPacket>(HandleSetSlot);
+        OnPacketAfterInitialization<CBHeldItemPacket>(HandleHeldItemChange);
+        OnPacketAfterInitialization<OpenWindowPacket>(HandleOpenWindow);
     }
 
     /// <summary>
@@ -102,12 +105,12 @@ public class WindowPlugin : Plugin
     public AsyncEvent<MineSharpBot, Item?> OnHeldItemChanged = new();
 
     /// <inheritdoc />
-    protected override Task Init()
+    protected override async Task Init()
     {
         playerPlugin = Bot.GetPlugin<PlayerPlugin>();
+        await playerPlugin.WaitForInitialization().WaitAsync(Bot.CancellationToken);
 
         CreateInventory();
-        return base.Init();
     }
 
     /// <summary>
@@ -133,7 +136,7 @@ public class WindowPlugin : Plugin
             throw new ArgumentException("Cannot open block of type " + block.Info.Name);
         }
 
-        openContainerTsc = new();
+        openContainerTsc = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var packet = new PlaceBlockPacket(
             (int)PlayerHand.MainHand,
@@ -207,8 +210,8 @@ public class WindowPlugin : Plugin
         await Bot.Client.SendPacket(packet);
 
         SelectedHotbarIndex = hotbarIndex;
-        
-        await OnHeldItemChanged.Dispatch(Bot, HeldItem);
+
+        _ = OnHeldItemChanged.Dispatch(Bot, HeldItem);
     }
 
     /// <summary>
@@ -224,6 +227,199 @@ public class WindowPlugin : Plugin
     }
 
     /// <summary>
+    ///     Confirmation flags for eating a food item.
+    /// </summary>
+    [Flags]
+    public enum EatFoodItemConfirmation
+    {
+        /// <summary>
+        ///     No confirmation.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        ///     Confirm if food or saturation value increased.
+        /// </summary>
+        FoodOrSaturationValueIncreased = 1 << 0,
+
+        /// <summary>
+        ///     Confirm if food item count decreased.
+        /// </summary>
+        FoodItemCountDecreased = 1 << 1,
+
+        /// <summary>
+        ///     Confirm all conditions.
+        /// </summary>
+        All = FoodOrSaturationValueIncreased | FoodItemCountDecreased
+    }
+
+    /// <summary>
+    ///     Reasons why eating food was canceled.
+    /// </summary>
+    public enum EatFoodItemResult
+    {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        /// <summary>
+        /// This value is internal and should never be returned.
+        /// </summary>
+        Unknown,
+        SuccessfullyEaten,
+        CancelledUserRequested,
+        CancelledBotDisconnected,
+        CancelledBotDied,
+        CancelledFoodItemSlotChanged,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    }
+
+    /// <summary>
+    ///     Makes the bot eat a food item from the specified hand.
+    /// </summary>
+    /// <param name="hand">The hand from which to eat the food item.</param>
+    /// <param name="eatFoodItemConfirmation">The confirmation flags determining what checks should be made to ensure the food was eaten (server side).</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the task.</param>
+    /// <returns>A task that completes once the food was eaten or eating the food was cancelled.</returns>
+    public async Task<EatFoodItemResult> EatFoodItem(PlayerHand hand = PlayerHand.MainHand, EatFoodItemConfirmation eatFoodItemConfirmation = EatFoodItemConfirmation.All, CancellationToken cancellationToken = default)
+    {
+        var foodSlot = await GetSlotForPlayerHand(hand);
+
+        // TODO: Also check whether the item is eatable
+        if (foodSlot is null)
+        {
+            throw new Exception("No food item found in hand");
+        }
+
+        var result = EatFoodItemResult.Unknown;
+
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(Bot.CancellationToken, cancellationToken);
+        var token = cts.Token;
+        var botDiedTask = Bot.Client.WaitForPacketWhere<SetHealthPacket>(packet => packet.Health <= 0, token)
+            .ContinueWith(_ =>
+            {
+                InterlockedHelper.CompareExchangeIfNot(ref result, EatFoodItemResult.CancelledBotDied, EatFoodItemResult.SuccessfullyEaten);
+                Logger.Debug("Bot died while eating food.");
+                return cts.CancelAsync();
+            }, TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously);
+
+        var currentFood = playerPlugin!.Food;
+        var currentSaturation = playerPlugin!.Saturation;
+        var foodValueIncreasedTask = eatFoodItemConfirmation.HasFlag(EatFoodItemConfirmation.FoodOrSaturationValueIncreased)
+            ? Bot.Client.WaitForPacketWhere<SetHealthPacket>(packet => packet.Food > currentFood || packet.Saturation > currentSaturation, token)
+            // for debugging race conditions
+            //.ContinueWith(t =>
+            //{
+            //    var packet = t.Result;
+            //    Logger.Debug("Eat finish SetHealthPacket: {Health} {Food} {Saturation}", packet.Health, packet.Food, packet.Saturation);
+            //}, TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously)
+            : Task.CompletedTask;
+
+        TaskCompletionSource? foodItemCountDecreasedTcs = null;
+        CancellationTokenRegistration cancellationTokenRegistration = default;
+        Task foodSlotUpdatedTask = Task.CompletedTask;
+        if (eatFoodItemConfirmation.HasFlag(EatFoodItemConfirmation.FoodItemCountDecreased))
+        {
+            foodItemCountDecreasedTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            cancellationTokenRegistration = token.Register(() => foodItemCountDecreasedTcs.TrySetCanceled());
+            foodSlotUpdatedTask = foodItemCountDecreasedTcs.Task;
+        }
+        Inventory!.OnSlotChanged += HandleSlotUpdate;
+        Task HandleSlotUpdate(Window window, short index)
+        {
+            var slot = window.GetSlot(index);
+            if (slot.SlotIndex == foodSlot.SlotIndex)
+            {
+                var itemTypeMatches = slot.Item?.Info.Type == foodSlot.Item!.Info.Type;
+                var currentCount = slot.Item?.Count ?? 0;
+                if (currentCount == 0 || itemTypeMatches)
+                {
+                    if (eatFoodItemConfirmation.HasFlag(EatFoodItemConfirmation.FoodItemCountDecreased))
+                    {
+                        if (currentCount > foodSlot.Item!.Count)
+                        {
+                            // player picked up more food
+                            // we need to update our expected food count
+                            foodSlot.Item!.Count = currentCount;
+                        }
+                        else if (currentCount < foodSlot.Item!.Count)
+                        {
+                            // food item got removed from slot
+                            foodItemCountDecreasedTcs!.TrySetResult();
+                        }
+                    }
+                }
+                // not else if. Do both
+                if (!itemTypeMatches)
+                {
+                    // food item got removed or replaced from slot
+                    // the case that the food count reached zero can be both an cancel reason and a success reason
+                    InterlockedHelper.CompareExchange(ref result, EatFoodItemResult.CancelledFoodItemSlotChanged, EatFoodItemResult.Unknown);
+                    return cts.CancelAsync();
+                }
+            }
+            return Task.CompletedTask;
+        }
+        await UseItem(hand);
+
+        EatFoodItemResult finalResult = EatFoodItemResult.Unknown;
+        try
+        {
+            // wait for food to be eaten
+            // no WaitAsync here because both tasks will get canceled
+            await Task.WhenAll(foodValueIncreasedTask, foodSlotUpdatedTask);
+            // TODO: Maybe here is a race condition when the foodSlotUpdatedTask finishes (item == null) so that foodValueIncreasedTask gets canceled before the packet gets handled
+            // or that the player died but the died packet came in later
+            // ^^ only solution would be a packetReceiveIndex or synchronous packet handling
+
+            // here we do not use interlocked because it commonly happens that the result is set to CancelledFoodItemSlotChanged (item == null)
+            // but that is a this a success case
+            result = EatFoodItemResult.SuccessfullyEaten;
+            Logger.Debug("Bot ate food of type {FoodType} at slot {SlotIndex}.", foodSlot.Item?.Info.Type, foodSlot.SlotIndex);
+        }
+        catch (OperationCanceledException)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                InterlockedHelper.CompareExchange(ref result, EatFoodItemResult.CancelledUserRequested, EatFoodItemResult.Unknown);
+            }
+            else if (Bot.CancellationToken.IsCancellationRequested)
+            {
+                InterlockedHelper.CompareExchange(ref result, EatFoodItemResult.CancelledBotDisconnected, EatFoodItemResult.Unknown);
+            }
+        }
+        finally
+        {
+            Inventory!.OnSlotChanged -= HandleSlotUpdate;
+            cancellationTokenRegistration.Dispose();
+
+            // cancel the other WaitForPacket tasks (like botDiedTask)
+            await cts.CancelAsync();
+            cts.Dispose();
+            finalResult = result;
+            if (finalResult != EatFoodItemResult.SuccessfullyEaten)
+            {
+                Logger.Debug("Eating food of type {FoodType} at slot {SlotIndex} was cancelled with reason: {CancelReason}.", foodSlot.Item?.Info.Type, foodSlot.SlotIndex, finalResult);
+            }
+        }
+        // if it occurs that the cancelReason is not EatFoodCancelReason.None but the "Bot ate food" is logged than there is a race condition
+        return finalResult;
+    }
+
+    /// <summary>
+    ///     Gets the slot for the specified player hand.
+    /// </summary>
+    /// <param name="hand">The hand to get the slot for.</param>
+    /// <returns>The slot corresponding to the specified hand.</returns>
+    public async Task<Slot> GetSlotForPlayerHand(PlayerHand hand)
+    {
+        await WaitForInventory();
+
+        var slot = hand == PlayerHand.MainHand
+            ? Inventory!.GetSlot((short)(PlayerWindowSlots.HotbarStart + SelectedHotbarIndex))
+            : Inventory!.GetSlot(Inventory.Slot.OffHand);
+
+        return slot;
+    }
+
+    /// <summary>
     ///     Search inventory for item of type <paramref name="type" />, and put it
     ///     in the bots <paramref name="hand" />.
     /// </summary>
@@ -232,11 +428,7 @@ public class WindowPlugin : Plugin
     /// <returns></returns>
     public async Task EquipItem(ItemType type, PlayerHand hand = PlayerHand.MainHand)
     {
-        await WaitForInventory();
-
-        var handSlot = hand == PlayerHand.MainHand
-            ? Inventory!.GetSlot((short)(PlayerWindowSlots.HotbarStart + SelectedHotbarIndex))
-            : Inventory!.GetSlot(Inventory.Slot.OffHand);
+        var handSlot = await GetSlotForPlayerHand(hand);
 
         _EquipItem(type, handSlot);
     }
@@ -302,11 +494,11 @@ public class WindowPlugin : Plugin
 
     private Window OpenWindow(int id, WindowInfo windowInfo)
     {
-        Logger.Debug("Opening window with id=" + id);
+        Logger.Debug("Opening window with id={WindowId}", id);
 
         if (openWindows.ContainsKey(id))
         {
-            throw new ArgumentException("Window with id " + id + " already opened");
+            throw new ArgumentException($"Window with id {id} already opened");
         }
 
         var window = new Window(
@@ -320,7 +512,7 @@ public class WindowPlugin : Plugin
         {
             if (!openWindows.TryAdd(id, window))
             {
-                Logger.Warn($"Could not add window with id {id}, it already existed.");
+                Logger.Warn("Could not add window with id {WindowId}, it already existed.", id);
             }
         }
 
@@ -333,7 +525,7 @@ public class WindowPlugin : Plugin
             && DateTime.Now - cacheTimestamp! <= TimeSpan.FromSeconds(5))
         {
             // use cache
-            Logger.Debug("Applying cached window items for window with id=" + id);
+            Logger.Debug("Applying cached window items for window with id={WindowId}", id);
             HandleWindowItems(cachedWindowItemsPacket);
         }
 
@@ -385,18 +577,17 @@ public class WindowPlugin : Plugin
         }
         else if (!openWindows.TryGetValue(packet.WindowId, out window))
         {
-            Logger.Warn($"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened");
+            Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened", nameof(WindowSetSlotPacket), packet.WindowId);
             return Task.CompletedTask;
         }
 
         if (window == null)
         {
-            Logger.Warn(
-                $"Received {nameof(WindowSetSlotPacket)} for windowId={packet.WindowId}, but its not opened, {CurrentlyOpenedWindow?.ToString() ?? "null"}, {Inventory?.ToString() ?? "null"}");
+            Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened, {CurrentlyOpenedWindow}, {Inventory}", nameof(WindowSetSlotPacket), packet.WindowId, CurrentlyOpenedWindow?.ToString() ?? "null", Inventory?.ToString() ?? "null");
             return Task.CompletedTask;
         }
 
-        Logger.Debug("Handle set slot: {Slot}", packet.Slot);
+        // Logger.Debug("Handle set slot: {Slot}", packet.Slot);
 
         window.StateId = packet.StateId;
         window.SetSlot(packet.Slot);
@@ -411,7 +602,7 @@ public class WindowPlugin : Plugin
         {
             if (!openWindows.TryGetValue(packet.WindowId, out window))
             {
-                Logger.Warn($"Received {packet.GetType().Name} for windowId={packet.WindowId}, but its not opened");
+                Logger.Warn("Received {PacketType} for windowId={WindowId}, but it's not opened", packet.GetType().Name, packet.WindowId);
 
                 // Cache items in case it gets opened in a bit
                 cachedWindowItemsPacket = packet;
@@ -420,7 +611,7 @@ public class WindowPlugin : Plugin
                 return Task.CompletedTask;
             }
 
-            Logger.Debug($"HandleWindowItems for window {window.Title}");
+            Logger.Debug("HandleWindowItems for window {WindowTitle}", window.Title);
         }
 
         var slots = packet.Items
@@ -429,9 +620,9 @@ public class WindowPlugin : Plugin
         window.StateId = packet.StateId;
         window.SetSlots(slots);
 
-        if (window.WindowId == 0 && !inventoryLoadedTsc.Task.IsCompleted)
+        if (window.WindowId == 0)
         {
-            inventoryLoadedTsc.SetResult();
+            inventoryLoadedTsc.TrySetResult();
         }
 
         return Task.CompletedTask;
@@ -449,7 +640,7 @@ public class WindowPlugin : Plugin
         var windowInfo = Bot.Data.Windows.ById(packet.InventoryType);
 
         windowInfo = windowInfo with { Title = packet.WindowTitle };
-        Logger.Debug($"Received Open Window Packet id={packet.WindowId}");
+        Logger.Debug("Received Open Window Packet id={WindowId}", packet.WindowId);
         OpenWindow(packet.WindowId, windowInfo);
 
         return Task.CompletedTask;

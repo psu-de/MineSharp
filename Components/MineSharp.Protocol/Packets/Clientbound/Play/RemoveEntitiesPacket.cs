@@ -1,18 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class RemoveEntitiesPacket : IPacket
+public sealed record RemoveEntitiesPacket(int[] EntityIds) : IPacket
 {
-    public RemoveEntitiesPacket(int[] entityIds)
-    {
-        EntityIds = entityIds;
-    }
-
-    public int[] EntityIds { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityDestroy;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_EntityDestroy;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

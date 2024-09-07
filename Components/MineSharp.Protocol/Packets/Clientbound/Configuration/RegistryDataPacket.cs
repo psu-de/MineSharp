@@ -1,5 +1,5 @@
 ﻿using fNbt;
-using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
@@ -9,25 +9,26 @@ namespace MineSharp.Protocol.Packets.Clientbound.Configuration;
 ///     Registry data packet
 ///     See https://wiki.vg/Protocol#Registry_Data
 /// </summary>
-public class RegistryDataPacket : IPacket
+/// <param name="RegistryData">The registry data</param>
+public sealed record RegistryDataPacket(NbtCompound RegistryData) : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Configuration_RegistryData;
-    
-    /// <summary>
-    ///     The registry data
-    /// </summary>
-    public required NbtCompound RegistryData { get; init; }
-    
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Configuration_RegistryData;
+
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteNbt(RegistryData);
     }
-    
+
     /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
-        return new RegistryDataPacket() { RegistryData = buffer.ReadNbtCompound() };
+        var registryData = buffer.ReadNbtCompound();
+        registryData = registryData.NormalizeRegistryDataTopLevelIdentifiers();
+        return new RegistryDataPacket(registryData);
     }
 }
+

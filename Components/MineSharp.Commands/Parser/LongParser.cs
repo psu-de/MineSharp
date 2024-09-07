@@ -1,16 +1,19 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class LongParser : IParser
 {
+    public static readonly Identifier BrigadierLongIdentifier = Identifier.Parse("brigadier:long");
+
     public long Min { get; private set; }
     public long Max { get; private set; }
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "brigadier:long";
+        return BrigadierLongIdentifier;
     }
 
     public int GetArgumentCount()

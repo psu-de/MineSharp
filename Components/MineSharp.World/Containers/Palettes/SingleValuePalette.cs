@@ -1,4 +1,4 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 
 namespace MineSharp.World.Containers.Palettes;
 
@@ -32,8 +32,9 @@ internal class SingleValuePalette : IPalette
 
         var count = (int)Math.Ceiling(container.Capacity / (64.0F / container.MinBits));
         var lData = new long[count];
-        container.Data = new(lData, container.MaxBits);
-        container.Data.Set(index, 1);
+        var newData = new IntBitArray(lData, container.MinBits);
+        newData.Set(index, 1);
+        container.Data = newData;
 
         return new IndirectPalette(map);
     }

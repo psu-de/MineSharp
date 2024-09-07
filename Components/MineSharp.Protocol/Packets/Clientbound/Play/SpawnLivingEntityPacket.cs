@@ -1,47 +1,46 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     SpawnLivingEntityPacket used for versions &lt;= 1.18.2
 /// </summary>
-public class SpawnLivingEntityPacket : IPacket
+/// <param name="EntityId">The ID of the entity.</param>
+/// <param name="EntityUuid">The UUID of the entity.</param>
+/// <param name="EntityType">The type of the entity.</param>
+/// <param name="X">The X coordinate of the entity.</param>
+/// <param name="Y">The Y coordinate of the entity.</param>
+/// <param name="Z">The Z coordinate of the entity.</param>
+/// <param name="Yaw">The yaw of the entity.</param>
+/// <param name="Pitch">The pitch of the entity.</param>
+/// <param name="HeadPitch">The head pitch of the entity.</param>
+/// <param name="VelocityX">The X velocity of the entity.</param>
+/// <param name="VelocityY">The Y velocity of the entity.</param>
+/// <param name="VelocityZ">The Z velocity of the entity.</param>
+public sealed record SpawnLivingEntityPacket(
+    int EntityId,
+    Uuid EntityUuid,
+    int EntityType,
+    double X,
+    double Y,
+    double Z,
+    byte Yaw,
+    byte Pitch,
+    byte HeadPitch,
+    short VelocityX,
+    short VelocityY,
+    short VelocityZ
+) : IPacket
 {
-    public SpawnLivingEntityPacket(int entityId, Uuid entityUuid, int entityType, double x, double y, double z,
-                                   byte yaw, byte pitch,
-                                   byte headPitch, short velocityX, short velocityY, short velocityZ)
-    {
-        EntityId = entityId;
-        EntityUuid = entityUuid;
-        EntityType = entityType;
-        X = x;
-        Y = y;
-        Z = z;
-        Yaw = yaw;
-        Pitch = pitch;
-        HeadPitch = headPitch;
-        VelocityX = velocityX;
-        VelocityY = velocityY;
-        VelocityZ = velocityZ;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_SpawnEntityLiving;
 
-
-    public int EntityId { get; set; }
-    public Uuid EntityUuid { get; set; }
-    public int EntityType { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Z { get; set; }
-    public byte Yaw { get; set; }
-    public byte Pitch { get; set; }
-    public byte HeadPitch { get; set; }
-    public short VelocityX { get; set; }
-    public short VelocityY { get; set; }
-    public short VelocityZ { get; set; }
-    public PacketType Type => PacketType.CB_Play_SpawnEntityLiving;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(EntityId);
@@ -58,6 +57,7 @@ public class SpawnLivingEntityPacket : IPacket
         buffer.WriteShort(VelocityZ);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         return new SpawnLivingEntityPacket(
@@ -72,7 +72,7 @@ public class SpawnLivingEntityPacket : IPacket
             buffer.ReadByte(),
             buffer.ReadShort(),
             buffer.ReadShort(),
-            buffer.ReadShort());
+            buffer.ReadShort()
+        );
     }
 }
-#pragma warning restore CS1591

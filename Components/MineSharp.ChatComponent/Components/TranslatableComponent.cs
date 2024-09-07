@@ -101,11 +101,16 @@ public class TranslatableComponent : Chat
         var with = With.Select(x => x.GetMessage(data)).ToArray();
         if (data == null)
         {
-            Logger.Warn("Cannot translate message because no minecraft data was provided!");
+            Logger.Warn("Cannot translate message because no minecraft data was provided! For: {TranslationKey}", Translation);
             return string.Join(' ', with);
         }
 
         var rule = data.Language.GetTranslation(Translation)!;
+        if (rule == null)
+        {
+            Logger.Warn("Cannot translate message because no translation string was found! For: {TranslationKey}", Translation);
+            return string.Join(' ', with);
+        }
         return TranslateString(rule, with);
     }
 
@@ -151,9 +156,50 @@ public class TranslatableComponent : Chat
         var with = Array.Empty<Chat>();
         if (obj.TryGet("with", out var withToken))
         {
-            with = (withToken as NbtList)!.Select(Chat.Parse).ToArray();
+            with = ParseArguments(withToken!);
         }
 
         return new(translate, with, Style.Parse(tag), ParseChildren(tag));
+    }
+
+    private static Chat[] ParseArguments(NbtTag tag)
+    {
+        // as of 1.20.3 and the introduction of chat components via nbt,
+        // TranslatableComponents allow arguments to be the primitive types
+        // of java.lang.Number (byte, double, float, integer, ...), boolean and strings
+        
+        // because NbtLists only allow elements of the same tag, these primitives types
+        // are sometimes wrapped in a TAG_Compound
+
+        return tag switch
+        {
+            NbtLongArray longArray => longArray.Value.Select(Chat (x) => new TextComponent(x.ToString())).ToArray(),
+
+            NbtIntArray intArray => intArray.Value.Select(Chat (x) => new TextComponent(x.ToString())).ToArray(),
+
+            NbtByteArray byteArray => byteArray.Value.Select(Chat (x) => new TextComponent(x.ToString())).ToArray(),
+
+            NbtList list => list.Select(ParseArgument).ToArray(),
+            
+            _ => throw new ArgumentException($"Unexpected tag type: {tag.TagType}")
+        };
+    }
+
+    private static Chat ParseArgument(NbtTag tag)
+    {
+        if (tag.TagType != NbtTagType.Compound)
+        {
+            return new TextComponent(tag.StringValue);
+        }
+        
+        var compound = (tag as NbtCompound)!;
+        if (compound.Count == 1 && compound.TryGet("", out var primitive))
+        {
+            // it's a primitive value wrapped in a compound
+            return new TextComponent(primitive.StringValue);
+        }
+        
+        // it's a normal chat component
+        return Chat.Parse(compound);
     }
 }

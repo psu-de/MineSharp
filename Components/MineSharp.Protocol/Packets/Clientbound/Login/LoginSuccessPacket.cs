@@ -1,33 +1,25 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
+using static MineSharp.Protocol.Packets.Clientbound.Login.LoginSuccessPacket;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Login;
 
 /// <summary>
 ///     Login success packet
 /// </summary>
-public class LoginSuccessPacket : IPacket
+/// <param name="Uuid">Uuid</param>
+/// <param name="Username">Username of the client</param>
+/// <param name="Properties">A list of properties sent for versions &gt;= 1.19</param>
+public sealed record LoginSuccessPacket(Uuid Uuid, string Username, Property[]? Properties = null) : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Login_Success;
-    
-    /// <summary>
-    ///     Uuid
-    /// </summary>
-    public required Uuid Uuid { get; init; }
-
-    /// <summary>
-    ///     Username of the client
-    /// </summary>
-    public required string Username { get; init; }
-
-    /// <summary>
-    ///     A list of properties sent for versions &gt;= 1.19
-    /// </summary>
-    public Property[]? Properties { get; init; } = null;
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Login_Success;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -60,34 +52,14 @@ public class LoginSuccessPacket : IPacket
             properties = buffer.ReadVarIntArray(Property.Read);
         }
 
-        return new LoginSuccessPacket()
-        {
-            Uuid = uuid,
-            Username = username,
-            Properties = properties
-        };
+        return new LoginSuccessPacket(uuid, username, properties);
     }
 
     /// <summary>
     ///     A player property
     /// </summary>
-    public class Property : ISerializable<Property>
+    public sealed record Property(string Name, string Value, string? Signature) : ISerializable<Property>
     {
-        /// <summary>
-        ///     Name of this property
-        /// </summary>
-        public required string Name { get; init; }
-
-        /// <summary>
-        ///     Value of this property
-        /// </summary>
-        public required string Value { get; init; }
-
-        /// <summary>
-        ///     Signature
-        /// </summary>
-        public required string? Signature { get; init; }
-
         /// <inheritdoc />
         public void Write(PacketBuffer buffer)
         {
@@ -113,7 +85,7 @@ public class LoginSuccessPacket : IPacket
                 signature = buffer.ReadString();
             }
 
-            return new() { Name = name, Value = value, Signature = signature };
+            return new Property(name, value, signature);
         }
     }
 }

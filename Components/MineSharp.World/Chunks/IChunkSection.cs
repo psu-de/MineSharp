@@ -13,7 +13,7 @@ public interface IChunkSection
     /// <summary>
     ///     The number of solid blocks in this chunk section.
     /// </summary>
-    public short SolidBlockCount { get; protected set; }
+    public short SolidBlockCount { get; }
 
     /// <summary>
     ///     Returns the Block at the given position.

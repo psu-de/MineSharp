@@ -1,45 +1,23 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     ChatPacket only used for versions &lt;= 1.18.2.
 ///     It was replaced by multiple packets in 1.19
 /// </summary>
-public class ChatPacket : IPacket
+/// <param name="Message">The chat message</param>
+/// <param name="Position">The position of the chat message</param>
+/// <param name="Sender">The UUID of the message sender</param>
+public sealed record ChatPacket(string Message, byte Position, Uuid Sender) : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="message"></param>
-    /// <param name="position"></param>
-    /// <param name="sender"></param>
-    public ChatPacket(string message, byte position, Uuid sender)
-    {
-        Message = message;
-        Position = position;
-        Sender = sender;
-    }
-
-    /// <summary>
-    ///     The chat message
-    /// </summary>
-    public string Message { get; set; }
-
-    /// <summary>
-    ///     The position of the chat message
-    /// </summary>
-    public byte Position { get; set; }
-
-    /// <summary>
-    ///     The UUID of the message sender
-    /// </summary>
-    public Uuid Sender { get; set; }
-
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_Chat;
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_Chat;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -58,4 +36,4 @@ public class ChatPacket : IPacket
             buffer.ReadUuid());
     }
 }
-#pragma warning restore CS1591
+

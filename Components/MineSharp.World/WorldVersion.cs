@@ -1,4 +1,5 @@
-﻿using MineSharp.Data;
+﻿using MineSharp.Core.Common;
+using MineSharp.Data;
 using MineSharp.World.V1_18;
 
 namespace MineSharp.World;
@@ -8,19 +9,18 @@ namespace MineSharp.World;
 /// </summary>
 public static class WorldVersion
 {
-    private static readonly MinecraftVersion Major118 = new("1.18", -1);
-
     /// <summary>
     ///     Create a new IWorld for the given version
     /// </summary>
     /// <param name="version"></param>
+    /// <param name="dimension"></param>
     /// <returns></returns>
     /// <exception cref="NotSupportedException"></exception>
-    public static IWorld CreateWorld(MinecraftData version)
+    public static IAsyncWorld CreateWorld(MinecraftData version, Dimension dimension)
     {
-        if (version.Version >= Major118)
+        if (version.Version >= DimensionInfo.MinecraftVersionMajor118)
         {
-            return new World118(version);
+            return new World118(version, DimensionInfo.FromDimension(dimension));
         }
 
         throw new NotSupportedException(

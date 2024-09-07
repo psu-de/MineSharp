@@ -1,13 +1,13 @@
 ﻿using MineSharp.Core;
 using MineSharp.Core.Common;
-using MineSharp.Data;
+using MineSharp.Core.Serialization;
 
 namespace MineSharp.Protocol.Packets.NetworkTypes;
 
 /// <summary>
 ///     Represents a signed chat message
 /// </summary>
-public class ChatMessageItem
+public class ChatMessageItem : ISerializable<ChatMessageItem>
 {
     /// <summary>
     ///     Creates a new instance
@@ -50,9 +50,9 @@ public class ChatMessageItem
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="version"></param>
-    public void Write(PacketBuffer buffer, MinecraftData version)
+    public void Write(PacketBuffer buffer)
     {
-        if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
+        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_2)
         {
             buffer.WriteUuid(Sender!.Value);
             buffer.WriteVarInt(Signature!.Length);
@@ -74,12 +74,12 @@ public class ChatMessageItem
     /// <param name="buffer"></param>
     /// <param name="version"></param>
     /// <returns></returns>
-    public static ChatMessageItem Read(PacketBuffer buffer, MinecraftData version)
+    public static ChatMessageItem Read(PacketBuffer buffer)
     {
         Uuid? uuid = null;
         byte[]? signature = null;
 
-        if (version.Version.Protocol == ProtocolVersion.V_1_19_2)
+        if (buffer.ProtocolVersion == ProtocolVersion.V_1_19_2)
         {
             uuid = buffer.ReadUuid();
             signature = new byte[buffer.ReadVarInt()];

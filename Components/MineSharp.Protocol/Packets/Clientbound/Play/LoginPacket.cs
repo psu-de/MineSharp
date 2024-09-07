@@ -2,82 +2,66 @@
 using MineSharp.Core;
 using MineSharp.Core.Common;
 using MineSharp.Core.Geometry;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Exceptions;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class LoginPacket : IPacket
+
+/// <summary>
+/// Represents a login packet.
+/// </summary>
+/// <param name="EntityId">The entity ID.</param>
+/// <param name="IsHardcore">Indicates if the game is in hardcore mode.</param>
+/// <param name="GameMode">The current game mode.</param>
+/// <param name="PreviousGameMode">The previous game mode.</param>
+/// <param name="DimensionNames">The names of the dimensions.</param>
+/// <param name="RegistryCodec">The registry codec.</param>
+/// <param name="DimensionType">The type of the dimension.</param>
+/// <param name="DimensionName">The name of the dimension.</param>
+/// <param name="HashedSeed">The hashed seed.</param>
+/// <param name="MaxPlayers">The maximum number of players.</param>
+/// <param name="ViewDistance">The view distance.</param>
+/// <param name="SimulationDistance">The simulation distance.</param>
+/// <param name="ReducedDebugInfo">Indicates if reduced debug info is enabled.</param>
+/// <param name="EnableRespawnScreen">Indicates if the respawn screen is enabled.</param>
+/// <param name="IsDebug">Indicates if the game is in debug mode.</param>
+/// <param name="IsFlat">Indicates if the world is flat.</param>
+/// <param name="HasDeathLocation">Indicates if there is a death location.</param>
+/// <param name="DeathDimensionName">The name of the death dimension.</param>
+/// <param name="DeathLocation">The death location.</param>
+/// <param name="PortalCooldown">The portal cooldown.</param>
+/// <param name="DoLimitedCrafting">Indicates if limited crafting is enabled.</param>
+public sealed record LoginPacket(
+    int EntityId,
+    bool IsHardcore,
+    byte GameMode,
+    sbyte PreviousGameMode,
+    Identifier[] DimensionNames,
+    NbtCompound? RegistryCodec,
+    Identifier DimensionType,
+    Identifier DimensionName,
+    long HashedSeed,
+    int MaxPlayers,
+    int ViewDistance,
+    int SimulationDistance,
+    bool ReducedDebugInfo,
+    bool EnableRespawnScreen,
+    bool IsDebug,
+    bool IsFlat,
+    bool HasDeathLocation,
+    Identifier? DeathDimensionName,
+    Position? DeathLocation,
+    int? PortalCooldown,
+    bool? DoLimitedCrafting) : IPacket
 {
-    public LoginPacket(int entityId,
-                       bool isHardcore,
-                       byte gameMode,
-                       sbyte previousGameMode,
-                       string[] dimensionNames,
-                       NbtCompound? registryCodec,
-                       string dimensionType,
-                       string dimensionName,
-                       long hashedSeed,
-                       int maxPlayers,
-                       int viewDistance,
-                       int simulationDistance,
-                       bool reducedDebugInfo,
-                       bool enableRespawnScreen,
-                       bool isDebug,
-                       bool isFlat,
-                       bool hasDeathLocation,
-                       string? deathDimensionName,
-                       Position? deathLocation,
-                       int? portalCooldown,
-                       bool? doLimitedCrafting)
-    {
-        EntityId = entityId;
-        IsHardcore = isHardcore;
-        GameMode = gameMode;
-        PreviousGameMode = previousGameMode;
-        DimensionNames = dimensionNames;
-        RegistryCodec = registryCodec;
-        DimensionType = dimensionType;
-        DimensionName = dimensionName;
-        HashedSeed = hashedSeed;
-        MaxPlayers = maxPlayers;
-        ViewDistance = viewDistance;
-        SimulationDistance = simulationDistance;
-        ReducedDebugInfo = reducedDebugInfo;
-        EnableRespawnScreen = enableRespawnScreen;
-        IsDebug = isDebug;
-        IsFlat = isFlat;
-        HasDeathLocation = hasDeathLocation;
-        DeathDimensionName = deathDimensionName;
-        DeathLocation = deathLocation;
-        PortalCooldown = portalCooldown;
-        DoLimitedCrafting = doLimitedCrafting;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_Login;
 
-    public int EntityId { get; set; }
-    public bool IsHardcore { get; set; }
-    public byte GameMode { get; set; }
-    public sbyte PreviousGameMode { get; set; }
-    public string[] DimensionNames { get; set; }
-    public NbtCompound? RegistryCodec { get; set; }
-    public string DimensionType { get; set; }
-    public string DimensionName { get; set; }
-    public long HashedSeed { get; set; }
-    public int MaxPlayers { get; set; }
-    public int ViewDistance { get; set; }
-    public int SimulationDistance { get; set; }
-    public bool ReducedDebugInfo { get; set; }
-    public bool EnableRespawnScreen { get; set; }
-    public bool IsDebug { get; set; }
-    public bool IsFlat { get; set; }
-    public bool HasDeathLocation { get; set; }
-    public string? DeathDimensionName { get; set; }
-    public Position? DeathLocation { get; set; }
-    public int? PortalCooldown { get; set; }
-    public bool? DoLimitedCrafting { get; set; } // since 1.20.2
-    public PacketType Type => PacketType.CB_Play_Login;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
@@ -94,12 +78,12 @@ public class LoginPacket : IPacket
             buffer.WriteSByte(PreviousGameMode);
         }
 
-        buffer.WriteVarIntArray(DimensionNames, (buf, val) => buf.WriteString(val));
+        buffer.WriteVarIntArray(DimensionNames, (buf, val) => buf.WriteIdentifier(val));
         if (version.Version.Protocol < ProtocolVersion.V_1_20_2)
         {
-            buffer.WriteNbt(RegistryCodec);
-            buffer.WriteString(DimensionType);
-            buffer.WriteString(DimensionName);
+            buffer.WriteOptionalNbt(RegistryCodec);
+            buffer.WriteIdentifier(DimensionType);
+            buffer.WriteIdentifier(DimensionName);
             buffer.WriteLong(HashedSeed);
         }
 
@@ -111,8 +95,8 @@ public class LoginPacket : IPacket
         if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
         {
             buffer.WriteBool(DoLimitedCrafting!.Value);
-            buffer.WriteString(DimensionType);
-            buffer.WriteString(DimensionName);
+            buffer.WriteIdentifier(DimensionType);
+            buffer.WriteIdentifier(DimensionName);
             buffer.WriteLong(HashedSeed);
             buffer.WriteByte(GameMode);
             buffer.WriteSByte(PreviousGameMode);
@@ -124,8 +108,8 @@ public class LoginPacket : IPacket
         buffer.WriteBool(HasDeathLocation);
         if (HasDeathLocation)
         {
-            buffer.WriteString(DeathDimensionName!);
-            buffer.WriteULong(DeathLocation!.ToULong());
+            buffer.WriteIdentifier(DeathDimensionName ?? throw new InvalidOperationException($"{nameof(DeathDimensionName)} must not be null if {nameof(HasDeathLocation)} is true."));
+            buffer.WritePosition(DeathLocation ?? throw new InvalidOperationException($"{nameof(DeathLocation)} must not be null if {nameof(HasDeathLocation)} is true."));
         }
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_20)
@@ -139,6 +123,7 @@ public class LoginPacket : IPacket
         }
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         if (version.Version.Protocol >= ProtocolVersion.V_1_20_2)
@@ -150,21 +135,22 @@ public class LoginPacket : IPacket
         var isHardcore = buffer.ReadBool();
         var gameMode = buffer.ReadByte();
         var previousGameMode = buffer.ReadSByte();
-        var dimensionNames = buffer.ReadVarIntArray<string>(buf => buf.ReadString());
+        var dimensionNames = buffer.ReadVarIntArray(buf => buf.ReadIdentifier());
         var registryCodec = buffer.ReadOptionalNbtCompound();
+        registryCodec = registryCodec?.NormalizeRegistryDataTopLevelIdentifiers();
 
-        string dimensionType;
+        Identifier dimensionType;
         if (version.Version.Protocol < ProtocolVersion.V_1_19)
         {
             var dimensionTypeNbt = buffer.ReadNbtCompound();
-            dimensionType = dimensionTypeNbt.Get<NbtString>("effects")!.Value;
+            dimensionType = Identifier.Parse(dimensionTypeNbt.Get<NbtString>("effects")!.Value);
         }
         else
         {
-            dimensionType = buffer.ReadString();
+            dimensionType = buffer.ReadIdentifier();
         }
 
-        var dimensionName = buffer.ReadString();
+        var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
         var maxPlayers = buffer.ReadVarInt();
         var viewDistance = buffer.ReadVarInt();
@@ -174,7 +160,7 @@ public class LoginPacket : IPacket
         var isDebug = buffer.ReadBool();
         var isFlat = buffer.ReadBool();
         bool? hasDeathLocation = null;
-        string? deathDimensionName = null;
+        Identifier? deathDimensionName = null;
         Position? deathLocation = null;
 
         if (version.Version.Protocol >= ProtocolVersion.V_1_19)
@@ -182,8 +168,8 @@ public class LoginPacket : IPacket
             hasDeathLocation = buffer.ReadBool();
             if (hasDeathLocation.Value)
             {
-                deathDimensionName = buffer.ReadString();
-                deathLocation = new(buffer.ReadULong());
+                deathDimensionName = buffer.ReadIdentifier();
+                deathLocation = buffer.ReadPosition();
             }
         }
 
@@ -221,27 +207,27 @@ public class LoginPacket : IPacket
     {
         var entityId = buffer.ReadInt();
         var isHardcode = buffer.ReadBool();
-        var dimensionNames = buffer.ReadVarIntArray<string>(buf => buf.ReadString());
+        var dimensionNames = buffer.ReadVarIntArray(buf => buf.ReadIdentifier());
         var maxPlayer = buffer.ReadVarInt();
         var viewDistance = buffer.ReadVarInt();
         var simulationDistance = buffer.ReadVarInt();
         var reducedDebugInfo = buffer.ReadBool();
         var enableRespawnScreen = buffer.ReadBool();
         var doLimitedCrafting = buffer.ReadBool();
-        var dimensionType = buffer.ReadString();
-        var dimensionName = buffer.ReadString();
+        var dimensionType = buffer.ReadIdentifier();
+        var dimensionName = buffer.ReadIdentifier();
         var hashedSeed = buffer.ReadLong();
         var gameMode = buffer.ReadByte();
         var previousGameMode = buffer.ReadSByte();
         var isDebug = buffer.ReadBool();
         var isFlat = buffer.ReadBool();
         var hasDeathLocation = buffer.ReadBool();
-        string? deathDimensionName = null;
+        Identifier? deathDimensionName = null;
         Position? deathLocation = null;
         if (hasDeathLocation)
         {
-            deathDimensionName = buffer.ReadString();
-            deathLocation = new(buffer.ReadULong());
+            deathDimensionName = buffer.ReadIdentifier();
+            deathLocation = buffer.ReadPosition();
         }
 
         var portalCooldown = buffer.ReadVarInt();
@@ -270,4 +256,3 @@ public class LoginPacket : IPacket
             doLimitedCrafting);
     }
 }
-#pragma warning restore CS1591
