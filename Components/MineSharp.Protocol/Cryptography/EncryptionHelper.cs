@@ -7,15 +7,16 @@ using NLog;
 
 namespace MineSharp.Protocol.Cryptography;
 
-internal class EncryptionHelper
+internal partial class EncryptionHelper
 {
     private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
+    private static readonly ReadOnlyMemory<byte> SeqOid = new([0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00]);
 
     public static RSA? DecodePublicKey(byte[] publicKeyBytes)
     {
         var ms = new MemoryStream(publicKeyBytes);
         var rd = new BinaryReader(ms);
-        byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
         var seq = new byte[15];
 
         try
@@ -45,7 +46,7 @@ internal class EncryptionHelper
 
             seq = rd.ReadBytes(15);
 
-            if (!CompareBytearrays(seq, seqOid))
+            if (!seq.AsSpan().SequenceEqual(SeqOid.Span))
             {
                 return null;
             }
@@ -96,16 +97,16 @@ internal class EncryptionHelper
             var rsa = RSA.Create();
 
             //RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(parms);
-            var rsAparams = new RSAParameters();
+            var rsaParams = new RSAParameters();
 
-            rsAparams.Modulus = rd.ReadBytes(DecodeIntegerSize(rd));
+            rsaParams.Modulus = rd.ReadBytes(DecodeIntegerSize(rd));
 
-            GetTraits(rsAparams.Modulus.Length * 8, out var sizeMod, out var sizeExp);
+            GetTraits(rsaParams.Modulus.Length * 8, out var sizeMod, out var sizeExp);
 
-            rsAparams.Modulus = AlignBytes(rsAparams.Modulus, sizeMod);
-            rsAparams.Exponent = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), sizeExp);
+            rsaParams.Modulus = AlignBytes(rsaParams.Modulus, sizeMod);
+            rsaParams.Exponent = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), sizeExp);
 
-            rsa.ImportParameters(rsAparams);
+            rsa.ImportParameters(rsaParams);
 
             return rsa;
         }
@@ -121,28 +122,6 @@ internal class EncryptionHelper
         }
     }
 
-    private static bool CompareBytearrays(byte[] a, byte[] b)
-    {
-        if (a.Length != b.Length)
-        {
-            return false;
-        }
-
-        var i = 0;
-
-        foreach (var c in a)
-        {
-            if (c != b[i])
-            {
-                return false;
-            }
-
-            i++;
-        }
-
-        return true;
-    }
-
     private static byte[] AlignBytes(byte[] inputBytes, int alignSize)
     {
         var inputBytesSize = inputBytes.Length;
@@ -151,10 +130,7 @@ internal class EncryptionHelper
         {
             var buf = new byte[alignSize];
 
-            for (var i = 0; i < inputBytesSize; ++i)
-            {
-                buf[i + (alignSize - inputBytesSize)] = inputBytes[i];
-            }
+            inputBytes.CopyTo(buf.AsSpan().Slice(alignSize - inputBytesSize));
 
             return buf;
         }
@@ -254,7 +230,7 @@ internal class EncryptionHelper
 
     public static string PemKeyToDer(string pem)
     {
-        var rx = new Regex("-+[^-]+-+");
+        var rx = PemKeyHeaderFooterRegex();
         var der = rx.Replace(pem, "")
                     .Replace("\r", "")
                     .Replace("\n", "");
@@ -279,4 +255,7 @@ internal class EncryptionHelper
 
         return hex.TrimStart('0');
     }
+
+    [GeneratedRegex("-+[^-]+-+")]
+    private static partial Regex PemKeyHeaderFooterRegex();
 }

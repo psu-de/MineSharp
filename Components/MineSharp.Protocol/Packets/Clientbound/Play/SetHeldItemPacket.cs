@@ -1,18 +1,15 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class SetHeldItemPacket : IPacket
+public sealed record SetHeldItemPacket(sbyte Slot) : IPacket
 {
-    public SetHeldItemPacket(sbyte slot)
-    {
-        Slot = slot;
-    }
-
-    public sbyte Slot { get; set; }
-    public PacketType Type => PacketType.CB_Play_HeldItemSlot;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_HeldItemSlot;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {

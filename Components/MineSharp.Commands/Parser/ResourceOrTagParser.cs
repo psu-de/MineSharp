@@ -1,15 +1,18 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class ResourceOrTagParser : IParser
 {
+    public static readonly Identifier ResourceOrTagIdentifier = Identifier.Parse("minecraft:resource_or_tag");
+
     public string Registry { get; private set; } = string.Empty;
 
-    public string GetName()
+    public Identifier GetName()
     {
-        return "minecraft:resource_or_tag";
+        return ResourceOrTagIdentifier;
     }
 
     public int GetArgumentCount()

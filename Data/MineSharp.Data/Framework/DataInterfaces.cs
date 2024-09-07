@@ -1,9 +1,11 @@
-﻿using MineSharp.Core.Common.Biomes;
+﻿using MineSharp.Core.Common;
+using MineSharp.Core.Common.Biomes;
 using MineSharp.Core.Common.Blocks;
 using MineSharp.Core.Common.Effects;
 using MineSharp.Core.Common.Enchantments;
 using MineSharp.Core.Common.Entities;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Common.Particles;
 using MineSharp.Core.Common.Protocol;
 using MineSharp.Core.Common.Recipes;
 using MineSharp.Core.Geometry;
@@ -182,5 +184,10 @@ public interface IWindowData
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public WindowInfo ByName(string name);
+    public WindowInfo ByName(Identifier name);
 }
+
+/// <summary>
+/// Interface for implementing particle data
+/// </summary>
+public interface IParticleData : INameAndProtocolNumberIndexedData<ParticleType>;

@@ -1,19 +1,20 @@
 ﻿using System.Diagnostics;
+using MineSharp.Core.Serialization;
 
 namespace MineSharp.Core.Common.Entities.Attributes;
 
 /// <summary>
 ///     Entity Attribute
 /// </summary>
-public class Attribute
+public sealed record Attribute : ISerializable<Attribute>
 {
     /// <summary>
     ///     Create a new Attribute
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="base"></param>
-    /// <param name="modifiers"></param>
-    public Attribute(string key, double @base, Modifier[] modifiers)
+    /// <param name="key">The name of this Attribute</param>
+    /// <param name="base">The base value of this attribute</param>
+    /// <param name="modifiers">The modifiers active for this attribute. Indexed by their UUID</param>
+    public Attribute(Identifier key, double @base, Modifier[] modifiers)
     {
         Key = key;
         Base = @base;
@@ -23,17 +24,17 @@ public class Attribute
     /// <summary>
     ///     The name of this Attribute
     /// </summary>
-    public string Key { get; }
+    public Identifier Key { get; init; }
 
     /// <summary>
     ///     The base value of this attribute
     /// </summary>
-    public double Base { get; }
+    public double Base { get; init; }
 
     /// <summary>
     ///     The modifiers active for this attribute. Indexed by their UUID
     /// </summary>
-    public Dictionary<Uuid, Modifier> Modifiers { get; }
+    public Dictionary<Uuid, Modifier> Modifiers { get; } // must never be set from outside because we do not want uncontrollable Dictionary changes
 
     /// <summary>
     ///     Calculate the Multiplier of this attribute with all modifiers.
@@ -73,5 +74,23 @@ public class Attribute
     public void RemoveModifier(Uuid uuid)
     {
         Modifiers.Remove(uuid);
+    }
+
+    /// <inheritdoc/>
+    public void Write(PacketBuffer buffer)
+    {
+        buffer.WriteIdentifier(Key);
+        buffer.WriteDouble(Value);
+        buffer.WriteVarIntArray(Modifiers.Values, (buffer, modifier) => modifier.Write(buffer));
+    }
+
+    /// <inheritdoc/>
+    public static Attribute Read(PacketBuffer buffer)
+    {
+        var key = buffer.ReadIdentifier();
+        var value = buffer.ReadDouble();
+        var modifiers = buffer.ReadVarIntArray(Modifier.Read);
+
+        return new(key, value, modifiers);
     }
 }

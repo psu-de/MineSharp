@@ -1,21 +1,20 @@
 ﻿using MineSharp.ChatComponent;
 using MineSharp.Core;
 using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 using MineSharp.Protocol.Packets.NetworkTypes;
+using static MineSharp.Protocol.Packets.Clientbound.Play.PlayerChatPacket;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
 #pragma warning disable CS1591
-public class PlayerChatPacket : IPacket
+public sealed record PlayerChatPacket(IChatMessageBody Body) : IPacket
 {
-    public PlayerChatPacket(IChatMessageBody body)
-    {
-        Body = body;
-    }
-
-    public IChatMessageBody Body { get; set; }
-    public PacketType Type => PacketType.CB_Play_PlayerChat;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_PlayerChat;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
@@ -42,33 +41,31 @@ public class PlayerChatPacket : IPacket
         void Write(PacketBuffer buffer, MinecraftData version);
     }
 
-    public class V119Body : IChatMessageBody
+    /// <summary>
+    /// Represents the body of a chat message in version 1.19.
+    /// </summary>
+    /// <param name="SignedChat">The signed chat message.</param>
+    /// <param name="UnsignedChat">The unsigned chat message, if available.</param>
+    /// <param name="MessageType">The type of the message.</param>
+    /// <param name="Sender">The UUID of the sender.</param>
+    /// <param name="SenderName">The name of the sender.</param>
+    /// <param name="SenderTeamName">The name of the sender's team, if available.</param>
+    /// <param name="Timestamp">The timestamp of the message.</param>
+    /// <param name="Salt">The salt value for the message.</param>
+    /// <param name="Signature">The signature of the message.</param>
+    public sealed record V119Body(
+        Chat SignedChat,
+        Chat? UnsignedChat,
+        int MessageType,
+        Uuid Sender,
+        Chat SenderName,
+        Chat? SenderTeamName,
+        long Timestamp,
+        long Salt,
+        byte[] Signature
+    ) : IChatMessageBody
     {
-        public V119Body(Chat signedChat, Chat? unsignedChat, int messageType, Uuid sender, Chat senderName,
-                        Chat? senderTeamName,
-                        long timestamp, long salt, byte[] signature)
-        {
-            SignedChat = signedChat;
-            UnsignedChat = unsignedChat;
-            MessageType = messageType;
-            Sender = sender;
-            SenderName = senderName;
-            SenderTeamName = senderTeamName;
-            Timestamp = timestamp;
-            Salt = salt;
-            Signature = signature;
-        }
-
-        public Chat SignedChat { get; set; }
-        public Chat? UnsignedChat { get; set; }
-        public int MessageType { get; set; }
-        public Uuid Sender { get; set; }
-        public Chat SenderName { get; set; }
-        public Chat? SenderTeamName { get; set; }
-        public long Timestamp { get; set; }
-        public long Salt { get; set; }
-        public byte[] Signature { get; set; }
-
+        /// <inheritdoc />
         public void Write(PacketBuffer buffer, MinecraftData version)
         {
             buffer.WriteChatComponent(SignedChat);
@@ -84,6 +81,7 @@ public class PlayerChatPacket : IPacket
             buffer.WriteUuid(Sender);
 
             var hasTeamName = SenderTeamName != null;
+            buffer.WriteBool(hasTeamName);
             if (hasTeamName)
             {
                 buffer.WriteChatComponent(SenderTeamName!);
@@ -95,6 +93,11 @@ public class PlayerChatPacket : IPacket
             buffer.WriteBytes(Signature);
         }
 
+        /// <summary>
+        /// Reads a <see cref="V119Body"/> from the given <see cref="PacketBuffer"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer to read from.</param>
+        /// <returns>The read <see cref="V119Body"/>.</returns>
         public static V119Body Read(PacketBuffer buffer)
         {
             var signedChat = buffer.ReadChatComponent();
@@ -122,13 +125,20 @@ public class PlayerChatPacket : IPacket
             var signature = new byte[buffer.ReadVarInt()];
             buffer.ReadBytes(signature);
 
-            return new(signedChat, unsignedChat, messageType, sender, senderName, senderTeamName, timestamp, salt,
-                       signature);
+            return new V119Body(signedChat, unsignedChat, messageType, sender, senderName, senderTeamName, timestamp, salt, signature);
         }
     }
 
-    public class V11923Body : IChatMessageBody
+    public sealed record V11923Body : IChatMessageBody
     {
+        // Here is no non-argument constructor allowed
+        // Do not use
+#pragma warning disable CS8618
+        private V11923Body()
+#pragma warning restore CS8618
+        {
+        }
+
         private V11923Body(byte[]? previousSignature, Uuid sender, int? index, byte[]? signature, string plainMessage,
                            Chat? formattedMessage, long timestamp, long salt, ChatMessageItem[] previousMessages,
                            Chat? unsignedContent, int filterType, long[]? filterTypeMask, int type, Chat networkName,
@@ -236,21 +246,21 @@ public class PlayerChatPacket : IPacket
             NetworkTargetName = networkTargetName;
         }
 
-        public byte[]? PreviousSignature { get; set; }
-        public Uuid Sender { get; set; }
-        public int? Index { get; set; }
-        public byte[]? Signature { get; set; }
-        public string PlainMessage { get; set; }
-        public Chat? FormattedMessage { get; set; }
-        public long Timestamp { get; set; }
-        public long Salt { get; set; }
-        public ChatMessageItem[] PreviousMessages { get; set; }
-        public Chat? UnsignedContent { get; set; }
-        public int FilterType { get; set; }
-        public long[]? FilterTypeMask { get; set; }
-        public int Type { get; set; }
-        public Chat NetworkName { get; set; }
-        public Chat? NetworkTargetName { get; set; }
+        public byte[]? PreviousSignature { get; init; }
+        public Uuid Sender { get; init; }
+        public int? Index { get; init; }
+        public byte[]? Signature { get; init; }
+        public string PlainMessage { get; init; }
+        public Chat? FormattedMessage { get; init; }
+        public long Timestamp { get; init; }
+        public long Salt { get; init; }
+        public ChatMessageItem[] PreviousMessages { get; init; }
+        public Chat? UnsignedContent { get; init; }
+        public int FilterType { get; init; }
+        public long[]? FilterTypeMask { get; init; }
+        public int Type { get; init; }
+        public Chat NetworkName { get; init; }
+        public Chat? NetworkTargetName { get; init; }
 
         public void Write(PacketBuffer buffer, MinecraftData version)
         {
@@ -296,7 +306,7 @@ public class PlayerChatPacket : IPacket
 
             buffer.WriteLong(Timestamp);
             buffer.WriteLong(Salt);
-            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf, version));
+            buffer.WriteVarIntArray(PreviousMessages, (buf, val) => val.Write(buf));
 
             var hasUnsignedContent = UnsignedContent != null;
             buffer.WriteBool(hasUnsignedContent);
@@ -383,7 +393,7 @@ public class PlayerChatPacket : IPacket
 
             timestamp = buffer.ReadLong();
             salt = buffer.ReadLong();
-            previousMessages = buffer.ReadVarIntArray(buff => ChatMessageItem.Read(buff, version));
+            previousMessages = buffer.ReadVarIntArray(ChatMessageItem.Read);
 
             var hasUnsignedContent = buffer.ReadBool();
             unsignedContent = null;

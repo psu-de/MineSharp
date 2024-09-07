@@ -12,24 +12,23 @@ internal static class HandshakeProtocol
 {
     public static async Task PerformHandshake(MinecraftClient client, GameState next, MinecraftData data)
     {
-        if (next is GameState.Play or GameState.Handshaking)
+        if (!(next is GameState.Status or GameState.Login))
         {
             throw new ArgumentException($"{nameof(next)} must either be {GameState.Status} or {GameState.Login}");
         }
 
         var handshake = new HandshakePacket(data.Version.Protocol, client.Hostname, client.Port, next);
+        await client.ChangeGameState(GameState.Handshaking);
         await client.SendPacket(handshake);
 
+        await client.ChangeGameState(next);
         if (next == GameState.Status)
         {
             return;
         }
-
-        var login = GetLoginPacket(data, client.Session);
-        await client.SendPacket(login);
     }
 
-    private static LoginStartPacket GetLoginPacket(MinecraftData data, Session session)
+    internal static LoginStartPacket GetLoginPacket(MinecraftData data, Session session)
     {
         LoginStartPacket.SignatureContainer? signature = null;
 

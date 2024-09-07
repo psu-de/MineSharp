@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
@@ -20,11 +20,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj"/>
+    <ProjectReference Include="..\..\Data\MineSharp.Data\MineSharp.Data.csproj" />
+    <ProjectReference Include="..\..\MineSharp.Core\MineSharp.Core.csproj" />
 
-    <None Include="README.md" Pack="true" PackagePath="\"/>
+    <None Include="README.md" Pack="true" PackagePath="\" />
 
-    <None Include="LICENSE" Pack="true" PackagePath="\"/>
+    <None Include="LICENSE" Pack="true" PackagePath="\" />
     <None Include="icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

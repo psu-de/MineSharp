@@ -1,16 +1,18 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Bundle delimiter packet
 /// </summary>
-public class BundleDelimiterPacket : IPacket
+public sealed record BundleDelimiterPacket : IPacket
 {
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_BundleDelimiter;
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_BundleDelimiter;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -22,4 +24,3 @@ public class BundleDelimiterPacket : IPacket
         return new BundleDelimiterPacket();
     }
 }
-#pragma warning restore CS1591

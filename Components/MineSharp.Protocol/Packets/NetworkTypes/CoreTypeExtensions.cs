@@ -1,5 +1,6 @@
 ﻿using MineSharp.Core.Common;
 using MineSharp.Core.Common.Items;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Protocol.Packets.NetworkTypes;

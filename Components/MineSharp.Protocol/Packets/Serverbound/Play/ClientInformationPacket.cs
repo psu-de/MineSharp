@@ -1,43 +1,34 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Serverbound.Play;
 #pragma warning disable CS1591
-public class ClientInformationPacket : IPacket
+public sealed record ClientInformationPacket(
+    string Locale,
+    byte ViewDistance,
+    ChatMode ChatMode,
+    bool ChatColors,
+    SkinPart DisplayedSkinParts,
+    PlayerHand MainHand,
+    bool EnableTextFiltering,
+    bool AllowServerListings
+) : IPacket
 {
-    public ClientInformationPacket(string locale, byte viewDistance, int chatMode, bool chatColors,
-                                   byte displayedSkinParts, int mainHand,
-                                   bool enableTextFiltering, bool allowServerListings)
-    {
-        Locale = locale;
-        ViewDistance = viewDistance;
-        ChatMode = chatMode;
-        ChatColors = chatColors;
-        DisplayedSkinParts = displayedSkinParts;
-        MainHand = mainHand;
-        EnableTextFiltering = enableTextFiltering;
-        AllowServerListings = allowServerListings;
-    }
-
-    public string Locale { get; set; }
-    public byte ViewDistance { get; set; }
-    public int ChatMode { get; set; }
-    public bool ChatColors { get; set; }
-    public byte DisplayedSkinParts { get; set; }
-    public int MainHand { get; set; }
-    public bool EnableTextFiltering { get; set; }
-    public bool AllowServerListings { get; set; }
-    public PacketType Type => PacketType.SB_Play_Settings;
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.SB_Play_Settings;
 
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteString(Locale);
         buffer.WriteByte(ViewDistance);
-        buffer.WriteVarInt(ChatMode);
+        buffer.WriteVarInt((int)ChatMode);
         buffer.WriteBool(ChatColors);
-        buffer.WriteByte(DisplayedSkinParts);
-        buffer.WriteVarInt(MainHand);
+        buffer.WriteByte((byte)DisplayedSkinParts);
+        buffer.WriteVarInt((int)MainHand);
         buffer.WriteBool(EnableTextFiltering);
         buffer.WriteBool(AllowServerListings);
     }
@@ -47,12 +38,13 @@ public class ClientInformationPacket : IPacket
         return new ClientInformationPacket(
             buffer.ReadString(),
             buffer.ReadByte(),
-            buffer.ReadVarInt(),
+            (ChatMode)buffer.ReadVarInt(),
             buffer.ReadBool(),
-            buffer.ReadByte(),
-            buffer.ReadVarInt(),
+            (SkinPart)buffer.ReadByte(),
+            (PlayerHand)buffer.ReadVarInt(),
             buffer.ReadBool(),
-            buffer.ReadBool());
+            buffer.ReadBool()
+        );
     }
 }
 #pragma warning restore CS1591

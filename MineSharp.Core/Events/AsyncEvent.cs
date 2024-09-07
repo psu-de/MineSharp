@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using ConcurrentCollections;
+using NLog;
 
 namespace MineSharp.Core.Events;
 
@@ -12,52 +13,51 @@ public abstract class AsyncEventBase<TSync, TAsync> where TSync : Delegate where
     /// <summary>
     /// List of synchronous handlers subscribed to this event
     /// </summary>
-    protected readonly HashSet<TSync> Handlers = [];
-    
+    protected readonly ConcurrentHashSet<TSync> Handlers = [];
+
     /// <summary>
     /// List of asynchronous handlers subscribed to this event
     /// </summary>
-    protected readonly HashSet<TAsync> AsyncHandlers = [];
+    protected readonly ConcurrentHashSet<TAsync> AsyncHandlers = [];
 
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
-    public void Subscribe(TSync handler)
+    public bool Subscribe(TSync handler)
     {
-        Handlers.Add(handler);
-    }    
-    
-    /// <summary>
-    /// Unsubscribe <paramref name="handler"/> from this event
-    /// </summary>
-    public void Unsubscribe(TSync handler)
-    {
-        Handlers.Remove(handler);
-    }
-    
-    /// <summary>
-    /// Subscribe <paramref name="handler"/> to this event
-    /// </summary>
-    public void Subscribe(TAsync handler)
-    {
-        AsyncHandlers.Add(handler);
+        return Handlers.Add(handler);
     }
 
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
-    public void Unsubscribe(TAsync handler)
+    public bool Unsubscribe(TSync handler)
     {
-        AsyncHandlers.Remove(handler);
+        return Handlers.TryRemove(handler);
     }
-    
+
+    /// <summary>
+    /// Subscribe <paramref name="handler"/> to this event
+    /// </summary>
+    public bool Subscribe(TAsync handler)
+    {
+        return AsyncHandlers.Add(handler);
+    }
+
+    /// <summary>
+    /// Unsubscribe <paramref name="handler"/> from this event
+    /// </summary>
+    public bool Unsubscribe(TAsync handler)
+    {
+        return AsyncHandlers.TryRemove(handler);
+    }
+
     /// <summary>
     /// Makes sure all handlers run to completion and catch exceptions in the handlers
     /// </summary>
     /// <param name="tasks"></param>
-    /// <param name="block"></param>
     /// <returns></returns>
-    protected Task WaitForHandlers(Task[] tasks, bool block = false)
+    protected Task WaitForHandlers(Task[] tasks)
     {
         var task = Task.Run(async () =>
         {
@@ -74,9 +74,7 @@ public abstract class AsyncEventBase<TSync, TAsync> where TSync : Delegate where
             }
         });
 
-        return block
-            ? task
-            : Task.CompletedTask;
+        return task;
     }
 
     /// <summary>
@@ -99,27 +97,26 @@ public class AsyncEvent : AsyncEventBase<AsyncEvent.Handler, AsyncEvent.AsyncHan
     /// A synchronous event handler
     /// </summary>
     public delegate void Handler();
-    
+
     /// <summary>
     /// An asynchronous event handler
     /// </summary>
     public delegate Task AsyncHandler();
-    
+
     /// <summary>
     /// Dispatch this event
     /// </summary>
-    /// <param name="block">Whether to block until all handlers are completed</param>
-    /// <returns></returns>
-    public Task Dispatch(bool block = false)
+    /// <returns>A task that completes once all handlers have completed.</returns>
+    public Task Dispatch()
     {
         var tasks = AsyncHandlers
                    .Select(handler => Task.Run(async () => await handler()))
                    .Concat(Handlers.Select(handler => Task.Run(() => handler())))
                    .ToArray();
 
-        return WaitForHandlers(tasks, block);
+        return WaitForHandlers(tasks);
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -131,7 +128,7 @@ public class AsyncEvent : AsyncEventBase<AsyncEvent.Handler, AsyncEvent.AsyncHan
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -143,7 +140,7 @@ public class AsyncEvent : AsyncEventBase<AsyncEvent.Handler, AsyncEvent.AsyncHan
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -155,7 +152,7 @@ public class AsyncEvent : AsyncEventBase<AsyncEvent.Handler, AsyncEvent.AsyncHan
         eventBase.Unsubscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -178,28 +175,27 @@ public class AsyncEvent<T> : AsyncEventBase<AsyncEvent<T>.Handler, AsyncEvent<T>
     /// A synchronous event handler
     /// </summary>
     public delegate void Handler(T arg1);
-    
+
     /// <summary>
     /// An asynchronous event handler
     /// </summary>
     public delegate Task AsyncHandler(T arg1);
-    
+
     /// <summary>
     /// Dispatch this event
     /// </summary>
-    /// <param name="block">Whether to block until all handlers are completed</param>
     /// <param name="arg1">First argument for the handlers</param>
-    /// <returns></returns>
-    public Task Dispatch(T arg1, bool block = false)
+    /// <returns>A task that completes once all handlers have completed.</returns>
+    public Task Dispatch(T arg1)
     {
         var tasks = AsyncHandlers
                    .Select(handler => Task.Run(async () => await handler(arg1)))
                    .Concat(Handlers.Select(handler => Task.Run(() => handler(arg1))))
                    .ToArray();
 
-        return WaitForHandlers(tasks, block);
+        return WaitForHandlers(tasks);
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -211,7 +207,7 @@ public class AsyncEvent<T> : AsyncEventBase<AsyncEvent<T>.Handler, AsyncEvent<T>
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -223,7 +219,7 @@ public class AsyncEvent<T> : AsyncEventBase<AsyncEvent<T>.Handler, AsyncEvent<T>
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -235,7 +231,7 @@ public class AsyncEvent<T> : AsyncEventBase<AsyncEvent<T>.Handler, AsyncEvent<T>
         eventBase.Unsubscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -258,29 +254,28 @@ public class AsyncEvent<T1, T2> : AsyncEventBase<AsyncEvent<T1, T2>.Handler, Asy
     /// A synchronous event handler
     /// </summary>
     public delegate void Handler(T1 arg1, T2 arg2);
-    
+
     /// <summary>
     /// An asynchronous event handler
     /// </summary>
     public delegate Task AsyncHandler(T1 arg1, T2 arg2);
-    
+
     /// <summary>
     /// Dispatch this event
     /// </summary>
-    /// <param name="block">Whether to block until all handlers are completed</param>
     /// <param name="arg1">First argument for the handlers</param>
     /// <param name="arg2">Second argument for the handlers</param>
-    /// <returns></returns>
-    public Task Dispatch(T1 arg1, T2 arg2, bool block = false)
+    /// <returns>A task that completes once all handlers have completed.</returns>
+    public Task Dispatch(T1 arg1, T2 arg2)
     {
         var tasks = AsyncHandlers
                    .Select(handler => Task.Run(async () => await handler(arg1, arg2)))
                    .Concat(Handlers.Select(handler => Task.Run(() => handler(arg1, arg2))))
                    .ToArray();
 
-        return WaitForHandlers(tasks, block);
+        return WaitForHandlers(tasks);
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -292,7 +287,7 @@ public class AsyncEvent<T1, T2> : AsyncEventBase<AsyncEvent<T1, T2>.Handler, Asy
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -304,7 +299,7 @@ public class AsyncEvent<T1, T2> : AsyncEventBase<AsyncEvent<T1, T2>.Handler, Asy
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -316,7 +311,7 @@ public class AsyncEvent<T1, T2> : AsyncEventBase<AsyncEvent<T1, T2>.Handler, Asy
         eventBase.Unsubscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -339,30 +334,29 @@ public class AsyncEvent<T1, T2, T3> : AsyncEventBase<AsyncEvent<T1, T2, T3>.Hand
     /// A synchronous event handler
     /// </summary>
     public delegate void Handler(T1 arg1, T2 arg2, T3 arg3);
-    
+
     /// <summary>
     /// An asynchronous event handler
     /// </summary>
     public delegate Task AsyncHandler(T1 arg1, T2 arg2, T3 arg3);
-    
+
     /// <summary>
     /// Dispatch this event
     /// </summary>
-    /// <param name="block">Whether to block until all handlers are completed</param>
     /// <param name="arg1">First argument for the handlers</param>
     /// <param name="arg2">Second argument for the handlers</param>
     /// <param name="arg3">Third argument for the handlers</param>
-    /// <returns></returns>
-    public Task Dispatch(T1 arg1, T2 arg2, T3 arg3, bool block = false)
+    /// <returns>A task that completes once all handlers have completed.</returns>
+    public Task Dispatch(T1 arg1, T2 arg2, T3 arg3)
     {
         var tasks = AsyncHandlers
                    .Select(handler => Task.Run(async () => await handler(arg1, arg2, arg3)))
                    .Concat(Handlers.Select(handler => Task.Run(() => handler(arg1, arg2, arg3))))
                    .ToArray();
-        
-        return WaitForHandlers(tasks, block);
+
+        return WaitForHandlers(tasks);
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -374,7 +368,7 @@ public class AsyncEvent<T1, T2, T3> : AsyncEventBase<AsyncEvent<T1, T2, T3>.Hand
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -386,7 +380,7 @@ public class AsyncEvent<T1, T2, T3> : AsyncEventBase<AsyncEvent<T1, T2, T3>.Hand
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -398,7 +392,7 @@ public class AsyncEvent<T1, T2, T3> : AsyncEventBase<AsyncEvent<T1, T2, T3>.Hand
         eventBase.Unsubscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -421,12 +415,12 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
     /// A synchronous event handler
     /// </summary>
     public delegate void Handler(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-    
+
     /// <summary>
     /// An asynchronous event handler
     /// </summary>
     public delegate Task AsyncHandler(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-    
+
     /// <summary>
     /// Dispatch this event
     /// </summary>
@@ -435,17 +429,17 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
     /// <param name="arg2">Second argument for the handlers</param>
     /// <param name="arg3">Third argument for the handlers</param>
     /// <param name="arg4">Fourth argument for the handlers</param>
-    /// <returns></returns>
-    public Task Dispatch(T1 arg1, T2 arg2, T3 arg3, T4 arg4, bool block = false)
+    /// <returns>A task that completes once all handlers have completed.</returns>
+    public Task Dispatch(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
     {
         var tasks = AsyncHandlers
                    .Select(handler => Task.Run(async () => await handler(arg1, arg2, arg3, arg4)))
                    .Concat(Handlers.Select(handler => Task.Run(() => handler(arg1, arg2, arg3, arg4))))
                    .ToArray();
-        
-        return WaitForHandlers(tasks, block);
+
+        return WaitForHandlers(tasks);
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -457,7 +451,7 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Subscribe <paramref name="handler"/> to this event
     /// </summary>
@@ -469,7 +463,7 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
         eventBase.Subscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>
@@ -481,7 +475,7 @@ public class AsyncEvent<T1, T2, T3, T4> : AsyncEventBase<AsyncEvent<T1, T2, T3, 
         eventBase.Unsubscribe(handler);
         return eventBase;
     }
-    
+
     /// <summary>
     /// Unsubscribe <paramref name="handler"/> from this event
     /// </summary>

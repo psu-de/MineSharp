@@ -99,6 +99,11 @@ public static class NameUtils
         return CommonGetName(name);
     }
 
+    public static string GetParticleName(string name)
+    {
+        return CommonGetName(name); 
+    }
+
     public static string GetPacketName(string name, string direction, string ns)
     {
         direction = direction == "toClient" ? "CB" : "SB";

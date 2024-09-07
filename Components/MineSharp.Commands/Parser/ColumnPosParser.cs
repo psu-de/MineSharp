@@ -1,13 +1,16 @@
 ﻿using MineSharp.Core.Common;
+using MineSharp.Core.Serialization;
 using MineSharp.Data;
 
 namespace MineSharp.Commands.Parser;
 
 public class ColumnPosParser : IParser
 {
-    public string GetName()
+    public static readonly Identifier ColumnPosIdentifier = Identifier.Parse("minecraft:column_pos");
+
+    public Identifier GetName()
     {
-        return "minecraft:column_pos";
+        return ColumnPosIdentifier;
     }
 
     public int GetArgumentCount()

@@ -1,25 +1,24 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
-public class EntityRotationPacket : IPacket
+
+/// <summary>
+///     Entity rotation packet
+/// </summary>
+/// <param name="EntityId">The entity ID</param>
+/// <param name="Yaw">The yaw rotation</param>
+/// <param name="Pitch">The pitch rotation</param>
+/// <param name="OnGround">Whether the entity is on the ground</param>
+public sealed record EntityRotationPacket(int EntityId, sbyte Yaw, sbyte Pitch, bool OnGround) : IPacket
 {
-    public EntityRotationPacket(int entityId, sbyte yaw, sbyte pitch, bool onGround)
-    {
-        EntityId = entityId;
-        Yaw = yaw;
-        Pitch = pitch;
-        OnGround = onGround;
-    }
+    /// <inheritdoc />
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_EntityLook;
 
-    public int EntityId { get; set; }
-    public sbyte Yaw { get; set; }
-    public sbyte Pitch { get; set; }
-    public bool OnGround { get; set; }
-    public PacketType Type => PacketType.CB_Play_EntityLook;
-
+    /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
     {
         buffer.WriteVarInt(EntityId);
@@ -28,6 +27,7 @@ public class EntityRotationPacket : IPacket
         buffer.WriteBool(OnGround);
     }
 
+    /// <inheritdoc />
     public static IPacket Read(PacketBuffer buffer, MinecraftData version)
     {
         var entityId = buffer.ReadVarInt();
@@ -38,4 +38,4 @@ public class EntityRotationPacket : IPacket
         return new EntityRotationPacket(entityId, yaw, pitch, onGround);
     }
 }
-#pragma warning restore CS1591
+

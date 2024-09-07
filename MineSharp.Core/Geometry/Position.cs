@@ -3,8 +3,28 @@
 /// <summary>
 ///     Represents a 3D-Position
 /// </summary>
-public class Position
+public readonly struct Position : IEquatable<Position>
 {
+    /// <summary>
+    ///     A Position with all coordinates set to zero
+    /// </summary>
+    public static Position Zero => new(0, 0, 0);
+
+    /// <summary>
+    ///     The X coordinate
+    /// </summary>
+    public readonly int X;
+
+    /// <summary>
+    ///     The Y coordinate
+    /// </summary>
+    public readonly int Y;
+
+    /// <summary>
+    ///     The Z coordinate
+    /// </summary>
+    public readonly int Z;
+
     /// <summary>
     ///     Create a new Position from a packed ulong <paramref name="value" />
     /// </summary>
@@ -50,21 +70,6 @@ public class Position
     }
 
     /// <summary>
-    ///     The X coordinate
-    /// </summary>
-    public int X { get; protected set; }
-
-    /// <summary>
-    ///     The Y coordinate
-    /// </summary>
-    public int Y { get; protected set; }
-
-    /// <summary>
-    ///     The Z coordinate
-    /// </summary>
-    public int Z { get; protected set; }
-
-    /// <summary>
     ///     Check if the two positions represent the same point
     /// </summary>
     /// <param name="a"></param>
@@ -72,7 +77,7 @@ public class Position
     /// <returns></returns>
     public static bool operator ==(Position a, Position b)
     {
-        return a.ToULong() == b.ToULong();
+        return a.Equals(b);
     }
 
     /// <summary>
@@ -83,7 +88,13 @@ public class Position
     /// <returns></returns>
     public static bool operator !=(Position a, Position b)
     {
-        return a.ToULong() != b.ToULong();
+        return !(a == b);
+    }
+
+    /// <inheritdoc />
+    public bool Equals(Position other)
+    {
+        return ToULong() == other.ToULong();
     }
 
     /// <inheritdoc />
@@ -91,7 +102,7 @@ public class Position
     {
         if (obj is Position pos)
         {
-            return pos.ToULong() == ToULong();
+            return Equals(pos);
         }
 
         return false;
@@ -126,32 +137,5 @@ public class Position
     public static explicit operator Vector3(Position x)
     {
         return new(x.X, x.Y, x.Z);
-    }
-}
-
-/// <summary>
-///     A <see cref="Position" /> whose coordinates are mutable.
-/// </summary>
-public class MutablePosition : Position
-{
-    /// <inheritdoc />
-    public MutablePosition(ulong value) : base(value)
-    { }
-
-    /// <inheritdoc />
-    public MutablePosition(int x, int y, int z) : base(x, y, z)
-    { }
-
-    /// <summary>
-    ///     Update the X, Y, Z coordinates of this position
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    public void Set(int x, int y, int z)
-    {
-        X = x;
-        Y = y;
-        Z = z;
     }
 }

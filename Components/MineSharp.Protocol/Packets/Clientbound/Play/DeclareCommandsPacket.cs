@@ -1,30 +1,21 @@
-﻿using MineSharp.Core.Common;
+﻿using MineSharp.Core.Serialization;
 using MineSharp.Data;
 using MineSharp.Data.Protocol;
 
 namespace MineSharp.Protocol.Packets.Clientbound.Play;
-#pragma warning disable CS1591
+
 /// <summary>
 ///     Declare commands packet
 /// </summary>
-public class DeclareCommandsPacket : IPacket
+/// <param name="RawBuffer">
+///     Raw buffer. The Command tree is not parsed here
+/// </param>
+public sealed record DeclareCommandsPacket(PacketBuffer RawBuffer) : IPacket
 {
-    /// <summary>
-    ///     Create a new instance
-    /// </summary>
-    /// <param name="buffer"></param>
-    public DeclareCommandsPacket(PacketBuffer buffer)
-    {
-        RawBuffer = buffer;
-    }
-
-    /// <summary>
-    ///     Raw buffer. The Command tree is not parsed here
-    /// </summary>
-    public PacketBuffer RawBuffer { get; set; }
-
     /// <inheritdoc />
-    public PacketType Type => PacketType.CB_Play_DeclareCommands;
+    public PacketType Type => StaticType;
+    /// <inheritdoc />
+    public static PacketType StaticType => PacketType.CB_Play_DeclareCommands;
 
     /// <inheritdoc />
     public void Write(PacketBuffer buffer, MinecraftData version)
@@ -39,4 +30,3 @@ public class DeclareCommandsPacket : IPacket
         return new DeclareCommandsPacket(clone);
     }
 }
-#pragma warning restore CS1591
